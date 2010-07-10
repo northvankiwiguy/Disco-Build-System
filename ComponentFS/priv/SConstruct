@@ -1,0 +1,16 @@
+env = Environment(CFLAGS='-g')
+
+pub_dir = '#../pub'
+Export('env pub_dir')
+
+#
+# Build all the CFS source code
+#
+SConscript('src/SConscript', variant_dir='obj', duplicate=0)
+
+
+#
+# If the user enters "scons install", we'll install the binaries
+# into the top-level pub directory.
+#
+env.Alias('install', pub_dir)
