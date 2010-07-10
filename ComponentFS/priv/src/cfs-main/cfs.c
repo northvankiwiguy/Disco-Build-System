@@ -1,8 +1,8 @@
 /*
  * cfs.c
  *
- *  Created on: Jul 8, 2010
- *      Author: psmith@arapiki.com
+ *      Author: Peter Smith <psmith@arapiki.com>
+ *      Copyright 2010 Arapiki Solutions Inc.
  */
 
 #include <stdio.h>

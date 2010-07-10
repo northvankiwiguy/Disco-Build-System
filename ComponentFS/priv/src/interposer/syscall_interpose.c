@@ -1,8 +1,8 @@
 /*
  * syscall_interpose.c
  *
- *  Created on: Jul 8, 2010
- *      Author: psmith
+ *      Author: Peter Smith <psmith@arapiki.com>
+ *      Copyright 2010 Arapiki Solutions Inc.
  */
 #define _GNU_SOURCE
 #include <dlfcn.h>
