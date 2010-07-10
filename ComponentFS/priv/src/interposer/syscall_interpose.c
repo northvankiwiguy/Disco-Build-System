@@ -1,12 +1,15 @@
-/*
- * syscall_interpose.c
+/*******************************************************************************
+ * Copyright (c) 2010 Arapiki Solutions Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- * Author: Peter Smith <psmith@arapiki.com>
- * Copyright 2010 Arapiki Solutions Inc.
- *
- * This code is released under the terms of the Eclipse Public License.
- * For more detail, refer to http://www.eclipse.org/legal/epl-v10.html
- */
+ * Contributors:
+ *    "Peter Smith <psmith@arapiki.com>" - initial API and
+ *        implementation and/or initial documentation
+ *******************************************************************************/
+
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <stdarg.h>
