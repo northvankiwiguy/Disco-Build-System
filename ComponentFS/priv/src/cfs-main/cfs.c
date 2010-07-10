@@ -1,8 +1,11 @@
 /*
  * cfs.c
  *
- *      Author: Peter Smith <psmith@arapiki.com>
- *      Copyright 2010 Arapiki Solutions Inc.
+ * Author: Peter Smith <psmith@arapiki.com>
+ * Copyright 2010 Arapiki Solutions Inc.
+ *
+ * This code is released under the terms of the Eclipse Public License.
+ * For more detail, refer to http://www.eclipse.org/legal/epl-v10.html
  */
 
 #include <stdio.h>
