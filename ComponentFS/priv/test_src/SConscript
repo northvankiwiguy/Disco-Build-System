@@ -1,16 +1,17 @@
 Import('*')
 
 # Build the CFS interposer unit test suites
-env.Program('run-test-interposer', 
-	['test-interposer/main.c', 
-	 'test-interposer/regress-glibc-suite.c'], 
-	LIBS=['cunit', cfs_interposer_lib])
+env.Program('run_test_interposer', 
+	['test_interposer/main.c', 
+	 'test_interposer/regress_glibc_suite.c',
+	 'test_interposer/trace_buffer_suite.c'], 
+	LIBS=['cunit', cfs_interposer_lib], CPPPATH="#src/interposer")
 
 #
 # If the user enters "scons test", we'll compile and run the unit tests, using
 # the interposer library. Note that the 'test-results' target is just a dummy
 # and is never actually created.
 #
-env.Command('test-results', 'run-test-interposer', 
+env.Command('test_results', 'run_test_interposer', 
 	"sh -c 'LD_PRELOAD=" + str(cfs_interposer_lib[0]) + " ./$SOURCE'")
-env.Alias('test', 'test-results')
+env.Alias('test', 'test_results')

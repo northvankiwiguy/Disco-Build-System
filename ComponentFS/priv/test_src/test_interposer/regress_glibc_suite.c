@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "cunit-helper.h"
+#include "cunit_helper.h"
 
 /*
  * This test suite validates that system calls keep their normal functionality, even
@@ -90,7 +90,7 @@ static void test_second(void)
 }
 
 /*======================================================================
- * init_suite_1 - main entry point for initializing this test suite
+ * init_regress_glibc_suite - main entry point for initializing this test suite
  *======================================================================*/
 
 int init_regress_glibc_suite()

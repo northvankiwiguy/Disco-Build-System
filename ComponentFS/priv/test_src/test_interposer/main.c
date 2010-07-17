@@ -11,10 +11,12 @@
  *******************************************************************************/ 
 
 /* define helper macros for using CUnit */
-#include "cunit-helper.h"
+#include "cunit_helper.h"
 
 /* each suite initializes itself via one of these functions */
 extern int init_regress_glibc_suite();
+extern int init_trace_buffer_suite();
+
 
 /*======================================================================
  * main - The main entry point for unit-testing the CFS interposer.
@@ -31,6 +33,13 @@ int main(int argc, char *argv[])
 	 * outside of the build tree.
 	 */
 	if (init_regress_glibc_suite() != CUE_SUCCESS) {
+		return CU_get_error();
+	}
+
+	/*
+	 * Directly test the trace buffer by invoking the trace buffer's API.
+	 */
+	if (init_trace_buffer_suite() != CUE_SUCCESS) {
 		return CU_get_error();
 	}
 
