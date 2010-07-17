@@ -1,4 +1,4 @@
-env = Environment(CFLAGS='-g')
+env = Environment(CFLAGS=['-g', '-Wall', '-Werror'])
 
 pub_dir = '#../pub'
 Export('env pub_dir')
@@ -13,7 +13,6 @@ Export('cfs_interposer_lib')
 # Build the test cases
 #
 SConscript('test-src/SConscript', variant_dir='test-obj', duplicate=0)
-
 
 #
 # If the user enters "scons install", we'll install the binaries

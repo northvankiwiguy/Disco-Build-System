@@ -29,4 +29,6 @@ int main(int argc, char *argv[], char *envp[])
 	// pass in the arguments that were passed to cfs, unless there were none in which case we create a default shell.
 	char *default_shell = getenv("SHELL");
 	execl(default_shell, default_shell, NULL);
+
+	return 0;
 }

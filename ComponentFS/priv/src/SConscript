@@ -4,7 +4,7 @@ cfs_program = env.Program('cfs',
 	['cfs-main/cfs.c'])
 	
 cfs_interposer_lib = env.SharedLibrary('cfs', 
-	['interposer/syscall_interpose.c'],
+	['interposer/glibc_interpose.c'],
 	LIBS='dl')
 
 env.Install(pub_dir + '/bin', cfs_program)

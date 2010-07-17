@@ -14,7 +14,7 @@
 #include "cunit-helper.h"
 
 /* each suite initializes itself via one of these functions */
-extern int init_regress_syscalls_suite();
+extern int init_regress_glibc_suite();
 
 /*======================================================================
  * main - The main entry point for unit-testing the CFS interposer.
@@ -27,13 +27,18 @@ int main(int argc, char *argv[])
 	NEW_REGISTRY();
 
 	/*
-	 * Make sure system calls don't lose their normal behavior when accessing files
+	 * Make sure glibc calls don't lose their normal behavior when accessing files
 	 * outside of the build tree.
 	 */
-	if (init_regress_syscalls_suite() != CUE_SUCCESS) {
+	if (init_regress_glibc_suite() != CUE_SUCCESS) {
 		return CU_get_error();
 	}
 
 	/* Run all tests using the CUnit Basic interface */
 	RUN_TESTS();
+
+	/* clean up, and return a non-zero exit code if there were failures */
+	int failures = 	CU_get_number_of_tests_failed();
+	CU_cleanup_registry();
+	return failures != 0;
 }
