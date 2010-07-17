@@ -1,5 +1,12 @@
 Import('*')
 
+Program('run-test-interposer', 
+	['test-interposer/main.c', 
+	 'test-interposer/regress-syscalls-suite.c'], 
+	LIBS=['cunit', cfs_interposer_lib])
 
-
-
+#
+# If the user enters "scons test", we'll compile and run the unit tests
+#
+env.Command('test-results', 'run-test-interposer', "./$SOURCE")
+env.Alias('test', 'test-results')

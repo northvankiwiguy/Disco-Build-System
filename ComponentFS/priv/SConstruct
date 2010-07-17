@@ -6,7 +6,8 @@ Export('env pub_dir')
 #
 # Build all the CFS source code
 #
-SConscript('src/SConscript', variant_dir='obj', duplicate=0)
+cfs_interposer_lib = SConscript('src/SConscript', variant_dir='obj', duplicate=0)
+Export('cfs_interposer_lib')
 
 #
 # Build the test cases
@@ -19,3 +20,6 @@ SConscript('test-src/SConscript', variant_dir='test-obj', duplicate=0)
 # into the top-level pub directory.
 #
 env.Alias('install', pub_dir)
+
+	
+	
