@@ -10,12 +10,12 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
+/*
+ * Various helper macros to make writing CUnit tests much easier.
+ */
+
 #ifndef CUNITHELPER_H_
 #define CUNITHELPER_H_
-
-/*
- * This file contains macros and other definitions for helping to write cunit test cases.
- */
 
 #include "CUnit/Basic.h"
 

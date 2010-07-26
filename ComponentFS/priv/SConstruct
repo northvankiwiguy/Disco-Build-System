@@ -1,16 +1,37 @@
-env = Environment(CFLAGS=['-g', '-Wall', '-Werror'])
+#******************************************************************************
+# Copyright (c) 2010 Arapiki Solutions Inc.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#    "Peter Smith <psmith@arapiki.com>" - initial API and 
+#        implementation and/or initial documentation
+#*******************************************************************************/ 
 
-pub_dir = '#../pub'
+#
+# Top-level build descriptiobn fot the ComponentFS component.
+#
+
+# what's the default location for installing cfs (and libraries)
+pub_dir = '/usr/local'
+
+# set up the default environment for compiling cfs.
+env = Environment(CFLAGS=['-g', '-Wall', '-Werror'], 
+	CPPDEFINES=[('INSTALL_PATH', '\\"' + pub_dir + '\\"')])
+
+# export these values to any SConscript files we may call upon.
 Export('env pub_dir')
 
 #
-# Build all the CFS source code
+# Build all the CFS source code, placing object files in the obj/ directory.
 #
 cfs_interposer_lib = SConscript('src/SConscript', variant_dir='obj', duplicate=0)
 Export('cfs_interposer_lib')
 
 #
-# Build the test cases
+# Build the test cases, placing object files in the test_obj/ directory.
 #
 SConscript('test_src/SConscript', variant_dir='test_obj', duplicate=0)
 
@@ -23,5 +44,6 @@ env.Alias('install', pub_dir)
 #
 # When we clean the tree, remove the object directories too.
 #
-Clean('.', ['obj', 'test_obj', pub_dir])
+Clean('.', ['obj', 'test_obj'])
+
 	

@@ -10,22 +10,45 @@
  *        implementation and/or initial documentation
  *******************************************************************************/
 
+/*
+ * glibc_interpose.c
+ *
+ * This file is the main entry point for a number of interposed glibc library functions.
+ * That is, by setting the LD_PRELOAD environment variable, the Linux dynamic loading system
+ * loads this file (as part of the libcfs.so library) ahead of the real glibc.so file.
+ * Therefore, any user-level program that calls a library function (e.g. read, write, open, etc)
+ * will end up executing in this file. This allows us to perform additional tracing and/or
+ * manipulation of parameters and return values to implement the CFS (Component File System).
+ * After performing this extra work, each function proceeds to invoke the "real" library
+ * function from the glibc library.
+ */
+
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "trace_buffer.h"
+#include "trace_file_format.h"
+
 /*
- * Fetch a pointer to the real version of the function (if not already defined).
+ * A useful macro for fetching a pointer to the real version of the function
  * We search the list of dynamic libraries to find the next occurrence of this symbol,
- * which should be the "real" version of the function.
+ * which should be the "real" version of the function. Each interposed function can
+ * use this macro to efficiently find the location of the real function. Note that we
+ * only need to initialize the variable once.
+ * For example:
+ * 		FETCH_REAL_FN(FILE *, real_fopen, "fopen");
+ * assigns the memory address of the real "fopen" function to the real_fopen variable.
  */
-#define FETCH_REAL_FN(fn_var, fn_name) \
-		static int (*(fn_var))() = NULL; \
+#define FETCH_REAL_FN(type, fn_var, fn_name) \
+		static type (*(fn_var))() = NULL; \
 		if (!(fn_var)){ \
 			(fn_var) = dlsym(RTLD_NEXT, (fn_name)); \
 		}
@@ -43,7 +66,20 @@ void _init_interposer() __attribute__ ((constructor));
 
 void _init_interposer()
 {
-	//printf("_init_interposer\n");
+	/*
+	 * If the CFS_ID environment variable is defined, then this current process
+	 * is running within the cfs environment. If not, just return silently.
+	 */
+	char *cfs_id = getenv("CFS_ID");
+	if (cfs_id){
+
+		/* Yes, there's an existing CFS trace buffer. Attach to it */
+		trace_buffer_id id = atoi(cfs_id);
+		if (trace_buffer_use_existing(id) == -1){
+			fprintf(stderr, "Error: couldn't attach to cfs trace buffer\n");
+			exit(-1);
+		}
+	}
 }
 
 /*======================================================================
@@ -127,28 +163,57 @@ void _init_interposer()
 // int fchdir(int filedes)
 
 /*======================================================================
- * Interposed - fopen()
+ * fopen_common()
+ *
+ * A common function for tracing the arguments of fopen, fopen64 and
+ * other related commands.
  *======================================================================*/
-// FILE *fopen(const char *filename, const char *opentype)
 
+static void fopen_common(const char *filename, const char *opentype)
+{
+	/*
+	 * Grab a lock on the trace buffer. If it hasn't been initialized yet,
+	 * just return and don't trace anything.
+	 */
+	if (trace_buffer_lock() == 0){
+		/* for 'r' and 'rb' modes, the operation is a read, else it's a write */
+		if ((strcmp(opentype, "r") == 0) ||
+			(strcmp(opentype, "rb") == 0)){
+			trace_buffer_write_byte(TRACE_FILE_READ);
+		} else {
+			trace_buffer_write_byte(TRACE_FILE_WRITE);
+		}
+		trace_buffer_write_string(filename);
+		trace_buffer_unlock();
+	}
+}
 /*======================================================================
  * Interposed - fopen()
  *======================================================================*/
 
-//FILE *fopen(const char *filename, const char *opentype)
-//{
-//	FETCH_REAL_FN(real_fopen, "fopen");
-//
-//	printf("fopen(%s, %s)\n", filename, opentype);
-//	FILE *f = real_fopen(filename, opentype);
-//	return f;
-//}
+FILE *fopen(const char *filename, const char *opentype)
+{
+	FETCH_REAL_FN(FILE *, real_fopen, "fopen");
+
+	printf("fopen(%s, %s)\n", filename, opentype);
+	fopen_common(filename, opentype);
+	FILE *f = real_fopen(filename, opentype);
+	return f;
+}
 
 /*======================================================================
  * Interposed - fopen64()
  *======================================================================*/
 
-// FILE *fopen64(const char *filename, const char *opentype)
+FILE *fopen64(const char *filename, const char *opentype)
+{
+	FETCH_REAL_FN(FILE *, real_fopen64, "fopen64");
+
+	printf("fopen64(%s, %s)\n", filename, opentype);
+	fopen_common(filename, opentype);
+	FILE *f = real_fopen64(filename, opentype);
+	return f;
+}
 
 /*======================================================================
  * Interposed - freopen()
@@ -246,20 +311,45 @@ void _init_interposer()
 // int nftw64(const char *filename, __nftw64_func_t func, int descriptors, int flag)
 
 /*======================================================================
+ * open_common()
+ *
+ * A common function for tracing detail of open, open64 or related library
+ * calls.
+ *======================================================================*/
+
+static void open_common(const char *filename, int flags)
+{
+	/* if there's a trace buffer, write the file name to it */
+	if (trace_buffer_lock() == 0){
+		if ((flags & (O_APPEND|O_CREAT|O_WRONLY|O_RDWR)) != 0) {
+			trace_buffer_write_byte(TRACE_FILE_WRITE);
+		} else {
+			trace_buffer_write_byte(TRACE_FILE_READ);
+		}
+		trace_buffer_write_string(filename);
+		trace_buffer_unlock();
+	}
+}
+/*======================================================================
  * Interposed - open()
  *======================================================================*/
 
 int open(const char *filename, int flags, ...)
 {
-	FETCH_REAL_FN(real_open, "open");
+	FETCH_REAL_FN(int, real_open, "open");
 
-	// fetch the optional mode argument.
+	/*
+	 * Fetch the optional mode argument. If it wasn't
+	 * provided, we'll get a junk value, but let's just
+	 * pass that junk value onto the real library function.
+	 */
 	va_list ap;
 	va_start(ap, &flags);
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
 	printf("open(%s, %d, 0x%x)\n", filename, flags, mode);
+	open_common(filename, flags);
 	int fd = real_open(filename, flags, mode);
 	return fd;
 }
@@ -268,20 +358,25 @@ int open(const char *filename, int flags, ...)
  * Interposed - open64()
  *======================================================================*/
 
-//int open64(const char *filename, int flags, ...)
-//{
-//	FETCH_REAL_FN(real_open64, "open64");
-//
-//	// fetch the optional mode argument.
-//	va_list ap;
-//	va_start(ap, &flags);
-//	mode_t mode = va_arg(ap, mode_t);
-//	va_end(ap);
-//
-//	printf("open64(%s, %d, 0x%x)\n", filename, flags, mode);
-//	int fd = real_open64(filename, flags, mode);
-//	return fd;
-//}
+int open64(const char *filename, int flags, ...)
+{
+	FETCH_REAL_FN(int, real_open64, "open64");
+
+	/*
+	 * Fetch the optional mode argument. If it wasn't
+	 * provided, we'll get a junk value, but let's just
+	 * pass that junk value onto the real library function.
+	 */
+	va_list ap;
+	va_start(ap, &flags);
+	mode_t mode = va_arg(ap, mode_t);
+	va_end(ap);
+
+	printf("open64(%s, %d, 0x%x)\n", filename, flags, mode);
+	open_common(filename, flags);
+	int fd = real_open64(filename, flags, mode);
+	return fd;
+}
 
 /*======================================================================
  * Interposed - opendir()

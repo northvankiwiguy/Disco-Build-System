@@ -10,12 +10,23 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
+/*
+ * This is the main entry point for all unit tests related to the CFS interposer.
+ * The test suites themselves are in other source files, including:
+ * 		- regress_glibc_suite.c - make sure our interposers don't break the standard
+ *        glibc functionality.
+ *      - trace_buffer_suite.c - test the operation of the trace buffer.
+ *      - trace_glibc_suite.c - test that calling glibc functions generates the
+ *        correct trace output.
+ */
+
 /* define helper macros for using CUnit */
 #include "cunit_helper.h"
 
 /* each suite initializes itself via one of these functions */
 extern int init_regress_glibc_suite();
 extern int init_trace_buffer_suite();
+extern int init_trace_glibc_suite();
 
 
 /*======================================================================
@@ -43,6 +54,13 @@ int main(int argc, char *argv[])
 		return CU_get_error();
 	}
 
+	/*
+	 * Test that glibc functions are being traced correctly.
+	 */
+	if (init_trace_glibc_suite() != CUE_SUCCESS) {
+		return CU_get_error();
+	}
+
 	/* Run all tests using the CUnit Basic interface */
 	RUN_TESTS();
 
@@ -51,3 +69,5 @@ int main(int argc, char *argv[])
 	CU_cleanup_registry();
 	return failures != 0;
 }
+
+/*======================================================================*/
