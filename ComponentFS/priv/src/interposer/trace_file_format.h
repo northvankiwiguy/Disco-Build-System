@@ -21,13 +21,87 @@
 #ifndef TRACE_FILE_FORMAT_H_
 #define TRACE_FILE_FORMAT_H_
 
-// TODO: define a header, including a magic number and a version number.
+/*
+ * Each trace file starts with the following short header
+ */
+typedef struct trace_file_header {
+	unsigned int tf_magic;		/* magic number to identify this as a trace file */
+	unsigned int tf_version;	/* file format version - for ensuring file/tool compatibility */
+} trace_file_header;
+
+/* the trace file magic number */
+#define TF_MAGIC	0xBEEFFEED
+
+/* the current trace file version - to be updated whenever the file format changes */
+#define TF_VERSION	1
 
 /*
- * Entries in the trace buffer start with a single byte to state what the action being executed is.
+ * The remainder of the trace file is free-form (can't be described with structs).
+ * Each entry starts with a single byte to state the action. Note that process numbers
+ * are not the same as Unix process IDs, since they're never intended to be reused
+ * (therefore only 4 billion processes can be mentioned in a trace file).
  */
-#define TRACE_FILE_WRITE 1  		/* followed by a single string giving the file name */
-#define TRACE_FILE_READ 2   		/* followed by a single string giving the file name */
-#define TRACE_FILE_REMOVE 3 		/* followed by a single string giving the file name */
+
+/*
+ * TRACE_FILE_REGISTER - register the existence of a file on the file system.
+ * 		- 1 byte : TRACE_FILE_REGISTER
+ *      - nul-terminated string : the file's absolute path name.
+ */
+#define TRACE_FILE_REGISTER 		1
+
+/*
+ * TRACE_FILE_WRITE - a file has been opened for writing.
+ * 		- 1 byte : TRACE_FILE_WRITE
+ * 		- 4 bytes : process number (doing the writing)
+ *      - nul-terminated string : the file's absolute path name.
+ */
+#define TRACE_FILE_WRITE 			2
+
+/*
+ * TRACE_FILE_READ - a file has been opened for reading.
+ * 		- 1 byte : TRACE_FILE_READ
+ * 		- 4 bytes : process number (doing the reading)
+ *      - nul-terminated string : the file's absolute path name.
+ */
+#define TRACE_FILE_READ 			3
+
+/*
+ * TRACE_FILE_REMOVE - a file has been deleted.
+ * 		- 1 byte : TRACE_FILE_REMOVE
+ * 		- 4 bytes : process number (doing the remove)
+ *      - nul-terminated string : the file's absolute path name.
+ */
+#define TRACE_FILE_REMOVE 			4
+
+/*
+ * TRACE_FILE_RENAME - a file has been renamed.
+ * 		- 1 byte : TRACE_FILE_RENAME
+ * 		- 4 bytes : process number (doing the rename)
+ *      - nul-terminated string : the file's original absolute path name.
+ *      - nul-terminated string : the file's new absolute path name.
+ */
+#define TRACE_FILE_RENAME			5
+
+/*
+ * TRACE_FILE_NEW_LINK - a file has been hard/soft linked to a new location.
+ * 		- 1 byte : TRACE_FILE_NEW_LINK
+ * 		- 4 bytes : process number (creating the link)
+ *      - nul-terminated string : the file's source absolute path name.
+ *      - nul-terminated string : the absolute path name of the link.
+ */
+#define TRACE_FILE_NEW_LINK			6
+
+/*
+ * TRACE_FILE_NEW_PROGRAM - a new program has been started
+ * 		- 1 byte : TRACE_FILE_NEW_PROGRAM
+ * 		- 4 bytes : process number of the new program
+ *      - 4 bytes : process number of the parent process
+ *      - sequence of nul-terminated strings : ARGV[0] .. [ARGV[n-1]]
+ *      - an empty nul-terminated string to indicate the end of the arguments.
+ *      - sequence of nul-terminated strings : ENVP[0] .. [ENVP[n-1]]
+ *      - a final empty string, to indicate the end of environment variables.
+ */
+#define TRACE_FILE_NEW_PROGRAM 		7
+
 
 #endif /* TRACE_FILE_FORMAT_H_ */

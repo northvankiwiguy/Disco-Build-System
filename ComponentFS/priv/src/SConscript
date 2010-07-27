@@ -26,6 +26,7 @@ cfs_interposer_lib = env.SharedLibrary('cfs',
 # build the cfs executable
 cfs_program = env.Program('cfs',
 	['cfs_main/cfs.c',
+	 'cfs_main/cfs_traverse_source.c',
 	 'interposer/trace_buffer.c'],
 	LIBS=['z'],
 	CPPPATH=['interposer'])

@@ -40,12 +40,21 @@
 
 #include "trace_buffer.h"
 
+/* functions in other source files */
+extern int traverse_and_trace_source();
+
 /*======================================================================
  * Global variables
  *======================================================================*/
 
 /* the default file name for trace output */
 static char *trace_file_name = "cfs.trace";
+
+/*
+ * Should cfs first traverse the file system and report all source files
+ * that it finds?
+ */
+int traverse_source = FALSE;
 
 /*======================================================================
  * parse_args()
@@ -59,21 +68,22 @@ static char *trace_file_name = "cfs.trace";
 static char **parse_options(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "+ho:")) != -1){
+	while ((opt = getopt(argc, argv, "+hro:")) != -1){
 		switch (opt){
 		case 'o':
-		{
 			/* -o <trace-file> */
 			trace_file_name = optarg;
 			break;
-		}
+		case 'r':
+			/* -r - traverse the directory hierarchy to locate source files */
+			traverse_source = TRUE;
+			break;
+
 		case '?':
 		case 'h':
-		{
 			fprintf(stderr, "Usage:\n");
 			fprintf(stderr, "    cfs [-h | -o trace-file] [ command args ...]\n");
 			exit(-1);
-		}
 		default:
 			/* ignore */
 			break;
@@ -175,6 +185,12 @@ int main(int argc, char *argv[], char *envp[])
 		{
 			/* child */
 
+			if (traverse_source) {
+				printf("Searching for source files... ");
+				traverse_and_trace_source();
+				printf("done.\n");
+			}
+
 			/*
 			 * Export the CFS_ID environment variable so that child processes know our
 			 * trace buffer ID.
@@ -184,7 +200,7 @@ int main(int argc, char *argv[], char *envp[])
 			setenv("CFS_ID", trace_buffer_id_string, 0);
 
 			/* display the command to be executed */
-			printf("Command is ");
+			printf("Executing ");
 			char **ptr = program_args;
 			while (*ptr != NULL) {
 				printf("%s ", *ptr);
