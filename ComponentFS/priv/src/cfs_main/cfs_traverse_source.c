@@ -42,6 +42,7 @@ static int process_file(const char *fpath, const struct stat *sb, int typeflag)
 	switch (typeflag) {
 	case FTW_F:
 		trace_buffer_write_byte(TRACE_FILE_REGISTER);
+		trace_buffer_write_int(0);
 		trace_buffer_write_string(fpath);
 		break;
 	default:

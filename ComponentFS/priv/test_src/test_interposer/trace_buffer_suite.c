@@ -575,6 +575,26 @@ static void test_trace_buffer_large_writes(void)
 }
 
 /*======================================================================
+ * test_trace_buffer_next_process_number()
+ *
+ * Test that allocation of unique process numbers works.
+ *======================================================================*/
+
+static void test_trace_buffer_next_process_number(void)
+{
+	/* Create a new buffer - should succeed */
+	trace_buffer_id id1 = trace_buffer_create();
+	CU_ASSERT_NOT_EQUAL(id1, -1);
+
+	CU_ASSERT_EQUAL(trace_buffer_next_process_number(), 1);
+	CU_ASSERT_EQUAL(trace_buffer_next_process_number(), 2);
+	CU_ASSERT_EQUAL(trace_buffer_next_process_number(), 3);
+
+	/* completely remove the trace buffer. */
+	trace_buffer_delete();
+}
+
+/*======================================================================
  * init_regress_glibc_suite - main entry point for initializing this test suite
  *======================================================================*/
 
@@ -595,6 +615,7 @@ int init_trace_buffer_suite()
 	ADD_TEST_CASE(test_trace_buffer_lock, "Test trace_buffer_lock()");
 	ADD_TEST_CASE(test_trace_buffer_mark_full, "Test trace_buffer_mark_full()");
 	ADD_TEST_CASE(test_trace_buffer_large_writes, "Test that trace_buffer manages large amounts of data.");
+	ADD_TEST_CASE(test_trace_buffer_next_process_number, "Test trace_buffer_next_process_number()");
 
 	return 0;
 }

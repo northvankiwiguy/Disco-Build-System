@@ -30,6 +30,7 @@ cfs_program = env.Program('cfs',
 	 'interposer/trace_buffer.c'],
 	LIBS=['z'],
 	CPPPATH=['interposer'])
+	
 
 # install the executable in <prefix>/bin and the library in <prefix>/lib
 env.Install(pub_dir + '/bin', cfs_program)

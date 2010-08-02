@@ -25,14 +25,16 @@
 
 #define _GNU_SOURCE
 #include <dlfcn.h>
+#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
+#include <sys/param.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 #include "trace_buffer.h"
 #include "trace_file_format.h"
@@ -53,6 +55,22 @@
 			(fn_var) = dlsym(RTLD_NEXT, (fn_name)); \
 		}
 
+/*======================================================================
+ * Global variables
+ *======================================================================*/
+
+/*
+ * Each process must have a unique process number. This is not the same
+ * as a Unix process ID, since those are only 16-bit in size and may easily
+ * be reused during a single build process.
+ */
+static int my_process_number;
+
+/*
+ * Same, but for this process's parent.
+ */
+static int my_parent_process_number;
+
 
 /*======================================================================
  * _init_interposer()
@@ -66,18 +84,85 @@ void _init_interposer() __attribute__ ((constructor));
 
 void _init_interposer()
 {
+	static char argv_and_envp[NCARGS];
+
 	/*
 	 * If the CFS_ID environment variable is defined, then this current process
 	 * is running within the cfs environment. If not, just return silently.
 	 */
 	char *cfs_id = getenv("CFS_ID");
-	if (cfs_id){
+	if (!cfs_id){
+		return;
+	}
 
-		/* Yes, there's an existing CFS trace buffer. Attach to it */
-		trace_buffer_id id = atoi(cfs_id);
-		if (trace_buffer_use_existing(id) == -1){
-			fprintf(stderr, "Error: couldn't attach to cfs trace buffer\n");
-			exit(-1);
+	/* Grab a copy of the command line arguments and environment (argv/envp) */
+	int fd = open("/proc/self/cmdline", O_RDONLY);
+	int argv_size = read(fd, argv_and_envp, NCARGS);
+	if (argv_size == -1) {
+		fprintf(stderr, "Error: cfs couldn't determine command line arguments.\n");
+		exit(1);
+	}
+	close(fd);
+
+	/* Write an empty string immediately after the last argument string. */
+	argv_and_envp[argv_size] = '\0';
+	fd = open("/proc/self/environ", O_RDONLY);
+	int envp_size = read(fd, &argv_and_envp[argv_size + 1], NCARGS - argv_size - 2);
+	if (envp_size == -1) {
+		fprintf(stderr, "Error: cfs couldn't determine command environment.\n");
+		exit(1);
+	}
+	close(fd);
+
+	/* Terminate the environment array */
+	argv_and_envp[argv_size + 1 + envp_size] = '\0';
+
+
+	/* Yes, there's an existing CFS trace buffer. Attach to it */
+	trace_buffer_id id = atoi(cfs_id);
+	if (trace_buffer_use_existing(id) == -1){
+		fprintf(stderr, "Error: couldn't attach to cfs trace buffer\n");
+		exit(1);
+	}
+
+	/*
+	 * Determine our parent's process number by examining the CFS_PARENT_ID
+	 * environment variable. If this isn't defined, use ID number 0.
+	 */
+	char *cfs_parent_id = getenv("CFS_PARENT_ID");
+	if (cfs_parent_id == NULL) {
+		my_parent_process_number = 0;
+	} else {
+		/*
+		 * Convert to an integer. Note: atoi returns 0 on an error, but that's
+		 * what we want.
+		 */
+		my_parent_process_number = atoi(cfs_parent_id);
+	}
+
+	/*
+	 * Allocate a process number for this newly started process. This process
+	 * number is added to each trace message.
+	 */
+	if (trace_buffer_lock() == 0){
+		my_process_number = trace_buffer_next_process_number();
+
+		/* trace the argv and envp arrays */
+		trace_buffer_write_byte(TRACE_FILE_NEW_PROGRAM);
+		trace_buffer_write_int(my_process_number);
+		trace_buffer_write_int(my_parent_process_number);
+		trace_buffer_write_bytes(argv_and_envp, argv_size + 1 + envp_size + 1);
+		trace_buffer_unlock();
+
+		/*
+		 * Write our process number into CFS_PARENT_ID, ready for when we become
+		 * the parent.
+		 */
+		char id_string[strlen("NNNNNNNNNN") + 1];
+		sprintf(id_string, "%d", my_process_number);
+		if (setenv("CFS_PARENT_ID", id_string, 1) != 0){
+			fprintf(stderr, "Error: failed to set the CFS_PARENT_ID variable\n");
+			exit(1);
 		}
 	}
 }
@@ -183,6 +268,7 @@ static void fopen_common(const char *filename, const char *opentype)
 		} else {
 			trace_buffer_write_byte(TRACE_FILE_WRITE);
 		}
+		trace_buffer_write_int(my_process_number);
 		trace_buffer_write_string(filename);
 		trace_buffer_unlock();
 	}
@@ -195,7 +281,7 @@ FILE *fopen(const char *filename, const char *opentype)
 {
 	FETCH_REAL_FN(FILE *, real_fopen, "fopen");
 
-	printf("fopen(%s, %s)\n", filename, opentype);
+	//printf("fopen(%s, %s)\n", filename, opentype);
 	fopen_common(filename, opentype);
 	FILE *f = real_fopen(filename, opentype);
 	return f;
@@ -209,7 +295,7 @@ FILE *fopen64(const char *filename, const char *opentype)
 {
 	FETCH_REAL_FN(FILE *, real_fopen64, "fopen64");
 
-	printf("fopen64(%s, %s)\n", filename, opentype);
+	//printf("fopen64(%s, %s)\n", filename, opentype);
 	fopen_common(filename, opentype);
 	FILE *f = real_fopen64(filename, opentype);
 	return f;
@@ -326,6 +412,7 @@ static void open_common(const char *filename, int flags)
 		} else {
 			trace_buffer_write_byte(TRACE_FILE_READ);
 		}
+		trace_buffer_write_int(my_process_number);
 		trace_buffer_write_string(filename);
 		trace_buffer_unlock();
 	}
@@ -348,7 +435,7 @@ int open(const char *filename, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	printf("open(%s, %d, 0x%x)\n", filename, flags, mode);
+	//printf("open(%s, %d, 0x%x)\n", filename, flags, mode);
 	open_common(filename, flags);
 	int fd = real_open(filename, flags, mode);
 	return fd;
@@ -372,7 +459,7 @@ int open64(const char *filename, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	printf("open64(%s, %d, 0x%x)\n", filename, flags, mode);
+	//printf("open64(%s, %d, 0x%x)\n", filename, flags, mode);
 	open_common(filename, flags);
 	int fd = real_open64(filename, flags, mode);
 	return fd;

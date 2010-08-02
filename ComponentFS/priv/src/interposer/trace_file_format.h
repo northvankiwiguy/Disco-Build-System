@@ -45,6 +45,7 @@ typedef struct trace_file_header {
 /*
  * TRACE_FILE_REGISTER - register the existence of a file on the file system.
  * 		- 1 byte : TRACE_FILE_REGISTER
+ *      - 4 bytes : process number (typically 0)
  *      - nul-terminated string : the file's absolute path name.
  */
 #define TRACE_FILE_REGISTER 		1

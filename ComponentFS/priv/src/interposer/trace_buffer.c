@@ -140,6 +140,7 @@ trace_buffer_id trace_buffer_create(void)
 	trace_buffer->tb_size = 0;                /* current no data has been written to it */
 	trace_buffer->tb_sem_id = sem_id;         /* the ID of our semaphore set */
 	trace_buffer->tb_creator_pid = getpid(); /* the PID of the process that created the buffer */
+	trace_buffer->tb_process_number = 1;	  /* each new process must have a unique process number */
 
 	/* remember the shared memory ID for later */
 	our_trace_buffer_id = shm_id;
@@ -598,6 +599,23 @@ int trace_buffer_wait_until_full()
 	return 0;
 }
 
+
+/*======================================================================
+ * trace_buffer_next_process_number()
+ *
+ * Allocate and return the next unique process number. The trace buffer
+ * must be locked before calling this function. Return -1 if the trace
+ * buffer isn't initialized properly.
+ *======================================================================*/
+
+int trace_buffer_next_process_number(void)
+{
+	if (our_trace_buffer_id == -1){
+		return -1;
+	}
+
+	return trace_buffer->tb_process_number++;
+}
 
 /*======================================================================*/
 

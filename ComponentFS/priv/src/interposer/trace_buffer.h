@@ -47,6 +47,8 @@ typedef struct trace_buffer_header {
 	unsigned long tb_size;			/* how many bytes are used so far. */
 	int	tb_sem_id;					/* ID of the semaphore for controlling access to this trace buffer. */
 	int tb_creator_pid;				/* PID of the process that created this trace buffer. */
+	int tb_process_number;			/* Each new process allocates a new process number. This records the */
+									/* last number to be allocated */
 } trace_buffer_header;
 
 /*
@@ -77,5 +79,6 @@ extern int trace_buffer_lock(void);
 extern int trace_buffer_unlock(void);
 extern int trace_buffer_mark_full(int);
 extern int trace_buffer_wait_until_full(void);
+extern int trace_buffer_next_process_number(void);
 
 #endif /* TRACE_BUFFER_H_ */

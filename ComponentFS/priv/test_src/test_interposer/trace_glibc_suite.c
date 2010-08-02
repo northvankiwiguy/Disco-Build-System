@@ -64,9 +64,10 @@ static void test_open(void)
 
 	/* validate that the trace buffer content is correct */
 	trace_buffer_fetch((void **)&buffer_base, &buffer_size);
-	CU_ASSERT_EQUAL(buffer_size, 16);
+	CU_ASSERT_EQUAL(buffer_size, 20);
 	CU_ASSERT_EQUAL(buffer_base[0], TRACE_FILE_WRITE);
-	CU_ASSERT_EQUAL(memcmp(&buffer_base[1], file_name, strlen(file_name) + 1), 0);
+	/* don't test the process number, but do test the file name */
+	CU_ASSERT_EQUAL(memcmp(&buffer_base[5], file_name, strlen(file_name) + 1), 0);
 	close(fd1);
 
 	/* perform a second open() call */
@@ -74,11 +75,13 @@ static void test_open(void)
 
 	/* validate both the new and old content is correct (from both open() calls) */
 	trace_buffer_fetch((void **)&buffer_base, &buffer_size);
-	CU_ASSERT_EQUAL(buffer_size, 32);
+	CU_ASSERT_EQUAL(buffer_size, 40);
 	CU_ASSERT_EQUAL(buffer_base[0], TRACE_FILE_WRITE);
-	CU_ASSERT_EQUAL(memcmp(&buffer_base[1], file_name, strlen(file_name) + 1), 0);
-	CU_ASSERT_EQUAL(buffer_base[16], TRACE_FILE_READ);
-	CU_ASSERT_EQUAL(memcmp(&buffer_base[17], file_name, strlen(file_name) + 1), 0);
+	/* don't test the process number, but do test the file name */
+	CU_ASSERT_EQUAL(memcmp(&buffer_base[5], file_name, strlen(file_name) + 1), 0);
+	CU_ASSERT_EQUAL(buffer_base[20], TRACE_FILE_READ);
+	/* don't test the process number, but do test the file name */
+	CU_ASSERT_EQUAL(memcmp(&buffer_base[25], file_name, strlen(file_name) + 1), 0);
 	close(fd2);
 
 	/* clean up */
