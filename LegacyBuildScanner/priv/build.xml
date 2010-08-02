@@ -1,0 +1,47 @@
+<!--
+ - Copyright (c) 2010 Arapiki Solutions Inc.
+ - All rights reserved. This program and the accompanying materials
+ - are made available under the terms of the Eclipse Public License v1.0
+ - which accompanies this distribution, and is available at
+ - http://www.eclipse.org/legal/epl-v10.html
+ -
+ - Contributors:
+ -    "Peter Smith <psmith@arapiki.com>" - initial API and 
+ -        implementation and/or initial documentation
+ -->
+
+<!-- Build the LegacyBuildScanner project -->
+<project name="legacy-build-scanner" default="all">
+
+	<!-- Location information -->
+	<property name="srcdir" location="src"/>
+	<property name="scriptdir" location="src/scripts"/>
+	<property name="objdir" location="obj"/>
+	<property name="pubdir" location="/usr/local"/>
+	<property name="publibdir" location="${pubdir}/lib/cfs"/>
+	<property name="jarfile" location="${publibdir}/legacy-build-scanner.jar"/>
+	
+	<target name="all" depends="compile,install"/>
+	
+	<!-- Compile all the Java code -->
+	<target name="compile">
+		<mkdir dir="${objdir}"/>
+		<mkdir dir="${pubdir}"/>
+		<depend srcdir="${srcdir}" destdir="${objdir}"/>
+		<javac srcdir="${srcdir}" destdir="${objdir}"/>
+	</target>
+	
+	<!-- Install the final software -->
+	<target name="install">
+		<mkdir dir="${publibdir}"/>
+		<jar destfile="${jarfile}" basedir="${objdir}"/>
+		<copy file="${scriptdir}/legacy-build-scanner" todir="${pubdir}/bin" />
+		<chmod perm="0755" file="${pubdir}/bin/legacy-build-scanner"/>
+	</target>
+
+	<!-- Clean the generated files -->
+	<target name="clean">
+		<delete dir="${objdir}"/>
+	</target>
+	
+</project>
