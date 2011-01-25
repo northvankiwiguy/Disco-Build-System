@@ -15,13 +15,8 @@ package com.arapiki.disco.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.List;
-
-import org.hamcrest.core.IsInstanceOf;
 
 import com.arapiki.utils.string.PathUtils;
-
 
 /**
  * A helper class to manage the file tree structures within a BuildStore.
@@ -34,7 +29,7 @@ import com.arapiki.utils.string.PathUtils;
 public class FileNameSpace {
 	
 	/**
-	 * Our database manager, used to access the database content. This is provided 
+	 * Our database manager object, used to access the database content. This is provided 
 	 * to us when the BuildStoreFileSpace is first instantiated.
 	 */
 	private BuildStoreDB db = null;
@@ -61,6 +56,7 @@ public class FileNameSpace {
 	PreparedStatement findPathIdFromParentPrepStmt = null;
 	
 	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Create a new BuildStoreFileSpace object.
 	 * @param db The BuildStoreDB object to use when accessing the underlying database.
@@ -78,6 +74,7 @@ public class FileNameSpace {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Returns the PathID of the root of a specified namespace. This is equivalent to "/" in a file system,
 	 * although in this case we potentially have multiple namespaces, each with their own root.
@@ -88,6 +85,7 @@ public class FileNameSpace {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Add a new file into the database.
 	 * @param fullPath The full path of the file.
@@ -106,6 +104,7 @@ public class FileNameSpace {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Similar to addFullPath, but return null if the path doesn't exist, rather than automatically adding it.
 	 * @param fullPath
@@ -133,6 +132,7 @@ public class FileNameSpace {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * For a given parent, search for the specific child path underneath
 	 * that parent. Return the child's path ID, or -1 if the child
@@ -170,6 +170,7 @@ public class FileNameSpace {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Given a parent's path's ID, add a new child path. If that path already exists, return
 	 * the existing child path ID, rather than adding anything.
@@ -279,6 +280,11 @@ public class FileNameSpace {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
+	/**
+	 * For a specific parent path, fetch a list of all children of that parent.
+	 * @param The ID of the parent path.
+	 * @return An array of child path ID numbers.
+	 */
 	public Integer[] getChildPathIDs(int pathID) {
 		
 		/*
@@ -311,4 +317,6 @@ public class FileNameSpace {
 		
 		return results;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
