@@ -12,6 +12,7 @@
 
 package com.arapiki.disco.model;
 
+
 /**
  * Represents a full Disco build system.
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -22,7 +23,7 @@ public class BuildStore {
 	private BuildStoreDB db;
 	
 	/* the BuildStoreFileSpace object we'll delegate work to */
-	private BuildStoreFileSpace fileSpace;
+	private FileNameSpace fileSpace;
 
 	/**
 	 * Open or create a new BuildStore database. If the database already
@@ -37,7 +38,7 @@ public class BuildStore {
 		db = new BuildStoreDB(buildStoreName);
 		
 		/* create a new BuildStoreFileSpace object to manage our list of files */
-		fileSpace = new BuildStoreFileSpace(db);
+		fileSpace = new FileNameSpace(db);
 		
 		/* if necessary, initialize the database with required tables */
 		if (getBuildStoreVersion() == 0){
@@ -60,7 +61,7 @@ public class BuildStore {
 	 * encapsulates all knowledge about files/directories within the build system.
 	 * @return A BuildStoreFileSpace object
 	 */
-	public BuildStoreFileSpace getBuildStoreFileSpace() {
+	public FileNameSpace getBuildStoreFileSpace() {
 		return fileSpace;
 	}
 	
@@ -72,5 +73,12 @@ public class BuildStore {
 	 */
 	public void setFastAccessMode(boolean fast) {
 		db.setFastAccessMode(fast);
+	}
+
+	/**
+	 * Force the database to be empty. This is primarily for testing purposes.
+	 */
+	public void forceInitialize() {
+		db.initDatabase();
 	}
 }

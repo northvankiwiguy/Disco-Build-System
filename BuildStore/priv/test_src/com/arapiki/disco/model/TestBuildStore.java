@@ -14,12 +14,9 @@ package com.arapiki.disco.model;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.util.Random;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 /**
  * Test cases for validating the BuildStore class.
@@ -32,7 +29,7 @@ public class TestBuildStore {
 	private BuildStore bs;
 
 	/** The BuildStoreFileSpace associated with this BuildStore */
-	BuildStoreFileSpace bsfs;
+	FileNameSpace bsfs;
 
 	/**
 	 * Setup code - create a new/empty BuildStore.
@@ -40,21 +37,12 @@ public class TestBuildStore {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
-		/* create a totally new BuildStore, after deleting the old file */
-		File dbFile = new File("/tmp/MyFirstDB.db");
-		dbFile.delete();
-		bs = new BuildStore("/tmp/MyFirstDB");
+	
+		/* get a new empty BuildStore */
+		bs = TestCommon.getEmptyBuildStore();
 		
 		/* fetch the associated FileSpace */
 		bsfs = bs.getBuildStoreFileSpace();
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	/**
@@ -74,31 +62,4 @@ public class TestBuildStore {
 		}
 	}
 
-	/**
-	 * Test that we can add 100,000 file names into the file table. This
-	 * is more of a timing test than a functionality test.
-	 */
-	@Test
-	public void testFilesTable() {
-		
-		bs.setFastAccessMode(true);
-
-		/* create a large number of randomly-generated file names */
-		Random r = new Random();
-		for (int i = 0; i != 100000; i++) {
-			/* file names can be 10-200 characters long. */
-			int len = r.nextInt(190) + 10;
-			StringBuffer sb = new StringBuffer(40);
-			for (int j = 0; j != len; j++) {
-				sb.append((char) (r.nextInt(26) + 65));
-			}
-
-			/* add the file name to the FileSpace */
-			bsfs.addFile(sb.toString());
-		}
-		bs.setFastAccessMode(false);
-		
-		// TODO: count the number of records to validate success.
-	}
-	
 }

@@ -12,11 +12,14 @@
 
 package com.arapiki.disco.model;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * A helper class to manage and simplify all the database access performed
@@ -39,6 +42,10 @@ class BuildStoreDB  {
 	 */
 	private static final int SCHEMA_VERSION = 1;
 
+
+	/* Prepared Statements to make database access faster */
+	PreparedStatement lastRowIDPrepStmt = null;
+	
 	/**
 	 * Create a new BuildStoreDB object.
 	 * @param databaseName The name of the database to create. For SQLite databases,
@@ -66,6 +73,9 @@ class BuildStoreDB  {
 			throw new FatalBuildStoreError("Unable to connect to SQLite database: " + 
 					databaseName + ".db", e);
 		}
+		
+		/* prepare some statements */
+		lastRowIDPrepStmt = prepareStatement("select last_insert_rowid()");
 	}
 	
 	/**
@@ -125,6 +135,7 @@ class BuildStoreDB  {
 	/* package private */
 	void initDatabase() {
 
+		dropDatabase();
 		try {
 			Statement stat = dbConn.createStatement();
 			
@@ -132,25 +143,39 @@ class BuildStoreDB  {
 			 * Create the "schema_version" table, and insert the current schema version. We can
 			 * use this field to detect older versions of the database.
 			 */
-			stat.executeUpdate("drop table if exists schema_version");
 			stat.executeUpdate("create table schema_version ( version integer )");
 			stat.executeUpdate("insert into schema_version values ( " + SCHEMA_VERSION + ")");
 
 			/*
 			 * Create the "files" table.
 			 */
-			stat.executeUpdate("drop table if exists files");
 			stat.executeUpdate(
 				"create table files ( " +
 					"id integer primary key," +
+					"parentID integer," + 
 					"name text not null" +
 				")");
+			stat.executeUpdate("insert into files values (0, 0, \"/\")");
+			stat.executeUpdate("create unique index files_idx on files(parentID,name)");
 			stat.close();
 						
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to initialize database schema", e);
 		}
-		
+	}
+	
+	/**
+	 * 
+	 */
+	public void dropDatabase() {
+		try {
+			Statement stat = dbConn.createStatement();
+			stat.executeUpdate("drop table if exists schema_version");
+			stat.executeUpdate("drop table if exists files");
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to drop database schema", e);
+		}
 	}
 
 	/**
@@ -181,8 +206,109 @@ class BuildStoreDB  {
 			stmt.executeUpdate(sql);
 			stmt.close();
 		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error execute SQL: " + sql, e);
+			throw new FatalBuildStoreError("Error executing SQL: " + sql, e);
 		}
 	}
+
+	/**
+	 * @param insertChildPrepStmt
+	 */
+	public void executePrepUpdate(PreparedStatement stmt) {
+		try {
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error executing SQL: ", e);
+		}		
+	}
+	
+	/**
+	 * @param cmd
+	 * @return
+	 */
+	public String[] executeSelectColumn(String sql) {
+		Statement stmt;
+		ArrayList<String> result;
+		try {
+			stmt = dbConn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			result = new ArrayList<String>();
+			while (rs.next()){
+				result.add(rs.getString(1));
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error executing SQL: " + sql, e);
+		}
+		
+		return result.toArray(new String[0]);
+	}
+
+	/**
+	 * 
+	 * @param stmt
+	 * @return
+	 */
+	public String[] executePrepSelectColumn(PreparedStatement stmt) {
+		
+		ArrayList<String> result;
+		try {
+			ResultSet rs = stmt.executeQuery();
+			result = new ArrayList<String>();
+			while (rs.next()){
+				result.add(rs.getString(1));
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error executing SQL:", e);
+		}
+		
+		return result.toArray(new String[0]);
+	}
+	
+	/**
+	 * Execute a database query using a prepared statement, and
+	 * return the full ResultSet object.
+	 * @param cmd
+	 * @return
+	 */
+	public ResultSet executePrepSelectResultSet(PreparedStatement stmt) {
+		ResultSet rs;
+		try {
+			rs = stmt.executeQuery();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error executing SQL:", e);
+		}
+		
+		return rs;
+	}
+
+
+
+	/**
+	 * Returns the integer value of the last auto-increment row ID. This is used to
+	 * fetch the last primary key inserted into a table, when the user provided "null"
+	 * to have the database automatically select a suitable unique primary key.
+	 * @return The last inserted primary key.
+	 */
+	public int getLastRowID() {
+		String lastRowID[] = executePrepSelectColumn(lastRowIDPrepStmt);
+		return Integer.valueOf(lastRowID[0]);
+	}
+
+	/**
+	 * Create a prepared statement. Some other class will use this later on. We're
+	 * just creating it for them, since we own the database connection.
+	 * @param string
+	 * @return
+	 */
+	public PreparedStatement prepareStatement(String sql) {
+		try {
+			return dbConn.prepareStatement(sql);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to prepare sql statement: " + sql, e);
+		}
+	}
+
+
 	
 }
