@@ -26,7 +26,7 @@ import com.arapiki.utils.string.PathUtils;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class FileNameSpace {
+public class FileNameSpaces {
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
@@ -61,7 +61,7 @@ public class FileNameSpace {
 	 * Create a new BuildStoreFileSpace object.
 	 * @param db The BuildStoreDB object to use when accessing the underlying database.
 	 */
-	public FileNameSpace(BuildStoreDB db) {
+	public FileNameSpaces(BuildStoreDB db) {
 		this.db = db;
 		rootPathID = 0; // TODO: fix this to handle multiple name spaces.
 		

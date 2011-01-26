@@ -30,7 +30,7 @@ public class TestFileNameSpace {
 	private BuildStore bs;
 
 	/** The BuildStoreFileSpace associated with this BuildStore */
-	FileNameSpace bsfs;
+	FileNameSpaces bsfs;
 	
 	/**
 	 * @throws java.lang.Exception
@@ -41,7 +41,7 @@ public class TestFileNameSpace {
 		bs = TestCommon.getEmptyBuildStore();
 		
 		/* fetch the associated FileSpace */
-		bsfs = bs.getBuildStoreFileSpace();
+		bsfs = bs.getFileNameSpaces();
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -29,7 +29,7 @@ public class TestBuildStore {
 	private BuildStore bs;
 
 	/** The BuildStoreFileSpace associated with this BuildStore */
-	FileNameSpace bsfs;
+	FileNameSpaces bsfs;
 
 	/**
 	 * Setup code - create a new/empty BuildStore.
@@ -42,7 +42,7 @@ public class TestBuildStore {
 		bs = TestCommon.getEmptyBuildStore();
 		
 		/* fetch the associated FileSpace */
-		bsfs = bs.getBuildStoreFileSpace();
+		bsfs = bs.getFileNameSpaces();
 	}
 
 	/**

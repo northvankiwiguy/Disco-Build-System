@@ -23,7 +23,7 @@ public class BuildStore {
 	private BuildStoreDB db;
 	
 	/* the BuildStoreFileSpace object we'll delegate work to */
-	private FileNameSpace fileSpace;
+	private FileNameSpaces fileSpace;
 
 	/**
 	 * Open or create a new BuildStore database. If the database already
@@ -37,15 +37,15 @@ public class BuildStore {
 		/* create a new DB manager to handle all the SQL connection issues */
 		db = new BuildStoreDB(buildStoreName);
 		
-		/* create a new BuildStoreFileSpace object to manage our list of files */
-		fileSpace = new FileNameSpace(db);
-		
 		/* if necessary, initialize the database with required tables */
 		if (getBuildStoreVersion() == 0){
 			/* changes must be committed promptly */
 			db.setFastAccessMode(false); 
 			db.initDatabase();
 		}
+		
+		/* create a new BuildStoreFileSpace object to manage our list of files */
+		fileSpace = new FileNameSpaces(db);
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public class BuildStore {
 	 * encapsulates all knowledge about files/directories within the build system.
 	 * @return A BuildStoreFileSpace object
 	 */
-	public FileNameSpace getBuildStoreFileSpace() {
+	public FileNameSpaces getFileNameSpaces() {
 		return fileSpace;
 	}
 	
