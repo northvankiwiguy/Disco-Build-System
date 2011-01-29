@@ -25,6 +25,8 @@ import org.junit.Test;
  */
 public class TestPathUtils {
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -32,12 +34,16 @@ public class TestPathUtils {
 	public void setUp() throws Exception {
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@After
 	public void tearDown() throws Exception {
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Test the validatePathComponent() method
@@ -57,7 +63,9 @@ public class TestPathUtils {
 		assertTrue(PathUtils.validatePathComponent("aardvark.."));
 		assertTrue(PathUtils.validatePathComponent("aardvark"));
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Test the normalizeAbsolutePath() method.
 	 * @throws Exception
@@ -77,6 +85,7 @@ public class TestPathUtils {
 		assertEquals("/aardvark/camel/bear", PathUtils.normalizeAbsolutePath("/aardvark/camel/.//bear/."));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
 	
 	/**
 	 * Test the isAbsolutePath() method.
@@ -97,6 +106,8 @@ public class TestPathUtils {
 		assertTrue(PathUtils.isAbsolutePath("/aardvark/"));
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Test the tokenizePath method.
 	 * @throws Exception
@@ -113,4 +124,21 @@ public class TestPathUtils {
 		assertArrayEquals(new String[]{"a1", "b2", "c3"}, PathUtils.tokenizePath("a1/b2/c3"));
 		assertArrayEquals(new String[]{"aardvark", "banana", "camel"}, PathUtils.tokenizePath("/aardvark//banana/camel"));
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the matchPathRoot method.
+	 * @throws Exception
+	 */
+	@Test
+	public void testMatchPathRoot() throws Exception {
+		assertEquals(PathUtils.matchPathRoot(new String[] {"/home/"}, "/home/aardvark/"), "aardvark/");
+		assertNull(PathUtils.matchPathRoot(new String[] {"/home/"}, "/etc/aardvark/"));
+		assertEquals(PathUtils.matchPathRoot(new String[] {"/project", "/home/", "/etc/"}, "/home/aardvark/"), "aardvark/");
+		assertNull(PathUtils.matchPathRoot(new String[] {}, "/home/aardvark/"));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

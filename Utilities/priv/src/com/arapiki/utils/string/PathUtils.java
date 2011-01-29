@@ -25,6 +25,8 @@ import java.util.Stack;
  */
 public class PathUtils {
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Given a single component of a file system path, validate that it's well formed. This
 	 * basically ensures that the name doesn't contain / or \, and that it's not empty, . or ..
@@ -40,6 +42,7 @@ public class PathUtils {
 			      (pathComponent.equals("..")));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
 	
 	/**
 	 * Given an absolute path (starting with '/'), normalize it so that there
@@ -136,6 +139,8 @@ public class PathUtils {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Determine whether a file system path is absolute or relative.
 	 * 
@@ -147,7 +152,9 @@ public class PathUtils {
 		return ((path != null) && (!path.isEmpty()) && 
 				((path.charAt(0) == '/') || (path.charAt(0) == '\\')));
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Given a path-like string, break it into separate file/directory
 	 * component names. For example, "/a/b/c" will be broken into {"a", "b", "c"}.
@@ -195,5 +202,33 @@ public class PathUtils {
 		return resultList.toArray(new String[0]);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Given an array of file system paths, detect whether this specific path falls within
+	 * one of those directories (known as the "root"). If not, return null. If so, return
+	 * the portion of the path with the root removed. For example, with pathRoots equal to
+	 * { "/home/fred/", "/tmp" } and path equal to "/home/fred/src/foo.c", return "src/foo.c".
+	 * @param An array of path roots, in the form of absolute paths.
+	 * @param An absolute path that may or may not fall within the root.
+	 * @return The portion of the path, with the root extracted, or null if the path isn't
+	 * within one of the roots.
+	 */
+	public static String matchPathRoot(String [] pathRoots, String path) {
+		
+		for (String root : pathRoots) {
+			
+			/* this path matches the root? */
+			if (path.startsWith(root)) {
+				return path.substring(root.length());
+			}
+		}
+		
+		/* no match */
+		return null;
+		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
 
