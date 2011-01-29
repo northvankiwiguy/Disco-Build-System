@@ -103,7 +103,7 @@ class BuildStoreDB  {
 		 * fails, it's just because we haven't initialized the schema. Return 0.
 		 */
 		try {
-			rs = stat.executeQuery("select version from schema_version");
+			rs = stat.executeQuery("select version from schemaVersion");
 			if (rs.next()) {
 				version = rs.getInt("version");
 			}			
@@ -143,20 +143,27 @@ class BuildStoreDB  {
 			 * Create the "schema_version" table, and insert the current schema version. We can
 			 * use this field to detect older versions of the database.
 			 */
-			stat.executeUpdate("create table schema_version ( version integer )");
-			stat.executeUpdate("insert into schema_version values ( " + SCHEMA_VERSION + ")");
+			stat.executeUpdate("create table schemaVersion ( version integer )");
+			stat.executeUpdate("insert into schemaVersion values ( " + SCHEMA_VERSION + ")");
 
-			/*
-			 * Create the "files" table.
-			 */
-			stat.executeUpdate(
-				"create table files ( " +
-					"id integer primary key," +
-					"parentID integer," + 
-					"name text not null" +
-				")");
-			stat.executeUpdate("insert into files values (0, 0, \"/\")");
-			stat.executeUpdate("create unique index files_idx on files(parentID,name)");
+			/* Create the "files" table. */
+			stat.executeUpdate("create table files ( id integer primary key, parentId integer, " +
+							   "pathType integer, name text not null)");
+			stat.executeUpdate("insert into files values (0, 0, 1, \"/\")");
+			stat.executeUpdate("create unique index filesIdx on files(parentId, name)");
+			
+			/* Create the "includes" table */
+			stat.executeUpdate("create table includes ( fileId1 integer, fileId2 integer, usage integer)");
+			// TODO: do we need an index here?
+			
+			/* Create the "build_tasks" table. */
+			stat.executeUpdate("create table buildTasks ( taskId integer, command text)");
+			// TODO: do we need an index here?
+			
+			/* Create the "build_task_files" tables. */
+			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation char)");
+			// TODO: do we need an index here?
+			
 			stat.close();
 						
 		} catch (SQLException e) {
@@ -170,8 +177,11 @@ class BuildStoreDB  {
 	public void dropDatabase() {
 		try {
 			Statement stat = dbConn.createStatement();
-			stat.executeUpdate("drop table if exists schema_version");
+			stat.executeUpdate("drop table if exists schemaVersion");
 			stat.executeUpdate("drop table if exists files");
+			stat.executeUpdate("drop table if exists includes");
+			stat.executeUpdate("drop table if exists buildTasks");
+			stat.executeUpdate("drop table if exists buildTaskFiles");
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to drop database schema", e);
@@ -197,17 +207,20 @@ class BuildStoreDB  {
 	 * A helper method to perform any type of "update" command in SQL. That is,
 	 * there can't be any results returned from this command.
 	 * @param sql The SQL command to executed.
+	 * @return The number of rows changed (or 0 if the command in question didn't change rows).
 	 */
 	/* package private */
-	void executeUpdate(String sql) {
+	int executeUpdate(String sql) {
 		Statement stmt;
+		int rowCount = 0;
 		try {
 			stmt = dbConn.createStatement();
-			stmt.executeUpdate(sql);
+			rowCount = stmt.executeUpdate(sql);
 			stmt.close();
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error executing SQL: " + sql, e);
 		}
+		return rowCount;
 	}
 
 	/**
@@ -244,9 +257,12 @@ class BuildStoreDB  {
 	}
 
 	/**
-	 * 
-	 * @param stmt
-	 * @return
+	 * Execute a prepared database statement that returns a value
+	 * (such as a select statement). The query should only return
+	 * a single column of results (if multiple columns are queried,
+	 * only the first will be returned).
+	 * @param stmt The prepared statement to be executed.
+	 * @return Returns a (possibly empty) array of results. 
 	 */
 	public String[] executePrepSelectColumn(PreparedStatement stmt) {
 		

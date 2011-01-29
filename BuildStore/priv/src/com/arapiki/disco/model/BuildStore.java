@@ -22,9 +22,15 @@ public class BuildStore {
 	/* the BuildStoreDB object that manages our DB access */
 	private BuildStoreDB db;
 	
-	/* the BuildStoreFileSpace object we'll delegate work to */
-	private FileNameSpaces fileSpace;
+	/* the FileNameSpaces object we'll delegate work to */
+	private FileNameSpaces fileSpaces;
 
+	/* the FileIncludes object we'll delegate work to */
+	private FileIncludes fileIncludes;
+
+	/* the BuildTasks object we'll delegate work to */
+	private BuildTasks buildTasks;
+	
 	/**
 	 * Open or create a new BuildStore database. If the database already
 	 * exists, open it for updating. If there's no database by this name,
@@ -44,8 +50,14 @@ public class BuildStore {
 			db.initDatabase();
 		}
 		
-		/* create a new BuildStoreFileSpace object to manage our list of files */
-		fileSpace = new FileNameSpaces(db);
+		/* create a new FileNameSpaces object to manage our list of files */
+		fileSpaces = new FileNameSpaces(db);
+		
+		/* create a new FileDepenencies object to manage the relationship between files */
+		fileIncludes = new FileIncludes(db);
+
+		/* create a new BuildTasks object to manage the relationship between files */
+		buildTasks = new BuildTasks(db);
 	}
 	
 	/**
@@ -57,12 +69,31 @@ public class BuildStore {
 	}
 
 	/**
-	 * Fetch the BuildStoreFileSpace object associated with this BuildStore. This object
+	 * Fetch the FileNamesSpaces object associated with this BuildStore. This object
 	 * encapsulates all knowledge about files/directories within the build system.
-	 * @return A BuildStoreFileSpace object
+	 * @return A FileNameSpaces object
 	 */
 	public FileNameSpaces getFileNameSpaces() {
-		return fileSpace;
+		return fileSpaces;
+	}
+
+	/**
+	 * Fetch the FileIncludes object associated with this BuildStore. This object
+	 * encapsulates knowledge of which source files textually include which other
+	 * source files.
+	 * @return A FileIncludes object
+	 */
+	public FileIncludes getFileIncludes() {
+		return fileIncludes;
+	}
+
+	/**
+	 * Fetch the BuildTasks object associated with this BuildStore. This object
+	 * contains a list of all build tasks.
+	 * @return A BuildTasks object.
+	 */
+	public BuildTasks getBuildTasks() {
+		return buildTasks;
 	}
 	
 	/**
