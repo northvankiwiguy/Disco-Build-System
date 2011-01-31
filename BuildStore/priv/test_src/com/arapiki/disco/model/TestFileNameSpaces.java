@@ -23,7 +23,7 @@ import com.arapiki.disco.model.FileNameSpaces.PathType;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class TestFileNameSpace {
+public class TestFileNameSpaces {
 
 	/** Our BuildStore object, used in many test cases */
 	private BuildStore bs;
