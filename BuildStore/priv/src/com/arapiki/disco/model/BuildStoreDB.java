@@ -150,20 +150,20 @@ class BuildStoreDB  {
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, " +
 							   "pathType integer, name text not null)");
 			stat.executeUpdate("insert into files values (0, 0, 1, \"/\")");
-			stat.executeUpdate("create unique index filesIdx on files(parentId, name)");
+			stat.executeUpdate("create unique index filesIdx on files (parentId, name)");
 			
 			/* Create the "includes" table */
 			stat.executeUpdate("create table includes ( fileId1 integer, fileId2 integer, usage integer)");
 			// TODO: do we need an index here?
 			
 			/* Create the "build_tasks" table. */
-			stat.executeUpdate("create table buildTasks ( taskId integer, command text)");
+			stat.executeUpdate("create table buildTasks ( taskId integer primary key, command text)");
 			// TODO: do we need an index here?
 			
 			/* Create the "build_task_files" tables. */
-			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation char)");
-			// TODO: do we need an index here?
-			
+			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");
+			stat.executeUpdate("create unique index buildTaskFilesIdx1 on buildTaskfiles (taskId, fileId)");
+
 			stat.close();
 						
 		} catch (SQLException e) {
