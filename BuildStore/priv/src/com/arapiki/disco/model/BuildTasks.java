@@ -128,7 +128,7 @@ public class BuildTasks {
 		try {
 			findOperationInBuildTaskFilesPrepStmt.setInt(1, buildTaskId);
 			findOperationInBuildTaskFilesPrepStmt.setInt(2, fileNumber);
-			stringResults = db.executePrepSelectColumn(findOperationInBuildTaskFilesPrepStmt);
+			stringResults = db.executePrepSelectStringColumn(findOperationInBuildTaskFilesPrepStmt);
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -270,7 +270,7 @@ public class BuildTasks {
 		String [] stringResults = null;
 		try {
 			findCommandPrepStmt.setInt(1, taskId);
-			stringResults = db.executePrepSelectColumn(findCommandPrepStmt);
+			stringResults = db.executePrepSelectStringColumn(findCommandPrepStmt);
 			
 		} catch (SQLException e) {
 			new FatalBuildStoreError("Error in SQL: " + e);

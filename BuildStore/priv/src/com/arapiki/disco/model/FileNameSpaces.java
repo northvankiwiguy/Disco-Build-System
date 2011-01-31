@@ -313,20 +313,14 @@ public class FileNameSpaces {
 		 * query) is that / (the root) is always a child of itself, although
 		 * we don't want to report it. The query already excludes /.
 		 */
-		String stringResults[] = null;
+		Integer results[] = null;
 		try {
 			findpathIdFromParentPrepStmt.setInt(1, pathId);
-			stringResults = db.executePrepSelectColumn(findpathIdFromParentPrepStmt);
+			results = db.executePrepSelectIntegerColumn(findpathIdFromParentPrepStmt);
 			
 		} catch (SQLException e) {
 			new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		
-		Integer results[] = new Integer[stringResults.length];
-		for (int i = 0; i < stringResults.length; i++) {
-			results[i] = Integer.valueOf(stringResults[i]);
-		}
-		
+		}	
 		return results;
 	}
 	

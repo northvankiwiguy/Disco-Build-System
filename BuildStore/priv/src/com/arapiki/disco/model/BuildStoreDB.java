@@ -12,7 +12,6 @@
 
 package com.arapiki.disco.model;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -152,9 +151,11 @@ class BuildStoreDB  {
 			stat.executeUpdate("insert into files values (0, 0, 1, \"/\")");
 			stat.executeUpdate("create unique index filesIdx on files (parentId, name)");
 			
-			/* Create the "includes" table */
-			stat.executeUpdate("create table includes ( fileId1 integer, fileId2 integer, usage integer)");
-			// TODO: do we need an index here?
+			/* Create the "fileIncludes" table */
+			stat.executeUpdate("create table fileIncludes ( fileId1 integer, fileId2 integer, usage integer)");
+			stat.executeUpdate("create unique index buildFileIncludesIdx1 on fileIncludes (fileId1, fileId2)");
+			stat.executeUpdate("create index buildFileIncludesIdx2 on fileIncludes (fileId1)");
+			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
 			/* Create the "build_tasks" table. */
 			stat.executeUpdate("create table buildTasks ( taskId integer primary key, command text)");
@@ -162,7 +163,7 @@ class BuildStoreDB  {
 			
 			/* Create the "build_task_files" tables. */
 			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");
-			stat.executeUpdate("create unique index buildTaskFilesIdx1 on buildTaskfiles (taskId, fileId)");
+			stat.executeUpdate("create unique index buildTaskFilesIdx on buildTaskfiles (taskId, fileId)");
 
 			stat.close();
 						
@@ -179,7 +180,7 @@ class BuildStoreDB  {
 			Statement stat = dbConn.createStatement();
 			stat.executeUpdate("drop table if exists schemaVersion");
 			stat.executeUpdate("drop table if exists files");
-			stat.executeUpdate("drop table if exists includes");
+			stat.executeUpdate("drop table if exists fileIncludes");
 			stat.executeUpdate("drop table if exists buildTasks");
 			stat.executeUpdate("drop table if exists buildTaskFiles");
 			
@@ -226,12 +227,14 @@ class BuildStoreDB  {
 	/**
 	 * @param insertChildPrepStmt
 	 */
-	public void executePrepUpdate(PreparedStatement stmt) {
+	public int executePrepUpdate(PreparedStatement stmt) {
+		int rowCount = 0;
 		try {
-			stmt.executeUpdate();
+			rowCount = stmt.executeUpdate();
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error executing SQL: ", e);
-		}		
+		}
+		return rowCount;
 	}
 	
 	/**
@@ -264,7 +267,7 @@ class BuildStoreDB  {
 	 * @param stmt The prepared statement to be executed.
 	 * @return Returns a (possibly empty) array of results. 
 	 */
-	public String[] executePrepSelectColumn(PreparedStatement stmt) {
+	public String[] executePrepSelectStringColumn(PreparedStatement stmt) {
 		
 		ArrayList<String> result;
 		try {
@@ -279,6 +282,31 @@ class BuildStoreDB  {
 		}
 		
 		return result.toArray(new String[0]);
+	}
+	
+	/**
+	 * Execute a prepared database statement that returns a value
+	 * (such as a select statement). The query should only return
+	 * a single column of results (if multiple columns are queried,
+	 * only the first will be returned).
+	 * @param stmt The prepared statement to be executed.
+	 * @return Returns a (possibly empty) array of results. 
+	 */
+	public Integer[] executePrepSelectIntegerColumn(PreparedStatement stmt) {
+		
+		ArrayList<Integer> result;
+		try {
+			ResultSet rs = stmt.executeQuery();
+			result = new ArrayList<Integer>();
+			while (rs.next()){
+				result.add(rs.getInt(1));
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error executing SQL:", e);
+		}
+		
+		return result.toArray(new Integer[0]);
 	}
 	
 	/**
@@ -307,8 +335,8 @@ class BuildStoreDB  {
 	 * @return The last inserted primary key.
 	 */
 	public int getLastRowID() {
-		String lastRowID[] = executePrepSelectColumn(lastRowIDPrepStmt);
-		return Integer.valueOf(lastRowID[0]);
+		Integer lastRowID[] = executePrepSelectIntegerColumn(lastRowIDPrepStmt);
+		return lastRowID[0];
 	}
 
 	/**
