@@ -49,14 +49,15 @@ public class BuildTasks {
 	/**
 	 * Various prepared statement for database access.
 	 */
-	PreparedStatement insertBuildTaskPrepStmt = null;
-	PreparedStatement findCommandPrepStmt = null;
-	PreparedStatement insertBuildTaskFilesPrepStmt = null;
-	PreparedStatement findOperationInBuildTaskFilesPrepStmt = null;
-	PreparedStatement findFilesInBuildTaskFilesPrepStmt = null;
-	PreparedStatement findFilesByOperationInBuildTaskFilesPrepStmt = null;
-	PreparedStatement findTasksByFileInBuildTaskFilesPrepStmt = null;
-	PreparedStatement findTasksByFileAndOperationInBuildTaskFilesPrepStmt = null;
+	private PreparedStatement 
+		insertBuildTaskPrepStmt = null,
+		findCommandPrepStmt = null,
+		insertBuildTaskFilesPrepStmt = null,
+		findOperationInBuildTaskFilesPrepStmt = null,
+		findFilesInBuildTaskFilesPrepStmt = null,
+		findFilesByOperationInBuildTaskFilesPrepStmt = null,
+		findTasksByFileInBuildTaskFilesPrepStmt = null,
+		findTasksByFileAndOperationInBuildTaskFilesPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS

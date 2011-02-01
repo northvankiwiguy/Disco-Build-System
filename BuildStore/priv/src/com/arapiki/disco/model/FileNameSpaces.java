@@ -61,10 +61,11 @@ public class FileNameSpaces {
 	/**
 	 * Various prepared statement for database access.
 	 */
-	PreparedStatement findChildPrepStmt = null;
-	PreparedStatement insertChildPrepStmt = null;
-	PreparedStatement findPathDetailsPrepStmt = null;
-	PreparedStatement findpathIdFromParentPrepStmt = null;
+	private PreparedStatement 
+		findChildPrepStmt = null,
+		insertChildPrepStmt = null,
+		findPathDetailsPrepStmt = null,
+		findpathIdFromParentPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS

@@ -35,12 +35,13 @@ public class FileIncludes {
 	/**
 	 * Various prepared statement for database access.
 	 */
-	PreparedStatement insertFileIncludesPrepStmt = null;
-	PreparedStatement updateFileIncludesPrepStmt = null;
-	PreparedStatement selectUsageFromFileIncludesPrepStmt = null;
-	PreparedStatement selectTotalUsageFromFileIncludesPrepStmt = null;
-	PreparedStatement selectFile1FromFileIncludesPrepStmt = null;
-	PreparedStatement selectFile2FromFileIncludesPrepStmt = null;
+	private PreparedStatement 
+		insertFileIncludesPrepStmt = null,
+		updateFileIncludesPrepStmt = null,
+		selectUsageFromFileIncludesPrepStmt = null,
+		selectTotalUsageFromFileIncludesPrepStmt = null,
+		selectFile1FromFileIncludesPrepStmt = null,
+		selectFile2FromFileIncludesPrepStmt = null;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
