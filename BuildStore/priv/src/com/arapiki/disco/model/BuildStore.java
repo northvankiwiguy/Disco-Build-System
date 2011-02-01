@@ -31,6 +31,9 @@ public class BuildStore {
 	/* the BuildTasks object we'll delegate work to */
 	private BuildTasks buildTasks;
 	
+	/* the Reports object we'll delegate work to */
+	private Reports reports;
+	
 	/**
 	 * Open or create a new BuildStore database. If the database already
 	 * exists, open it for updating. If there's no database by this name,
@@ -58,6 +61,9 @@ public class BuildStore {
 
 		/* create a new BuildTasks object to manage the relationship between files */
 		buildTasks = new BuildTasks(db);
+		
+		/* create a new Reports object to provide reporting methods */
+		reports = new Reports(db);
 	}
 	
 	/**
@@ -94,6 +100,15 @@ public class BuildStore {
 	 */
 	public BuildTasks getBuildTasks() {
 		return buildTasks;
+	}
+	
+	/**
+	 * Fetch the Reports object associated with this BuildStore. This object
+	 * contains methods for generating 
+	 * @return A BuildTasks object.
+	 */
+	public Reports getReports() {
+		return reports;
 	}
 	
 	/**
