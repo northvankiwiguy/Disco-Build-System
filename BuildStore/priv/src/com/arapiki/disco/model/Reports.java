@@ -37,9 +37,9 @@ public class Reports {
 	 * fills out the relevant parts of this record (not necessarily all fields).
 	 */
 	public class FileRecord {
-		int fileId;	
-		int count;
-		int size;
+		public int pathId;	
+		public int count;
+		public int size;
 	}
 	
 	/**
@@ -99,7 +99,7 @@ public class Reports {
 
 			while (rs.next()) {
 				FileRecord record = new FileRecord();
-				record.fileId = rs.getInt(1);
+				record.pathId = rs.getInt(1);
 				record.count = rs.getInt(2);
 				results.add(record);
 			}
@@ -123,7 +123,7 @@ public class Reports {
 
 			while (rs.next()) {
 				FileRecord record = new FileRecord();
-				record.fileId = rs.getInt(1);
+				record.pathId = rs.getInt(1);
 				record.count = rs.getInt(2);
 				results.add(record);
 			}
@@ -147,7 +147,7 @@ public class Reports {
 
 			while (rs.next()) {
 				FileRecord record = new FileRecord();
-				record.fileId = rs.getInt(1);
+				record.pathId = rs.getInt(1);
 				results.add(record);
 			}
 			rs.close();

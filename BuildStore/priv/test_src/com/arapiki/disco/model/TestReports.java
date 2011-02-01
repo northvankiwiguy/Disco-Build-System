@@ -100,11 +100,11 @@ public class TestReports {
 		assertEquals(3, results.length);
 		
 		/* validate the order in which they were returned */
-		assertEquals(foxFile, results[0].fileId);
+		assertEquals(foxFile, results[0].pathId);
 		assertEquals(3, results[0].count);
-		assertEquals(boxFile, results[1].fileId);
+		assertEquals(boxFile, results[1].pathId);
 		assertEquals(2, results[1].count);
-		assertEquals(soxFile, results[2].fileId);
+		assertEquals(soxFile, results[2].pathId);
 		assertEquals(1, results[2].count);
 		
 		/* now add roxFile into the mix - access it lots */
@@ -120,13 +120,13 @@ public class TestReports {
 		assertEquals(4, results.length);
 		
 		/* validate the order in which they were returned */
-		assertEquals(roxFile, results[0].fileId);
+		assertEquals(roxFile, results[0].pathId);
 		assertEquals(4, results[0].count);
-		assertEquals(foxFile, results[1].fileId);
+		assertEquals(foxFile, results[1].pathId);
 		assertEquals(3, results[1].count);
-		assertEquals(boxFile, results[2].fileId);
+		assertEquals(boxFile, results[2].pathId);
 		assertEquals(2, results[2].count);
-		assertEquals(soxFile, results[3].fileId);
+		assertEquals(soxFile, results[3].pathId);
 		assertEquals(1, results[3].count);
 				
 		/*
@@ -205,11 +205,11 @@ public class TestReports {
 		 */
 		FileRecord results[] = reports.reportMostCommonIncludersOfFile(file2);
 		assertEquals(3, results.length);
-		assertEquals(file1, results[0].fileId);
+		assertEquals(file1, results[0].pathId);
 		assertEquals(4, results[0].count);
-		assertEquals(file3, results[1].fileId);
+		assertEquals(file3, results[1].pathId);
 		assertEquals(2, results[1].count);
-		assertEquals(file4, results[2].fileId);
+		assertEquals(file4, results[2].pathId);
 		assertEquals(1, results[2].count);
 		
 		/* Check for file3 which isn't included by anybody - should be empty list */
@@ -278,22 +278,22 @@ public class TestReports {
 		/* file3 and file4 should both be in the results, but we don't know the order */
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(2, results.length);
-		assertTrue((results[0].fileId == file3) && (results[1].fileId == file4) ||
-				(results[0].fileId == file4) && (results[1].fileId == file3));
+		assertTrue((results[0].pathId == file3) && (results[1].pathId == file4) ||
+				(results[0].pathId == file4) && (results[1].pathId == file3));
 		
 		/* another task should access those same files, and the results will be the same */
 		bts.addFileAccess(task2, file2, OperationType.OP_READ);
 		bts.addFileAccess(task2, file1, OperationType.OP_WRITE);
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(2, results.length);
-		assertTrue((results[0].fileId == file3) && (results[1].fileId == file4) ||
-				(results[0].fileId == file4) && (results[1].fileId == file3));
+		assertTrue((results[0].pathId == file3) && (results[1].pathId == file4) ||
+				(results[0].pathId == file4) && (results[1].pathId == file3));
 		
 		/* now access file 3 */
 		bts.addFileAccess(task1, file3, OperationType.OP_READ);
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(1, results.length);
-		assertEquals(file4, results[0].fileId);
+		assertEquals(file4, results[0].pathId);
 		
 		/* finally access file 3 */
 		bts.addFileAccess(task2, file4, OperationType.OP_READ);
