@@ -162,8 +162,9 @@ class BuildStoreDB  {
 			// TODO: do we need an index here?
 			
 			/* Create the "build_task_files" tables. */
-			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");
-			stat.executeUpdate("create unique index buildTaskFilesIdx on buildTaskfiles (taskId, fileId)");
+			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");			
+			stat.executeUpdate("create index buildTaskFilesIdx1 on buildTaskfiles (fileId)");
+			stat.executeUpdate("create unique index buildTaskFilesIdx2 on buildTaskfiles (taskId, fileId)");
 
 			stat.close();
 						
