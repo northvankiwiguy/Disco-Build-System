@@ -21,8 +21,8 @@ if [ -e "$DISCO_HOME/../../DiscoMain" ];
 then
     WORK="$DISCO_HOME/../../"
     
-	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar"
-	export CLASSPATH="$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
+	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
+	export CLASSPATH="$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	
 #
 # Case 2 & 3 for a fully installed disco release, or eclipse plug-in - everything is in jar files.
