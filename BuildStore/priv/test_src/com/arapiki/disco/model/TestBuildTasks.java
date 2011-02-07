@@ -159,13 +159,13 @@ public class TestBuildTasks {
 		int task3 = bts.addBuildTask("gcc -o mult.o mult.c");
 
 		/* and a bunch of files that access those tasks */
-		int file1 = bsfs.addFile("root", "clock.o");
-		int file2 = bsfs.addFile("root", "clock.c");
-		int file3 = bsfs.addFile("root", "banner.o");
-		int file4 = bsfs.addFile("root", "banner.c");
-		int file5 = bsfs.addFile("root", "mult.o");
-		int file6 = bsfs.addFile("root", "mult.c");
-		int file7 = bsfs.addFile("root", "stdio.h");
+		int file1 = bsfs.addFile("root", "/clock.o");
+		int file2 = bsfs.addFile("root", "/clock.c");
+		int file3 = bsfs.addFile("root", "/banner.o");
+		int file4 = bsfs.addFile("root", "/banner.c");
+		int file5 = bsfs.addFile("root", "/mult.o");
+		int file6 = bsfs.addFile("root", "/mult.c");
+		int file7 = bsfs.addFile("root", "/stdio.h");
 		
 		/* now register each task's file accesses */
 		bts.addFileAccess(task1, file1, OperationType.OP_WRITE);

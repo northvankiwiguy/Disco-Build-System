@@ -157,6 +157,10 @@ public class TestFileNameSpaces {
 
 		int path4 = bsfs.addFile("root", "/aardvark/beaver/cat/dog");
 		assertEquals(path3, path4);
+		
+		/* test case where non-absolute path is provided */
+		int path5 = bsfs.addFile("root", "a/b/c");
+		assertEquals(-1, path5);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

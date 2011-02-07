@@ -350,6 +350,13 @@ public class FileNameSpaces {
 	 *=====================================================================================*/
 
 	private int addPath(String spaceName, PathType pathType, String fullPathName) {
+		
+		/* path's must be absolute (relative to the root of this name space */
+		if (!PathUtils.isAbsolutePath(fullPathName)) {
+			return -1;
+		}
+		
+		/* convert the absolute path in /-separated path components */
 		String components[] = PathUtils.tokenizePath(fullPathName);
 		
 		int parentId = getRootPath(spaceName);
