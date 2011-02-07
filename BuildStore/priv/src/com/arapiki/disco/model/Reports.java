@@ -12,14 +12,11 @@
 
 package com.arapiki.disco.model;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 
 /**
