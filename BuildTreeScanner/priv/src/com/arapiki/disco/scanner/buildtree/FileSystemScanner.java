@@ -50,7 +50,7 @@ public class FileSystemScanner {
 	/**
 	 * 
 	 */
-	void scanForFiles(String rootName, String fileSystemPath) {
+	public void scanForFiles(String rootName, String fileSystemPath) {
 		File startingFile = new File(fileSystemPath);
 		bs.setFastAccessMode(true);
 		scanForFilesHelper(bs.getFileNameSpaces(), rootName, startingFile, "/");
