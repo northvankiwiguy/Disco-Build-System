@@ -43,7 +43,7 @@ class BuildStoreDB  {
 
 
 	/* Prepared Statements to make database access faster */
-	PreparedStatement lastRowIDPrepStmt = null;
+	private PreparedStatement lastRowIDPrepStmt = null;
 	
 	/**
 	 * Create a new BuildStoreDB object.
