@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# Simple launcher script for the "disco" command.
+#
+
+# Figure out what this script was executed as.
+export DISCO_HOME=`dirname $0`/..
+
+#
+# Now we have three cases for setting up the classpath, depending on where the files are installed.
+#
+#   1) A development installation inside a Eclipse project
+#   2) A fully installed disco release.
+#   3) Disco, installed as an Eclipse plug-in.
+#
+
+#
+# Case 1 for a development installation - all .class and .jar files are in the Eclipse project layout.
+#
+if [ -e "$DISCO_HOME/../../DiscoMain" ];
+then
+    WORK="$DISCO_HOME/../../"
+    
+	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar"
+	export CLASSPATH="$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
+	
+#
+# Case 2 & 3 for a fully installed disco release, or eclipse plug-in - everything is in jar files.
+#
+else
+    echo Case not handled yet
+    exit 1
+fi
+
+#
+# Now, invoke the disco command line tool, with all the command line arguments.
+#
+java com.arapiki.disco.main.DiscoMain $*
+
+# Note: the return code from java is the return code for our whole script.
