@@ -1,0 +1,16 @@
+
+<project name="Utilities" default="jars" basedir=".">
+
+	<!-- root of this component's build tree -->
+	<property name="project-root" location=".." />
+	
+	<!-- name of the jar file we'll create -->
+	<property name="project-jar" value="utilities.jar" />
+
+	<!-- no extra classpath for this project -->
+	<path id="project-classpath" />
+	
+	<!-- import the common build file definitions -->	
+	<import file="build-common.xml" />
+	
+</project>

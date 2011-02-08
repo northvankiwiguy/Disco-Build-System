@@ -1,0 +1,100 @@
+
+<!--
+   - This Ant project is called upon by all other Ant projects in order to get
+   - standard build definitions and targets.
+  -->
+<project name="build-common" default="jars" basedir=".">
+
+	<!-- these properties must be defined by the build.xml that imports build-common.xml -->
+	<fail unless="project-root" message="project-root property not set" />
+	<fail unless="project-jar" message="project-jar property not set" />
+	
+	<!-- project definitions - all projects must look the same -->
+	<property name="src-dir" location="${project-root}/priv/src" />
+	<property name="test-src-dir" location="${project-root}/priv/test_src" />
+	<property name="bin-dir" location="${project-root}/priv/bin" />
+	<property name="test-bin-dir" location="${project-root}/priv/test_bin" />
+	<property name="pub-dir" location="${project-root}/pub" />
+	<property name="jar-file" location="${pub-dir}/${project-jar}" />
+	
+	<!--
+	   - Build the output jar file for the project. 
+      -->
+	<target name="jars" depends="java">
+		<echo>Checking ${jar-file}</echo>
+		<mkdir dir="${pub-dir}" />
+		<jar basedir="${bin-dir}" jarfile="${jar-file}"/>
+	</target>
+
+	<!--
+	   - Compile all the (non-test) java files in this project.
+      -->
+	<target name="java" depends="build-upstream-components">
+		<echo>Checking ${ant.project.name} Java code</echo>
+		<mkdir dir="${bin-dir}" />
+		<depend srcdir="${src-dir}" destdir="${bin-dir}" />
+		<javac srcdir="${src-dir}" destdir="${bin-dir}" debug="true" classpathref="project-classpath"/>
+	</target>
+	
+	<!--
+	   - Package all our code (including thirdparty jars) into the packaging directory.
+	   - The caller of this target must define the ${pkg-dir} property.
+      -->
+	<target name="package">
+		<fail unless="pkg-dir" message="Property pkg-dir is not set properly" />
+		<!-- TODO: finish this -->		
+	</target>
+
+	<!--
+	   - Clean everything in this project.
+	  -->
+	<target name="clean">
+		<echo>Cleaning project ${ant.project.name}</echo>
+		<delete dir="${bin-dir}" />
+		<delete dir="${test-bin-dir}" />
+		<delete dir="${pub-dir}" />
+	</target>
+	
+	<!--
+	   - Build and package everything
+	  -->
+	<target name="all">
+		
+		<!-- build everything -->
+		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="jars" />
+		
+		<!-- make the packaging directory -->
+		<property name="pkg-dir" location="${project-root}/../DiscoMain/pub/" />
+		<mkdir dir="${pkg-dir}" />
+		
+		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="package" inheritall="false">
+			<property name="pkg-dir" location="${pkg-dir}"/>
+		</ant>
+		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="package" inheritall="false">
+			<property name="pkg-dir" location="${pkg-dir}"/>
+		</ant>
+		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="package" inheritall="false">
+			<property name="pkg-dir" location="${pkg-dir}"/>
+		</ant>
+		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="package" inheritall="false">
+			<property name="pkg-dir" location="${pkg-dir}"/>
+		</ant>
+		
+	</target>
+	
+	<!--
+	   - Clean all projects.
+	  -->
+	<target name="clean-all">
+		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
+	</target>
+	
+	<!--
+	   - Default "build-upstream-components" target, in case it's not overidden.
+	  -->
+	<target name="build-upstream-components" />
+
+</project>
