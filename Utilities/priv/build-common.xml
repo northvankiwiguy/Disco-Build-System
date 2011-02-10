@@ -1,7 +1,8 @@
 
 <!--
    - This Ant project is called upon by all other Ant projects in order to get
-   - standard build definitions and targets.
+   - standard build definitions and targets. All the targets here should be
+   - 100% generic and reusable, no matter which project is being built.
   -->
 <project name="build-common" default="jars" basedir=".">
 
@@ -10,11 +11,13 @@
 	<fail unless="project-jar" message="project-jar property not set" />
 	
 	<!-- project definitions - all projects must look the same -->
-	<property name="src-dir" location="${project-root}/priv/src" />
-	<property name="test-src-dir" location="${project-root}/priv/test_src" />
-	<property name="bin-dir" location="${project-root}/priv/bin" />
-	<property name="test-bin-dir" location="${project-root}/priv/test_bin" />
+	<property name="priv-dir" location="${project-root}/priv" />
 	<property name="pub-dir" location="${project-root}/pub" />
+	
+	<property name="src-dir" location="${priv-dir}/src" />
+	<property name="test-src-dir" location="${priv-dir}/test_src" />
+	<property name="bin-dir" location="${priv-dir}/bin" />
+	<property name="test-bin-dir" location="${priv-dir}/test_bin" />
 	<property name="jar-file" location="${pub-dir}/${project-jar}" />
 	
 	<!--
@@ -53,48 +56,18 @@
 		<delete dir="${bin-dir}" />
 		<delete dir="${test-bin-dir}" />
 		<delete dir="${pub-dir}" />
-	</target>
-	
-	<!--
-	   - Build and package everything
-	  -->
-	<target name="all">
-		
-		<!-- build everything -->
-		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="jars" />
-		
-		<!-- make the packaging directory -->
-		<property name="pkg-dir" location="${project-root}/../DiscoMain/pub/" />
-		<mkdir dir="${pkg-dir}" />
-		
-		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="package" inheritall="false">
-			<property name="pkg-dir" location="${pkg-dir}"/>
-		</ant>
-		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="package" inheritall="false">
-			<property name="pkg-dir" location="${pkg-dir}"/>
-		</ant>
-		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="package" inheritall="false">
-			<property name="pkg-dir" location="${pkg-dir}"/>
-		</ant>
-		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="package" inheritall="false">
-			<property name="pkg-dir" location="${pkg-dir}"/>
-		</ant>
-		
-	</target>
-	
-	<!--
-	   - Clean all projects.
-	  -->
-	<target name="clean-all">
-		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
+		<antcall target="project-clean" />
 	</target>
 	
 	<!--
 	   - Default "build-upstream-components" target, in case it's not overidden.
 	  -->
 	<target name="build-upstream-components" />
+
+	<!--
+	   - Default "project-clean" target, in case it's not overidden.
+	  -->
+	<target name="project-clean" />
+		
 
 </project>

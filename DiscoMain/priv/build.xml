@@ -22,5 +22,63 @@
 	<target name="build-upstream-components">
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
+	
+	<!-- specific cleaning operation for this project only -->
+	<target name="project-clean">
+		<delete dir="${priv-dir}/pkg" />
+	</target>
+	
+	<!--
+	   - Build and package everything to create the disco (command line) installation package. However, the
+	   - Disco eclipse plugin and Disco web application aren't built here. 
+	   -->
+	<target name="all">
+		
+		<fail unless="version" message="Missing version number. Please use -Dversion=" />
+		
+		<!-- build everything -->
+		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="jars" />
 			
+		<!-- make the packaging directory -->
+		<property name="pkg-dir" location="${priv-dir}/pkg/disco-${version}" />
+		<property name="tmp-dir" location="${priv-dir}/pkg/tmp" />
+		<mkdir dir="${pkg-dir}/bin" />
+		<mkdir dir="${pkg-dir}/lib" />
+		<mkdir dir="${tmp-dir}" />
+		
+		<!-- place all the .class files into a single directory, ready to create a single jar file -->
+		<unjar src="${project-root}/../BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
+		<unjar src="${project-root}/../BuildStore/priv/lib/sqlitejdbc-v056.jar" dest="${tmp-dir}" />
+		<unjar src="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
+		<unjar src="${project-root}/../DiscoMain/pub/disco-main.jar" dest="${tmp-dir}" />		
+		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />				
+		<unjar src="${project-root}/../Utilities/pub/utilities.jar" dest="${tmp-dir}" />
+		
+		<!-- now create a single jar file, placing it in the release package -->
+		<jar basedir="${tmp-dir}" destfile="${pkg-dir}/lib/disco.jar" />
+		
+		<!-- copy the "disco" shell script -->
+		<copy file="scripts/disco" todir="${pkg-dir}/bin" />
+		<chmod perm="0555" dest="${pkg-dir}/bin/disco" />
+		
+		<!-- finally, tar up the whole release package -->
+		<delete file="${pub-dir}/disco-${version}.tar.gz" />
+		<tar destfile="${pub-dir}/disco-${version}.tar.gz" compression="gzip"> 
+			<tarfileset dir="${pkg-dir}/..">
+				<include name="disco-${version}/**"/>
+			</tarfileset>
+		</tar>
+			
+	</target>
+		
+	<!--
+	   - Clean all projects.
+	  -->
+	<target name="clean-all">
+		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
+	</target>
+		
 </project>
