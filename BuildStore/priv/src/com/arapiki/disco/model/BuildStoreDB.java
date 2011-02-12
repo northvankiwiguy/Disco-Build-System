@@ -165,7 +165,8 @@ class BuildStoreDB  {
 			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");			
 			stat.executeUpdate("create index buildTaskFilesIdx1 on buildTaskfiles (fileId)");
 			stat.executeUpdate("create unique index buildTaskFilesIdx2 on buildTaskfiles (taskId, fileId)");
-
+			stat.executeUpdate("create index buildTaskFilesIdx3 on buildTaskfiles (fileId, operation)");
+			
 			stat.close();
 						
 		} catch (SQLException e) {
