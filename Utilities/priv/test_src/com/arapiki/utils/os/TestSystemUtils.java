@@ -17,10 +17,14 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.arapiki.utils.os.FileSystemTraverseCallback;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -32,6 +36,12 @@ public class TestSystemUtils {
 	 * A temporary file that contains a simple executable program
 	 */
 	private static File ourTempExe;
+	
+	/*
+	 * A temporary directory that we'll fill up with interesting files and directories.
+	 * This is used for testing the traverseFileSystem() method.
+	 */
+	private static File ourTempDir;
 	
 	/**
 	 * This method is called before any of test methods are called, but
@@ -51,7 +61,7 @@ public class TestSystemUtils {
 		 * This script starts by echoing it's stdin to its stdout, then displays N letters/digits
 		 * on the stdout/stderr respectively.
 		 */
-		ourTempExe = File.createTempFile("tempExecutable", null, null);
+		ourTempExe = File.createTempFile("tempExecutable", null);
 		PrintStream tmpStream = new PrintStream(ourTempExe);
 		tmpStream.println("#!/usr/bin/perl");
 		tmpStream.println("while (<STDIN>) { print $_; };");
@@ -67,7 +77,31 @@ public class TestSystemUtils {
 		tmpStream.close();
 		
 		/* set execute permission - only works on Unix */
-		Runtime.getRuntime().exec("chmod 755 " + ourTempExe);
+		ourTempExe.setExecutable(true);
+		
+		/*
+		 * Next, create a temporary directory full of files and subdirectories, for the purpose of
+		 * testing traverseFileSystem(). Note, we create a temporary directory name by first creating
+		 * a temporary file, then stealing (reusing) the same name for a directory.
+		 */	
+		ourTempDir = File.createTempFile("tempDir", null);
+		ourTempDir.delete();
+		ourTempDir.mkdir();
+		
+		/* create some subdirectories */
+		File dirA = new File(ourTempDir.getPath() + "/dirA");
+		File dirB = new File(ourTempDir.getPath() + "/dirA/nested/dirB");
+		File dirC = new File(ourTempDir.getPath() + "/dirC");
+		dirA.mkdirs();
+		dirB.mkdirs();
+		dirC.mkdirs();
+		
+		new File(ourTempDir + "/topLevelFile").createNewFile();
+		new File(dirA + "/fileInDirA").createNewFile();
+		new File(dirB + "/fileInDirB").createNewFile();
+		new File(dirB + "/anotherFileInDirB").createNewFile();
+		new File(dirB + "/aThirdFileInDirB").createNewFile();
+		new File(dirB + "/onelastFileInDirB").createNewFile();
 	}
 
 	/**
@@ -78,7 +112,12 @@ public class TestSystemUtils {
 	public static void tearDownAfterClass() throws Exception {
 		/* remove our short perl script */
 		ourTempExe.delete();
+		
+		/* remove our temporary directory */
+		Runtime.getRuntime().exec("rm -r " + ourTempDir);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Test method for {@link com.arapiki.utils.os.SystemUtils#executeShellCmd(java.lang.String, java.lang.String)}.
@@ -145,5 +184,143 @@ public class TestSystemUtils {
 		}
 		
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	private class TestCallback extends FileSystemTraverseCallback {
+		
+		private ArrayList<String> names = new ArrayList<String>();
+		
+		@Override
+		public void callback(File thisPath) {
+			names.add(thisPath.toString());
+		}
+		
+		public String [] getNames() {
+			String result[] = names.toArray(new String[0]);
+			names = new ArrayList<String>();
+			return result;
+		}
+	};
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	@Test
+	public void testTraverseFileSystem() throws Exception {
+
+		/*
+		 * Create an object of type FileSystemTraverseCallback that'll be called for each
+		 * file system path that's reported. Calling getNames() returns an array of Strings
+		 * containing the file names.
+		 */
+		TestCallback callbackCollector = new TestCallback();
+		
+		/* Test a non-existent directory */
+		SystemUtils.traverseFileSystem("/non-existent", SystemUtils.REPORT_DIRECTORIES | SystemUtils.REPORT_FILES,
+				callbackCollector);
+		String names[] = callbackCollector.getNames();
+		assertEquals(0, names.length);
+		
+		/* report all directories in our test hierarchy */
+		SystemUtils.traverseFileSystem(ourTempDir.toString(), SystemUtils.REPORT_DIRECTORIES, callbackCollector);
+		names = callbackCollector.getNames();
+		assertEquals(5, names.length);
+		assertSortedPathArraysEqual(ourTempDir.toString(), names, 
+				new String[] {"", "/dirA", "/dirA/nested", "/dirA/nested/dirB", "/dirC"});
+		
+		/* report all files in our test hierarchy */
+		SystemUtils.traverseFileSystem(ourTempDir.toString(), SystemUtils.REPORT_FILES, callbackCollector);
+		names = callbackCollector.getNames();
+		assertSortedPathArraysEqual(ourTempDir.toString(), names, 
+				new String[] {"/dirA/fileInDirA", "/dirA/nested/dirB/aThirdFileInDirB", 
+							  "/dirA/nested/dirB/anotherFileInDirB", "/dirA/nested/dirB/fileInDirB", 
+							  "/dirA/nested/dirB/onelastFileInDirB", "/topLevelFile"});
+
+		/* report all files and directories in our test hierarchy */
+		SystemUtils.traverseFileSystem(ourTempDir.toString(), SystemUtils.REPORT_FILES | SystemUtils.REPORT_DIRECTORIES, 
+				callbackCollector);
+		names = callbackCollector.getNames();
+		assertSortedPathArraysEqual(ourTempDir.toString(), names, 
+				new String[] {"", "/dirA", "/dirA/fileInDirA", "/dirA/nested", "/dirA/nested/dirB",
+							  "/dirA/nested/dirB/aThirdFileInDirB", 
+							  "/dirA/nested/dirB/anotherFileInDirB", "/dirA/nested/dirB/fileInDirB", 
+							  "/dirA/nested/dirB/onelastFileInDirB", "/dirC", "/topLevelFile"});
+
+		/* filter out the "nested" directory */
+		SystemUtils.traverseFileSystem(ourTempDir.toString(), 
+				null,
+				"nested",
+				SystemUtils.REPORT_FILES | SystemUtils.REPORT_DIRECTORIES, 
+				callbackCollector);
+		names = callbackCollector.getNames();
+		assertSortedPathArraysEqual(ourTempDir.toString(), names, 
+				new String[] {"", "/dirA", "/dirA/fileInDirA", "/dirC", "/topLevelFile"});
+
+		/* filter out the "nested" and "dirC" directories */
+		SystemUtils.traverseFileSystem(ourTempDir.toString(), 
+				null,
+				"nested|dirC",
+				SystemUtils.REPORT_FILES | SystemUtils.REPORT_DIRECTORIES, 
+				callbackCollector);
+		names = callbackCollector.getNames();
+		assertSortedPathArraysEqual(ourTempDir.toString(), names, 
+				new String[] {"", "/dirA", "/dirA/fileInDirA", "/topLevelFile"});
+
+		/* only return the files that have "In" in their name */
+		SystemUtils.traverseFileSystem(ourTempDir.toString(),
+				".*In.*",
+				null,
+				SystemUtils.REPORT_FILES, 
+				callbackCollector);
+		names = callbackCollector.getNames();
+		assertSortedPathArraysEqual(ourTempDir.toString(), names, 
+				new String[] {"/dirA/fileInDirA", "/dirA/nested/dirB/aThirdFileInDirB", 
+							  "/dirA/nested/dirB/anotherFileInDirB", "/dirA/nested/dirB/fileInDirB", 
+							  "/dirA/nested/dirB/onelastFileInDirB"});
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* 
+	 * Helper method to determine whether two arrays of path names contain the same elements, 
+	 * even if those elements aren't in the same order in both arrays. Also, remove a prefix
+	 * from each path in arr1 before comparing. 
+	 */
+	public static void assertSortedPathArraysEqual(String arr1prefix, String[] arr1, String[] arr2) {
+		
+		/* if one is null, then both must be null */
+		if (arr1 == null) {
+			if (arr2 != null) {
+				fail("One array is null, but the other isn't.");
+			} else {
+				/* everything is good */
+				return;
+			}
+		}
+		
+		/* lengths must be the same */
+		if (arr1.length != arr2.length) {
+			fail("Arrays have different length: " + arr1.length + " versus " + arr2.length);
+		}
+		
+		/* now sort the elements and compare them */
+		Arrays.sort(arr1);
+		Arrays.sort(arr2);
+		
+		for (int i = 0; i < arr1.length; i++) {
+			String str1 = arr1[i];
+			if (!str1.startsWith(arr1prefix)) {
+				fail("Array element " + str1 + " doesn't start with " + arr1prefix);
+			}
+			str1 = str1.substring(arr1prefix.length());
+			String str2 = arr2[i];
+			//System.out.println("Comparing " + str1 + " and " + str2);
+			if (!str1.equals(str2)) {
+				fail("Mismatched array elements: " + str1 + " and " + str2);
+			}
+		}		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 }
