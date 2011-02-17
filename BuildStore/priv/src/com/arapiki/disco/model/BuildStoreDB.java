@@ -60,12 +60,19 @@ class BuildStoreDB  {
 			throw new FatalBuildStoreError("Unable to access the SQLite driver", e);
 		}
 		
+		/*
+		 * Ensure that the database name ends with .db (if it doesn't already)
+		 */
+		if (!databaseName.endsWith(".db")) {
+			databaseName += ".db";
+		}
+		
 		/* 
 		 * Open/create the database. The sqlite database will be created as
 		 * a local disk file with a .db extension.
 		 */
 	    try {
-			dbConn = DriverManager.getConnection("jdbc:sqlite:" + databaseName + ".db");
+			dbConn = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
 
 			
 		} catch (SQLException e) {
