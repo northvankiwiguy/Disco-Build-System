@@ -16,6 +16,8 @@ import java.io.File;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.utils.os.FileSystemTraverseCallback;
+import com.arapiki.utils.os.SystemUtils;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -50,65 +52,56 @@ public class FileSystemScanner {
 	/**
 	 * 
 	 */
-	public void scanForFiles(String rootName, String fileSystemPath) {
-		File startingFile = new File(fileSystemPath);
+	public void scanForFiles(final String spaceName, String fileSystemPath) {
+		
+		/* 
+		 * Get the path's base name, since we want to remove it from any
+		 * paths we add to a BuildStore. Note that if baseName is null, that's
+		 * a valid case where there's no prefix (parent path) to remove.
+		 */
+		String baseName = new File(fileSystemPath).getParent();
+		if (baseName != null) {
+			baseName += "/";
+		}
+		
+		/* these need to be final so the callback class (see later) can access them */
+		final String prefixToRemove = baseName;
+		final FileNameSpaces fns = bs.getFileNameSpaces();
+		
+		/* make the database really fast (turn off auto-commit ). */
 		bs.setFastAccessMode(true);
-		scanForFilesHelper(bs.getFileNameSpaces(), rootName, startingFile, "/");
+		
+		/* now traverse the file system */
+		SystemUtils.traverseFileSystem(fileSystemPath, 
+				null, 
+				"CVS|.git", 
+				SystemUtils.REPORT_FILES, 
+				new FileSystemTraverseCallback() {
+					
+					/**
+					 * When a file is located, remove our path prefix from its file name
+					 * (if there is a prefix), then add it to the BuildStore.
+					 */
+					@Override
+					public void callback(File thisPath) {
+						String relativeName = thisPath.toString();
+						if (prefixToRemove != null) {
+							if (relativeName.startsWith(prefixToRemove)){
+								relativeName = relativeName.substring(prefixToRemove.length());
+							} else {
+								throw new FatalBuildTreeScannerError("File name " + relativeName + 
+										" is not within prefix " + prefixToRemove);
+							}
+						}
+						if (fns.addFile(spaceName, "/" + relativeName) == -1){
+							throw new FatalBuildTreeScannerError("Adding file name /" + relativeName +
+									" to BuildStore returned an error."); 
+						}
+					}
+				});
+		
+		/* now commit everything */
 		bs.setFastAccessMode(false);
-	}
-
-	/*=====================================================================================*
-	 * PRIVATE METHODS
-	 *=====================================================================================*/
-
-	/**
-	 * 
-	 */
-	private void scanForFilesHelper(FileNameSpaces fns, String rootName, File thisFile, String relativePath) {
-		
-		/* if the file doesn't actually exist, there's nothing to do */
-		if (!thisFile.exists()) {
-			return;
-		}
-		
-		String fileName = thisFile.getName();
-		/* if this file is something we should ignore (based on it's name), skip over it */
-		if (ignoreFile(fileName)){
-			return;
-		}
-			
-		/* if the file is actually a directory, recursively visit each of the entries */
-		if (thisFile.isDirectory()) {
-			File children [] = thisFile.listFiles();
-			if (children == null) {
-				return;
-			}
-			String subDirName = relativePath + fileName + "/";
-			for (int i = 0; i < children.length; i++) {
-				scanForFilesHelper(fns, rootName, children[i], subDirName);
-			}
-		}
-		
-		/* else if it's a file, register it in the BuildStore */
-		else if (thisFile.isFile()) {
-			fns.addFile(rootName, relativePath + fileName);
-		}
-		
-		/* else, it's not a file or directory - throw an error, for now */
-		else {
-			throw new Error("Found a path that isn't a file or directory: " + relativePath + fileName);
-		}
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * @param name
-	 * @return
-	 */
-	private boolean ignoreFile(String name) {
-		return (name.equals("CVS") || name.equals(".git") ||
-					name.equals(".gitignore") || name.endsWith("~"));
 	}
 
 	/*=====================================================================================*/
