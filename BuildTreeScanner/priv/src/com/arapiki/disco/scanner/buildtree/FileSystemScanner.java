@@ -50,22 +50,15 @@ public class FileSystemScanner {
 	 *=====================================================================================*/
 
 	/**
-	 * 
+	 * Scan a real file system tree (on our local disk, not in the BuildStore), and add the
+	 * paths into the BuildStore. It's important to note that the entire file path will be
+	 * added into the BuildStore. For example, adding "/usr/include/sys" will result in all
+	 * paths starting with the /usr/include/sys prefix. However, adding "sys" will result 
+	 * in everything starting with just "/sys".
 	 */
 	public void scanForFiles(final String spaceName, String fileSystemPath) {
 		
-		/* 
-		 * Get the path's base name, since we want to remove it from any
-		 * paths we add to a BuildStore. Note that if baseName is null, that's
-		 * a valid case where there's no prefix (parent path) to remove.
-		 */
-		String baseName = new File(fileSystemPath).getParent();
-		if (baseName != null) {
-			baseName += "/";
-		}
-		
 		/* these need to be final so the callback class (see later) can access them */
-		final String prefixToRemove = baseName;
 		final FileNameSpaces fns = bs.getFileNameSpaces();
 		
 		/* make the database really fast (turn off auto-commit ). */
@@ -79,22 +72,13 @@ public class FileSystemScanner {
 				new FileSystemTraverseCallback() {
 					
 					/**
-					 * When a file is located, remove our path prefix from its file name
-					 * (if there is a prefix), then add it to the BuildStore.
+					 * When a file is located, add it to the BuildStore.
 					 */
 					@Override
 					public void callback(File thisPath) {
-						String relativeName = thisPath.toString();
-						if (prefixToRemove != null) {
-							if (relativeName.startsWith(prefixToRemove)){
-								relativeName = relativeName.substring(prefixToRemove.length());
-							} else {
-								throw new FatalBuildTreeScannerError("File name " + relativeName + 
-										" is not within prefix " + prefixToRemove);
-							}
-						}
-						if (fns.addFile(spaceName, "/" + relativeName) == -1){
-							throw new FatalBuildTreeScannerError("Adding file name /" + relativeName +
+						String pathName = thisPath.toString();
+						if (fns.addFile(spaceName, "/" + pathName) == -1){
+							throw new FatalBuildTreeScannerError("Adding file name /" + pathName +
 									" to BuildStore returned an error."); 
 						}
 					}
