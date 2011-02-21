@@ -291,8 +291,13 @@ public class FileNameSpaces {
 	 * Return:
 	 *     ErrorCode.OK on success
 	 *     ErrorCode.NOT_FOUND if the root doesn't exist.
+	 *     ErrorCode.CANT_REMOVE the "root" root can't be removed.
 	 */
 	public int deleteRoot(String rootName) {
+		
+		if (rootName.equals("root")) {
+			return ErrorCode.CANT_REMOVE;
+		}
 		
 		/* try to delete it from the database, but if no records where removed, that's an error */
 		try {

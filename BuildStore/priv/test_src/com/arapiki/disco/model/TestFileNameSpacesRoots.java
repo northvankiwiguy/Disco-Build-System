@@ -305,6 +305,9 @@ public class TestFileNameSpacesRoots {
 		
 		/* try to delete a root that doesn't already exist */
 		assertEquals(ErrorCode.NOT_FOUND, bsfs.deleteRoot("fakeRoot"));
+		
+		/* it shouldn't be possible to delete the "root" root - it's always required */
+		assertEquals(ErrorCode.CANT_REMOVE, bsfs.deleteRoot("root"));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
