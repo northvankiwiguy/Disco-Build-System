@@ -329,14 +329,17 @@ public class TestFileNameSpaces {
 		int path1 = bsfs.addFile("/pen");
 		int path2 = bsfs.addFile("/apple/blueberry/carrot");
 		int path3 = bsfs.addFile("/ear/foot/knee");
+		int path4 = bsfs.addFile("/");
 
 		String path1name = bsfs.getPathName(path1);
 		String path2name = bsfs.getPathName(path2);
 		String path3name = bsfs.getPathName(path3);
+		String path4name = bsfs.getPathName(path4);
 
 		assertEquals("/pen", path1name);
 		assertEquals("/apple/blueberry/carrot", path2name);
-		assertEquals("/ear/foot/knee", path3name);		
+		assertEquals("/ear/foot/knee", path3name);
+		assertEquals("/", path4name);
 	}	
 	
 	/*-------------------------------------------------------------------------------------*/

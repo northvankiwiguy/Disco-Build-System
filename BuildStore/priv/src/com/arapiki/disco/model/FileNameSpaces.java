@@ -441,7 +441,13 @@ public class FileNameSpaces {
 
 		// TODO: handle case where the pathId is invalid.
 		StringBuffer sb = new StringBuffer();
-		getPathNameHelper(sb, pathId, showRoots);
+		
+		/* if we're at the root, simply return /, else recurse */
+		if (pathId == 0) {
+			sb.append('/');
+		} else {
+			getPathNameHelper(sb, pathId, showRoots);
+		}
 		return sb.toString();
 	}
 	
@@ -662,7 +668,7 @@ public class FileNameSpaces {
 	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots) {
 
 		Object pathDetails[] = getPathDetails(pathId);
-		int parentID = (Integer)pathDetails[0];
+		int parentId = (Integer)pathDetails[0];
 		String name = (String)pathDetails[2];
 		String rootName = (String)pathDetails[3];
 	
@@ -683,7 +689,7 @@ public class FileNameSpaces {
 		}
 		
 		/* else, recursive up the parent chain, display each path component after we returned */
-		getPathNameHelper(sb, parentID, showRoots);
+		getPathNameHelper(sb, parentId, showRoots);
 		sb.append("/");
 		sb.append(name);
 	}
