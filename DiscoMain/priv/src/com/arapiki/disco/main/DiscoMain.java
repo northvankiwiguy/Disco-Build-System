@@ -129,6 +129,12 @@ public final class DiscoMain {
 		System.err.println("\treport-all-files           List all files recorded in the build store.");
 		System.err.println("\treport-unused-files        Report on files that are never used by the build system.");
 		System.err.println("\treport-most-used           Report on files the build system accessed the most.");
+		
+		System.err.println("\nFile System commands:");
+		System.err.println("\tshow-root [<root-name>]    Show the file system path referred to by this root. Without");
+		System.err.println("\t                           arguments, list all available roots.");
+		System.err.println("\tset-root <root> <path>     Set the <root> to refer to the <path>");
+		System.err.println("\trm-root <root>             Remove the <root> so it no long references a path");
 
 		System.err.println("\nError: " + message);
 		System.exit(1);
@@ -164,6 +170,24 @@ public final class DiscoMain {
 			DiscoReports.reportAllFiles(buildStore);
 		}
 		
+		/*
+		 * Commands for showing/manipulating attributes of the BuildStore
+		 */
+		else if (cmdName.equals("show-root")){
+			validateArgs(cmdArgs, 0, 1, "show-root [ <root> ]");
+			DiscoAttributes.showRoot(buildStore, cmdArgs);
+		}
+		
+		else if (cmdName.equals("set-root")){
+			validateArgs(cmdArgs, 2, 2, "set-root <root> <path>");
+			DiscoAttributes.setRoot(buildStore, cmdArgs);
+		}
+
+		else if (cmdName.equals("rm-root")){
+			validateArgs(cmdArgs, 1, 1, "rm-root <root>");
+			DiscoAttributes.rmRoot(buildStore, cmdArgs);
+		}
+
 		/*
 		 * Else, unrecognized command.
 		 */
