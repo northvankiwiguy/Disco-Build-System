@@ -199,6 +199,14 @@ public class TestFileNameSpacesRoots {
 		
 		/* try to move a root onto a file (not a directory) */
 		assertEquals(ErrorCode.NOT_A_DIRECTORY, bsfs.moveRootToPath("newRoot", path1));
+		
+		/* try to move a root onto a path that already has a root */
+		int path5 = bsfs.addDirectory("/1/2/3");
+		int path6 = bsfs.addDirectory("/1/2/3/4");
+		
+		assertEquals(ErrorCode.OK, bsfs.addNewRoot("root1", path5));
+		assertEquals(ErrorCode.OK, bsfs.addNewRoot("root2", path6));
+		assertEquals(ErrorCode.ONLY_ONE_ALLOWED, bsfs.moveRootToPath("root2", path5));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

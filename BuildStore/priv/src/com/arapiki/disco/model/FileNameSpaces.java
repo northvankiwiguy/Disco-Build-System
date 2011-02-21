@@ -196,6 +196,7 @@ public class FileNameSpaces {
 	 *    ErrorCode.OK if the move completed successfully.
 	 *    ErrorCode.NOT_FOUND if the root doesn't exist
 	 *    ErrorCode.NOT_A_DIRECTORY if the new pathID doesn't refer to a directory
+	 *    ErrorCode.ONLY_ONE_ALLOWED if the target pathId already has a root.
 	 *    ErrorCode.BAD_PATH an invalid path ID was provided
 	 */
 	public int moveRootToPath(String rootName, int pathId) {
@@ -214,6 +215,11 @@ public class FileNameSpaces {
 		/* is it a directory? */
 		if (pathType != PathType.TYPE_DIR) {
 			return ErrorCode.NOT_A_DIRECTORY;
+		}
+		
+		/* does the pathId already have a root associated with it? */
+		if (getRootAtPath(pathId) != null){
+			return ErrorCode.ONLY_ONE_ALLOWED;
 		}
 		
 		/* now, update the fileRoots table to refer to this new path */
