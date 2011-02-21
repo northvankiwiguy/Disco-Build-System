@@ -46,18 +46,14 @@ public class TestFileNameSpaces {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test the getRootPath() method.
+	 * Test the getRootPath() method - by default there's always a "root" root, associated
+	 * with path ID 0.
 	 */
 	@Test
 	public void testGetRootPath() throws Exception {
 		
-		int root1 = bsfs.getRootPath("root1");
-		int root2 = bsfs.getRootPath("root2");
-		int root3 = bsfs.getRootPath("root3");
-		
-		assertEquals(root1, 0);
-		assertEquals(root2, 0);
-		assertEquals(root3, 0);
+		int root = bsfs.getRootPath("root");		
+		assertEquals(root, 0);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

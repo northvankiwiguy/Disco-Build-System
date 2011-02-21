@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.PathUtils;
 
 // TODO: comment and clean-up this file.
@@ -53,19 +54,19 @@ public class FileNameSpaces {
 	private String spaceName;
 	
 	/**
-	 * The PathID of the root of our name space.
-	 * TODO: Fix this to support multiple name spaces.
-	 */
-	private int rootPathId;
-	
-	/**
 	 * Various prepared statement for database access.
 	 */
 	private PreparedStatement 
 		findChildPrepStmt = null,
 		insertChildPrepStmt = null,
 		findPathDetailsPrepStmt = null,
-		findpathIdFromParentPrepStmt = null;
+		findPathIdFromParentPrepStmt = null,
+		insertRootPrepStmt = null,
+		findRootPathIdPrepStmt = null,
+		findRootNamesPrepStmt = null,
+		findRootNamePrepStmt = null,
+		updateRootPathPrepStmt = null,
+		deleteFileRootPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -77,14 +78,20 @@ public class FileNameSpaces {
 	 */
 	public FileNameSpaces(BuildStoreDB db) {
 		this.db = db;
-		rootPathId = 0; // TODO: fix this to handle multiple name spaces.
 		
 		/* initialize prepared database statements */
 		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ?");
 		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, ?, ?)");
-		findPathDetailsPrepStmt = db.prepareStatement("select parentId, pathType, name from files where id=?");
-		findpathIdFromParentPrepStmt = db.prepareStatement(
+		findPathDetailsPrepStmt = db.prepareStatement("select parentId, pathType, files.name, fileRoots.name " +
+				" from files left join fileRoots on files.id = fileRoots.fileId where files.id = ?");
+		findPathIdFromParentPrepStmt = db.prepareStatement(
 				"select id from files where parentId = ? and name != \"/\" order by name");
+		insertRootPrepStmt = db.prepareStatement("insert into fileRoots values (?, ?)");	
+		findRootPathIdPrepStmt = db.prepareStatement("select fileId from fileRoots where name = ?");
+		findRootNamesPrepStmt = db.prepareStatement("select name from fileRoots order by name");
+		findRootNamePrepStmt = db.prepareStatement("select name from fileRoots where fileId = ?");
+		updateRootPathPrepStmt = db.prepareStatement("update fileRoots set fileId = ? where name = ?");
+		deleteFileRootPrepStmt = db.prepareStatement("delete from fileRoots where name = ?");
 	}
 	
 	/*=====================================================================================*
@@ -92,15 +99,217 @@ public class FileNameSpaces {
 	 *=====================================================================================*/
 	
 	/**
-	 * Returns the pathId of the root of a specified namespace. This is equivalent to "/" in a file system,
-	 * although in this case we potentially have multiple namespaces, each with their own root.
-	 * @return The namespace's root path ID.
+	 * Retrieve the ID of the path that's currently associated with this root.
+	 * @return The namespace's root path ID, or ErrorCode.NOT_FOUND if it's not defined.
 	 */
-	public int getRootPath(String spaceName) {
-		return rootPathId;
+	public int getRootPath(String rootName) {
+		Integer results[] = null;
+		
+		/* by default, assume it won't be found */
+		int pathId = ErrorCode.NOT_FOUND;
+		
+		try {
+			findRootPathIdPrepStmt.setString(1, rootName);
+			results = db.executePrepSelectIntegerColumn(findRootPathIdPrepStmt);
+			
+			/* is there exactly one root registered? */
+			if (results.length == 1) {
+				pathId = results[0];
+			}
+			
+			/* were there multiple roots with this name? Throw an error */
+			else if (results.length > 1) {
+				throw new FatalBuildStoreError("More than one root found with name: " + rootName);
+			}			
+			
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}	
+		return pathId;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add a new root to be associated with a specified path ID, which must refer to an
+	 * existing directory.
+	 * Returns:
+	 * 	 ErrorCode.OK on success
+	 *   ErrorCode.ONLY_ONE_ALLOWED if there's already a root associated with this path ID,
+	 *   ErrorCode.ALREADY_USED if the root name is already in use
+	 *   ErrorCode.INVALID_NAME if the new proposed name is invalid.
+	 *   ErrorCode.NOT_A_DIRECTORY if the path doesn't refer to a valid directory.
+	 */
+	public int addNewRoot(String rootName, int pathId) {
+		
+		/* the root name can't already be in use */
+		if (getRootPath(rootName) != ErrorCode.NOT_FOUND) {
+			return ErrorCode.ALREADY_USED;
+		}
+		
+		/* names can't contain :, or spaces, since this are considered root name separators */
+		if (rootName.contains(":") || rootName.contains(" ")){
+			return ErrorCode.INVALID_NAME;
+		}
+		
+		/* this path must be valid, and refer to a directory, not a file */
+		PathType pathType = getPathType(pathId);
+		if (pathType == PathType.TYPE_INVALID) {
+			return ErrorCode.BAD_PATH;
+		}
+		if (pathType != PathType.TYPE_DIR){
+			return ErrorCode.NOT_A_DIRECTORY;
+		}
+		
+		/* there can't already be a root at this path */
+		if (getRootAtPath(pathId) != null) {
+			return ErrorCode.ONLY_ONE_ALLOWED;
+		}
+		
+		/* insert the root into our table */
+		try {
+			insertRootPrepStmt.setString(1, rootName);
+			insertRootPrepStmt.setInt(2, pathId);
+			db.executePrepUpdate(insertRootPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/*
+	 * Return an array of all root names that are currently valid. The list is returned
+	 * in alphabetical order.
+	 */
+	public String [] getRoots() {
+		return db.executePrepSelectStringColumn(findRootNamesPrepStmt);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Move an existing root to refer to an existing pathId.
+	 * Return codes:
+	 *    ErrorCode.OK if the move completed successfully.
+	 *    ErrorCode.NOT_FOUND if the root doesn't exist
+	 *    ErrorCode.NOT_A_DIRECTORY if the new pathID doesn't refer to a directory
+	 *    ErrorCode.BAD_PATH an invalid path ID was provided
+	 */
+	public int moveRootToPath(String rootName, int pathId) {
+	
+		/* if the root doesn't already exists, that's an error */
+		if (getRootPath(rootName) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* is the new path valid? */
+		PathType pathType = getPathType(pathId);
+		if (pathType == PathType.TYPE_INVALID) {
+			return ErrorCode.BAD_PATH;
+		}
+		
+		/* is it a directory? */
+		if (pathType != PathType.TYPE_DIR) {
+			return ErrorCode.NOT_A_DIRECTORY;
+		}
+		
+		/* now, update the fileRoots table to refer to this new path */
+		try {
+			insertRootPrepStmt.setInt(1, pathId);
+			insertRootPrepStmt.setString(2, rootName);
+			db.executePrepUpdate(updateRootPathPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
+	}
+		
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * If this path has an associated root attached to it, return the root name. If there's
+	 * no root, return null. There can be at most one root associated with this path.
+	 */
+	public String getRootAtPath(int pathId) {
+		
+		/* query the table to see if there's a record for this path ID */
+		String results[] = null;
+		try {
+			findRootNamePrepStmt.setInt(1, pathId);
+			results = db.executePrepSelectStringColumn(findRootNamePrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* no result == no root at this path */
+		if (results.length == 0) {
+			return null;
+		} 
+		
+		/* one result == we have the correct result */
+		else if (results.length == 1) {
+			return results[0];
+		}
+		
+		/* multiple results is an error */
+		else {
+			throw new FatalBuildStoreError("Multiple entries found in fileRoots table, for path ID " + pathId);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the name of the root that is encloses this path. There may be multiple roots
+	 * above this path, but return the root that's closest to the path. The "root" root
+	 * will always be the default if there's no closer root.
+	 */
+	public String getEnclosingRoot(int pathId) {
+		
+		do {
+			/* if the current path has a root, use it */
+			String thisRoot = getRootAtPath(pathId);
+			if (thisRoot != null) {
+				return thisRoot;
+			}
+			/* else, move up to the parent */
+			pathId = getParentPath(pathId);
+		} while (pathId != -1);
+			
+		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	
+	/**
+	 * Delete the specified root from the database. The very top root ("root") can't be removed.
+	 * Return:
+	 *     ErrorCode.OK on success
+	 *     ErrorCode.NOT_FOUND if the root doesn't exist.
+	 */
+	public int deleteRoot(String rootName) {
+		
+		/* try to delete it from the database, but if no records where removed, that's an error */
+		try {
+			deleteFileRootPrepStmt.setString(1, rootName);
+			int rowCount = db.executePrepUpdate(deleteFileRootPrepStmt);
+			if (rowCount == 0) {
+				return ErrorCode.NOT_FOUND;
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	
 	/**
 	 * Add a new file into the FileNameSpace.
@@ -108,8 +317,8 @@ public class FileNameSpaces {
 	 * @return the ID of the newly added file, or -1 if the file couldn't be added within
 	 * this part of the tree (such as when the parent itself is a file, not a directory).
 	 */
-	public int addFile(String spaceName, String fullPathName) {
-		return addPath(spaceName, PathType.TYPE_FILE, fullPathName);
+	public int addFile(String rootNameName, String fullPathName) {
+		return addPath(rootNameName, PathType.TYPE_FILE, fullPathName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -120,13 +329,13 @@ public class FileNameSpaces {
 	 * @return the ID of the newly added file, or -1 if the directory couldn't be added within
 	 * this part of the tree (such as when the parent itself is a file, not a directory).
 	 */
-	public int addDirectory(String spaceName, String fullPathName) {
-		return addPath(spaceName, PathType.TYPE_DIR, fullPathName);
+	public int addDirectory(String rootName, String fullPathName) {
+		return addPath(rootName, PathType.TYPE_DIR, fullPathName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	public int addSymlink(String spaceName, String fullPath) {
+	public int addSymlink(String rootName, String fullPath) {
 		
 		// TODO: implement this
 		return -1;
@@ -193,10 +402,10 @@ public class FileNameSpaces {
 	 * @param fullPath
 	 * @return
 	 */
-	public int getPath(String spaceName, String fullPath) {
+	public int getPath(String rootName, String fullPath) {
 		String components[] = PathUtils.tokenizePath(fullPath);
 
-		int parentID = getRootPath(spaceName);
+		int parentID = getRootPath(rootName);
 		for (int i = 0; i < components.length; i++) {
 			
 			/* get the next child ID, if it's missing, then the full path is missing */
@@ -216,13 +425,18 @@ public class FileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	public String getPathName(int pathId) {
+	public String getPathName(int pathId, boolean showRoots) {
 
 		// TODO: handle case where the pathId is invalid.
-		// TODO: put root name, such as ${root}/a/b/c
 		StringBuffer sb = new StringBuffer();
-		getPathNameHelper(sb, pathId);
+		getPathNameHelper(sb, pathId, showRoots);
 		return sb.toString();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	public String getPathName(int pathId) {
+		return getPathName(pathId, false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -316,11 +530,11 @@ public class FileNameSpaces {
 		 */
 		Integer results[] = null;
 		try {
-			findpathIdFromParentPrepStmt.setInt(1, pathId);
-			results = db.executePrepSelectIntegerColumn(findpathIdFromParentPrepStmt);
+			findPathIdFromParentPrepStmt.setInt(1, pathId);
+			results = db.executePrepSelectIntegerColumn(findPathIdFromParentPrepStmt);
 			
 		} catch (SQLException e) {
-			new FatalBuildStoreError("Error in SQL: " + e);
+			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}	
 		return results;
 	}
@@ -349,7 +563,7 @@ public class FileNameSpaces {
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
-	private int addPath(String spaceName, PathType pathType, String fullPathName) {
+	private int addPath(String rootName, PathType pathType, String fullPathName) {
 		
 		/* path's must be absolute (relative to the root of this name space */
 		if (!PathUtils.isAbsolutePath(fullPathName)) {
@@ -359,7 +573,7 @@ public class FileNameSpaces {
 		/* convert the absolute path in /-separated path components */
 		String components[] = PathUtils.tokenizePath(fullPathName);
 		
-		int parentId = getRootPath(spaceName);
+		int parentId = getRootPath(rootName);
 		
 		/* for each path name component, make sure it's added, then move to the next */
 		int len = components.length - 1;
@@ -376,11 +590,12 @@ public class FileNameSpaces {
 	/**
 	 * Return the given path's parent path ID, and the path's own name.
 	 * @return An array of three Objects. The first is the parent's path ID (Integer), the
-	 * second is true if this is a directory, else false and the
-	 * third is the path's own name (String). Returns null if there's no matching record.
+	 * second is true if this is a directory, else false, the
+	 * third is the path's own name (String), and the fourth is the name of the attached
+	 * root (if any). Returns null if there's no matching record.
 	 */
 	private Object[] getPathDetails(int pathId) {
-		Object result[] = new Object[3];
+		Object result[] = new Object[4];
 		
 		try {
 			findPathDetailsPrepStmt.setInt(1, pathId);
@@ -389,6 +604,7 @@ public class FileNameSpaces {
 				result[0] = rs.getInt(1);
 				result[1] = intToPathType(rs.getInt(2));
 				result[2] = rs.getString(3);
+				result[3] = rs.getString(4);
 				rs.close();
 			} else {
 				
@@ -397,7 +613,7 @@ public class FileNameSpaces {
 			}
 			
 		} catch (SQLException e) {
-			new FatalBuildStoreError("SQL error", e);
+			throw new FatalBuildStoreError("SQL error", e);
 		}
 				
 		return result;
@@ -426,17 +642,33 @@ public class FileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	private void getPathNameHelper(StringBuffer sb, int pathId) {
+	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots) {
 
 		Object pathDetails[] = getPathDetails(pathId);
 		int parentID = (Integer)pathDetails[0];
 		String name = (String)pathDetails[2];
+		String rootName = (String)pathDetails[3];
 	
-		if (!name.equals("/")){
-			getPathNameHelper(sb, parentID);
-			sb.append("/");
-			sb.append(name);
+		/* 
+		 * If we're showing root names, and we've reached one, display it and terminate recursion
+		 */
+		if (showRoots && (rootName != null)) {
+			sb.append(rootName);
+			sb.append(':');
+			return;
 		}
+		
+		/*
+		 * If we're not showing roots, we terminate recursion at the / path.
+		 */
+		else if (!showRoots && name.equals("/")){
+			return;
+		}
+		
+		/* else, recursive up the parent chain, display each path component after we returned */
+		getPathNameHelper(sb, parentID, showRoots);
+		sb.append("/");
+		sb.append(name);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

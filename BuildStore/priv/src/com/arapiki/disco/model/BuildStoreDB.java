@@ -164,15 +164,19 @@ class BuildStoreDB  {
 			stat.executeUpdate("create index buildFileIncludesIdx2 on fileIncludes (fileId1)");
 			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
-			/* Create the "build_tasks" table. */
+			/* Create the "buildTasks" table. */
 			stat.executeUpdate("create table buildTasks ( taskId integer primary key, command text)");
 			// TODO: do we need an index here?
 			
-			/* Create the "build_task_files" tables. */
+			/* Create the "buildTaskFiles" tables. */
 			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");			
 			stat.executeUpdate("create index buildTaskFilesIdx1 on buildTaskfiles (fileId)");
 			stat.executeUpdate("create unique index buildTaskFilesIdx2 on buildTaskfiles (taskId, fileId)");
 			stat.executeUpdate("create index buildTaskFilesIdx3 on buildTaskfiles (fileId, operation)");
+			
+			/* Create the "file_roots" table */
+			stat.executeUpdate("create table fileRoots (name text primary key, fileId integer)");	
+			stat.executeUpdate("insert into fileRoots values (\"root\", 0)");
 			
 			stat.close();
 						
@@ -192,6 +196,7 @@ class BuildStoreDB  {
 			stat.executeUpdate("drop table if exists fileIncludes");
 			stat.executeUpdate("drop table if exists buildTasks");
 			stat.executeUpdate("drop table if exists buildTaskFiles");
+			stat.executeUpdate("drop table if exists fileRoots");
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to drop database schema", e);
