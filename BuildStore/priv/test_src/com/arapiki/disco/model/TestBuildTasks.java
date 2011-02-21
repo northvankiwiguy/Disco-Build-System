@@ -101,10 +101,10 @@ public class TestBuildTasks {
 		int task = bts.addBuildTask("gcc -o foo foo.c");
 		
 		/* create a number of new files */
-		int fileFooC = bsfs.addFile("root", "/a/b/c/foo.c");
-		int fileFooH = bsfs.addFile("root", "/a/b/c/foo.h");
-		int fileFooO = bsfs.addFile("root", "/a/b/c/foo.o");
-		int fileFoo = bsfs.addFile("root", "/a/b/c/foo");
+		int fileFooC = bsfs.addFile("/a/b/c/foo.c");
+		int fileFooH = bsfs.addFile("/a/b/c/foo.h");
+		int fileFooO = bsfs.addFile("/a/b/c/foo.o");
+		int fileFoo = bsfs.addFile("/a/b/c/foo");
 		
 		/* record that these files are accessed by the task */
 		bts.addFileAccess(task, fileFooC, OperationType.OP_READ);
@@ -159,13 +159,13 @@ public class TestBuildTasks {
 		int task3 = bts.addBuildTask("gcc -o mult.o mult.c");
 
 		/* and a bunch of files that access those tasks */
-		int file1 = bsfs.addFile("root", "/clock.o");
-		int file2 = bsfs.addFile("root", "/clock.c");
-		int file3 = bsfs.addFile("root", "/banner.o");
-		int file4 = bsfs.addFile("root", "/banner.c");
-		int file5 = bsfs.addFile("root", "/mult.o");
-		int file6 = bsfs.addFile("root", "/mult.c");
-		int file7 = bsfs.addFile("root", "/stdio.h");
+		int file1 = bsfs.addFile("/clock.o");
+		int file2 = bsfs.addFile("/clock.c");
+		int file3 = bsfs.addFile("/banner.o");
+		int file4 = bsfs.addFile("/banner.c");
+		int file5 = bsfs.addFile("/mult.o");
+		int file6 = bsfs.addFile("/mult.c");
+		int file7 = bsfs.addFile("/stdio.h");
 		
 		/* now register each task's file accesses */
 		bts.addFileAccess(task1, file1, OperationType.OP_WRITE);

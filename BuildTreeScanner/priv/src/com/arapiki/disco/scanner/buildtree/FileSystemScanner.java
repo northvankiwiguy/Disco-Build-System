@@ -56,7 +56,7 @@ public class FileSystemScanner {
 	 * paths starting with the /usr/include/sys prefix. However, adding "sys" will result 
 	 * in everything starting with just "/sys".
 	 */
-	public void scanForFiles(final String spaceName, String fileSystemPath) {
+	public void scanForFiles(final String rootName, String fileSystemPath) {
 		
 		/* these need to be final so the callback class (see later) can access them */
 		final FileNameSpaces fns = bs.getFileNameSpaces();
@@ -77,7 +77,7 @@ public class FileSystemScanner {
 					@Override
 					public void callback(File thisPath) {
 						String pathName = thisPath.toString();
-						if (fns.addFile(spaceName, "/" + pathName) == -1){
+						if (fns.addFile(rootName + ":/" + pathName) == -1){
 							throw new FatalBuildTreeScannerError("Adding file name /" + pathName +
 									" to BuildStore returned an error."); 
 						}

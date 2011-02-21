@@ -317,8 +317,8 @@ public class FileNameSpaces {
 	 * @return the ID of the newly added file, or -1 if the file couldn't be added within
 	 * this part of the tree (such as when the parent itself is a file, not a directory).
 	 */
-	public int addFile(String rootNameName, String fullPathName) {
-		return addPath(rootNameName, PathType.TYPE_FILE, fullPathName);
+	public int addFile(String fullPathName) {
+		return addPath(PathType.TYPE_FILE, fullPathName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -329,13 +329,13 @@ public class FileNameSpaces {
 	 * @return the ID of the newly added file, or -1 if the directory couldn't be added within
 	 * this part of the tree (such as when the parent itself is a file, not a directory).
 	 */
-	public int addDirectory(String rootName, String fullPathName) {
-		return addPath(rootName, PathType.TYPE_DIR, fullPathName);
+	public int addDirectory(String fullPathName) {
+		return addPath(PathType.TYPE_DIR, fullPathName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	public int addSymlink(String rootName, String fullPath) {
+	public int addSymlink(String fullPath) {
 		
 		// TODO: implement this
 		return -1;
@@ -402,8 +402,15 @@ public class FileNameSpaces {
 	 * @param fullPath
 	 * @return
 	 */
-	public int getPath(String rootName, String fullPath) {
-		String components[] = PathUtils.tokenizePath(fullPath);
+	public int getPath(String fullPathName) {
+		
+		/* parse the path name and separate it into root and path components */
+		String rootAndPath[] = getRootAndPath(fullPathName);
+		String rootName = rootAndPath[0];
+		String pathName = rootAndPath[1];
+
+		/* split the path into components, separated by / */
+		String components[] = PathUtils.tokenizePath(pathName);
 
 		int parentID = getRootPath(rootName);
 		for (int i = 0; i < components.length; i++) {
@@ -563,15 +570,20 @@ public class FileNameSpaces {
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
-	private int addPath(String rootName, PathType pathType, String fullPathName) {
+	private int addPath(PathType pathType, String fullPathName) {
+		
+		/* parse the path name and separate it into root and path components */
+		String rootAndPath[] = getRootAndPath(fullPathName);
+		String rootName = rootAndPath[0];
+		String pathName = rootAndPath[1];
 		
 		/* path's must be absolute (relative to the root of this name space */
-		if (!PathUtils.isAbsolutePath(fullPathName)) {
+		if (!PathUtils.isAbsolutePath(pathName)) {
 			return -1;
 		}
 		
 		/* convert the absolute path in /-separated path components */
-		String components[] = PathUtils.tokenizePath(fullPathName);
+		String components[] = PathUtils.tokenizePath(pathName);
 		
 		int parentId = getRootPath(rootName);
 		
@@ -705,6 +717,39 @@ public class FileNameSpaces {
 			throw new FatalBuildStoreError("SQL problem in prepared statement", e);
 		}
 	}	
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a path name of the format "root:/absolute/path/name", split out the root and
+	 * path components. If not root component is provided, default to "root". Note: minimal 
+	 * error checking is done on the root and path names, so they should be validated by this
+	 * method's caller.
+	 * @param fullPathName
+	 * @return A String[2] array, where element 0 is the root name, and element 1 is the 
+	 * path name.
+	 */
+	private String[] getRootAndPath(String fullPathName) {
+		
+		/* the default values, in case no root: is provided */
+		String rootName = "root";
+		String pathName = fullPathName;
+		
+		/* 
+		 * See if there's a colon, if so, split the full path into
+		 * "root" and "path name" components.
+		 */
+		int colonIndex = fullPathName.indexOf(':');
+		if (colonIndex != -1){
+			rootName = fullPathName.substring(0, colonIndex);
+			pathName = fullPathName.substring(colonIndex + 1);
+		}
+		
+		String resultPair[] = new String[2];
+		resultPair[0] = rootName;
+		resultPair[1] = pathName;
+		return resultPair;
+	}
 	
 	/*=====================================================================================*/
 }

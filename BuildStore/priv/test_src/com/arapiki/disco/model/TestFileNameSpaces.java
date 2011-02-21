@@ -145,17 +145,17 @@ public class TestFileNameSpaces {
 	 */
 	@Test
 	public void testAddFile() throws Exception {
-		int path1 = bsfs.addFile("root", "/aardvark/beaver/camel/dog");
-		int path2 = bsfs.addFile("root", "/aardvark/beaver/camel/doggish");
-		int path3 = bsfs.addFile("root", "/aardvark/beaver/cat/dog");
+		int path1 = bsfs.addFile("/aardvark/beaver/camel/dog");
+		int path2 = bsfs.addFile("/aardvark/beaver/camel/doggish");
+		int path3 = bsfs.addFile("/aardvark/beaver/cat/dog");
 		assertNotSame(path1, path2);
 		assertNotSame(path2, path3);
 
-		int path4 = bsfs.addFile("root", "/aardvark/beaver/cat/dog");
+		int path4 = bsfs.addFile("/aardvark/beaver/cat/dog");
 		assertEquals(path3, path4);
 		
 		/* test case where non-absolute path is provided */
-		int path5 = bsfs.addFile("root", "a/b/c");
+		int path5 = bsfs.addFile("a/b/c");
 		assertEquals(-1, path5);
 	}
 
@@ -168,43 +168,43 @@ public class TestFileNameSpaces {
 	public void testAddDirectory() throws Exception {
 		
 		/* Add some directories and make sure the names are correct */
-		int path1 = bsfs.addDirectory("root", "/aardvark/beaver/camel/dog");
-		int path2 = bsfs.addDirectory("root", "/aardvark/beaver/camel/doggish");
-		int path3 = bsfs.addDirectory("root", "/aardvark/beaver/cat/dog");
+		int path1 = bsfs.addDirectory("/aardvark/beaver/camel/dog");
+		int path2 = bsfs.addDirectory("/aardvark/beaver/camel/doggish");
+		int path3 = bsfs.addDirectory("/aardvark/beaver/cat/dog");
 		assertNotSame(path1, path2);
 		assertNotSame(path2, path3);
 
-		int path4 = bsfs.addDirectory("root", "/aardvark/beaver/cat/dog");
+		int path4 = bsfs.addDirectory("/aardvark/beaver/cat/dog");
 		assertEquals(path3, path4);
 		
 		/* Adding a directory within a directory is OK */
-		int path5 = bsfs.addDirectory("root", "/p1/p2");
+		int path5 = bsfs.addDirectory("/p1/p2");
 		assertNotSame(-1, path5);
-		int path6 = bsfs.addDirectory("root", "/p1/p2/p3");
+		int path6 = bsfs.addDirectory("/p1/p2/p3");
 		assertNotSame(-1, path6);
-		int path7 = bsfs.addDirectory("root", "/p1");
+		int path7 = bsfs.addDirectory("/p1");
 		assertNotSame(-1, path7);
 		
 		/* Adding a directory within a file is NOT OK */
-		int path8 = bsfs.addFile("root", "/p1/p2/p3/myfile");
+		int path8 = bsfs.addFile("/p1/p2/p3/myfile");
 		assertNotSame(-1, path8);
-		int path9 = bsfs.addDirectory("root", "/p1/p2/p3/myfile/mydir");
+		int path9 = bsfs.addDirectory("/p1/p2/p3/myfile/mydir");
 		assertEquals(-1, path9);
 		
 		/* Trying to add an existing file as a directory is NOT OK */
-		int path10 = bsfs.addFile("root", "/x/y/z/file");
+		int path10 = bsfs.addFile("/x/y/z/file");
 		assertNotSame(-1, path10);
-		int path11 = bsfs.addDirectory("root", "/x/y/z/file");
+		int path11 = bsfs.addDirectory("/x/y/z/file");
 		assertEquals(-1, path11);
 		
 		/* but getting the path is OK */
-		int path12 = bsfs.getPath("root", "x/y/z/file");
+		int path12 = bsfs.getPath("x/y/z/file");
 		assertEquals(path12, path10);
 
 		/* Trying to add an existing directory as a file is NOT OK */
-		int path13 = bsfs.addDirectory("root", "/x/y/z/dir");
+		int path13 = bsfs.addDirectory("/x/y/z/dir");
 		assertNotSame(-1, path13);
-		int path14 = bsfs.addFile("root", "/x/y/z/dir");
+		int path14 = bsfs.addFile("/x/y/z/dir");
 		assertEquals(-1, path14);
 	}
 
@@ -217,14 +217,14 @@ public class TestFileNameSpaces {
 	public void testGetPathType() throws Exception {
 		
 		/* add a file, and check that it's a file */
-		int path1 = bsfs.addFile("root", "/antarctica/brazil/chile/denmark");
+		int path1 = bsfs.addFile("/antarctica/brazil/chile/denmark");
 		assertEquals(PathType.TYPE_FILE, bsfs.getPathType(path1));
 
 		/* check that all the parent paths are of type TYPE_DIR */
-		int path2 = bsfs.addDirectory("root", "/antarctica/brazil/chile");
-		int path3 = bsfs.getPath("root", "/antarctica/brazil");
-		int path4 = bsfs.getPath("root", "/antarctica");
-		int path5 = bsfs.getPath("root", "/");
+		int path2 = bsfs.addDirectory("/antarctica/brazil/chile");
+		int path3 = bsfs.getPath("/antarctica/brazil");
+		int path4 = bsfs.getPath("/antarctica");
+		int path5 = bsfs.getPath("/");
 
 		assertEquals(PathType.TYPE_DIR, bsfs.getPathType(path2));
 		assertEquals(PathType.TYPE_DIR, bsfs.getPathType(path3));
@@ -232,12 +232,12 @@ public class TestFileNameSpaces {
 		assertEquals(PathType.TYPE_DIR, bsfs.getPathType(path5));
 		
 		/* test that you can't add a file within a file */
-		int path6 = bsfs.addFile("root", "/a/b/c");
-		int path7 = bsfs.addFile("root", "/a/b/c/d");
+		int path6 = bsfs.addFile("/a/b/c");
+		int path7 = bsfs.addFile("/a/b/c/d");
 		assertEquals(-1, path7);
 		
 		/* test adding at the top level */
-		int path8 = bsfs.addFile("root", "/moose");
+		int path8 = bsfs.addFile("/moose");
 		assertEquals(PathType.TYPE_FILE, bsfs.getPathType(path8));
 	}
 
@@ -250,21 +250,21 @@ public class TestFileNameSpaces {
 	public void testGetPath() throws Exception {
 
 		/* check that the first path we lookup from an empty database is missing */
-		int missingPath1 = bsfs.getPath("root", "/anchovy/bacon/cheddar/dill");
+		int missingPath1 = bsfs.getPath("/anchovy/bacon/cheddar/dill");
 		assertEquals(-1, missingPath1);
 		
 		/* now add it, and check it again */
-		int newPath1 = bsfs.addFile("root", "/anchovy/bacon/cheddar/dill");
-		int existingPath1 = bsfs.getPath("root", "/anchovy/bacon/cheddar/dill");
+		int newPath1 = bsfs.addFile("/anchovy/bacon/cheddar/dill");
+		int existingPath1 = bsfs.getPath("/anchovy/bacon/cheddar/dill");
 		assertEquals(newPath1, existingPath1);
 		assertNotSame(-1, existingPath1);
 
 		/* now check for a second path, it should be missing */
-		int missingPath2 = bsfs.getPath("root", "/anchovy/bacon/cottage/cheese");
+		int missingPath2 = bsfs.getPath("/anchovy/bacon/cottage/cheese");
 		assertEquals(-1, missingPath2);
 		
-		int newPath2 = bsfs.addFile("root", "/anchovy/bacon/cottage/cheese");
-		int existingPath2 = bsfs.getPath("root", "/anchovy/bacon/cottage/cheese");
+		int newPath2 = bsfs.addFile("/anchovy/bacon/cottage/cheese");
+		int existingPath2 = bsfs.getPath("/anchovy/bacon/cottage/cheese");
 		assertEquals(newPath2, existingPath2);
 		assertNotSame(existingPath1, existingPath2);
 	}
@@ -277,9 +277,9 @@ public class TestFileNameSpaces {
 	@Test
 	public void testGetBaseName() throws Exception {
 
-		int path1 = bsfs.addFile("root", "/pen");
-		int path2 = bsfs.addFile("root", "/apple/blueberry/carrot");
-		int path3 = bsfs.addFile("root", "/ear/foot/knee");
+		int path1 = bsfs.addFile("/pen");
+		int path2 = bsfs.addFile("/apple/blueberry/carrot");
+		int path3 = bsfs.addFile("/ear/foot/knee");
 		int path4 = bsfs.getRootPath("root");
 
 		assertEquals("pen", bsfs.getBaseName(path1));
@@ -300,10 +300,10 @@ public class TestFileNameSpaces {
 	public void testGetParentPath() throws Exception {
 
 		/* Create a single file, then check that all parents match up */
-		int path1 = bsfs.addFile("root", "/albania/bolivia/canada/denmark");
-		int path2 = bsfs.getPath("root", "/albania/bolivia/canada");
-		int path3 = bsfs.getPath("root", "/albania/bolivia");		
-		int path4 = bsfs.getPath("root", "/albania");
+		int path1 = bsfs.addFile("/albania/bolivia/canada/denmark");
+		int path2 = bsfs.getPath("/albania/bolivia/canada");
+		int path3 = bsfs.getPath("/albania/bolivia");		
+		int path4 = bsfs.getPath("/albania");
 		int path5 = bsfs.getRootPath("root");
 		
 		assertEquals(path2, bsfs.getParentPath(path1));
@@ -326,9 +326,9 @@ public class TestFileNameSpaces {
 	@Test
 	public void testGetPathName() throws Exception {
 
-		int path1 = bsfs.addFile("root", "/pen");
-		int path2 = bsfs.addFile("root", "/apple/blueberry/carrot");
-		int path3 = bsfs.addFile("root", "/ear/foot/knee");
+		int path1 = bsfs.addFile("/pen");
+		int path2 = bsfs.addFile("/apple/blueberry/carrot");
+		int path3 = bsfs.addFile("/ear/foot/knee");
 
 		String path1name = bsfs.getPathName(path1);
 		String path2name = bsfs.getPathName(path2);
@@ -356,9 +356,9 @@ public class TestFileNameSpaces {
 		 * Add a couple of paths and check that they're returned
 		 * in alphabetical order.
 		 */
-		int path2 = bsfs.addFile("root", "/banana");
-		int path3 = bsfs.addFile("root", "/aardvark");
-		int path4 = bsfs.addDirectory("root", "/cello");
+		int path2 = bsfs.addFile("/banana");
+		int path3 = bsfs.addFile("/aardvark");
+		int path4 = bsfs.addDirectory("/cello");
 		children = bsfs.getChildPaths(path1);
 		assertEquals(path3, children[0].intValue());
 		assertEquals(path2, children[1].intValue());
@@ -367,9 +367,9 @@ public class TestFileNameSpaces {
 		/*
 		 * Add some more paths, underneath an existing path.
 		 */
-		int path5 = bsfs.addFile("root", "/cello/gold");
-		int path6 = bsfs.addFile("root", "/cello/silver");
-		int path7 = bsfs.addFile("root", "/cello/bronze");
+		int path5 = bsfs.addFile("/cello/gold");
+		int path6 = bsfs.addFile("/cello/silver");
+		int path7 = bsfs.addFile("/cello/bronze");
 		children = bsfs.getChildPaths(path4);
 		assertEquals(path7, children[0].intValue());
 		assertEquals(path5, children[1].intValue());
@@ -424,7 +424,7 @@ public class TestFileNameSpaces {
 			//System.out.println("Adding " + sb);
 
 			/* add the file name to the FileSpace */
-			bsfs.addFile("root", sb.toString());
+			bsfs.addFile(sb.toString());
 		}
 		bs.setFastAccessMode(false);
 

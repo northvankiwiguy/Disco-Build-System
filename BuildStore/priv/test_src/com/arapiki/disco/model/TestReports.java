@@ -39,8 +39,6 @@ public class TestReports {
 	/* our Reports object, used for testing */
 	private Reports reports;
 	
-	
-	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -64,11 +62,11 @@ public class TestReports {
 	public void testReportMostCommonlyAccessedFiles() {
 		
 		/* add some files */
-		int foxFile = fns.addFile("root", "/mydir/fox");
-		int boxFile = fns.addFile("root", "/mydir/box");
-		int soxFile = fns.addFile("root", "/mydir/sox");
-		int roxFile = fns.addFile("root", "/mydir/rox");
-		int dir = fns.addDirectory("root", "myEmptydir");
+		int foxFile = fns.addFile("/mydir/fox");
+		int boxFile = fns.addFile("/mydir/box");
+		int soxFile = fns.addFile("/mydir/sox");
+		int roxFile = fns.addFile("/mydir/rox");
+		int dir = fns.addDirectory("myEmptydir");
 
 		/* create three different tasks */
 		int task1 = bts.addBuildTask("command");
@@ -154,7 +152,7 @@ public class TestReports {
 		
 		/* add a bunch of files */
 		for (int i = 0; i != numFiles; i++) {
-			fns.addFile("root", String.valueOf(r.nextInt()));
+			fns.addFile(String.valueOf(r.nextInt()));
 		}
 		
 		/* add a (small) bunch of tasks, and associate files with them. */
@@ -180,11 +178,11 @@ public class TestReports {
 	public void testreportMostCommonIncludersOfFile() throws Exception {
 	
 		/* create some files */
-		int file1 = fns.addFile("root", "/mydir/files/fileA.h");
-		int file2 = fns.addFile("root", "/mydir/files/fileB.h");
-		int file3 = fns.addFile("root", "/mydir/files/fileC.h");
-		int file4 = fns.addFile("root", "/mydir/files/fileD.h");
-		int file5 = fns.addFile("root", "/mydir/files/fileE.h");
+		int file1 = fns.addFile("/mydir/files/fileA.h");
+		int file2 = fns.addFile("/mydir/files/fileB.h");
+		int file3 = fns.addFile("/mydir/files/fileC.h");
+		int file4 = fns.addFile("/mydir/files/fileD.h");
+		int file5 = fns.addFile("/mydir/files/fileE.h");
 	
 		/* register the include relationships, all for file2 */
 		fis.addFileIncludes(file1, file2);
@@ -235,8 +233,8 @@ public class TestReports {
 		bs.setFastAccessMode(true);
 		Random r = new Random();
 		
-		int file1 = fns.addFile("root", "/file1");
-		int file2 = fns.addFile("root", "/file2");
+		int file1 = fns.addFile("/file1");
+		int file2 = fns.addFile("/file2");
 		
 		/* add a bunch of files - some include file*/
 		for (int i = 0; i != numIncludes; i++) {
@@ -263,10 +261,10 @@ public class TestReports {
 		assertEquals(0, results.length);
 		
 		/* add some files and a couple of tasks */
-		int file1 = fns.addFile("root", "/home/psmith/myfile1");
-		int file2 = fns.addFile("root", "/home/psmith/myfile2");
-		int file3 = fns.addFile("root", "/home/psmith/myfile3");
-		int file4 = fns.addFile("root", "/home/psmith/myfile4");
+		int file1 = fns.addFile("/home/psmith/myfile1");
+		int file2 = fns.addFile("/home/psmith/myfile2");
+		int file3 = fns.addFile("/home/psmith/myfile3");
+		int file4 = fns.addFile("/home/psmith/myfile4");
 		
 		int task1 = bts.addBuildTask("task1");
 		int task2 = bts.addBuildTask("task2");
