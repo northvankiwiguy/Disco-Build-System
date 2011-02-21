@@ -224,8 +224,8 @@ public class FileNameSpaces {
 		
 		/* now, update the fileRoots table to refer to this new path */
 		try {
-			insertRootPrepStmt.setInt(1, pathId);
-			insertRootPrepStmt.setString(2, rootName);
+			updateRootPathPrepStmt.setInt(1, pathId);
+			updateRootPathPrepStmt.setString(2, rootName);
 			db.executePrepUpdate(updateRootPathPrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);

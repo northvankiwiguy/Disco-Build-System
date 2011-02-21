@@ -191,6 +191,10 @@ public class TestFileNameSpacesRoots {
 		/* now, let's move the root to path3 */
 		assertEquals(ErrorCode.OK, bsfs.moveRootToPath("newRoot", path3));
 		
+		/* make sure it actually moved */
+		assertEquals("newRoot", bsfs.getRootAtPath(path3));
+		assertEquals(path3, bsfs.getRootPath("newRoot"));
+		
 		/* try to move a root that doesn't yet exist */
 		assertEquals(ErrorCode.NOT_FOUND, bsfs.moveRootToPath("nonRoot", path4));
 		
