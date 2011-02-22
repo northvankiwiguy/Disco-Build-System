@@ -30,14 +30,27 @@ import com.arapiki.disco.model.FileNameSpaces;
 	 * Provide a list of all files in the BuildStore.
 	 * @param buildStore The BuildStore to query.
 	 */
-	/* package */ static void reportAllFiles(BuildStore buildStore) {
+	/* package */ static void showFiles(BuildStore buildStore, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		int rootPath = fns.getRootPath("root");
+		int rootPath;
 		
-		StringBuffer pathSoFar = new StringBuffer();
-		pathSoFar.append("${root}");
-		reportAllFilesHelper(fns, pathSoFar, rootPath, 0);
+		/* 
+		 * If the user provided a starting point on the traversal, use that, else
+		 * use the tree's top root.
+		 */
+		if (cmdArgs.length == 2) {
+			String rootPathName = cmdArgs[1];
+			rootPath = fns.getPath(rootPathName);
+			if (rootPath == -1) {
+				System.err.println("Error: Invalid path " + rootPathName);
+				System.exit(1);
+			}
+		} else {
+			rootPath = fns.getRootPath("root");
+		} 
+		
+		showFilesHelper(fns, rootPath, 0);
 	}
 
 	/*=====================================================================================*
@@ -51,29 +64,12 @@ import com.arapiki.disco.model.FileNameSpaces;
 	 * @param pathId The start point of the recursion
 	 * @param indent The number of spaces to indent each line
 	 */
-	private static void reportAllFilesHelper(FileNameSpaces fns, StringBuffer pathSoFar,
-			int pathId, int indent) {
-
-		/* Print out this path's name, including the necessary indent level */
-		String cmptName = fns.getBaseName(pathId);
+	private static void showFilesHelper(FileNameSpaces fns, int pathId, int indent) {
 		
-		// TODO: make indentation a configuration option
-		//PrintUtils.indent(System.out, indent);
-		System.out.print(pathSoFar);
-		System.out.println(cmptName);
-		
-		/* now consider the children, if there are any */
+		System.out.println(fns.getPathName(pathId, true));
 		Integer children[] = fns.getChildPaths(pathId);
-		if (children.length != 0) {
-			int sbLen = pathSoFar.length();
-			pathSoFar.append(cmptName);
-			if (!cmptName.equals("/")){
-				pathSoFar.append('/');
-			}
-			for (int i = 0; i < children.length; i++) {
-				reportAllFilesHelper(fns, pathSoFar, children[i], indent + 2);
-			}
-			pathSoFar.setLength(sbLen);
+		for (int i = 0; i < children.length; i++) {
+			showFilesHelper(fns, children[i], indent + 2);
 		}
 	}
 

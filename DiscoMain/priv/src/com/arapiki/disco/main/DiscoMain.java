@@ -126,9 +126,9 @@ public final class DiscoMain {
 		System.err.println("\tscan-tree <directories>    Scan one or more file system directory and record file names.");
 		
 		System.err.println("\nReporting commands:");
-		System.err.println("\treport-all-files           List all files recorded in the build store.");
-		System.err.println("\treport-unused-files        Report on files that are never used by the build system.");
-		System.err.println("\treport-most-used           Report on files the build system accessed the most.");
+		System.err.println("\tshow-files                 List all files recorded in the build store.");
+		System.err.println("\tshow-unused-files          Report on files that are never used by the build system.");
+		System.err.println("\tshow-most-used             Report on files the build system accessed the most.");
 		
 		System.err.println("\nFile System commands:");
 		System.err.println("\tshow-root [<root-name>]    Show the file system path referred to by this root. Without");
@@ -165,9 +165,9 @@ public final class DiscoMain {
 		/*
 		 * Reporting commands
 		 */
-		else if (cmdName.equals("report-all-files")){
-			validateArgs(cmdArgs, 0, 0, "report-all-files doesn't require any arguments");
-			DiscoReports.reportAllFiles(buildStore);
+		else if (cmdName.equals("show-files")){
+			validateArgs(cmdArgs, 0, 1, "show-files [ <top-path> ]");
+			DiscoReports.showFiles(buildStore, cmdArgs);
 		}
 		
 		/*
