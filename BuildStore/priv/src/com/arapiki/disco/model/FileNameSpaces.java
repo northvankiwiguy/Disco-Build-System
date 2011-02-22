@@ -450,7 +450,11 @@ public class FileNameSpaces {
 		
 		/* if we're at the root, simply return /, else recurse */
 		if (pathId == 0) {
-			sb.append('/');
+			if (showRoots) {
+				sb.append("root:");
+			} else {
+				sb.append('/');
+			}
 		} else {
 			getPathNameHelper(sb, pathId, showRoots);
 		}

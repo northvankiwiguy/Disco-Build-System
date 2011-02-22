@@ -351,5 +351,11 @@ public class TestFileNameSpacesRoots {
 		/* delete the subsubroot, so the subroot is now returned */
 		assertEquals(ErrorCode.OK, bsfs.deleteRoot("subSubRoot"));
 		assertEquals("subRoot:/c/d/e.h", bsfs.getPathName(path1, true));
+		
+		/* test that the "/" case is handled properly */
+		int rootPath = bsfs.getPath("/");
+		assertEquals("/", bsfs.getPathName(rootPath, false));
+		assertEquals("root:", bsfs.getPathName(rootPath, true));
+		
 	}
 }
