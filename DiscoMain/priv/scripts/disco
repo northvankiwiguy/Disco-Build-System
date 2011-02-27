@@ -22,13 +22,14 @@ then
     
 	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
 	export CLASSPATH="$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
-	
+	export LD_LIBRARY_PATH="$WORK/Utilities/pub"
 #
 # Case 2 for a fully installed disco release - everything is in a single jar file.
 #
 elif [ -e "$DISCO_HOME/lib/disco.jar" ];
 then
 	export CLASSPATH="$DISCO_HOME/lib/disco.jar"
+	export LD_LIBRARY_PATH="$DISCO_HOME/lib"
 
 #
 # Else, it's an error

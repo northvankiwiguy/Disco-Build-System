@@ -23,7 +23,7 @@
 	<!--
 	   - Build the output jar file for the project. 
       -->
-	<target name="jars" depends="java">
+	<target name="jars" depends="java, extra-compilation">
 		<echo>Checking ${jar-file}</echo>
 		<mkdir dir="${pub-dir}" />
 		<jar basedir="${bin-dir}" jarfile="${jar-file}"/>
@@ -63,6 +63,11 @@
 	   - Default "build-upstream-components" target, in case it's not overidden.
 	  -->
 	<target name="build-upstream-components" />
+	
+	<!--
+	   - Default "extra-compilation" target, in case it's not overidden.
+	  -->
+	<target name="extra-compilation" />
 
 	<!--
 	   - Default "project-clean" target, in case it's not overidden.

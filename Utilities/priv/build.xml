@@ -9,8 +9,56 @@
 
 	<!-- no extra classpath for this project -->
 	<path id="project-classpath" />
-	
+
+	<!-- where we'll generate native code -->
+	<property name="gen-src" location="bin/gensrc" />
+
+	<!-- location of native src code -->
+	<property name="native-src" location="src/native" />
+		
 	<!-- import the common build file definitions -->	
 	<import file="build-common.xml" />
+
+	<!-- name of the native library we'll build -->
+	<property name="native-lib" location="${pub-dir}/libnativeLib.so" />
+		
+	<!-- build native methods -->
+	<target name="extra-compilation" depends="extra-comp-1, extra-comp-2" />
 	
+	<target name="extra-comp-1">
+		<mkdir dir="${gen-src}" />
+		<javah class="com.arapiki.utils.os.SystemUtils" classpath="bin" destdir="${gen-src}" />		
+	</target>
+	
+	<target name="check-native-uptodate">
+	  <uptodate property="native-uptodate" targetfile="${native-lib}" >
+	    <srcfiles dir= "${native-src}" includes="*.c"/>
+	  	<srcfiles dir="${gen-src}" includes="*.h" />
+	  </uptodate>
+	</target>
+
+	<target name="extra-comp-2" depends="check-native-uptodate" unless="native-uptodate">
+		<echo>Compiling native methods</echo>
+		<mkdir dir="${pub-dir}" />
+		<exec executable="gcc" >
+			<arg line="-o" />
+			<arg line="${native-lib}" />
+			<arg line="-shared" />
+			<arg line="-Wl,-soname,libnative.so" />
+			<arg line="-I${gen-src}" />
+			<arg line="-I${java.home}/../include" />
+			<arg line="-I${java.home}/../include/linux" />
+			<arg line="${native-src}/com_arapiki_utils_os_SystemUtils.c" />
+			<arg line="-static" />
+			<arg line="-lc" />
+		</exec>
+
+	</target>
+	
+	<!-- project-specific clean operations -->
+	<target name="project-clean">
+		<delete dir="${gen-src}" />
+	</target>
+
+		
 </project>

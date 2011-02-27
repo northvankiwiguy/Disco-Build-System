@@ -69,13 +69,18 @@
 		
 		<!-- copy the "disco" shell script -->
 		<copy file="scripts/disco" todir="${pkg-dir}/bin" />
-		<chmod perm="0555" dest="${pkg-dir}/bin/disco" />
+		
+		<!-- copy the native Utilities library -->
+		<copy file="${project-root}/../Utilities/pub/libnativeLib.so" todir="${pkg-dir}/lib" />
 		
 		<!-- finally, tar up the whole release package -->
 		<delete file="${pub-dir}/disco-${version}.tar.gz" />
-		<tar destfile="${pub-dir}/disco-${version}.tar.gz" compression="gzip"> 
-			<tarfileset dir="${pkg-dir}/..">
-				<include name="disco-${version}/**"/>
+		<tar destfile="${pub-dir}/disco-${version}.tar.gz" compression="gzip" > 
+			<tarfileset dir="${pkg-dir}/.." dirmode="555" mode="555">
+				<include name="disco-${version}/bin/**"/>
+			</tarfileset>
+			<tarfileset dir="${pkg-dir}/.." dirmode="555" mode="444">
+				<include name="disco-${version}/lib/**"/>
 			</tarfileset>
 		</tar>
 			

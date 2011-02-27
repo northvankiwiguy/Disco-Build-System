@@ -13,13 +13,16 @@
 package com.arapiki.utils.os;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.arapiki.utils.errors.FatalError;
+
 /**
- * Various static methods for accessing the operating system features.
+ * Various static methods for accessing the operating system's features.
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class SystemUtils {
@@ -39,7 +42,54 @@ public class SystemUtils {
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * Static block - called when the class is first loaded. This will load any native
+	 * libraries that we need.
+	 */
+	static {
+		try {
+			System.loadLibrary("nativeLib");
+		} catch (Exception ex) {
+			throw new FatalError("Unable to load native methods.", ex);
+		}
+	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test whether a local file is a symlink (as opposed to a regular file or directory)
+	 * @param The file's name.
+	 * @return True if the file is a symlink, else false.
+	 * @exception FileNotFoundException If the file doesn't exist
+	 */
+	public static native boolean isSymlink(String fileName)
+		throws FileNotFoundException;
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Read the target of the specified symlink.
+	 * @param fileName The name of the symlink
+	 * @return The target of the symlink, or null if it's not a symlink, or if some other 
+	 *          error occurred.
+	 * @exception FileNotFoundException If the file doesn't exist
+	 */
+	public static native String readSymlink(String fileName)
+		throws FileNotFoundException;
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a new symlink on the local machine's file system.
+	 * @param fileName The name of the symlink that will be created.
+	 * @param targetFileName The destination of the symlink.
+	 * @return 0 if the symlink was created successfully, otherwise non-zero.
+	 */
+	public static native int createSymlink(String fileName, String targetFileName);
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Execute a shell command and capture the return code and output.
 	 * @param cmd The command to be executed.
@@ -99,6 +149,9 @@ public class SystemUtils {
 		File rootFile = new File(rootPath);
 		traverseFileSystemHelper(rootFile, null, null, pathsToReport, callbackObj);
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 
 	/**
 	 * 
@@ -123,6 +176,8 @@ public class SystemUtils {
 		
 		traverseFileSystemHelper(rootFile, mfPattern, idPattern, pathsToReport, callbackObj);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * 
@@ -187,4 +242,6 @@ public class SystemUtils {
 			throw new Error("Found a path that isn't a file or directory: " + thisPath.toString());
 		}
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
