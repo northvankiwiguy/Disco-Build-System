@@ -16,12 +16,10 @@ import static org.junit.Assert.*;
 
 import java.util.Random;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.disco.model.Reports.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -257,8 +255,8 @@ public class TestReports {
 	public void testFilesNeverAccessed() throws Exception {
 		
 		/* without any files in the database, return the empty list */
-		FileRecord results[] = reports.reportFilesNeverAccessed();
-		assertEquals(0, results.length);
+		FileSet results = reports.reportFilesNeverAccessed();
+		assertEquals(0, results.size());
 		
 		/* add some files and a couple of tasks */
 		int file1 = fns.addFile("/home/psmith/myfile1");
@@ -275,27 +273,28 @@ public class TestReports {
 		
 		/* file3 and file4 should both be in the results, but we don't know the order */
 		results = reports.reportFilesNeverAccessed();
-		assertEquals(2, results.length);
-		assertTrue((results[0].pathId == file3) && (results[1].pathId == file4) ||
-				(results[0].pathId == file4) && (results[1].pathId == file3));
-		
+		assertEquals(2, results.size());
+		assertTrue(results.isMember(file3));
+		assertTrue(results.isMember(file4));
+				
 		/* another task should access those same files, and the results will be the same */
 		bts.addFileAccess(task2, file2, OperationType.OP_READ);
 		bts.addFileAccess(task2, file1, OperationType.OP_WRITE);
 		results = reports.reportFilesNeverAccessed();
-		assertEquals(2, results.length);
-		assertTrue((results[0].pathId == file3) && (results[1].pathId == file4) ||
-				(results[0].pathId == file4) && (results[1].pathId == file3));
-		
+		assertEquals(2, results.size());
+		assertTrue(results.isMember(file3));
+		assertTrue(results.isMember(file4));
+				
 		/* now access file 3 */
 		bts.addFileAccess(task1, file3, OperationType.OP_READ);
 		results = reports.reportFilesNeverAccessed();
-		assertEquals(1, results.length);
-		assertEquals(file4, results[0].pathId);
+		assertEquals(1, results.size());
+		assertTrue(results.isMember(file4));
+		assertFalse(results.isMember(file3));
 		
 		/* finally access file 3 */
 		bts.addFileAccess(task2, file4, OperationType.OP_READ);
 		results = reports.reportFilesNeverAccessed();
-		assertEquals(0, results.length);		
+		assertEquals(0, results.size());
 	}
 }

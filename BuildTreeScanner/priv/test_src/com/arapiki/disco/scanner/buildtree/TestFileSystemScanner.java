@@ -19,9 +19,10 @@ import org.junit.Test;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.FileRecord;
+import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.TestCommon;
-import com.arapiki.disco.model.Reports.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -62,12 +63,12 @@ public class TestFileSystemScanner {
 		
 		/* display the list of files that were never accessed */
 		Reports reports = bs.getReports();
-		FileRecord results[] = reports.reportFilesNeverAccessed();
-		for (int i = 0; i < results.length; i++) {
-			String pathName = fns.getPathName(results[i].pathId);
+		FileSet results = reports.reportFilesNeverAccessed();
+		for (Integer pathId : results) {			
+			String pathName = fns.getPathName(pathId);
 			System.out.println(pathName);
 		}
-		System.out.println("Found " + results.length + " files");
+		System.out.println("Found " + results.size() + " files");
 		
 	}
 

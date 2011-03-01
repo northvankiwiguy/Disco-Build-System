@@ -63,7 +63,7 @@ public class BuildStore {
 		buildTasks = new BuildTasks(db);
 		
 		/* create a new Reports object to provide reporting methods */
-		reports = new Reports(db);
+		reports = new Reports(db, fileSpaces);
 	}
 	
 	/**

@@ -28,22 +28,18 @@ public class Reports {
 	/*=====================================================================================*
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
-
-	/**
-	 * This record is used when returning results from a report query. Each report
-	 * fills out the relevant parts of this record (not necessarily all fields).
-	 */
-	public class FileRecord {
-		public int pathId;	
-		public int count;
-		public int size;
-	}
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
 	 * to us when the Reports object is first instantiated.
 	 */
 	private BuildStoreDB db = null;
+	
+	/**
+	 * The FileNameSpaces object we're reporting on. This is provided to use when the
+	 * Reports object is first instantiated.
+	 */
+	private FileNameSpaces fns = null;
 	
 	/**
 	 * Various prepared statement for database access.
@@ -61,8 +57,9 @@ public class Reports {
 	/**
 	 * @param db
 	 */
-	public Reports(BuildStoreDB db) {
+	public Reports(BuildStoreDB db, FileNameSpaces fns) {
 		this.db = db;
+		this.fns = fns;
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from buildTaskFiles, files " +
@@ -83,7 +80,7 @@ public class Reports {
 	 *=====================================================================================*/
 
 	/**
-	 * Provides a list of the most commonly accessed files across the whole build store.
+	 * Provides an ordered list of the most commonly accessed files across the whole build store.
 	 * For each record, returns the number of unique tasks that accessed the file.
 	 * @return A list of FileRecord, sorted by most commonly accessed file first.
 	 */
@@ -135,10 +132,9 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	public FileRecord [] reportFilesNeverAccessed() {
+	public FileSet reportFilesNeverAccessed() {
 		
-		
-		ArrayList<FileRecord> results = new ArrayList<FileRecord>();
+		FileSet results = new FileSet(fns);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesNotUsedPrepStmt);
 
@@ -153,8 +149,7 @@ public class Reports {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
-		return results.toArray(new FileRecord[0]);
-		
+		return results;
 	}
 	
 	/*=====================================================================================*/
