@@ -18,6 +18,7 @@ import java.util.Iterator;
 import org.apache.commons.cli.*;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.utils.print.PrintUtils;
 
 /**
  * This is the main entry point for the "disco" command line program. All other projects (with
@@ -33,6 +34,12 @@ public final class DiscoMain {
 	
 	/* which file to use for the BuildStore database */
 	private static String buildStoreFileName = "buildstore";	
+	
+	/* should we use indentation when displaying reports? */
+	private static boolean optionShowIndents = false;
+
+	/* should we show roots when displaying reports? */
+	private static boolean optionShowRoots = false;
 	
 	/* when validating command line args - this value is considered infinite */
 	private static final int ARGS_INFINITE = -1;
@@ -61,7 +68,15 @@ public final class DiscoMain {
 		Option fOpt = new Option("f", "buildstore-file", true, "Name of buildstore to query/edit");
 		fOpt.setArgName("file-name");
 		opts.addOption(fOpt);
-	
+		
+		/* add the -i / --indent option */
+		Option iOpt = new Option("i", "indent", false, "Use indentation when displaying report output");
+		opts.addOption(iOpt);
+
+		/* add the -r / --show-roots option */
+		Option rOpt = new Option("r", "show-roots", false, "Show file name space roots when displaying report output");
+		opts.addOption(rOpt);
+
 		/*
 		 * Initiate the parsing process - also, report on any options that require
 		 * an argument but didn't receive one.
@@ -80,6 +95,8 @@ public final class DiscoMain {
 		if (line.hasOption('f')){
 			buildStoreFileName = line.getOptionValue('f');
 		}
+		optionShowIndents = line.hasOption('i');
+		optionShowRoots = line.hasOption('r');
 		
 		/*
 		 * Validate that at least one more argument (the command name) is provided.
@@ -101,6 +118,19 @@ public final class DiscoMain {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Display a formatted line in the help output. Used for lining up the columns in the help text.
+	 * @param leftCol The text in the left column
+	 * @param rightCol The text in the right column
+	 */
+	private static void formattedDisplayLine(String leftCol, String rightCol) {
+		System.err.print(leftCol);
+		PrintUtils.indent(System.err, 40 - leftCol.length());
+		System.err.println(rightCol);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Display a formatted error message to explain that the command line args
 	 * were invalid. Note: this method never returns, instead the whole program
 	 * is aborted.
@@ -115,26 +145,29 @@ public final class DiscoMain {
 		Collection<Option> optList = opts.getOptions();
 		for (Iterator<Option> iterator = optList.iterator(); iterator.hasNext();) {
 			Option thisOpt = iterator.next();
-			System.err.println("  -" + thisOpt.getOpt() + " | --" + 
-					thisOpt.getLongOpt() + " <" + thisOpt.getArgName() + ">\t" + thisOpt.getDescription());
+			String line = "    -" + thisOpt.getOpt() + " | --" + thisOpt.getLongOpt();
+			if (thisOpt.hasArg()) {
+				line += " <" + thisOpt.getArgName() + ">";
+			}
+			formattedDisplayLine(line, thisOpt.getDescription());
 		}
 
 		System.err.println("\nGeneral commands:");
-		System.err.println("\thelp                       Provides this help information.");
+		formattedDisplayLine("    help", "Provides this help information");
 		
 		System.err.println("\nScanning commands:");
-		System.err.println("\tscan-tree <directories>    Scan one or more file system directory and record file names.");
+		formattedDisplayLine("    scan-tree <directories>", "Scan one or more file system directory and record file names");
 		
 		System.err.println("\nReporting commands:");
-		System.err.println("\tshow-files                 List all files recorded in the build store.");
-		System.err.println("\tshow-unused-files          Report on files that are never used by the build system.");
-		System.err.println("\tshow-most-used             Report on files the build system accessed the most.");
+		formattedDisplayLine("    show-files", "List all files recorded in the build store.");
+		formattedDisplayLine("    show-unused-files", "Report on files that are never used by the build system.");
+		formattedDisplayLine("    show-most-used", "Report on files the build system accessed the most.");
 		
 		System.err.println("\nFile System commands:");
-		System.err.println("\tshow-root [<root-name>]    Show the file system path referred to by this root. Without");
-		System.err.println("\t                           arguments, list all available roots.");
-		System.err.println("\tset-root <root> <path>     Set the <root> to refer to the <path>");
-		System.err.println("\trm-root <root>             Remove the <root> so it no long references a path");
+		formattedDisplayLine("    show-root [<root-name>]", "Show the file system path referred to by this root. Without");
+		formattedDisplayLine("", "arguments, list all available roots.");
+		formattedDisplayLine("    set-root <root> <path>", "Set the <root> to refer to the <path>");
+		formattedDisplayLine("    rm-root <root>", "Remove the <root> so it no long references a path");
 
 		System.err.println("\nError: " + message);
 		System.exit(1);
@@ -167,7 +200,7 @@ public final class DiscoMain {
 		 */
 		else if (cmdName.equals("show-files")){
 			validateArgs(cmdArgs, 0, 1, "show-files [ <top-path> ]");
-			DiscoReports.showFiles(buildStore, cmdArgs);
+			DiscoReports.showFiles(buildStore, optionShowRoots, optionShowIndents, cmdArgs);
 		}
 		
 		/*
