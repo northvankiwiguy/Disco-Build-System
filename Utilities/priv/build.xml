@@ -40,7 +40,7 @@
 	<target name="extra-comp-2" depends="check-native-uptodate" unless="native-uptodate">
 		<echo>Compiling native methods</echo>
 		<mkdir dir="${pub-dir}" />
-		<exec executable="gcc" >
+		<exec executable="gcc" failonerror="true">
 			<arg line="-o" />
 			<arg line="${native-lib}" />
 			<arg line="-shared" />
