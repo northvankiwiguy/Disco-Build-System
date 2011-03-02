@@ -10,6 +10,15 @@
 	<fail unless="project-root" message="project-root property not set" />
 	<fail unless="project-jar" message="project-jar property not set" />
 	
+	<!-- check that we're using the minimum Java version level -->
+	<condition property="java-ok">
+		<or>
+			<equals arg1="${ant.java.version}" arg2="1.5" />
+			<equals arg1="${ant.java.version}" arg2="1.6" />
+		</or>
+	</condition>
+	<fail message="A JDK of version 1.5 or greater is required" unless="java-ok" />
+	
 	<!-- project definitions - all projects must look the same -->
 	<property name="priv-dir" location="${project-root}/priv" />
 	<property name="pub-dir" location="${project-root}/pub" />
