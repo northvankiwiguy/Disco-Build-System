@@ -3,5 +3,5 @@
 	<classpathentry kind="src" path="priv/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildStore"/>
-	<classpathentry kind="output" path="priv/obj"/>
+	<classpathentry kind="output" path="priv/bin"/>
 </classpath>
