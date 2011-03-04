@@ -20,7 +20,8 @@ Import('*')
 # build the interposer library.
 cfs_interposer_lib = env.SharedLibrary('cfs', 
 	['interposer/glibc_interpose.c',
-	 'interposer/trace_buffer.c'],
+	 'interposer/trace_buffer.c',
+	 'interposer/file_name_utils.c'],
 	LIBS=['dl'])
 
 # build the cfs executable
