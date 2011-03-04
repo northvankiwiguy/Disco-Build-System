@@ -11,6 +11,12 @@
 	<path id="project-classpath">
 		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
 		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
+		<pathelement location="${project-root}/../BuildStore/priv/lib/sqlitejdbc-v056.jar" />
+	</path>
+	
+	<!-- We make use of some of BuildStore's test methods -->
+	<path id="extra-test-classpath">
+		<pathelement location="${project-root}/../BuildStore/priv/test_bin" />
 	</path>
 
 	<!-- import the common build file definitions -->	

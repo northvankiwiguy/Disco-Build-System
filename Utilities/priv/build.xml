@@ -9,6 +9,9 @@
 
 	<!-- no extra classpath for this project -->
 	<path id="project-classpath" />
+	
+	<!-- no extra classpath for unit testing -->
+	<path id="extra-test-classpath" />
 
 	<!-- where we'll generate native code -->
 	<property name="gen-src" location="bin/gensrc" />

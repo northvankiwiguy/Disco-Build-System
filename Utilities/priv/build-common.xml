@@ -19,6 +19,12 @@
 	</condition>
 	<fail message="A JDK of version 1.5 or greater is required" unless="java-ok" />
 	
+	<!-- Check the minimum version of ant -->
+	<condition property="ant-ok">
+		<contains string="${ant.version}" substring="version 1.8" />
+	</condition>
+	<fail message="Ant version 1.8 or greater is required" unless="ant-ok" />
+	
 	<!-- project definitions - all projects must look the same -->
 	<property name="priv-dir" location="${project-root}/priv" />
 	<property name="pub-dir" location="${project-root}/pub" />
@@ -45,7 +51,7 @@
 		<echo>Checking ${ant.project.name} Java code</echo>
 		<mkdir dir="${bin-dir}" />
 		<depend srcdir="${src-dir}" destdir="${bin-dir}" />
-		<javac srcdir="${src-dir}" destdir="${bin-dir}" debug="true" classpathref="project-classpath"/>
+		<javac srcdir="${src-dir}" destdir="${bin-dir}" debug="true" classpathref="project-classpath" includeantruntime="false"/>
 	</target>
 	
 	<!--
@@ -82,6 +88,52 @@
 	   - Default "project-clean" target, in case it's not overidden.
 	  -->
 	<target name="project-clean" />
+	
+	<!-- The classpath to use when unit testing -->
+	<path id="test-classpath">
+		<path refid="project-classpath" />
+		<path location="${bin-dir}" />
+		<path location="${test-bin-dir}" />
+		<path refid="extra-test-classpath" />
+	</path>
+	
+	<!-- The java.library.path to use for running unit tests -->
+	<property name="java-library-path" location="${project-root}/../Utilities/pub" />
+
+	<!--
+	   - Compile all the (non-test) java files in this project.
+      -->
+	<target name="test-java" depends="java">
+		<echo>Checking ${ant.project.name} Java test code</echo>
+		<mkdir dir="${test-bin-dir}" />
+		<depend srcdir="${test-src-dir}" destdir="${test-bin-dir}" />
+		<javac srcdir="${test-src-dir}" destdir="${test-bin-dir}" debug="true" 
+				classpathref="test-classpath" includeantruntime="true" />
+	</target>
+	
+	<!--
+	   - Execute unit tests using junit
+	  -->
+	<target name="test" depends="test-java">
+		<junit fork="yes" printsummary="false" haltonfailure="false">
 		
+			<!-- ensure that the correct classpath and library path is set up -->
+			<jvmarg value="-Djava.library.path=${java-library-path}" />
+			<classpath refid="test-classpath" />
+			
+			<formatter type="brief" usefile="false" />
+			
+			<!--
+			   - Attempt to run all classes that start with "Test", although
+			   - skip any inner classes, since these aren't usually test classes.
+			  -->
+			<batchtest fork="yes">
+				<fileset dir="${test-bin-dir}">
+					<include name="**/Test*.class" />
+					<exclude name="**/Test*$*.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
 </project>

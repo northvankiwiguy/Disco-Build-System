@@ -10,7 +10,11 @@
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
 		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
+		<pathelement location="${project-root}/priv/lib/sqlitejdbc-v056.jar" />
 	</path>
+
+	<!-- no extra classpath for unit testing -->
+	<path id="extra-test-classpath" />
 
 	<!-- import the common build file definitions -->	
 	<import file="${project-root}/../Utilities/priv/build-common.xml" />

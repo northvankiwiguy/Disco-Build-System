@@ -102,5 +102,15 @@
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
 	</target>
+	
+	<!--
+	   - Test all projects.
+	  -->
+	<target name="test-all">
+		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="test" inheritall="false" />
+		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="test" inheritall="false" />
+		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="test" inheritall="false" />
+		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="test" inheritall="false" />
+	</target>
 		
 </project>
