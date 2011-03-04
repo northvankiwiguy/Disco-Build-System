@@ -44,7 +44,7 @@ public class TestReports {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		fns = bs.getFileNameSpaces();
 		bts = bs.getBuildTasks();
 		fis = bs.getFileIncludes();

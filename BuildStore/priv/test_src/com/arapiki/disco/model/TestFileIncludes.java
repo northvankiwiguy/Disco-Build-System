@@ -39,7 +39,7 @@ public class TestFileIncludes {
 	@Before
 	public void setUp() throws Exception {
 		/* get a new empty BuildStore */
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		
 		/* fetch the associated FileDependencies */
 		fdeps = bs.getFileIncludes();
@@ -127,13 +127,13 @@ public class TestFileIncludes {
 		fdeps.addFileIncludes(10, 1);
 		
 		/* search for the files that include file 1 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] {2, 3, 4, 7, 10}, fdeps.getFilesThatInclude(1)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {2, 3, 4, 7, 10}, fdeps.getFilesThatInclude(1)));
 
 		/* search for the files that include file 2 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] {5, 6}, fdeps.getFilesThatInclude(2)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {5, 6}, fdeps.getFilesThatInclude(2)));
 
 		/* search for the files that include file 3 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] {8, 9}, fdeps.getFilesThatInclude(3)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {8, 9}, fdeps.getFilesThatInclude(3)));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -156,16 +156,16 @@ public class TestFileIncludes {
 		fdeps.addFileIncludes(10, 1);
 		
 		/* search for the files that are included by file 10 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] { 1 }, fdeps.getFilesIncludedBy(10)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1 }, fdeps.getFilesIncludedBy(10)));
 
 		/* search for the files that are included by 3 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] { 2, 3, 9, 10 }, fdeps.getFilesIncludedBy(3)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 2, 3, 9, 10 }, fdeps.getFilesIncludedBy(3)));
 
 		/* search for the files that are include by 2 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] { 1, 3, 4, 10 }, fdeps.getFilesIncludedBy(2)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1, 3, 4, 10 }, fdeps.getFilesIncludedBy(2)));
 		
 		/* search for the files that are include by 11 */
-		assertTrue(TestCommon.sortedArraysEqual(new Integer[] { }, fdeps.getFilesIncludedBy(11)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { }, fdeps.getFilesIncludedBy(11)));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

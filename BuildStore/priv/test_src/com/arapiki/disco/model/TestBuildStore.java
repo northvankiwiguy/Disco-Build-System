@@ -39,7 +39,7 @@ public class TestBuildStore {
 	public void setUp() throws Exception {
 	
 		/* get a new empty BuildStore */
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		
 		/* fetch the associated FileSpace */
 		bsfs = bs.getFileNameSpaces();

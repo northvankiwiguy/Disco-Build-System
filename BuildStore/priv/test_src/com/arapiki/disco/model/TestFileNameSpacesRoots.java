@@ -40,7 +40,7 @@ public class TestFileNameSpacesRoots {
 	@Before
 	public void setUp() throws Exception {
 		/* get a new empty BuildStore */
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		
 		/* fetch the associated FileSpace */
 		bsfs = bs.getFileNameSpaces();
@@ -150,25 +150,25 @@ public class TestFileNameSpacesRoots {
 		
 		/* by default, there should be one root only */
 		String roots[] = bsfs.getRoots();
-		TestCommon.sortedArraysEqual(roots, new String[] { "root" });
+		CommonTestUtils.sortedArraysEqual(roots, new String[] { "root" });
 		
 		/* add one with a low-alphabetical name */
 		int path1 = bsfs.addDirectory("root:/aardvark/bear/cat/donkey");
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("aroot", path1));
 		roots = bsfs.getRoots();
-		TestCommon.sortedArraysEqual(roots, new String[] { "aroot", "root" });
+		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root" });
 
 		/* add one with a high-alphabetical name */
 		int path2 = bsfs.addDirectory("root:/aardvark/bear/cat/deer");
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("zebraroot", path2));
 		roots = bsfs.getRoots();
-		TestCommon.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });
+		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });
 
 		/* adding an invalid root doesn't change anything */
 		int path3 = bsfs.addDirectory("root:/aardvark/bear/cat/dragon");
 		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("zebra root", path3));
 		roots = bsfs.getRoots();
-		TestCommon.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });		
+		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.disco.model.TestCommon;
+import com.arapiki.disco.model.CommonTestUtils;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -46,7 +46,7 @@ public class TestBuildTasks {
 	@Before
 	public void setUp() throws Exception {
 		/* get a new empty BuildStore */
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		
 		/* fetch the associated FileNameSpace object */
 		bsfs = bs.getFileNameSpaces();
@@ -114,15 +114,15 @@ public class TestBuildTasks {
 		
 		/* now check that the records are correct */
 		Integer allAccesses[] = bts.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
-		assertTrue(TestCommon.sortedArraysEqual(allAccesses, new Integer[] { fileFooH, fileFooO, fileFooC, fileFoo }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(allAccesses, new Integer[] { fileFooH, fileFooO, fileFooC, fileFoo }));
 
 		/* now, just the reads */
 		Integer readAccesses[] = bts.getFilesAccessed(task, OperationType.OP_READ);
-		assertTrue(TestCommon.sortedArraysEqual(readAccesses, new Integer[] { fileFooC, fileFooH }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(readAccesses, new Integer[] { fileFooC, fileFooH }));
 		
 		/* and just the writes */
 		Integer writeAccesses[] = bts.getFilesAccessed(task, OperationType.OP_WRITE);
-		assertTrue(TestCommon.sortedArraysEqual(writeAccesses, new Integer[] { fileFooO, fileFoo }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(writeAccesses, new Integer[] { fileFooO, fileFoo }));
 
 		/* check an empty task - should return no results */
 		int emptyTask = bts.addBuildTask("echo Hi");
@@ -187,40 +187,40 @@ public class TestBuildTasks {
 
 		/* for clock.o */
 		Integer results[] = bts.getTasksThatAccess(file1, OperationType.OP_UNSPECIFIED);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task1 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 }));
 
 		results = bts.getTasksThatAccess(file1, OperationType.OP_WRITE);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task1 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 }));
 
 		results = bts.getTasksThatAccess(file1, OperationType.OP_READ);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] {} ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {} ));
 
 		/* for clock.c */
 		results = bts.getTasksThatAccess(file2, OperationType.OP_UNSPECIFIED);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task1 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 } ));
 
 		results = bts.getTasksThatAccess(file2, OperationType.OP_WRITE);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { } ));
 
 		results = bts.getTasksThatAccess(file2, OperationType.OP_READ);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task1 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 } ));
 
 		/* for mult.o */
 		results = bts.getTasksThatAccess(file5, OperationType.OP_UNSPECIFIED);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task3 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task3 } ));
 
 		results = bts.getTasksThatAccess(file5, OperationType.OP_WRITE);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task3 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task3 } ));
 
 		results = bts.getTasksThatAccess(file5, OperationType.OP_READ);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { } ));
 
 		/* for stdio.h */
 		results = bts.getTasksThatAccess(file7, OperationType.OP_READ);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { task1, task2, task3 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1, task2, task3 } ));
 
 		results = bts.getTasksThatAccess(file7, OperationType.OP_WRITE);
-		assertTrue(TestCommon.sortedArraysEqual(results, new Integer[] { } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { } ));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

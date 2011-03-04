@@ -55,7 +55,7 @@ public class TestFileSet {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		fns = bs.getFileNameSpaces();
 		fs = new FileSet(fns);
 	}
@@ -178,7 +178,7 @@ public class TestFileSet {
 		for (Integer pathId : fs) {
 			returnedList.add(pathId);
 		}
-		assertTrue(TestCommon.sortedArraysEqual(
+		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] {23, 34, 134, 256, 3643, 9275}, 
 				returnedList.toArray(new Integer[0])));
 	}

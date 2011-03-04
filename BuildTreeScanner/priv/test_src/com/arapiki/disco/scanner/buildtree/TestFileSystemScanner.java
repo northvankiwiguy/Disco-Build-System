@@ -22,7 +22,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileRecord;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.TestCommon;
+import com.arapiki.disco.model.CommonTestUtils;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -40,7 +40,7 @@ public class TestFileSystemScanner {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		bs = TestCommon.getEmptyBuildStore();
+		bs = CommonTestUtils.getEmptyBuildStore();
 		fns = bs.getFileNameSpaces();
 	}
 

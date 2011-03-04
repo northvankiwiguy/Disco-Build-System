@@ -19,7 +19,7 @@ import java.util.Arrays;
  * Common methods for testing BuildStore and related classes.
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class TestCommon {
+public class CommonTestUtils {
 
 	/** The name of the temporary database file */
 	private static String tempDbFile = "/tmp/testBuildStore";
