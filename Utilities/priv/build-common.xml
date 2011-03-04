@@ -115,7 +115,7 @@
 	   - Execute unit tests using junit
 	  -->
 	<target name="test" depends="test-java">
-		<junit fork="yes" printsummary="false" haltonfailure="false">
+		<junit fork="yes" printsummary="false" haltonfailure="true">
 		
 			<!-- ensure that the correct classpath and library path is set up -->
 			<jvmarg value="-Djava.library.path=${java-library-path}" />

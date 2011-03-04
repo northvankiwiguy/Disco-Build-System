@@ -55,6 +55,9 @@ public class TestFileSystemScanner {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
+	/*
+	 * TODO: This isn't a unit test. Needs to be fixed.
+	 */
 	@Test
 	public void testScanForFiles() throws Exception {
 		FileSystemScanner fss = new FileSystemScanner(bs);
@@ -66,9 +69,9 @@ public class TestFileSystemScanner {
 		FileSet results = reports.reportFilesNeverAccessed();
 		for (Integer pathId : results) {			
 			String pathName = fns.getPathName(pathId);
-			System.out.println(pathName);
+			//System.out.println(pathName);
 		}
-		System.out.println("Found " + results.size() + " files");
+		//System.out.println("Found " + results.size() + " files");
 		
 	}
 
