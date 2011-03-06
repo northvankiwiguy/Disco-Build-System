@@ -157,6 +157,7 @@ public final class DiscoMain {
 		
 		System.err.println("\nScanning commands:");
 		formattedDisplayLine("    scan-tree <directories>", "Scan one or more file system directory and record file names");
+		formattedDisplayLine("    scan-ea-anno <anno-file>", "Scan an Electric Accelerator annotation file");
 		
 		System.err.println("\nReporting commands:");
 		formattedDisplayLine("    show-files", "List all files recorded in the build store.");
@@ -194,6 +195,10 @@ public final class DiscoMain {
 			validateArgs(cmdArgs, 1, ARGS_INFINITE, "scan-tree requires one or more directory names to be specified.");
 			DiscoScans.scanBuildTree(buildStore, cmdArgs);
 		}
+		else if (cmdName.equals("scan-ea-anno")){
+			validateArgs(cmdArgs, 1, 1, "scan-ea-anno requires one Electric Accelerator annotation file to be specified.");
+			DiscoScans.scanElectricAnno(buildStore, cmdArgs);
+		}
 		
 		/*
 		 * Reporting commands
@@ -201,6 +206,10 @@ public final class DiscoMain {
 		else if (cmdName.equals("show-files")){
 			validateArgs(cmdArgs, 0, 1, "show-files [ <top-path> ]");
 			DiscoReports.showFiles(buildStore, optionShowRoots, optionShowIndents, cmdArgs);
+		}
+		else if (cmdName.equals("show-unused-files")) {
+			validateArgs(cmdArgs, 0, 1, "show-unused-files [ <top-path> ]");
+			DiscoReports.showUnusedFiles(buildStore, optionShowRoots, optionShowIndents, cmdArgs);			
 		}
 		
 		/*

@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
+import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.utils.print.PrintUtils;
 
@@ -61,6 +62,46 @@ import com.arapiki.utils.print.PrintUtils;
 		 * we provide null for the FileSet parameter.
 		 */
 		printPathListing(System.out, fns, rootPath, null, showRoots, useIndents);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Provide a list of all unused files in the BuildStore. That is, files that aren't
+	 * referenced by any build tasks.
+	 * @param buildStore The BuildStore to query.
+	 */
+	/* package */ static void showUnusedFiles(BuildStore buildStore, 
+			boolean showRoots, boolean useIndents, String cmdArgs[]) {
+
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Reports reports = buildStore.getReports();
+		int rootPath;
+		
+		/* 
+		 * If the user provided a starting point on the traversal, use that, else
+		 * use the tree's top root.
+		 */
+		if (cmdArgs.length == 2) {
+			String rootPathName = cmdArgs[1];
+			rootPath = fns.getPath(rootPathName);
+			if (rootPath == -1) {
+				System.err.println("Error: Invalid path " + rootPathName);
+				System.exit(1);
+			}
+		} else {
+			rootPath = fns.getRootPath("root");
+		}
+
+		/* get list of unused files, including parent paths */
+		FileSet unusedFileSet = reports.reportFilesNeverAccessed();
+		unusedFileSet.populateWithParents();
+		
+		/* 
+		 * Go ahead and display the files - we want all files to be shown, so
+		 * we provide null for the FileSet parameter.
+		 */
+		printPathListing(System.out, fns, rootPath, unusedFileSet, showRoots, useIndents);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -112,10 +153,12 @@ import com.arapiki.utils.print.PrintUtils;
 			 * Special case for displaying the top path, potentially when it's a "root", as opposed
 			 * to an absolute path.
 			 */
-			if (!showRoots || fns.getRootAtPath(topPath) == null){
-				outStream.println(rootPathName);
-			} else {
-				outStream.println(rootPathName + " (" + fns.getPathName(topPath, false) + ")");
+			if ((filesToShow == null) || (filesToShow.isMember(topPath))){
+				if (!showRoots || fns.getRootAtPath(topPath) == null){
+					outStream.println(rootPathName);
+				} else {
+					outStream.println(rootPathName + " (" + fns.getPathName(topPath, false) + ")");
+				}
 			}
 			
 			/* call the helper function to display each of our children */
@@ -152,6 +195,9 @@ import com.arapiki.utils.print.PrintUtils;
 		/* we'll use this to record the current path's name */
 		String baseName;
 		
+		/* is this path in the set of paths to be displayed? */
+		boolean isInSet = (filesToShow == null) || (filesToShow.isMember(thisPathId));
+		
 		/*
 		 * There are two cases to handle:
 		 * 	1) Roots should be displayed, and this path is a root.
@@ -168,15 +214,18 @@ import com.arapiki.utils.print.PrintUtils;
 			/* get the name of this path */
 			baseName = fns.getBaseName(thisPathId);
 		
-			/* display this path, prefixed by the absolute pathSoFar */
-			outStream.print(pathSoFar);		
-			outStream.print(baseName);
+			/* if this is to be displayed, then display it */
+			if (isInSet) {
+				/* display this path, prefixed by the absolute pathSoFar */
+				outStream.print(pathSoFar);		
+				outStream.print(baseName);
 		
-			/* for all directories (empty or not), display a / after their name */
-			if (fns.getPathType(thisPathId) == PathType.TYPE_DIR){
-				outStream.print('/');
+				/* for all directories (empty or not), display a / after their name */
+				if (fns.getPathType(thisPathId) == PathType.TYPE_DIR){
+					outStream.print('/');
+				}
+				outStream.println();
 			}
-			outStream.println();
 		}
 			
 		/* else, this is a root and we need to display it */
@@ -192,7 +241,9 @@ import com.arapiki.utils.print.PrintUtils;
 			pathSoFar.append(':');
 			
 			/* display information about this root */
-			outStream.println(pathSoFar + " (" + fns.getPathName(thisPathId) + ")");
+			if (isInSet) {
+				outStream.println(pathSoFar + " (" + fns.getPathName(thisPathId) + ")");
+			}
 			
 			/* we don't display this path's name */
 			baseName = "";
@@ -254,15 +305,18 @@ import com.arapiki.utils.print.PrintUtils;
 			}
 		}
 		
-		/* print the base name, preceded by spaces to the desired indentation level */
-		PrintUtils.indent(outStream, indentLevel);		
-		outStream.print(baseName);
+		/* if this file is in the set of files to display */
+		if ((filesToShow == null) || filesToShow.isMember(thisPathId)){
+			/* print the base name, preceded by spaces to the desired indentation level */
+			PrintUtils.indent(outStream, indentLevel);		
+			outStream.print(baseName);
 		
-		/* for directories (empty or not), display a trailing "/" */
-		if (displaySlash && (fns.getPathType(thisPathId) == PathType.TYPE_DIR)){
-			outStream.print('/');
+			/* for directories (empty or not), display a trailing "/" */
+			if (displaySlash && (fns.getPathType(thisPathId) == PathType.TYPE_DIR)){
+				outStream.print('/');
+			}
+			outStream.println();
 		}
-		outStream.println();
 		
 		/* recursively call ourselves for each child, with an increased indent level */
 		Integer children[] = fns.getChildPaths(thisPathId);
