@@ -9,6 +9,7 @@
 
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
+		<pathelement location="${project-root}/../BuildScanners/pub/build-scanners.jar" />
 		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
 		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
 		<pathelement location="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" />
@@ -17,6 +18,7 @@
 	
 	<!-- sourcepath for generating documentation -->
 	<path id="javadoc-path">
+		<pathelement location="${project-root}/../BuildScanners/priv/src" />
 		<pathelement location="${project-root}/../BuildStore/priv/src" />
 		<pathelement location="${project-root}/../BuildTreeScanner/priv/src" />
 		<pathelement location="${project-root}/../DiscoMain/priv/src" />
@@ -30,6 +32,7 @@
 	<!-- Make sure that all upstream components are up to date -->
 	<target name="build-upstream-components">
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
 	
 	<!-- specific cleaning operation for this project only -->
@@ -59,6 +62,7 @@
 		<!-- place all the .class files into a single directory, ready to create a single jar file -->
 		<unjar src="${project-root}/../BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
 		<unjar src="${project-root}/../BuildStore/priv/lib/sqlitejdbc-v056.jar" dest="${tmp-dir}" />
+		<unjar src="${project-root}/../BuildScanners/pub/build-scanners.jar" dest="${tmp-dir}" />
 		<unjar src="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
 		<unjar src="${project-root}/../DiscoMain/pub/disco-main.jar" dest="${tmp-dir}" />		
 		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />				
@@ -98,6 +102,7 @@
 	  -->
 	<target name="clean-all">
 		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
@@ -108,6 +113,7 @@
 	  -->
 	<target name="test-all">
 		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="test" inheritall="false" />
+		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="test" inheritall="false" />
