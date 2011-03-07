@@ -10,38 +10,26 @@
  -        implementation and/or initial documentation
  -->
 
-<!-- Build the LegacyBuildScanner project -->
-<project name="legacy-build-scanner" default="all">
+<!-- Build the BuildScanners project -->
+<project name="legacy-scanners" default="jars">
 
-	<!-- Location information -->
-	<property name="srcdir" location="src"/>
-	<property name="scriptdir" location="src/scripts"/>
-	<property name="objdir" location="obj"/>
-	<property name="pubdir" location="/usr/local"/>
-	<property name="publibdir" location="${pubdir}/lib/cfs"/>
-	<property name="jarfile" location="${publibdir}/legacy-build-scanner.jar"/>
+	<!-- root of this component's build tree -->
+	<property name="project-root" location=".." />
 	
-	<target name="all" depends="compile,install"/>
+	<!-- name of the jar file we'll create -->
+	<property name="project-jar" value="build-scanners.jar" />
 	
-	<!-- Compile all the Java code -->
-	<target name="compile">
-		<mkdir dir="${objdir}"/>
-		<mkdir dir="${pubdir}"/>
-		<depend srcdir="${srcdir}" destdir="${objdir}"/>
-		<javac srcdir="${srcdir}" destdir="${objdir}"/>
-	</target>
-	
-	<!-- Install the final software -->
-	<target name="install">
-		<mkdir dir="${publibdir}"/>
-		<jar destfile="${jarfile}" basedir="${objdir}"/>
-		<copy file="${scriptdir}/legacy-build-scanner" todir="${pubdir}/bin" />
-		<chmod perm="0755" file="${pubdir}/bin/legacy-build-scanner"/>
+	<!-- extra classpath for this project -->
+	<path id="project-classpath">
+		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
+	</path>
+
+	<!-- Make sure that all upstream components are up to date -->
+	<target name="build-upstream-components">
+		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
 
-	<!-- Clean the generated files -->
-	<target name="clean">
-		<delete dir="${objdir}"/>
-	</target>
-	
+	<!-- import the common build file definitions -->	
+	<import file="${project-root}/../Utilities/priv/build-common.xml" />
+
 </project>
