@@ -12,6 +12,8 @@
 
 package com.arapiki.disco.model;
 
+import java.io.FileNotFoundException;
+
 
 /**
  * Represents a full Disco build system.
@@ -40,8 +42,9 @@ public class BuildStore {
 	 * create a fresh database.
 	 * 
 	 * @param databaseName Name of the database to open or create
+	 * @throws FileNotFoundException The database file can't be found, or isn't writable
 	 */
-	public BuildStore(String buildStoreName) {
+	public BuildStore(String buildStoreName) throws FileNotFoundException {
 		
 		/* create a new DB manager to handle all the SQL connection issues */
 		db = new BuildStoreDB(buildStoreName);

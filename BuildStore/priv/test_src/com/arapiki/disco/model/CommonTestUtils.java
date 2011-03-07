@@ -12,6 +12,7 @@
 
 package com.arapiki.disco.model;
 
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 
 
@@ -28,8 +29,9 @@ public class CommonTestUtils {
 	 * Create a new empty BuildStore, with an empty database. For
 	 * testing purposes only.
 	 * @return The empty BuildStore database
+	 * @throws FileNotFoundException If the database file can't be opened
 	 */
-	public static BuildStore getEmptyBuildStore() {
+	public static BuildStore getEmptyBuildStore() throws FileNotFoundException {
 		BuildStore bs = new BuildStore(tempDbFile);
 		
 		// force the schema to be dropped and recreated.

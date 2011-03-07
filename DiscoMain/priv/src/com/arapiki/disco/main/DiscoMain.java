@@ -12,6 +12,7 @@
 
 package com.arapiki.disco.main;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -288,8 +289,13 @@ public final class DiscoMain {
 			/*
 			 * Open the build store file, or create a new file.
 			 */
-			BuildStore buildStore = new BuildStore(buildStoreFileName);
-		
+			BuildStore buildStore = null;
+			try {
+				 buildStore = new BuildStore(buildStoreFileName);
+			} catch (FileNotFoundException ex) {
+				System.err.println(ex.getMessage());
+				System.exit(1);
+			}
 			/*
 			 * Now, invoke a command.
 			 */

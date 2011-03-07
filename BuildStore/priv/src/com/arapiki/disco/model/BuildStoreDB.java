@@ -12,6 +12,8 @@
 
 package com.arapiki.disco.model;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -49,9 +51,10 @@ class BuildStoreDB  {
 	 * Create a new BuildStoreDB object.
 	 * @param databaseName The name of the database to create. For SQLite databases,
 	 * this is the path to the database file.
+	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
 	 */
 	/* package private */ 
-	BuildStoreDB(String databaseName) {
+	BuildStoreDB(String databaseName) throws FileNotFoundException {
 		
 		/* make sure that the sqlite JDBC connector is available */
 		try {
@@ -72,6 +75,10 @@ class BuildStoreDB  {
 		 * a local disk file with a .db extension.
 		 */
 	    try {
+	    	File dbFile = new File(databaseName);
+	    	if ((dbFile == null) || (!dbFile.canWrite()) || (!dbFile.canRead())){
+	    		throw new FileNotFoundException("Error: Unable to access database file " + databaseName);
+	    	}
 			dbConn = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
 
 			
