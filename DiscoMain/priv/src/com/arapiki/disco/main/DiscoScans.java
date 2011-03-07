@@ -19,6 +19,7 @@ import java.io.IOException;
 import org.xml.sax.SAXException;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.scanner.buildtree.FatalBuildTreeScannerError;
 import com.arapiki.disco.scanner.buildtree.FileSystemScanner;
 import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
 
@@ -58,8 +59,14 @@ import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
 		/* for each directory (skipping the first one which is the command name) */
 		for (int i = 1; i < cmdArgs.length; i++) {
 			String dirName = cmdArgs[i];
-			System.out.println("Scanning " + dirName);
-			fss.scanForFiles("root", dirName);
+			String dirNameAbs;
+			try {
+				dirNameAbs = new File(dirName).getCanonicalPath();
+			} catch (IOException e) {
+				throw new FatalBuildTreeScannerError("Can't determine absolute path of " + dirName);
+			}
+			System.out.println("Scanning " + dirNameAbs);
+			fss.scanForFiles("root", dirNameAbs);
 		}		
 	}
 
