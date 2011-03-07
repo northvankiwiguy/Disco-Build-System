@@ -21,6 +21,7 @@ then
     WORK="$DISCO_HOME/../../"
     
 	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
+	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	export LD_LIBRARY_PATH="$WORK/Utilities/pub"
 #

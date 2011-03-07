@@ -13,9 +13,14 @@
 package com.arapiki.disco.main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.xml.sax.SAXException;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.scanner.buildtree.FileSystemScanner;
+import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
 
 /**
  * A helper class for DiscoMain. This class handles the disco commands that scan things
@@ -56,6 +61,35 @@ import com.arapiki.disco.scanner.buildtree.FileSystemScanner;
 			System.out.println("Scanning " + dirName);
 			fss.scanForFiles("root", dirName);
 		}		
+	}
+
+	/**
+	 * Parse an ElectricAccelerator annotation file and store the data in the specified 
+	 * BuildStore file.
+	 * @param buildStore
+	 * @param cmdArgs
+	 */
+	public static void scanElectricAnno(BuildStore buildStore, String[] cmdArgs) {
+		String fileName = cmdArgs[1];
+		
+		ElectricAnnoScanner eas = new ElectricAnnoScanner(buildStore);
+		try {
+			eas.parse(fileName);
+
+		} catch (FileNotFoundException e) {
+			System.err.println("Error: ElectricAccelerator annotation file " + fileName + " not found.");
+			System.exit(1);
+			
+		} catch (IOException e) {
+			System.err.println("Error: I/O error while reading ElectricAccelerator annotation file " + fileName);
+			System.exit(1);
+
+		} catch (SAXException e) {
+			System.err.println("Error: Unexpected syntax in ElectricAccelerator annotation file " + fileName);
+			System.exit(1);
+		}
+		
+		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
