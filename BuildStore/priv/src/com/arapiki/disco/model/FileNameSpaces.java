@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.arapiki.disco.model.FileNameCache.FileNameCacheValue;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.PathUtils;
 
@@ -52,6 +53,11 @@ public class FileNameSpaces {
 	 * be done within this namespace.
 	 */
 	private String spaceName;
+	
+	/**
+	 * A cache for recording the most recently accessed file name mappings.
+	 */
+	FileNameCache fileNameCache;
 	
 	/**
 	 * Various prepared statement for database access.
@@ -92,6 +98,12 @@ public class FileNameSpaces {
 		findRootNamePrepStmt = db.prepareStatement("select name from fileRoots where fileId = ?");
 		updateRootPathPrepStmt = db.prepareStatement("update fileRoots set fileId = ? where name = ?");
 		deleteFileRootPrepStmt = db.prepareStatement("delete from fileRoots where name = ?");
+		
+		/* 
+		 * Create an empty cache to record the most-recently accessed file name mapping, to save us from
+		 * querying the database all the time.
+		 */
+		fileNameCache = new FileNameCache(1024);
 	}
 	
 	/*=====================================================================================*
@@ -358,6 +370,7 @@ public class FileNameSpaces {
 	 * Given a parent's path's ID, add a new child path. If that path already exists, return
 	 * the existing child path ID, rather than adding anything.
 	 * @param parentId The ID of the parent path.
+	 * @param pathType The type of the path to be added (directory, file, etc)
 	 * @param childName The name of the child path.
 	 * @return The ID of the child path, or -1 if the path couldn't be added.
 	 */
@@ -370,40 +383,8 @@ public class FileNameSpaces {
 			return -1;
 		}
 		
-		/*
-		 * Search for the path ID and path type for a child of "parentId" that has
-		 * the name "childName". This is similar to the getChildOfPath() operation,
-		 * but we also fetch the path's type.
-		 */
-		Object childPathAndType[] = getChildOfPathWithType(parentId, childName);
-
-		/* If child isn't yet present, we need to add it */
-		if (childPathAndType == null) {
-			/*
-			 *  TODO: fix the race condition here - there's a small chance that somebody
-			 *  else has already added it. Not thread safe.
-			 */
-			try {
-				insertChildPrepStmt.setInt(1, parentId);
-				insertChildPrepStmt.setInt(2, pathType.ordinal());
-				insertChildPrepStmt.setString(3, childName);
-				db.executePrepUpdate(insertChildPrepStmt);
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-			}
-
-			return db.getLastRowID();
-		}
-		
-		/* else, it exists, but we need to make sure it's the correct type of path */
-		else if ((PathType)childPathAndType[1] != pathType) {
-			return -1;
-		}
-		
-		/* else, return the existing child ID */
-		else {
-			return (Integer)childPathAndType[0];
-		}
+		/* delegate to our helper function, which does the rest of the work */
+		return addChildOfPathHelper(parentId, pathType, childName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -604,8 +585,18 @@ public class FileNameSpaces {
 		int len = components.length - 1;
 		for (int i = 0; i <= len; i++) {
 			PathType thisType = (i == len) ? pathType : PathType.TYPE_DIR;
-			int childId = addChildOfPath(parentId, thisType, components[i]);
+			int childId = addChildOfPathHelper(parentId, thisType, components[i]);
 			parentId = childId;
+			
+			/* 
+			 * If the path we just added didn't have the correct type, that's a problem.
+			 * For example, if we thought we added a directory, but it was already added
+			 * as a file, return -1
+			 */
+			if (childId == -1) {
+				return -1;
+			}
+			
 		}
 		return parentId;
 	}
@@ -708,14 +699,30 @@ public class FileNameSpaces {
 	 */
 	private Object[] getChildOfPathWithType(int parentId, String childName) {
 		Object result[];
+		
+		/*
+		 * Start by looking in the in-memory cache to see if it's there.
+		 */
+		FileNameCacheValue cacheValue = fileNameCache.get(parentId, childName);
+		if (cacheValue != null) {
+			return new Object[] { cacheValue.getChildFileId(), intToPathType(cacheValue.getChildType())};
+		}
+		// TODO: what happens if the mapping changes?
+		
+		/*
+		 * Not in cache, try the database
+		 */
 		try {
 			findChildPrepStmt.setInt(1, parentId);
 			findChildPrepStmt.setString(2, childName);
 			ResultSet rs = db.executePrepSelectResultSet(findChildPrepStmt);
 
-			/* if there's a result, return it. */
+			/* if there's a result, return it and add it to the cache for faster access next time */
 			if (rs.next()){
-				result = new Object[] { Integer.valueOf(rs.getInt(1)), intToPathType(rs.getInt(2))};
+				int childId = rs.getInt(1);
+				int childType = rs.getInt(2);
+				result = new Object[] { Integer.valueOf(childId), intToPathType(childType)};
+				fileNameCache.put(parentId, childName, childId, childType);
 			} 
 			
 			/* else, no result = no child */
@@ -762,6 +769,55 @@ public class FileNameSpaces {
 		resultPair[0] = rootName;
 		resultPair[1] = pathName;
 		return resultPair;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * This is a helper function that does most of the work of the addChildOfPath() method,
+	 * which is a public method. This helper function exists solely because we don't always
+	 * want the extra error checking provided by addChildOfPath(), so sometimes we'll
+	 * call this method directly.
+	 * @param parentId The ID of the parent path
+	 * @param pathType The type of the path to be added (directory, file, etc)
+	 * @param childName The name of the child path to add
+	 * @return The ID of the child path, or -1 if the path already exists, but was of the wrong type.
+	 */
+	private int addChildOfPathHelper(int parentId, PathType pathType, String childName) {
+		/*
+		 * Search for the path ID and path type for a child of "parentId" that has
+		 * the name "childName". This is similar to the getChildOfPath() operation,
+		 * but we also fetch the path's type.
+		 */
+		Object childPathAndType[] = getChildOfPathWithType(parentId, childName);
+
+		/* If child isn't yet present, we need to add it */
+		if (childPathAndType == null) {
+			/*
+			 *  TODO: fix the race condition here - there's a small chance that somebody
+			 *  else has already added it. Not thread safe.
+			 */
+			try {
+				insertChildPrepStmt.setInt(1, parentId);
+				insertChildPrepStmt.setInt(2, pathType.ordinal());
+				insertChildPrepStmt.setString(3, childName);
+				db.executePrepUpdate(insertChildPrepStmt);
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+
+			return db.getLastRowID();
+		}
+		
+		/* else, it exists, but we need to make sure it's the correct type of path */
+		else if ((PathType)childPathAndType[1] != pathType) {
+			return -1;
+		}
+		
+		/* else, return the existing child ID */
+		else {
+			return (Integer)childPathAndType[0];
+		}
 	}
 	
 	/*=====================================================================================*/
