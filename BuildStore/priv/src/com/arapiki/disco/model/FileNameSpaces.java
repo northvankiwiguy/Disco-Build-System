@@ -579,14 +579,6 @@ public class FileNameSpaces {
 		return null;
 	}
 	
-	/*-------------------------------------------------------------------------------------*/
-
-	// TODO: need an attrName table and an attr table.
-	// TODO: void setAttr(int fileID, String attrName, String attrValue)
-	// TODO: String getAttr(int fileID, String attrName)
-	// TODO: String[] getAttrNames(int fileID) -> return all attr names (but not values).
-	
-	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
