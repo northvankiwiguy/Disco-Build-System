@@ -19,6 +19,7 @@ import java.io.IOException;
 import org.xml.sax.SAXException;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.scanner.FatalBuildScannerError;
 import com.arapiki.disco.scanner.buildtree.FatalBuildTreeScannerError;
 import com.arapiki.disco.scanner.buildtree.FileSystemScanner;
 import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
@@ -93,6 +94,10 @@ import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
 
 		} catch (SAXException e) {
 			System.err.println("Error: Unexpected syntax in ElectricAccelerator annotation file " + fileName);
+			System.exit(1);
+		} catch (FatalBuildScannerError e) {
+			System.err.println("Error: Logic problem while scanning ElectricAccelerator annotation file " + fileName);
+			System.err.println(e.getMessage());
 			System.exit(1);
 		}
 		

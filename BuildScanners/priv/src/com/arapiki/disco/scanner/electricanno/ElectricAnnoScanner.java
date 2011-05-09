@@ -26,6 +26,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 /**
  * Class for reading an Electric Accelerator annotation file, and populating a 
@@ -89,7 +90,8 @@ public class ElectricAnnoScanner {
 			@Override
 			public InputSource resolveEntity(String publicId, String systemId)
 					throws SAXException, IOException {
-				return new InputSource(new ByteArrayInputStream(new byte[0]));
+				return new InputSource(
+						new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
 			}
 		});
 
@@ -98,8 +100,11 @@ public class ElectricAnnoScanner {
 		 * time, so put the database in fast mode.
 		 */
 		buildStore.setFastAccessMode(true);
-		parser.parse(new InputSource(in));
-		buildStore.setFastAccessMode(false);
+		try {
+			parser.parse(new InputSource(in));
+		} finally {
+			buildStore.setFastAccessMode(false);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

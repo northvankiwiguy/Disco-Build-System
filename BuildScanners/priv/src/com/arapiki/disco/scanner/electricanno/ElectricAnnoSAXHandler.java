@@ -12,6 +12,7 @@
 
 package com.arapiki.disco.scanner.electricanno;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.xml.sax.Attributes;
@@ -20,8 +21,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.FatalBuildStoreError;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.scanner.FatalBuildScannerError;
+import com.arapiki.utils.string.PathUtils;
 
 /**
  * A SAX Handler class for use when parsing an Electric Accelerator annotation file. The
@@ -59,10 +63,10 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	private FileNameSpaces fns;
 	
 	/** the set of files that have been read in the current <job> */
-	private HashSet<String> filesRead;
+	private ArrayList<String> filesRead;
 	
 	/** the set of files that have been written in the current <job> */	
-	private HashSet<String> filesWritten;
+	private ArrayList<String> filesWritten;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -106,8 +110,8 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 				 * Create an empty pair of sets for recording files that this job has read,
 				 * or that this job has written.
 				 */
-				filesRead = new HashSet<String>();
-				filesWritten = new HashSet<String>();
+				filesRead = new ArrayList<String>();
+				filesWritten = new ArrayList<String>();
 			}
 		}
 		
@@ -124,8 +128,11 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 				
 				String opType = atts.getValue("type");
 				String file = atts.getValue("file");
+				String isDir = atts.getValue("isdir");
+				file = PathUtils.normalizeAbsolutePath(file);
 				
-				if (opType != null) {
+				/* for files (not directories) that are read or written... */
+				if ((opType != null) && (isDir == null)) {
 					
 					/* this file was read by the job */
 					if (opType.equals("read")){
@@ -140,8 +147,10 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 					/* this file was renamed by the job */
 					else if (opType.equals("rename")) {
 						String otherFile = atts.getValue("other");
+						otherFile = PathUtils.normalizeAbsolutePath(otherFile);
 						filesWritten.remove(otherFile);
 						filesWritten.add(file);
+						// TODO: does this work if otherFile was added multiple times?
 					}
 				}
 			}
@@ -175,13 +184,21 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 			/* add all the file reads to the build task */
 			for (String file : filesRead) {
 				int newFileId = fns.addFile(file);
-				buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
+				if (newFileId != -1) {
+					buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
+				} else {
+					throw new FatalBuildScannerError("Unable to register new file in database: " + file);
+				}
 			}
 
 			/* add all the file writes to the build task */
 			for (String file : filesWritten) {
 				int newFileId = fns.addFile(file);
+				if (newFileId != -1) {
 				buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
+				} else {
+					throw new FatalBuildScannerError("Unable to register new file in database: " + file);
+				}
 			}
 		}
 	}
