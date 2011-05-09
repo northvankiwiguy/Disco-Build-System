@@ -163,7 +163,7 @@ public final class DiscoMain {
 		System.err.println("\nReporting commands:");
 		formattedDisplayLine("    show-files", "List all files recorded in the build store.");
 		formattedDisplayLine("    show-unused-files", "Report on files that are never used by the build system.");
-		formattedDisplayLine("    show-most-used", "Report on files the build system accessed the most.");
+		formattedDisplayLine("    show-most-used-files", "Report on files the build system accessed the most.");
 		
 		System.err.println("\nFile System commands:");
 		formattedDisplayLine("    show-root [<root-name>]", "Show the file system path referred to by this root. Without");
