@@ -23,7 +23,6 @@
 	<path id="project-classpath">
 		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
 		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
-
 	</path>
 
 	<!-- Make sure that all upstream components are up to date -->
