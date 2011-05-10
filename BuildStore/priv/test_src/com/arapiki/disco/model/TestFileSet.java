@@ -340,4 +340,26 @@ public class TestFileSet {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/*
+	 * Test the initialization of a FileSet from an array
+	 */
+	@Test
+	public void testInitialization() throws Exception {
+	
+		Integer array[] = {1, 13, 145, 7626, 23232};
+		
+		FileSet fs = new FileSet(fns, array);
+		assertEquals(5, fs.size());
+		assertTrue(fs.isMember(1));
+		assertTrue(fs.isMember(13));
+		assertTrue(fs.isMember(145));
+		assertTrue(fs.isMember(7626));
+		assertTrue(fs.isMember(23232));
+		assertFalse(fs.isMember(42));		
+	}
+	
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

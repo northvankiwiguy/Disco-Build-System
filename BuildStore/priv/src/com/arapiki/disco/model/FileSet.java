@@ -52,6 +52,22 @@ public class FileSet implements Iterable<Integer> {
 		this.fns = fns;
 		content = new Hashtable<Integer, FileRecord>();
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Constructor - creates a new FileSet and initializes it from an array of pathId values
+	 */
+	public FileSet(FileNameSpaces fns, Integer paths[]) {
+		this(fns);
+		
+		/* copy the paths from the array into a FileSet */
+		for (int i = 0; i < paths.length; i++) {
+			FileRecord fr = new FileRecord();
+			fr.pathId = paths[i];
+			add(fr);
+		}
+	}
 	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
