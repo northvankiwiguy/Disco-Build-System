@@ -63,15 +63,15 @@ class BuildStoreDB  {
 		}
 		
 		/*
-		 * Ensure that the database name ends with .db (if it doesn't already)
+		 * Ensure that the database name ends with .disco (if it doesn't already)
 		 */
-		if (!databaseName.endsWith(".db")) {
-			databaseName += ".db";
+		if (!databaseName.endsWith(".disco")) {
+			databaseName += ".disco";
 		}
 		
 		/* 
 		 * Open/create the database. The sqlite database will be created as
-		 * a local disk file with a .db extension.
+		 * a local disk file with a .disco extension.
 		 */
 	    try {
 			dbConn = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
