@@ -12,7 +12,6 @@
 
 package com.arapiki.disco.model;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -75,16 +74,17 @@ class BuildStoreDB  {
 		 * a local disk file with a .db extension.
 		 */
 	    try {
-	    	File dbFile = new File(databaseName);
-	    	if ((dbFile == null) || (!dbFile.canWrite()) || (!dbFile.canRead())){
-	    		throw new FileNotFoundException("Error: Unable to access database file " + databaseName);
-	    	}
 			dbConn = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-
 			
 		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to connect to SQLite database: " + 
-					databaseName + ".db", e);
+			/* provide a meaningful error message if the file simply can't be opened */
+			if (e.getMessage().contains("Permission denied")) {
+				throw new FileNotFoundException("Error: Unable to open database file: " + databaseName);
+			}
+			
+			/* else provide a more generic message */
+			throw new FatalBuildStoreError("Unable to access to SQLite database: " + 
+					databaseName + "\n" + e.getMessage());
 		}
 		
 		/* prepare some statements */
@@ -181,9 +181,18 @@ class BuildStoreDB  {
 			stat.executeUpdate("create unique index buildTaskFilesIdx2 on buildTaskfiles (taskId, fileId)");
 			stat.executeUpdate("create index buildTaskFilesIdx3 on buildTaskfiles (fileId, operation)");
 			
-			/* Create the "file_roots" table */
+			/* Create the "fileRoots" table */
 			stat.executeUpdate("create table fileRoots (name text primary key, fileId integer)");	
 			stat.executeUpdate("insert into fileRoots values (\"root\", 0)");
+			
+			/* Create the fileAttrsName table */
+			stat.executeUpdate("create table fileAttrsName (id integer primary key, name text)");
+			
+			
+			/* Create the fileAttrs table */
+			stat.executeUpdate("create table fileAttrs (pathId integer, attrId integer, value text)");
+			stat.executeUpdate("create index fileAttrsIdx1 on fileAttrs (pathId)");
+			stat.executeUpdate("create unique index fileAttrsIdx2 on fileAttrs (pathId, attrId)");
 			
 			stat.close();
 						
@@ -204,6 +213,8 @@ class BuildStoreDB  {
 			stat.executeUpdate("drop table if exists buildTasks");
 			stat.executeUpdate("drop table if exists buildTaskFiles");
 			stat.executeUpdate("drop table if exists fileRoots");
+			stat.executeUpdate("drop table if exists fileAttrsName");
+			stat.executeUpdate("drop table if exists fileAttrs");
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to drop database schema", e);

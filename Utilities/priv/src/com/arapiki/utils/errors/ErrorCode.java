@@ -29,4 +29,6 @@ public class ErrorCode {
 	public static final int CANT_REMOVE		= -5;	/* this item can't be removed */
 	public static final int NOT_A_DIRECTORY	= -6;	/* a directory name or ID was expected */
 	public static final int BAD_PATH 			= -7;	/* an invalid path name or ID was provided */
+	public static final int BAD_VALUE 		= -8;	/* an invalid value was provided */
+
 }

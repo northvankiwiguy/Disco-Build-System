@@ -36,6 +36,9 @@ public class BuildStore {
 	/* the Reports object we'll delegate work to */
 	private Reports reports;
 	
+	/* the FileAttributes object we'll delegate work to */
+	private FileAttributes fileAttributes;
+	
 	/**
 	 * Open or create a new BuildStore database. If the database already
 	 * exists, open it for updating. If there's no database by this name,
@@ -59,7 +62,7 @@ public class BuildStore {
 		/* create a new FileNameSpaces object to manage our list of files */
 		fileSpaces = new FileNameSpaces(db);
 		
-		/* create a new FileDepenencies object to manage the relationship between files */
+		/* create a new FileIncludes object to manage the relationship between files */
 		fileIncludes = new FileIncludes(db);
 
 		/* create a new BuildTasks object to manage the relationship between files */
@@ -67,6 +70,9 @@ public class BuildStore {
 		
 		/* create a new Reports object to provide reporting methods */
 		reports = new Reports(db, fileSpaces);
+		
+		/* create a new FileAttributes object to manage the attributes on files */
+		fileAttributes = new FileAttributes(db, fileSpaces);
 	}
 	
 	/**
@@ -112,6 +118,16 @@ public class BuildStore {
 	 */
 	public Reports getReports() {
 		return reports;
+	}
+	
+	/**
+	 * Fetch the FileAttributes object associated with this BuildStore. This object
+	 * encapsulates knowledge of which attributes are attached to the paths in
+	 * our FileNameSpaces object.
+	 * @return A FileAttributes object
+	 */
+	public FileAttributes getFileAttributes() {
+		return fileAttributes;
 	}
 	
 	/**
