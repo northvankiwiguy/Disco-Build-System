@@ -38,5 +38,14 @@ public class FileRecord {
 	 * Used whenever a report returns the size of something. This may vary depending on the report.
 	 */
 	public int size;
+	
+	/**
+	 * Create a new instance of FileRecord, with all files set to default values.
+	 */
+	public FileRecord() {
+		pathId = 0;
+		count = 0;
+		size = 0;
+	}
 }
 
