@@ -13,15 +13,12 @@
 package com.arapiki.disco.scanner.electricanno;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
-import com.arapiki.disco.model.FatalBuildStoreError;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
