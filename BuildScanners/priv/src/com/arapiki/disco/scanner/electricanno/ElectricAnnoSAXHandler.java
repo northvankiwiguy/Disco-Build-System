@@ -170,7 +170,7 @@ import com.arapiki.utils.string.PathUtils;
 		 * to this job. To finish up, create a new build task and populate it with all the
 		 * file access information we acquired.. 
 		 */
-		if (localName.equals("job")) {
+		if (withinJob && localName.equals("job")) {
 			
 			withinJob = false;
 			
