@@ -89,6 +89,16 @@ class BuildStoreDB  {
 		
 		/* prepare some statements */
 		lastRowIDPrepStmt = prepareStatement("select last_insert_rowid()");
+		
+		/* performance tuning for the database */
+		long maxMemory = Runtime.getRuntime().maxMemory();
+		if (maxMemory != Long.MAX_VALUE){
+			/* 
+			 * Set the SQLITE in-memory page cache to 30% of available memory. 
+			 * This makes the database really fast, although does tend to take up memory.
+			 */
+			executeUpdate("pragma cache_size=" + (int)(maxMemory * 0.3));
+		}
 	}
 	
 	/**
