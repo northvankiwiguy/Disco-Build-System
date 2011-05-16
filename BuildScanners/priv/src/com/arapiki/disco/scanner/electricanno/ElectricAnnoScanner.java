@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.EntityResolver;
@@ -26,7 +25,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.scanner.FatalBuildScannerError;
+import com.arapiki.utils.files.ProgressFileInputStream;
+import com.arapiki.utils.files.ProgressFileInputStreamListener;
 
 /**
  * Class for reading an Electric Accelerator annotation file, and populating a 
@@ -62,16 +62,17 @@ public class ElectricAnnoScanner {
 	/**
 	 * Parse and store the content of the specified annotation file name.
 	 * @param annoFileName The Electric Accelerator annotation file.
+	 * @param listener The callback to receive progress reports
 	 * @throws IOException Something when wrong as the file was being read
 	 * @throws FileNotFoundException The annotation file couldn't be found
 	 * @throws SAXException The XML structure of this file is incorrect.
 	 */
-	public void parse(String annoFileName) 
+	public void parse(String annoFileName, ProgressFileInputStreamListener listener) 
 		throws FileNotFoundException, IOException, SAXException {
-		
-		/* open the file, validating that the file exists */
-		InputStream in = new FileInputStream(annoFileName);
-		
+				
+		/* Open the file for input, and report progress every two seconds */
+		FileInputStream in = new ProgressFileInputStream(annoFileName, listener, 2);
+
 		/*
 		 * Create a new XMLReader to parse this file, then set the ContentHandler
 		 * to our own SAX handler class.

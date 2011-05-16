@@ -23,6 +23,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 import com.arapiki.disco.scanner.buildtree.FatalBuildTreeScannerError;
 import com.arapiki.disco.scanner.buildtree.FileSystemScanner;
 import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
+import com.arapiki.utils.files.ProgressFileInputStreamListener;
 
 /**
  * A helper class for DiscoMain. This class handles the disco commands that scan things
@@ -82,7 +83,20 @@ import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
 		
 		ElectricAnnoScanner eas = new ElectricAnnoScanner(buildStore);
 		try {
-			eas.parse(fileName);
+			/* create a listener that will monitor/display our progress in parsing the file */
+			ProgressFileInputStreamListener listener = new ProgressFileInputStreamListener() {
+				@Override
+				public void progress(long current, long total, int percentage) {
+					System.out.print("\rPercentage complete: " + percentage + "%");
+				}
+				@Override
+				public void done() {
+					System.out.println();
+				}
+			};
+			
+			/* now parse - the listener will update us as we go */
+			eas.parse(fileName, listener);
 
 		} catch (FileNotFoundException e) {
 			System.err.println("Error: ElectricAccelerator annotation file " + fileName + " not found.");
