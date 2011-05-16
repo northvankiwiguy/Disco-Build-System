@@ -97,7 +97,11 @@ class BuildStoreDB  {
 			 * Set the SQLITE in-memory page cache to 30% of available memory. 
 			 * This makes the database really fast, although does tend to take up memory.
 			 */
-			executeUpdate("pragma cache_size=" + (int)(maxMemory * 0.3));
+			int cache_size = (int)(maxMemory / 1024 * 0.3);
+			if (cache_size < 2000) {
+				cache_size = 2000;
+			}
+			executeUpdate("pragma cache_size=" + cache_size);
 		}
 	}
 	
