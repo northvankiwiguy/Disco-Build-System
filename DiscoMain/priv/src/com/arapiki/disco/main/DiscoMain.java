@@ -302,7 +302,8 @@ public final class DiscoMain {
 			invokeCommandOnBuildStore(buildStore, cmdArgs[0], cmdArgs);
 			
 		} catch (Exception e) {
-			System.err.println("Error: Unexpected software problem. Please report the following error:\n" + e);
+			System.err.println("Error: Unexpected software problem. Please report the following error:\n");
+			e.printStackTrace(System.err);
 			System.exit(1);
 		}
 	}
