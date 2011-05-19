@@ -47,7 +47,8 @@ public class Reports {
 	private PreparedStatement 
 		selectFileAccessCountPrepStmt = null,
 		selectFileIncludesCountPrepStmt = null,
-		selectFilesNotUsedPrepStmt = null;
+		selectFilesNotUsedPrepStmt = null,
+		selectFilesWithMatchingNamePrepStmt = null;
 
 	
 	/*=====================================================================================*
@@ -73,6 +74,18 @@ public class Reports {
 				"select files.id from files left join buildTaskFiles on files.id = buildTaskfiles.fileId" +
 					" where files.pathType = " + PathType.TYPE_FILE.ordinal() + 
 					" and buildTaskFiles.taskId is null");
+		
+		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
+				"select files.id from files where name = ? and pathType = " + PathType.TYPE_FILE.ordinal());
+		
+		//
+		// This is what I've used - it seems to work at scale.
+		// selectFilesWrittenButNotUsedPrepStmt = db.prepareStatement(
+		//		    "select writeFileId from (select distinct fileId as writeFileId from " +
+		//		    "buildTaskFiles where operation = " + OperationType.OP_WRITE.ordinal() + ") " +
+		//		    "left join (select distinct fileId as readFileId from buildTaskFiles " +
+		//		    "where operation = " + OperationType.OP_READ.ordinal() + ") on writeFileId = readFileId " +
+		//		      "where readFileId is null");
 	}
 
 	/*=====================================================================================*
@@ -137,6 +150,34 @@ public class Reports {
 		FileSet results = new FileSet(fns);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesNotUsedPrepStmt);
+
+			while (rs.next()) {
+				FileRecord record = new FileRecord();
+				record.pathId = rs.getInt(1);
+				results.add(record);
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the set of files (not directories) that match the user-specified file name
+	 * @param fileArg The name of the file(s) to match.
+	 * @return The FileSet of matching file names.
+	 */
+	public FileSet reportFilesThatMatchName(String fileArg) {
+		
+		FileSet results = new FileSet(fns);
+		try {
+			selectFilesWithMatchingNamePrepStmt.setString(1, fileArg);
+			ResultSet rs = db.executePrepSelectResultSet(selectFilesWithMatchingNamePrepStmt);
 
 			while (rs.next()) {
 				FileRecord record = new FileRecord();

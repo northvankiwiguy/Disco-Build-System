@@ -297,4 +297,52 @@ public class TestReports {
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(0, results.size());
 	}
+
+	/*-------------------------------------------------------------------------------------*/	
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesThatMatchName()}.
+	 */
+	@Test
+	public void testReportFilesThatMatchName() throws Exception {
+
+		/* the null argument should return the empty set */
+		FileSet results = reports.reportFilesThatMatchName(null);
+		assertEquals(0, results.size());
+
+		/* without any files in the database, return the empty list, no matter what the argument */
+		results = reports.reportFilesThatMatchName("");
+		assertEquals(0, results.size());
+		results = reports.reportFilesThatMatchName("Makefile");
+		assertEquals(0, results.size());
+
+		/* add some files */		
+		int file1 = fns.addFile("/home/psmith/myfile");
+		int file2 = fns.addFile("/home/psmith/src/myfile");
+		int file3 = fns.addFile("/home/psmith/src/myfile2");
+		int file4 = fns.addFile("/home/psmith/src/lib/myfile");
+		int file5 = fns.addFile("/home/psmith/src/lib/myfile2");
+		
+		/* search for something that doesn't exist at all */
+		results = reports.reportFilesThatMatchName("Makefile");
+		assertEquals(0, results.size());
+		
+		/* search for things that exist */
+		results = reports.reportFilesThatMatchName("myfile");
+		assertEquals(3, results.size());
+		assertTrue(results.isMember(file1));
+		assertTrue(results.isMember(file2));
+		assertTrue(results.isMember(file4));
+		
+		results = reports.reportFilesThatMatchName("myfile2");
+		assertEquals(2, results.size());
+		assertTrue(results.isMember(file3));
+		assertTrue(results.isMember(file5));
+
+		/* directories shouldn't match - files only */
+		results = reports.reportFilesThatMatchName("home");
+		assertEquals(0, results.size());
+		results = reports.reportFilesThatMatchName("src");
+		assertEquals(0, results.size());		
+	}
 }

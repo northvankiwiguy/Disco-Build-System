@@ -33,35 +33,71 @@ import com.arapiki.utils.print.PrintUtils;
 	 *=====================================================================================*/
 
 	/**
-	 * Provide a list of all files in the BuildStore.
+	 * Provide a list of all files in the BuildStore. A argument can be provided to limit
+	 * the result set:
+	 *   1) A path name prefix - only show files within that path
+	 *   2) A file name - show all files (regardless of path) matching that name.
 	 * @param buildStore The BuildStore to query.
 	 */
 	/* package */ static void showFiles(BuildStore buildStore, 
 			boolean showRoots, boolean useIndents, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		int rootPath;
 		
-		/* 
-		 * If the user provided a starting point on the traversal, use that, else
-		 * use the tree's top root.
-		 */
+		/* by default (with no command line arg), we'll print all files from the root */
+		int rootPath = -1;
+		boolean showFromPrefix = true;
+		String fileArg = null;
+		
+		/* in the case where a user-supplied path or file name is supplied, we override defaults */
 		if (cmdArgs.length == 2) {
-			String rootPathName = cmdArgs[1];
-			rootPath = fns.getPath(rootPathName);
-			if (rootPath == -1) {
-				System.err.println("Error: Invalid path " + rootPathName);
-				System.exit(1);
+			fileArg = cmdArgs[1];
+
+			/* 
+			 * Detect whether the argument is a path prefix, or a single file name. A 
+			 * path prefix will contain a /, whereas a file name won't.
+			 */
+			if (fileArg.indexOf('/') != -1){
+				
+				/* we've been given a path prefix, find the new root */
+				showFromPrefix = true;
+				rootPath = fns.getPath(fileArg);
+				if (rootPath == -1) {
+					System.err.println("Error: Invalid path " + fileArg);
+					System.exit(1);
+				}
+			} 
+			
+			/* the argument was a single file name, not a path prefix */
+			else {
+				showFromPrefix = false;
 			}
-		} else {
+		}
+		
+		/* was a root path selected? If not, select the default */
+		if (rootPath == -1) {
 			rootPath = fns.getRootPath("root");
 		}
 		
 		/* 
-		 * Go ahead and display the files - we want all files to be shown, so
-		 * we provide null for the FileSet parameter.
+		 * So... should we print all files (within the prefix), or all files that 
+		 * match the name?
 		 */
-		printPathListing(System.out, fns, rootPath, null, showRoots, useIndents);
+		if (showFromPrefix) {
+		
+			/* 
+			 * Go ahead and display the files - we want all files to be shown, so
+			 * we provide null for the FileSet parameter.
+			 */
+			printPathListing(System.out, fns, rootPath, null, showRoots, useIndents);
+		}
+		
+		/* the user provided a file name, print all paths that match that name */
+		else {
+			Reports reports = buildStore.getReports();
+			FileSet matchingFiles = reports.reportFilesThatMatchName(fileArg);
+			printPathListing(System.out, fns, rootPath, matchingFiles, showRoots, useIndents);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
