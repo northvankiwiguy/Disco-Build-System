@@ -18,6 +18,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.arapiki.utils.errors.ErrorCode;
+
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
  *
@@ -50,6 +52,8 @@ public class BuildTasks {
 	private PreparedStatement 
 		insertBuildTaskPrepStmt = null,
 		findCommandPrepStmt = null,
+		findParentPrepStmt = null,
+		findChildrenPrepStmt = null,
 		insertBuildTaskFilesPrepStmt = null,
 		findOperationInBuildTaskFilesPrepStmt = null,
 		findFilesInBuildTaskFilesPrepStmt = null,
@@ -70,8 +74,11 @@ public class BuildTasks {
 		this.db = db;
 
 		/* create prepared database statements */
-		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?)");
-		findCommandPrepStmt = db.prepareStatement("select command from buildTasks where taskID = ?");
+		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?)");
+		findCommandPrepStmt = db.prepareStatement("select command from buildTasks where taskId = ?");
+		findParentPrepStmt = db.prepareStatement("select parentTaskId from buildTasks where taskId = ?");
+		findChildrenPrepStmt = db.prepareStatement("select taskId from buildTasks where parentTaskId = ?" +
+				" and parentTaskId != taskId");
 		insertBuildTaskFilesPrepStmt = db.prepareStatement("insert into buildTaskFiles values (?, ?, ?)");
 		findOperationInBuildTaskFilesPrepStmt = 
 			db.prepareStatement("select operation from buildTaskFiles where taskId = ? and fileId = ?");
@@ -95,10 +102,11 @@ public class BuildTasks {
 	 * @param command The shell command to be executed.
 	 * @return The new task's ID.
 	 */
-	public int addBuildTask(String command) {
+	public int addBuildTask(int parentTaskId, String command) {
 		
 		try {
-			insertBuildTaskPrepStmt.setString(1, command);
+			insertBuildTaskPrepStmt.setInt(1, parentTaskId);
+			insertBuildTaskPrepStmt.setString(2, command);
 			db.executePrepUpdate(insertBuildTaskPrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -289,6 +297,85 @@ public class BuildTasks {
 		else {
 			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + taskId);
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given the ID of a task, return the task's parent task.
+	 * @param taskId The task to return the parent of
+	 * @return The ID of the task's parent, or NOT_FOUND if the task is at the root, or
+	 * BAD_VALUE if the task ID is invalid.
+	 */
+	public int getParent(int taskId) {
+		
+		/* query the database, based on the task Id */
+		Integer [] intResults = null;
+		try {
+			findParentPrepStmt.setInt(1, taskId);
+			intResults = db.executePrepSelectIntegerColumn(findParentPrepStmt);
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* if there were no results, it's because taskId is invalid. Return an error */
+		if (intResults.length == 0) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* if there was one result, return it */
+		else if (intResults.length == 1) {
+			
+			/* the single result is the parent, unless this task's parent is itself! */
+			int parentTaskId = intResults[0];
+			if (parentTaskId == taskId) {
+				/* the current task is at the root */
+				return ErrorCode.NOT_FOUND;
+			}
+			return parentTaskId;
+			
+		}
+		
+		/* else, multiple results is a bad thing */
+		else {
+			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + taskId);
+		}
+		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given the ID of task, return an array of the task's children (possibly empty).
+	 * @param taskId The task that is the parent of the children to be returned.
+	 * @return An array of child task Id (in no particular order). Or the empty array if there
+	 * are no children.
+	 */
+	public Integer [] getChildren(int taskId) {
+		
+		Integer [] intResults = null;
+		try {
+			findChildrenPrepStmt.setInt(1, taskId);
+			intResults = db.executePrepSelectIntegerColumn(findChildrenPrepStmt);
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+
+		return intResults;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the build task Id of the task with the associated root name
+	 * @param rootName The name of the root, which is attached to a task.
+	 * @return The root task's ID.
+	 */
+	public int getRootTask(String rootName) {
+		
+		// TODO: return something other than 0. Currently the default task is created
+		// implicitly, rather than explicitly
+		return 0;
 	}
 	
 	/*=====================================================================================*

@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.CommonTestUtils;
+import com.arapiki.utils.errors.ErrorCode;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -37,6 +38,9 @@ public class TestBuildTasks {
 	
 	/** The BuildTasks object associated with this BuildStore */
 	BuildTasks bts;
+	
+	/** The root task ID */
+	int rootTaskId;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -52,7 +56,10 @@ public class TestBuildTasks {
 		bsfs = bs.getFileNameSpaces();
 		
 		/* fetch the associated BuildTasks object */
-		bts = bs.getBuildTasks();	
+		bts = bs.getBuildTasks();
+		
+		/* if we don't care about each new task's parents, we'll use the root task */
+		rootTaskId = bts.getRootTask("root");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -64,9 +71,9 @@ public class TestBuildTasks {
 	public void testAddBuildTask() {
 		
 		/* test that each new build task is assigned a unique ID number */
-		int task1 = bts.addBuildTask("gcc -o test.o test.c");
-		int task2 = bts.addBuildTask("gcc -o main.o main.c");
-		int task3 = bts.addBuildTask("gcc -o tree.o tree.c");
+		int task1 = bts.addBuildTask(rootTaskId, "gcc -o test.o test.c");
+		int task2 = bts.addBuildTask(rootTaskId, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(rootTaskId, "gcc -o tree.o tree.c");
 		assertNotSame(task1, task2);
 		assertNotSame(task1, task3);
 		assertNotSame(task2, task3);
@@ -79,9 +86,9 @@ public class TestBuildTasks {
 	 */
 	@Test
 	public void testGetCommand() {
-		int task1 = bts.addBuildTask("gcc -o test.o test.c");
-		int task2 = bts.addBuildTask("gcc -o main.o main.c");
-		int task3 = bts.addBuildTask("gcc -o tree.o tree.c");
+		int task1 = bts.addBuildTask(rootTaskId, "gcc -o test.o test.c");
+		int task2 = bts.addBuildTask(rootTaskId, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(rootTaskId, "gcc -o tree.o tree.c");
 		assertEquals("gcc -o tree.o tree.c", bts.getCommand(task3));
 		assertEquals("gcc -o main.o main.c", bts.getCommand(task2));
 		assertEquals("gcc -o test.o test.c", bts.getCommand(task1));
@@ -93,12 +100,70 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getParent(int)}
+	 */
+	@Test
+	public void testGetParent() throws Exception {
+		
+		/* add a bunch of tasks in a hierarchy */
+		int task1 = bts.addBuildTask(rootTaskId, "/bin/sh");
+		int task2 = bts.addBuildTask(task1, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(task1, "/bin/sh");
+		int task4 = bts.addBuildTask(task3, "gcc -o tree.o tree.c");
+		int task5 = bts.addBuildTask(task3, "gcc -o bark.o bark.c");
+		
+		/* the parent of the root is ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, bts.getParent(rootTaskId));
+		
+		/* all the other new tasks have valid parents */
+		assertEquals(rootTaskId, bts.getParent(task1));
+		assertEquals(task1, bts.getParent(task2));
+		assertEquals(task1, bts.getParent(task3));
+		assertEquals(task3, bts.getParent(task4));
+		assertEquals(task3, bts.getParent(task5));
+		
+		/* inquiring about the parent of an invalid task Id is ErrorCode.BAD_VALUE */
+		assertEquals(ErrorCode.BAD_VALUE, bts.getParent(1000));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getParent(int)}
+	 */
+	@Test
+	public void testGetChildren() throws Exception {
+
+		/* add a bunch of tasks in a hierarchy */
+		int task1 = bts.addBuildTask(rootTaskId, "/bin/sh");
+		int task2 = bts.addBuildTask(task1, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(task1, "/bin/sh");
+		int task4 = bts.addBuildTask(task3, "gcc -o tree.o tree.c");
+		int task5 = bts.addBuildTask(task3, "gcc -o bark.o bark.c");
+		int task6 = bts.addBuildTask(task3, "gcc -o woof.o woof.c");
+		
+		/* test valid parent/child relationships */
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(rootTaskId), new Integer[] {task1}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(task1), new Integer[] {task2, task3 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(task2), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(task3), new Integer[] {task4, task5, task6 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(task4), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(task5), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(task6), new Integer[] {}));
+		
+		/* the children of non-existent tasks is the empty list */
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(1000), new Integer[] {}));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.arapiki.disco.model.BuildTasks#addFileAccess(int, int, char)}.
 	 */
 	@Test
 	public void testAddGetFileAccess() {
 		/* create a new task */
-		int task = bts.addBuildTask("gcc -o foo foo.c");
+		int task = bts.addBuildTask(rootTaskId, "gcc -o foo foo.c");
 		
 		/* create a number of new files */
 		int fileFooC = bsfs.addFile("/a/b/c/foo.c");
@@ -125,7 +190,7 @@ public class TestBuildTasks {
 		assertTrue(CommonTestUtils.sortedArraysEqual(writeAccesses, new Integer[] { fileFooO, fileFoo }));
 
 		/* check an empty task - should return no results */
-		int emptyTask = bts.addBuildTask("echo Hi");
+		int emptyTask = bts.addBuildTask(rootTaskId, "echo Hi");
 		Integer emptyAccesses[] = bts.getFilesAccessed(emptyTask, OperationType.OP_UNSPECIFIED);
 		assertEquals(0, emptyAccesses.length);
 		
@@ -154,9 +219,9 @@ public class TestBuildTasks {
 	public void testGetTasksThatAccess() {
 
 		/* create some tasks */
-		int task1 = bts.addBuildTask("gcc -o clock.o clock.c");
-		int task2 = bts.addBuildTask("gcc -o banner.o banner.c");
-		int task3 = bts.addBuildTask("gcc -o mult.o mult.c");
+		int task1 = bts.addBuildTask(rootTaskId, "gcc -o clock.o clock.c");
+		int task2 = bts.addBuildTask(rootTaskId, "gcc -o banner.o banner.c");
+		int task3 = bts.addBuildTask(rootTaskId, "gcc -o mult.o mult.c");
 
 		/* and a bunch of files that access those tasks */
 		int file1 = bsfs.addFile("/clock.o");
@@ -250,7 +315,7 @@ public class TestBuildTasks {
 			//System.out.println("Adding " + sb);
 
 			/* add the file name to the FileSpace */
-			int taskId = bts.addBuildTask(sb.toString());
+			int taskId = bts.addBuildTask(rootTaskId, sb.toString());
 			
 			/* now add files to this tasks */
 			for (int k = 0; k != 200; k++) {
