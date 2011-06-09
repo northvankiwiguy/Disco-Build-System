@@ -36,9 +36,6 @@ public final class DiscoMain {
 	/* which file to use for the BuildStore database */
 	private static String buildStoreFileName = "buildstore";	
 	
-	/* should we use indentation when displaying reports? */
-	private static boolean optionShowIndents = false;
-
 	/* should we show roots when displaying reports? */
 	private static boolean optionShowRoots = false;
 	
@@ -69,10 +66,6 @@ public final class DiscoMain {
 		Option fOpt = new Option("f", "buildstore-file", true, "Name of buildstore to query/edit");
 		fOpt.setArgName("file-name");
 		opts.addOption(fOpt);
-		
-		/* add the -i / --indent option */
-		Option iOpt = new Option("i", "indent", false, "Use indentation when displaying report output");
-		opts.addOption(iOpt);
 
 		/* add the -r / --show-roots option */
 		Option rOpt = new Option("r", "show-roots", false, "Show file name space roots when displaying report output");
@@ -96,7 +89,6 @@ public final class DiscoMain {
 		if (line.hasOption('f')){
 			buildStoreFileName = line.getOptionValue('f');
 		}
-		optionShowIndents = line.hasOption('i');
 		optionShowRoots = line.hasOption('r');
 		
 		/*
@@ -205,12 +197,12 @@ public final class DiscoMain {
 		 * Reporting commands
 		 */
 		else if (cmdName.equals("show-files")){
-			validateArgs(cmdArgs, 0, 1, "show-files [ <top-path> ]");
-			DiscoReports.showFiles(buildStore, optionShowRoots, optionShowIndents, cmdArgs);
+			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-files [ <top-path> ]");
+			DiscoReports.showFiles(buildStore, optionShowRoots, cmdArgs);
 		}
 		else if (cmdName.equals("show-unused-files")) {
-			validateArgs(cmdArgs, 0, 1, "show-unused-files [ <top-path> ]");
-			DiscoReports.showUnusedFiles(buildStore, optionShowRoots, optionShowIndents, cmdArgs);			
+			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-unused-files [ <top-path> ]");
+			DiscoReports.showUnusedFiles(buildStore, optionShowRoots, cmdArgs);			
 		}
 		
 		/*
