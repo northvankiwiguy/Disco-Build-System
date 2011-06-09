@@ -19,7 +19,6 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
-import com.arapiki.utils.print.PrintUtils;
 
 /**
  *  A helper class for DiscoMain. This class handles the disco commands that report things
@@ -29,75 +28,34 @@ import com.arapiki.utils.print.PrintUtils;
 /* package */ class DiscoReports {
 
 	/*=====================================================================================*
-	 * PACKAGE METHODS
+	 * PACKAGE-LEVEL METHODS
 	 *=====================================================================================*/
 
 	/**
-	 * Provide a list of all files in the BuildStore. A argument can be provided to limit
-	 * the result set:
-	 *   1) A path name prefix - only show files within that path
-	 *   2) A file name - show all files (regardless of path) matching that name.
-	 * @param buildStore The BuildStore to query.
+	 * Provide a list of all files in the BuildStore. Path filters can be provided to limit
+	 * the result set
+	 * @param buildStore The BuildStore to query
+	 * @param showRoots True if file system roots (e.g. "root:") should be shown
+	 * @param cmdArgs The user-supplied list of files/directories to be displayed. Only
+	 * files that match this filter will be displayed. Note that cmdArgs[0] is the
+	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showFiles(BuildStore buildStore, 
-			boolean showRoots, boolean useIndents, String cmdArgs[]) {
+			boolean showRoots, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		
-		/* by default (with no command line arg), we'll print all files from the root */
-		int rootPath = -1;
-		boolean showFromPrefix = true;
-		String fileArg = null;
-		
-		/* in the case where a user-supplied path or file name is supplied, we override defaults */
-		if (cmdArgs.length == 2) {
-			fileArg = cmdArgs[1];
-
-			/* 
-			 * Detect whether the argument is a path prefix, or a single file name. A 
-			 * path prefix will contain a /, whereas a file name won't.
-			 */
-			if (fileArg.indexOf('/') != -1){
-				
-				/* we've been given a path prefix, find the new root */
-				showFromPrefix = true;
-				rootPath = fns.getPath(fileArg);
-				if (rootPath == -1) {
-					System.err.println("Error: Invalid path " + fileArg);
-					System.exit(1);
-				}
-			} 
-			
-			/* the argument was a single file name, not a path prefix */
-			else {
-				showFromPrefix = false;
-			}
-		}
-		
-		/* was a root path selected? If not, select the default */
-		if (rootPath == -1) {
-			rootPath = fns.getRootPath("root");
-		}
+		/* fetch the subset of files we should filter through */
+		FileSet filterFileSet = getFilterFileSet(fns, cmdArgs);
 		
 		/* 
-		 * So... should we print all files (within the prefix), or all files that 
-		 * match the name?
+		 * There were no search "results", so we'll show everything (except those
+		 * that are filtered-out by filterFileSet. 
 		 */
-		if (showFromPrefix) {
+		FileSet resultFileSet = null;
 		
-			/* 
-			 * Go ahead and display the files - we want all files to be shown, so
-			 * we provide null for the FileSet parameter.
-			 */
-			printPathListing(System.out, fns, rootPath, null, showRoots, useIndents);
-		}
-		
-		/* the user provided a file name, print all paths that match that name */
-		else {
-			Reports reports = buildStore.getReports();
-			FileSet matchingFiles = reports.reportFilesThatMatchName(fileArg);
-			printPathListing(System.out, fns, rootPath, matchingFiles, showRoots, useIndents);
-		}
+		/* pretty print the results */
+		printFileSet(System.out, fns, resultFileSet, filterFileSet, showRoots);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -106,102 +64,99 @@ import com.arapiki.utils.print.PrintUtils;
 	 * Provide a list of all unused files in the BuildStore. That is, files that aren't
 	 * referenced by any build tasks.
 	 * @param buildStore The BuildStore to query.
+	 * @param showRoots True if file system roots (e.g. "root:") should be shown
+	 * @param cmdArgs The user-supplied list of files/directories to be displayed. Only unused
+	 * files that match this filter will be displayed. Note that cmdArgs[0] is the
+	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showUnusedFiles(BuildStore buildStore, 
-			boolean showRoots, boolean useIndents, String cmdArgs[]) {
+			boolean showRoots, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
-		int rootPath;
-		
-		/* 
-		 * If the user provided a starting point on the traversal, use that, else
-		 * use the tree's top root.
-		 */
-		if (cmdArgs.length == 2) {
-			String rootPathName = cmdArgs[1];
-			rootPath = fns.getPath(rootPathName);
-			if (rootPath == -1) {
-				System.err.println("Error: Invalid path " + rootPathName);
-				System.exit(1);
-			}
-		} else {
-			rootPath = fns.getRootPath("root");
-		}
 
-		/* get list of unused files, including parent paths */
+		/* fetch the file/directory filter so we know which result files to display */
+		FileSet filterFileSet = getFilterFileSet(fns, cmdArgs);
+
+		/* get list of unused files, and add their parent paths */
 		FileSet unusedFileSet = reports.reportFilesNeverAccessed();
 		unusedFileSet.populateWithParents();
 		
-		/* 
-		 * Go ahead and display the files - we want all files to be shown, so
-		 * we provide null for the FileSet parameter.
-		 */
-		printPathListing(System.out, fns, rootPath, unusedFileSet, showRoots, useIndents);
+		/* pretty print the results */
+		printFileSet(System.out, fns, unusedFileSet, filterFileSet, showRoots);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Generic function for displaying a list of files. This is used primarily for displaying
+	 * Generic function for displaying a FileSet. This is used primarily for displaying
 	 * the result of reports.
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
 	 * @param fns The FileNameSpaces containing the files to be listed.
-	 * @param topPath The top path of all the files to be displayed (can be used to limit which
-	 * 		   paths are displayed).
-	 * @param fileToShow If not-null, used to limited whether a path should be displayed (set to null to
-	 *         display everything).
+	 * @param resultFileSet The set of files to be displayed (if null, show them all)
+	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
+	 *         displayed (set to null to display everything).
 	 * @param showRoots Indicates whether path roots should be displayed (true), or whether absolute paths
 	 * 		   should be used (false).
-	 * @param useIndents Indicates whether listings should use indentation (true), or whether each line
-	 * 		   should display the full path (false).
 	 */
-	/* package */ static void printPathListing(
-			PrintStream outStream, FileNameSpaces fns, int topPath,
-			FileSet filesToShow, boolean showRoots, boolean useIndents) {
+	/* package */ static void printFileSet(
+			PrintStream outStream, FileNameSpaces fns, FileSet resultFileSet,
+			FileSet filterFileSet, boolean showRoots) {
 		
 		/*
-		 * The case for indented printed.
+		 * This method uses recursion to traverse the FileNameSpaces
+ 		 * from the root to the leaves of the tree. It maintains a StringBuffer with the 
+		 * path encountered so far. That is, if the StringBuffer contains "/a/b/c" and the
+		 * path "d" is encountered, then append "/d" to the StringBuffer to get "/a/b/c/d".
+		 * Once we've finished traversing directory "d", we pop it off the StringBuffer
+		 * and return to "/a/b/c/". This allows us to do a depth-first traversal of the
+		 * FileNameSpaces tree without doing more database access than we need to.
+		 * 
+		 * The resultFileSet and filterFileSet work together to determine which paths are
+		 * to be displayed. resultFileSet contains all the files from the relevant database
+		 * query. On the other hand, filterFileSet is the list of files that have been
+		 * selected by the user's command line argument (e.g. selecting a subdirectory, or
+		 * selecting files that match a pattern, such as *.c).
 		 */
-		if (useIndents) {
-			printPathListingIndentHelper(outStream, fns, topPath, filesToShow, showRoots, 0);
-		} 
 		
+		/* 
+		 * We always start at the top root, even though we may only display a subset
+		 * of the paths underneath that root. Also, figure out the root's name
+		 * (it's '/' or 'root:').
+		 */
+		int topRoot = fns.getRootPath("root");
+		String rootPathName = fns.getPathName(topRoot, showRoots);
+
 		/*
-		 * The case for non-indented printing, requiring us to keep track of the parent path.
-		 * Each recursive iteration only needs to append the current path's base name, rather
-		 * than calling the expensive fns.getPathName() method for each path.
+		 * Create a StringBuffer that'll be used for tracking the path name. We'll
+		 * expand and contract this StringBuffer as we progress through the directory
+		 * listing. This saves us from recomputing the parent path each time we
+		 * visit a new directory.
 		 */
-		else {
+		StringBuffer sb = new StringBuffer();					
+		sb.append(rootPathName);
+		if (!rootPathName.equals("/")) {
+			sb.append('/');
+		}
 			
-			/* what's our starting point for the traversal? (possibly a root in form "root:" */
-			String rootPathName = fns.getPathName(topPath, showRoots);
+		/* 
+		 * Special case for displaying the top path, potentially when it's a "root", as opposed
+		 * to an absolute path.
+		 */
+		if (shouldBeDisplayed(topRoot, resultFileSet, filterFileSet)){
+			if (!showRoots || fns.getRootAtPath(topRoot) == null){
+				outStream.println(rootPathName);
+			} else {
+				outStream.println(rootPathName + " (" + fns.getPathName(topRoot, false) + ")");
+			}
+		}
 		
-			/* create a StringBuffer and put the top path's full name in it, complete with trailing '/' */
-			StringBuffer sb = new StringBuffer();			
-			sb.append(rootPathName);
-			if (!rootPathName.equals("/")) {
-				sb.append('/');
-			}
-			
-			/* 
-			 * Special case for displaying the top path, potentially when it's a "root", as opposed
-			 * to an absolute path.
-			 */
-			if ((filesToShow == null) || (filesToShow.isMember(topPath))){
-				if (!showRoots || fns.getRootAtPath(topPath) == null){
-					outStream.println(rootPathName);
-				} else {
-					outStream.println(rootPathName + " (" + fns.getPathName(topPath, false) + ")");
-				}
-			}
-			
-			/* call the helper function to display each of our children */
-			Integer children[] = fns.getChildPaths(topPath);
-			for (int i = 0; i < children.length; i++) {
-				printPathListingNonIndentHelper(outStream, sb, fns, children[i], filesToShow, showRoots);
-			}
+		/* call the helper function to display each of our children */
+		Integer children[] = fns.getChildPaths(topRoot);
+		for (int i = 0; i < children.length; i++) {
+			printFileSetHelper(outStream, sb, fns, children[i], 
+					resultFileSet, filterFileSet, showRoots);
 		}
 	}
 			
@@ -212,27 +167,38 @@ import com.arapiki.utils.print.PrintUtils;
 
 	/**
 	 * Helper method for displaying a path and all it's children. This should only be called
-	 * by printPathListing().
+	 * by printFileSet().
 	 * 
 	 * @param outStream The PrintStream to display the paths on
 	 * @param pathSoFar This path's parent path as a string, complete with trailing "/"
 	 * @param fns The FileNameSpaces object in which these paths belong
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
-	 * @param filesToShow A FileSet stating which paths to show (or null to show all of them)
+	 * @param resultFileSet The set of files to be displayed (if null, show them all)
+	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
+	 * 		   should be displayed (set to null to display everything).
 	 * @param showRoots Whether to show path roots (true) or absolute paths (false)
 	 */
-	private static void printPathListingNonIndentHelper(
+	private static void printFileSetHelper(
 			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, int thisPathId,
-			FileSet filesToShow, boolean showRoots) {
+			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots) {
 
+		/* 
+		 * Optimize the tree walk - if thisPathId isn't in resultFileSet, there's no point
+		 * in walking the tree any further down. This assumes that resultFileSet.populateWithParents()
+		 * has been called. Note that filterFileSet can't be used in this optimization.
+		 */
+		if ((resultFileSet != null) && (!resultFileSet.isMember(thisPathId))){
+			return;
+		}	
+		
 		/* get this path's list of children */
 		Integer children[] = fns.getChildPaths(thisPathId);
 
 		/* we'll use this to record the current path's name */
 		String baseName;
 		
-		/* is this path in the set of paths to be displayed? */
-		boolean isInSet = (filesToShow == null) || (filesToShow.isMember(thisPathId));
+		/* should this path be displayed? */
+		boolean isInSet = shouldBeDisplayed(thisPathId, resultFileSet, filterFileSet);	
 		
 		/*
 		 * There are two cases to handle:
@@ -295,7 +261,8 @@ import com.arapiki.utils.print.PrintUtils;
 		
 			/* display each of the children */
 			for (int i = 0; i < children.length; i++) {
-				printPathListingNonIndentHelper(outStream, pathSoFar, fns, children[i], filesToShow, showRoots);
+				printFileSetHelper(outStream, pathSoFar, fns, children[i], 
+						resultFileSet, filterFileSet, showRoots);
 			}
 			
 			/* remove our base name from the pathSoFar, so our caller sees the correct value again */
@@ -304,62 +271,47 @@ import com.arapiki.utils.print.PrintUtils;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
-
+	
 	/**
-	 * Helper method for displaying a path and all it's children. This should only be called
-	 * by printPathListing().
-	 * @param outStream The PrintStream to display the paths on
-	 * @param fns The FileNameSpaces object in which these paths belong
-	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
-	 * @param filesToShow A FileSet stating which paths to show (or null to show all of them)
-	 * @param showRoots Whether to show path roots (true) or absolute paths (false)
-	 * @param indentLevel This path's indentation level (how many spaces to print before the name)
+	 * Given zero or more command line arguments, create a FileSet that stores all the files
+	 * mention in those command-line arguments
+	 * @param cmdArgs A String[] of command line arguments (files, directories, or regular expressions).
+	 * Note that cmdArgs[0] is the command name (e.g. show-files), and should therefore be ignored.
+	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
-	private static void printPathListingIndentHelper(
-			PrintStream outStream, FileNameSpaces fns, int thisPathId,
-			FileSet filesToShow, boolean showRoots, int indentLevel) {
+	private static FileSet getFilterFileSet(FileNameSpaces fns, String[] cmdArgs) {
+		
+		/* if no arguments are provided (except the command name), return null to represent "all files" */
+		if (cmdArgs.length <= 1) {
+			return null;
+		}
 
-		/* 
-		 * Get the base name (without directory) of this path. For "/", we display nothing 
-		 * because a "/" will be added anyway. If this path has an attached root, we'll
-		 * display that instead.
-		 */
-		String baseName = fns.getBaseName(thisPathId);
-		if (baseName.equals("/")) {
-			baseName = "";
-		}
-		boolean displaySlash = true;
-
-		/* do we want to show roots? */
-		if (showRoots) {
-			String rootName = fns.getRootAtPath(thisPathId);
+		/* skip over the first argument, which is the command name */
+		String filterPaths[] = new String[cmdArgs.length - 1];
+		System.arraycopy(cmdArgs, 1, filterPaths, 0, cmdArgs.length - 1);
 		
-			/* if there's an attached root, display it */
-			if (rootName != null) {
-				baseName = rootName + ": (" + fns.getPathName(thisPathId) + ")";
-				displaySlash = false;
-			}
-		}
+		FileSet result = new FileSet(fns);
+		result.populateWithPaths(filterPaths);
 		
-		/* if this file is in the set of files to display */
-		if ((filesToShow == null) || filesToShow.isMember(thisPathId)){
-			/* print the base name, preceded by spaces to the desired indentation level */
-			PrintUtils.indent(outStream, indentLevel);		
-			outStream.print(baseName);
-		
-			/* for directories (empty or not), display a trailing "/" */
-			if (displaySlash && (fns.getPathType(thisPathId) == PathType.TYPE_DIR)){
-				outStream.print('/');
-			}
-			outStream.println();
-		}
-		
-		/* recursively call ourselves for each child, with an increased indent level */
-		Integer children[] = fns.getChildPaths(thisPathId);
-		for (int i = 0; i < children.length; i++) {
-			printPathListingIndentHelper(outStream, fns, children[i], filesToShow, showRoots, indentLevel + 2);
-		}
+		return result;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Is this path in the set of paths to be displayed? That is, is it in the resultFileSet
+	 * as well as being part of filterFileSet?
+	 * @param thisPathId The ID of the path we might want to display
+	 * @param resultFileSet The set of paths in the result set
+	 * @param filterFileSet The set of paths in the filter set
+	 */
+	private static boolean shouldBeDisplayed(int thisPathId, 
+			FileSet resultFileSet, FileSet filterFileSet) {
+		
+		return ((resultFileSet == null) || (resultFileSet.isMember(thisPathId))) &&
+				((filterFileSet == null) || (filterFileSet.isMember(thisPathId)));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 }
