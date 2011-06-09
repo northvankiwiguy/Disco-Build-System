@@ -58,9 +58,9 @@ public class Reports {
 	/**
 	 * @param db
 	 */
-	public Reports(BuildStoreDB db, FileNameSpaces fns) {
-		this.db = db;
-		this.fns = fns;
+	public Reports(BuildStore bs) {
+		this.db = bs.getBuildStoreDB();
+		this.fns = bs.getFileNameSpaces();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from buildTaskFiles, files " +
@@ -76,7 +76,7 @@ public class Reports {
 					" and buildTaskFiles.taskId is null");
 		
 		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
-				"select files.id from files where name = ? and pathType = " + PathType.TYPE_FILE.ordinal());
+				"select files.id from files where name like ? and pathType = " + PathType.TYPE_FILE.ordinal());
 		
 		//
 		// This is what I've used - it seems to work at scale.

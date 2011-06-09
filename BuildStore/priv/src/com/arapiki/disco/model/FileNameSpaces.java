@@ -42,6 +42,11 @@ public class FileNameSpaces {
 	public enum PathType { TYPE_INVALID, TYPE_DIR, TYPE_FILE, TYPE_SYMLINK };
 	
 	/**
+	 * The BuildStore object that "owns" this FileNameSpaces object.
+	 */
+	private BuildStore buildStore;
+	
+	/**
 	 * Our database manager object, used to access the database content. This is provided 
 	 * to us when the BuildStoreFileSpace is first instantiated.
 	 */
@@ -82,8 +87,9 @@ public class FileNameSpaces {
 	 * Create a new BuildStoreFileSpace object.
 	 * @param db The BuildStoreDB object to use when accessing the underlying database.
 	 */
-	public FileNameSpaces(BuildStoreDB db) {
-		this.db = db;
+	public FileNameSpaces(BuildStore bs) {
+		this.buildStore = bs;
+		this.db = bs.getBuildStoreDB();
 		
 		/* initialize prepared database statements */
 		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ?");
@@ -390,9 +396,9 @@ public class FileNameSpaces {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Similar to addFile, but return null if the path doesn't exist, rather than automatically adding it.
+	 * Similar to addFile, but return an error if the path doesn't exist, rather than automatically adding it.
 	 * @param fullPath
-	 * @return
+	 * @return The path's ID, or ErrorCode.BAD_PATH if the path isn't defined.
 	 */
 	public int getPath(String fullPathName) {
 		
@@ -410,7 +416,7 @@ public class FileNameSpaces {
 			/* get the next child ID, if it's missing, then the full path is missing */
 			int childID = getChildOfPath(parentID, components[i]);
 			if (childID == -1) {
-				return -1;
+				return ErrorCode.BAD_PATH;
 			}
 			
 			/* this component was found - move to the next */
@@ -419,11 +425,18 @@ public class FileNameSpaces {
 		
 		/* all path components exist, so return the last one */
 		return parentID;
-		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	
+	/**
+	 * Given a path Id, return a String containing the full path name.
+	 * @param pathId The ID of the path to display as a String
+	 * @param showRoots True if we should show applicable file system roots in the string, else
+	 * show the absolute path.
+	 * @return The String representation of the path, in the form /a/b/c/..., possibly
+	 * containing a file system root (e.g. root:/a/b/c/...)
+	 */
 	public String getPathName(int pathId, boolean showRoots) {
 
 		// TODO: handle case where the pathId is invalid.
@@ -444,6 +457,12 @@ public class FileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Given a path Id, return a String containing the full path name.
+	 * @param pathId The ID of the path to display as a String
+	 * 
+	 * @return The String representation of the path, in the form /a/b/c/...
+	 */
 	public String getPathName(int pathId) {
 		return getPathName(pathId, false);
 	}
@@ -548,8 +567,7 @@ public class FileNameSpaces {
 		return results;
 	}
 	
-	/*-------------------------------------------------------------------------------------*/
-	
+	/*-------------------------------------------------------------------------------------*/	
 	
 	/**
 	 * A variation on the one-argument getChildpathIds method that filters paths based on
@@ -558,6 +576,16 @@ public class FileNameSpaces {
 	 */
 	public Integer[] getChildPaths(int pathId, String attrName, String attrValue) {
 		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns a reference to this FileNameSpace's BuildStore object. 
+	 * @return A reference to this FileNameSpace's BuildStore object.
+	 */
+	public BuildStore getBuildStore() {
+		return buildStore;
 	}
 	
 	/*=====================================================================================*
@@ -658,8 +686,21 @@ public class FileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * A helper method for getPathName. This method is called recursively as we traverse from
+	 * the path Id in question, right up to the root path. The recursive step moves up the
+	 * path hierarchy until either / is reached or one of the path's is a "root". At that point,
+	 * the recursion unwinds back to the start as it appends the path names to the result string.
+	 * @param sb The StringBuffer we'll append path component names onto (as we recurse)
+	 * @param pathId The ID of the path we're currently looking at (whose name we'll append to sb)
+	 * @param showRoots True if we should return a file system root (e.g. "root:") in the path name.
+	 */
 	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots) {
 
+		/*
+		 * Get the details of this path, including it's parent ID, its name and whether
+		 * or not it's a root.
+		 */
 		Object pathDetails[] = getPathDetails(pathId);
 		int parentId = (Integer)pathDetails[0];
 		String name = (String)pathDetails[2];
@@ -681,7 +722,11 @@ public class FileNameSpaces {
 			return;
 		}
 		
-		/* else, recursive up the parent chain, display each path component after we returned */
+		/* 
+		 * Now the recursion has terminated and we start moving back along the sequence
+		 * of paths until we reach the original path again. At each step, we'll append
+		 * the path component onto the full result string.
+		 */
 		getPathNameHelper(sb, parentId, showRoots);
 		sb.append("/");
 		sb.append(name);

@@ -60,16 +60,16 @@ public class BuildStore {
 		}
 		
 		/* create a new FileNameSpaces object to manage our list of files */
-		fileSpaces = new FileNameSpaces(db);
+		fileSpaces = new FileNameSpaces(this);
 		
 		/* create a new FileIncludes object to manage the relationship between files */
-		fileIncludes = new FileIncludes(db);
+		fileIncludes = new FileIncludes(this);
 
 		/* create a new BuildTasks object to manage the relationship between files */
-		buildTasks = new BuildTasks(db);
+		buildTasks = new BuildTasks(this);
 		
 		/* create a new Reports object to provide reporting methods */
-		reports = new Reports(db, fileSpaces);
+		reports = new Reports(this);
 		
 		/* create a new FileAttributes object to manage the attributes on files */
 		fileAttributes = new FileAttributes(db, fileSpaces);
@@ -145,5 +145,15 @@ public class BuildStore {
 	 */
 	public void forceInitialize() {
 		db.initDatabase();
+	}
+
+
+	/**
+	 * Fetch a reference to this BuildStore's underlying database. This is a package-scope
+	 * method to be used only by delegate classes (such as FileNameSpaces).
+	 * @return Reference to this BuildStore's underlying database
+	 */
+	/* package */ BuildStoreDB getBuildStoreDB() {
+		return db;
 	}
 }

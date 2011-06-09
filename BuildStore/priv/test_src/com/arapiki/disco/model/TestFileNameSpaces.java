@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.utils.errors.ErrorCode;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -251,17 +252,17 @@ public class TestFileNameSpaces {
 
 		/* check that the first path we lookup from an empty database is missing */
 		int missingPath1 = bsfs.getPath("/anchovy/bacon/cheddar/dill");
-		assertEquals(-1, missingPath1);
+		assertEquals(ErrorCode.BAD_PATH, missingPath1);
 		
 		/* now add it, and check it again */
 		int newPath1 = bsfs.addFile("/anchovy/bacon/cheddar/dill");
 		int existingPath1 = bsfs.getPath("/anchovy/bacon/cheddar/dill");
 		assertEquals(newPath1, existingPath1);
-		assertNotSame(-1, existingPath1);
+		assertNotSame(ErrorCode.BAD_PATH, existingPath1);
 
 		/* now check for a second path, it should be missing */
 		int missingPath2 = bsfs.getPath("/anchovy/bacon/cottage/cheese");
-		assertEquals(-1, missingPath2);
+		assertEquals(ErrorCode.BAD_PATH, missingPath2);
 		
 		int newPath2 = bsfs.addFile("/anchovy/bacon/cottage/cheese");
 		int existingPath2 = bsfs.getPath("/anchovy/bacon/cottage/cheese");

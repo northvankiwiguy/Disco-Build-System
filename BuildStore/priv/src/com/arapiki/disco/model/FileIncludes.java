@@ -51,8 +51,8 @@ public class FileIncludes {
 	 * Create a new FileDependencies object.
 	 * @param db The database manager who provides this object with database access.
 	 */
-	public FileIncludes(BuildStoreDB db) {
-		this.db = db;
+	public FileIncludes(BuildStore bs) {
+		this.db = bs.getBuildStoreDB();
 		
 		/* create prepared database statements */
 		insertFileIncludesPrepStmt = db.prepareStatement("insert into fileIncludes values (?, ?, 1)");

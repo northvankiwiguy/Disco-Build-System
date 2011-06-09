@@ -70,8 +70,8 @@ public class BuildTasks {
 	 * tasks in the system.
 	 * @param db
 	 */
-	public BuildTasks(BuildStoreDB db) {
-		this.db = db;
+	public BuildTasks(BuildStore bs) {
+		this.db = bs.getBuildStoreDB();
 
 		/* create prepared database statements */
 		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?)");
