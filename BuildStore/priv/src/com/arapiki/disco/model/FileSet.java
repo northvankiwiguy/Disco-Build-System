@@ -16,6 +16,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import com.arapiki.utils.errors.ErrorCode;
+
 /**
  * Implements an unordered set of FileRecord objects. This is used as the return
  * value from any method in the Reports class where the order of the returned values
@@ -120,6 +122,102 @@ public class FileSet implements Iterable<Integer> {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
+	 * Given zero or more textual path names, populate the FileSet with the relevant files. Each
+	 * pathArg String can be one of the following:
+	 *    1) An absolute path name (starting with /), either a directory name or a file name. If the
+	 *       path is a directory, add all files and directories below that point in the tree.
+	 *    2) A path name starting with a root: - the same rules apply as for #1
+	 *    3) A single file name, with one or more wildcard (*) characters. All files that match
+     *       the name are added, no matter what their directory.
+	 * 
+	 *    @returns ErrorCode.OK on success, or ErrorCode.BAD_PATH if an invalid path name was
+	 *    provided.
+	 */
+	public int populateWithPaths(String [] pathArgs) {
+		
+		/* for each path provided as input... */
+		for (int i = 0; i < pathArgs.length; i++) {
+			
+			String thisPath = pathArgs[i];
+			
+			/* 
+			 * First check case where a single file name (possibly with wildcards) is used.
+			 * This implies there are no '/' or ':' characters in the path.
+			 */
+			if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf(':') == -1)){
+				
+				/* map any occurrences of * into %, since that's what SQL requires */
+				String regExp = thisPath.replace('*', '%');
+				
+				/* run a report to get all files that match this regexp */
+				BuildStore bs = fns.getBuildStore();
+				Reports reports = bs.getReports();
+				FileSet results = reports.reportFilesThatMatchName(regExp);
+				
+				/* 
+				 * Merge these results into this FileSet (we update the same file set
+				 * for each user-supplied path).
+				 */
+				mergeFileSet(results);
+			} 
+
+			/* else add files/directories by name. Look up the path and add its children recursively */
+			else {
+				int pathId = fns.getPath(thisPath);
+				if (pathId == ErrorCode.BAD_PATH) {
+					return ErrorCode.BAD_PATH;
+				}
+			
+				/* add this path to the FileSet, and all its children too */
+				populateWithPathsHelper(pathId);
+			}
+		}
+		
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a second FileSet, mask off any files from this FileSet that don't appear in the
+	 * second FileSet. This is essentially a bitwise "and".
+	 */
+	public void maskFileSet(FileSet mask) {
+		// TODO: implement this if ever needed
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a second FileSet, merge all the files from that second set into this set. This is
+	 * essentially a bitwise "or". If a particular path is already present in "this" FileSet,
+	 * we won't override it with the FileRecord from "second" (this fact is only interesting if
+	 * you care about the content of the FileRecord).
+	 * Note that the two FileSets must belong to the same FileNameSpaces object, else they
+	 * can't be merged ("this" FileSet will be unchanged)
+	 */
+	public void mergeFileSet(FileSet second) {
+		
+		/* ensure the FileNameSpaces are the same for both FileSets */
+		if (fns != second.fns) {
+			return;
+		}
+		
+		/* for each element in the second FileSet */
+		for (Iterator<Integer> iterator = second.iterator(); iterator.hasNext();) {
+			Integer pathId = (Integer) iterator.next();
+			
+			/* if it's not already in "this" FileSet, add it */
+			if (get(pathId) == null) {
+				FileRecord secondFr = second.get(pathId);
+				add(secondFr);
+			}
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Add a new FileRecord to the FileSet.
 	 * @param fileRecord The file record to add. The pathId field will be used as the index key and
 	 * 			must therefore be unique.
@@ -191,6 +289,31 @@ public class FileSet implements Iterable<Integer> {
 	public Iterator<Integer> iterator() {
 		return content.keySet().iterator();
 	}
+	
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
 
+	/**
+	 * Helper function for populateWithPaths. Recursively add a path and its children to 
+	 * this FileSet.
+	 * @param pathId The ID of the path to be added.
+	 */
+	private void populateWithPathsHelper(int pathId) {
+		
+		/* add a new file record for this pathId, but only if it's not already in the FileSet */
+		if (get(pathId) == null) {
+			FileRecord fr = new FileRecord();
+			fr.pathId = pathId;
+			add(fr);
+		}
+		
+		/* now add all the children of this path */
+		Integer children [] = fns.getChildPaths(pathId);
+		for (int i = 0; i < children.length; i++) {
+			populateWithPathsHelper(children[i]);
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

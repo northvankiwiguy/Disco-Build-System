@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.arapiki.utils.errors.ErrorCode;
+
 /**
  * Test methods for validating the FileSet class.
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -266,6 +268,171 @@ public class TestFileSet {
 		assertFalse(fs.isMember(parC));
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.FileSet#mergeFileSet()}.
+	 */
+	@Test
+	public void testMergeFileSet() throws Exception {
+		FileSet mainFileSet = new FileSet(fns);
+		
+		int file1 = fns.addFile("/apple/banana/carrot/donkey.h");
+		int file2 = fns.addFile("/apple/banana/carrot/elephant.h");
+		int file3 = fns.addFile("/apple/banana/chilly/fish.h");
+		int file4 = fns.addFile("/apple/banana/dragonfruit/goat.h");
+		int file5 = fns.addFile("/apple/banana/dragonfruit/hamster.h");
+		int file6 = fns.addFile("/apple/banana/dragonfruit/iguana.h");
+
+		/* seed mainFileSet with one file */
+		mainFileSet.add(newFileRecord(file1, 10, 10));
+
+		/* merge the empty FileSet, and make sure mainFileSet is unchanged */
+		FileSet fs2 = new FileSet(fns);
+		mainFileSet.mergeFileSet(fs2);
+		assertEquals(1, mainFileSet.size());
+		
+		/* merge in a single file */
+		FileSet fs3 = new FileSet(fns);
+		fs3.add(newFileRecord(file2, 100, 200));
+		mainFileSet.mergeFileSet(fs3);
+		assertEquals(2, mainFileSet.size());
+		assertTrue(mainFileSet.isMember(file1));
+		assertTrue(mainFileSet.isMember(file2));
+		
+		/* merge in a file that already exists - this shouldn't change anything */
+		FileSet fs4 = new FileSet(fns);
+		fs4.add(newFileRecord(file1, 11, 11));
+		mainFileSet.mergeFileSet(fs4);
+		assertEquals(2, mainFileSet.size());
+		assertTrue(mainFileSet.isMember(file1));
+		assertTrue(mainFileSet.isMember(file2));
+
+		/* the details of file1 must not have changed */
+		FileRecord fr = mainFileSet.get(file1);
+		assertNotNull(fr);
+		assertEquals(10, fr.count);
+		assertEquals(10, fr.size);
+		
+		/* merge in three new files */
+		FileSet fs5 = new FileSet(fns);
+		fs5.add(newFileRecord(file4, 11, 11));
+		fs5.add(newFileRecord(file5, 11, 11));
+		fs5.add(newFileRecord(file6, 11, 11));
+		mainFileSet.mergeFileSet(fs5);
+		assertEquals(5, mainFileSet.size());
+		assertTrue(mainFileSet.isMember(file1));
+		assertTrue(mainFileSet.isMember(file2));
+		assertFalse(mainFileSet.isMember(file3));
+		assertTrue(mainFileSet.isMember(file4));
+		assertTrue(mainFileSet.isMember(file5));
+		assertTrue(mainFileSet.isMember(file6));
+	}
+	
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.FileSet#populateWithPaths()}.
+	 */
+	@Test
+	public void testPopulateWithPaths() throws Exception {
+		
+		/* create a bunch of files */
+		int f1path = fns.addFile("/a/b/c/d/e/f1.c");
+		int f2path = fns.addFile("/a/b/c/d/e/f2.c");
+		int f3path = fns.addFile("/a/b/c/d/g/f3.c");
+		int f4path = fns.addFile("/b/c/d/f4.c");
+		int f5path = fns.addFile("/b/c/d/f5.c");
+		int dirRoot = fns.getPath("/");
+		int dirA = fns.getPath("/a");
+		int dirAB = fns.getPath("/a/b");
+		int dirABC = fns.getPath("/a/b/c");
+		int dirABCD = fns.getPath("/a/b/c/d");
+		int dirABCDG = fns.getPath("/a/b/c/d/g");
+		int dirABCDE = fns.getPath("/a/b/c/d/e");
+		int dirB = fns.getPath("/b");
+		int dirBC = fns.getPath("/b/c");
+		int dirBCD = fns.getPath("/b/c/d");
+		
+		/* add some file roots */
+		assertEquals(ErrorCode.OK, fns.addNewRoot("abcRoot", dirABC));
+		assertEquals(ErrorCode.OK, fns.addNewRoot("bRoot", dirB));
+		
+		/* with no arguments, no paths are added */
+		FileSet fs0 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs0.populateWithPaths(new String [] {}));
+		assertEquals(0, fs0.size());
+		
+		/* add all paths by passing in '/' */
+		FileSet fs1 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs1.populateWithPaths(new String [] {"/"}));
+		assertTrue(fs1.isMember(f1path)); assertTrue(fs1.isMember(f2path)); assertTrue(fs1.isMember(f3path)); 
+		assertTrue(fs1.isMember(f4path)); assertTrue(fs1.isMember(f5path)); assertTrue(fs1.isMember(dirRoot));
+		assertTrue(fs1.isMember(dirA)); assertTrue(fs1.isMember(dirAB)); assertTrue(fs1.isMember(dirABC)); 
+		assertTrue(fs1.isMember(dirABCD)); assertTrue(fs1.isMember(dirABCDE)); assertTrue(fs1.isMember(dirABCDG));
+		assertTrue(fs1.isMember(dirB)); assertTrue(fs1.isMember(dirBC)); assertTrue(fs1.isMember(dirBCD));
+		assertEquals(15, fs1.size());
+				
+		/* add a single directory and it's contents */
+		FileSet fs3 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs3.populateWithPaths(new String[] {"/b/c/d/"}));
+		assertTrue(fs3.isMember(f4path)); 
+		assertTrue(fs3.isMember(f5path)); 
+		assertTrue(fs3.isMember(dirBCD));
+		assertEquals(3, fs3.size());
+
+		/* add a directory (/b/c/d) and a file (/a/b/c/d/e/f1.c) */
+		FileSet fs4 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs4.populateWithPaths(new String[] {"/b/c/d/", "/a/b/c/d/e/f1.c"}));
+		assertTrue(fs4.isMember(f1path)); 
+		assertTrue(fs4.isMember(f4path)); 
+		assertTrue(fs4.isMember(f5path)); 
+		assertTrue(fs4.isMember(dirBCD));
+		assertEquals(4, fs4.size());
+		
+		/* add a file (/b/c/d/f4.c) and another file (/a/b/c/d/e/f1.c) */
+		FileSet fs5 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs5.populateWithPaths(new String[] {"/b/c/d/f4.c", "/a/b/c/d/e/f1.c"}));
+		assertTrue(fs5.isMember(f1path)); 
+		assertTrue(fs5.isMember(f4path));
+		assertEquals(2, fs5.size());
+		
+		/* search for all files ending in .c */
+		FileSet fs6 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs6.populateWithPaths(new String[] {"*.c"}));
+		assertTrue(fs6.isMember(f1path));
+		assertTrue(fs6.isMember(f2path));
+		assertTrue(fs6.isMember(f3path)); 
+		assertTrue(fs6.isMember(f4path));
+		assertTrue(fs6.isMember(f5path));
+		assertEquals(5, fs6.size());
+
+		/* search for all files that have 3 in the name */
+		FileSet fs7 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs7.populateWithPaths(new String[] {"*3*"}));
+		assertTrue(fs7.isMember(f3path)); 
+		assertEquals(1, fs7.size());
+		
+		/* test abcRoot */
+		FileSet fs8 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs8.populateWithPaths(new String[] {"abcRoot:"}));
+		assertEquals(7, fs8.size());
+		assertTrue(fs8.isMember(f1path)); assertTrue(fs8.isMember(f2path)); assertTrue(fs8.isMember(f3path));
+		assertTrue(fs8.isMember(dirABC)); assertTrue(fs8.isMember(dirABCD)); assertTrue(fs8.isMember(dirABCDE));
+		assertTrue(fs8.isMember(dirABCDG));
+
+		/* test bRoot: with a path following it */
+		FileSet fs9 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs9.populateWithPaths(new String[] {"bRoot:c/d/f4.c"}));
+		assertEquals(1, fs9.size());
+		assertTrue(fs9.isMember(f4path));
+		
+		/* test with invalid paths */
+		FileSet fs11 = new FileSet(fns);
+		assertEquals(ErrorCode.BAD_PATH, fs11.populateWithPaths(new String[] {"/a/b/x/y/z/"}));	
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
