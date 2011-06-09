@@ -61,20 +61,28 @@ import com.arapiki.utils.errors.ErrorCode;
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		String rootName = cmdArgs[1];
 		String pathName = cmdArgs[2];
+		int rc;
 
 		int pathId = fns.getPath(pathName);
 
-		/* 
-		 * There are two approaches here - if the root exists already, move it.
-		 */
-		int rc;
-		if (fns.getRootPath(rootName) != ErrorCode.NOT_FOUND){
-			rc = fns.moveRootToPath(rootName, pathId);
-		}
+		/* is the path valid, if so, set the root */
+		if (pathId != ErrorCode.BAD_PATH) {
+			/* 
+			 * There are two approaches here - if the root exists already, move it.
+			 */
+			if (fns.getRootPath(rootName) != ErrorCode.NOT_FOUND){
+				rc = fns.moveRootToPath(rootName, pathId);
+			}
 		
-		/* else, create a new root */
+			/* else, create a new root */
+			else {
+				rc = fns.addNewRoot(rootName, pathId);
+			}
+		} 
+		
+		/* the path we're trying to set the root at is invalid */
 		else {
-			rc = fns.addNewRoot(rootName, pathId);
+			rc = ErrorCode.BAD_PATH;
 		}
 		
 		/* Do we need to report an error? */
