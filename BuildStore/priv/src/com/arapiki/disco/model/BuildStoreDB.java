@@ -186,8 +186,9 @@ class BuildStoreDB  {
 			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
 			/* Create the "buildTasks" table. */
-			stat.executeUpdate("create table buildTasks ( taskId integer primary key, parentTaskId integer, command text)");
-			stat.executeUpdate("insert into buildTasks values (0, 0, null)");
+			stat.executeUpdate("create table buildTasks ( taskId integer primary key, parentTaskId integer, " +
+							   "taskDirId integer, command text)");
+			stat.executeUpdate("insert into buildTasks values (0, 0, 0, null)");
 			// TODO: do we need an index here?
 			
 			/* Create the "buildTaskFiles" tables. */

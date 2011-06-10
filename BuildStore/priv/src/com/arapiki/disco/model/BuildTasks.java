@@ -53,6 +53,7 @@ public class BuildTasks {
 		insertBuildTaskPrepStmt = null,
 		findCommandPrepStmt = null,
 		findParentPrepStmt = null,
+		findDirectoryPrepStmt = null,
 		findChildrenPrepStmt = null,
 		insertBuildTaskFilesPrepStmt = null,
 		findOperationInBuildTaskFilesPrepStmt = null,
@@ -74,9 +75,10 @@ public class BuildTasks {
 		this.db = bs.getBuildStoreDB();
 
 		/* create prepared database statements */
-		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?)");
+		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildTasks where taskId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentTaskId from buildTasks where taskId = ?");
+		findDirectoryPrepStmt = db.prepareStatement("select taskDirId from buildTasks where taskId = ?");
 		findChildrenPrepStmt = db.prepareStatement("select taskId from buildTasks where parentTaskId = ?" +
 				" and parentTaskId != taskId");
 		insertBuildTaskFilesPrepStmt = db.prepareStatement("insert into buildTaskFiles values (?, ?, ?)");
@@ -99,14 +101,17 @@ public class BuildTasks {
 	
 	/**
 	 * Add a new build task, and return the task ID number.
+	 * @param parentTaskId The task ID of this task's parent
+	 * @param taskDirId The ID of the path in which this task was executed
 	 * @param command The shell command to be executed.
 	 * @return The new task's ID.
 	 */
-	public int addBuildTask(int parentTaskId, String command) {
+	public int addBuildTask(int parentTaskId, int taskDirId, String command) {
 		
 		try {
 			insertBuildTaskPrepStmt.setInt(1, parentTaskId);
-			insertBuildTaskPrepStmt.setString(2, command);
+			insertBuildTaskPrepStmt.setInt(2, taskDirId);
+			insertBuildTaskPrepStmt.setString(3, command);
 			db.executePrepUpdate(insertBuildTaskPrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -339,8 +344,40 @@ public class BuildTasks {
 		/* else, multiple results is a bad thing */
 		else {
 			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + taskId);
+		}	
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the path ID of the directory in which this task was executed.
+	 * @param taskId The ID of the task whose directory will be returned
+	 * @return The ID of the directory in which this task was executed
+	 */
+	public int getDirectory(int taskId) {
+		Integer [] intResults = null;
+		try {
+			findDirectoryPrepStmt.setInt(1, taskId);
+			intResults = db.executePrepSelectIntegerColumn(findDirectoryPrepStmt);
+			
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
 		}
 		
+		/* if there were no results, return a not found error */
+		if (intResults.length == 0) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* if there was one result, return it */
+		else if (intResults.length == 1) {
+			return intResults[0];
+		}
+		
+		/* else, multiple results is a bad thing */
+		else {
+			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + taskId);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

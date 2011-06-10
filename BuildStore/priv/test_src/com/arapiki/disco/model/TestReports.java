@@ -71,10 +71,10 @@ public class TestReports {
 		int dir = fns.addDirectory("myEmptydir");
 
 		/* create three different tasks */
-		int task1 = bts.addBuildTask(rootTaskId, "command");
-		int task2 = bts.addBuildTask(rootTaskId, "command");		
-		int task3 = bts.addBuildTask(rootTaskId, "command");
-		int task4 = bts.addBuildTask(rootTaskId, "command");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "command");
+		int task2 = bts.addBuildTask(rootTaskId, 0, "command");		
+		int task3 = bts.addBuildTask(rootTaskId, 0, "command");
+		int task4 = bts.addBuildTask(rootTaskId, 0, "command");
 		
 		/* add references from the tasks to the files - task1 uses three of them */
 		bts.addFileAccess(task1, foxFile, OperationType.OP_READ);
@@ -159,7 +159,7 @@ public class TestReports {
 		
 		/* add a (small) bunch of tasks, and associate files with them. */
 		for (int i = 0; i != numTasks; i++) {
-			int taskId = bts.addBuildTask(rootTaskId, "command");
+			int taskId = bts.addBuildTask(rootTaskId, 0, "command");
 			
 			for (int j = 0; j != filesPerTask; j++) {
 				bts.addFileAccess(taskId, r.nextInt(numFiles), OperationType.OP_READ);
@@ -268,8 +268,8 @@ public class TestReports {
 		int file3 = fns.addFile("/home/psmith/myfile3");
 		int file4 = fns.addFile("/home/psmith/myfile4");
 		
-		int task1 = bts.addBuildTask(rootTaskId, "task1");
-		int task2 = bts.addBuildTask(rootTaskId, "task2");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "task1");
+		int task2 = bts.addBuildTask(rootTaskId, 0, "task2");
 
 		/* access some */
 		bts.addFileAccess(task1, file1, OperationType.OP_READ);

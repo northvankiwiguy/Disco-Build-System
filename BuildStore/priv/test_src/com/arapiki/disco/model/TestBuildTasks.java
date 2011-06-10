@@ -71,9 +71,9 @@ public class TestBuildTasks {
 	public void testAddBuildTask() {
 		
 		/* test that each new build task is assigned a unique ID number */
-		int task1 = bts.addBuildTask(rootTaskId, "gcc -o test.o test.c");
-		int task2 = bts.addBuildTask(rootTaskId, "gcc -o main.o main.c");
-		int task3 = bts.addBuildTask(rootTaskId, "gcc -o tree.o tree.c");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "gcc -o test.o test.c");
+		int task2 = bts.addBuildTask(rootTaskId, 0, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(rootTaskId, 0, "gcc -o tree.o tree.c");
 		assertNotSame(task1, task2);
 		assertNotSame(task1, task3);
 		assertNotSame(task2, task3);
@@ -86,9 +86,9 @@ public class TestBuildTasks {
 	 */
 	@Test
 	public void testGetCommand() {
-		int task1 = bts.addBuildTask(rootTaskId, "gcc -o test.o test.c");
-		int task2 = bts.addBuildTask(rootTaskId, "gcc -o main.o main.c");
-		int task3 = bts.addBuildTask(rootTaskId, "gcc -o tree.o tree.c");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "gcc -o test.o test.c");
+		int task2 = bts.addBuildTask(rootTaskId, 0, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(rootTaskId, 0, "gcc -o tree.o tree.c");
 		assertEquals("gcc -o tree.o tree.c", bts.getCommand(task3));
 		assertEquals("gcc -o main.o main.c", bts.getCommand(task2));
 		assertEquals("gcc -o test.o test.c", bts.getCommand(task1));
@@ -106,11 +106,11 @@ public class TestBuildTasks {
 	public void testGetParent() throws Exception {
 		
 		/* add a bunch of tasks in a hierarchy */
-		int task1 = bts.addBuildTask(rootTaskId, "/bin/sh");
-		int task2 = bts.addBuildTask(task1, "gcc -o main.o main.c");
-		int task3 = bts.addBuildTask(task1, "/bin/sh");
-		int task4 = bts.addBuildTask(task3, "gcc -o tree.o tree.c");
-		int task5 = bts.addBuildTask(task3, "gcc -o bark.o bark.c");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "/bin/sh");
+		int task2 = bts.addBuildTask(task1, 0, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(task1, 0, "/bin/sh");
+		int task4 = bts.addBuildTask(task3, 0, "gcc -o tree.o tree.c");
+		int task5 = bts.addBuildTask(task3, 0, "gcc -o bark.o bark.c");
 		
 		/* the parent of the root is ErrorCode.NOT_FOUND */
 		assertEquals(ErrorCode.NOT_FOUND, bts.getParent(rootTaskId));
@@ -129,18 +129,44 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getDirectory(int)}
+	 */
+	@Test
+	public void testGetDirectory() throws Exception {
+		
+		/* add a bunch of tasks in a hierarchy, each with a different directory */
+		int task1 = bts.addBuildTask(rootTaskId, 0, "/bin/sh");
+		int task2 = bts.addBuildTask(task1, 10, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(task1, 20, "/bin/sh");
+		int task4 = bts.addBuildTask(task3, 25, "gcc -o tree.o tree.c");
+		int task5 = bts.addBuildTask(task3, 30, "gcc -o bark.o bark.c");
+		
+		/* check that the directories are stored correctly */
+		assertEquals(0, bts.getDirectory(task1));
+		assertEquals(10, bts.getDirectory(task2));
+		assertEquals(20, bts.getDirectory(task3));
+		assertEquals(25, bts.getDirectory(task4));
+		assertEquals(30, bts.getDirectory(task5));
+		
+		/* invalid task IDs should return an error */
+		assertEquals(ErrorCode.NOT_FOUND, bts.getDirectory(1000));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getParent(int)}
 	 */
 	@Test
 	public void testGetChildren() throws Exception {
 
 		/* add a bunch of tasks in a hierarchy */
-		int task1 = bts.addBuildTask(rootTaskId, "/bin/sh");
-		int task2 = bts.addBuildTask(task1, "gcc -o main.o main.c");
-		int task3 = bts.addBuildTask(task1, "/bin/sh");
-		int task4 = bts.addBuildTask(task3, "gcc -o tree.o tree.c");
-		int task5 = bts.addBuildTask(task3, "gcc -o bark.o bark.c");
-		int task6 = bts.addBuildTask(task3, "gcc -o woof.o woof.c");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "/bin/sh");
+		int task2 = bts.addBuildTask(task1, 0, "gcc -o main.o main.c");
+		int task3 = bts.addBuildTask(task1, 0, "/bin/sh");
+		int task4 = bts.addBuildTask(task3, 0, "gcc -o tree.o tree.c");
+		int task5 = bts.addBuildTask(task3, 0, "gcc -o bark.o bark.c");
+		int task6 = bts.addBuildTask(task3, 0, "gcc -o woof.o woof.c");
 		
 		/* test valid parent/child relationships */
 		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getChildren(rootTaskId), new Integer[] {task1}));
@@ -163,7 +189,7 @@ public class TestBuildTasks {
 	@Test
 	public void testAddGetFileAccess() {
 		/* create a new task */
-		int task = bts.addBuildTask(rootTaskId, "gcc -o foo foo.c");
+		int task = bts.addBuildTask(rootTaskId, 0, "gcc -o foo foo.c");
 		
 		/* create a number of new files */
 		int fileFooC = bsfs.addFile("/a/b/c/foo.c");
@@ -190,7 +216,7 @@ public class TestBuildTasks {
 		assertTrue(CommonTestUtils.sortedArraysEqual(writeAccesses, new Integer[] { fileFooO, fileFoo }));
 
 		/* check an empty task - should return no results */
-		int emptyTask = bts.addBuildTask(rootTaskId, "echo Hi");
+		int emptyTask = bts.addBuildTask(rootTaskId, 0, "echo Hi");
 		Integer emptyAccesses[] = bts.getFilesAccessed(emptyTask, OperationType.OP_UNSPECIFIED);
 		assertEquals(0, emptyAccesses.length);
 		
@@ -219,9 +245,9 @@ public class TestBuildTasks {
 	public void testGetTasksThatAccess() {
 
 		/* create some tasks */
-		int task1 = bts.addBuildTask(rootTaskId, "gcc -o clock.o clock.c");
-		int task2 = bts.addBuildTask(rootTaskId, "gcc -o banner.o banner.c");
-		int task3 = bts.addBuildTask(rootTaskId, "gcc -o mult.o mult.c");
+		int task1 = bts.addBuildTask(rootTaskId, 0, "gcc -o clock.o clock.c");
+		int task2 = bts.addBuildTask(rootTaskId, 0, "gcc -o banner.o banner.c");
+		int task3 = bts.addBuildTask(rootTaskId, 0, "gcc -o mult.o mult.c");
 
 		/* and a bunch of files that access those tasks */
 		int file1 = bsfs.addFile("/clock.o");
@@ -315,7 +341,7 @@ public class TestBuildTasks {
 			//System.out.println("Adding " + sb);
 
 			/* add the file name to the FileSpace */
-			int taskId = bts.addBuildTask(rootTaskId, sb.toString());
+			int taskId = bts.addBuildTask(rootTaskId, 0, sb.toString());
 			
 			/* now add files to this tasks */
 			for (int k = 0; k != 200; k++) {
