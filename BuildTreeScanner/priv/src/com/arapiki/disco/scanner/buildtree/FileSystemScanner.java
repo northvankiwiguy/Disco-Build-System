@@ -16,6 +16,7 @@ import java.io.File;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.os.FileSystemTraverseCallback;
 import com.arapiki.utils.os.SystemUtils;
 
@@ -77,7 +78,7 @@ public class FileSystemScanner {
 					@Override
 					public void callback(File thisPath) {
 						String pathName = thisPath.toString();
-						if (fns.addFile(rootName + ":/" + pathName) == -1){
+						if (fns.addFile(rootName + ":/" + pathName) == ErrorCode.BAD_PATH){
 							throw new FatalBuildTreeScannerError("Adding file name /" + pathName +
 									" to BuildStore returned an error."); 
 						}

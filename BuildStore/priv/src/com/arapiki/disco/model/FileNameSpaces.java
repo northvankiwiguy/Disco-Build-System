@@ -343,8 +343,9 @@ public class FileNameSpaces {
 	/**
 	 * Add a new file into the FileNameSpace.
 	 * @param fullPathName The full path of the file.
-	 * @return the ID of the newly added file, or -1 if the file couldn't be added within
-	 * this part of the tree (such as when the parent itself is a file, not a directory).
+	 * @return the ID of the newly added file, or ErrorCode.BAD_PATH if the file couldn't 
+	 * be added within this part of the tree (such as when the parent itself is a 
+	 * file, not a directory).
 	 */
 	public int addFile(String fullPathName) {
 		return addPath(PathType.TYPE_FILE, fullPathName);
@@ -355,8 +356,9 @@ public class FileNameSpaces {
 	/**
 	 * Add a new directory into the FileNameSpace.
 	 * @param fullPathName The full path of the directory.
-	 * @return the ID of the newly added file, or -1 if the directory couldn't be added within
-	 * this part of the tree (such as when the parent itself is a file, not a directory).
+	 * @return the ID of the newly added file, or ErrorCode.BAD_PATH if the directory 
+	 * couldn't be added within this part of the tree (such as when the parent itself 
+	 * is a file, not a directory).
 	 */
 	public int addDirectory(String fullPathName) {
 		return addPath(PathType.TYPE_DIR, fullPathName);
@@ -592,6 +594,15 @@ public class FileNameSpaces {
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
+	/**
+	 * Helper method for addDirectory, addFile and addSymlink. Adds a new path, of the
+	 * specified type (pathType) to the FileNameSpaces. If the path already exists in
+	 * the FileNameSpaces object, return the ID of the existing path.
+	 * @param pathType The type of the path to be added (TYPE_DIR, TYPE_FILE, TYPE_SYMLINK)
+	 * @param fullPathName The full absolute path name to be added
+	 * @return The new (or existing) path's ID, or ErrorCode.BAD_PATH if for some reason
+	 * the path isn't valid.
+	 */
 	private int addPath(PathType pathType, String fullPathName) {
 		
 		/* parse the path name and separate it into root and path components */
@@ -601,7 +612,7 @@ public class FileNameSpaces {
 		
 		/* path's must be absolute (relative to the root of this name space */
 		if (!PathUtils.isAbsolutePath(pathName)) {
-			return -1;
+			return ErrorCode.BAD_PATH;
 		}
 		
 		/* convert the absolute path in /-separated path components */
@@ -619,10 +630,10 @@ public class FileNameSpaces {
 			/* 
 			 * If the path we just added didn't have the correct type, that's a problem.
 			 * For example, if we thought we added a directory, but it was already added
-			 * as a file, return -1
+			 * as a file, return ErrorCode.BAD_PATH;
 			 */
 			if (childId == -1) {
-				return -1;
+				return ErrorCode.BAD_PATH;
 			}
 			
 		}

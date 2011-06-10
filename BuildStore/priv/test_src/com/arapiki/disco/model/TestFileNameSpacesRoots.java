@@ -220,7 +220,7 @@ public class TestFileNameSpacesRoots {
 	 */
 	@Test
 	public void testGetRootAtPath() {
-		assertNotSame(-1, bsfs.addFile("root:/a/b/c/d.c"));
+		assertNotSame(ErrorCode.BAD_PATH, bsfs.addFile("root:/a/b/c/d.c"));
 		int path2 = bsfs.getPath("root:/a/b/c");
 		int path3 = bsfs.getPath("root:/a/b");
 		int path4 = bsfs.getPath("root:/a");
@@ -285,7 +285,7 @@ public class TestFileNameSpacesRoots {
 	public void testDeleteRoot() {
 		
 		/* add some basic paths and roots */
-		assertNotSame(-1, bsfs.addFile("root:/a/b/c/d.c"));
+		assertNotSame(ErrorCode.BAD_PATH, bsfs.addFile("root:/a/b/c/d.c"));
 		int path2 = bsfs.getPath("root:/a/b/c");
 		int path3 = bsfs.getPath("root:/a/b");
 		int path4 = bsfs.getPath("root:/a");

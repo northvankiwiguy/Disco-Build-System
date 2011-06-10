@@ -157,7 +157,7 @@ public class TestFileNameSpaces {
 		
 		/* test case where non-absolute path is provided */
 		int path5 = bsfs.addFile("a/b/c");
-		assertEquals(-1, path5);
+		assertEquals(ErrorCode.BAD_PATH, path5);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -180,23 +180,23 @@ public class TestFileNameSpaces {
 		
 		/* Adding a directory within a directory is OK */
 		int path5 = bsfs.addDirectory("/p1/p2");
-		assertNotSame(-1, path5);
+		assertNotSame(ErrorCode.BAD_PATH, path5);
 		int path6 = bsfs.addDirectory("/p1/p2/p3");
-		assertNotSame(-1, path6);
+		assertNotSame(ErrorCode.BAD_PATH, path6);
 		int path7 = bsfs.addDirectory("/p1");
-		assertNotSame(-1, path7);
+		assertNotSame(ErrorCode.BAD_PATH, path7);
 		
 		/* Adding a directory within a file is NOT OK */
 		int path8 = bsfs.addFile("/p1/p2/p3/myfile");
-		assertNotSame(-1, path8);
+		assertNotSame(ErrorCode.BAD_PATH, path8);
 		int path9 = bsfs.addDirectory("/p1/p2/p3/myfile/mydir");
-		assertEquals(-1, path9);
+		assertEquals(ErrorCode.BAD_PATH, path9);
 		
 		/* Trying to add an existing file as a directory is NOT OK */
 		int path10 = bsfs.addFile("/x/y/z/file");
-		assertNotSame(-1, path10);
+		assertNotSame(ErrorCode.BAD_PATH, path10);
 		int path11 = bsfs.addDirectory("/x/y/z/file");
-		assertEquals(-1, path11);
+		assertEquals(ErrorCode.BAD_PATH, path11);
 		
 		/* but getting the path is OK */
 		int path12 = bsfs.getPath("x/y/z/file");
@@ -204,9 +204,9 @@ public class TestFileNameSpaces {
 
 		/* Trying to add an existing directory as a file is NOT OK */
 		int path13 = bsfs.addDirectory("/x/y/z/dir");
-		assertNotSame(-1, path13);
+		assertNotSame(ErrorCode.BAD_PATH, path13);
 		int path14 = bsfs.addFile("/x/y/z/dir");
-		assertEquals(-1, path14);
+		assertEquals(ErrorCode.BAD_PATH, path14);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -235,7 +235,7 @@ public class TestFileNameSpaces {
 		/* test that you can't add a file within a file */
 		int path6 = bsfs.addFile("/a/b/c");
 		int path7 = bsfs.addFile("/a/b/c/d");
-		assertEquals(-1, path7);
+		assertEquals(ErrorCode.BAD_PATH, path7);
 		
 		/* test adding at the top level */
 		int path8 = bsfs.addFile("/moose");
