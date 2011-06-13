@@ -159,18 +159,6 @@ import com.arapiki.utils.print.PrintUtils;
 		if (!rootPathName.equals("/")) {
 			sb.append('/');
 		}
-			
-		/* 
-		 * Special case for displaying the top path, potentially when it's a "root", as opposed
-		 * to an absolute path.
-		 */
-		if (shouldBeDisplayed(topRoot, resultFileSet, filterFileSet)){
-			if (!showRoots || fns.getRootAtPath(topRoot) == null){
-				outStream.println(rootPathName);
-			} else {
-				outStream.println(rootPathName + " (" + fns.getPathName(topRoot, false) + ")");
-			}
-		}
 		
 		/* call the helper function to display each of our children */
 		Integer children[] = fns.getChildPaths(topRoot);
@@ -224,12 +212,8 @@ import com.arapiki.utils.print.PrintUtils;
 			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, int thisPathId,
 			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots) {
 
-		/* 
-		 * Optimize the tree walk - if thisPathId isn't in resultFileSet, there's no point
-		 * in walking the tree any further down. This assumes that resultFileSet.populateWithParents()
-		 * has been called. Note that filterFileSet can't be used in this optimization.
-		 */
-		if ((resultFileSet != null) && (!resultFileSet.isMember(thisPathId))){
+		/* should this path be displayed? */
+		if (!shouldBeDisplayed(thisPathId, resultFileSet, filterFileSet)){
 			return;
 		}	
 		
@@ -238,9 +222,6 @@ import com.arapiki.utils.print.PrintUtils;
 
 		/* we'll use this to record the current path's name */
 		String baseName;
-		
-		/* should this path be displayed? */
-		boolean isInSet = shouldBeDisplayed(thisPathId, resultFileSet, filterFileSet);	
 		
 		/*
 		 * There are two cases to handle:
@@ -252,23 +233,24 @@ import com.arapiki.utils.print.PrintUtils;
 			rootName = fns.getRootAtPath(thisPathId);
 		}
 		
+		/* what is this path? A directory or something else? */
+		boolean isDirectory = (fns.getPathType(thisPathId) == PathType.TYPE_DIR);
+		boolean isNonEmptyDirectory = isDirectory && (children.length != 0);
+		
 		/* this path isn't a root, or we're not interested in displaying roots */
 		if (rootName == null) {
 			
 			/* get the name of this path */
 			baseName = fns.getBaseName(thisPathId);
 		
-			/* if this is to be displayed, then display it */
-			if (isInSet) {
-				/* display this path, prefixed by the absolute pathSoFar */
+			/* 
+			 * Display this path, prefixed by the absolute pathSoFar. Don't show non-empty
+			 * directories, since they'll be displayed when the file they contain is
+			 * displayed.
+			 */
+			if (!isNonEmptyDirectory) {
 				outStream.print(pathSoFar);		
-				outStream.print(baseName);
-		
-				/* for all directories (empty or not), display a / after their name */
-				if (fns.getPathType(thisPathId) == PathType.TYPE_DIR){
-					outStream.print('/');
-				}
-				outStream.println();
+				outStream.println(baseName);
 			}
 		}
 			
@@ -284,10 +266,8 @@ import com.arapiki.utils.print.PrintUtils;
 			pathSoFar.append(rootName);
 			pathSoFar.append(':');
 			
-			/* display information about this root */
-			if (isInSet) {
-				outStream.println(pathSoFar + " (" + fns.getPathName(thisPathId) + ")");
-			}
+			/* display information about this root. */
+			outStream.println(pathSoFar + " (" + fns.getPathName(thisPathId) + ")");
 			
 			/* we don't display this path's name */
 			baseName = "";
@@ -334,6 +314,9 @@ import com.arapiki.utils.print.PrintUtils;
 		
 		FileSet result = new FileSet(fns);
 		result.populateWithPaths(filterPaths);
+		
+		/* this result set will be traversed, so populate the parents too */
+		result.populateWithParents();
 		
 		return result;
 	}
