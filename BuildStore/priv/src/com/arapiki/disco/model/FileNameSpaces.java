@@ -109,7 +109,7 @@ public class FileNameSpaces {
 		 * Create an empty cache to record the most-recently accessed file name mapping, to save us from
 		 * querying the database all the time.
 		 */
-		fileNameCache = new FileNameCache(1024);
+		fileNameCache = new FileNameCache(40960);
 	}
 	
 	/*=====================================================================================*
