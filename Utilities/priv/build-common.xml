@@ -101,9 +101,16 @@
 	<property name="java-library-path" location="${project-root}/../Utilities/pub" />
 
 	<!--
+	   - Not all projects have tests. Set "tests-available" if this project does
+	  -->
+	<target name="check-for-tests">
+		<available file="${test-src-dir}" property="tests-available" />			
+	</target>
+	
+	<!--
 	   - Compile all the (non-test) java files in this project.
       -->
-	<target name="test-java" depends="java">
+	<target name="test-java" depends="java, check-for-tests" if="tests-available">
 		<echo>Checking ${ant.project.name} Java test code</echo>
 		<mkdir dir="${test-bin-dir}" />
 		<depend srcdir="${test-src-dir}" destdir="${test-bin-dir}" />
@@ -114,7 +121,7 @@
 	<!--
 	   - Execute unit tests using junit
 	  -->
-	<target name="test" depends="test-java">
+	<target name="test" depends="test-java, check-for-tests" if="tests-available">
 		<junit fork="yes" printsummary="false" haltonfailure="true">
 		
 			<!-- ensure that the correct classpath and library path is set up -->
