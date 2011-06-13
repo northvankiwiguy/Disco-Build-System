@@ -14,8 +14,6 @@ package com.arapiki.disco.main;
 
 import java.io.PrintStream;
 
-import javax.swing.text.Utilities;
-
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
@@ -23,6 +21,7 @@ import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.TaskSet;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.print.PrintUtils;
 
 /**
@@ -313,7 +312,10 @@ import com.arapiki.utils.print.PrintUtils;
 		System.arraycopy(cmdArgs, 1, filterPaths, 0, cmdArgs.length - 1);
 		
 		FileSet result = new FileSet(fns);
-		result.populateWithPaths(filterPaths);
+		if (result.populateWithPaths(filterPaths) != ErrorCode.OK) {
+			System.err.println("Error: Invalid path filter provided.");
+			System.exit(1);
+		}
 		
 		/* this result set will be traversed, so populate the parents too */
 		result.populateWithParents();
