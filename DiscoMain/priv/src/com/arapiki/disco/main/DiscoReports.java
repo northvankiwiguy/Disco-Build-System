@@ -14,11 +14,16 @@ package com.arapiki.disco.main;
 
 import java.io.PrintStream;
 
+import javax.swing.text.Utilities;
+
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
+import com.arapiki.disco.model.TaskSet;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.utils.print.PrintUtils;
 
 /**
  *  A helper class for DiscoMain. This class handles the disco commands that report things
@@ -84,6 +89,21 @@ import com.arapiki.disco.model.FileNameSpaces.PathType;
 		
 		/* pretty print the results */
 		printFileSet(System.out, fns, unusedFileSet, filterFileSet, showRoots);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * TODO: comment this properly
+	 * TODO: do filtering based on cmdArgs.
+	 * @param buildStore
+	 * @param cmdArgs
+	 */
+	public static void showTasks(BuildStore buildStore, String[] cmdArgs) {
+		BuildTasks bts = buildStore.getBuildTasks();
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		
+		printTaskSet(System.out, bts, fns, null, null);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -159,7 +179,29 @@ import com.arapiki.disco.model.FileNameSpaces.PathType;
 					resultFileSet, filterFileSet, showRoots);
 		}
 	}
-			
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * TODO: Comment this properly
+	 */
+	/* package */ static void printTaskSet(
+			PrintStream outStream, BuildTasks bts, FileNameSpaces fns,
+			TaskSet resultTaskSet, TaskSet filterTaskSet) {
+		
+		/* 
+		 * We always start at the top root, even though we may only display a subset
+		 * of the paths underneath that root.
+		 */
+		int topRoot = bts.getRootTask("");
+
+		/* call the helper function to display each of our children */
+		Integer children[] = bts.getChildren(topRoot);
+		for (int i = 0; i < children.length; i++) {
+			printTaskSetHelper(outStream, bts, fns, children[i], 
+					resultTaskSet, filterTaskSet, 1);
+		}
+	}
 
 	/*=====================================================================================*
 	 * PRIVATE METHODS
@@ -314,4 +356,60 @@ import com.arapiki.disco.model.FileNameSpaces.PathType;
 	
 	/*-------------------------------------------------------------------------------------*/
 	
+	/**
+	 * 
+	 * TODO: comment this properly.
+	 * @param outStream
+	 * @param bts
+	 * @param integer
+	 * @param resultTaskSet
+	 * @param filterTaskSet
+	 * @param i
+	 */
+	private static void printTaskSetHelper(PrintStream outStream,
+			BuildTasks bts, FileNameSpaces fns, int taskId, TaskSet resultTaskSet,
+			TaskSet filterTaskSet, int indentLevel) {
+
+		/* 
+		 * Display the current task, at the appropriate indentation level. The format is:
+		 * 
+		 * - Task 1 (/home/psmith/t/cvs-1.11.23)
+         *     if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :; 
+         * -- Task 2 (/home/psmith/t/cvs-1.11.23)
+         *      failcom='exit 1'; for f in x $MAKEFLAGS; do case $f in *=* | --[!k]*);; \
+         *
+         * Where Task 1 is the parent of Task 2.
+         */
+
+		/* fetch the task's command string (if there is one) */
+		String command = bts.getCommand(taskId);
+		if (command == null) {
+			command = "<unknown command>";
+		}
+		
+		/* fetch the name of the directory the task was executed in */
+		int taskDirId = bts.getDirectory(taskId);
+		String taskDirName = fns.getPathName(taskDirId);
+		
+		/* display the correct number of "-" characters */
+		for (int i = 0; i != indentLevel; i++) {
+			outStream.append('-');
+		}
+		outStream.println(" Task " + taskId + " (" + taskDirName + ")");
+		
+		/* display the task's command string. Each line must be indented appropriately */
+		/* TODO: make the wrap value settable */
+		PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, 100);
+		outStream.println();
+		
+		/* recursively call ourselves to display each of our children */
+		Integer children[] = bts.getChildren(taskId);
+		for (int i = 0; i < children.length; i++) {
+			printTaskSetHelper(outStream, bts, fns, children[i], 
+					resultTaskSet, filterTaskSet, indentLevel + 1);
+		}
+		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }

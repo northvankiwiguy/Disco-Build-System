@@ -152,10 +152,13 @@ public final class DiscoMain {
 		formattedDisplayLine("    scan-tree <directories>", "Scan one or more file system directory and record file names");
 		formattedDisplayLine("    scan-ea-anno <anno-file>", "Scan an Electric Accelerator annotation file");
 		
-		System.err.println("\nReporting commands:");
+		System.err.println("\nFile reporting commands:");
 		formattedDisplayLine("    show-files", "List all files recorded in the build store.");
 		formattedDisplayLine("    show-unused-files", "Report on files that are never used by the build system.");
 		formattedDisplayLine("    show-most-used-files", "Report on files the build system accessed the most.");
+		
+		System.err.println("\nTask reporting commands:");
+		formattedDisplayLine("    show-tasks", "List all tasks recorded in the build store.");
 		
 		System.err.println("\nFile System commands:");
 		formattedDisplayLine("    show-root [<root-name>]", "Show the file system path referred to by this root. Without");
@@ -194,7 +197,7 @@ public final class DiscoMain {
 		}
 		
 		/*
-		 * Reporting commands
+		 * File reporting commands
 		 */
 		else if (cmdName.equals("show-files")){
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-files [ <top-path> ]");
@@ -203,6 +206,14 @@ public final class DiscoMain {
 		else if (cmdName.equals("show-unused-files")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-unused-files [ <top-path> ]");
 			DiscoReports.showUnusedFiles(buildStore, optionShowRoots, cmdArgs);			
+		}
+		
+		/*
+		 * Task reporting commands
+		 */
+		else if (cmdName.equals("show-tasks")) {
+			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-tasks");
+			DiscoReports.showTasks(buildStore, cmdArgs);			
 		}
 		
 		/*

@@ -13,6 +13,8 @@
 package com.arapiki.disco.scanner.electricanno;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -22,6 +24,7 @@ import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
+import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.PathUtils;
 
 /**
@@ -47,11 +50,27 @@ import com.arapiki.utils.string.PathUtils;
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
-	/*
+	/**
+	 * The command argv StringBuffer starts out this size.
+	 */
+	private static final int INITIAL_COMMAND_SB_SIZE = 256;
+
+	/**
 	 * Are we parsing the content within a <job>...</job> pair of elements? This is used 
 	 * for optimizing the decision making in our code.
 	 */
 	private boolean withinJob = false;
+	
+	/**
+	 * Are we parsing the content with a <argv>...</argv> pair of elements?
+	 */
+	private boolean withinArgv = false;
+	
+	/**
+	 * The command line for this job. This is a StringBuffer, since command lines are often
+	 * multiline and we append to them as we seen new <argv> tags.
+	 */
+	StringBuffer commandArgv;
 	
 	/** the BuildTasks object associated with this BuildStore */
 	private BuildTasks buildTasks;
@@ -65,6 +84,18 @@ import com.arapiki.utils.string.PathUtils;
 	/** the set of files that have been written in the current <job> */	
 	private ArrayList<String> filesWritten;
 	
+	/** The ID of the current task's parent task */
+	private int currentParentTask;
+	
+	/** The ID of the task we most recently processed */
+	private int mostRecentTask;
+	
+	/** our stack of parent tasks, recording our progress through the <make> </make> tags */
+	private ArrayList<Integer> taskStack;
+	
+	/** what directory was the current task performed in? */
+	private int currentDirId;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -77,6 +108,12 @@ import com.arapiki.utils.string.PathUtils;
 	public ElectricAnnoSAXHandler(BuildStore buildStore) {
 		buildTasks = buildStore.getBuildTasks();
 		fns = buildStore.getFileNameSpaces();
+		
+		/* create a stack to remember the hierarchy of tasks */
+		taskStack = new ArrayList<Integer>();
+		
+		/* To start with, all tasks we encounter are children of the root task */
+		mostRecentTask = currentParentTask = buildTasks.getRootTask("");
 	}
 	
 	/*=====================================================================================*
@@ -110,6 +147,22 @@ import com.arapiki.utils.string.PathUtils;
 				filesRead = new ArrayList<String>();
 				filesWritten = new ArrayList<String>();
 			}
+		}
+		
+		/*
+		 * else, the <make> tag tells us the nesting relationship between tasks.
+		 */
+		else if (localName.equals("make")) {
+			String cwd = atts.getValue("cwd");
+			
+			currentDirId = fns.addDirectory(cwd);
+			if (currentDirId == ErrorCode.BAD_PATH) {
+				throw new FatalBuildScannerError("Unable to register new directory in database: " + cwd);
+			}
+								
+			/* push our existing state on a stack, effectively changing our current parent task */
+			taskStack.add(Integer.valueOf(mostRecentTask));
+			currentParentTask = mostRecentTask;
 		}
 		
 		/*
@@ -151,9 +204,14 @@ import com.arapiki.utils.string.PathUtils;
 					}
 				}
 			}
+			
+			/* else, handle command line arguments that appear within <argv> </argv> */
+			else if (localName.equals("argv")) {
+				withinArgv = true;
+			}
 		}
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -174,29 +232,58 @@ import com.arapiki.utils.string.PathUtils;
 			
 			withinJob = false;
 			
-			/* we've seen all the details of this job, add it as a build task */
-			/* TODO: add the actual shell command here */
-			int newTaskId = buildTasks.addBuildTask("");
+			/* 
+			 * We've seen all the details of this job, and if it's an interesting
+			 * job, then we'll add it as a build task. We currently define "interesting"
+			 * as whether there's a command argv associated with it.
+			 */
+			if (commandArgv != null){
+				
+				String argvString = commandArgv.toString();
+				commandArgv = null;	
+				
+				int newTaskId = buildTasks.addBuildTask(currentParentTask, currentDirId, argvString);
+				
+				/* record the ID of this task, since it might be the new parent task soon */
+				mostRecentTask = newTaskId;
 
-			/* add all the file reads to the build task */
-			for (String file : filesRead) {
-				int newFileId = fns.addFile(file);
-				if (newFileId != -1) {
-					buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
-				} else {
-					throw new FatalBuildScannerError("Unable to register new file in database: " + file);
+				/* add all the file reads to the build task */
+				for (String file : filesRead) {
+					int newFileId = fns.addFile(file);
+					if (newFileId != ErrorCode.BAD_PATH) {
+						buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
+					} else {
+						throw new FatalBuildScannerError("Unable to register new file in database: " + file);
+					}
+				}
+
+				/* add all the file writes to the build task */
+				for (String file : filesWritten) {
+					int newFileId = fns.addFile(file);
+					if (newFileId != ErrorCode.BAD_PATH) {
+						buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
+					} else {
+						throw new FatalBuildScannerError("Unable to register new file in database: " + file);
+					}
 				}
 			}
-
-			/* add all the file writes to the build task */
-			for (String file : filesWritten) {
-				int newFileId = fns.addFile(file);
-				if (newFileId != -1) {
-				buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
-				} else {
-					throw new FatalBuildScannerError("Unable to register new file in database: " + file);
-				}
+		}
+		
+		/* have we seen a </argv>? */
+		else if (withinArgv && localName.equals("argv")) {
+			withinArgv = false;
+			if (commandArgv != null) {
+				commandArgv.append('\n');
 			}
+		}
+		
+		/* else, we're done with this nesting level of tasks */
+		else if (localName.equals("make")) {
+			int stackSize = taskStack.size();
+			if (stackSize == 0) {
+				throw new FatalBuildScannerError("Too many </make> tags in annotation file");
+			}
+			mostRecentTask = currentParentTask = taskStack.remove(stackSize - 1);
 		}
 	}
 
@@ -211,7 +298,12 @@ import com.arapiki.utils.string.PathUtils;
 	public void characters(char[] ch, int start, int length) 
 			throws SAXException {
 		
-		/* TODO: capture the job's shell command */
+		if (withinArgv) {
+			if (commandArgv == null) {
+				commandArgv = new StringBuffer(INITIAL_COMMAND_SB_SIZE);
+			}
+			commandArgv.append(ch, start, length);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

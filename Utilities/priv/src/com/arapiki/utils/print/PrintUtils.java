@@ -50,4 +50,41 @@ public class PrintUtils {
 		}
 		
 	}
+
+	/**
+	 * Given a multi-line string, display each line of that string after indenting by
+	 * the specified number of spaces, and wrapping lines at the specific line width.
+	 * Every effort is made to wrap lines at a word boundary, rather than splitting
+	 * words across different lines. A line that is wrapped will end with a "\" character.
+	 * Note that the wrapWidth includes the number of spaces in indentLevel. That is,
+	 * if indentLevel is 20, and wrapWidth is 40, then up to 20 characters will be displayed
+	 * per line.
+	 * @param out The stream to write to (such as System.out) 
+	 * @param string The string to indent, wrap and display
+	 * @param indentLevel The number of characters to indent by
+	 * @param wrapWidth The column number at which to wrap
+	 */
+	public static void indentAndWrap(PrintStream out, String string, int indentLevel, int wrapWidth) {
+		
+		// TODO: implement this properly.
+		// TODO: implement tests for this method
+		
+		int pos = 0;
+		int stringLen = string.length();
+		
+		while (pos < stringLen){
+			/* figure out how long the next line is - it might not be \n terminated */
+			int newLinePos = string.indexOf('\n', pos);
+			if (newLinePos == -1) {
+				newLinePos = string.length();
+			}
+		
+			/* display the current line (a substring) */
+			indent(out, indentLevel);
+			out.println(string.substring(pos, newLinePos));
+			
+			/* prepare for printing the next line */
+			pos = newLinePos + 1;
+		}
+	}
 }
