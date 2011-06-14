@@ -54,7 +54,21 @@ public class TestReports {
 		reports = bs.getReports();
 		rootTaskId = bts.getRootTask("root");
 	}
+	
+	
+	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Helper function for creating a new FileRecord and adding it to a FileSet
+	 * @param fileSet The FileSet to add the new record to
+	 * @param pathId The new FileRecord's pathId
+	 */
+	private void addFileRecord(FileSet fileSet,int pathId) {
+		FileRecord fr = new FileRecord();
+		fr.pathId = pathId;
+		fileSet.add(fr);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -348,5 +362,179 @@ public class TestReports {
 		assertEquals(0, results.size());
 		results = reports.reportFilesThatMatchName("src");
 		assertEquals(0, results.size());		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportDerivedFiles()}.
+	 */
+	@Test
+	public void testReportDerivedFiles() throws Exception {
+
+		/*
+		 * Create a bunch of files. Each of these .c files is compiled into .o file, which
+		 * is archived into its own .a file. All .a files are linked into the .exe file.
+		 * Note that each of cat.c, dog.c and bunny.c includes pets.h.
+		 * For example, for cat.c the dependency graph is:
+		 * 
+		 *     pets.h ->
+		 *     cat.c  -> cat.o -> cat.a -> animals.exe
+		 */
+		int filePetH = fns.addFile("/home/pets.h");
+		int fileCatC = fns.addFile("/home/cat.c");
+		int fileDogC = fns.addFile("/home/dog.c");
+		int fileBunnyC = fns.addFile("/home/bunny.c");
+		int fileCatO = fns.addFile("/home/cat.o");
+		int fileDogO = fns.addFile("/home/dog.o");
+		int fileBunnyO = fns.addFile("/home/bunny.o");
+		int fileCatA = fns.addFile("/home/cat.a");
+		int fileDogA = fns.addFile("/home/dog.a");
+		int fileBunnyA = fns.addFile("/home/bunny.a");
+		int fileAnimalsExe = fns.addFile("/home/animals.exe");
+		
+		/* what directory were these tasks executed in? */
+		int dirHome = fns.getPath("/home");
+		
+		/* add all tasks underneath the root */
+		int rootTask = bts.getRootTask("");
+		
+		/* compile cat.c -> cat.o */
+		int taskCompCat = bts.addBuildTask(rootTask, dirHome, "gcc -c cat.c");
+		bts.addFileAccess(taskCompCat, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskCompCat, fileCatC, OperationType.OP_READ);
+		bts.addFileAccess(taskCompCat, fileCatO, OperationType.OP_WRITE);
+
+		/* compile dog.c -> dog.o */
+		int taskCompDog = bts.addBuildTask(rootTask, dirHome, "gcc -c dog.c");
+		bts.addFileAccess(taskCompDog, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskCompDog, fileDogC, OperationType.OP_READ);
+		bts.addFileAccess(taskCompDog, fileDogO, OperationType.OP_WRITE);
+		
+		/* compile bunny.c -> bunny.o */
+		int taskCompBunny = bts.addBuildTask(rootTask, dirHome, "gcc -c bunny.c");
+		bts.addFileAccess(taskCompBunny, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskCompBunny, fileBunnyC, OperationType.OP_READ);
+		bts.addFileAccess(taskCompBunny, fileBunnyO, OperationType.OP_WRITE);
+		
+		/* archive cat.o -> cat.a */
+		int taskArchCat = bts.addBuildTask(rootTask, dirHome, "ar c cat.a cat.o");
+		bts.addFileAccess(taskArchCat, fileCatO, OperationType.OP_READ);
+		bts.addFileAccess(taskArchCat, fileCatA, OperationType.OP_WRITE);
+
+		/* archive dog.o -> dog.a */
+		int taskArchDog = bts.addBuildTask(rootTask, dirHome, "ar c dog.a dog.o");
+		bts.addFileAccess(taskArchDog, fileDogO, OperationType.OP_READ);
+		bts.addFileAccess(taskArchDog, fileDogA, OperationType.OP_WRITE);
+		
+		/* archive bunny.o -> bunny.a */
+		int taskArchBunny = bts.addBuildTask(rootTask, dirHome, "ar c bunny.a bunny.o");
+		bts.addFileAccess(taskArchBunny, fileBunnyO, OperationType.OP_READ);
+		bts.addFileAccess(taskArchBunny, fileBunnyA, OperationType.OP_WRITE);
+
+		/* link cat.a, dog.a and bunny.a -> animals.exe */
+		int taskLinkAnimals = bts.addBuildTask(rootTask, dirHome, "ln -o animals.exe cat.a dog.a bunny.a");
+		bts.addFileAccess(taskLinkAnimals, fileCatA, OperationType.OP_READ);
+		bts.addFileAccess(taskLinkAnimals, fileDogA, OperationType.OP_READ);
+		bts.addFileAccess(taskLinkAnimals, fileBunnyA, OperationType.OP_READ);
+		bts.addFileAccess(taskLinkAnimals, fileAnimalsExe, OperationType.OP_WRITE);
+
+		/*
+		 * Test directly derived relationships
+		 */
+
+		/* test empty FileSet -> empty FileSet */		
+		FileSet source = new FileSet(fns);
+		FileSet result = reports.reportDerivedFiles(source, false);
+		assertEquals(0, result.size());
+		
+		/* test cat.c -> cat.o */
+		source = new FileSet(fns);
+		addFileRecord(source, fileCatC);
+		result = reports.reportDerivedFiles(source, false);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(fileCatO));
+		
+		/* test dog.c -> dog.o */
+		source = new FileSet(fns);
+		addFileRecord(source, fileDogC);
+		result = reports.reportDerivedFiles(source, false);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(fileDogO));
+		
+		/* test pets.h -> cat.o, dog.o, bunny.o */
+		source = new FileSet(fns);
+		addFileRecord(source, filePetH);
+		result = reports.reportDerivedFiles(source, false);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(fileCatO));
+		assertTrue(result.isMember(fileDogO));
+		assertTrue(result.isMember(fileBunnyO));
+
+		/* test dog.o -> dog.a */
+		source = new FileSet(fns);
+		addFileRecord(source, fileDogO);
+		result = reports.reportDerivedFiles(source, false);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(fileDogA));
+		
+		/* test dog.a -> animals.exe */
+		source = new FileSet(fns);
+		addFileRecord(source, fileDogA);
+		result = reports.reportDerivedFiles(source, false);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(fileAnimalsExe));
+
+		/* test cat.c, dog.c -> cat.o, dog.o */
+		source = new FileSet(fns);
+		addFileRecord(source, fileCatC);
+		addFileRecord(source, fileDogC);
+		result = reports.reportDerivedFiles(source, false);
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(fileCatO));
+		assertTrue(result.isMember(fileDogO));
+
+		/*
+		 * Test indirectly derived relationships
+		 */
+		
+		/* test cat.c -> cat.o, cat.a, animals.exe */
+		source = new FileSet(fns);
+		addFileRecord(source, fileCatC);
+		result = reports.reportDerivedFiles(source, true);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(fileCatO));
+		assertTrue(result.isMember(fileCatA));
+		assertTrue(result.isMember(fileAnimalsExe));
+		
+		/* test dog.c -> dog.o, dog.a, animals.exe */
+		source = new FileSet(fns);
+		addFileRecord(source, fileDogC);
+		result = reports.reportDerivedFiles(source, true);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(fileDogO));
+		assertTrue(result.isMember(fileDogA));
+		assertTrue(result.isMember(fileAnimalsExe));
+		
+		/* test bunny.o -> bunny.a, animals.exe */
+		source = new FileSet(fns);
+		addFileRecord(source, fileBunnyO);
+		result = reports.reportDerivedFiles(source, true);
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(fileBunnyA));
+		assertTrue(result.isMember(fileAnimalsExe));
+
+		/* test pets.h -> cat.o, dog.o, bunny.o, cat.a, dog.a, bunny.a, animals.exe */
+		source = new FileSet(fns);
+		addFileRecord(source, filePetH);
+		result = reports.reportDerivedFiles(source, true);
+		assertEquals(7, result.size());
+		assertTrue(result.isMember(fileCatO));
+		assertTrue(result.isMember(fileDogO));
+		assertTrue(result.isMember(fileBunnyO));
+		assertTrue(result.isMember(fileCatA));
+		assertTrue(result.isMember(fileDogA));
+		assertTrue(result.isMember(fileBunnyA));
+		assertTrue(result.isMember(fileAnimalsExe));
 	}
 }

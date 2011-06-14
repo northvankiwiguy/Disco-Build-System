@@ -50,7 +50,7 @@ import com.arapiki.utils.print.PrintUtils;
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		
 		/* fetch the subset of files we should filter through */
-		FileSet filterFileSet = getFilterFileSet(fns, cmdArgs);
+		FileSet filterFileSet = getCmdLineFileSet(fns, cmdArgs);
 		
 		/* 
 		 * There were no search "results", so we'll show everything (except those
@@ -80,7 +80,7 @@ import com.arapiki.utils.print.PrintUtils;
 		Reports reports = buildStore.getReports();
 
 		/* fetch the file/directory filter so we know which result files to display */
-		FileSet filterFileSet = getFilterFileSet(fns, cmdArgs);
+		FileSet filterFileSet = getCmdLineFileSet(fns, cmdArgs);
 
 		/* get list of unused files, and add their parent paths */
 		FileSet unusedFileSet = reports.reportFilesNeverAccessed();
@@ -90,6 +90,41 @@ import com.arapiki.utils.print.PrintUtils;
 		printFileSet(System.out, fns, unusedFileSet, filterFileSet, showRoots);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Display a report of the files that are directly (or indirectly) derived from the set
+	 * of input files (provided on the command line). The concept of "derived" means that there's
+	 * some task that takes the specific file(s) as input and writes to some other file. A
+	 * file is "directly" derived if the same task reads the input and writes the output. 
+	 * A file is "indirectly" derived if a chain of tasks exists between the input and
+	 * output files.
+	 * For example, foo.o is directly derived from foo.c, and foo.exe is indirectly derived
+	 * through the chain foo.c -> foo.o -> foo.exe.
+	 * @param buildStore The BuildStore to query.
+	 * @param optionShowRoots True if file system roots (e.g. "root:") should be shown
+	 * @param showAll Set to true if indirectly derived files should also be shown.
+	 * @param cmdArgs The user-supplied list of files/directories to be displayed. Only unused
+	 * files that match this filter will be displayed. Note that cmdArgs[0] is the
+	 * name of the command (show-files) are will be ignored.
+	 */
+	public static void showDerivedFiles(BuildStore buildStore,
+			boolean showRoots, boolean showAll, String[] cmdArgs) {
+		
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Reports reports = buildStore.getReports();
+
+		/* fetch the list of files that are the source of the derivation */
+		FileSet sourceFileSet = getCmdLineFileSet(fns, cmdArgs);
+
+		/* get list of derived files, and add their parent paths */
+		FileSet derivedFileSet = reports.reportDerivedFiles(sourceFileSet, showAll);
+		derivedFileSet.populateWithParents();
+		
+		/* pretty print the results - no filtering used here */
+		printFileSet(System.out, fns, derivedFileSet, null, showRoots);	
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -300,7 +335,7 @@ import com.arapiki.utils.print.PrintUtils;
 	 * Note that cmdArgs[0] is the command name (e.g. show-files), and should therefore be ignored.
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
-	private static FileSet getFilterFileSet(FileNameSpaces fns, String[] cmdArgs) {
+	private static FileSet getCmdLineFileSet(FileNameSpaces fns, String[] cmdArgs) {
 		
 		/* if no arguments are provided (except the command name), return null to represent "all files" */
 		if (cmdArgs.length <= 1) {
@@ -308,11 +343,11 @@ import com.arapiki.utils.print.PrintUtils;
 		}
 
 		/* skip over the first argument, which is the command name */
-		String filterPaths[] = new String[cmdArgs.length - 1];
-		System.arraycopy(cmdArgs, 1, filterPaths, 0, cmdArgs.length - 1);
+		String inputPaths[] = new String[cmdArgs.length - 1];
+		System.arraycopy(cmdArgs, 1, inputPaths, 0, cmdArgs.length - 1);
 		
 		FileSet result = new FileSet(fns);
-		if (result.populateWithPaths(filterPaths) != ErrorCode.OK) {
+		if (result.populateWithPaths(inputPaths) != ErrorCode.OK) {
 			System.err.println("Error: Invalid path filter provided.");
 			System.exit(1);
 		}

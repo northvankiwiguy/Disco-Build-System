@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 
 /**
@@ -48,8 +49,8 @@ public class Reports {
 		selectFileAccessCountPrepStmt = null,
 		selectFileIncludesCountPrepStmt = null,
 		selectFilesNotUsedPrepStmt = null,
-		selectFilesWithMatchingNamePrepStmt = null;
-
+		selectFilesWithMatchingNamePrepStmt = null,
+		selectDerivedFilesPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -77,7 +78,13 @@ public class Reports {
 		
 		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
 				"select files.id from files where name like ? and pathType = " + PathType.TYPE_FILE.ordinal());
-		
+
+		selectDerivedFilesPrepStmt = db.prepareStatement(
+				"select distinct fileId from buildTaskFiles where taskId in " +
+				"(select taskId from buildTaskFiles where fileId = ? and " +
+				"operation = " + OperationType.OP_READ.ordinal() + ") " + 
+				"and operation = " + OperationType.OP_WRITE.ordinal());
+
 		//
 		// This is what I've used - it seems to work at scale.
 		// selectFilesWrittenButNotUsedPrepStmt = db.prepareStatement(
@@ -190,6 +197,87 @@ public class Reports {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
+		return results;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given the input FileSet (sourceFileSet), return a new FileSet containing all the 
+	 * paths that are derived from the paths listed in sourceFileSet. A file (A) is derived 
+	 * from file (B) if there's a task (or sequence of paths) that reads B and writes to A.
+	 * @param sourceFileSet The FileSet of all files we should consider as input to the tasks.
+	 * @param reportIndirect Should we also report on indirectly derived files (multiple tasks
+	 * between file A and file B?
+	 * @return The FileSet of derived paths.
+	 */
+	public FileSet reportDerivedFiles(FileSet sourceFileSet, boolean reportIndirect) {
+		
+		/* 
+		 * Create a new empty FileSet for tracking all the results. Each time we
+		 * iterate through the loop, we merge the results into this FileSet
+		 */
+		FileSet results = new FileSet(fns);
+		
+		/* the first set of files to analyze is the original source FileSet */
+		FileSet nextFileSet = sourceFileSet;
+		
+		/* 
+		 * This variable is used to track the progress of finding new results.
+		 * If it doesn't change from one iteration to the next, we stop the iterations.
+		 */
+		int lastNumberOfResults = 0;
+
+		/* 
+		 * Start the iterations. If "reportIndirect" is false, we'll only execute
+		 * the loop once. Each time we go around the loop, we take the derived files
+		 * from the previous round and treat them as the new set of input files.
+		 */
+		boolean done = false;
+		do {
+			
+			/* empty FileSet to collect this round's set of results */
+			FileSet thisRoundOfResults = new FileSet(fns);
+
+			/* iterate through each of the files in this round's FileSet */
+			for (int fileId : nextFileSet) {
+				
+				/* determine the directly derived files for this file, and add them to the result set */
+				try {
+					selectDerivedFilesPrepStmt.setInt(1, fileId);
+					ResultSet rs = db.executePrepSelectResultSet(selectDerivedFilesPrepStmt);
+
+					while (rs.next()) {
+						FileRecord record = new FileRecord();
+						record.pathId = rs.getInt(1);
+						thisRoundOfResults.add(record);
+					}
+					rs.close();
+			
+				} catch (SQLException e) {
+					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+				}
+			}
+			
+			/* 
+			 * Prepare to repeat the process by using the results from this iteration as
+			 * the input to the next iteration.
+			 */
+			nextFileSet = thisRoundOfResults;
+		
+			/*
+			 * Merge this cycle's results into our final result set
+			 */
+			results.mergeFileSet(thisRoundOfResults);
+			
+			/* are we done? Did we find any new results in this iteration? */
+			int thisNumberOfResults = results.size();
+			done = (thisNumberOfResults == lastNumberOfResults);
+			lastNumberOfResults = thisNumberOfResults;
+			
+		} while (reportIndirect && !done);
+		
+		/* return the combined set of results */
 		return results;
 	}
 	
