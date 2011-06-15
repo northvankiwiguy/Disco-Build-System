@@ -64,8 +64,7 @@ public class TestReports {
 	 * @param pathId The new FileRecord's pathId
 	 */
 	private void addFileRecord(FileSet fileSet,int pathId) {
-		FileRecord fr = new FileRecord();
-		fr.pathId = pathId;
+		FileRecord fr = new FileRecord(pathId);
 		fileSet.add(fr);
 	}
 	
@@ -114,12 +113,12 @@ public class TestReports {
 		assertEquals(3, results.length);
 		
 		/* validate the order in which they were returned */
-		assertEquals(foxFile, results[0].pathId);
-		assertEquals(3, results[0].count);
-		assertEquals(boxFile, results[1].pathId);
-		assertEquals(2, results[1].count);
-		assertEquals(soxFile, results[2].pathId);
-		assertEquals(1, results[2].count);
+		assertEquals(foxFile, results[0].getId());
+		assertEquals(3, results[0].getCount());
+		assertEquals(boxFile, results[1].getId());
+		assertEquals(2, results[1].getCount());
+		assertEquals(soxFile, results[2].getId());
+		assertEquals(1, results[2].getCount());
 		
 		/* now add roxFile into the mix - access it lots */
 		bts.addFileAccess(task1, roxFile, OperationType.OP_READ);
@@ -134,14 +133,14 @@ public class TestReports {
 		assertEquals(4, results.length);
 		
 		/* validate the order in which they were returned */
-		assertEquals(roxFile, results[0].pathId);
-		assertEquals(4, results[0].count);
-		assertEquals(foxFile, results[1].pathId);
-		assertEquals(3, results[1].count);
-		assertEquals(boxFile, results[2].pathId);
-		assertEquals(2, results[2].count);
-		assertEquals(soxFile, results[3].pathId);
-		assertEquals(1, results[3].count);
+		assertEquals(roxFile, results[0].getId());
+		assertEquals(4, results[0].getCount());
+		assertEquals(foxFile, results[1].getId());
+		assertEquals(3, results[1].getCount());
+		assertEquals(boxFile, results[2].getId());
+		assertEquals(2, results[2].getCount());
+		assertEquals(soxFile, results[3].getId());
+		assertEquals(1, results[3].getCount());
 				
 		/*
 		 * Access a directory, this shouldn't be in the results.
@@ -219,12 +218,12 @@ public class TestReports {
 		 */
 		FileRecord results[] = reports.reportMostCommonIncludersOfFile(file2);
 		assertEquals(3, results.length);
-		assertEquals(file1, results[0].pathId);
-		assertEquals(4, results[0].count);
-		assertEquals(file3, results[1].pathId);
-		assertEquals(2, results[1].count);
-		assertEquals(file4, results[2].pathId);
-		assertEquals(1, results[2].count);
+		assertEquals(file1, results[0].getId());
+		assertEquals(4, results[0].getCount());
+		assertEquals(file3, results[1].getId());
+		assertEquals(2, results[1].getCount());
+		assertEquals(file4, results[2].getId());
+		assertEquals(1, results[2].getCount());
 		
 		/* Check for file3 which isn't included by anybody - should be empty list */
 		results = reports.reportMostCommonIncludersOfFile(file3);		

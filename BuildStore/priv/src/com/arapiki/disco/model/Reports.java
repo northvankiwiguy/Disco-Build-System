@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.utils.types.IntegerTreeSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -112,9 +113,8 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectFileAccessCountPrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord();
-				record.pathId = rs.getInt(1);
-				record.count = rs.getInt(2);
+				FileRecord record = new FileRecord(rs.getInt(1));
+				record.setCount(rs.getInt(2));
 				results.add(record);
 			}
 			rs.close();
@@ -136,9 +136,8 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectFileIncludesCountPrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord();
-				record.pathId = rs.getInt(1);
-				record.count = rs.getInt(2);
+				FileRecord record = new FileRecord(rs.getInt(1));
+				record.setCount(rs.getInt(2));
 				results.add(record);
 			}
 			rs.close();
@@ -159,8 +158,7 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesNotUsedPrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord();
-				record.pathId = rs.getInt(1);
+				FileRecord record = new FileRecord(rs.getInt(1));
 				results.add(record);
 			}
 			rs.close();
@@ -187,8 +185,7 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesWithMatchingNamePrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord();
-				record.pathId = rs.getInt(1);
+				FileRecord record = new FileRecord(rs.getInt(1));
 				results.add(record);
 			}
 			rs.close();
@@ -248,8 +245,7 @@ public class Reports {
 					ResultSet rs = db.executePrepSelectResultSet(selectDerivedFilesPrepStmt);
 
 					while (rs.next()) {
-						FileRecord record = new FileRecord();
-						record.pathId = rs.getInt(1);
+						FileRecord record = new FileRecord(rs.getInt(1));
 						thisRoundOfResults.add(record);
 					}
 					rs.close();

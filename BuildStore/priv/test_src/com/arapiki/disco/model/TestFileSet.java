@@ -41,10 +41,9 @@ public class TestFileSet {
 	 * @return
 	 */
 	private FileRecord newFileRecord(int pathId, int count, int size) {
-		FileRecord fr = new FileRecord();
-		fr.pathId = pathId;
-		fr.count = count;
-		fr.size = size;
+		FileRecord fr = new FileRecord(pathId);
+		fr.setCount(count);
+		fr.setSize(size);
 		return fr;
 	}
 	
@@ -77,21 +76,21 @@ public class TestFileSet {
 		
 		/* fetch FileRecord #1, and validate the fields */
 		FileRecord fr = fs.get(1);
-		assertEquals(1, fr.pathId);
-		assertEquals(100, fr.count);
-		assertEquals(1000, fr.size);
+		assertEquals(1, fr.getId());
+		assertEquals(100, fr.getCount());
+		assertEquals(1000, fr.getSize());
 
 		/* same for FileRecord #2 */
 		fr = fs.get(2);
-		assertEquals(2, fr.pathId);
-		assertEquals(200, fr.count);
-		assertEquals(2000, fr.size);
+		assertEquals(2, fr.getId());
+		assertEquals(200, fr.getCount());
+		assertEquals(2000, fr.getSize());
 
 		/* same for FileRecord #2000 */
 		fr = fs.get(2000);
-		assertEquals(2000, fr.pathId);
-		assertEquals(2, fr.count);
-		assertEquals(2000000, fr.size);
+		assertEquals(2000, fr.getId());
+		assertEquals(2, fr.getCount());
+		assertEquals(2000000, fr.getSize());
 		
 		/* this record doesn't exist - should return null */
 		fr = fs.get(100);
@@ -311,8 +310,8 @@ public class TestFileSet {
 		/* the details of file1 must not have changed */
 		FileRecord fr = mainFileSet.get(file1);
 		assertNotNull(fr);
-		assertEquals(10, fr.count);
-		assertEquals(10, fr.size);
+		assertEquals(10, fr.getCount());
+		assertEquals(10, fr.getSize());
 		
 		/* merge in three new files */
 		FileSet fs5 = new FileSet(fns);
@@ -502,7 +501,7 @@ public class TestFileSet {
 			assertFalse(fs.isMember(i * 3 + 1));
 			assertFalse(fs.isMember(i * 3 + 2));
 			
-			assertEquals(i * 3, fs.get(i * 3).pathId);
+			assertEquals(i * 3, fs.get(i * 3).getId());
 		}
 	}
 	
