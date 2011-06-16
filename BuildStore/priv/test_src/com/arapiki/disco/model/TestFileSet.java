@@ -288,13 +288,13 @@ public class TestFileSet {
 
 		/* merge the empty FileSet, and make sure mainFileSet is unchanged */
 		FileSet fs2 = new FileSet(fns);
-		mainFileSet.mergeFileSet(fs2);
+		mainFileSet.mergeSet(fs2);
 		assertEquals(1, mainFileSet.size());
 		
 		/* merge in a single file */
 		FileSet fs3 = new FileSet(fns);
 		fs3.add(newFileRecord(file2, 100, 200));
-		mainFileSet.mergeFileSet(fs3);
+		mainFileSet.mergeSet(fs3);
 		assertEquals(2, mainFileSet.size());
 		assertTrue(mainFileSet.isMember(file1));
 		assertTrue(mainFileSet.isMember(file2));
@@ -302,7 +302,7 @@ public class TestFileSet {
 		/* merge in a file that already exists - this shouldn't change anything */
 		FileSet fs4 = new FileSet(fns);
 		fs4.add(newFileRecord(file1, 11, 11));
-		mainFileSet.mergeFileSet(fs4);
+		mainFileSet.mergeSet(fs4);
 		assertEquals(2, mainFileSet.size());
 		assertTrue(mainFileSet.isMember(file1));
 		assertTrue(mainFileSet.isMember(file2));
@@ -318,7 +318,7 @@ public class TestFileSet {
 		fs5.add(newFileRecord(file4, 11, 11));
 		fs5.add(newFileRecord(file5, 11, 11));
 		fs5.add(newFileRecord(file6, 11, 11));
-		mainFileSet.mergeFileSet(fs5);
+		mainFileSet.mergeSet(fs5);
 		assertEquals(5, mainFileSet.size());
 		assertTrue(mainFileSet.isMember(file1));
 		assertTrue(mainFileSet.isMember(file2));

@@ -108,7 +108,7 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 				 * Merge these results into this FileSet (we update the same file set
 				 * for each user-supplied path).
 				 */
-				mergeFileSet(results);
+				mergeSet(results);
 			} 
 
 			/* else add files/directories by name. Look up the path and add its children recursively */
@@ -130,9 +130,9 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 
 	/**
 	 * (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#mergeFileSet()
+	 * @see com.arapiki.utils.types.IntegerTreeSet#mergeSet()
 	 */
-	public void mergeFileSet(FileSet second) {
+	public void mergeSet(FileSet second) {
 		
 		/* ensure the FileNameSpaces are the same for both FileSets */
 		if (fns != second.fns) {

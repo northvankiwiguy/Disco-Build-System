@@ -264,7 +264,7 @@ public class Reports {
 			/*
 			 * Merge this cycle's results into our final result set
 			 */
-			results.mergeFileSet(thisRoundOfResults);
+			results.mergeSet(thisRoundOfResults);
 			
 			/* are we done? Did we find any new results in this iteration? */
 			int thisNumberOfResults = results.size();
