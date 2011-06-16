@@ -536,4 +536,122 @@ public class TestReports {
 		assertTrue(result.isMember(fileBunnyA));
 		assertTrue(result.isMember(fileAnimalsExe));
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportTasksThatAccessFiles()}.
+	 */
+	@Test
+	public void testReportTasksThatAccessFiles() throws Exception {
+
+		/* Create a bunch of files */
+		int file1a = fns.addFile("/file1a");
+		int file1b = fns.addFile("/file1b");
+		int file2a = fns.addFile("/file2a");
+		int file2b = fns.addFile("/file2b");
+		int file3a = fns.addFile("/file3a");
+		int file3b = fns.addFile("/file3b");
+
+		int rootTask = bts.getRootTask("");
+		
+		/* task 1 reads/writes file1a and file1b */
+		int task1a = bts.addBuildTask(rootTask, 0, "task1 command reads file1a");
+		int task1b = bts.addBuildTask(rootTask, 0, "task1 command writes file1b");
+		bts.addFileAccess(task1a, file1a, OperationType.OP_READ);
+		bts.addFileAccess(task1b, file1b, OperationType.OP_WRITE);
+
+		/* task 2 reads/writes file2a and file2b */
+		int task2a = bts.addBuildTask(rootTask, 0, "task2 command reads file2a");
+		int task2b = bts.addBuildTask(rootTask, 0, "task2 command writes file2b");
+		bts.addFileAccess(task2a, file2a, OperationType.OP_READ);
+		bts.addFileAccess(task2b, file2b, OperationType.OP_WRITE);
+
+		/* task 3 reads/writes file3a and file3b */
+		int task3a = bts.addBuildTask(rootTask, 0, "task3 command reads file3a");
+		int task3b = bts.addBuildTask(rootTask, 0, "task3 command writes file3b");
+		bts.addFileAccess(task3a, file3a, OperationType.OP_READ);
+		bts.addFileAccess(task3b, file3b, OperationType.OP_WRITE);
+
+		/* test the report for an empty FileSet */
+		FileSet source = new FileSet(fns);
+		TaskSet resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
+		TaskSet resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
+		TaskSet resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
+		assertEquals(0, resultReads.size());
+		assertEquals(0, resultWrites.size());
+		assertEquals(0, resultUses.size());
+		
+		/* test with only file1a */
+		source = new FileSet(fns);
+		addFileRecord(source, file1a);
+		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
+		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
+		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
+		assertEquals(1, resultReads.size());
+		assertTrue(resultReads.isMember(task1a));
+		assertEquals(0, resultWrites.size());
+		assertEquals(1, resultUses.size());
+		assertTrue(resultUses.isMember(task1a));
+
+		/* test with only file1b */
+		source = new FileSet(fns);
+		addFileRecord(source, file1b);
+		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
+		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
+		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
+		assertEquals(0, resultReads.size());
+		assertEquals(1, resultWrites.size());
+		assertTrue(resultWrites.isMember(task1b));
+		assertEquals(1, resultUses.size());
+		assertTrue(resultUses.isMember(task1b));
+		
+		/* test with both file1a and file1b */
+		source = new FileSet(fns);
+		addFileRecord(source, file1a);
+		addFileRecord(source, file1b);
+		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
+		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
+		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
+		assertEquals(1, resultReads.size());
+		assertTrue(resultReads.isMember(task1a));
+		assertEquals(1, resultWrites.size());
+		assertTrue(resultWrites.isMember(task1b));
+		assertEquals(2, resultUses.size());
+		assertTrue(resultUses.isMember(task1a));
+		assertTrue(resultUses.isMember(task1b));
+		
+		/* test with file1a and file2a */
+		source = new FileSet(fns);
+		addFileRecord(source, file1a);
+		addFileRecord(source, file2a);
+		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
+		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
+		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
+		assertEquals(2, resultReads.size());
+		assertTrue(resultReads.isMember(task1a));
+		assertTrue(resultReads.isMember(task2a));
+		assertEquals(0, resultWrites.size());
+		assertEquals(2, resultUses.size());
+		assertTrue(resultUses.isMember(task1a));
+		assertTrue(resultUses.isMember(task2a));
+
+		/* test with file1a, file2a and file3b */
+		source = new FileSet(fns);
+		addFileRecord(source, file1a);
+		addFileRecord(source, file2a);
+		addFileRecord(source, file3b);
+		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
+		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
+		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
+		assertEquals(2, resultReads.size());
+		assertTrue(resultReads.isMember(task1a));
+		assertTrue(resultReads.isMember(task2a));
+		assertEquals(1, resultWrites.size());
+		assertTrue(resultWrites.isMember(task3b));
+		assertEquals(3, resultUses.size());
+		assertTrue(resultUses.isMember(task1a));
+		assertTrue(resultUses.isMember(task2a));
+		assertTrue(resultUses.isMember(task3b));
+	}
 }

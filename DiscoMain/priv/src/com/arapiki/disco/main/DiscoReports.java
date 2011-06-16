@@ -20,6 +20,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.TaskSet;
+import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.print.PrintUtils;
@@ -142,6 +143,36 @@ import com.arapiki.utils.print.PrintUtils;
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Display all build tasks that access (read, write or use) any of the user-specified
+	 * files.
+	 * @param buildStore The BuildStore to query
+	 * @param opWrite Either OP_READ, OP_WRITE or OP_UNSPECIFIED, depending on whether
+	 *         we want to find tasks that read files, write files, or access files (either 
+	 *         read or write)
+	 * @param cmdArgs The user-supplied list of files/directories to query. 
+	 * Note that cmdArgs[0] is the name of the command (show-files) are will be ignored.
+	 */
+	public static void showTasksThatAccess(BuildStore buildStore,
+			OperationType opType, String[] cmdArgs) {
+		
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		BuildTasks bts = buildStore.getBuildTasks();
+		Reports reports = buildStore.getReports();
+
+		/* fetch the FileSet of paths from the user's command line */
+		FileSet fileSet = getCmdLineFileSet(fns, cmdArgs);
+		
+		/* find all tasks that access (read, write or both) these files */
+		TaskSet taskSet = reports.reportTasksThatAccessFiles(fileSet, opType);
+		taskSet.populateWithParents();
+		
+		/* display the resulting set of tasks */
+		printTaskSet(System.out, bts, fns, taskSet, null);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Generic function for displaying a FileSet. This is used primarily for displaying
 	 * the result of reports.
@@ -400,6 +431,10 @@ import com.arapiki.utils.print.PrintUtils;
          *
          * Where Task 1 is the parent of Task 2.
          */
+		// TODO: consider this logic.
+		if (! ((resultTaskSet == null) || (resultTaskSet.isMember(taskId)))) {
+			return;
+		}
 
 		/* fetch the task's command string (if there is one) */
 		String command = bts.getCommand(taskId);

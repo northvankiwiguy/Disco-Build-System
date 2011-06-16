@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
@@ -38,10 +39,16 @@ public class Reports {
 	private BuildStoreDB db = null;
 	
 	/**
-	 * The FileNameSpaces object we're reporting on. This is provided to use when the
+	 * The FileNameSpaces object we're reporting on. This is provided to us when the
 	 * Reports object is first instantiated.
 	 */
 	private FileNameSpaces fns = null;
+	
+	/**
+	 * The BuildTasks object we're reporting on. This is provided to us when the
+	 * Reports object is first instantiated.
+	 */
+	private BuildTasks bts = null;
 	
 	/**
 	 * Various prepared statement for database access.
@@ -51,7 +58,10 @@ public class Reports {
 		selectFileIncludesCountPrepStmt = null,
 		selectFilesNotUsedPrepStmt = null,
 		selectFilesWithMatchingNamePrepStmt = null,
-		selectDerivedFilesPrepStmt = null;
+		selectDerivedFilesPrepStmt = null,
+		selectTasksAccessingFilesPrepStmt = null,
+		selectTasksAccessingFilesAnyPrepStmt = null;
+		
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -63,6 +73,7 @@ public class Reports {
 	public Reports(BuildStore bs) {
 		this.db = bs.getBuildStoreDB();
 		this.fns = bs.getFileNameSpaces();
+		this.bts = bs.getBuildTasks();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from buildTaskFiles, files " +
@@ -85,6 +96,12 @@ public class Reports {
 				"(select taskId from buildTaskFiles where fileId = ? and " +
 				"operation = " + OperationType.OP_READ.ordinal() + ") " + 
 				"and operation = " + OperationType.OP_WRITE.ordinal());
+		
+		selectTasksAccessingFilesPrepStmt = db.prepareStatement(
+				"select taskId from buildTaskFiles where fileId = ? and operation = ?");
+		
+		selectTasksAccessingFilesAnyPrepStmt = db.prepareStatement(
+				"select taskId from buildTaskFiles where fileId = ?");
 
 		//
 		// This is what I've used - it seems to work at scale.
@@ -274,6 +291,63 @@ public class Reports {
 		} while (reportIndirect && !done);
 		
 		/* return the combined set of results */
+		return results;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a FileSet, return a TaskSet containing all the build tasks that access this
+	 * collection files. The opType specifies whether we want tasks that read these files,
+	 * write to these files, or either read or write. 
+	 * @param fileSet The set of input files
+	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
+	 * @return a TaskSet of all tasks that access these files in the mode specified.
+	 */
+	public TaskSet reportTasksThatAccessFiles(FileSet fileSet,
+			OperationType opType) {
+		
+		/* create an empty result TaskSet */
+		TaskSet results = new TaskSet(bts);
+		
+		/* for each file in the FileSet */
+		for (Iterator iterator = fileSet.iterator(); iterator.hasNext();) {		
+			int fileId = (Integer) iterator.next();
+			
+			/* find the tasks that access this file */
+			try {
+				ResultSet rs;
+				
+				/* the case where we care about the operation type */
+				if (opType != OperationType.OP_UNSPECIFIED) {
+					selectTasksAccessingFilesPrepStmt.setInt(1, fileId);
+					selectTasksAccessingFilesPrepStmt.setInt(2, opType.ordinal());
+					rs = db.executePrepSelectResultSet(selectTasksAccessingFilesPrepStmt);
+				} 
+				
+				/* the case where we don't care */
+				else {
+					selectTasksAccessingFilesAnyPrepStmt.setInt(1, fileId);
+					rs = db.executePrepSelectResultSet(selectTasksAccessingFilesAnyPrepStmt);	
+				}
+				
+				/* add the results into our TaskSet */
+				while (rs.next()) {
+					int taskId = rs.getInt(1);
+				
+					/* only add the result if it's not in the set */
+					if (!results.isMember(taskId)){
+						TaskRecord record = new TaskRecord(rs.getInt(1));
+						results.add(record);
+					}
+				}
+				rs.close();
+			
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+		}
+		
 		return results;
 	}
 	

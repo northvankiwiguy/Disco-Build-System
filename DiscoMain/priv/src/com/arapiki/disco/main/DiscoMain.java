@@ -19,6 +19,7 @@ import java.util.Iterator;
 import org.apache.commons.cli.*;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.utils.print.PrintUtils;
 
 /**
@@ -161,6 +162,9 @@ public final class DiscoMain {
 		
 		System.err.println("\nTask reporting commands:");
 		formattedDisplayLine("    show-tasks", "List all tasks recorded in the build store.");
+		formattedDisplayLine("    show-tasks-that-use", "List all tasks that use (read or write) the specified file(s)");
+		formattedDisplayLine("    show-tasks-that-read", "List all tasks that read from the specified file(s)");
+		formattedDisplayLine("    show-tasks-that-write", "List all tasks that write to the specified file(s)");
 		
 		System.err.println("\nFile System commands:");
 		formattedDisplayLine("    show-root [<root-name>]", "Show the file system path referred to by this root. Without");
@@ -224,6 +228,18 @@ public final class DiscoMain {
 		else if (cmdName.equals("show-tasks")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-tasks");
 			DiscoReports.showTasks(buildStore, cmdArgs);			
+		}
+		else if (cmdName.equals("show-tasks-that-use")) {
+			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-use {<input-path>}");
+			DiscoReports.showTasksThatAccess(buildStore, OperationType.OP_UNSPECIFIED, cmdArgs);
+		}
+		else if (cmdName.equals("show-tasks-that-read")) {
+			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-read {<input-path>}");
+			DiscoReports.showTasksThatAccess(buildStore, OperationType.OP_READ, cmdArgs);
+		}
+		else if (cmdName.equals("show-tasks-that-write")) {
+			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-write {<input-path>}");
+			DiscoReports.showTasksThatAccess(buildStore, OperationType.OP_WRITE, cmdArgs);
 		}
 		
 		/*
