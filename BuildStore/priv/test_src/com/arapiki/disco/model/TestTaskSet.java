@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.arapiki.utils.errors.ErrorCode;
+
 /**
  * Test methods for validating the TaskSet class. These test are
  * very simplistic, since the functionality is largely shared with FileSet,
@@ -287,4 +289,90 @@ public class TestTaskSet {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks()}.
+	 */
+	@Test
+	public void testPopulateWithTasks() {
+		
+		/* add some tasks in a tree hierarchy */
+		int root = bts.getRootTask("");
+		int taskA = bts.addBuildTask(root, 0, "top-level-task-A");
+		int taskA1 = bts.addBuildTask(taskA, 0, "second-level-task-under-A");
+		int taskA2 = bts.addBuildTask(taskA, 0, "second-level-task-under-A");
+		int taskA3 = bts.addBuildTask(taskA, 0, "second-level-task-under-A");
+		int taskA31 = bts.addBuildTask(taskA3, 0, "third-level-task-under-A3");
+		int taskA32 = bts.addBuildTask(taskA3, 0, "third-level-task-under-A3");
+		int taskA321 = bts.addBuildTask(taskA32, 0, "fourth-level-task-under-A32");
+		int taskA4 = bts.addBuildTask(taskA, 0, "second-level-task-under-A");
+		int taskB = bts.addBuildTask(root, 0, "top-level-task-B");
+		int taskC = bts.addBuildTask(root, 0, "top-level-task-C");
+	
+		/* populate with an empty specification string array*/
+		ts.populateWithTasks(new String[0]);
+		assertEquals(0, ts.size());
+		
+		/* populate with a single task, without any of its descendants. Format is "<taskA3>" */
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString()}));
+		assertEquals(1, ts.size());
+		assertTrue(ts.isMember(taskA3));
+
+		/* populate with a complete subtree. Format is "<taskA3>:" */
+		ts = new TaskSet(bts);
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + ":" }));
+		assertEquals(4, ts.size());
+		assertTrue(ts.isMember(taskA3));
+		assertTrue(ts.isMember(taskA31));
+		assertTrue(ts.isMember(taskA32));
+		assertTrue(ts.isMember(taskA321));
+		
+		/* populate with a complete subtree, of depth 2. Format is "<taskA3>:2" */
+		ts = new TaskSet(bts);
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + ":2" }));
+		assertEquals(3, ts.size());
+		assertTrue(ts.isMember(taskA3));
+		assertTrue(ts.isMember(taskA31));
+		assertTrue(ts.isMember(taskA32));
+		
+		/* similar complete subtree of depth 2, but with different tasks. Format is "<taskA>:2" */
+		ts = new TaskSet(bts);
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA).toString() + ":2" }));
+		assertEquals(5, ts.size());
+		assertTrue(ts.isMember(taskA));
+		assertTrue(ts.isMember(taskA1));
+		assertTrue(ts.isMember(taskA2));
+		assertTrue(ts.isMember(taskA3));
+	
+		/* populate the full tree, down four levels (this excludes only one task) */
+		ts = new TaskSet(bts);
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + ":4" }));
+		assertEquals(10, ts.size());
+		assertFalse(ts.isMember(taskA321));
+		
+		/* populate with two different tasks */
+		ts = new TaskSet(bts);
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA1).toString(),
+					Integer.valueOf(taskB).toString()}));
+		assertEquals(2, ts.size());
+		assertTrue(ts.isMember(taskA1));
+		assertTrue(ts.isMember(taskB));
+		
+		/* populate the full tree (all levels), then remove a subtree (taskA32 and below) */
+		ts = new TaskSet(bts);
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + ":",
+				"^" + Integer.valueOf(taskA32).toString() + ":" }));
+		assertEquals(9, ts.size());
+		assertFalse(ts.isMember(taskA32));
+		assertFalse(ts.isMember(taskA321));
+		
+		/* test invalid syntax */
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "+123" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "X" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123-" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123:foo" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { ":1" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "1::" }));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/	
 }

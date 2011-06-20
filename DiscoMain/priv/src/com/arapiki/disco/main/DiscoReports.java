@@ -129,16 +129,23 @@ import com.arapiki.utils.print.PrintUtils;
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * TODO: comment this properly
-	 * TODO: do filtering based on cmdArgs.
-	 * @param buildStore
-	 * @param cmdArgs
+	 * Show a number of tasks from the BuildStore. By default, all tasks will be shown in
+	 * a tree hierarchy. If user-supplied filter parameters are provided, the set of tasks
+	 * will be filtered accordingly.
+	 * @param buildStore The BuildStore to query
+	 * @param cmdArgs The user-supplied list of tasks to be displayed. Only tasks 
+	 * that match this filter will be displayed. Note that cmdArgs[0] is the
+	 * name of the command (show-tasks) are will be ignored.
 	 */
 	public static void showTasks(BuildStore buildStore, String[] cmdArgs) {
 		BuildTasks bts = buildStore.getBuildTasks();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		
-		printTaskSet(System.out, bts, fns, null, null);
+		/* compute a TaskSet to display, or null if no arguments are provided */
+		TaskSet ts = getCmdLineTaskSet(bts, cmdArgs);
+		
+		/* display the selected task set */
+		printTaskSet(System.out, bts, fns, ts, null);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -403,6 +410,39 @@ import com.arapiki.utils.print.PrintUtils;
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Given a user-supplied set of command line arguments, parse those arguments and create
+	 * a suitable TaskSet. If no arguments are provided, the null TaskSet is returned (indicating
+	 * that all files should be shown).
+	 * @param bts The BuildTasks object to query.
+	 * @param cmdArgs The command line arguments that specify the TaskSet to show. Note that cmdArgs[0]
+	 * is ignored since it's the disco command to be executed, rather than a TaskSet filter.
+	 */
+	private static TaskSet getCmdLineTaskSet(BuildTasks bts, String[] cmdArgs) {
+		
+		/* if no arguments are provided (except the command name), return null to represent "all tasks" */
+		if (cmdArgs.length <= 1) {
+			return null;
+		}
+
+		/* skip over the first argument, which is the command name */
+		String inputTasks[] = new String[cmdArgs.length - 1];
+		System.arraycopy(cmdArgs, 1, inputTasks, 0, cmdArgs.length - 1);
+		
+		TaskSet result = new TaskSet(bts);
+		if (result.populateWithTasks(inputTasks) != ErrorCode.OK) {
+			System.err.println("Error: Invalid task filter provided.");
+			System.exit(1);
+		}
+		
+		/* this result set will be traversed, so populate the parents too */
+		result.populateWithParents();
+		
+		return result;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Is this path in the set of paths to be displayed? That is, is it in the resultFileSet
 	 * as well as being part of filterFileSet?
