@@ -147,14 +147,26 @@ import com.arapiki.utils.print.PrintUtils;
 	 * Display all build tasks that access (read, write or use) any of the user-specified
 	 * files.
 	 * @param buildStore The BuildStore to query
-	 * @param opWrite Either OP_READ, OP_WRITE or OP_UNSPECIFIED, depending on whether
-	 *         we want to find tasks that read files, write files, or access files (either 
-	 *         read or write)
+	 * @param optionRead Only show tasks that read the files
+	 * @param optionWrite Only show tasks that read the files
 	 * @param cmdArgs The user-supplied list of files/directories to query. 
 	 * Note that cmdArgs[0] is the name of the command (show-files) are will be ignored.
 	 */
 	public static void showTasksThatAccess(BuildStore buildStore,
-			OperationType opType, String[] cmdArgs) {
+			boolean optionRead, boolean optionWrite, String[] cmdArgs) {
+		
+		/* can't have both --read and --write at the same time */
+		if (optionRead && optionWrite) {
+			System.err.println("Error: can't specify both --read and --write in the same command.");
+			System.exit(-1);
+		}
+		
+		OperationType opType = OperationType.OP_UNSPECIFIED;
+		if (optionRead) {
+			opType = OperationType.OP_READ;
+		} else if (optionWrite) {
+			opType = OperationType.OP_WRITE;			
+		}
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();

@@ -40,6 +40,12 @@ public final class DiscoMain {
 	/* should we show roots when displaying reports? */
 	private static boolean optionShowRoots = false;
 	
+	/* should we only show files/tasks/things that "read" - set by the --read option */
+	private static boolean optionRead = false;
+	
+	/* should we only show files/tasks/things that "write" - set by the --write option */
+	private static boolean optionWrite = false;
+
 	/* when validating command line args - this value is considered infinite */
 	private static final int ARGS_INFINITE = -1;
 	
@@ -72,6 +78,14 @@ public final class DiscoMain {
 		Option rOpt = new Option("r", "show-roots", false, "Show file name space roots when displaying report output");
 		opts.addOption(rOpt);
 
+		/* add the --read option */
+		Option readOpt = new Option(null, "read", false, "Only show files/tasks that perform a 'read' operation");
+		opts.addOption(readOpt);
+
+		/* add the --write option */
+		Option writeOpt = new Option(null, "write", false, "Only show files/tasks that perform a 'write' operation");
+		opts.addOption(writeOpt);		
+
 		/*
 		 * Initiate the parsing process - also, report on any options that require
 		 * an argument but didn't receive one.
@@ -91,6 +105,8 @@ public final class DiscoMain {
 			buildStoreFileName = line.getOptionValue('f');
 		}
 		optionShowRoots = line.hasOption('r');
+		optionRead = line.hasOption("read");
+		optionWrite = line.hasOption("write");
 		
 		/*
 		 * Validate that at least one more argument (the command name) is provided.
@@ -139,7 +155,18 @@ public final class DiscoMain {
 		Collection<Option> optList = opts.getOptions();
 		for (Iterator<Option> iterator = optList.iterator(); iterator.hasNext();) {
 			Option thisOpt = iterator.next();
-			String line = "    -" + thisOpt.getOpt() + " | --" + thisOpt.getLongOpt();
+			String shortOpt = thisOpt.getOpt();
+			String longOpt = thisOpt.getLongOpt();
+			String line = "    ";
+			if (shortOpt != null) {
+				line += "-" + shortOpt;
+			}
+			if (shortOpt != null && longOpt != null) {
+				line += " | ";
+			}
+			if (longOpt != null) {
+				line += "--" + thisOpt.getLongOpt();
+			}
 			if (thisOpt.hasArg()) {
 				line += " <" + thisOpt.getArgName() + ">";
 			}
@@ -162,9 +189,7 @@ public final class DiscoMain {
 		
 		System.err.println("\nTask reporting commands:");
 		formattedDisplayLine("    show-tasks", "List all tasks recorded in the build store.");
-		formattedDisplayLine("    show-tasks-that-use", "List all tasks that use (read or write) the specified file(s)");
-		formattedDisplayLine("    show-tasks-that-read", "List all tasks that read from the specified file(s)");
-		formattedDisplayLine("    show-tasks-that-write", "List all tasks that write to the specified file(s)");
+		formattedDisplayLine("    show-tasks-that-use", "List all tasks that use (or --read or --write) the specified file(s)");
 		
 		System.err.println("\nFile System commands:");
 		formattedDisplayLine("    show-root [<root-name>]", "Show the file system path referred to by this root. Without");
@@ -231,15 +256,7 @@ public final class DiscoMain {
 		}
 		else if (cmdName.equals("show-tasks-that-use")) {
 			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-use {<input-path>}");
-			DiscoReports.showTasksThatAccess(buildStore, OperationType.OP_UNSPECIFIED, cmdArgs);
-		}
-		else if (cmdName.equals("show-tasks-that-read")) {
-			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-read {<input-path>}");
-			DiscoReports.showTasksThatAccess(buildStore, OperationType.OP_READ, cmdArgs);
-		}
-		else if (cmdName.equals("show-tasks-that-write")) {
-			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-write {<input-path>}");
-			DiscoReports.showTasksThatAccess(buildStore, OperationType.OP_WRITE, cmdArgs);
+			DiscoReports.showTasksThatAccess(buildStore, optionRead, optionWrite, cmdArgs);
 		}
 		
 		/*
