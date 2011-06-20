@@ -191,6 +191,8 @@ public final class DiscoMain {
 		System.err.println("\nFile reporting commands:");
 		formattedDisplayLine("    show-files", "List all files recorded in the build store.");
 		formattedDisplayLine("    show-unused-files", "Report on files that are never used by the build system.");
+		formattedDisplayLine("    show-files-used-by", "Report on files that are used by the specified tasks.");
+		formattedDisplayLine("",                       "Use --read or --write to only see files that are read or written.");
 		formattedDisplayLine("    show-most-used-files", "Report on files the build system accessed the most.");
 		formattedDisplayLine("    show-derived-files", "List the files that are directly derived from the input file(s).");
 		formattedDisplayLine("",                       "Use --all to see indirectly derived files.");
@@ -248,14 +250,18 @@ public final class DiscoMain {
 		}
 		else if (cmdName.equals("show-derived-files")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-derived-files [ {<input-path>} ]");
-			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, optionAll, cmdArgs);			
+			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, optionAll, cmdArgs);	
+		} 
+		else if (cmdName.equals("show-files-used-by")) {
+			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-files-used-by [ {<task-filter>} ]");
+			DiscoReports.showFilesUsedBy(buildStore, optionShowRoots, optionRead, optionWrite, cmdArgs);			
 		}
 				
 		/*
 		 * Task reporting commands
 		 */
 		else if (cmdName.equals("show-tasks")) {
-			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-tasks");
+			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-tasks [ {<task-filter>} ]");
 			DiscoReports.showTasks(buildStore, cmdArgs);			
 		}
 		else if (cmdName.equals("show-tasks-that-use")) {

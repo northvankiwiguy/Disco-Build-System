@@ -66,6 +66,43 @@ import com.arapiki.utils.print.PrintUtils;
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Display a report of all the files that are used (or read, or written) by a user-specified
+	 * set of tasks. 
+	 * @param buildStore The BuildStore to query.
+	 * @param optionShowRoots Should we display path roots? (--show-roots option)
+	 * @param optionRead Should we only show files that were read by these tasks
+	 * @param optionWrite Should we only show files that were written by these tasks
+	 * @param cmdArgs The user-supplied command argument, providing the list of tasks to query
+	 */
+	public static void showFilesUsedBy(BuildStore buildStore,
+			boolean optionShowRoots, boolean optionRead, boolean optionWrite,
+			String[] cmdArgs) {
+		
+		/* are we searching for reads, writes, or both? */
+		OperationType opType = getOperationType(optionRead, optionWrite);
+		
+		BuildTasks bts = buildStore.getBuildTasks();
+		Reports reports = buildStore.getReports();
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		
+		/* fetch the list of tasks we're querying */
+		TaskSet ts = getCmdLineTaskSet(bts, cmdArgs);
+		if (ts == null) {
+			System.err.println("Error: no tasks were selected.");
+			System.exit(-1);
+		}
+		
+		/* run the report */
+		FileSet accessedFiles = reports.reportFilesAccessedByTasks(ts, opType);
+		accessedFiles.populateWithParents();
+		
+		/* pretty print the results */
+		printFileSet(System.out, fns, accessedFiles, null, optionShowRoots);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Provide a list of all unused files in the BuildStore. That is, files that aren't
 	 * referenced by any build tasks.
 	 * @param buildStore The BuildStore to query.
@@ -162,22 +199,12 @@ import com.arapiki.utils.print.PrintUtils;
 	public static void showTasksThatAccess(BuildStore buildStore,
 			boolean optionRead, boolean optionWrite, String[] cmdArgs) {
 		
-		/* can't have both --read and --write at the same time */
-		if (optionRead && optionWrite) {
-			System.err.println("Error: can't specify both --read and --write in the same command.");
-			System.exit(-1);
-		}
-		
-		OperationType opType = OperationType.OP_UNSPECIFIED;
-		if (optionRead) {
-			opType = OperationType.OP_READ;
-		} else if (optionWrite) {
-			opType = OperationType.OP_WRITE;			
-		}
-		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();
 		Reports reports = buildStore.getReports();
+
+		/* are we searching for reads, writes, or both? */
+		OperationType opType = getOperationType(optionRead, optionWrite);		
 
 		/* fetch the FileSet of paths from the user's command line */
 		FileSet fileSet = getCmdLineFileSet(fns, cmdArgs);
@@ -278,6 +305,33 @@ import com.arapiki.utils.print.PrintUtils;
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * Given the possible use of the --read and --write command line flags, return an
+	 * OperationType value that can be used for querying the database
+	 * @param optionRead Whether the user provided the --read flag
+	 * @param optionWrite Whether the user provided the --write flag
+	 * @return Either OP_UNSPECIFIED (search for either), OP_READ, or OP_WRITE
+	 */
+	private static OperationType getOperationType(boolean optionRead,
+			boolean optionWrite) {
+		
+		/* can't have both --read and --write at the same time */
+		if (optionRead && optionWrite) {
+			System.err.println("Error: can't specify both --read and --write in the same command.");
+			System.exit(-1);
+		}
+		
+		OperationType opType = OperationType.OP_UNSPECIFIED;
+		if (optionRead) {
+			opType = OperationType.OP_READ;
+		} else if (optionWrite) {
+			opType = OperationType.OP_WRITE;			
+		}
+		return opType;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Helper method for displaying a path and all it's children. This should only be called

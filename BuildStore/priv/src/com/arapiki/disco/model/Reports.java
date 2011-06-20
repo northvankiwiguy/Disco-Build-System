@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
-import com.arapiki.utils.types.IntegerTreeSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -60,8 +59,9 @@ public class Reports {
 		selectFilesWithMatchingNamePrepStmt = null,
 		selectDerivedFilesPrepStmt = null,
 		selectTasksAccessingFilesPrepStmt = null,
-		selectTasksAccessingFilesAnyPrepStmt = null;
-		
+		selectTasksAccessingFilesAnyPrepStmt = null,
+		selectFilesAccessedByTaskPrepStmt = null,
+		selectFilesAccessedByTaskAnyPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -102,6 +102,13 @@ public class Reports {
 		
 		selectTasksAccessingFilesAnyPrepStmt = db.prepareStatement(
 				"select taskId from buildTaskFiles where fileId = ?");
+		
+		selectFilesAccessedByTaskPrepStmt = db.prepareStatement(
+				"select fileId from buildTaskFiles where taskId = ? and operation = ?");
+		
+		selectFilesAccessedByTaskAnyPrepStmt = db.prepareStatement(
+				"select fileId from buildTaskFiles where taskId = ?");
+		
 
 		//
 		// This is what I've used - it seems to work at scale.
@@ -311,7 +318,7 @@ public class Reports {
 		TaskSet results = new TaskSet(bts);
 		
 		/* for each file in the FileSet */
-		for (Iterator iterator = fileSet.iterator(); iterator.hasNext();) {		
+		for (Iterator<Integer> iterator = fileSet.iterator(); iterator.hasNext();) {		
 			int fileId = (Integer) iterator.next();
 			
 			/* find the tasks that access this file */
@@ -338,6 +345,62 @@ public class Reports {
 					/* only add the result if it's not in the set */
 					if (!results.isMember(taskId)){
 						TaskRecord record = new TaskRecord(rs.getInt(1));
+						results.add(record);
+					}
+				}
+				rs.close();
+			
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+		}
+		
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a TaskSet, return a FileSet containing all the files that are accessed by this
+	 * collection of tasks. The opType specifies whether we want files that are read by
+	 * these tasks, written by these tasks, or either read or written. 
+	 * @param taskSet The set of input tasks
+	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
+	 * @return a FileSet of all files that are accessed by these tasks, in the mode specified.
+	 */
+	public FileSet reportFilesAccessedByTasks(TaskSet taskSet, OperationType opType) {
+		
+		/* create an empty result FileSet */
+		FileSet results = new FileSet(fns);
+		
+		/* for each task in the TaskSet */
+		for (Iterator<Integer> iterator = taskSet.iterator(); iterator.hasNext();) {		
+			int taskId = (Integer) iterator.next();
+			
+			/* find the tasks that access this file */
+			try {
+				ResultSet rs;
+				
+				/* the case where we care about the operation type */
+				if (opType != OperationType.OP_UNSPECIFIED) {
+					selectFilesAccessedByTaskPrepStmt.setInt(1, taskId);
+					selectFilesAccessedByTaskPrepStmt.setInt(2, opType.ordinal());
+					rs = db.executePrepSelectResultSet(selectFilesAccessedByTaskPrepStmt);
+				} 
+				
+				/* the case where we don't care */
+				else {
+					selectFilesAccessedByTaskAnyPrepStmt.setInt(1, taskId);
+					rs = db.executePrepSelectResultSet(selectFilesAccessedByTaskAnyPrepStmt);	
+				}
+				
+				/* add the results into our FileSet */
+				while (rs.next()) {
+					int fileId = rs.getInt(1);
+				
+					/* only add the result if it's not in the set */
+					if (!results.isMember(fileId)){
+						FileRecord record = new FileRecord(rs.getInt(1));
 						results.add(record);
 					}
 				}

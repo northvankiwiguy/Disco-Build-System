@@ -654,4 +654,83 @@ public class TestReports {
 		assertTrue(resultUses.isMember(task2a));
 		assertTrue(resultUses.isMember(task3b));
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesAccessedByTasks()}.
+	 */
+	@Test
+	public void testFilesAccessedByTasks() throws Exception {
+		
+		/* create some tasks, and some file accesses for each */
+		int file1 = fns.addFile("/a/b/c.java");
+		int file2 = fns.addFile("/a/b/d.java");
+		int file3 = fns.addFile("/a/b/e.java");
+
+		int root = bts.getRootTask("");
+		int task1 = bts.addBuildTask(root, 0, "");
+		bts.addFileAccess(task1, file1, OperationType.OP_WRITE);
+		bts.addFileAccess(task1, file2, OperationType.OP_READ);
+
+		int task2 = bts.addBuildTask(root, 0, "");
+		bts.addFileAccess(task2, file1, OperationType.OP_READ);
+		bts.addFileAccess(task2, file3, OperationType.OP_READ);
+
+		int task3 = bts.addBuildTask(root, 0, "");
+		bts.addFileAccess(task3, file3, OperationType.OP_WRITE);
+		bts.addFileAccess(task3, file3, OperationType.OP_WRITE);
+
+		/* test with the empty TaskSet - should be no files returned */
+		TaskSet ts = new TaskSet(bts);
+		FileSet result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_UNSPECIFIED);
+		assertEquals(0, result.size());
+		
+		/* test with a single task, looking for all accessed files */
+		ts.add(new TaskRecord(task1));
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_UNSPECIFIED);
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(file1));
+		assertTrue(result.isMember(file2));
+		
+		/* test with a single task, looking for all read files */
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_READ);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(file2));
+
+		/* test with a single task, looking for all written files */
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_WRITE);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(file1));
+
+		/* test with two tasks, looking for all accessed files */
+		ts.add(new TaskRecord(task2));
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_UNSPECIFIED);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(file1));
+		assertTrue(result.isMember(file2));
+		assertTrue(result.isMember(file3));
+		
+		/* test with two tasks, looking for all read files */
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_READ);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(file1));
+		assertTrue(result.isMember(file2));
+		assertTrue(result.isMember(file3));
+
+		/* test with two tasks, looking for all written files */
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_WRITE);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(file1));
+
+		/* test with three tasks, looking for all written files */
+		ts.add(new TaskRecord(task3));
+		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_WRITE);
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(file1));
+		assertTrue(result.isMember(file3));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }
