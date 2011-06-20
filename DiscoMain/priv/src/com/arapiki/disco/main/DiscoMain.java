@@ -45,6 +45,9 @@ public final class DiscoMain {
 	
 	/* should we only show files/tasks/things that "write" - set by the --write option */
 	private static boolean optionWrite = false;
+	
+	/* should we show everything? (purpose varies by command) */
+	private static boolean optionAll = false;
 
 	/* when validating command line args - this value is considered infinite */
 	private static final int ARGS_INFINITE = -1;
@@ -84,7 +87,11 @@ public final class DiscoMain {
 
 		/* add the --write option */
 		Option writeOpt = new Option(null, "write", false, "Only show files/tasks that perform a 'write' operation");
-		opts.addOption(writeOpt);		
+		opts.addOption(writeOpt);
+		
+		/* add the --all option */
+		Option allOpt = new Option(null, "all", false, "Show everything (purpose varies for each command)");
+		opts.addOption(allOpt);	
 
 		/*
 		 * Initiate the parsing process - also, report on any options that require
@@ -107,6 +114,7 @@ public final class DiscoMain {
 		optionShowRoots = line.hasOption('r');
 		optionRead = line.hasOption("read");
 		optionWrite = line.hasOption("write");
+		optionAll = line.hasOption("all");
 		
 		/*
 		 * Validate that at least one more argument (the command name) is provided.
@@ -184,8 +192,8 @@ public final class DiscoMain {
 		formattedDisplayLine("    show-files", "List all files recorded in the build store.");
 		formattedDisplayLine("    show-unused-files", "Report on files that are never used by the build system.");
 		formattedDisplayLine("    show-most-used-files", "Report on files the build system accessed the most.");
-		formattedDisplayLine("    show-derived-files", "List the files that are directly derived from the input file(s)");
-		formattedDisplayLine("    show-all-derived-files", "List the files that are directly or indirectly derived from the input file(s)");
+		formattedDisplayLine("    show-derived-files", "List the files that are directly derived from the input file(s).");
+		formattedDisplayLine("",                       "Use --all to see indirectly derived files.");
 		
 		System.err.println("\nTask reporting commands:");
 		formattedDisplayLine("    show-tasks", "List all tasks recorded in the build store.");
@@ -240,13 +248,9 @@ public final class DiscoMain {
 		}
 		else if (cmdName.equals("show-derived-files")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-derived-files [ {<input-path>} ]");
-			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, false, cmdArgs);			
+			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, optionAll, cmdArgs);			
 		}
-		else if (cmdName.equals("show-all-derived-files")) {
-			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-all-derived-files [ {<input-path>} ]");
-			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, true, cmdArgs);			
-		}
-		
+				
 		/*
 		 * Task reporting commands
 		 */
