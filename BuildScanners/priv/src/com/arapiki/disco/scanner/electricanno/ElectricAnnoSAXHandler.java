@@ -13,8 +13,6 @@
 package com.arapiki.disco.scanner.electricanno;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -96,6 +94,9 @@ import com.arapiki.utils.string.PathUtils;
 	/** what directory was the current task performed in? */
 	private int currentDirId;
 	
+	/** Maintain a stack of directories, pushing and popping as we encounter <make> and </make> */
+	private ArrayList<Integer> directoryStack;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -114,6 +115,11 @@ import com.arapiki.utils.string.PathUtils;
 		
 		/* To start with, all tasks we encounter are children of the root task */
 		mostRecentTask = currentParentTask = buildTasks.getRootTask("");
+		taskStack.add(currentParentTask);
+		
+		/* we'll also need to track our current directory */
+		directoryStack = new ArrayList<Integer>();
+		directoryStack.add(fns.getRootPath("root"));
 	}
 	
 	/*=====================================================================================*
@@ -155,10 +161,12 @@ import com.arapiki.utils.string.PathUtils;
 		else if (localName.equals("make")) {
 			String cwd = atts.getValue("cwd");
 			
+			/* record the <make>'s current directory */
 			currentDirId = fns.addDirectory(cwd);
 			if (currentDirId == ErrorCode.BAD_PATH) {
 				throw new FatalBuildScannerError("Unable to register new directory in database: " + cwd);
 			}
+			directoryStack.add(currentDirId);
 								
 			/* push our existing state on a stack, effectively changing our current parent task */
 			taskStack.add(Integer.valueOf(mostRecentTask));
@@ -279,11 +287,22 @@ import com.arapiki.utils.string.PathUtils;
 		
 		/* else, we're done with this nesting level of tasks */
 		else if (localName.equals("make")) {
-			int stackSize = taskStack.size();
-			if (stackSize == 0) {
+			
+			/* 
+			 * Restore the current parent's ID and most recent task ID for the
+			 * parent's <job>
+			 */
+			int taskStackSize = taskStack.size();
+			if (taskStackSize == 0) {
 				throw new FatalBuildScannerError("Too many </make> tags in annotation file");
 			}
-			mostRecentTask = currentParentTask = taskStack.remove(stackSize - 1);
+			currentParentTask = taskStack.get(taskStackSize - 2);
+			mostRecentTask = taskStack.remove(taskStackSize - 1);
+			
+			/* restore the previous job's current directory */
+			int dirStackSize = directoryStack.size();
+			directoryStack.remove(dirStackSize - 1);
+			currentDirId = directoryStack.get(dirStackSize - 2);
 		}
 	}
 
