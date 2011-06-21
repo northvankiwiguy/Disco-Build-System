@@ -27,6 +27,32 @@ import org.junit.Test;
  */
 public class TestPrintUtils {
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper method for comparing a byte array and a string
+	 * @param baos The ByteArrayOutStream to compare against
+	 * @param string The String to compare against
+	 * @return True if they're same, else false.
+	 */
+	private boolean compareByteArray(ByteArrayOutputStream baos, String string) {
+		
+		if (baos.size() != string.length()) {
+			return false;
+		}
+		
+		byte bytes[] = baos.toByteArray();
+		for (int i = 0; i != bytes.length; i++) {
+			if (bytes[i] != string.charAt(i)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/*
 	 * Test the PrintUtils.test() method.
 	 */
@@ -58,5 +84,57 @@ public class TestPrintUtils {
 		for (int i = 0; i < bytes.length; i++) {
 			assertEquals(' ', bytes[i]);
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * Test the PrintUtils.indentAndWrap() method.
+	 */
+	@Test
+	public void testIndentAndWrap() throws Exception {
+		
+		/* all output is stored here, so we can easily analysis it */
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		/* Test a basic unwrapped line - without a terminating \n */
+		PrintUtils.indentAndWrap(new PrintStream(baos), "This is my basic line", 4, 80);
+		assertTrue(compareByteArray(baos, "    This is my basic line\n"));
+
+		/* Test three lines of text, none of them wrapping */
+		baos.reset();
+		PrintUtils.indentAndWrap(new PrintStream(baos), "This is the first line\nNow the second\nAnd the third.", 4, 80);
+		assertTrue(compareByteArray(baos, "    This is the first line\n    Now the second\n    And the third.\n"));
+		
+		/* Test a long line that wraps once */
+		baos.reset();
+		PrintUtils.indentAndWrap(new PrintStream(baos), "This is a very long line with lots of text.", 10, 40);
+		assertTrue(compareByteArray(baos, "          This is a very long line with \\\n            lots of text.\n"));	
+	
+		/* Test a long line that wraps once, but has no convenient spaces */
+		baos.reset();
+		PrintUtils.indentAndWrap(new PrintStream(baos), "This is a very-long-line-with-lots-of-text.", 10, 40);
+		assertTrue(compareByteArray(baos, "          This is a very-long-line-with-\\\n            lots-of-text.\n"));	
+		
+		/* Test a long line that must be split over three lines */
+		baos.reset();
+		PrintUtils.indentAndWrap(new PrintStream(baos), "This is a very long line with lots of text.", 20, 40);
+		assertTrue(compareByteArray(baos, "                    This is a very long \\\n" +
+				"                      line with lots of \\\n" +
+				"                      text.\n"));
+		
+		/* Test a line wrap, followed by a non line wrap */
+		baos.reset();
+		PrintUtils.indentAndWrap(new PrintStream(baos), "This is a very long line with lots of text.\n" +
+				"And a short line\nAnd another", 10, 40);
+		assertTrue(compareByteArray(baos, "          This is a very long line with \\\n            lots of text.\n" +
+				"          And a short line\n          And another\n"));	
+		
+		/* Test a realistic scenario */
+		baos.reset();
+		PrintUtils.indentAndWrap(new PrintStream(baos), "gcc -DHAVE_CONFIG_H -I. -I.. -I../src     " +
+				"-g -O2 -MT getopt1.o -MD -MP -MF .deps/getopt1.Tpo -c -o getopt1.o getopt1.c", 6, 80);
+		assertTrue(compareByteArray(baos, "      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     " +
+				"-g -O2 -MT getopt1.o -MD -MP -MF \\\n        .deps/getopt1.Tpo -c -o getopt1.o getopt1.c\n"));
 	}
 }

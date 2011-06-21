@@ -560,7 +560,7 @@ import com.arapiki.utils.print.PrintUtils;
 		
 		/* display the task's command string. Each line must be indented appropriately */
 		/* TODO: make the wrap value settable */
-		PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, 100);
+		PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, 80);
 		outStream.println();
 		
 		/* recursively call ourselves to display each of our children */

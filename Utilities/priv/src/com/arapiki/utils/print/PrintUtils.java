@@ -65,26 +65,87 @@ public class PrintUtils {
 	 * @param wrapWidth The column number at which to wrap
 	 */
 	public static void indentAndWrap(PrintStream out, String string, int indentLevel, int wrapWidth) {
+	
+		/* at which index within the string does the current line start? */
+		int startPos = 0;
 		
-		// TODO: implement this properly.
-		// TODO: implement tests for this method
+		/* when a line wraps, we'll indent a couple of extra spaces for the next line */
+		int extraIndentNextTime = 0;
 		
-		int pos = 0;
+		/* how long is the total string? */
 		int stringLen = string.length();
 		
-		while (pos < stringLen){
-			/* figure out how long the next line is - it might not be \n terminated */
-			int newLinePos = string.indexOf('\n', pos);
-			if (newLinePos == -1) {
-				newLinePos = string.length();
-			}
+		/* how many columns can be used for text (total width - indent) */
+		int wrapAtColumn = wrapWidth - indentLevel;
 		
-			/* display the current line (a substring) */
-			indent(out, indentLevel);
-			out.println(string.substring(pos, newLinePos));
+		/* repeat until we've displayed every line of text in the string */
+		while (startPos < stringLen){
 			
-			/* prepare for printing the next line */
-			pos = newLinePos + 1;
+			/* 
+			 * Display the appropriate indentation, possibly with extra indentation
+			 * because the previous line was wrapped.
+			 */
+			indent(out, indentLevel + extraIndentNextTime);
+			
+			/* 
+			 * Figure out how long the next line is - it might not be \n terminated,
+			 * so we must allow for the EOL case.
+			 */
+			int endPos = string.indexOf('\n', startPos);
+			if (endPos == -1) {
+				endPos = string.length();
+			}
+			
+			/* would this line need to wrap? That is, is it too long? */
+			boolean willWrap = false;
+			if ((endPos - startPos) > (wrapAtColumn - extraIndentNextTime)) {
+				
+				/* yes, we need to wrap */
+				willWrap = true;
+				
+				/* 
+				 * Find a suitable place to break the line. We first calculate
+				 * the maximum length at which we might break the line, although
+				 * this might be in the middle of a word.
+				 */
+				endPos = startPos + (wrapAtColumn - extraIndentNextTime);
+				
+				/*
+				 * Now check if there's a convenient space (' '), in the second half of this line,
+				 * that would be a better place to break things.
+				 */
+				int spacePos = string.lastIndexOf(' ', endPos);
+				if ((spacePos != -1) && (spacePos <= endPos) && (spacePos > ((startPos + endPos) / 2))){
+					endPos = spacePos + 1;
+				}
+				
+				/*
+				 * Because we wrapped this line, we should indent the following line
+				 * by a couple of spaces, just for visual appeal.
+				 */
+				extraIndentNextTime = 2;	
+			} 
+			
+			/* no wrap this time, so no indentation next time */
+			else {
+				extraIndentNextTime = 0;
+			}
+			
+			/* display the current line (a substring), with a trailing \ if we wrapped */
+			out.print(string.substring(startPos, endPos));
+			if (willWrap) {
+				out.print("\\");
+			}
+			out.println();
+			
+			/* 
+			 * Prepare for printing the next line. If we wrapped, continue from the very next
+			 * character. If we didn't wrap, then we need to skip over the \n character */
+			if (willWrap) {
+				startPos = endPos;
+			} else {
+				startPos = endPos + 1;
+			}
 		}
 	}
 }
