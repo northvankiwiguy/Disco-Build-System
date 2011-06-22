@@ -16,7 +16,6 @@ import static org.junit.Assert.*;
 
 import java.util.Random;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -97,6 +96,29 @@ public class TestBuildTasks {
 		assertNull(bts.getCommand(100));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getCommandSummary(int, int)}
+	 */
+	@Test
+	public void testGetCommandSummary() {
+	
+		/* create a single task, with a long command string */
+		int mytask = bts.addBuildTask(bts.getRootTask(""), 0,
+				"gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
+				"-o myfile.o -c myfile.c");
+		
+		/* fetch the summary at various widths */
+		assertEquals("gcc -Ipath1/...", bts.getCommandSummary(mytask, 15));
+		assertEquals("gcc -Ipath1/include -Ipath2...", bts.getCommandSummary(mytask, 30));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/inc...", bts.getCommandSummary(mytask, 50));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
+				"-o myfile.o -c myfile....", bts.getCommandSummary(mytask, 89));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
+				"-o myfile.o -c myfile.c", bts.getCommandSummary(mytask, 100));
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

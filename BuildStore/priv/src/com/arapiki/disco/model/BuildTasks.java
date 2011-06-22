@@ -307,6 +307,44 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Fetch a summary of this task's command. The summary string is designed to give a
+	 * high-level overview of what the command does. The summary string for certain commands
+	 * may contain the command name and most important parameters, whereas for other commands
+	 * it may just be the first 'width' characters of the shell command.
+	 * @param taskId The ID of the task
+	 * @param width The maximum number of characters in the summary string
+	 * @return The summary string for this task's command
+	 */
+	public String getCommandSummary(int taskId, int width) {
+		
+		/* 
+		 * For now, we treat all commands as being the same, and simply return the
+		 * first 'width' characters from the task's command string.
+		 */
+		String command = getCommand(taskId);
+		
+		/* for strings that are longer than 'width', truncate them and suffix them with "..." */
+		boolean dotsNeeded = false;
+		int stringLen = command.length();
+		if (stringLen > width - 3) {
+			stringLen = width - 3;
+			dotsNeeded = true;
+		}
+		
+		/* form the summary string, possibly with ... */
+		StringBuffer sb = new StringBuffer(command.substring(0, stringLen));
+		if (dotsNeeded){
+			sb.append("...");
+		}
+		
+		/* return the summary string */
+		return sb.toString();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+
+	/**
 	 * Given the ID of a task, return the task's parent task.
 	 * @param taskId The task to return the parent of
 	 * @return The ID of the task's parent, or NOT_FOUND if the task is at the root, or
