@@ -189,7 +189,7 @@ class BuildStoreDB  {
 			stat.executeUpdate("create table buildTasks ( taskId integer primary key, parentTaskId integer, " +
 							   "taskDirId integer, command text)");
 			stat.executeUpdate("insert into buildTasks values (0, 0, 0, null)");
-			// TODO: do we need an index here?
+			stat.executeUpdate("create index buildTasksIdx on buildTasks (parentTaskId)");
 			
 			/* Create the "buildTaskFiles" tables. */
 			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");			

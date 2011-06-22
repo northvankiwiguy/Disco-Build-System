@@ -22,11 +22,18 @@ import java.io.PrintStream;
  *
  */
 public class PrintUtils {
-
+	
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
 	
 	/* fast access to printing an arbitrary number of spaces. Used by indent() */
 	private static String spaces = "                                                                ";
 
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+	
 	/**
 	 * Utility function for print spaces. This is useful for indented screen output.
 	 * @param out The stream to write to (such as System.out).
@@ -50,6 +57,8 @@ public class PrintUtils {
 		}
 		
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Given a multi-line string, display each line of that string after indenting by
@@ -93,7 +102,7 @@ public class PrintUtils {
 			 */
 			int endPos = string.indexOf('\n', startPos);
 			if (endPos == -1) {
-				endPos = string.length();
+				endPos = stringLen;
 			}
 			
 			/* would this line need to wrap? That is, is it too long? */
@@ -148,4 +157,6 @@ public class PrintUtils {
 			}
 		}
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 }
