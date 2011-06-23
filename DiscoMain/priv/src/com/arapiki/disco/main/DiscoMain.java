@@ -19,7 +19,6 @@ import java.util.Iterator;
 import org.apache.commons.cli.*;
 
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.utils.print.PrintUtils;
 
 /**
@@ -48,6 +47,12 @@ public final class DiscoMain {
 	
 	/* should we show everything? (purpose varies by command) */
 	private static boolean optionAll = false;
+
+	/* do we want short output? */
+	private static boolean optionShort = false;
+	
+	/* do we want long output? */
+	private static boolean optionLong = false;
 
 	/* when validating command line args - this value is considered infinite */
 	private static final int ARGS_INFINITE = -1;
@@ -78,20 +83,33 @@ public final class DiscoMain {
 		opts.addOption(fOpt);
 
 		/* add the -r / --show-roots option */
-		Option rOpt = new Option("r", "show-roots", false, "Show file name space roots when displaying report output");
+		Option rOpt = new Option(null, "show-roots", false, "Show file name space roots when displaying report output");
 		opts.addOption(rOpt);
 
 		/* add the --read option */
-		Option readOpt = new Option(null, "read", false, "Only show files/tasks that perform a 'read' operation");
+		Option readOpt = new Option("r", "read", false, "Only show files/tasks that perform a 'read' operation");
 		opts.addOption(readOpt);
 
 		/* add the --write option */
-		Option writeOpt = new Option(null, "write", false, "Only show files/tasks that perform a 'write' operation");
+		Option writeOpt = new Option("w", "write", false, "Only show files/tasks that perform a 'write' operation");
 		opts.addOption(writeOpt);
 		
 		/* add the --all option */
-		Option allOpt = new Option(null, "all", false, "Show everything (purpose varies for each command)");
+		Option allOpt = new Option("a", "all", false, "Show everything (purpose varies for each command)");
 		opts.addOption(allOpt);	
+		
+		/* add the -s/--short option */
+		Option shortOpt = new Option("s", "short", false, "Provide abbreviated output");
+		opts.addOption(shortOpt);	
+
+		/* add the -l/--long option */
+		Option longOpt = new Option("l", "long", false, "Provide detailed/long output");
+		opts.addOption(longOpt);
+		
+		/* how many columns of output should we show (default is 80) */
+		Option widthOpt = new Option(null, "width", true, "Number of output columns (default is " +
+				DiscoReports.getColumnWidth() + ")");
+		opts.addOption(widthOpt);
 
 		/*
 		 * Initiate the parsing process - also, report on any options that require
@@ -111,10 +129,30 @@ public final class DiscoMain {
 		if (line.hasOption('f')){
 			buildStoreFileName = line.getOptionValue('f');
 		}
-		optionShowRoots = line.hasOption('r');
+		optionShowRoots = line.hasOption("show-roots");
 		optionRead = line.hasOption("read");
 		optionWrite = line.hasOption("write");
 		optionAll = line.hasOption("all");
+		optionShort = line.hasOption("short");
+		optionLong = line.hasOption("long");
+		
+		String argWidth = line.getOptionValue("width");
+		if (argWidth != null) {
+			try {
+				int newWidth = Integer.valueOf(argWidth);
+				DiscoReports.setColumnWidth(newWidth);
+			} catch (NumberFormatException ex) {
+				System.err.println("Error: invalid argument to --width: " + argWidth);
+				System.exit(1);
+			}
+		}
+		
+		
+		/* do we want short or long command output? We can't have both */
+		if (optionShort && optionLong) {
+			System.err.println("Error: can't select --short and --long in the same command.");
+			System.exit(-1);
+		}
 		
 		/*
 		 * Validate that at least one more argument (the command name) is provided.
@@ -168,9 +206,13 @@ public final class DiscoMain {
 			String line = "    ";
 			if (shortOpt != null) {
 				line += "-" + shortOpt;
+			} else {
+				line += "  ";
 			}
 			if (shortOpt != null && longOpt != null) {
 				line += " | ";
+			} else {
+				line += "   ";
 			}
 			if (longOpt != null) {
 				line += "--" + thisOpt.getLongOpt();
@@ -199,6 +241,7 @@ public final class DiscoMain {
 		
 		System.err.println("\nTask reporting commands:");
 		formattedDisplayLine("    show-tasks", "List all tasks recorded in the build store.");
+		formattedDisplayLine("", "Use --long to see the full command string");
 		formattedDisplayLine("    show-tasks-that-use", "List all tasks that use (or --read or --write) the specified file(s)");
 		
 		System.err.println("\nFile System commands:");
@@ -262,11 +305,11 @@ public final class DiscoMain {
 		 */
 		else if (cmdName.equals("show-tasks")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-tasks [ {<task-filter>} ]");
-			DiscoReports.showTasks(buildStore, cmdArgs);			
+			DiscoReports.showTasks(buildStore, optionLong, cmdArgs);			
 		}
 		else if (cmdName.equals("show-tasks-that-use")) {
 			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-use {<input-path>}");
-			DiscoReports.showTasksThatAccess(buildStore, optionRead, optionWrite, cmdArgs);
+			DiscoReports.showTasksThatAccess(buildStore, optionRead, optionWrite, optionLong, cmdArgs);
 		}
 		
 		/*

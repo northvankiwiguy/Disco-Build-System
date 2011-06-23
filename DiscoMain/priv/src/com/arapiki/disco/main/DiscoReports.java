@@ -33,6 +33,13 @@ import com.arapiki.utils.print.PrintUtils;
 /* package */ class DiscoReports {
 
 	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+
+	/** the number of columns (characters) per output line */
+	private static int columnWidth = 80;
+	
+	/*=====================================================================================*
 	 * PACKAGE-LEVEL METHODS
 	 *=====================================================================================*/
 
@@ -170,19 +177,22 @@ import com.arapiki.utils.print.PrintUtils;
 	 * a tree hierarchy. If user-supplied filter parameters are provided, the set of tasks
 	 * will be filtered accordingly.
 	 * @param buildStore The BuildStore to query
+	 * @param longOutput Should command strings be shown in full?
 	 * @param cmdArgs The user-supplied list of tasks to be displayed. Only tasks 
 	 * that match this filter will be displayed. Note that cmdArgs[0] is the
 	 * name of the command (show-tasks) are will be ignored.
 	 */
-	public static void showTasks(BuildStore buildStore, String[] cmdArgs) {
+	public static void showTasks(BuildStore buildStore, boolean longOutput, String[] cmdArgs) {
 		BuildTasks bts = buildStore.getBuildTasks();
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		FileNameSpaces fns = buildStore.getFileNameSpaces();		
 		
 		/* compute a TaskSet to display, or null if no arguments are provided */
 		TaskSet ts = getCmdLineTaskSet(bts, cmdArgs);
 		
-		/* display the selected task set */
-		printTaskSet(System.out, bts, fns, ts, null);
+		/* 
+		 * Display the selected task set.
+		 */
+		printTaskSet(System.out, bts, fns, ts, null, longOutput);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -193,11 +203,12 @@ import com.arapiki.utils.print.PrintUtils;
 	 * @param buildStore The BuildStore to query
 	 * @param optionRead Only show tasks that read the files
 	 * @param optionWrite Only show tasks that read the files
+	 * @param longOutput Should command strings be shown in full?
 	 * @param cmdArgs The user-supplied list of files/directories to query. 
 	 * Note that cmdArgs[0] is the name of the command (show-files) are will be ignored.
 	 */
 	public static void showTasksThatAccess(BuildStore buildStore,
-			boolean optionRead, boolean optionWrite, String[] cmdArgs) {
+			boolean optionRead, boolean optionWrite, boolean longOutput, String[] cmdArgs) {
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();
@@ -214,7 +225,7 @@ import com.arapiki.utils.print.PrintUtils;
 		taskSet.populateWithParents();
 		
 		/* display the resulting set of tasks */
-		printTaskSet(System.out, bts, fns, taskSet, null);
+		printTaskSet(System.out, bts, fns, taskSet, null, longOutput);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -282,11 +293,18 @@ import com.arapiki.utils.print.PrintUtils;
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * TODO: Comment this properly
+	 * Given a TaskSet, display the tasks in that set in a pretty-printed format. To ensure
+	 * that all tasks are displayed, you should first call TaskSet.populateWithParents().
+	 * @param outStream The PrintStream to display the output on
+	 * @param bts The BuildTasks object containing the task information
+	 * @param fns The FileNameSpaces object containing file name information
+	 * @param resultTaskSet The set of tasks to be displayed
+	 * @param filterTaskSet Currently unused
+	 * @param longOutput Set to true if the full command strings should be displayed.
 	 */
 	/* package */ static void printTaskSet(
 			PrintStream outStream, BuildTasks bts, FileNameSpaces fns,
-			TaskSet resultTaskSet, TaskSet filterTaskSet) {
+			TaskSet resultTaskSet, TaskSet filterTaskSet, boolean longOutput) {
 		
 		/* 
 		 * We always start at the top root, even though we may only display a subset
@@ -298,8 +316,32 @@ import com.arapiki.utils.print.PrintUtils;
 		Integer children[] = bts.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
 			printTaskSetHelper(outStream, bts, fns, children[i], 
-					resultTaskSet, filterTaskSet, 1);
+					resultTaskSet, filterTaskSet, longOutput, 1);
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the number of columns (characters) of output to be printed per report line.
+	 * @return The number of columns 
+	 */
+	public static int getColumnWidth() {
+		return columnWidth;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set the number of columns (characters) of output to be printed per report line. The
+	 * minimum width is 40 characters. Any attempt to set a narrower width will revert to 40.
+	 * @param newWidth The new column width to set
+	 */
+	public static void setColumnWidth(int newWidth) {
+		if (newWidth < 40) {
+			newWidth = 40;
+		}
+		columnWidth = newWidth;
 	}
 
 	/*=====================================================================================*
@@ -514,36 +556,47 @@ import com.arapiki.utils.print.PrintUtils;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * 
-	 * TODO: comment this properly.
-	 * @param outStream
-	 * @param bts
-	 * @param integer
-	 * @param resultTaskSet
-	 * @param filterTaskSet
-	 * @param i
+	 * A helper method, used exclusively by printTaskSet. This method calls itself recursively
+	 * as it traverses the TaskSet's tree structure.
+	 * @param outStream The PrintStream to display the output on
+	 * @param bts The BuildTasks object containing the task information
+	 * @param fns The FileNameSpaces object containing file name information
+	 * @param resultTaskSet The set of tasks to be displayed
+	 * @param filterTaskSet Currently unused
+	 * @param longOutput Set to true if the full command strings should be displayed.
+	 * @param indentLevel The number of spaces to indent this task by.
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
 			BuildTasks bts, FileNameSpaces fns, int taskId, TaskSet resultTaskSet,
-			TaskSet filterTaskSet, int indentLevel) {
+			TaskSet filterTaskSet, boolean longOutput, int indentLevel) {
 
 		/* 
 		 * Display the current task, at the appropriate indentation level. The format is:
 		 * 
 		 * - Task 1 (/home/psmith/t/cvs-1.11.23)
-         *     if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :; 
+         *     if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :;
+         *     
          * -- Task 2 (/home/psmith/t/cvs-1.11.23)
          *      failcom='exit 1'; for f in x $MAKEFLAGS; do case $f in *=* | --[!k]*);; \
          *
          * Where Task 1 is the parent of Task 2.
          */
-		// TODO: consider this logic.
+		
+		/* is this task in the TaskSet to be printed? If not, terminate recursion */
 		if (! ((resultTaskSet == null) || (resultTaskSet.isMember(taskId)))) {
 			return;
 		}
 
-		/* fetch the task's command string (if there is one) */
-		String command = bts.getCommand(taskId);
+		/* 
+		 * Fetch the task's command string (if there is one). It can either be
+		 * in short format (on a single line), or a full string (possibly multiple lines)
+		 */
+		String command;
+		if (longOutput) {
+			command = bts.getCommand(taskId);
+		} else {
+			command = bts.getCommandSummary(taskId, getColumnWidth() - indentLevel - 3);
+		}
 		if (command == null) {
 			command = "<unknown command>";
 		}
@@ -559,15 +612,14 @@ import com.arapiki.utils.print.PrintUtils;
 		outStream.println(" Task " + taskId + " (" + taskDirName + ")");
 		
 		/* display the task's command string. Each line must be indented appropriately */
-		/* TODO: make the wrap value settable */
-		PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, 80);
+		PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, getColumnWidth());
 		outStream.println();
 		
 		/* recursively call ourselves to display each of our children */
 		Integer children[] = bts.getChildren(taskId);
 		for (int i = 0; i < children.length; i++) {
 			printTaskSetHelper(outStream, bts, fns, children[i], 
-					resultTaskSet, filterTaskSet, indentLevel + 1);
+					resultTaskSet, filterTaskSet, longOutput, indentLevel + 1);
 		}
 		
 	}

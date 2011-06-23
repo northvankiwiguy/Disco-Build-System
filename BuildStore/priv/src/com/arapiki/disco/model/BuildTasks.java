@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.arapiki.utils.errors.ErrorCode;
+import com.arapiki.utils.string.ShellCommandUtils;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -321,7 +322,7 @@ public class BuildTasks {
 		 * For now, we treat all commands as being the same, and simply return the
 		 * first 'width' characters from the task's command string.
 		 */
-		String command = getCommand(taskId);
+		String command = ShellCommandUtils.joinCommandLine(getCommand(taskId));
 		
 		/* for strings that are longer than 'width', truncate them and suffix them with "..." */
 		boolean dotsNeeded = false;
