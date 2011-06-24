@@ -136,5 +136,28 @@ public class TestPrintUtils {
 				"-g -O2 -MT getopt1.o -MD -MP -MF .deps/getopt1.Tpo -c -o getopt1.o getopt1.c", 6, 80);
 		assertTrue(compareByteArray(baos, "      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     " +
 				"-g -O2 -MT getopt1.o -MD -MP -MF \\\n        .deps/getopt1.Tpo -c -o getopt1.o getopt1.c\n"));
+		
+		/* Test a scenario where the text is already indented, so wrapping a line should keep that indentation intact */
+		baos.reset();
+		System.out.println("STARTING FINAL TEST");
+		PrintUtils.indentAndWrap(new PrintStream(baos), 
+				"if (a == 2){\n" +
+				"  if (b == 3){\n" +
+				"    printf(\"%d\\n\", a + b + c + d + e + f + g + h + i);\n" +
+				"    printf(\"%d\\n\", j + k + l + m + n + o + p + q + r);\n" +
+				"  }\n" +
+				"}\n", 4, 30);
+		System.out.println(baos.toString());
+		assertTrue(compareByteArray(baos, 
+				"    if (a == 2){\n" +
+				"      if (b == 3){\n" +
+				"        printf(\"%d\\n\", a + b + \\\n" +
+				"          c + d + e + f + g + \\\n" +
+				"          h + i);\n" +
+				"        printf(\"%d\\n\", j + k + \\\n" +
+				"          l + m + n + o + p + \\\n" +
+				"          q + r);\n" +
+				"      }\n" +
+				"    }\n"));
 	}
 }

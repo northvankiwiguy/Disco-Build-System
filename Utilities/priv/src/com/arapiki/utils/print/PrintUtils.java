@@ -87,6 +87,13 @@ public class PrintUtils {
 		/* how many columns can be used for text (total width - indent) */
 		int wrapAtColumn = wrapWidth - indentLevel;
 		
+		/*
+		 * Record how many spaces each line was already indented by, just
+		 * in case we need to wrap a line and indent the next line by
+         * the same amount.
+		 */
+		int prefixSpaces = 0;
+		
 		/* repeat until we've displayed every line of text in the string */
 		while (startPos < stringLen){
 			
@@ -103,6 +110,36 @@ public class PrintUtils {
 			int endPos = string.indexOf('\n', startPos);
 			if (endPos == -1) {
 				endPos = stringLen;
+			}
+
+			/*
+			 * If this is the beginning of a new line (not just a wrapped line), find
+			 * out how many spaces/tabs are at the start of this line. If we end up wrapping
+			 * this line across multiple lines, we need to add this amount of indent at
+			 * the start of the next line. For example, to wrap:
+			 *           a b c d e f g
+			 * We want to end up with
+			 *           a b c d \
+			 *             e f g
+			 * Rather than
+			 * 			 a b c d \
+			 *   e f g     
+			 */
+			if (extraIndentNextTime == 0){ /* not a wrapped line */
+				
+				prefixSpaces = 0;
+				int pos = startPos;
+				while (pos != endPos) {
+					char ch = string.charAt(pos);
+					if ((ch != ' ') && (ch != '\t')){
+						break;
+					}
+					prefixSpaces++;
+					pos++;
+					if (ch == '\t') {
+						prefixSpaces += 3;
+					}
+				}
 			}
 			
 			/* would this line need to wrap? That is, is it too long? */
@@ -130,9 +167,10 @@ public class PrintUtils {
 				
 				/*
 				 * Because we wrapped this line, we should indent the following line
-				 * by a couple of spaces, just for visual appeal.
+				 * by a couple of spaces, just for visual appeal. We also make sure
+				 * that we indent the next line by the current line's indentation.
 				 */
-				extraIndentNextTime = 2;	
+				extraIndentNextTime = 2 + prefixSpaces;
 			} 
 			
 			/* no wrap this time, so no indentation next time */
