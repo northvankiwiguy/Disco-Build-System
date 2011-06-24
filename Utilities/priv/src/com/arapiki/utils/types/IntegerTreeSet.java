@@ -12,6 +12,7 @@
 
 package com.arapiki.utils.types;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -163,16 +164,23 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	 */
 	public void populateWithParents() {
 	
-		/* fetch the list of IDs already in the IntegerTreeSet */
+		/*
+		 * Fetch the list of IDs already in the IntegerTreeSet. We'll be modifying
+		 * 'content', so we first need to save the keys that we'll traverse, otherwise
+		 * keys.nextElement() doesn't return the correct data.
+		 */
 		Enumeration<Integer> keys = content.keys();
-	
+		ArrayList<Integer> savedKeys = new ArrayList<Integer>(content.size());
+		while (keys.hasMoreElements()) {
+			savedKeys.add(keys.nextElement());
+		}
+		
 		/*
 		 * For each ID, add all of its parent Is, all the way up to the root. However,
 		 * if any of this ID's ancestors have already been added, there's no need to
 		 * add it again.
 		 */
-		while (keys.hasMoreElements()) {
-			int elementId = keys.nextElement();
+		for (Integer elementId : savedKeys) {
 			
 			int parentId;
 			while (true) {
