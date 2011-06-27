@@ -152,6 +152,9 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * TODO: finish implementing this
+	 */
 	public FileRecord[] reportMostCommonIncludersOfFile(int includedFile) {
 		
 		ArrayList<FileRecord> results = new ArrayList<FileRecord>();
@@ -175,6 +178,13 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Provides a FileSet of all files in the BuildStore that aren't accessed by any tasks.
+	 * This helps identify which source files are never used (this implies that the files
+	 * were added to the FileNameSpaces by scanning for files (--scan-tree), rather than
+	 * finding the files by scanning the build.
+	 * @return The set of files that are never accessed.
+	 */
 	public FileSet reportFilesNeverAccessed() {
 		
 		FileSet results = new FileSet(fns);
