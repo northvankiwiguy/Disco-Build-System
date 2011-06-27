@@ -733,4 +733,74 @@ public class TestReports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportWriteOnlyFiles()}.
+	 */
+	@Test
+	public void testWriteOnlyFiles() throws Exception {
+	
+		/* 
+		 * Create a bunch of files, with different characteristics.
+		 * But first, run the report - should be empty.
+		 */
+		FileSet result = reports.reportWriteOnlyFiles();
+		assertEquals(0, result.size());
+		
+		/* a.java will be compiled into a.class, which goes into prog.jar (see later) */
+		int fileAJava = fns.addFile("/a.java");
+		int fileAClass = fns.addFile("/a.class");
+		int taskA = bts.addBuildTask(0, 0, "javac a.java");
+		bts.addFileAccess(taskA, fileAJava, OperationType.OP_READ);
+		bts.addFileAccess(taskA, fileAClass, OperationType.OP_WRITE);
+
+		/* run the report - should show a.class */
+		result = reports.reportWriteOnlyFiles();
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(fileAClass));		
+		
+		/* b.java will be compiled into b.class, which goes into prog.jar (see later) */		
+		int fileBJava = fns.addFile("/b.java");
+		int fileBClass = fns.addFile("/b.class");
+		int taskB = bts.addBuildTask(0, 0, "javac b.java");
+		bts.addFileAccess(taskB, fileBJava, OperationType.OP_READ);
+		bts.addFileAccess(taskB, fileBClass, OperationType.OP_WRITE);
+		
+		/* Run the report - a.class and b.class should be listed */
+		result = reports.reportWriteOnlyFiles();
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(fileAClass));
+		assertTrue(result.isMember(fileBClass));
+		
+		/* c.java will be compiled into c.class, but no further */
+		int fileCJava = fns.addFile("/c.java");
+		int fileCClass = fns.addFile("/c.class");
+		int taskC = bts.addBuildTask(0, 0, "javac c.java");
+		bts.addFileAccess(taskC, fileCJava, OperationType.OP_READ);
+		bts.addFileAccess(taskC, fileCClass, OperationType.OP_WRITE);
+		
+		/* d.java is not read at all */
+		int fileDJava = fns.addFile("/d.java");		
+
+		/* Run the report - a.class, b.class and c.class should be listed */
+		result = reports.reportWriteOnlyFiles();
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(fileAClass));
+		assertTrue(result.isMember(fileBClass));
+		assertTrue(result.isMember(fileCClass));
+		
+		/* now put A.class and B.class into prog.jar */
+		int fileProgJar = fns.addFile("/prog.jar");
+		int taskProg = bts.addBuildTask(0, 0, "jar cf prog.jar a.class b.class");
+		bts.addFileAccess(taskProg, fileAClass, OperationType.OP_READ);
+		bts.addFileAccess(taskProg, fileBClass, OperationType.OP_READ);
+		bts.addFileAccess(taskProg, fileProgJar, OperationType.OP_WRITE);
+	
+		/* Run the report - only c.class and prog.jar should be listed */
+		result = reports.reportWriteOnlyFiles();
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(fileCClass));
+		assertTrue(result.isMember(fileProgJar));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/		
 }

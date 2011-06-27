@@ -136,6 +136,36 @@ import com.arapiki.utils.print.PrintUtils;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Provide a list of all files in the BuildStore that are written-to by a task, but
+	 * there are no other tasks that read from this file. This implies that the file
+	 * is "final", such as an executable program or release package, rather than an
+	 * intermediate file (such as an object file).
+	 * @param buildStore The BuildStore to query.
+	 * @param showRoots True if file system roots (e.g. "root:") should be shown
+	 * @param cmdArgs The user-supplied list of files/directories to be displayed. Only unused
+	 * files that match this filter will be displayed. Note that cmdArgs[0] is the
+	 * name of the command (show-files) are will be ignored.
+	 */
+	/* package */ static void showWriteOnlyFiles(BuildStore buildStore, 
+			boolean showRoots, String cmdArgs[]) {
+
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Reports reports = buildStore.getReports();
+
+		/* fetch the file/directory filter so we know which result files to display */
+		FileSet filterFileSet = getCmdLineFileSet(fns, cmdArgs);
+
+		/* get list of write-only files, and add their parent paths */
+		FileSet writeOnlyFileSet = reports.reportWriteOnlyFiles();
+		writeOnlyFileSet.populateWithParents();
+		
+		/* pretty print the results */
+		printFileSet(System.out, fns, writeOnlyFileSet, filterFileSet, showRoots);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Display a report of the files that are directly (or indirectly) derived from the set

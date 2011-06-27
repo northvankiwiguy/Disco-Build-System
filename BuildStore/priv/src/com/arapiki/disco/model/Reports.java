@@ -61,7 +61,8 @@ public class Reports {
 		selectTasksAccessingFilesPrepStmt = null,
 		selectTasksAccessingFilesAnyPrepStmt = null,
 		selectFilesAccessedByTaskPrepStmt = null,
-		selectFilesAccessedByTaskAnyPrepStmt = null;
+		selectFilesAccessedByTaskAnyPrepStmt = null,
+		selectWriteOnlyFilesPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -109,15 +110,12 @@ public class Reports {
 		selectFilesAccessedByTaskAnyPrepStmt = db.prepareStatement(
 				"select fileId from buildTaskFiles where taskId = ?");
 		
-
-		//
-		// This is what I've used - it seems to work at scale.
-		// selectFilesWrittenButNotUsedPrepStmt = db.prepareStatement(
-		//		    "select writeFileId from (select distinct fileId as writeFileId from " +
-		//		    "buildTaskFiles where operation = " + OperationType.OP_WRITE.ordinal() + ") " +
-		//		    "left join (select distinct fileId as readFileId from buildTaskFiles " +
-		//		    "where operation = " + OperationType.OP_READ.ordinal() + ") on writeFileId = readFileId " +
-		//		      "where readFileId is null");
+		selectWriteOnlyFilesPrepStmt = db.prepareStatement(
+				    "select writeFileId from (select distinct fileId as writeFileId from " +
+				    "buildTaskFiles where operation = " + OperationType.OP_WRITE.ordinal() + ") " +
+				    "left join (select distinct fileId as readFileId from buildTaskFiles " +
+				    "where operation = " + OperationType.OP_READ.ordinal() + ") on writeFileId = readFileId " +
+				      "where readFileId is null");
 	}
 
 	/*=====================================================================================*
@@ -424,5 +422,33 @@ public class Reports {
 		return results;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the set of files that are written to by a build task, but aren't ever
+	 * read by a different task. This generally implies that the file is a "final"
+	 * file (such as an executable program, or release package), rather than an intermediate
+	 * file (such as an object file).
+	 * @return The FileSet of write-only files
+	 */
+	public FileSet reportWriteOnlyFiles() {
+		
+		FileSet results = new FileSet(fns);
+		try {
+			ResultSet rs = db.executePrepSelectResultSet(selectWriteOnlyFilesPrepStmt);
+
+			while (rs.next()) {
+				FileRecord record = new FileRecord(rs.getInt(1));
+				results.add(record);
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;
+	}
+		
 	/*=====================================================================================*/
 }
