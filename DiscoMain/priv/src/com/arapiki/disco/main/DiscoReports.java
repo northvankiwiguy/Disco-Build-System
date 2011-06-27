@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.FileRecord;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.TaskSet;
@@ -198,6 +199,40 @@ import com.arapiki.utils.print.PrintUtils;
 		
 		/* pretty print the results - no filtering used here */
 		printFileSet(System.out, fns, derivedFileSet, null, showRoots);	
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Display a list of files, ordered by the number of tasks make use of that file.
+	 * The result set can be filtered based on the input file set.
+	 * @param buildStore The BuildStore to query.
+	 * @param showRoots True if file system roots (e.g. "root:") should be shown
+	 * @param cmdArgs The user-supplied list of files/directories to use as a filter. Only
+	 * files that match this filter will be displayed. Note that cmdArgs[0] is the
+	 * name of the command (show-files) are will be ignored.
+	 */
+	public static void showPopularFiles(BuildStore buildStore,
+			boolean showRoots, String[] cmdArgs) {
+		
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Reports reports = buildStore.getReports();
+
+		/* fetch the set of files we're interested in learning about */
+		FileSet filterFileSet = getCmdLineFileSet(fns, cmdArgs);
+
+		/* fetch the list of most popular files */
+		FileRecord results[] = reports.reportMostCommonlyAccessedFiles();
+		
+		/* pretty print the results - only show files if they're in the filter set */
+		for (FileRecord fileRecord : results) {
+			int id = fileRecord.getId();
+			if ((filterFileSet == null) || (filterFileSet.isMember(id))){
+				int count = fileRecord.getCount();
+				String pathName = fns.getPathName(id, showRoots);
+				System.out.println(count + "\t" + pathName);
+			}
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
