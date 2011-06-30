@@ -37,6 +37,9 @@ import com.arapiki.utils.print.PrintUtils;
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** how are tasks commands displayed? */
+	public enum DisplayWidth { ONE_LINE, WRAPPED, NOT_WRAPPED };
+	
 	/** the number of columns (characters) per output line */
 	private static int columnWidth = 80;
 	
@@ -247,7 +250,7 @@ import com.arapiki.utils.print.PrintUtils;
 	 * that match this filter will be displayed. Note that cmdArgs[0] is the
 	 * name of the command (show-tasks) are will be ignored.
 	 */
-	public static void showTasks(BuildStore buildStore, boolean longOutput, String[] cmdArgs) {
+	public static void showTasks(BuildStore buildStore, DisplayWidth outputFormat, String[] cmdArgs) {
 		BuildTasks bts = buildStore.getBuildTasks();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();		
 		
@@ -257,7 +260,7 @@ import com.arapiki.utils.print.PrintUtils;
 		/* 
 		 * Display the selected task set.
 		 */
-		printTaskSet(System.out, bts, fns, ts, null, longOutput);
+		printTaskSet(System.out, bts, fns, ts, null, outputFormat);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -273,7 +276,7 @@ import com.arapiki.utils.print.PrintUtils;
 	 * Note that cmdArgs[0] is the name of the command (show-files) are will be ignored.
 	 */
 	public static void showTasksThatAccess(BuildStore buildStore,
-			boolean optionRead, boolean optionWrite, boolean longOutput, String[] cmdArgs) {
+			boolean optionRead, boolean optionWrite, DisplayWidth outputFormat, String[] cmdArgs) {
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();
@@ -290,7 +293,7 @@ import com.arapiki.utils.print.PrintUtils;
 		taskSet.populateWithParents();
 		
 		/* display the resulting set of tasks */
-		printTaskSet(System.out, bts, fns, taskSet, null, longOutput);
+		printTaskSet(System.out, bts, fns, taskSet, null, outputFormat);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -369,7 +372,7 @@ import com.arapiki.utils.print.PrintUtils;
 	 */
 	/* package */ static void printTaskSet(
 			PrintStream outStream, BuildTasks bts, FileNameSpaces fns,
-			TaskSet resultTaskSet, TaskSet filterTaskSet, boolean longOutput) {
+			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat) {
 		
 		/* 
 		 * We always start at the top root, even though we may only display a subset
@@ -381,7 +384,7 @@ import com.arapiki.utils.print.PrintUtils;
 		Integer children[] = bts.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
 			printTaskSetHelper(outStream, bts, fns, children[i], 
-					resultTaskSet, filterTaskSet, longOutput, 1);
+					resultTaskSet, filterTaskSet, outputFormat, 1);
 		}
 	}
 
@@ -633,7 +636,7 @@ import com.arapiki.utils.print.PrintUtils;
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
 			BuildTasks bts, FileNameSpaces fns, int taskId, TaskSet resultTaskSet,
-			TaskSet filterTaskSet, boolean longOutput, int indentLevel) {
+			TaskSet filterTaskSet, DisplayWidth outputFormat, int indentLevel) {
 
 		/* 
 		 * Display the current task, at the appropriate indentation level. The format is:
@@ -657,10 +660,10 @@ import com.arapiki.utils.print.PrintUtils;
 		 * in short format (on a single line), or a full string (possibly multiple lines)
 		 */
 		String command;
-		if (longOutput) {
-			command = bts.getCommand(taskId);
-		} else {
+		if (outputFormat == DisplayWidth.ONE_LINE) {
 			command = bts.getCommandSummary(taskId, getColumnWidth() - indentLevel - 3);
+		} else {
+			command = bts.getCommand(taskId);
 		}
 		if (command == null) {
 			command = "<unknown command>";
@@ -677,14 +680,18 @@ import com.arapiki.utils.print.PrintUtils;
 		outStream.println(" Task " + taskId + " (" + taskDirName + ")");
 		
 		/* display the task's command string. Each line must be indented appropriately */
-		PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, getColumnWidth());
-		outStream.println();
+		if (outputFormat != DisplayWidth.NOT_WRAPPED) {
+			PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, getColumnWidth());
+			outStream.println();
+		} else {
+			outStream.println(command);
+		}
 		
 		/* recursively call ourselves to display each of our children */
 		Integer children[] = bts.getChildren(taskId);
 		for (int i = 0; i < children.length; i++) {
 			printTaskSetHelper(outStream, bts, fns, children[i], 
-					resultTaskSet, filterTaskSet, longOutput, indentLevel + 1);
+					resultTaskSet, filterTaskSet, outputFormat, indentLevel + 1);
 		}
 		
 	}

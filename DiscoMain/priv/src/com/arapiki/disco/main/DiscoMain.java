@@ -18,6 +18,7 @@ import java.util.Iterator;
 
 import org.apache.commons.cli.*;
 
+import com.arapiki.disco.main.DiscoReports.DisplayWidth;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.utils.print.PrintUtils;
 
@@ -315,11 +316,17 @@ public final class DiscoMain {
 		 */
 		else if (cmdName.equals("show-tasks")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-tasks [ {<task-filter>} ]");
-			DiscoReports.showTasks(buildStore, optionLong, cmdArgs);			
+			DiscoReports.showTasks(buildStore, 
+					optionShort ? DisplayWidth.ONE_LINE :
+						optionLong ? DisplayWidth.NOT_WRAPPED : DisplayWidth.WRAPPED,
+					cmdArgs);			
 		}
 		else if (cmdName.equals("show-tasks-that-use")) {
 			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-use {<input-path>}");
-			DiscoReports.showTasksThatAccess(buildStore, optionRead, optionWrite, optionLong, cmdArgs);
+			DiscoReports.showTasksThatAccess(buildStore, optionRead, optionWrite, 
+					optionShort ? DisplayWidth.ONE_LINE :
+						optionLong ? DisplayWidth.NOT_WRAPPED : DisplayWidth.WRAPPED,
+					cmdArgs);
 		}
 		
 		/*
