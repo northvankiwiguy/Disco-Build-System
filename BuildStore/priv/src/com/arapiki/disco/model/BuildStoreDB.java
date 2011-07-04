@@ -187,8 +187,8 @@ class BuildStoreDB  {
 			
 			/* Create the "buildTasks" table. */
 			stat.executeUpdate("create table buildTasks ( taskId integer primary key, parentTaskId integer, " +
-							   "taskDirId integer, compId integer, compSectionId integer, command text)");
-			stat.executeUpdate("insert into buildTasks values (0, 0, 0, 0, 0, null)");
+							   "taskDirId integer, compId integer, command text)");
+			stat.executeUpdate("insert into buildTasks values (0, 0, 0, 0, null)");
 			stat.executeUpdate("create index buildTasksIdx on buildTasks (parentTaskId)");
 			
 			/* Create the "buildTaskFiles" tables. */

@@ -76,7 +76,7 @@ public class BuildTasks {
 		this.db = bs.getBuildStoreDB();
 
 		/* create prepared database statements */
-		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, 0, 0, ?)");
+		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, 0, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildTasks where taskId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentTaskId from buildTasks where taskId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select taskDirId from buildTasks where taskId = ?");
