@@ -13,6 +13,7 @@
 package com.arapiki.disco.model;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.arapiki.utils.errors.ErrorCode;
@@ -57,7 +58,14 @@ public class Components {
 		findComponentByNamePrepStmt = null,
 		findComponentByIdPrepStmt = null,
 		findAllComponentsPrepStmt = null,
-		removeComponentByNamePrepStmt = null;
+		removeComponentByNamePrepStmt = null,
+		updateFileComponentPrepStmt = null,
+		findFileComponentPrepStmt = null,
+		findFilesInComponent1PrepStmt = null,
+		findFilesInComponent2PrepStmt = null,
+		updateTaskComponentPrepStmt = null,
+		findTaskComponentPrepStmt = null,
+		findTasksInComponentPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -79,6 +87,17 @@ public class Components {
 		findAllComponentsPrepStmt = db.prepareStatement(
 				"select name from components order by name collate nocase");
 		removeComponentByNamePrepStmt = db.prepareStatement("delete from components where name = ?");
+		updateFileComponentPrepStmt = db.prepareStatement("update files set compId = ?, compSectionId = ? " +
+				"where id = ?");
+		findFileComponentPrepStmt = db.prepareStatement("select compId, compSectionId from files " +
+				"where id = ?");
+		findFilesInComponent1PrepStmt = db.prepareStatement("select id from files where compId = ?");
+		findFilesInComponent2PrepStmt = db.prepareStatement("select id from files where " +
+				"compId = ? and compSectionId = ?");
+		updateTaskComponentPrepStmt = db.prepareStatement("update buildTasks set compId = ? " +
+				"where taskId = ?");
+		findTaskComponentPrepStmt = db.prepareStatement("select compId from buildTasks where taskId = ?");
+		findTasksInComponentPrepStmt = db.prepareStatement("select taskId from buildTasks where compId = ?");
 	}
 
 	/*=====================================================================================*
@@ -200,7 +219,8 @@ public class Components {
 	public int removeComponent(String componentName) {
 		
 		/* check that the component already exists */
-		if (getComponentId(componentName) == ErrorCode.NOT_FOUND){
+		int compId = getComponentId(componentName);
+		if (compId == ErrorCode.NOT_FOUND){
 			return ErrorCode.NOT_FOUND;
 		}
 		
@@ -209,7 +229,17 @@ public class Components {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
-		// TODO: return ErrorCode.CANT_REMOVE if this component is used anywhere.
+		/* determine if this component is used by any files */
+		Integer filesInComponent[] = getFilesInComponent(compId);
+		if (filesInComponent.length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* determine if this component is used by any tasks */
+		Integer tasksInComponent[] = getTasksInComponent(compId);
+		if (tasksInComponent.length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
 		
 		/* remove from the database */
 		try {
@@ -287,6 +317,172 @@ public class Components {
 		return sectionNames;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set the component/section associated with this file.
+	 * @param fileId The ID of the file whose component will be set
+	 * @param compId The ID of the component to be associated with this file
+	 * @param compSectionId The ID of the component's section.
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this file doesn't exist
+	 */
+	public int setFileComponent(int fileId, int compId, int compSectionId) {
+		
+		try {
+			updateFileComponentPrepStmt.setInt(1, compId);
+			updateFileComponentPrepStmt.setInt(2, compSectionId);
+			updateFileComponentPrepStmt.setInt(3, fileId);
+			int rowCount = db.executePrepUpdate(updateFileComponentPrepStmt);
+			if (rowCount == 0) {
+				return ErrorCode.NOT_FOUND;
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Get the component/section associated with this file.
+	 * @param fileId The ID of the file whose component we're interested in
+	 * @return A Integer[2] array where [0] is the component ID, and [1] is the section ID,
+	 * or null if the file doesn't exist.
+	 */
+	public Integer[] getFileComponent(int fileId) {
+		
+		Integer result[] = new Integer[2];
+		
+		try {
+			findFileComponentPrepStmt.setInt(1, fileId);
+			ResultSet rs = db.executePrepSelectResultSet(findFileComponentPrepStmt);
+			if (rs.next()){
+				result[0] = rs.getInt(1);
+				result[1] = rs.getInt(2);
+				rs.close();
+			} else {
+				/* error - there was no record, so the fileId must be invalid */
+				return null;
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("SQL error", e);
+		}
+				
+		return result;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of files that are within the specified component.
+	 * @param compId The component we're examining
+	 * @return An array of files that reside inside that component.
+	 */
+	public Integer[] getFilesInComponent(int compId) {
+		Integer results[] = null;
+		try {
+			findFilesInComponent1PrepStmt.setInt(1, compId);
+			results = db.executePrepSelectIntegerColumn(findFilesInComponent1PrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return results;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of files that are within the specified component/section.
+	 * @param compId The component we're examining
+	 * @param compSectionId The section within the component we're interested in
+	 * @return An array of files that reside inside that component/section.
+	 */
+	public Integer[] getFilesInComponent(int compId, int compSectionId) {
+		Integer results[] = null;
+		try {
+			findFilesInComponent2PrepStmt.setInt(1, compId);
+			findFilesInComponent2PrepStmt.setInt(2, compSectionId);
+			results = db.executePrepSelectIntegerColumn(findFilesInComponent2PrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set the component/section associated with this task.
+	 * @param taskId The ID of the task whose component will be set
+	 * @param compId The ID of the component to be associated with this task
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this task doesn't exist
+	 */
+	public int setTaskComponent(int taskId, int compId) {
+		
+		try {
+			updateTaskComponentPrepStmt.setInt(1, compId);
+			updateTaskComponentPrepStmt.setInt(2, taskId);
+			int rowCount = db.executePrepUpdate(updateTaskComponentPrepStmt);
+			if (rowCount == 0) {
+				return ErrorCode.NOT_FOUND;
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Get the component/section associated with this task.
+	 * @param taskId The ID of the task whose component we're interested in
+	 * @return The task's component, or ErrorCode.NOT_FOUND if the task doesn't exist
+	 */
+	public int getTaskComponent(int taskId) {
+		
+		Integer results[];
+		try {
+			findTaskComponentPrepStmt.setInt(1, taskId);
+			results = db.executePrepSelectIntegerColumn(findTaskComponentPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* no result == no component by this name */
+		if (results.length == 0) {
+			return ErrorCode.NOT_FOUND;
+		} 
+		
+		/* 
+		 * One result == we have the correct ID (note: it's not possible to have
+		 * multiple results, since taskId is a unique key
+		 */
+		return results[0];
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of tasks that are within the specified component.
+	 * @param compId The component we're examining
+	 * @return An array of tasks that reside inside that component.
+	 */
+	public Integer[] getTasksInComponent(int compId) {
+		Integer results[] = null;
+		try {
+			findTasksInComponentPrepStmt.setInt(1, compId);
+			results = db.executePrepSelectIntegerColumn(findTasksInComponentPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return results;
+	}
+
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/

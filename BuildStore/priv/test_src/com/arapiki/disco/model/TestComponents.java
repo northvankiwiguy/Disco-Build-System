@@ -166,6 +166,9 @@ public class TestComponents {
 	@Test
 	public void testRemoveComponent() {
 		
+		FileNameSpaces fns = bs.getFileNameSpaces();
+		BuildTasks bts = bs.getBuildTasks();
+		
 		/* try to remove component names that haven't been added */
 		assertEquals(ErrorCode.NOT_FOUND, cmpts.removeComponent("CompA"));
 		assertEquals(ErrorCode.NOT_FOUND, cmpts.removeComponent("my_component"));
@@ -187,17 +190,27 @@ public class TestComponents {
 		assertTrue(cmpts.addComponent("CompA") > 0);
 		assertTrue(cmpts.addComponent("my_component") > 0);	
 		
-		/* TODO: add component names, assign them to files, then try to remove the name */
-		fail();
+		/* assign a component to files, then try to remove the name */
+		int compA = cmpts.getComponentId("CompA");
+		int sectPrivate = cmpts.getSectionId("priv");
+		int file1 = fns.addFile("/aardvark/bunny");
+		cmpts.setFileComponent(file1, compA, sectPrivate);
+		assertEquals(ErrorCode.CANT_REMOVE, cmpts.removeComponent("CompA"));
 		
-		/* TODO: remove them from files, then try again to remove the component name */
-		fail();
+		/* remove the component from the file, then try again to remove the component name */
+		int compNone = cmpts.getComponentId("None");
+		cmpts.setFileComponent(file1, compNone, sectPrivate);
+		assertEquals(ErrorCode.OK, cmpts.removeComponent("CompA"));
 		
-		/* TODO: add component names, assign them to tasks, then try to remove the name */
-		fail();
+		/* assign them to tasks, then try to remove the name */
+		int my_comp = cmpts.getComponentId("my_component");
+		int task1 = bts.addBuildTask(0, 0, "task1");
+		cmpts.setTaskComponent(task1, my_comp);
+		assertEquals(ErrorCode.CANT_REMOVE, cmpts.removeComponent("my_component"));
 		
-		/* TODO: remove them from tasks, then try again to remove the component name */
-		fail();
+		/* remove them from tasks, then try again to remove the component name */
+		cmpts.setTaskComponent(task1, compNone);
+		assertEquals(ErrorCode.OK, cmpts.removeComponent("my_component"));		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -294,4 +307,238 @@ public class TestComponents {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test the setFileComponent and getFileComponent methods.
+	 */
+	@Test
+	public void testFileComponents() throws Exception {
+		
+		Components cmpts = bs.getComponents();
+		FileNameSpaces bsfs = bs.getFileNameSpaces();
+		
+		/* create a few files */
+		int path1 = bsfs.addFile("/banana");
+		int path2 = bsfs.addFile("/aardvark");
+		int path3 = bsfs.addFile("/carrot");
+		
+		/* create a couple of new components */
+		int compA = cmpts.addComponent("CompA");
+		int compB = cmpts.addComponent("CompB");
+		int compNone = cmpts.getComponentId("None");
+
+		/* fetch the sections IDs */
+		int sectPublic = cmpts.getSectionId("public");
+		int sectPrivate = cmpts.getSectionId("private");
+		
+		/* by default, all files are in None/private */
+		Integer results[] = cmpts.getFileComponent(path1);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		results = cmpts.getFileComponent(path2);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		results = cmpts.getFileComponent(path3);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+
+		/* set one of the files into CompA/public */
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compA, sectPublic));
+		results = cmpts.getFileComponent(path1);
+		assertEquals(compA, results[0].intValue());
+		assertEquals(sectPublic, results[1].intValue());
+		results = cmpts.getFileComponent(path2);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		results = cmpts.getFileComponent(path3);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		
+		/* set another file to another component */
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path3, compB, sectPrivate));
+		results = cmpts.getFileComponent(path1);
+		assertEquals(compA, results[0].intValue());
+		assertEquals(sectPublic, results[1].intValue());
+		results = cmpts.getFileComponent(path2);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		results = cmpts.getFileComponent(path3);
+		assertEquals(compB, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		
+		/* set a file's component back to None */
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compNone, sectPrivate));
+		results = cmpts.getFileComponent(path1);
+		assertEquals(compNone, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		
+		/* try to set a non-existent file */
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.setFileComponent(1000, compA, sectPublic));
+		
+		/* try to get a non-existent file */
+		assertNull(cmpts.getFileComponent(2000));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * Test the getFilesInComponent(int) and getFilesInComponent(int, int) methods
+	 */
+	@Test
+	public void testGetFilesInComponent() throws Exception {
+
+		FileNameSpaces fns = bs.getFileNameSpaces();
+		
+		/* define a new component, which we'll add files to */
+		int compA = cmpts.addComponent("CompA");
+		int compNone = cmpts.addComponent("None");
+		
+		/* what are the sections? */
+		int sectPub = cmpts.getSectionId("public");
+		int sectPriv = cmpts.getSectionId("private");
+		
+		/* initially, there are no files in the component (public, private, or any) */
+		Integer results[] = cmpts.getFilesInComponent(compA);
+		assertEquals(0, results.length);
+		results = cmpts.getFilesInComponent(compA, sectPub);
+		assertEquals(0, results.length);
+		results = cmpts.getFilesInComponent(compA, sectPriv);
+		assertEquals(0, results.length);
+		
+		/* add a single file to the "private" section of compA */
+		int file1 = fns.addFile("/myfile1");
+		cmpts.setFileComponent(file1, compA, sectPriv);
+		
+		/* check again - should be one file in compA and one in compA/priv */
+		results = cmpts.getFilesInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1}));
+		results = cmpts.getFilesInComponent(compA, sectPub);
+		assertEquals(0, results.length);
+		results = cmpts.getFilesInComponent(compA, sectPriv);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1}));
+		
+		/* now add another to compA/priv and check again */
+		int file2 = fns.addFile("/myfile2");
+		cmpts.setFileComponent(file2, compA, sectPriv);
+		results = cmpts.getFilesInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2}));
+		results = cmpts.getFilesInComponent(compA, sectPub);
+		assertEquals(0, results.length);
+		results = cmpts.getFilesInComponent(compA, sectPriv);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2}));
+		
+		/* finally, add one to compA/pub and check again */
+		int file3 = fns.addFile("/myfile3");
+		cmpts.setFileComponent(file3, compA, sectPub);
+		results = cmpts.getFilesInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2, file3}));
+		results = cmpts.getFilesInComponent(compA, sectPub);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file3}));
+		results = cmpts.getFilesInComponent(compA, sectPriv);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2}));
+		
+		/* move file1 back into None */
+		cmpts.setFileComponent(file1, compNone, sectPriv);
+		results = cmpts.getFilesInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file2, file3}));
+		results = cmpts.getFilesInComponent(compA, sectPub);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file3}));
+		results = cmpts.getFilesInComponent(compA, sectPriv);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file2}));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the setTaskComponent and getTaskComponent methods.
+	 */
+	@Test
+	public void testTaskComponents() throws Exception {
+		
+		Components cmpts = bs.getComponents();
+		BuildTasks bts = bs.getBuildTasks();
+		
+		/* create a few tasks */
+		int task1 = bts.addBuildTask(0, 0, "task1");
+		int task2 = bts.addBuildTask(0, 0, "task2");
+		int task3 = bts.addBuildTask(0, 0, "task3");
+		
+		/* create a couple of new components */
+		int compA = cmpts.addComponent("CompA");
+		int compB = cmpts.addComponent("CompB");
+		int compNone = cmpts.getComponentId("None");
+		
+		/* by default, all tasks are in "None" */
+		assertEquals(compNone, cmpts.getTaskComponent(task1));
+		assertEquals(compNone, cmpts.getTaskComponent(task2));
+		assertEquals(compNone, cmpts.getTaskComponent(task3));
+		
+		/* add a task to CompA and check the tasks */
+		cmpts.setTaskComponent(task1, compA);
+		assertEquals(compA, cmpts.getTaskComponent(task1));
+		assertEquals(compNone, cmpts.getTaskComponent(task2));
+		assertEquals(compNone, cmpts.getTaskComponent(task3));
+		
+		/* add a different task to CompB and check the tasks */
+		cmpts.setTaskComponent(task2, compB);
+		assertEquals(compA, cmpts.getTaskComponent(task1));
+		assertEquals(compB, cmpts.getTaskComponent(task2));
+		assertEquals(compNone, cmpts.getTaskComponent(task3));
+		
+		/* revert one of the tasks back to None, and check the tasks */
+		cmpts.setTaskComponent(task1, compNone);
+		assertEquals(compNone, cmpts.getTaskComponent(task1));
+		assertEquals(compB, cmpts.getTaskComponent(task2));
+		assertEquals(compNone, cmpts.getTaskComponent(task3));
+		
+		/* check an invalid task - should return ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.getTaskComponent(1000));		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/*
+	 * Test the getTasksInComponent(int) method
+	 */
+	@Test
+	public void testGetTasksInComponent() throws Exception {
+		Components cmpts = bs.getComponents();
+		BuildTasks bts = bs.getBuildTasks();
+		
+		/* create a few tasks */
+		int task1 = bts.addBuildTask(0, 0, "task1");
+		int task2 = bts.addBuildTask(0, 0, "task2");
+		int task3 = bts.addBuildTask(0, 0, "task3");
+		
+		/* create a couple of new components */
+		int compA = cmpts.addComponent("CompA");
+		int compB = cmpts.addComponent("CompB");
+		
+		/* initially, compA is empty */
+		Integer results[] = cmpts.getTasksInComponent(compA);
+		assertEquals(0, results.length);
+		
+		/* add a task to compA */
+		cmpts.setTaskComponent(task1, compA);
+		results = cmpts.getTasksInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1}));
+
+		/* add another task to compA */
+		cmpts.setTaskComponent(task3, compA);
+		results = cmpts.getTasksInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1, task3}));
+
+		/* Add a third */
+		cmpts.setTaskComponent(task2, compA);
+		results = cmpts.getTasksInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1, task2, task3}));
+	
+		/* move the second task into compB */
+		cmpts.setTaskComponent(task2, compB);
+		results = cmpts.getTasksInComponent(compA);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1, task3}));		
+		results = cmpts.getTasksInComponent(compB);
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task2}));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }
