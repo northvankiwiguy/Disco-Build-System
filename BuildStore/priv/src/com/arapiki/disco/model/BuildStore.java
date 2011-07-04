@@ -39,6 +39,9 @@ public class BuildStore {
 	/* the FileAttributes object we'll delegate work to */
 	private FileAttributes fileAttributes;
 	
+	/* the Components object we'll delegate work to */
+	private Components components;
+	
 	/**
 	 * Open or create a new BuildStore database. If the database already
 	 * exists, open it for updating. If there's no database by this name,
@@ -73,6 +76,9 @@ public class BuildStore {
 		
 		/* create a new FileAttributes object to manage the attributes on files */
 		fileAttributes = new FileAttributes(db, fileSpaces);
+		
+		/* create a new Components object */
+		components = new Components(this);		
 	}
 	
 	/**
@@ -128,6 +134,16 @@ public class BuildStore {
 	 */
 	public FileAttributes getFileAttributes() {
 		return fileAttributes;
+	}
+	
+	/**
+	 * Fetch the Components object associated with this BuildStore. This object
+	 * encapsulates knowledge of which component names (and their IDs) are stored
+	 * in the BuildStore
+	 * @return A Components object
+	 */
+	public Components getComponents() {
+		return components;
 	}
 	
 	/**

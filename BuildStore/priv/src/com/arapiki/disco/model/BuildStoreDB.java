@@ -175,8 +175,8 @@ class BuildStoreDB  {
 
 			/* Create the "files" table. */
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, " +
-							   "pathType integer, name text not null)");
-			stat.executeUpdate("insert into files values (0, 0, 1, \"/\")");
+							   "pathType integer, compId integer, compSectionId integer, name text not null)");
+			stat.executeUpdate("insert into files values (0, 0, 1, 0, 0, \"/\")");
 			stat.executeUpdate("create unique index filesIdx on files (parentId, name)");
 			
 			/* Create the "fileIncludes" table */
@@ -187,8 +187,8 @@ class BuildStoreDB  {
 			
 			/* Create the "buildTasks" table. */
 			stat.executeUpdate("create table buildTasks ( taskId integer primary key, parentTaskId integer, " +
-							   "taskDirId integer, command text)");
-			stat.executeUpdate("insert into buildTasks values (0, 0, 0, null)");
+							   "taskDirId integer, compId integer, compSectionId integer, command text)");
+			stat.executeUpdate("insert into buildTasks values (0, 0, 0, 0, 0, null)");
 			stat.executeUpdate("create index buildTasksIdx on buildTasks (parentTaskId)");
 			
 			/* Create the "buildTaskFiles" tables. */
@@ -209,6 +209,10 @@ class BuildStoreDB  {
 			stat.executeUpdate("create table fileAttrs (pathId integer, attrId integer, value text)");
 			stat.executeUpdate("create index fileAttrsIdx1 on fileAttrs (pathId)");
 			stat.executeUpdate("create unique index fileAttrsIdx2 on fileAttrs (pathId, attrId)");
+			
+			/* Create the components table */
+			stat.executeUpdate("create table components (id integer primary key, name text)");
+			stat.executeUpdate("insert into components values (0, 'None')");
 			
 			stat.close();
 						
@@ -231,6 +235,7 @@ class BuildStoreDB  {
 			stat.executeUpdate("drop table if exists fileRoots");
 			stat.executeUpdate("drop table if exists fileAttrsName");
 			stat.executeUpdate("drop table if exists fileAttrs");
+			stat.executeUpdate("drop table if exists components");
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to drop database schema", e);

@@ -93,7 +93,7 @@ public class FileNameSpaces {
 		
 		/* initialize prepared database statements */
 		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ?");
-		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, ?, ?)");
+		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, ?, 0, 0, ?)");
 		findPathDetailsPrepStmt = db.prepareStatement("select parentId, pathType, files.name, fileRoots.name " +
 				" from files left join fileRoots on files.id = fileRoots.fileId where files.id = ?");
 		findPathIdFromParentPrepStmt = db.prepareStatement(
