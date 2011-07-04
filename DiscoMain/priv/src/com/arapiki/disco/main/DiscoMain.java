@@ -253,6 +253,11 @@ public final class DiscoMain {
 		formattedDisplayLine("    set-root <root> <path>", "Set the <root> to refer to the <path>");
 		formattedDisplayLine("    rm-root <root>", "Remove the <root> so it no long references a path");
 
+		System.err.println("\nComponent commands:");
+		formattedDisplayLine("    show-comp", "Show the components defined in the build system.");
+		formattedDisplayLine("    add-comp <comp-name>", "Add a new (empty) component.");
+		formattedDisplayLine("    rm-comp <comp-name>", "Remove an existing (but unused) component.");
+		
 		System.err.println("\nError: " + message);
 		System.exit(1);
 	}
@@ -336,17 +341,28 @@ public final class DiscoMain {
 			validateArgs(cmdArgs, 0, 1, "show-root [ <root> ]");
 			DiscoAttributes.showRoot(buildStore, cmdArgs);
 		}
-		
 		else if (cmdName.equals("set-root")){
 			validateArgs(cmdArgs, 2, 2, "set-root <root> <path>");
 			DiscoAttributes.setRoot(buildStore, cmdArgs);
 		}
-
 		else if (cmdName.equals("rm-root")){
 			validateArgs(cmdArgs, 1, 1, "rm-root <root>");
 			DiscoAttributes.rmRoot(buildStore, cmdArgs);
 		}
+		else if (cmdName.equals("show-comp")){
+			validateArgs(cmdArgs, 0, 0, "show-comp");
+			DiscoAttributes.showComp(buildStore, cmdArgs);
+		}
+		else if (cmdName.equals("add-comp")){
+			validateArgs(cmdArgs, 1, 1, "add-comp <comp-name>");
+			DiscoAttributes.addComp(buildStore, cmdArgs);
+		}
+		else if (cmdName.equals("rm-comp")){
+			validateArgs(cmdArgs, 1, 1, "rm-comp <comp-name>");
+			DiscoAttributes.rmComp(buildStore, cmdArgs);
+		}
 
+		
 		/*
 		 * Else, unrecognized command.
 		 */

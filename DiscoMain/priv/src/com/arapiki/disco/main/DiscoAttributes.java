@@ -13,6 +13,7 @@
 package com.arapiki.disco.main;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.utils.errors.ErrorCode;
 
@@ -22,6 +23,8 @@ import com.arapiki.utils.errors.ErrorCode;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 /* package */ class DiscoAttributes {
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Show the FileNameSpaces "roots" in this BuildStore. If a root name is provided,
@@ -49,6 +52,8 @@ import com.arapiki.utils.errors.ErrorCode;
 			System.out.println(associatedPath);			
 		}
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Assign a root to a specific path within the FileNameSpaces. Simply
@@ -114,6 +119,8 @@ import com.arapiki.utils.errors.ErrorCode;
 		
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Remove a root from the FileNameSpaces. Wraps the deleteRoot() with a lot
 	 * of error checking.
@@ -145,4 +152,76 @@ import com.arapiki.utils.errors.ErrorCode;
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Show the components that are defined within the BuildStore
+	 * @param buildStore The BuildStore to query.
+	 * @param cmdArgs Unused for now
+	 */
+	public static void showComp(BuildStore buildStore, String[] cmdArgs) {
+		Components cmpts = buildStore.getComponents();
+		
+		String compNames[] = cmpts.getComponents();
+		for (int i = 0; i < compNames.length; i++) {
+			System.out.println(compNames[i]);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add a new component to this BuildStore. The component is only described by a String name,
+	 * with no other values required.
+	 * @param buildStore The BuildStore to modify.
+	 * @param cmdArgs The name of a component (cmdArg[1]) to add.
+	 */
+	public static void addComp(BuildStore buildStore, String[] cmdArgs) {
+		Components cmpts = buildStore.getComponents();
+		
+		String compName = cmdArgs[1];
+		int compId = cmpts.addComponent(compName);
+		
+		/* was the syntax of the name valid? */
+		if (compId == ErrorCode.INVALID_NAME){
+			System.err.println("Error: Invalid component name " + compName);
+			System.exit(1);
+		}
+		
+		/* was the name already defined in the buildstore? */
+		if (compId == ErrorCode.ALREADY_USED){
+			System.err.println("Error: Component " + compName + " is already defined.");
+			System.exit(1);
+		}
+		
+		/* all is good */
+		System.out.println("New component " + compName + " added.");		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove a component from the BuildStore.
+	 * @param buildStore The BuildStore to modify.
+	 * @param cmdArgs The name of a component (cmdArg[1]) to delete.
+	 */
+	public static void rmComp(BuildStore buildStore, String[] cmdArgs) {
+		Components cmpts = buildStore.getComponents();
+		
+		String compName = cmdArgs[1];
+		int result = cmpts.removeComponent(compName);
+		if (result == ErrorCode.CANT_REMOVE) {
+			System.err.println("Error: Component " + compName + " can't be deleted while it still contains files or tasks.");
+			System.exit(1);
+		}
+		if (result == ErrorCode.NOT_FOUND) {
+			System.err.println("Error: Component " + compName + " is not defined.");
+			System.exit(1);
+		}
+		
+		/* else, all is good */
+		System.out.println("Component " + compName + " removed.");		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }
