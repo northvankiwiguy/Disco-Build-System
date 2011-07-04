@@ -294,7 +294,7 @@ public class Components {
 	/**
 	 * Validate a component's name. Valid characters are digits, letters (upper or lower case),
 	 * '-' and '_'. No other characters are permitted. Component names must contain at least
-	 * three characters.
+	 * three characters and start with a letter.
 	 * @param componentName The component name to be validated
 	 * @return True if the name is valid, else false
 	 */
@@ -311,9 +311,20 @@ public class Components {
 		int i = 0;
 		while (i != length) {
 			char ch = componentName.charAt(i);
-			if (!(Character.isLetterOrDigit(ch) ||
-					(ch == '_') || (ch == '-'))){
-				return false;
+			
+			/* first character must be a letter */
+			if (i == 0) {
+				if (!(Character.isLetter(ch))) {
+					return false;
+				}	
+			} 
+			
+			/* following characters are letter, digit, _ or - */
+			else {
+				if (!(Character.isLetterOrDigit(ch) ||
+						(ch == '_') || (ch == '-'))){
+					return false;
+				}
 			}
 			i++;
 		}

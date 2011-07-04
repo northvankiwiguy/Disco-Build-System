@@ -61,7 +61,7 @@ public class TestComponents {
 		assertNotSame(ErrorCode.INVALID_NAME, c2);
 		assertNotSame(c1, c2);
 
-		int c3 = cmpts.addComponent("1more-component");
+		int c3 = cmpts.addComponent("one-more-component");
 		assertNotSame(ErrorCode.ALREADY_USED, c3);
 		assertNotSame(ErrorCode.INVALID_NAME, c3);
 		assertNotSame(c1, c3);
@@ -86,6 +86,8 @@ public class TestComponents {
 		assertEquals(ErrorCode.INVALID_NAME, c10);
 		int c11 = cmpts.addComponent("ab");
 		assertEquals(ErrorCode.INVALID_NAME, c11);	
+		int c12 = cmpts.addComponent("1more");
+		assertEquals(ErrorCode.INVALID_NAME, c12);	
 		
 		/* try to add the None component, which exists by default */
 		int cNone = cmpts.addComponent("None");
