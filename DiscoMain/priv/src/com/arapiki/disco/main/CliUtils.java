@@ -66,10 +66,7 @@ public class CliUtils {
 			System.err.println("Error: Invalid path filter provided.");
 			System.exit(1);
 		}
-		
-		/* this result set will be traversed, so populate the parents too */
-		result.populateWithParents();
-		
+
 		return result;
 	}
 
@@ -83,25 +80,22 @@ public class CliUtils {
 	 * @param cmdArgs The command line arguments that specify the TaskSet to show. Note that cmdArgs[0]
 	 * is ignored since it's the disco command to be executed, rather than a TaskSet filter.
 	 */
-	/* package */ static TaskSet getCmdLineTaskSet(BuildTasks bts, String[] cmdArgs) {
+	/* package */ static TaskSet getCmdLineTaskSet(BuildTasks bts, String[] cmdArgs, int firstArgPos) {
 		
 		/* if no arguments are provided (except the command name), return null to represent "all tasks" */
-		if (cmdArgs.length <= 1) {
+		if (cmdArgs.length <= firstArgPos) {
 			return null;
 		}
 	
 		/* skip over the first argument, which is the command name */
-		String inputTasks[] = new String[cmdArgs.length - 1];
-		System.arraycopy(cmdArgs, 1, inputTasks, 0, cmdArgs.length - 1);
+		String inputTasks[] = new String[cmdArgs.length - firstArgPos];
+		System.arraycopy(cmdArgs, firstArgPos, inputTasks, 0, cmdArgs.length - firstArgPos);
 		
 		TaskSet result = new TaskSet(bts);
 		if (result.populateWithTasks(inputTasks) != ErrorCode.OK) {
 			System.err.println("Error: Invalid task filter provided.");
 			System.exit(1);
 		}
-		
-		/* this result set will be traversed, so populate the parents too */
-		result.populateWithParents();
 		
 		return result;
 	}
@@ -181,8 +175,9 @@ public class CliUtils {
 	 * @param longOutput Set to true if the full command strings should be displayed.
 	 */
 	/* package */ static void printTaskSet(
-			PrintStream outStream, BuildTasks bts, FileNameSpaces fns,
-			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat) {
+			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, Components cmpts,
+			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
+			boolean showComps) {
 		
 		/* 
 		 * We always start at the top root, even though we may only display a subset
@@ -193,8 +188,8 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = bts.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fns, children[i], 
-					resultTaskSet, filterTaskSet, outputFormat, 1);
+			printTaskSetHelper(outStream, bts, fns, cmpts, children[i], 
+					resultTaskSet, filterTaskSet, outputFormat, showComps, 1);
 		}
 	}
 
@@ -445,8 +440,10 @@ public class CliUtils {
 	 * @param indentLevel The number of spaces to indent this task by.
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
-			BuildTasks bts, FileNameSpaces fns, int taskId, TaskSet resultTaskSet,
-			TaskSet filterTaskSet, DisplayWidth outputFormat, int indentLevel) {
+			BuildTasks bts, FileNameSpaces fns, Components cmpts, 
+			int taskId, TaskSet resultTaskSet,
+			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showComps,
+			int indentLevel) {
 	
 		/* 
 		 * Display the current task, at the appropriate indentation level. The format is:
@@ -487,7 +484,23 @@ public class CliUtils {
 		for (int i = 0; i != indentLevel; i++) {
 			outStream.append('-');
 		}
-		outStream.println(" Task " + taskId + " (" + taskDirName + ")");
+		outStream.print(" Task " + taskId + " (" + taskDirName);
+		
+		/* if requested, display the task's component name */
+		if (showComps) {
+			int compId = cmpts.getTaskComponent(taskId);
+			if (compId == ErrorCode.NOT_FOUND) {
+				outStream.print(" - Invalid task");
+			} else {
+				String compName = cmpts.getComponentName(compId);
+				if (compName == null) {
+					outStream.print(" - Invalid component");
+				} else {
+					outStream.print(" - " + compName);					
+				}
+			}
+		}
+		outStream.println(")");
 		
 		/* display the task's command string. Each line must be indented appropriately */
 		if (outputFormat != DisplayWidth.NOT_WRAPPED) {
@@ -500,8 +513,8 @@ public class CliUtils {
 		/* recursively call ourselves to display each of our children */
 		Integer children[] = bts.getChildren(taskId);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fns, children[i], 
-					resultTaskSet, filterTaskSet, outputFormat, indentLevel + 1);
+			printTaskSetHelper(outStream, bts, fns, cmpts, children[i], 
+					resultTaskSet, filterTaskSet, outputFormat, showComps, indentLevel + 1);
 		}
 		
 	}

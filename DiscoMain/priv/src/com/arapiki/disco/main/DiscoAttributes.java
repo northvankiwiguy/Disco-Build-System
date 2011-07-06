@@ -13,9 +13,11 @@
 package com.arapiki.disco.main;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
+import com.arapiki.disco.model.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
@@ -259,8 +261,25 @@ import com.arapiki.utils.errors.ErrorCode;
 	 * @param cmdArgs
 	 */
 	public static void setTaskComp(BuildStore buildStore, String[] cmdArgs) {
+	
+		Components cmpts = buildStore.getComponents();
+		BuildTasks bts = buildStore.getBuildTasks();
+
+		/* 
+		 * The component can be of the form: "comp". There is no section allowed
+		 * for tasks.
+		 */
 		String compName = cmdArgs[1];
-		
+		int compAndSectionIds[] = CliUtils.parseComponentAndSection(cmpts, compName, false);
+		int compId = compAndSectionIds[0];
+				
+		/* now visit each task in the TaskSet and set its component */
+		TaskSet tasksToSet = CliUtils.getCmdLineTaskSet(bts, cmdArgs, 2);
+		buildStore.setFastAccessMode(true);
+		for (int task : tasksToSet) {
+			cmpts.setTaskComponent(task, compId);
+		}
+		buildStore.setFastAccessMode(false);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -335,14 +335,14 @@ public final class DiscoMain {
 			DiscoReports.showTasks(buildStore, 
 					optionShort ? DisplayWidth.ONE_LINE :
 						optionLong ? DisplayWidth.NOT_WRAPPED : DisplayWidth.WRAPPED,
-					cmdArgs);			
+					optionShowComps, cmdArgs);			
 		}
 		else if (cmdName.equals("show-tasks-that-use")) {
 			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-tasks-that-use {<input-path>}");
 			DiscoReports.showTasksThatAccess(buildStore, optionRead, optionWrite, 
 					optionShort ? DisplayWidth.ONE_LINE :
 						optionLong ? DisplayWidth.NOT_WRAPPED : DisplayWidth.WRAPPED,
-					cmdArgs);
+					optionShowComps, cmdArgs);
 		}
 		
 		/*
