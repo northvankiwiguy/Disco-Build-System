@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 import org.apache.commons.cli.*;
 
-import com.arapiki.disco.main.DiscoReports.DisplayWidth;
+import com.arapiki.disco.main.CliUtils.DisplayWidth;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.utils.print.PrintUtils;
 
@@ -39,6 +39,9 @@ public final class DiscoMain {
 	
 	/* should we show roots when displaying reports? */
 	private static boolean optionShowRoots = false;
+	
+	/* should we show component membership when displaying reports? */
+	private static boolean optionShowComps = false;
 	
 	/* should we only show files/tasks/things that "read" - set by the --read option */
 	private static boolean optionRead = false;
@@ -83,9 +86,13 @@ public final class DiscoMain {
 		fOpt.setArgName("file-name");
 		opts.addOption(fOpt);
 
-		/* add the -r / --show-roots option */
-		Option rOpt = new Option(null, "show-roots", false, "Show file name space roots when displaying report output");
-		opts.addOption(rOpt);
+		/* add the --show-roots option */
+		Option showRootsOpt = new Option(null, "show-roots", false, "Show file name space roots when displaying report output");
+		opts.addOption(showRootsOpt);
+
+		/* add the --show-comps option */
+		Option showCompsOpt = new Option(null, "show-comps", false, "Show component of each file/task in report output");
+		opts.addOption(showCompsOpt);
 
 		/* add the --read option */
 		Option readOpt = new Option("r", "read", false, "Only show files/tasks that perform a 'read' operation");
@@ -109,7 +116,7 @@ public final class DiscoMain {
 		
 		/* how many columns of output should we show (default is 80) */
 		Option widthOpt = new Option(null, "width", true, "Number of output columns (default is " +
-				DiscoReports.getColumnWidth() + ")");
+				CliUtils.getColumnWidth() + ")");
 		opts.addOption(widthOpt);
 
 		/*
@@ -131,6 +138,7 @@ public final class DiscoMain {
 			buildStoreFileName = line.getOptionValue('f');
 		}
 		optionShowRoots = line.hasOption("show-roots");
+		optionShowComps = line.hasOption("show-comps");
 		optionRead = line.hasOption("read");
 		optionWrite = line.hasOption("write");
 		optionAll = line.hasOption("all");
@@ -141,7 +149,7 @@ public final class DiscoMain {
 		if (argWidth != null) {
 			try {
 				int newWidth = Integer.valueOf(argWidth);
-				DiscoReports.setColumnWidth(newWidth);
+				CliUtils.setColumnWidth(newWidth);
 			} catch (NumberFormatException ex) {
 				System.err.println("Error: invalid argument to --width: " + argWidth);
 				System.exit(1);
@@ -255,8 +263,10 @@ public final class DiscoMain {
 
 		System.err.println("\nComponent commands:");
 		formattedDisplayLine("    show-comp", "Show the components defined in the build system.");
-		formattedDisplayLine("    add-comp <comp-name>", "Add a new (empty) component.");
-		formattedDisplayLine("    rm-comp <comp-name>", "Remove an existing (but unused) component.");
+		formattedDisplayLine("    add-comp", "Add a new (empty) component.");
+		formattedDisplayLine("    rm-comp", "Remove an existing (but unused) component.");
+		formattedDisplayLine("    set-file-comp", "Assign a set of files to a component");
+		formattedDisplayLine("    set-task-comp", "Assign a set of tasks to a component");
 		
 		System.err.println("\nError: " + message);
 		System.exit(1);
@@ -293,27 +303,28 @@ public final class DiscoMain {
 		 */
 		else if (cmdName.equals("show-files")){
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-files [ {<path-filter>} ]");
-			DiscoReports.showFiles(buildStore, optionShowRoots, cmdArgs);
+			DiscoReports.showFiles(buildStore, optionShowRoots, optionShowComps, cmdArgs);
 		}
 		else if (cmdName.equals("show-unused-files")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-unused-files [ {<path-filter>} ]");
-			DiscoReports.showUnusedFiles(buildStore, optionShowRoots, cmdArgs);			
+			DiscoReports.showUnusedFiles(buildStore, optionShowRoots, optionShowComps, cmdArgs);
 		}
 		else if (cmdName.equals("show-write-only-files")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-write-only-files [ {<path-filter>} ]");
-			DiscoReports.showWriteOnlyFiles(buildStore, optionShowRoots, cmdArgs);			
+			DiscoReports.showWriteOnlyFiles(buildStore, optionShowRoots, optionShowComps, cmdArgs);			
 		}
 		else if (cmdName.equals("show-popular-files")) {
 			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-popular-files [ {<path-filter>} ]");
-			DiscoReports.showPopularFiles(buildStore, optionShowRoots, cmdArgs);			
+			DiscoReports.showPopularFiles(buildStore, optionShowRoots, optionShowComps, cmdArgs);
 		}	
 		else if (cmdName.equals("show-derived-files")) {
-			validateArgs(cmdArgs, 0, ARGS_INFINITE, "show-derived-files [ {<input-path>} ]");
-			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, optionAll, cmdArgs);	
+			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-derived-files [ {<input-path>} ]");
+			DiscoReports.showDerivedFiles(buildStore, optionShowRoots, optionShowComps, optionAll, cmdArgs);
 		} 
 		else if (cmdName.equals("show-files-used-by")) {
 			validateArgs(cmdArgs, 1, ARGS_INFINITE, "show-files-used-by [ {<task-filter>} ]");
-			DiscoReports.showFilesUsedBy(buildStore, optionShowRoots, optionRead, optionWrite, cmdArgs);			
+			DiscoReports.showFilesUsedBy(buildStore, optionShowRoots, optionShowComps, 
+					optionRead, optionWrite, cmdArgs);
 		}
 				
 		/*
@@ -361,7 +372,14 @@ public final class DiscoMain {
 			validateArgs(cmdArgs, 1, 1, "rm-comp <comp-name>");
 			DiscoAttributes.rmComp(buildStore, cmdArgs);
 		}
-
+		else if (cmdName.equals("set-file-comp")){
+			validateArgs(cmdArgs, 2, ARGS_INFINITE, "set-file-comp <comp-name> {<paths>}");
+			DiscoAttributes.setFileComp(buildStore, cmdArgs);
+		} 
+		else if (cmdName.equals("set-task-comp")){
+			validateArgs(cmdArgs, 2, ARGS_INFINITE, "set-task-comp <comp-name> {<paths>}");
+			DiscoAttributes.setTaskComp(buildStore, cmdArgs);
+		}
 		
 		/*
 		 * Else, unrecognized command.

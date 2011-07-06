@@ -15,6 +15,7 @@ package com.arapiki.disco.main;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileRecord;
 import com.arapiki.disco.model.FileSet;
@@ -43,12 +44,13 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showFiles(BuildStore buildStore, 
-			boolean showRoots, String cmdArgs[]) {
+			boolean showRoots, boolean showComps, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Components cmpts = buildStore.getComponents();
 		
 		/* fetch the subset of files we should filter through */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs);
+		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 1);
 		
 		/* 
 		 * There were no search "results", so we'll show everything (except those
@@ -57,7 +59,7 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 		FileSet resultFileSet = null;
 		
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, resultFileSet, filterFileSet, showRoots);
+		CliUtils.printFileSet(System.out, fns, cmpts, resultFileSet, filterFileSet, showRoots, showComps);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -66,13 +68,14 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	 * Display a report of all the files that are used (or read, or written) by a user-specified
 	 * set of tasks. 
 	 * @param buildStore The BuildStore to query.
-	 * @param optionShowRoots Should we display path roots? (--show-roots option)
+	 * @param showRoots Should we display path roots? (--show-roots option)
 	 * @param optionRead Should we only show files that were read by these tasks
 	 * @param optionWrite Should we only show files that were written by these tasks
 	 * @param cmdArgs The user-supplied command argument, providing the list of tasks to query
 	 */
 	/* package */ static void showFilesUsedBy(BuildStore buildStore,
-			boolean optionShowRoots, boolean optionRead, boolean optionWrite,
+			boolean showRoots, boolean showComps, 
+			boolean optionRead, boolean optionWrite,
 			String[] cmdArgs) {
 		
 		/* are we searching for reads, writes, or both? */
@@ -81,6 +84,7 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 		BuildTasks bts = buildStore.getBuildTasks();
 		Reports reports = buildStore.getReports();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Components cmpts = buildStore.getComponents();
 		
 		/* fetch the list of tasks we're querying */
 		TaskSet ts = CliUtils.getCmdLineTaskSet(bts, cmdArgs);
@@ -94,7 +98,7 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 		accessedFiles.populateWithParents();
 		
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, accessedFiles, null, optionShowRoots);
+		CliUtils.printFileSet(System.out, fns, cmpts, accessedFiles, null, showRoots, showComps);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -109,20 +113,21 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showUnusedFiles(BuildStore buildStore, 
-			boolean showRoots, String cmdArgs[]) {
+			boolean showRoots, boolean showComps, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
+		Components cmpts = buildStore.getComponents();
 
 		/* fetch the file/directory filter so we know which result files to display */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs);
+		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 1);
 
 		/* get list of unused files, and add their parent paths */
 		FileSet unusedFileSet = reports.reportFilesNeverAccessed();
 		unusedFileSet.populateWithParents();
 		
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, unusedFileSet, filterFileSet, showRoots);
+		CliUtils.printFileSet(System.out, fns, cmpts, unusedFileSet, filterFileSet, showRoots, showComps);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -139,20 +144,21 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showWriteOnlyFiles(BuildStore buildStore, 
-			boolean showRoots, String cmdArgs[]) {
+			boolean showRoots, boolean showComps, String cmdArgs[]) {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
+		Components cmpts = buildStore.getComponents();
 
 		/* fetch the file/directory filter so we know which result files to display */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs);
+		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 1);
 
 		/* get list of write-only files, and add their parent paths */
 		FileSet writeOnlyFileSet = reports.reportWriteOnlyFiles();
 		writeOnlyFileSet.populateWithParents();
 		
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, writeOnlyFileSet, filterFileSet, showRoots);
+		CliUtils.printFileSet(System.out, fns, cmpts, writeOnlyFileSet, filterFileSet, showRoots, showComps);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -174,20 +180,21 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showDerivedFiles(BuildStore buildStore,
-			boolean showRoots, boolean showAll, String[] cmdArgs) {
+			boolean showRoots, boolean showComps, boolean showAll, String[] cmdArgs) {
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
+		Components cmpts = buildStore.getComponents();
 
 		/* fetch the list of files that are the source of the derivation */
-		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs);
+		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 1);
 
 		/* get list of derived files, and add their parent paths */
 		FileSet derivedFileSet = reports.reportDerivedFiles(sourceFileSet, showAll);
 		derivedFileSet.populateWithParents();
 		
 		/* pretty print the results - no filtering used here */
-		CliUtils.printFileSet(System.out, fns, derivedFileSet, null, showRoots);	
+		CliUtils.printFileSet(System.out, fns, cmpts, derivedFileSet, null, showRoots, showComps);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -202,13 +209,13 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 	 * name of the command (show-files) are will be ignored.
 	 */
 	/* package */ static void showPopularFiles(BuildStore buildStore,
-			boolean showRoots, String[] cmdArgs) {
+			boolean showRoots, boolean showComps, String[] cmdArgs) {
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
 
 		/* fetch the set of files we're interested in learning about */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs);
+		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 1);
 
 		/* fetch the list of most popular files */
 		FileRecord results[] = reports.reportMostCommonlyAccessedFiles();
@@ -275,7 +282,7 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 		OperationType opType = getOperationType(optionRead, optionWrite);		
 
 		/* fetch the FileSet of paths from the user's command line */
-		FileSet fileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs);
+		FileSet fileSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 1);
 		
 		/* find all tasks that access (read, write or both) these files */
 		TaskSet taskSet = reports.reportTasksThatAccessFiles(fileSet, opType);

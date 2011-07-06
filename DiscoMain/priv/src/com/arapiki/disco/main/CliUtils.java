@@ -15,6 +15,7 @@ package com.arapiki.disco.main;
 import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.TaskSet;
@@ -49,16 +50,16 @@ public class CliUtils {
 	 * Note that cmdArgs[0] is the command name (e.g. show-files), and should therefore be ignored.
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
-	/* package */ static FileSet getCmdLineFileSet(FileNameSpaces fns, String[] cmdArgs) {
+	/* package */ static FileSet getCmdLineFileSet(FileNameSpaces fns, String[] cmdArgs, int firstArgPos) {
 		
 		/* if no arguments are provided (except the command name), return null to represent "all files" */
-		if (cmdArgs.length <= 1) {
+		if (cmdArgs.length <= firstArgPos) {
 			return null;
 		}
 	
 		/* skip over the first argument, which is the command name */
-		String inputPaths[] = new String[cmdArgs.length - 1];
-		System.arraycopy(cmdArgs, 1, inputPaths, 0, cmdArgs.length - 1);
+		String inputPaths[] = new String[cmdArgs.length - firstArgPos];
+		System.arraycopy(cmdArgs, firstArgPos, inputPaths, 0, cmdArgs.length - firstArgPos);
 		
 		FileSet result = new FileSet(fns);
 		if (result.populateWithPaths(inputPaths) != ErrorCode.OK) {
@@ -120,8 +121,8 @@ public class CliUtils {
 	 * 		   should be used (false).
 	 */
 	/* package */ static void printFileSet(
-			PrintStream outStream, FileNameSpaces fns, FileSet resultFileSet,
-			FileSet filterFileSet, boolean showRoots) {
+			PrintStream outStream, FileNameSpaces fns, Components cmpts, FileSet resultFileSet,
+			FileSet filterFileSet, boolean showRoots, boolean showComps) {
 		
 		/*
 		 * This method uses recursion to traverse the FileNameSpaces
@@ -162,8 +163,8 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = fns.getChildPaths(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printFileSetHelper(outStream, sb, fns, children[i], 
-					resultFileSet, filterFileSet, showRoots);
+			printFileSetHelper(outStream, sb, fns, cmpts, children[i], 
+					resultFileSet, filterFileSet, showRoots, showComps);
 		}
 	}
 
@@ -224,6 +225,60 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Parses the user-supplied component/section string, and returns the corresponding
+	 * component ID and section ID. The string should be in the format "component" or 
+	 * "component/section". If "section" is not provided (and sectionAllowed is true),
+	 * "private" is assumed. If the input is invalid, display a meaningful error message
+	 * and exit the program.
+	 * @param compString The user-supplied input string (could be anything)
+	 * @param sectionAllowed Is the user allowed to provide a section? 
+	 */
+	/* package */ static int[] parseComponentAndSection(
+			Components cmpts,
+			String compString, 
+			boolean sectionAllowed) {
+	
+		String cmptName = null;
+		String sectName = null;
+		
+		/* check if there's a '/' in the string, to separate "component" from "section" */
+		int slashIndex = compString.indexOf('/');
+		if (slashIndex != -1) {
+			cmptName = compString.substring(0, slashIndex);
+			sectName = compString.substring(slashIndex + 1);
+			if (!sectionAllowed) {
+				System.err.println("Error: Invalid syntax - '/" + sectName + "' not allowed.");
+				System.exit(1);
+			}	
+		} 
+		
+		/* else, there's no /, assume 'private' for the section */
+		else {
+			cmptName = compString;
+			sectName = "private";
+		}
+
+		/* compute the IDs */
+		int cmptId = cmpts.getComponentId(cmptName);
+		int sectId = cmpts.getSectionId(sectName);
+		
+		if (cmptId == ErrorCode.NOT_FOUND) {
+			System.err.println("Error: Unknown component: " + cmptName);
+			System.exit(1);
+		}
+		if (sectId == ErrorCode.NOT_FOUND) {
+			System.err.println("Error: Unknown section name: " + sectName);
+			System.exit(1);
+		}
+		
+		return new int[]{ cmptId, sectId };
+	}
+
+	/*=====================================================================================*
+	 * Private methods
+	 *=====================================================================================*/
+
+	/**
 	 * Helper method for displaying a path and all it's children. This should only be called
 	 * by printFileSet().
 	 * 
@@ -236,10 +291,13 @@ public class CliUtils {
 	 * 		   should be displayed (set to null to display everything).
 	 * @param showRoots Whether to show path roots (true) or absolute paths (false)
 	 */
-	/* package */ static void printFileSetHelper(
-			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, int thisPathId,
-			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots) {
-	
+	private static void printFileSetHelper(
+			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, Components cmpts, int thisPathId,
+			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, boolean showComps) {
+
+		/* a StringBuffer for forming the component name */
+		StringBuffer compString = new StringBuffer();
+		
 		/* should this path be displayed? */
 		if (!shouldBeDisplayed(thisPathId, resultFileSet, filterFileSet)){
 			return;
@@ -265,6 +323,44 @@ public class CliUtils {
 		boolean isDirectory = (fns.getPathType(thisPathId) == PathType.TYPE_DIR);
 		boolean isNonEmptyDirectory = isDirectory && (children.length != 0);
 		
+		/* 
+		 * If we've been asked to display file components, prepare the string to be printed.
+		 */
+		if (showComps) {
+
+			/* to start, empty the StringBuffer */
+			compString.delete(0, compString.length());
+			
+			/* fetch the file's component and section */
+			Integer compAndSectionId[] = cmpts.getFileComponent(thisPathId);
+			if (compAndSectionId == null) {
+				compString.append("Invalid file");
+			} 
+			
+			/* if valid, fetch the human-readable names */
+			else {
+				int compId = compAndSectionId[0];
+				int sectId = compAndSectionId[1];
+
+				String compName = cmpts.getComponentName(compId);
+				String sectName = cmpts.getSectionName(sectId);
+			
+				/* if we can't fetch the text name of the component or section... */
+				if (compName == null || sectName == null) {
+					compString.append("Invalid component");
+				}
+			
+				/* else, both names are valid, append them to the string */
+				else {
+					compString.append("  (");
+					compString.append(compName);
+					compString.append('/');
+					compString.append(sectName);
+					compString.append(")");
+				}
+			}
+		}
+		
 		/* this path isn't a root, or we're not interested in displaying roots */
 		if (rootName == null) {
 			
@@ -277,8 +373,16 @@ public class CliUtils {
 			 * displayed.
 			 */
 			if (!isNonEmptyDirectory) {
+
 				outStream.print(pathSoFar);		
-				outStream.println(baseName);
+				outStream.print(baseName);
+				
+				/* show components, if requested */
+				if (showComps) {
+					outStream.println(compString);
+				} else {
+					outStream.println();
+				}
 			}
 		}
 			
@@ -295,7 +399,14 @@ public class CliUtils {
 			pathSoFar.append(':');
 			
 			/* display information about this root. */
-			outStream.println(pathSoFar + " (" + fns.getPathName(thisPathId) + ")");
+			outStream.print(pathSoFar + " (" + fns.getPathName(thisPathId) + ") ");
+			
+			/* show components, if requested */
+			if (showComps) {
+				outStream.println(compString);
+			} else {
+				outStream.println();
+			}
 			
 			/* we don't display this path's name */
 			baseName = "";
@@ -311,8 +422,8 @@ public class CliUtils {
 		
 			/* display each of the children */
 			for (int i = 0; i < children.length; i++) {
-				printFileSetHelper(outStream, pathSoFar, fns, children[i], 
-						resultFileSet, filterFileSet, showRoots);
+				printFileSetHelper(outStream, pathSoFar, fns, cmpts, children[i], 
+						resultFileSet, filterFileSet, showRoots, showComps);
 			}
 			
 			/* remove our base name from the pathSoFar, so our caller sees the correct value again */
@@ -412,6 +523,5 @@ public class CliUtils {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
-
 }
 

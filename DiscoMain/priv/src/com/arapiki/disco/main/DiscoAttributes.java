@@ -15,6 +15,7 @@ package com.arapiki.disco.main;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.FileSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
@@ -221,6 +222,45 @@ import com.arapiki.utils.errors.ErrorCode;
 		
 		/* else, all is good */
 		System.out.println("Component " + compName + " removed.");		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @param buildStore
+	 * @param cmdArgs
+	 */
+	public static void setFileComp(BuildStore buildStore, String[] cmdArgs) {
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Components cmpts = buildStore.getComponents();
+
+		/* 
+		 * The component can be of the form: "comp" or "comp/section". If section
+		 * isn't specified, "private" will be used.
+		 */
+		String compName = cmdArgs[1];
+		int compAndSectionIds[] = CliUtils.parseComponentAndSection(cmpts, compName, true);
+		int compId = compAndSectionIds[0];
+		int sectId = compAndSectionIds[1];
+
+		/* now visit each file in the FileSet and set it's component/section */
+		FileSet filesToSet = CliUtils.getCmdLineFileSet(fns, cmdArgs, 2);
+		buildStore.setFastAccessMode(true);
+		for (int file : filesToSet) {
+			cmpts.setFileComponent(file, compId, sectId);
+		}
+		buildStore.setFastAccessMode(false);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @param buildStore
+	 * @param cmdArgs
+	 */
+	public static void setTaskComp(BuildStore buildStore, String[] cmdArgs) {
+		String compName = cmdArgs[1];
+		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
