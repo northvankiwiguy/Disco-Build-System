@@ -19,13 +19,18 @@ import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.TaskSet;
+import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.print.PrintUtils;
 
 /**
+ * A collection of utility methods that can be used by any CLI Command code. This
+ * includes error reporting, command argument parsing, printing a FileSet and printing
+ * a TaskSet. These methods are all static, so no object is required for them to be
+ * invoked.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class CliUtils {
 
@@ -39,32 +44,30 @@ public class CliUtils {
 	/** the number of columns (characters) per output line */
 	private static int columnWidth = 80;
 	
+	/* when validating command line args - this value is considered infinite */
+	public static final int ARGS_INFINITE = -1;
+	
 	/*=====================================================================================*
-	 * Package-level methods
+	 * Public methods
 	 *=====================================================================================*/
 
 	/**
 	 * Given zero or more command line arguments, create a FileSet that stores all the files
 	 * mention in those command-line arguments
 	 * @param cmdArgs A String[] of command line arguments (files, directories, or regular expressions).
-	 * Note that cmdArgs[0] is the command name (e.g. show-files), and should therefore be ignored.
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
-	/* package */ static FileSet getCmdLineFileSet(FileNameSpaces fns, String[] cmdArgs, int firstArgPos) {
+	public static FileSet getCmdLineFileSet(FileNameSpaces fns, String[] cmdArgs) {
 		
-		/* if no arguments are provided (except the command name), return null to represent "all files" */
-		if (cmdArgs.length <= firstArgPos) {
+		/* if no arguments are provided, return null to represent "all files" */
+		if (cmdArgs.length == 0) {
 			return null;
 		}
 	
-		/* skip over the first argument, which is the command name */
-		String inputPaths[] = new String[cmdArgs.length - firstArgPos];
-		System.arraycopy(cmdArgs, firstArgPos, inputPaths, 0, cmdArgs.length - firstArgPos);
-		
+		/* else populate a new FileSet */
 		FileSet result = new FileSet(fns);
-		if (result.populateWithPaths(inputPaths) != ErrorCode.OK) {
-			System.err.println("Error: Invalid path filter provided.");
-			System.exit(1);
+		if (result.populateWithPaths(cmdArgs) != ErrorCode.OK) {
+			CliUtils.reportErrorAndExit("Invalid path filter provided");
 		}
 
 		return result;
@@ -77,22 +80,17 @@ public class CliUtils {
 	 * a suitable TaskSet. If no arguments are provided, the null TaskSet is returned (indicating
 	 * that all files should be shown).
 	 * @param bts The BuildTasks object to query.
-	 * @param cmdArgs The command line arguments that specify the TaskSet to show. Note that cmdArgs[0]
-	 * is ignored since it's the disco command to be executed, rather than a TaskSet filter.
+	 * @param cmdArgs The command line arguments that specify the TaskSet to show.
 	 */
-	/* package */ static TaskSet getCmdLineTaskSet(BuildTasks bts, String[] cmdArgs, int firstArgPos) {
+	public static TaskSet getCmdLineTaskSet(BuildTasks bts, String[] cmdArgs) {
 		
-		/* if no arguments are provided (except the command name), return null to represent "all tasks" */
-		if (cmdArgs.length <= firstArgPos) {
+		/* if no arguments are provided, return null to represent "all tasks" */
+		if (cmdArgs.length == 0) {
 			return null;
 		}
-	
-		/* skip over the first argument, which is the command name */
-		String inputTasks[] = new String[cmdArgs.length - firstArgPos];
-		System.arraycopy(cmdArgs, firstArgPos, inputTasks, 0, cmdArgs.length - firstArgPos);
 		
 		TaskSet result = new TaskSet(bts);
-		if (result.populateWithTasks(inputTasks) != ErrorCode.OK) {
+		if (result.populateWithTasks(cmdArgs) != ErrorCode.OK) {
 			System.err.println("Error: Invalid task filter provided.");
 			System.exit(1);
 		}
@@ -114,7 +112,7 @@ public class CliUtils {
 	 * @param showRoots Indicates whether path roots should be displayed (true), or whether absolute paths
 	 * 		   should be used (false).
 	 */
-	/* package */ static void printFileSet(
+	public static void printFileSet(
 			PrintStream outStream, FileNameSpaces fns, Components cmpts, FileSet resultFileSet,
 			FileSet filterFileSet, boolean showRoots, boolean showComps) {
 		
@@ -174,7 +172,7 @@ public class CliUtils {
 	 * @param filterTaskSet Currently unused
 	 * @param longOutput Set to true if the full command strings should be displayed.
 	 */
-	/* package */ static void printTaskSet(
+	public static void printTaskSet(
 			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, Components cmpts,
 			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
 			boolean showComps) {
@@ -199,7 +197,7 @@ public class CliUtils {
 	 * Return the number of columns (characters) of output to be printed per report line.
 	 * @return The number of columns 
 	 */
-	/* package */ static int getColumnWidth() {
+	public static int getColumnWidth() {
 		return columnWidth;
 	}
 
@@ -210,7 +208,7 @@ public class CliUtils {
 	 * minimum width is 40 characters. Any attempt to set a narrower width will revert to 40.
 	 * @param newWidth The new column width to set
 	 */
-	/* package */ static void setColumnWidth(int newWidth) {
+	public static void setColumnWidth(int newWidth) {
 		if (newWidth < 40) {
 			newWidth = 40;
 		}
@@ -228,7 +226,7 @@ public class CliUtils {
 	 * @param compString The user-supplied input string (could be anything)
 	 * @param sectionAllowed Is the user allowed to provide a section? 
 	 */
-	/* package */ static int[] parseComponentAndSection(
+	public static int[] parseComponentAndSection(
 			Components cmpts,
 			String compString, 
 			boolean sectionAllowed) {
@@ -269,6 +267,74 @@ public class CliUtils {
 		return new int[]{ cmptId, sectId };
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Validate function to ensure that the number of arguments provided to a command
+	 * is in range between minArgs and maxArgs.
+	 * @param cmdArgs The actual array of arguments.
+	 * @param minArgs The minimum number of arguments required (0 or higher)
+	 * @param maxArgs The maximum number of arguments required (0 or higher - possibly ARGS_INFINITE)
+	 * @param message An error message to provide if an invalid number of arguments is included.
+	 */
+	public static void validateArgs(String cmdName, String[] cmdArgs, int minArgs, int maxArgs,
+			String message) {
+		
+		int actualArgs = cmdArgs.length;
+	
+		/* too few arguments? */
+		if (actualArgs < minArgs) {
+			reportErrorAndExit("Too few arguments to " + cmdName + " - " + message);
+		}
+		
+		/* too many arguments? */
+		else if ((maxArgs != ARGS_INFINITE) && (actualArgs > maxArgs)){
+			reportErrorAndExit("Too many arguments to " + cmdName + "\n" + message);
+		}		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Display an error message in a standard format, then exit the program with a non-zero
+	 * error code. This method call never returns.
+	 * @param message The message to be display. If null, just exit without displaying.
+	 */
+	public static void reportErrorAndExit(String message) {
+		if (message != null){
+			System.err.println("Error: " + message);
+			System.err.println("       Use disco -h for more help.");
+		}
+		System.exit(1);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given the possible use of the --read and --write command line flags, return an
+	 * OperationType value that can be used for querying the database
+	 * @param optionRead Whether the user provided the --read flag
+	 * @param optionWrite Whether the user provided the --write flag
+	 * @return Either OP_UNSPECIFIED (search for either), OP_READ, or OP_WRITE
+	 */
+	public static OperationType getOperationType(boolean optionRead,
+			boolean optionWrite) {
+		
+		/* can't have both --read and --write at the same time */
+		if (optionRead && optionWrite) {
+			System.err.println("Error: can't specify both --read and --write in the same command.");
+			System.exit(-1);
+		}
+		
+		OperationType opType = OperationType.OP_UNSPECIFIED;
+		if (optionRead) {
+			opType = OperationType.OP_READ;
+		} else if (optionWrite) {
+			opType = OperationType.OP_WRITE;			
+		}
+		return opType;
+	}
+	
 	/*=====================================================================================*
 	 * Private methods
 	 *=====================================================================================*/
@@ -534,7 +600,8 @@ public class CliUtils {
 		return ((resultFileSet == null) || (resultFileSet.isMember(thisPathId))) &&
 				((filterFileSet == null) || (filterFileSet.isMember(thisPathId)));
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
+
 }
 
