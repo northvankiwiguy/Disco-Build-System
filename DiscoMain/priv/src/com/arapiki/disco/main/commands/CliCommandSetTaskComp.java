@@ -1,0 +1,129 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Arapiki Solutions Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    "Peter Smith <psmith@arapiki.com>" - initial API and 
+ *        implementation and/or initial documentation
+ *******************************************************************************/ 
+
+package com.arapiki.disco.main.commands;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+
+import com.arapiki.disco.main.CliUtils;
+import com.arapiki.disco.main.ICliCommand;
+import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.Components;
+import com.arapiki.disco.model.TaskSet;
+import com.arapiki.utils.string.StringArray;
+
+/**
+ * Disco CLI Command class that implements the "set-task-comp" command. See the 
+ * getLongDescription() method for details of this command's features.
+ * 
+ * @author "Peter Smith <psmith@arapiki.com>"
+ */
+public class CliCommandSetTaskComp implements ICliCommand {
+
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+	
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#getLongDescription()
+	 */
+	@Override
+	public String getLongDescription() {
+		// TODO Add a description
+		return null;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#getName()
+	 */
+	@Override
+	public String getName() {
+		return "set-task-comp";
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#getOptions()
+	 */
+	@Override
+	public Options getOptions() {
+		return new Options();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#getParameterDescription()
+	 */
+	@Override
+	public String getParameterDescription() {
+		return "<comp-name> <task-spec>, ...";
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#getShortDescription()
+	 */
+	@Override
+	public String getShortDescription() {
+		return "Assign a set of tasks to a component";
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
+	 */
+	@Override
+	public void processOptions(CommandLine cmdLine) {
+		/* no options */
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.arapiki.disco.main.ICliCommand#invoke(com.arapiki.disco.model.BuildStore, java.lang.String[])
+	 */
+	@Override
+	public void invoke(BuildStore buildStore, String[] args) {
+
+		CliUtils.validateArgs(getName(), args, 2, CliUtils.ARGS_INFINITE, "You must specify a component name at least one task spec");
+		
+		Components cmpts = buildStore.getComponents();
+		BuildTasks bts = buildStore.getBuildTasks();
+
+		/* 
+		 * The component can be of the form: "comp". There is no section allowed
+		 * for tasks.
+		 */
+		String compName = args[0];
+		int compAndSectionIds[] = CliUtils.parseComponentAndSection(cmpts, compName, false);
+		int compId = compAndSectionIds[0];
+				
+		/* now visit each task in the TaskSet and set its component */
+		String taskArray[] = StringArray.shiftLeft(args);
+		TaskSet tasksToSet = CliUtils.getCmdLineTaskSet(bts, taskArray);
+		buildStore.setFastAccessMode(true);
+		for (int task : tasksToSet) {
+			cmpts.setTaskComponent(task, compId);
+		}
+		buildStore.setFastAccessMode(false);	
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+}
