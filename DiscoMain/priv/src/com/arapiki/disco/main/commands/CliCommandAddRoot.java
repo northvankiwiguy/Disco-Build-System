@@ -22,12 +22,12 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
- * Disco CLI Command class that implements the "set-root" command. See the 
+ * Disco CLI Command class that implements the "add-root" command. See the 
  * getLongDescription() method for details of this command's features.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandSetRoot implements ICliCommand {
+public class CliCommandAddRoot implements ICliCommand {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -49,7 +49,7 @@ public class CliCommandSetRoot implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "set-root";
+		return "add-root";
 	}
 
 	/*-------------------------------------------------------------------------------------*/

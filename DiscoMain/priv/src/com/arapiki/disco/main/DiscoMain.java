@@ -313,7 +313,7 @@ public final class DiscoMain {
 		registerCommandGroup("Commands for managing file system roots",
 			new ICliCommand[] {
 				new CliCommandShowRoot(),
-				new CliCommandSetRoot(),
+				new CliCommandAddRoot(),
 				new CliCommandRemoveRoot()
 			});
 
