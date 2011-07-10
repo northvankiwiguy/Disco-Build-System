@@ -135,7 +135,7 @@ public class CliUtils {
 		/* 
 		 * We always start at the top root, even though we may only display a subset
 		 * of the paths underneath that root. Also, figure out the root's name
-		 * (it's '/' or 'root:').
+		 * (it's '/' or '%root').
 		 */
 		int topRoot = fns.getRootPath("root");
 		String rootPathName = fns.getPathName(topRoot, showRoots);
@@ -240,8 +240,7 @@ public class CliUtils {
 			cmptName = compString.substring(0, slashIndex);
 			sectName = compString.substring(slashIndex + 1);
 			if (!sectionAllowed) {
-				System.err.println("Error: Invalid syntax - '/" + sectName + "' not allowed.");
-				System.exit(1);
+				CliUtils.reportErrorAndExit("Invalid syntax - '/" + sectName + "' not allowed.");
 			}	
 		} 
 		
@@ -256,12 +255,10 @@ public class CliUtils {
 		int sectId = cmpts.getSectionId(sectName);
 		
 		if (cmptId == ErrorCode.NOT_FOUND) {
-			System.err.println("Error: Unknown component: " + cmptName);
-			System.exit(1);
+			CliUtils.reportErrorAndExit("Unknown component: " + cmptName);
 		}
 		if (sectId == ErrorCode.NOT_FOUND) {
-			System.err.println("Error: Unknown section name: " + sectName);
-			System.exit(1);
+			CliUtils.reportErrorAndExit("Unknown section name: " + sectName);
 		}
 		
 		return new int[]{ cmptId, sectId };
@@ -456,8 +453,8 @@ public class CliUtils {
 			 * has a reference to it and will use it for displaying our sibling paths).
 			 */
 			pathSoFar = new StringBuffer();
+			pathSoFar.append('%');
 			pathSoFar.append(rootName);
-			pathSoFar.append(':');
 			
 			/* display information about this root. */
 			outStream.print(pathSoFar + " (" + fns.getPathName(thisPathId) + ") ");

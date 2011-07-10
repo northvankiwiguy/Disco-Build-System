@@ -92,9 +92,9 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 			
 			/* 
 			 * First check case where a single file name (possibly with wildcards) is used.
-			 * This implies there are no '/' or ':' characters in the path.
+			 * This implies there are no '/' or '%' characters in the path.
 			 */
-			if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf(':') == -1)){
+			if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('%') == -1)){
 				
 				/* map any occurrences of * into %, since that's what SQL requires */
 				String regExp = thisPath.replace('*', '%');

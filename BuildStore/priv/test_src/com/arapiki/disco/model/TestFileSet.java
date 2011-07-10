@@ -415,15 +415,15 @@ public class TestFileSet {
 		
 		/* test abcRoot */
 		FileSet fs8 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs8.populateWithPaths(new String[] {"abcRoot:"}));
+		assertEquals(ErrorCode.OK, fs8.populateWithPaths(new String[] {"%abcRoot"}));
 		assertEquals(7, fs8.size());
 		assertTrue(fs8.isMember(f1path)); assertTrue(fs8.isMember(f2path)); assertTrue(fs8.isMember(f3path));
 		assertTrue(fs8.isMember(dirABC)); assertTrue(fs8.isMember(dirABCD)); assertTrue(fs8.isMember(dirABCDE));
 		assertTrue(fs8.isMember(dirABCDG));
 
-		/* test bRoot: with a path following it */
+		/* test %bRoot with a path following it */
 		FileSet fs9 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs9.populateWithPaths(new String[] {"bRoot:c/d/f4.c"}));
+		assertEquals(ErrorCode.OK, fs9.populateWithPaths(new String[] {"%bRoot/c/d/f4.c"}));
 		assertEquals(1, fs9.size());
 		assertTrue(fs9.isMember(f4path));
 		
