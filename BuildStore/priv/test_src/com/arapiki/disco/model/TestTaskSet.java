@@ -360,7 +360,7 @@ public class TestTaskSet {
 		/* populate the full tree (all levels), then remove a subtree (taskA32 and below) */
 		ts = new TaskSet(bts);
 		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + "/",
-				"^" + Integer.valueOf(taskA32).toString() + "/" }));
+				"-" + Integer.valueOf(taskA32).toString() + "/" }));
 		assertEquals(9, ts.size());
 		assertFalse(ts.isMember(taskA32));
 		assertFalse(ts.isMember(taskA321));

@@ -121,7 +121,7 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 
 	/**
 	 * Given the String-formatted specification of a set of tasks, populate this TaskSet
-	 * with those task values. A task specification has the format: {[^]taskNum[/[depth]]}
+	 * with those task values. A task specification has the format: {[-]taskNum[/[depth]]}
 	 * That is, we use the following syntax rules:
 	 *   - A task specification can have zero or more entries
 	 *   - Each entry contains a mandatory task number, which will be added to the TaskSet
@@ -131,7 +131,7 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 *     be added (or removed)
 	 *   - If 'depth' is omitted (only the '/' is provided), all tasks is the subtree are added
 	 *     (regardless of their depth).
-	 *   - If the task number is prefixed by '^', the tasks are removed from the TaskSet, rather
+	 *   - If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
 	 *     than being added.
 	 * @param taskSpecs[] An array of command line arguments that specify which tasks (or sub-trees
 	 * of tasks) should be added (or removed) from the task tree.
@@ -155,12 +155,12 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 			}
 			
 			/* 
-			 * Parse the string. It'll be in the format: [^]NNNN[/[DD]]
-			 * Does it start with an optional '^'? 
+			 * Parse the string. It'll be in the format: [-]NNNN[/[DD]]
+			 * Does it start with an optional '-'? 
 			 */
 			int taskNumPos = 0;					/* by default, task number is at start of string */
 			boolean isAdditiveSpec = true;		/* by default, we're adding (not removing) tasks */
-			if (taskSpec.charAt(taskNumPos) == '^'){
+			if (taskSpec.charAt(taskNumPos) == '-'){
 				taskNumPos++;
 				isAdditiveSpec = false;
 			}
