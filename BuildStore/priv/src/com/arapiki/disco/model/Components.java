@@ -50,6 +50,11 @@ public class Components {
 	private FileNameSpaces fns = null;
 	
 	/**
+	 * The BuildTasks object used to managed the files in this component
+	 */
+	private BuildTasks bts = null;
+	
+	/**
 	 * The names of the sections within a component. These are statically defined and
 	 * can't be modified by the user.
 	 */
@@ -87,6 +92,7 @@ public class Components {
 		this.buildStore = bs;
 		this.db = buildStore.getBuildStoreDB();
 		this.fns = buildStore.getFileNameSpaces();
+		this.bts = buildStore.getBuildTasks();
 		
 		/* initialize prepared database statements */
 		addComponentPrepStmt = db.prepareStatement("insert into components values (null, ?)");
@@ -247,8 +253,8 @@ public class Components {
 		}
 		
 		/* determine if this component is used by any tasks */
-		Integer tasksInComponent[] = getTasksInComponent(compId);
-		if (tasksInComponent.length != 0) {
+		TaskSet tasksInComponent = getTasksInComponent(compId);
+		if (tasksInComponent.size() != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -642,7 +648,7 @@ public class Components {
 	 * @param compId The component we're examining
 	 * @return An array of tasks that reside inside that component.
 	 */
-	public Integer[] getTasksInComponent(int compId) {
+	public TaskSet getTasksInComponent(int compId) {
 		Integer results[] = null;
 		try {
 			findTasksInComponentPrepStmt.setInt(1, compId);
@@ -650,9 +656,9 @@ public class Components {
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return results;
+		return new TaskSet(bts, results);
 	}
-
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/

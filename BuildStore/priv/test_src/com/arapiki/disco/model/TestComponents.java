@@ -478,17 +478,17 @@ public class TestComponents {
 		
 		/* check again - should be one file in compA and one in compA/priv */
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
 		assertEquals(0, results.size());
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1}));
 
 		/* now, we one file in compA/priv, we have some files outside the other components */
 		results = cmpts.getFilesOutsideComponent(compA);
 		assertEquals(1, results.size());
 		results = cmpts.getFilesOutsideComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1}));
 		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
 		assertEquals(1, results.size());
 		
@@ -496,17 +496,17 @@ public class TestComponents {
 		int file2 = fns.addFile("/myfile2");
 		cmpts.setFileComponent(file2, compA, sectPriv);
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
 		assertEquals(0, results.size());
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));
 		
 		/* now, we two files, we have some more files outside */
 		results = cmpts.getFilesOutsideComponent(compA);
 		assertEquals(1, results.size());
 		results = cmpts.getFilesOutsideComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
 		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
 		assertEquals(1, results.size());
 		
@@ -514,34 +514,34 @@ public class TestComponents {
 		int file3 = fns.addFile("/myfile3");
 		cmpts.setFileComponent(file3, compA, sectPub);
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2, file3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2, file3}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file3}));
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));		
 		results = cmpts.getFilesOutsideComponent(compA);
 		assertEquals(1, results.size());
 		results = cmpts.getFilesOutsideComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
 		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file3}));
 		
 		/* move file1 back into None */
 		cmpts.setFileComponent(file1, compNone, sectPriv);
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file2, file3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file2, file3}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file3}));
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file2}));
 		
 		/* now we have a file outside of compA */
 		results = cmpts.getFilesOutsideComponent(compA);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1}));		
 		results = cmpts.getFilesOutsideComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
 		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file3}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file3}));		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -688,30 +688,30 @@ public class TestComponents {
 		int compB = cmpts.addComponent("CompB");
 		
 		/* initially, compA is empty */
-		Integer results[] = cmpts.getTasksInComponent(compA);
-		assertEquals(0, results.length);
+		TaskSet results = cmpts.getTasksInComponent(compA);
+		assertEquals(0, results.size());
 		
 		/* add a task to compA */
 		cmpts.setTaskComponent(task1, compA);
 		results = cmpts.getTasksInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
 
 		/* add another task to compA */
 		cmpts.setTaskComponent(task3, compA);
 		results = cmpts.getTasksInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
 
 		/* Add a third */
 		cmpts.setTaskComponent(task2, compA);
 		results = cmpts.getTasksInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1, task2, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
 	
 		/* move the second task into compB */
 		cmpts.setTaskComponent(task2, compB);
 		results = cmpts.getTasksInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task1, task3}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));		
 		results = cmpts.getTasksInComponent(compB);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

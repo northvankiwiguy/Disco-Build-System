@@ -40,6 +40,7 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 
 	/**
 	 * Constructor - creates a new TaskSet and initializes it to being empty.
+	 * @param bts The BuildTasks object that contains the tasks in this set
 	 */	
 	public TaskSet(BuildTasks bts) {
 		
@@ -49,6 +50,28 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 		/* except we also need to record our BuildTasks object */
 		this.bts = bts;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Constructor - creates a new TaskSet and initializes it from an array of integer values.
+	 * @param bts The BuildTasks object that contains the tasks in this set
+	 * @param initValues The initial values to be added to the task set
+	 */
+	public TaskSet(BuildTasks bts, Integer[] initValues) {
+
+		/* most of the functionality is provided by the IntegerTreeSet class */
+		super();
+		
+		/* except we also need to record our BuildTasks object */
+		this.bts = bts;
+		
+		/* copy the initial task values from the array into the TaskSet */
+		for (int i = 0; i < initValues.length; i++) {
+			add(new TaskRecord(initValues[i]));
+		}
+	}
+
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS

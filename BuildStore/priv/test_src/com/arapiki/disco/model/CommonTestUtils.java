@@ -16,6 +16,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.arapiki.utils.types.IntegerTreeSet;
+
 
 /**
  * Common methods for testing BuildStore and related classes.
@@ -80,7 +82,7 @@ public class CommonTestUtils {
 	 * @param integers The array of integers to compare
 	 * @return True if the FileSet content is the same as the array content, else False
 	 */
-	public static boolean fileSetEqual(FileSet actual, Integer[] expected) {
+	public static boolean treeSetEqual(IntegerTreeSet<?> actual, Integer[] expected) {
 		
 		/* first, translate the FileSet into an array of Integer */
 		ArrayList<Integer> fsInts = new ArrayList<Integer>();
