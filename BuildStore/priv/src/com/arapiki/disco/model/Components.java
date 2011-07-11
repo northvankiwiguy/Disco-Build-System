@@ -45,10 +45,15 @@ public class Components {
 	private BuildStoreDB db = null;
 	
 	/**
+	 * The FileNameSpaces object used to managed the files in this component
+	 */
+	private FileNameSpaces fns = null;
+	
+	/**
 	 * The names of the sections within a component. These are statically defined and
 	 * can't be modified by the user.
 	 */
-	private static String sectionNames[] = new String[] {"private", "public"};
+	private static String sectionNames[] = new String[] {"None", "private", "public"};
 	
 	/**
 	 * Various prepared statement for database access.
@@ -63,6 +68,8 @@ public class Components {
 		findFileComponentPrepStmt = null,
 		findFilesInComponent1PrepStmt = null,
 		findFilesInComponent2PrepStmt = null,
+		findFilesOutsideComponent1PrepStmt = null,
+		findFilesOutsideComponent2PrepStmt = null,		
 		updateTaskComponentPrepStmt = null,
 		findTaskComponentPrepStmt = null,
 		findTasksInComponentPrepStmt = null;
@@ -79,6 +86,7 @@ public class Components {
 	public Components(BuildStore bs) {
 		this.buildStore = bs;
 		this.db = buildStore.getBuildStoreDB();
+		this.fns = buildStore.getFileNameSpaces();
 		
 		/* initialize prepared database statements */
 		addComponentPrepStmt = db.prepareStatement("insert into components values (null, ?)");
@@ -94,6 +102,9 @@ public class Components {
 		findFilesInComponent1PrepStmt = db.prepareStatement("select id from files where compId = ?");
 		findFilesInComponent2PrepStmt = db.prepareStatement("select id from files where " +
 				"compId = ? and compSectionId = ?");
+		findFilesOutsideComponent1PrepStmt = db.prepareStatement("select id from files where compId != ?");
+		findFilesOutsideComponent2PrepStmt = db.prepareStatement("select id from files where " +
+				"not (compId = ? and compSectionId = ?)");
 		updateTaskComponentPrepStmt = db.prepareStatement("update buildTasks set compId = ? " +
 				"where taskId = ?");
 		findTaskComponentPrepStmt = db.prepareStatement("select compId from buildTasks where taskId = ?");
@@ -230,8 +241,8 @@ public class Components {
 		}
 		
 		/* determine if this component is used by any files */
-		Integer filesInComponent[] = getFilesInComponent(compId);
-		if (filesInComponent.length != 0) {
+		FileSet filesInComponent = getFilesInComponent(compId);
+		if (filesInComponent.size() != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -277,8 +288,10 @@ public class Components {
 		/* the names are a static mapping, so no need for database look-ups */
 		switch (id) {
 		case 0:
-			return "private";
+			return "None";
 		case 1:
+			return "private";
+		case 2:
 			return "public";
 		default:
 			return null;
@@ -297,11 +310,14 @@ public class Components {
 	public int getSectionId(String name) {
 		
 		/* the mapping is static, so no need for a database look up */
-		if (name.equals("priv") || name.equals("private")) {
+		if (name.equalsIgnoreCase("None")) {
 			return 0;
 		}
-		if (name.equals("pub") || name.equals("public")) {
+		if (name.equals("priv") || name.equals("private")) {
 			return 1;
+		}
+		if (name.equals("pub") || name.equals("public")) {
+			return 2;
 		}
 		return ErrorCode.NOT_FOUND;
 	}
@@ -317,6 +333,49 @@ public class Components {
 		return sectionNames;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Parse a component specification string, and return the ID of the component and
+	 * (optionally) the ID of the section within that component. The syntax of the component
+	 * spec must be of the form:
+	 * 		1) <comp-name>
+	 * 		2) <comp-name>/<section-name>
+	 * That is, the section name is optional.
+	 * @param compSpec The component specification string
+	 * @return An Integer[2] array, where [0] is the component's ID and [1] is the section
+	 * ID. If either portion of the compSpec was invalid (not a registered component or section),
+	 * the ID will be ErrorCode.NOT_FOUND. If there was no section name specified, the section ID
+	 * will be 0, which represents the "None" section.
+	 */
+	public Integer[] parseCompSpec(String compSpec) {
+
+		/* parse the compSpec to separate it into "comp" and "sect" portions */
+		String compName = compSpec;
+		String sectName = null;
+
+		/* check if there's a '/' in the string, to separate "component" from "section" */
+		int slashIndex = compSpec.indexOf('/');
+		if (slashIndex != -1) {
+			compName = compSpec.substring(0, slashIndex);
+			sectName = compSpec.substring(slashIndex + 1);
+		} 
+
+		/* 
+		 * Convert the component's name into it's internal ID. If there's an error,
+		 * we simply pass it back to our own caller.
+		 */
+		int compId = getComponentId(compName);
+
+		/* if the user provided a /section portion, convert that to an ID too */
+		int sectId = 0;
+		if (sectName != null) {
+			sectId = getSectionId(sectName);
+		}
+		
+		return new Integer[] {compId, sectId};
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -378,10 +437,10 @@ public class Components {
 
 	/**
 	 * Return the list of files that are within the specified component.
-	 * @param compId The component we're examining
-	 * @return An array of files that reside inside that component.
+	 * @param compId The ID of the component we're examining.
+	 * @return The set of files that reside inside that component.
 	 */
-	public Integer[] getFilesInComponent(int compId) {
+	public FileSet getFilesInComponent(int compId) {
 		Integer results[] = null;
 		try {
 			findFilesInComponent1PrepStmt.setInt(1, compId);
@@ -389,18 +448,21 @@ public class Components {
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return results;
+		
+		/* convert to a FileSet */
+		return new FileSet(fns, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of files that are within the specified component/section.
-	 * @param compId The component we're examining
+	 * Return the set of files that are within the specified component/section.
+	 * @param compId The ID of the component we're examining
 	 * @param compSectionId The section within the component we're interested in
-	 * @return An array of files that reside inside that component/section.
+	 * @return The set of files that reside inside that component/section.
 	 */
-	public Integer[] getFilesInComponent(int compId, int compSectionId) {
+	public FileSet getFilesInComponent(int compId, int compSectionId) {
+		
 		Integer results[] = null;
 		try {
 			findFilesInComponent2PrepStmt.setInt(1, compId);
@@ -409,9 +471,117 @@ public class Components {
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return results;
+		
+		/* convert to a FileSet */
+		return new FileSet(fns, results);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the set of files that are within the specified component/section. This method
+	 * takes a string specification of the component/section.
+	 * @param compSpec - The component name, or the component/section name
+	 * @return The FileSet of all files in this component or component/section, or null if
+	 * there's a an error in parsing the comp/spec name.
+	 */
+	public FileSet getFilesInComponent(String compSpec) {
+
+		Integer compSpecParts[] = parseCompSpec(compSpec);
+		
+		int compId = compSpecParts[0];
+		int sectId = compSpecParts[1];
+		
+		/* the ID must not be invalid, else that's an error */
+		if ((compId == ErrorCode.NOT_FOUND) || (sectId == ErrorCode.NOT_FOUND)) {
+			return null;
+		}
+		
+		/* 
+		 * If the section ID isn't specified by the user, then sectId == 0 (the
+		 * ID of the "None" section). This indicates we should look for all paths
+		 * in the component, regardless of the section.
+		 */
+		if (sectId != 0) {
+			return getFilesInComponent(compId, sectId);
+		} else {
+			return getFilesInComponent(compId);			
+		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the set of files that are outside the specified component.
+	 * @param compId The ID of the component we're examining
+	 * @return The set of files that reside outside that component.
+	 */
+	public FileSet getFilesOutsideComponent(int compId) {
+		Integer results[] = null;
+		try {
+			findFilesOutsideComponent1PrepStmt.setInt(1, compId);
+			results = db.executePrepSelectIntegerColumn(findFilesOutsideComponent1PrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* convert to a FileSet */
+		return new FileSet(fns, results);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the set of files that are outside the specified component/section.
+	 * @param compId The ID of the component we're examining
+	 * @param compSectionId The ID of the section within the component we're interested in
+	 * @return The set of files that reside outside that component/section.
+	 */
+	public FileSet getFilesOutsideComponent(int compId, int compSectionId) {
+		Integer results[] = null;
+		try {
+			findFilesOutsideComponent2PrepStmt.setInt(1, compId);
+			findFilesOutsideComponent2PrepStmt.setInt(2, compSectionId);
+			results = db.executePrepSelectIntegerColumn(findFilesOutsideComponent2PrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* convert to a FileSet */
+		return new FileSet(fns, results);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns the set of files that fall outside of the component boundaries.
+	 * @param compSpec The component name, or the component/section name
+	 * @return The FileSet of all files outside of this component or component/section, or null if
+	 * there's a an error in parsing the comp/spec name.
+	 */
+	public FileSet getFilesOutsideComponent(String compSpec) {
+		
+		Integer compSpecParts[] = parseCompSpec(compSpec);
+		int compId = compSpecParts[0];
+		int sectId = compSpecParts[1];
+		
+		/* the ID must not be invalid, else that's an error */
+		if ((compId == ErrorCode.NOT_FOUND) || (sectId == ErrorCode.NOT_FOUND)) {
+			return null;
+		}
+		
+		/* 
+		 * The section ID is optional, since it still allows us to
+		 * get the component's files. Note that sectId == 0 implies
+		 * that the user didn't specify a /section value.
+		 */
+		if (sectId != 0) {
+			return getFilesOutsideComponent(compId, sectId);
+		} else {
+			return getFilesOutsideComponent(compId);			
+		}
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -527,6 +697,6 @@ public class Components {
 		
 		return true;
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 }

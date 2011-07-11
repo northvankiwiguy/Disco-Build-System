@@ -427,9 +427,68 @@ public class TestFileSet {
 		assertEquals(1, fs9.size());
 		assertTrue(fs9.isMember(f4path));
 		
-		/* test with invalid paths */
+		/* create a new component, named "foo", with one item in foo/public and three in foo/private */
+		Components cmpts = bs.getComponents();
+		int compFooId = cmpts.addComponent("foo");
+		int sectPublic = cmpts.getSectionId("public");
+		int sectPrivate = cmpts.getSectionId("private");
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f1path, compFooId, sectPublic));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f2path, compFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f4path, compFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f5path, compFooId, sectPrivate));
+		
+		/* test @foo/public membership */
+		FileSet fs10 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs10.populateWithPaths(new String[] {"@foo/public"}));
+		assertEquals(1, fs10.size());
+		assertTrue(fs10.isMember(f1path));
+
+		/* test @foo/private membership */
 		FileSet fs11 = new FileSet(fns);
-		assertEquals(ErrorCode.BAD_PATH, fs11.populateWithPaths(new String[] {"/a/b/x/y/z/"}));	
+		assertEquals(ErrorCode.OK, fs11.populateWithPaths(new String[] {"@foo/private"}));
+		assertEquals(3, fs11.size());
+		assertTrue(fs11.isMember(f2path));
+		assertTrue(fs11.isMember(f4path));
+		assertTrue(fs11.isMember(f5path));
+
+		/* test @foo membership */
+		FileSet fs12 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs12.populateWithPaths(new String[] {"@foo"}));
+		assertEquals(4, fs12.size());
+		assertTrue(fs12.isMember(f1path));
+		assertTrue(fs12.isMember(f2path));
+		assertTrue(fs12.isMember(f4path));
+		assertTrue(fs12.isMember(f5path));
+
+		/* test ^@foo/public membership - includes directories */
+		FileSet fs13 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs13.populateWithPaths(new String[] {"^@foo/public"}));
+		assertEquals(14, fs13.size());
+		assertTrue(fs13.isMember(f2path));
+		assertTrue(fs13.isMember(f3path));
+		assertTrue(fs13.isMember(f4path));
+		assertTrue(fs13.isMember(f5path));
+		
+		/* test ^@foo/private membership - includes directories */
+		FileSet fs14 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs14.populateWithPaths(new String[] {"^@foo/private"}));
+		assertEquals(12, fs14.size());
+		assertTrue(fs14.isMember(f1path));
+		assertTrue(fs14.isMember(f3path));
+
+		/* test ^@foo membership  - includes directories */
+		FileSet fs15 = new FileSet(fns);
+		assertEquals(ErrorCode.OK, fs15.populateWithPaths(new String[] {"^@foo"}));
+		assertEquals(11, fs15.size());
+		assertTrue(fs15.isMember(f3path));
+		
+		/* test with invalid paths */
+		FileSet fs16 = new FileSet(fns);
+		assertEquals(ErrorCode.BAD_PATH, fs16.populateWithPaths(new String[] {"/a/b/x/y/z/"}));	
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"@comp"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"@foo/badsect"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"^@comp"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"^@foo/badsect"}));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -261,12 +261,13 @@ public class TestComponents {
 	public void testGetSectionName() {
 		
 		/* Test valid section IDs */
-		assertEquals("private", cmpts.getSectionName(0));
-		assertEquals("public", cmpts.getSectionName(1));
+		assertEquals("None", cmpts.getSectionName(0));
+		assertEquals("private", cmpts.getSectionName(1));
+		assertEquals("public", cmpts.getSectionName(2));
 
 		/* Test invalid section IDs */
-		assertNull(cmpts.getSectionName(2));
 		assertNull(cmpts.getSectionName(3));
+		assertNull(cmpts.getSectionName(4));
 		assertNull(cmpts.getSectionName(100));
 	}
 
@@ -279,10 +280,11 @@ public class TestComponents {
 	public void testGetSectionId() {
 		
 		/* Test valid section names */
-		assertEquals(0, cmpts.getSectionId("priv"));
-		assertEquals(0, cmpts.getSectionId("private"));
-		assertEquals(1, cmpts.getSectionId("pub"));
-		assertEquals(1, cmpts.getSectionId("public"));
+		assertEquals(0, cmpts.getSectionId("None"));
+		assertEquals(1, cmpts.getSectionId("priv"));
+		assertEquals(1, cmpts.getSectionId("private"));
+		assertEquals(2, cmpts.getSectionId("pub"));
+		assertEquals(2, cmpts.getSectionId("public"));
 		
 		/* Test invalid section names */
 		assertEquals(ErrorCode.NOT_FOUND, cmpts.getSectionId("object"));
@@ -300,12 +302,64 @@ public class TestComponents {
 	public void testGetSections() {
 
 		String sections[] = cmpts.getSections();
-		assertEquals(2, sections.length);
-		assertEquals("private", sections[0]);
-		assertEquals("public", sections[1]);	
+		assertEquals(3, sections.length);
+		assertEquals("None", sections[0]);
+		assertEquals("private", sections[1]);
+		assertEquals("public", sections[2]);	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Components#parseCompSpec()}.
+	 */
+	@Test
+	public void testParseCompSpec() throws Exception {
+		
+		/* add a couple of components */
+		int comp1 = cmpts.addComponent("comp1");
+		int comp2 = cmpts.addComponent("comp2");
+		int sectPrivate = cmpts.getSectionId("private");
+		int sectPublic = cmpts.getSectionId("public");
+		
+		/* test the compSpecs with only component names */
+		Integer results[] = cmpts.parseCompSpec("comp1");
+		assertEquals(comp1, results[0].intValue());
+		assertEquals(0, results[1].intValue());
+		
+		results = cmpts.parseCompSpec("comp2");
+		assertEquals(comp2, results[0].intValue());
+		assertEquals(0, results[1].intValue());
+		
+		/* test compSpecs with both component and section names */
+		results = cmpts.parseCompSpec("comp1/private");
+		assertEquals(comp1, results[0].intValue());
+		assertEquals(sectPrivate, results[1].intValue());
+		
+		results = cmpts.parseCompSpec("comp2/public");
+		assertEquals(comp2, results[0].intValue());
+		assertEquals(sectPublic, results[1].intValue());
+		
+		/* test invalid compSpecs */
+		results = cmpts.parseCompSpec("badname");
+		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
+		assertEquals(0, results[1].intValue());
+		
+		results = cmpts.parseCompSpec("comp1/missing");
+		assertEquals(comp1, results[0].intValue());
+		assertEquals(ErrorCode.NOT_FOUND, results[1].intValue());
+		
+		results = cmpts.parseCompSpec("badname/missing");
+		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
+		assertEquals(ErrorCode.NOT_FOUND, results[1].intValue());
+		
+		results = cmpts.parseCompSpec("badname/public");
+		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
+		assertEquals(sectPublic, results[1].intValue());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 
 	/**
 	 * Test the setFileComponent and getFileComponent methods.
@@ -329,17 +383,18 @@ public class TestComponents {
 		/* fetch the sections IDs */
 		int sectPublic = cmpts.getSectionId("public");
 		int sectPrivate = cmpts.getSectionId("private");
-		
-		/* by default, all files are in None/private */
+		int sectNone = cmpts.getSectionId("None");
+
+		/* by default, all files are in None/None */
 		Integer results[] = cmpts.getFileComponent(path1);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 		results = cmpts.getFileComponent(path2);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 		results = cmpts.getFileComponent(path3);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 
 		/* set one of the files into CompA/public */
 		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compA, sectPublic));
@@ -348,10 +403,10 @@ public class TestComponents {
 		assertEquals(sectPublic, results[1].intValue());
 		results = cmpts.getFileComponent(path2);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 		results = cmpts.getFileComponent(path3);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 		
 		/* set another file to another component */
 		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path3, compB, sectPrivate));
@@ -360,16 +415,16 @@ public class TestComponents {
 		assertEquals(sectPublic, results[1].intValue());
 		results = cmpts.getFileComponent(path2);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 		results = cmpts.getFileComponent(path3);
 		assertEquals(compB, results[0].intValue());
 		assertEquals(sectPrivate, results[1].intValue());
 		
-		/* set a file's component back to None */
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compNone, sectPrivate));
+		/* set a file's component back to None/None */
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compNone, sectNone));
 		results = cmpts.getFileComponent(path1);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(sectNone, results[1].intValue());
 		
 		/* try to set a non-existent file */
 		assertEquals(ErrorCode.NOT_FOUND, cmpts.setFileComponent(1000, compA, sectPublic));
@@ -381,7 +436,8 @@ public class TestComponents {
 	/*-------------------------------------------------------------------------------------*/
 
 	/*
-	 * Test the getFilesInComponent(int) and getFilesInComponent(int, int) methods
+	 * Test the getFilesInComponent(int) and getFilesInComponent(int, int) methods,
+	 * as well as the getFilesOutsideComponent(int) and getFilesOutsideComponent(int,int)
 	 */
 	@Test
 	public void testGetFilesInComponent() throws Exception {
@@ -397,12 +453,24 @@ public class TestComponents {
 		int sectPriv = cmpts.getSectionId("private");
 		
 		/* initially, there are no files in the component (public, private, or any) */
-		Integer results[] = cmpts.getFilesInComponent(compA);
-		assertEquals(0, results.length);
+		FileSet results = cmpts.getFilesInComponent(compA);
+		assertEquals(0, results.size());
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertEquals(0, results.length);
+		assertEquals(0, results.size());
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertEquals(0, results.length);
+		assertEquals(0, results.size());
+		
+		/* 
+		 * Nothing is outside the component either, since there are no files. However '/'
+		 * is implicitly there all the time, so it'll be reported.
+		 */
+		int rootPathId = fns.getPath("/");
+		results = cmpts.getFilesOutsideComponent(compA);
+		assertEquals(1, results.size());
+		results = cmpts.getFilesOutsideComponent(compA, sectPub);
+		assertEquals(1, results.size());
+		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
+		assertEquals(1, results.size());
 		
 		/* add a single file to the "private" section of compA */
 		int file1 = fns.addFile("/myfile1");
@@ -410,40 +478,146 @@ public class TestComponents {
 		
 		/* check again - should be one file in compA and one in compA/priv */
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertEquals(0, results.length);
+		assertEquals(0, results.size());
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1}));
+
+		/* now, we one file in compA/priv, we have some files outside the other components */
+		results = cmpts.getFilesOutsideComponent(compA);
+		assertEquals(1, results.size());
+		results = cmpts.getFilesOutsideComponent(compA, sectPub);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1}));
+		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
+		assertEquals(1, results.size());
 		
 		/* now add another to compA/priv and check again */
 		int file2 = fns.addFile("/myfile2");
 		cmpts.setFileComponent(file2, compA, sectPriv);
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertEquals(0, results.length);
+		assertEquals(0, results.size());
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2}));
+		
+		/* now, we two files, we have some more files outside */
+		results = cmpts.getFilesOutsideComponent(compA);
+		assertEquals(1, results.size());
+		results = cmpts.getFilesOutsideComponent(compA, sectPub);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
+		assertEquals(1, results.size());
 		
 		/* finally, add one to compA/pub and check again */
 		int file3 = fns.addFile("/myfile3");
 		cmpts.setFileComponent(file3, compA, sectPub);
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2, file3}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2, file3}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file3}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file3}));
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file1, file2}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file1, file2}));		
+		results = cmpts.getFilesOutsideComponent(compA);
+		assertEquals(1, results.size());
+		results = cmpts.getFilesOutsideComponent(compA, sectPub);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file3}));
 		
 		/* move file1 back into None */
 		cmpts.setFileComponent(file1, compNone, sectPriv);
 		results = cmpts.getFilesInComponent(compA);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file2, file3}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file2, file3}));
 		results = cmpts.getFilesInComponent(compA, sectPub);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file3}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file3}));
 		results = cmpts.getFilesInComponent(compA, sectPriv);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {file2}));
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {file2}));
+		
+		/* now we have a file outside of compA */
+		results = cmpts.getFilesOutsideComponent(compA);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1}));		
+		results = cmpts.getFilesOutsideComponent(compA, sectPub);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		results = cmpts.getFilesOutsideComponent(compA, sectPriv);
+		assertTrue(CommonTestUtils.fileSetEqual(results, new Integer[] {rootPathId, file1, file3}));		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * Test the getFilesInComponent(String) and getFilesOutsideComponent(String)
+	 */
+	@Test
+	public void testGetFilesInAndOutsideComponent() throws Exception {
+
+		FileNameSpaces fns = bs.getFileNameSpaces();
+
+		/* create a bunch of files */
+		int f1path = fns.addFile("/a/b/c/d/e/f1.c");
+		int f2path = fns.addFile("/a/b/c/d/e/f2.c");
+		int f3path = fns.addFile("/a/b/c/d/g/f3.c");
+		int f4path = fns.addFile("/b/c/d/f4.c");
+		int f5path = fns.addFile("/b/c/d/f5.c");
+
+		/* create a new component, named "foo", with one item in foo/public and three in foo/private */
+		Components cmpts = bs.getComponents();
+		int compFooId = cmpts.addComponent("foo");
+		int sectPublic = cmpts.getSectionId("public");
+		int sectPrivate = cmpts.getSectionId("private");
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f1path, compFooId, sectPublic));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f2path, compFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f4path, compFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f5path, compFooId, sectPrivate));
+
+		/* test @foo/public membership */
+		FileSet fs = cmpts.getFilesInComponent("foo/public");
+		assertEquals(1, fs.size());
+		assertTrue(fs.isMember(f1path));
+
+		/* test @foo/private membership */
+		fs = cmpts.getFilesInComponent("foo/private");
+		assertEquals(3, fs.size());
+		assertTrue(fs.isMember(f2path));
+		assertTrue(fs.isMember(f4path));
+		assertTrue(fs.isMember(f5path));
+
+		/* test @foo membership */
+		fs = cmpts.getFilesInComponent("foo");
+		assertEquals(4, fs.size());
+		assertTrue(fs.isMember(f1path));
+		assertTrue(fs.isMember(f2path));
+		assertTrue(fs.isMember(f4path));
+		assertTrue(fs.isMember(f5path));
+
+		/* 
+		 * Test ^@foo/public membership - will always include "/" and
+		 * have a bunch of directories too.
+		 */
+		fs = cmpts.getFilesOutsideComponent("foo/public");
+		assertEquals(14, fs.size());
+		assertTrue(fs.isMember(f2path));
+		assertTrue(fs.isMember(f3path));
+		assertTrue(fs.isMember(f4path));
+		assertTrue(fs.isMember(f5path));
+
+		/* test ^@foo/private membership - which includes directories*/
+		fs = cmpts.getFilesOutsideComponent("foo/private");
+		assertEquals(12, fs.size());
+		assertTrue(fs.isMember(f1path));
+		assertTrue(fs.isMember(f3path));
+
+		/* test ^@foo membership - which includes directories */
+		fs = cmpts.getFilesOutsideComponent("foo");
+		assertEquals(11, fs.size());
+		assertTrue(fs.isMember(f3path));
+		
+		/* test bad names */
+		assertNull(cmpts.getFilesInComponent("foo/badsect"));
+		assertNull(cmpts.getFilesOutsideComponent("comp"));
+		assertNull(cmpts.getFilesOutsideComponent("foo/badsect"));
+		assertNull(cmpts.getFilesOutsideComponent("foo/"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

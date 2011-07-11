@@ -79,29 +79,50 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 *    2) A path name starting with a root: - the same rules apply as for #1
 	 *    3) A single file name, with one or more wildcard (*) characters. All files that match
      *       the name are added, no matter what their directory.
+     *    4) A component spec, starting with @, or the complement of a component, starting with ^@.
 	 * 
 	 *    @returns ErrorCode.OK on success, or ErrorCode.BAD_PATH if an invalid path name was
 	 *    provided.
 	 */
 	public int populateWithPaths(String [] pathArgs) {
 		
+		BuildStore bs = fns.getBuildStore();
+		Components cmpts = bs.getComponents();
+		Reports reports = bs.getReports();
+
 		/* for each path provided as input... */
 		for (int i = 0; i < pathArgs.length; i++) {
 			
 			String thisPath = pathArgs[i];
 			
+			/*
+			 * First, check for component specs that start with @ or ^@.
+			 */
+			if (thisPath.startsWith("@")){
+				FileSet results = cmpts.getFilesInComponent(thisPath.substring(1));
+				if (results == null) {
+					return ErrorCode.BAD_PATH;
+				}
+				mergeSet(results);
+			}
+			else if (thisPath.startsWith("^@")){
+				FileSet results = cmpts.getFilesOutsideComponent(thisPath.substring(2));
+				if (results == null) {
+					return ErrorCode.BAD_PATH;
+				}
+				mergeSet(results);
+			}
+			
 			/* 
-			 * First check case where a single file name (possibly with wildcards) is used.
+			 * Next check case where a single file name (possibly with wildcards) is used.
 			 * This implies there are no '/' or '%' characters in the path.
 			 */
-			if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('%') == -1)){
+			else if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('%') == -1)){
 				
 				/* map any occurrences of * into %, since that's what SQL requires */
 				String regExp = thisPath.replace('*', '%');
 				
 				/* run a report to get all files that match this regexp */
-				BuildStore bs = fns.getBuildStore();
-				Reports reports = bs.getReports();
 				FileSet results = reports.reportFilesThatMatchName(regExp);
 				
 				/* 
