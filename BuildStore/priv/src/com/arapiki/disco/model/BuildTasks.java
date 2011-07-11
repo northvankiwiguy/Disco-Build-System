@@ -46,6 +46,10 @@ public class BuildTasks {
 	 */
 	private BuildStoreDB db = null;
 	
+	/**
+	 * The BuildStore object that owns this BuildTasks object.
+	 */
+	private BuildStore bs = null;
 	
 	/**
 	 * Various prepared statement for database access.
@@ -73,6 +77,7 @@ public class BuildTasks {
 	 * @param db
 	 */
 	public BuildTasks(BuildStore bs) {
+		this.bs = bs;
 		this.db = bs.getBuildStoreDB();
 
 		/* create prepared database statements */
@@ -452,6 +457,15 @@ public class BuildTasks {
 		// TODO: return something other than 0. Currently the default task is created
 		// implicitly, rather than explicitly
 		return 0;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The BuildStore object that owns this BuildTasks object
+	 */
+	public BuildStore getBuildStore() {
+		return bs;
 	}
 	
 	/*=====================================================================================*

@@ -133,6 +133,8 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 *     (regardless of their depth).
 	 *   - If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
 	 *     than being added.
+	 *   - The special syntax "@comp" means all tasks in the component "comp"
+	 *   - The special syntax "^@comp" means all tasks outside the component "comp"
 	 * @param taskSpecs[] An array of command line arguments that specify which tasks (or sub-trees
 	 * of tasks) should be added (or removed) from the task tree.
 	 * @return ErrorCode.OK on success, or Error.BAD_VALUE if one of the task specifications
@@ -140,6 +142,9 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 */
 	public int populateWithTasks(String taskSpecs[]) {
 	
+		BuildStore bs = bts.getBuildStore();
+		Components cmpts = bs.getComponents();
+		
 		/* 
 		 * Process each task spec in turn. They're mostly independent, although
 		 * removing tasks from the TaskSet requires that you've already added a larger
@@ -154,53 +159,73 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 				return ErrorCode.BAD_VALUE;
 			}
 			
-			/* 
-			 * Parse the string. It'll be in the format: [-]NNNN[/[DD]]
-			 * Does it start with an optional '-'? 
-			 */
-			int taskNumPos = 0;					/* by default, task number is at start of string */
-			boolean isAdditiveSpec = true;		/* by default, we're adding (not removing) tasks */
-			if (taskSpec.charAt(taskNumPos) == '-'){
-				taskNumPos++;
-				isAdditiveSpec = false;
+			/* check if there's a @ or ^@ in the input - this tells us a component name is nearby */
+			if (taskSpec.startsWith("@")){
+				TaskSet compTaskSet = cmpts.getTasksInComponent(taskSpec.substring(1));
+				if (compTaskSet == null) {
+					return ErrorCode.BAD_VALUE;
+				}
+				mergeSet(compTaskSet);
 			}
-	
-			/* is there a '/' character that separates the task number from the depth? */
-			int slashIndex = taskSpec.indexOf('/', taskNumPos);
-	
-			/* yes, there's a /, so we care about the depth (otherwise we'd default to depth = 1 */
-			int depth = 1;
-			if (slashIndex != -1) {
 				
-				/* if there's no number after the '/', the depth is -1 (infinite) */
-				if (slashIndex + 1 == tsLen) {
-					depth = -1;
-				} 
-				
-				/* else, the number after the / is the depth */
-				else {
-					try {
-						depth = Integer.valueOf(taskSpec.substring(slashIndex + 1, tsLen));
-					} catch (NumberFormatException ex) {
-						return ErrorCode.BAD_VALUE;
-					}
-				}	
-			} else {
-				slashIndex = tsLen;
+			/* else, add tasks from ^@comp */
+			else if (taskSpec.startsWith("^@")){
+				TaskSet compTaskSet = cmpts.getTasksOutsideComponent(taskSpec.substring(2));
+				if (compTaskSet == null) {
+					return ErrorCode.BAD_VALUE;
+				}
+				mergeSet(compTaskSet);			
 			}
 			
-			/* what is the task number? It's between 'taskNumPos' and 'slashIndex' */
-			int taskNum;
-			try {
-				taskNum = Integer.valueOf(taskSpec.substring(taskNumPos, slashIndex));
-			} catch (NumberFormatException ex) {
-				return ErrorCode.BAD_VALUE;
-			}
+			else {
+				/* 
+				 * Parse the string. It'll be in the format: [-]NNNN[/[DD]]
+				 * Does it start with an optional '-'? 
+				 */
+				int taskNumPos = 0;					/* by default, task number is at start of string */
+				boolean isAdditiveSpec = true;		/* by default, we're adding (not removing) tasks */
+				if (taskSpec.charAt(taskNumPos) == '-'){
+					taskNumPos++;
+					isAdditiveSpec = false;
+				}
 			
-			/* populate this TaskSet, based on the taskNum and depth the user provided */
-			populateWithTasksHelper(taskNum, depth, isAdditiveSpec);
+				/* is there a '/' character that separates the task number from the depth? */
+				int slashIndex = taskSpec.indexOf('/', taskNumPos);
+
+				/* yes, there's a /, so we care about the depth (otherwise we'd default to depth = 1 */
+				int depth = 1;
+				if (slashIndex != -1) {
+
+					/* if there's no number after the '/', the depth is -1 (infinite) */
+					if (slashIndex + 1 == tsLen) {
+						depth = -1;
+					} 
+
+					/* else, the number after the / is the depth */
+					else {
+						try {
+							depth = Integer.valueOf(taskSpec.substring(slashIndex + 1, tsLen));
+						} catch (NumberFormatException ex) {
+							return ErrorCode.BAD_VALUE;
+						}
+					}	
+				} else {
+					slashIndex = tsLen;
+				}
+
+				/* what is the task number? It's between 'taskNumPos' and 'slashIndex' */
+				int taskNum;
+				try {
+					taskNum = Integer.valueOf(taskSpec.substring(taskNumPos, slashIndex));
+				} catch (NumberFormatException ex) {
+					return ErrorCode.BAD_VALUE;
+				}
+
+				/* populate this TaskSet, based on the taskNum and depth the user provided */
+				populateWithTasksHelper(taskNum, depth, isAdditiveSpec);
+			}
 		}
-		
+
 		return ErrorCode.OK;
 	}
 
