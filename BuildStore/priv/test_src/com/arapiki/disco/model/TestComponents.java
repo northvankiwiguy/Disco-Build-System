@@ -690,28 +690,69 @@ public class TestComponents {
 		/* initially, compA is empty */
 		TaskSet results = cmpts.getTasksInComponent(compA);
 		assertEquals(0, results.size());
+		results = cmpts.getTasksInComponent("CompA");
+		assertEquals(0, results.size());
+		results = cmpts.getTasksOutsideComponent(compA);
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
+		results = cmpts.getTasksOutsideComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));		
 		
 		/* add a task to compA */
 		cmpts.setTaskComponent(task1, compA);
 		results = cmpts.getTasksInComponent(compA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
+		results = cmpts.getTasksInComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
+		results = cmpts.getTasksOutsideComponent(compA);
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2, task3}));
+		results = cmpts.getTasksOutsideComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2, task3}));
 
 		/* add another task to compA */
 		cmpts.setTaskComponent(task3, compA);
 		results = cmpts.getTasksInComponent(compA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		results = cmpts.getTasksInComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		results = cmpts.getTasksOutsideComponent(compA);
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		results = cmpts.getTasksOutsideComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
 
 		/* Add a third */
 		cmpts.setTaskComponent(task2, compA);
 		results = cmpts.getTasksInComponent(compA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
-	
+		results = cmpts.getTasksInComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
+		results = cmpts.getTasksOutsideComponent(compA);
+		assertEquals(0, results.size());
+		results = cmpts.getTasksOutsideComponent("CompA");
+		assertEquals(0, results.size());
+
 		/* move the second task into compB */
 		cmpts.setTaskComponent(task2, compB);
 		results = cmpts.getTasksInComponent(compA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		results = cmpts.getTasksInComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
 		results = cmpts.getTasksInComponent(compB);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		results = cmpts.getTasksInComponent("CompB");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		results = cmpts.getTasksOutsideComponent(compA);
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		results = cmpts.getTasksOutsideComponent("CompA");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		results = cmpts.getTasksOutsideComponent(compB);
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		results = cmpts.getTasksOutsideComponent("CompB");
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		
+		/* try some bad component names */
+		assertNull(cmpts.getTasksInComponent("badname"));
+		assertNull(cmpts.getTasksInComponent("CompA/private"));
+		assertNull(cmpts.getTasksInComponent(""));		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

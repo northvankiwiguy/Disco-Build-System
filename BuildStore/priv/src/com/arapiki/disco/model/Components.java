@@ -77,7 +77,8 @@ public class Components {
 		findFilesOutsideComponent2PrepStmt = null,		
 		updateTaskComponentPrepStmt = null,
 		findTaskComponentPrepStmt = null,
-		findTasksInComponentPrepStmt = null;
+		findTasksInComponentPrepStmt = null,
+		findTasksOutsideComponentPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -115,6 +116,8 @@ public class Components {
 				"where taskId = ?");
 		findTaskComponentPrepStmt = db.prepareStatement("select compId from buildTasks where taskId = ?");
 		findTasksInComponentPrepStmt = db.prepareStatement("select taskId from buildTasks where compId = ?");
+		findTasksOutsideComponentPrepStmt = db.prepareStatement("select taskId from buildTasks " +
+				"where compId != ? and taskId != 0");
 	}
 
 	/*=====================================================================================*
@@ -646,7 +649,7 @@ public class Components {
 	/**
 	 * Return the list of tasks that are within the specified component.
 	 * @param compId The component we're examining
-	 * @return An array of tasks that reside inside that component.
+	 * @return The set of tasks that reside inside that component.
 	 */
 	public TaskSet getTasksInComponent(int compId) {
 		Integer results[] = null;
@@ -657,6 +660,62 @@ public class Components {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		return new TaskSet(bts, results);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of tasks that are within the specified component.
+	 * @param compSpec The name of the component to query
+	 * @return The set of tasks that reside inside that component, null if the
+	 * component name is invalid.
+	 */
+	public TaskSet getTasksInComponent(String compSpec) {
+		
+		/* translate the component's name to its ID */
+		int compId = getComponentId(compSpec);
+		if (compId == ErrorCode.NOT_FOUND){
+			return null;
+		}
+		
+		return getTasksInComponent(compId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of tasks that are outside the specified component.
+	 * @param compId The component we're examining
+	 * @return The set of tasks that reside outside that component.
+	 */
+	public TaskSet getTasksOutsideComponent(int compId) {
+		Integer results[] = null;
+		try {
+			findTasksOutsideComponentPrepStmt.setInt(1, compId);
+			results = db.executePrepSelectIntegerColumn(findTasksOutsideComponentPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return new TaskSet(bts, results);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of tasks that are outside the specified component.
+	 * @param compSpec The name of the component to query
+	 * @return An array of tasks that reside outside that component, null if the
+	 * component name is invalid.
+	 */
+	public TaskSet getTasksOutsideComponent(String compSpec) {
+		
+		/* translate the component's name to its ID */
+		int compId = getComponentId(compSpec);
+		if (compId == ErrorCode.NOT_FOUND){
+			return null;
+		}
+		
+		return getTasksOutsideComponent(compId);
 	}
 	
 	/*=====================================================================================*
