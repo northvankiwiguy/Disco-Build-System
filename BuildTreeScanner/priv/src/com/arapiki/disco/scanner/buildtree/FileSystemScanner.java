@@ -78,7 +78,7 @@ public class FileSystemScanner {
 					@Override
 					public void callback(File thisPath) {
 						String pathName = thisPath.toString();
-						if (fns.addFile(rootName + ":/" + pathName) == ErrorCode.BAD_PATH){
+						if (fns.addFile("%" + rootName + "/" + pathName) == ErrorCode.BAD_PATH){
 							throw new FatalBuildTreeScannerError("Adding file name /" + pathName +
 									" to BuildStore returned an error."); 
 						}
