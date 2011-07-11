@@ -88,7 +88,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 * @see com.arapiki.disco.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		/* no options */
 	}
 

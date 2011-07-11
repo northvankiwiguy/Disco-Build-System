@@ -434,7 +434,7 @@ public final class DiscoMain {
 			} catch (ParseException e) {
 				CliUtils.reportErrorAndExit(e.getMessage());
 			}
-			cmd.processOptions(cmdLine);
+			cmd.processOptions(buildStore, cmdLine);
 			
 			/*
 			 * Check for unprocessed command options. That is, if the first

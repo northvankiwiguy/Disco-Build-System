@@ -54,19 +54,16 @@ public class CliUtils {
 	/**
 	 * Given zero or more command line arguments, create a FileSet that stores all the files
 	 * mention in those command-line arguments
-	 * @param cmdArgs A String[] of command line arguments (files, directories, or regular expressions).
+	 * @param fileSpecs A String of ":"-separated path specs (files, directories, or regular expressions).
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
-	public static FileSet getCmdLineFileSet(FileNameSpaces fns, String[] cmdArgs) {
-		
-		/* if no arguments are provided, return null to represent "all files" */
-		if (cmdArgs.length == 0) {
-			return null;
-		}
+	public static FileSet getCmdLineFileSet(FileNameSpaces fns, String pathSpecs) {
 	
+		String pathSpecList[] = pathSpecs.split(":");
+		
 		/* else populate a new FileSet */
 		FileSet result = new FileSet(fns);
-		if (result.populateWithPaths(cmdArgs) != ErrorCode.OK) {
+		if (result.populateWithPaths(pathSpecList) != ErrorCode.OK) {
 			CliUtils.reportErrorAndExit("Invalid path filter provided");
 		}
 
@@ -286,7 +283,7 @@ public class CliUtils {
 		
 		/* too many arguments? */
 		else if ((maxArgs != ARGS_INFINITE) && (actualArgs > maxArgs)){
-			reportErrorAndExit("Too many arguments to " + cmdName + "\n" + message);
+			reportErrorAndExit("Too many arguments to " + cmdName + " - " + message);
 		}		
 	}
 	

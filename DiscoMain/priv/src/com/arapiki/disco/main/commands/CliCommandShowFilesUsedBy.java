@@ -113,10 +113,10 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	 * @see com.arapiki.disco.main.commands.CliCommandShowFiles#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		
 		/* first, process options for the show-files class */
-		super.processOptions(cmdLine);
+		super.processOptions(buildStore, cmdLine);
 		
 		/* now the specific options for show-files-used-by */
 		optionRead = cmdLine.hasOption("read");
@@ -153,7 +153,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		accessedFiles.populateWithParents();
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, cmpts, accessedFiles, null, optionShowRoots, optionShowComps);
+		CliUtils.printFileSet(System.out, fns, cmpts, accessedFiles, filterFileSet, optionShowRoots, optionShowComps);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

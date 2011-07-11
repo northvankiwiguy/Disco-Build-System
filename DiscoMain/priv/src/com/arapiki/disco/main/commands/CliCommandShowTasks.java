@@ -123,7 +123,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 * @see com.arapiki.disco.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		optionShort = cmdLine.hasOption("short");
 		optionLong = cmdLine.hasOption("long");
 		optionShowComps = cmdLine.hasOption("show-comps");

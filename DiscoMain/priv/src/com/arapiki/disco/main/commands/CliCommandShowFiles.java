@@ -41,6 +41,9 @@ public class CliCommandShowFiles implements ICliCommand {
 	/* should we show component membership when displaying reports? */
 	protected boolean optionShowComps = false;
 	
+	/* the FileSet used to filter our results (if -f/--filter is used) */
+	protected FileSet filterFileSet = null;
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -82,6 +85,11 @@ public class CliCommandShowFiles implements ICliCommand {
 		Option showCompsOpt = new Option("c", "show-comps", false, "Show component of each file in report output");
 		opts.addOption(showCompsOpt);
 
+		/* add the -f/--filter option */
+		Option filterOpt = new Option("f", "filter", true, "Colon-separated path-specs used to filter the output results");
+		filterOpt.setArgName("path-spec:...");
+		opts.addOption(filterOpt);
+		
 		return opts;
 	}
 
@@ -92,7 +100,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[ <path>, ... ]";
+		return "";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -111,9 +119,20 @@ public class CliCommandShowFiles implements ICliCommand {
 	 * @see com.arapiki.disco.main.ICliCommand#processOptions(java.lang.String[])
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		optionShowRoots = cmdLine.hasOption("show-roots");
 		optionShowComps = cmdLine.hasOption("show-comps");
+		
+		/* fetch the subset of files we should filter-in */
+	
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		String filterInString = cmdLine.getOptionValue("f");
+		if (filterInString != null) {
+			filterFileSet = CliUtils.getCmdLineFileSet(fns, filterInString);
+			if (filterFileSet != null) {
+				filterFileSet.populateWithParents();
+			}
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -123,19 +142,15 @@ public class CliCommandShowFiles implements ICliCommand {
 	 */
 	@Override
 	public void invoke(BuildStore buildStore, String [] args) {
-				
+		
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Components cmpts = buildStore.getComponents();
 
-		/* fetch the subset of files we should filter through */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, args);
-		if (filterFileSet != null) {
-			filterFileSet.populateWithParents();
-		}
-
 		/* 
 		 * There were no search "results", so we'll show everything (except those
-		 * that are filtered-out by filterFileSet. 
+		 * that are filtered-out by filterFileSet).
 		 */
 		FileSet resultFileSet = null;
 

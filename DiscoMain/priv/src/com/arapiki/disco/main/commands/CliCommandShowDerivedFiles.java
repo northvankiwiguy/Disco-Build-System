@@ -86,7 +86,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<path>, ...";
+		return "<path-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -105,10 +105,10 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 * @see com.arapiki.disco.main.commands.CliCommandShowFiles#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 
 		/* Handle the default show-files options first */
-		super.processOptions(cmdLine);
+		super.processOptions(buildStore, cmdLine);
 		
 		/* we also support the -a/--all flags */
 		optionAll = cmdLine.hasOption("all");
@@ -122,14 +122,14 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "At least one input path must be provided");
+		CliUtils.validateArgs(getName(), args, 1, 1, "One or more colon-separated path-specs must be provided");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
 		Components cmpts = buildStore.getComponents();
 
 		/* fetch the list of files that are the source of the derivation */
-		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fns, args);
+		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fns, args[0]);
 		if (sourceFileSet != null) {
 			sourceFileSet.populateWithParents();
 		}
@@ -139,7 +139,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 		derivedFileSet.populateWithParents();
 
 		/* pretty print the results - no filtering used here */
-		CliUtils.printFileSet(System.out, fns, cmpts, derivedFileSet, null, optionShowRoots, optionShowComps);	
+		CliUtils.printFileSet(System.out, fns, cmpts, derivedFileSet, filterFileSet, optionShowRoots, optionShowComps);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

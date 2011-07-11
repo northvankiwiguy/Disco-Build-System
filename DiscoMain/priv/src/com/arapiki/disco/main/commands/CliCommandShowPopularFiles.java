@@ -16,7 +16,6 @@ import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileRecord;
-import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 
 /**
@@ -57,7 +56,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[ <path-spec>, ... ]";
+		return "";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -78,14 +77,10 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
-
-		/* fetch the set of files we're interested in learning about */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, args);
-		if (filterFileSet != null) {
-			filterFileSet.populateWithParents();
-		}
 
 		/* fetch the list of most popular files */
 		FileRecord results[] = reports.reportMostCommonlyAccessedFiles();

@@ -96,7 +96,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<path>, ...";
+		return "<path-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -115,10 +115,10 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 * @see com.arapiki.disco.main.commands.CliCommandShowTasks#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		
 		/* process the standard show-tasks options */
-		super.processOptions(cmdLine);
+		super.processOptions(buildStore, cmdLine);
 		
 		/* now the specific options for show-files-used-by */
 		optionRead = cmdLine.hasOption("read");
@@ -133,7 +133,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "At least one path must be specified");
+		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();
@@ -144,7 +144,8 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite);		
 
 		/* fetch the FileSet of paths from the user's command line */
-		FileSet fileSet = CliUtils.getCmdLineFileSet(fns, args);
+		String fileSpecs = args[0];
+		FileSet fileSet = CliUtils.getCmdLineFileSet(fns, fileSpecs);
 		if (fileSet != null) {
 			fileSet.populateWithParents();
 		}

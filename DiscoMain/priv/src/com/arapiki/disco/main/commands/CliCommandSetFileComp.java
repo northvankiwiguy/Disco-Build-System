@@ -71,7 +71,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<comp-name> <path-spec>, ...";
+		return "<comp-name> <path-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -90,7 +90,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 * @see com.arapiki.disco.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(CommandLine cmdLine) {
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		/* no options */
 	}
 
@@ -102,7 +102,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, CliUtils.ARGS_INFINITE, "You must specify a component name at least one path");
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a path-spec");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Components cmpts = buildStore.getComponents();
@@ -116,9 +116,11 @@ public class CliCommandSetFileComp implements ICliCommand {
 		int compId = compAndSectionIds[0];
 		int sectId = compAndSectionIds[1];
 
+		/* find out which files the user wants to set */
+		String fileSpec = args[1];
+		FileSet filesToSet = CliUtils.getCmdLineFileSet(fns, fileSpec);
+
 		/* now visit each file in the FileSet and set it's component/section */
-		String pathArray[] = StringArray.shiftLeft(args);
-		FileSet filesToSet = CliUtils.getCmdLineFileSet(fns, pathArray);
 		buildStore.setFastAccessMode(true);
 		for (int file : filesToSet) {
 			cmpts.setFileComponent(file, compId, sectId);

@@ -62,9 +62,10 @@ public interface ICliCommand {
 	 * DiscoMain invokes this method to process the user-supplied options. Each CliCommand*
 	 * object should process these options in its own way and set its internal state
 	 * appropriately. 
+	 * @param buildStore The BuildStore we'll operate on
 	 * @param cmdLine The already-processed command line.
 	 */
-	public void processOptions(CommandLine cmdLine);
+	public void processOptions(BuildStore buildStore, CommandLine cmdLine);
 	
 	/**
 	 * Invoke this command, using the provided command line arguments. If an error occurs,

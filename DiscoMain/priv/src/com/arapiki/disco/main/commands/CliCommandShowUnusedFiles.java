@@ -58,7 +58,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[ <path>, ... ]";
+		return "";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -79,15 +79,11 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
 		Components cmpts = buildStore.getComponents();
-
-		/* fetch the file/directory filter so we know which result files to display */
-		FileSet filterFileSet = CliUtils.getCmdLineFileSet(fns, args);
-		if (filterFileSet != null) {
-			filterFileSet.populateWithParents();
-		}
 
 		/* get list of unused files, and add their parent paths */
 		FileSet unusedFileSet = reports.reportFilesNeverAccessed();
