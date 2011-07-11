@@ -13,6 +13,7 @@
 package com.arapiki.disco.model;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -21,6 +22,8 @@ import java.util.Arrays;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class CommonTestUtils {
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/** The name of the temporary database file */
 	private static String tempDbFile = "/tmp/testBuildStore";
@@ -40,6 +43,8 @@ public class CommonTestUtils {
 		return bs;
 	}	
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/* 
 	 * Determine whether two arrays contain the same elements, even if those elements
 	 * aren't in the same order in both arrays.
@@ -66,4 +71,26 @@ public class CommonTestUtils {
 		Arrays.sort(arr2);
 		return Arrays.equals(arr1, arr2);		
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Compare the content of a FileSet with an array of Integer values.
+	 * @param fileSet The FileSet to compare
+	 * @param integers The array of integers to compare
+	 * @return True if the FileSet content is the same as the array content, else False
+	 */
+	public static boolean fileSetEqual(FileSet actual, Integer[] expected) {
+		
+		/* first, translate the FileSet into an array of Integer */
+		ArrayList<Integer> fsInts = new ArrayList<Integer>();
+		for (Integer fsInt : actual) {
+			fsInts.add(fsInt);
+		}
+		
+		/* now compare the actual and expected values */
+		return sortedArraysEqual(fsInts.toArray(new Integer[0]), expected);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }
