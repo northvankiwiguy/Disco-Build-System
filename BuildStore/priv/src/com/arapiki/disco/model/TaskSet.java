@@ -98,15 +98,15 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 
 	/**
 	 * Given the String-formatted specification of a set of tasks, populate this TaskSet
-	 * with those task values. A task specification has the format: {[^]taskNum[:[depth]]}
+	 * with those task values. A task specification has the format: {[^]taskNum[/[depth]]}
 	 * That is, we use the following syntax rules:
 	 *   - A task specification can have zero or more entries
 	 *   - Each entry contains a mandatory task number, which will be added to the TaskSet
 	 *     (or removed - see later).
-	 *   - The task number may be followed by [:depth] to indicate that all tasks in the sub tree,
+	 *   - The task number may be followed by [/depth] to indicate that all tasks in the sub tree,
 	 *     starting at the specified task and moving down the task tree "depth" level, should
 	 *     be added (or removed)
-	 *   - If 'depth' is omitted (only the ':' is provided), all tasks is the subtree are added
+	 *   - If 'depth' is omitted (only the '/' is provided), all tasks is the subtree are added
 	 *     (regardless of their depth).
 	 *   - If the task number is prefixed by '^', the tasks are removed from the TaskSet, rather
 	 *     than being added.
@@ -132,7 +132,7 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 			}
 			
 			/* 
-			 * Parse the string. It'll be in the format: [^]NNNN[:[DD]]
+			 * Parse the string. It'll be in the format: [^]NNNN[/[DD]]
 			 * Does it start with an optional '^'? 
 			 */
 			int taskNumPos = 0;					/* by default, task number is at start of string */
@@ -142,34 +142,34 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 				isAdditiveSpec = false;
 			}
 	
-			/* is there a ':' character that separates the task number from the depth? */
-			int colonIndex = taskSpec.indexOf(':', taskNumPos);
+			/* is there a '/' character that separates the task number from the depth? */
+			int slashIndex = taskSpec.indexOf('/', taskNumPos);
 	
-			/* yes, there's a colon, so we care about the depth (otherwise we'd default to depth = 1 */
+			/* yes, there's a /, so we care about the depth (otherwise we'd default to depth = 1 */
 			int depth = 1;
-			if (colonIndex != -1) {
+			if (slashIndex != -1) {
 				
-				/* if there's no number after the ':', the depth is -1 (infinite) */
-				if (colonIndex + 1 == tsLen) {
+				/* if there's no number after the '/', the depth is -1 (infinite) */
+				if (slashIndex + 1 == tsLen) {
 					depth = -1;
 				} 
 				
-				/* else, the number after the colon is the depth */
+				/* else, the number after the / is the depth */
 				else {
 					try {
-						depth = Integer.valueOf(taskSpec.substring(colonIndex + 1, tsLen));
+						depth = Integer.valueOf(taskSpec.substring(slashIndex + 1, tsLen));
 					} catch (NumberFormatException ex) {
 						return ErrorCode.BAD_VALUE;
 					}
 				}	
 			} else {
-				colonIndex = tsLen;
+				slashIndex = tsLen;
 			}
 			
-			/* what is the task number? It's between 'taskNumPos' and 'colonIndex' */
+			/* what is the task number? It's between 'taskNumPos' and 'slashIndex' */
 			int taskNum;
 			try {
-				taskNum = Integer.valueOf(taskSpec.substring(taskNumPos, colonIndex));
+				taskNum = Integer.valueOf(taskSpec.substring(taskNumPos, slashIndex));
 			} catch (NumberFormatException ex) {
 				return ErrorCode.BAD_VALUE;
 			}

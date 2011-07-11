@@ -79,15 +79,12 @@ public class CliUtils {
 	 * @param bts The BuildTasks object to query.
 	 * @param cmdArgs The command line arguments that specify the TaskSet to show.
 	 */
-	public static TaskSet getCmdLineTaskSet(BuildTasks bts, String[] cmdArgs) {
+	public static TaskSet getCmdLineTaskSet(BuildTasks bts, String taskSpecs) {
 		
-		/* if no arguments are provided, return null to represent "all tasks" */
-		if (cmdArgs.length == 0) {
-			return null;
-		}
-		
+		String taskSpecList[] = taskSpecs.split(":");
+
 		TaskSet result = new TaskSet(bts);
-		if (result.populateWithTasks(cmdArgs) != ErrorCode.OK) {
+		if (result.populateWithTasks(taskSpecList) != ErrorCode.OK) {
 			System.err.println("Error: Invalid task filter provided.");
 			System.exit(1);
 		}
@@ -518,9 +515,10 @@ public class CliUtils {
 	     */
 		
 		/* is this task in the TaskSet to be printed? If not, terminate recursion */
-		if (! ((resultTaskSet == null) || (resultTaskSet.isMember(taskId)))) {
+		if (! (((resultTaskSet == null) || (resultTaskSet.isMember(taskId))) &&
+			((filterTaskSet == null) || (filterTaskSet.isMember(taskId))))) {
 			return;
-		}
+		}	
 	
 		/* 
 		 * Fetch the task's command string (if there is one). It can either be

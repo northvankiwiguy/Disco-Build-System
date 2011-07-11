@@ -155,7 +155,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		taskSet.populateWithParents();
 
 		/* display the resulting set of tasks */
-		CliUtils.printTaskSet(System.out, bts, fns, cmpts, taskSet, null, outputFormat, optionShowComps);
+		CliUtils.printTaskSet(System.out, bts, fns, cmpts, taskSet, filterTaskSet, outputFormat, optionShowComps);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

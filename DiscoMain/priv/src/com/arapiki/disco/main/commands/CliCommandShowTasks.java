@@ -49,6 +49,9 @@ public class CliCommandShowTasks implements ICliCommand {
 	/* the output format of the report (ONE_LINE, WRAPPED, NOT_WRAPPED) */
 	protected DisplayWidth outputFormat = DisplayWidth.WRAPPED;
 	
+	/* the TaskSet used to filter our results (if -f/--filter is used) */
+	protected TaskSet filterTaskSet = null;
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -94,6 +97,11 @@ public class CliCommandShowTasks implements ICliCommand {
 		Option longOpt = new Option("l", "long", false, "Provide detailed/long output");
 		opts.addOption(longOpt);
 		
+		/* add the -f/--filter option */
+		Option filterOpt = new Option("f", "filter", true, "Colon-separated task-specs used to filter the output results");
+		filterOpt.setArgName("task-spec:...");
+		opts.addOption(filterOpt);
+		
 		return opts;
 	}
 
@@ -135,6 +143,16 @@ public class CliCommandShowTasks implements ICliCommand {
 		
 		outputFormat = optionShort ? DisplayWidth.ONE_LINE :
 							optionLong ? DisplayWidth.NOT_WRAPPED : DisplayWidth.WRAPPED;
+		
+		/* fetch the subset of tasks we should filter-in */
+		BuildTasks bts = buildStore.getBuildTasks();
+		String filterInString = cmdLine.getOptionValue("f");
+		if (filterInString != null) {
+			filterTaskSet = CliUtils.getCmdLineTaskSet(bts, filterInString);
+			if (filterTaskSet != null) {
+				filterTaskSet.populateWithParents();
+			}
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -145,22 +163,16 @@ public class CliCommandShowTasks implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 0, CliUtils.ARGS_INFINITE, "");
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
 		
 		BuildTasks bts = buildStore.getBuildTasks();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();		
 		Components cmpts = buildStore.getComponents();
 
-		/* compute a TaskSet to display, or null if no arguments are provided */
-		TaskSet ts = CliUtils.getCmdLineTaskSet(bts, args);
-		if (ts != null) {
-			ts.populateWithParents();
-		}
-
 		/* 
 		 * Display the selected task set.
 		 */
-		CliUtils.printTaskSet(System.out, bts, fns, cmpts, ts, null, outputFormat, optionShowComps);
+		CliUtils.printTaskSet(System.out, bts, fns, cmpts, null, filterTaskSet, outputFormat, optionShowComps);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

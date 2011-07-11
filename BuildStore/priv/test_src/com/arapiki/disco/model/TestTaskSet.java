@@ -317,26 +317,26 @@ public class TestTaskSet {
 		assertEquals(1, ts.size());
 		assertTrue(ts.isMember(taskA3));
 
-		/* populate with a complete subtree. Format is "<taskA3>:" */
+		/* populate with a complete subtree. Format is "<taskA3>/" */
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + ":" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + "/" }));
 		assertEquals(4, ts.size());
 		assertTrue(ts.isMember(taskA3));
 		assertTrue(ts.isMember(taskA31));
 		assertTrue(ts.isMember(taskA32));
 		assertTrue(ts.isMember(taskA321));
 		
-		/* populate with a complete subtree, of depth 2. Format is "<taskA3>:2" */
+		/* populate with a complete subtree, of depth 2. Format is "<taskA3>/2" */
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + ":2" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + "/2" }));
 		assertEquals(3, ts.size());
 		assertTrue(ts.isMember(taskA3));
 		assertTrue(ts.isMember(taskA31));
 		assertTrue(ts.isMember(taskA32));
 		
-		/* similar complete subtree of depth 2, but with different tasks. Format is "<taskA>:2" */
+		/* similar complete subtree of depth 2, but with different tasks. Format is "<taskA>/2" */
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA).toString() + ":2" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA).toString() + "/2" }));
 		assertEquals(5, ts.size());
 		assertTrue(ts.isMember(taskA));
 		assertTrue(ts.isMember(taskA1));
@@ -345,7 +345,7 @@ public class TestTaskSet {
 	
 		/* populate the full tree, down four levels (this excludes only one task) */
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + ":4" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + "/4" }));
 		assertEquals(10, ts.size());
 		assertFalse(ts.isMember(taskA321));
 		
@@ -359,8 +359,8 @@ public class TestTaskSet {
 		
 		/* populate the full tree (all levels), then remove a subtree (taskA32 and below) */
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + ":",
-				"^" + Integer.valueOf(taskA32).toString() + ":" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + "/",
+				"^" + Integer.valueOf(taskA32).toString() + "/" }));
 		assertEquals(9, ts.size());
 		assertFalse(ts.isMember(taskA32));
 		assertFalse(ts.isMember(taskA321));
@@ -369,9 +369,9 @@ public class TestTaskSet {
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "+123" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "X" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123-" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123:foo" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { ":1" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "1::" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123/foo" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "/1" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "1//" }));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	

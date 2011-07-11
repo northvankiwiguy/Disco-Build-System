@@ -71,7 +71,7 @@ public class CliCommandSetTaskComp implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<comp-name> <task-spec>, ...";
+		return "<comp-name> <task-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -102,7 +102,7 @@ public class CliCommandSetTaskComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, CliUtils.ARGS_INFINITE, "You must specify a component name at least one task spec");
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a colon-separated list of task-specs");
 		
 		Components cmpts = buildStore.getComponents();
 		BuildTasks bts = buildStore.getBuildTasks();
@@ -114,10 +114,12 @@ public class CliCommandSetTaskComp implements ICliCommand {
 		String compName = args[0];
 		int compAndSectionIds[] = CliUtils.parseComponentAndSection(cmpts, compName, false);
 		int compId = compAndSectionIds[0];
-				
+		
+		/* compute the TaskSet from the user-supplied list of task-specs */
+		String taskSpecs = args[1];
+		TaskSet tasksToSet = CliUtils.getCmdLineTaskSet(bts, taskSpecs);
+		
 		/* now visit each task in the TaskSet and set its component */
-		String taskArray[] = StringArray.shiftLeft(args);
-		TaskSet tasksToSet = CliUtils.getCmdLineTaskSet(bts, taskArray);
 		buildStore.setFastAccessMode(true);
 		for (int task : tasksToSet) {
 			cmpts.setTaskComponent(task, compId);

@@ -131,7 +131,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 		
-		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "At least one task must be specified");
+		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of task-specs must be provided");
 
 		/* are we searching for reads, writes, or both? */
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite);
@@ -142,7 +142,8 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		Components cmpts = buildStore.getComponents();
 
 		/* fetch the list of tasks we're querying */
-		TaskSet ts = CliUtils.getCmdLineTaskSet(bts, args);
+		String taskSpecs = args[0];
+		TaskSet ts = CliUtils.getCmdLineTaskSet(bts, taskSpecs);
 		if (ts == null) {
 			CliUtils.reportErrorAndExit("no tasks were selected.");
 		}
