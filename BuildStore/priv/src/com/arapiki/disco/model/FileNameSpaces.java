@@ -165,8 +165,8 @@ public class FileNameSpaces {
 			return ErrorCode.ALREADY_USED;
 		}
 		
-		/* names can't contain :, or spaces, since this are considered root name separators */
-		if (rootName.contains("%") || rootName.contains(":") || rootName.contains(" ")){
+		/* names can't contain @, :, or spaces, since this are considered root name separators */
+		if (rootName.contains("@") || rootName.contains(":") || rootName.contains(" ")){
 			return ErrorCode.INVALID_NAME;
 		}
 		
@@ -437,7 +437,7 @@ public class FileNameSpaces {
 	 * @param showRoots True if we should show applicable file system roots in the string, else
 	 * show the absolute path.
 	 * @return The String representation of the path, in the form /a/b/c/..., possibly
-	 * containing a file system root (e.g. %root/a/b/c/...)
+	 * containing a file system root (e.g. @root/a/b/c/...)
 	 */
 	public String getPathName(int pathId, boolean showRoots) {
 
@@ -447,7 +447,7 @@ public class FileNameSpaces {
 		/* if we're at the root, simply return /, else recurse */
 		if (pathId == 0) {
 			if (showRoots) {
-				sb.append("%root");
+				sb.append("@root");
 			} else {
 				sb.append('/');
 			}
@@ -704,7 +704,7 @@ public class FileNameSpaces {
 	 * the recursion unwinds back to the start as it appends the path names to the result string.
 	 * @param sb The StringBuffer we'll append path component names onto (as we recurse)
 	 * @param pathId The ID of the path we're currently looking at (whose name we'll append to sb)
-	 * @param showRoots True if we should return a file system root (e.g. "%root") in the path name.
+	 * @param showRoots True if we should return a file system root (e.g. "@root") in the path name.
 	 */
 	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots) {
 
@@ -721,7 +721,7 @@ public class FileNameSpaces {
 		 * If we're showing root names, and we've reached one, display it and terminate recursion
 		 */
 		if (showRoots && (rootName != null)) {
-			sb.append('%');
+			sb.append('@');
 			sb.append(rootName);
 			return;
 		}
@@ -797,7 +797,7 @@ public class FileNameSpaces {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a path name of the format "%root/absolute/path/name", split out the root and
+	 * Given a path name of the format "@root/absolute/path/name", split out the root and
 	 * path components. If not root component is provided, default to "root". Note: minimal 
 	 * error checking is done on the root and path names, so they should be validated by this
 	 * method's caller.
@@ -807,18 +807,18 @@ public class FileNameSpaces {
 	 */
 	private String[] getRootAndPath(String fullPathName) {
 		
-		/* the default values, in case no %root is provided */
+		/* the default values, in case no @root is provided */
 		String rootName = "root";
 		String pathName = fullPathName;
 		
 		/* 
-		 * See if the path name starts with %, if so, 
+		 * See if the path name starts with @, if so, 
 		 * split the full path into "root" and "path name" components.
 		 * The root part of the name will end when a "/" is seen. If
 		 * there's no "/", then the whole fullPathName string is the 
 		 * root name.
 		 */
-		if (fullPathName.startsWith("%")){
+		if (fullPathName.startsWith("@")){
 			int slashIndex = fullPathName.indexOf('/');
 			if (slashIndex != -1){
 				rootName = fullPathName.substring(1, slashIndex);

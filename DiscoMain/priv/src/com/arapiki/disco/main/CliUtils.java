@@ -129,7 +129,7 @@ public class CliUtils {
 		/* 
 		 * We always start at the top root, even though we may only display a subset
 		 * of the paths underneath that root. Also, figure out the root's name
-		 * (it's '/' or '%root').
+		 * (it's '/' or '@root').
 		 */
 		int topRoot = fns.getRootPath("root");
 		String rootPathName = fns.getPathName(topRoot, showRoots);
@@ -447,7 +447,7 @@ public class CliUtils {
 			 * has a reference to it and will use it for displaying our sibling paths).
 			 */
 			pathSoFar = new StringBuffer();
-			pathSoFar.append('%');
+			pathSoFar.append('@');
 			pathSoFar.append(rootName);
 			
 			/* display information about this root. */

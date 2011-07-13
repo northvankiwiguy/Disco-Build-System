@@ -372,13 +372,13 @@ public class TestTaskSet {
 		assertEquals(ErrorCode.OK, cmpts.setTaskComponent(taskA2, fooCompId));
 		
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "@foo" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%comp/foo" }));
 		assertEquals(2, ts.size());
 		assertTrue(ts.isMember(taskA1));
 		assertTrue(ts.isMember(taskA2));
 
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "^@foo" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%not-comp/foo" }));
 		assertEquals(8, ts.size());
 		assertFalse(ts.isMember(taskA1));
 		assertFalse(ts.isMember(taskA2));
@@ -390,10 +390,13 @@ public class TestTaskSet {
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123/foo" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "/1" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "1//" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "@comp" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "@foo/private" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "@" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "^@" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/comp" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/foo/private" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%nc" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%nc/" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%badvalue/" }));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	

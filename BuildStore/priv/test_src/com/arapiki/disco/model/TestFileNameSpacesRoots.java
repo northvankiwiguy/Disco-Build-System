@@ -72,12 +72,12 @@ public class TestFileNameSpacesRoots {
 		assertEquals(ErrorCode.NOT_FOUND, bsfs.getRootPath("Root3"));
 		
 		/* 
-		 * Can't add names with '%', ':', or ' ' in the name, since these symbols are used for
+		 * Can't add names with '@', ':', or ' ' in the name, since these symbols are used for
 		 * displaying and inputing root names.
 		 */
 		int path3 = bsfs.addDirectory("/a/b/c/d/e");
 		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("badRoot:Name", path3));
-		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("%badRoot", path3));
+		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("@badRoot", path3));
 		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("badRoot Name", path3));
 		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("really Bad Name:", path3));
 		
@@ -119,24 +119,24 @@ public class TestFileNameSpacesRoots {
 		assertEquals(path1, bsfs.getPath("/aardvark/bear/cat/dog/eel.c"));
 		
 		/* so should accessing via the lower-level roots */
-		assertEquals(path1, bsfs.getPath("%bearRoot/cat/dog/eel.c"));
-		assertEquals(path1, bsfs.getPath("%dogRoot/eel.c"));
+		assertEquals(path1, bsfs.getPath("@bearRoot/cat/dog/eel.c"));
+		assertEquals(path1, bsfs.getPath("@dogRoot/eel.c"));
 	
 		/* files with the same name, but under different roots should have different IDs */
-		int path4 = bsfs.addFile("%root/test.h");
-		int path5 = bsfs.addFile("%bearRoot/test.h");
-		int path6 = bsfs.addFile("%dogRoot/test.h");
+		int path4 = bsfs.addFile("@root/test.h");
+		int path5 = bsfs.addFile("@bearRoot/test.h");
+		int path6 = bsfs.addFile("@dogRoot/test.h");
 		assertNotSame(path4, path5);
 		assertNotSame(path4, path6);
 		assertNotSame(path5, path6);
 		
 		/* but all should be accessible via other roots */
-		assertEquals(path4, bsfs.getPath("%root/test.h"));
-		assertEquals(path5, bsfs.getPath("%root/aardvark/bear/test.h"));
-		assertEquals(path6, bsfs.getPath("%root/aardvark/bear/cat/dog/test.h"));
-		assertEquals(path5, bsfs.getPath("%bearRoot/test.h"));
-		assertEquals(path6, bsfs.getPath("%bearRoot/cat/dog/test.h"));
-		assertEquals(path6, bsfs.getPath("%dogRoot/test.h"));
+		assertEquals(path4, bsfs.getPath("@root/test.h"));
+		assertEquals(path5, bsfs.getPath("@root/aardvark/bear/test.h"));
+		assertEquals(path6, bsfs.getPath("@root/aardvark/bear/cat/dog/test.h"));
+		assertEquals(path5, bsfs.getPath("@bearRoot/test.h"));
+		assertEquals(path6, bsfs.getPath("@bearRoot/cat/dog/test.h"));
+		assertEquals(path6, bsfs.getPath("@dogRoot/test.h"));
 		
 		// TODO: should we be able to ../../ above a root?
 	}
@@ -154,19 +154,19 @@ public class TestFileNameSpacesRoots {
 		CommonTestUtils.sortedArraysEqual(roots, new String[] { "root" });
 		
 		/* add one with a low-alphabetical name */
-		int path1 = bsfs.addDirectory("%root/aardvark/bear/cat/donkey");
+		int path1 = bsfs.addDirectory("@root/aardvark/bear/cat/donkey");
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("aroot", path1));
 		roots = bsfs.getRoots();
 		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root" });
 
 		/* add one with a high-alphabetical name */
-		int path2 = bsfs.addDirectory("%root/aardvark/bear/cat/deer");
+		int path2 = bsfs.addDirectory("@root/aardvark/bear/cat/deer");
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("zebraroot", path2));
 		roots = bsfs.getRoots();
 		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });
 
 		/* adding an invalid root doesn't change anything */
-		int path3 = bsfs.addDirectory("%root/aardvark/bear/cat/dragon");
+		int path3 = bsfs.addDirectory("@root/aardvark/bear/cat/dragon");
 		assertEquals(ErrorCode.INVALID_NAME, bsfs.addNewRoot("zebra root", path3));
 		roots = bsfs.getRoots();
 		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });		
@@ -179,10 +179,10 @@ public class TestFileNameSpacesRoots {
 	 */
 	@Test
 	public void testMoveRootToPath() {
-		int path1 = bsfs.addFile("%root/a/b/c/d.c");
-		int path2 = bsfs.getPath("%root/a/b/c");
-		int path3 = bsfs.getPath("%root/a/b");
-		int path4 = bsfs.getPath("%root/a");
+		int path1 = bsfs.addFile("@root/a/b/c/d.c");
+		int path2 = bsfs.getPath("@root/a/b/c");
+		int path3 = bsfs.getPath("@root/a/b");
+		int path4 = bsfs.getPath("@root/a");
 		
 		/* make sure there's no root at path2, until we add it */
 		assertNull(bsfs.getRootAtPath(path2));
@@ -221,10 +221,10 @@ public class TestFileNameSpacesRoots {
 	 */
 	@Test
 	public void testGetRootAtPath() {
-		assertNotSame(ErrorCode.BAD_PATH, bsfs.addFile("%root/a/b/c/d.c"));
-		int path2 = bsfs.getPath("%root/a/b/c");
-		int path3 = bsfs.getPath("%root/a/b");
-		int path4 = bsfs.getPath("%root/a");
+		assertNotSame(ErrorCode.BAD_PATH, bsfs.addFile("@root/a/b/c/d.c"));
+		int path2 = bsfs.getPath("@root/a/b/c");
+		int path3 = bsfs.getPath("@root/a/b");
+		int path4 = bsfs.getPath("@root/a");
 		
 		/* make sure there's no root at path2, until we add it */
 		assertNull(bsfs.getRootAtPath(path2));
@@ -243,7 +243,7 @@ public class TestFileNameSpacesRoots {
 		assertNull(bsfs.getRootAtPath(path4));
 		
 		/* the / path should be attached to "root" */
-		assertEquals("root", bsfs.getRootAtPath(bsfs.getPath("%root/")));
+		assertEquals("root", bsfs.getRootAtPath(bsfs.getPath("@root/")));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -253,10 +253,10 @@ public class TestFileNameSpacesRoots {
 	 */
 	@Test
 	public void testGetEnclosingRoot() {
-		int path1 = bsfs.addFile("%root/a/b/c/d.c");
-		int path2 = bsfs.getPath("%root/a/b/c");
-		int path3 = bsfs.getPath("%root/a/b");
-		int path4 = bsfs.getPath("%root/a");
+		int path1 = bsfs.addFile("@root/a/b/c/d.c");
+		int path2 = bsfs.getPath("@root/a/b/c");
+		int path3 = bsfs.getPath("@root/a/b");
+		int path4 = bsfs.getPath("@root/a");
 		
 		/* to start with, "root" will be the enclosing root of path1 */
 		assertEquals("root", bsfs.getEnclosingRoot(path1));
@@ -286,10 +286,10 @@ public class TestFileNameSpacesRoots {
 	public void testDeleteRoot() {
 		
 		/* add some basic paths and roots */
-		assertNotSame(ErrorCode.BAD_PATH, bsfs.addFile("%root/a/b/c/d.c"));
-		int path2 = bsfs.getPath("%root/a/b/c");
-		int path3 = bsfs.getPath("%root/a/b");
-		int path4 = bsfs.getPath("%root/a");
+		assertNotSame(ErrorCode.BAD_PATH, bsfs.addFile("@root/a/b/c/d.c"));
+		int path2 = bsfs.getPath("@root/a/b/c");
+		int path3 = bsfs.getPath("@root/a/b");
+		int path4 = bsfs.getPath("@root/a");
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("newRoot2", path2));
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("newRoot3", path3));
 		assertEquals(ErrorCode.OK, bsfs.addNewRoot("newRoot4", path4));
@@ -330,33 +330,33 @@ public class TestFileNameSpacesRoots {
 	 */
 	@Test
 	public void testGetPathName() {
-		int path1 = bsfs.addFile("%root/a/b/c/d/e.h");
+		int path1 = bsfs.addFile("@root/a/b/c/d/e.h");
 
 		/* show the path, without roots */
 		assertEquals("/a/b/c/d/e.h", bsfs.getPathName(path1));
 
 		/* now again, with the top level root */
-		assertEquals("%root/a/b/c/d/e.h", bsfs.getPathName(path1, true));
+		assertEquals("@root/a/b/c/d/e.h", bsfs.getPathName(path1, true));
 		
 		/* add a subroot, and test again */
-		bsfs.addNewRoot("subRoot", bsfs.addDirectory("%root/a/b"));
-		assertEquals("%subRoot/c/d/e.h", bsfs.getPathName(path1, true));
+		bsfs.addNewRoot("subRoot", bsfs.addDirectory("@root/a/b"));
+		assertEquals("@subRoot/c/d/e.h", bsfs.getPathName(path1, true));
 
 		/* add a subsubroot, and test again */
-		bsfs.addNewRoot("subSubRoot", bsfs.addDirectory("%root/a/b/c"));
-		assertEquals("%subSubRoot/d/e.h", bsfs.getPathName(path1, true));
+		bsfs.addNewRoot("subSubRoot", bsfs.addDirectory("@root/a/b/c"));
+		assertEquals("@subSubRoot/d/e.h", bsfs.getPathName(path1, true));
 		
 		/* the full path, without roots, hasn't changed */
 		assertEquals("/a/b/c/d/e.h", bsfs.getPathName(path1));
 		
 		/* delete the subsubroot, so the subroot is now returned */
 		assertEquals(ErrorCode.OK, bsfs.deleteRoot("subSubRoot"));
-		assertEquals("%subRoot/c/d/e.h", bsfs.getPathName(path1, true));
+		assertEquals("@subRoot/c/d/e.h", bsfs.getPathName(path1, true));
 		
 		/* test that the "/" case is handled properly */
 		int rootPath = bsfs.getPath("/");
 		assertEquals("/", bsfs.getPathName(rootPath, false));
-		assertEquals("%root", bsfs.getPathName(rootPath, true));
+		assertEquals("@root", bsfs.getPathName(rootPath, true));
 		
 	}
 }

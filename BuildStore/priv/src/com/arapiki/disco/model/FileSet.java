@@ -94,30 +94,50 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 		for (int i = 0; i < pathArgs.length; i++) {
 			
 			String thisPath = pathArgs[i];
-			
+		
 			/*
-			 * First, check for component specs that start with @ or ^@.
+			 * First, check for "commands" that have the syntax: "%<name>/".
 			 */
-			if (thisPath.startsWith("@")){
-				FileSet results = cmpts.getFilesInComponent(thisPath.substring(1));
-				if (results == null) {
+			if (thisPath.startsWith("%")){
+				
+				/* 
+				 * Figure out what the "name" is. It must be terminated by a '/',
+				 * which is then followed by the command's argument(s).
+				 */
+				int slashIndex = thisPath.indexOf('/');
+				if (slashIndex == -1) { /* there must be a / */
 					return ErrorCode.BAD_PATH;
 				}
-				mergeSet(results);
-			}
-			else if (thisPath.startsWith("^@")){
-				FileSet results = cmpts.getFilesOutsideComponent(thisPath.substring(2));
-				if (results == null) {
+				String commandName = thisPath.substring(1, slashIndex);
+				String commandArgs = thisPath.substring(slashIndex + 1);
+				
+				if (commandName.equals("c") || commandName.equals("comp")){
+					FileSet results = cmpts.getFilesInComponent(commandArgs);
+					if (results == null) {
+						return ErrorCode.BAD_PATH;
+					}
+					mergeSet(results);
+				}
+				else if (commandName.equals("nc") || (commandName.equals("not-comp"))){
+					FileSet results = cmpts.getFilesOutsideComponent(commandArgs);
+					if (results == null) {
+						return ErrorCode.BAD_PATH;
+					}
+					mergeSet(results);
+				}
+				
+				/* else, it's a bad command name */
+				else {
 					return ErrorCode.BAD_PATH;
 				}
-				mergeSet(results);
+				
 			}
 			
 			/* 
 			 * Next check case where a single file name (possibly with wildcards) is used.
-			 * This implies there are no '/' or '%' characters in the path.
+			 * This implies there are no '/' or '@' characters in the path.
 			 */
-			else if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('%') == -1)){
+			else if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('@') == -1)){
 				
 				/* map any occurrences of * into %, since that's what SQL requires */
 				String regExp = thisPath.replace('*', '%');

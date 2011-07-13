@@ -159,22 +159,39 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 				return ErrorCode.BAD_VALUE;
 			}
 			
-			/* check if there's a @ or ^@ in the input - this tells us a component name is nearby */
-			if (taskSpec.startsWith("@")){
-				TaskSet compTaskSet = cmpts.getTasksInComponent(taskSpec.substring(1));
-				if (compTaskSet == null) {
-					return ErrorCode.BAD_VALUE;
-				}
-				mergeSet(compTaskSet);
-			}
+			/* check for commands that start with %, and end with / */
+			if (taskSpec.startsWith("%")){
 				
-			/* else, add tasks from ^@comp */
-			else if (taskSpec.startsWith("^@")){
-				TaskSet compTaskSet = cmpts.getTasksOutsideComponent(taskSpec.substring(2));
-				if (compTaskSet == null) {
+				/* 
+				 * Figure out what the "name" is. It must be terminated by a '/',
+				 * which is then followed by the command's argument(s).
+				 */
+				int slashIndex = taskSpec.indexOf('/');
+				if (slashIndex == -1) { /* there must be a / */
 					return ErrorCode.BAD_VALUE;
 				}
-				mergeSet(compTaskSet);			
+				String commandName = taskSpec.substring(1, slashIndex);
+				String commandArgs = taskSpec.substring(slashIndex + 1);
+				
+				if (commandName.equals("c") || commandName.equals("comp")){
+					TaskSet compTaskSet = cmpts.getTasksInComponent(commandArgs);
+					if (compTaskSet == null) {
+						return ErrorCode.BAD_VALUE;
+					}
+					mergeSet(compTaskSet);
+				}
+				else if (commandName.equals("nc") || (commandName.equals("not-comp"))){
+					TaskSet compTaskSet = cmpts.getTasksOutsideComponent(commandArgs);
+					if (compTaskSet == null) {
+						return ErrorCode.BAD_VALUE;
+					}
+					mergeSet(compTaskSet);
+				}
+				
+				/* else, the command isn't recognized */
+				else {
+					return ErrorCode.BAD_VALUE;
+				}
 			}
 			
 			else {
