@@ -59,6 +59,7 @@ public class Reports {
 		selectFilesWithMatchingNamePrepStmt = null,
 		selectTasksWithMatchingNamePrepStmt = null,
 		selectDerivedFilesPrepStmt = null,
+		selectInputFilesPrepStmt = null,
 		selectTasksAccessingFilesPrepStmt = null,
 		selectTasksAccessingFilesAnyPrepStmt = null,
 		selectFilesAccessedByTaskPrepStmt = null,
@@ -101,6 +102,12 @@ public class Reports {
 				"(select taskId from buildTaskFiles where fileId = ? and " +
 				"operation = " + OperationType.OP_READ.ordinal() + ") " + 
 				"and operation = " + OperationType.OP_WRITE.ordinal());
+		
+		selectInputFilesPrepStmt = db.prepareStatement(
+				"select distinct fileId from buildTaskFiles where taskId in " +
+				"(select taskId from buildTaskFiles where fileId = ? and " +
+				"operation = " + OperationType.OP_WRITE.ordinal() + ") " + 
+				"and operation = " + OperationType.OP_READ.ordinal());
 		
 		selectTasksAccessingFilesPrepStmt = db.prepareStatement(
 				"select taskId from buildTaskFiles where fileId = ? and operation = ?");
@@ -266,76 +273,27 @@ public class Reports {
 	 * @return The FileSet of derived paths.
 	 */
 	public FileSet reportDerivedFiles(FileSet sourceFileSet, boolean reportIndirect) {
-		
-		/* 
-		 * Create a new empty FileSet for tracking all the results. Each time we
-		 * iterate through the loop, we merge the results into this FileSet
-		 */
-		FileSet results = new FileSet(fns);
-		
-		/* the first set of files to analyze is the original source FileSet */
-		FileSet nextFileSet = sourceFileSet;
-		
-		/* 
-		 * This variable is used to track the progress of finding new results.
-		 * If it doesn't change from one iteration to the next, we stop the iterations.
-		 */
-		int lastNumberOfResults = 0;
+		return reportDerivedFilesHelper(sourceFileSet, reportIndirect, selectDerivedFilesPrepStmt);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
-		/* 
-		 * Start the iterations. If "reportIndirect" is false, we'll only execute
-		 * the loop once. Each time we go around the loop, we take the derived files
-		 * from the previous round and treat them as the new set of input files.
-		 */
-		boolean done = false;
-		do {
-			
-			/* empty FileSet to collect this round's set of results */
-			FileSet thisRoundOfResults = new FileSet(fns);
-
-			/* iterate through each of the files in this round's FileSet */
-			for (int fileId : nextFileSet) {
-				
-				/* determine the directly derived files for this file, and add them to the result set */
-				try {
-					selectDerivedFilesPrepStmt.setInt(1, fileId);
-					ResultSet rs = db.executePrepSelectResultSet(selectDerivedFilesPrepStmt);
-
-					while (rs.next()) {
-						FileRecord record = new FileRecord(rs.getInt(1));
-						thisRoundOfResults.add(record);
-					}
-					rs.close();
-			
-				} catch (SQLException e) {
-					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-				}
-			}
-			
-			/* 
-			 * Prepare to repeat the process by using the results from this iteration as
-			 * the input to the next iteration.
-			 */
-			nextFileSet = thisRoundOfResults;
-		
-			/*
-			 * Merge this cycle's results into our final result set
-			 */
-			results.mergeSet(thisRoundOfResults);
-			
-			/* are we done? Did we find any new results in this iteration? */
-			int thisNumberOfResults = results.size();
-			done = (thisNumberOfResults == lastNumberOfResults);
-			lastNumberOfResults = thisNumberOfResults;
-			
-		} while (reportIndirect && !done);
-		
-		/* return the combined set of results */
-		return results;
+	/**
+	 * Given the input FileSet (targetFileSet), return a new FileSet containing all the 
+	 * paths that are used as input when generating the paths listed in targetFileSet. 
+	 * A file (A) is input for file (B) if there's a task (or sequence of paths) that reads A 
+	 * and writes to B. This is the opposite of reportDerivedFiles().
+	 * @param targetFileSet The FileSet of all files that are the target of tasks.
+	 * @param reportIndirect Should we also report on indirectly derived files (multiple tasks
+	 * between file A and file B?
+	 * @return The FileSet of input paths.
+	 */
+	public FileSet reportInputFiles(FileSet targetFileSet, boolean reportIndirect) {
+		return reportDerivedFilesHelper(targetFileSet, reportIndirect, selectInputFilesPrepStmt);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
-
+	
 	/**
 	 * Given a FileSet, return a TaskSet containing all the build tasks that access this
 	 * collection files. The opType specifies whether we want tasks that read these files,
@@ -474,6 +432,87 @@ public class Reports {
 		
 		return results;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * A helper method for reportDerivedFiles and reportInputFiles that both use the same
+	 * algorithm, but a slightly different SQL query.
+	 * @param startFileSet The set of files that we're deriving from, or that are used as
+	 * the target of the derivation.
+	 * @param reportIndirect True if we should do multiple iterations of derivation
+	 * @param sqlStatement The prepared SQL statement to find derived/input files.
+	 * @return The result FileSet 
+	 */
+	private FileSet reportDerivedFilesHelper(FileSet startFileSet, boolean reportIndirect,
+			PreparedStatement sqlStatement) {
 		
+		/* 
+		 * Create a new empty FileSet for tracking all the results. Each time we
+		 * iterate through the loop, we merge the results into this FileSet
+		 */
+		FileSet results = new FileSet(fns);
+		
+		/* the first set of files to analyze */
+		FileSet nextFileSet = startFileSet;
+		
+		/* 
+		 * This variable is used to track the progress of finding new results.
+		 * If it doesn't change from one iteration to the next, we stop the iterations.
+		 */
+		int lastNumberOfResults = 0;
+
+		/* 
+		 * Start the iterations. If "reportIndirect" is false, we'll only execute
+		 * the loop once. Each time we go around the loop, we take the files
+		 * from the previous round and treat them as the new set of start files.
+		 */
+		boolean done = false;
+		do {
+			
+			/* empty FileSet to collect this round's set of results */
+			FileSet thisRoundOfResults = new FileSet(fns);
+
+			/* iterate through each of the files in this round's FileSet */
+			for (int fileId : nextFileSet) {
+
+				/* determine the direct input/output files for this file, and add them to the result set */
+				try {
+					sqlStatement.setInt(1, fileId);
+					ResultSet rs = db.executePrepSelectResultSet(sqlStatement);
+
+					while (rs.next()) {
+						FileRecord record = new FileRecord(rs.getInt(1));
+						thisRoundOfResults.add(record);
+					}
+					rs.close();
+
+				} catch (SQLException e) {
+					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+				}
+			}
+
+			/* 
+			 * Prepare to repeat the process by using the results from this iteration as
+			 * the input to the next iteration.
+			 */
+			nextFileSet = thisRoundOfResults;
+		
+			/*
+			 * Merge this cycle's results into our final result set
+			 */
+			results.mergeSet(thisRoundOfResults);
+			
+			/* are we done? Did we find any new results in this iteration? */
+			int thisNumberOfResults = results.size();
+			done = (thisNumberOfResults == lastNumberOfResults);
+			lastNumberOfResults = thisNumberOfResults;
+			
+		} while (reportIndirect && !done);
+		
+		/* return the combined set of results */
+		return results;
+	}
+
 	/*=====================================================================================*/
 }

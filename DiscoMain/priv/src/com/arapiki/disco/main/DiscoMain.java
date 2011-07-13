@@ -301,6 +301,7 @@ public final class DiscoMain {
 					new CliCommandShowWriteOnlyFiles(),
 					new CliCommandShowPopularFiles(),
 					new CliCommandShowDerivedFiles(),
+					new CliCommandShowInputFiles(),
 					new CliCommandShowFilesUsedBy()
 			});
 

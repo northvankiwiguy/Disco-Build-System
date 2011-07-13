@@ -478,12 +478,16 @@ public class TestReports {
 		bts.addFileAccess(taskLinkAnimals, fileAnimalsExe, OperationType.OP_WRITE);
 
 		/*
-		 * Test directly derived relationships
+		 * Test directly derived/input relationships
 		 */
 
 		/* test empty FileSet -> empty FileSet */		
 		FileSet source = new FileSet(fns);
 		FileSet result = reports.reportDerivedFiles(source, false);
+		assertEquals(0, result.size());
+		
+		FileSet dest = new FileSet(fns);
+		result = reports.reportInputFiles(dest, false);
 		assertEquals(0, result.size());
 		
 		/* test cat.c -> cat.o */
@@ -493,13 +497,29 @@ public class TestReports {
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileCatO));
 		
+		/* test {pet.h, cat.c} <- cat.o */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileCatO);
+		result = reports.reportInputFiles(dest, false);
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(fileCatC));
+		assertTrue(result.isMember(filePetH));
+		
 		/* test dog.c -> dog.o */
 		source = new FileSet(fns);
 		addFileRecord(source, fileDogC);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileDogO));
-		
+
+		/* test {pet.h, dog.c} <- dog.o */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileDogO);
+		result = reports.reportInputFiles(dest, false);
+		assertEquals(2, result.size());
+		assertTrue(result.isMember(fileDogC));
+		assertTrue(result.isMember(filePetH));
+
 		/* test pets.h -> cat.o, dog.o, bunny.o */
 		source = new FileSet(fns);
 		addFileRecord(source, filePetH);
@@ -509,6 +529,12 @@ public class TestReports {
 		assertTrue(result.isMember(fileDogO));
 		assertTrue(result.isMember(fileBunnyO));
 
+		/* test {} <- pets.h */
+		dest = new FileSet(fns);
+		addFileRecord(dest, filePetH);
+		result = reports.reportInputFiles(dest, false);
+		assertEquals(0, result.size());
+		
 		/* test dog.o -> dog.a */
 		source = new FileSet(fns);
 		addFileRecord(source, fileDogO);
@@ -516,12 +542,28 @@ public class TestReports {
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileDogA));
 		
+		/* test dog.o <- dog.a */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileDogA);
+		result = reports.reportInputFiles(dest, false);
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(fileDogO));
+		
 		/* test dog.a -> animals.exe */
 		source = new FileSet(fns);
 		addFileRecord(source, fileDogA);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileAnimalsExe));
+		
+		/* test dog.a, cat.a, bunny.a <- animals.exe */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileAnimalsExe);
+		result = reports.reportInputFiles(dest, false);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(fileDogA));
+		assertTrue(result.isMember(fileCatA));
+		assertTrue(result.isMember(fileBunnyA));
 
 		/* test cat.c, dog.c -> cat.o, dog.o */
 		source = new FileSet(fns);
@@ -531,6 +573,16 @@ public class TestReports {
 		assertEquals(2, result.size());
 		assertTrue(result.isMember(fileCatO));
 		assertTrue(result.isMember(fileDogO));
+
+		/* test cat.c, dog.c, pets.h <- cat.o, dog.o */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileCatO);
+		addFileRecord(dest, fileDogO);
+		result = reports.reportInputFiles(dest, false);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(fileCatC));
+		assertTrue(result.isMember(fileDogC));
+		assertTrue(result.isMember(filePetH));
 
 		/*
 		 * Test indirectly derived relationships
@@ -562,6 +614,15 @@ public class TestReports {
 		assertTrue(result.isMember(fileBunnyA));
 		assertTrue(result.isMember(fileAnimalsExe));
 
+		/* test pets.h, bunny.c, bunny.o <- bunny.a */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileBunnyA);
+		result = reports.reportInputFiles(dest, true);
+		assertEquals(3, result.size());
+		assertTrue(result.isMember(filePetH));
+		assertTrue(result.isMember(fileBunnyC));
+		assertTrue(result.isMember(fileBunnyO));
+
 		/* test pets.h -> cat.o, dog.o, bunny.o, cat.a, dog.a, bunny.a, animals.exe */
 		source = new FileSet(fns);
 		addFileRecord(source, filePetH);
@@ -574,6 +635,12 @@ public class TestReports {
 		assertTrue(result.isMember(fileDogA));
 		assertTrue(result.isMember(fileBunnyA));
 		assertTrue(result.isMember(fileAnimalsExe));
+		
+		/* test pets.h, *.c, *.o, *.a <- animals.exe */
+		dest = new FileSet(fns);
+		addFileRecord(dest, fileAnimalsExe);
+		result = reports.reportInputFiles(dest, true);
+		assertEquals(10, result.size());
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
