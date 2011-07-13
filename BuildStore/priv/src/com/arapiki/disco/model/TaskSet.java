@@ -188,6 +188,17 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 					mergeSet(compTaskSet);
 				}
 				
+				/* try to match the task's command name */
+				else if (commandName.equals("m") || commandName.equals("match")){
+					Reports reports = bs.getReports();
+					
+					/* substitute * with %, and un-escape \\: to be : */
+					commandArgs = commandArgs.replace('*', '%');
+					commandArgs = commandArgs.replaceAll("\\\\:", ":");
+					TaskSet matchingTaskSet = reports.reportTasksThatMatchName(commandArgs);
+					mergeSet(matchingTaskSet);
+				}
+				
 				/* else, the command isn't recognized */
 				else {
 					return ErrorCode.BAD_VALUE;

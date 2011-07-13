@@ -399,5 +399,50 @@ public class TestTaskSet {
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%badvalue/" }));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks()}.
+	 */
+	@Test
+	public void testMatchingCommandNames() {
+
+		int task1 = bts.addBuildTask(0, 0, "a task is a task, of : course, of course");
+		int task2 = bts.addBuildTask(0, 0, "another task");
+		int task3 = bts.addBuildTask(0, 0, "gcc -c -o foo.o foo.c");
+		int task4 = bts.addBuildTask(0, 0, "gcc -c -o bah.o bah.c");
+		int task5 = bts.addBuildTask(0, 0, "gcc -c -o bling.o bling.c");
+
+		/* look for gcc commands */
+		TaskSet results = new TaskSet(bts);
+		results.populateWithTasks(new String[] {"%match/gcc *"});
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task3, task4, task5}));
+		
+		/* same, but use %m instead of %match */
+		results = new TaskSet(bts);
+		results.populateWithTasks(new String[] {"%m/gcc *"});
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task3, task4, task5}));
+		
+		/* look for the word "task" */
+		results = new TaskSet(bts);
+		results.populateWithTasks(new String[] {"%match/*task*"});
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2}));
+		
+		/* try with an empty pattern */
+		results = new TaskSet(bts);
+		results.populateWithTasks(new String[] {"%m/"});
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {}));
+	
+		/* try with a single * */
+		results = new TaskSet(bts);
+		results.populateWithTasks(new String[] {"%m/*"});
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3, task4, task5}));
+		
+		/* try to match an embedded : */
+		results = new TaskSet(bts);
+		results.populateWithTasks(new String[] {"%match/*of \\: course*"});
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
+	}
+	
 	/*-------------------------------------------------------------------------------------*/	
 }

@@ -363,6 +363,45 @@ public class TestReports {
 		assertEquals(0, results.size());		
 	}
 	
+	/*-------------------------------------------------------------------------------------*/	
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportTasksThatMatchName()}.
+	 */
+	@Test
+	public void testReportTasksThatMatchName() throws Exception {
+	
+		int task1 = bts.addBuildTask(0, 0, "My command number 1");
+		int task2 = bts.addBuildTask(0, 0, "My command number 2");
+		int task3 = bts.addBuildTask(0, 0, "Another with number 1 in it");
+		int task4 = bts.addBuildTask(0, 0, "A completely different task");
+		int task5 = bts.addBuildTask(0, 0, "A final command with 1 in it");
+	
+		/* match commands that contain "command" */
+		TaskSet results = reports.reportTasksThatMatchName("%command%");
+		CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task5});
+		
+		/* match commands with the number 1 in them */
+		results = reports.reportTasksThatMatchName("%1%");
+		CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3, task5});
+		
+		/* match command that start with the letter A */
+		results = reports.reportTasksThatMatchName("A%");
+		CommonTestUtils.treeSetEqual(results, new Integer[] {task3, task4, task5});
+		
+		/* match commands containing the word "task" */
+		results = reports.reportTasksThatMatchName("%task%");
+		CommonTestUtils.treeSetEqual(results, new Integer[] {task4});
+		
+		/* match commands containing "elephant" */
+		results = reports.reportTasksThatMatchName("%elephant%");
+		CommonTestUtils.treeSetEqual(results, new Integer[] {});
+		
+		/* test with the empty pattern */
+		results = reports.reportTasksThatMatchName("");
+		CommonTestUtils.treeSetEqual(results, new Integer[] {});		
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

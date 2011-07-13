@@ -57,6 +57,7 @@ public class Reports {
 		selectFileIncludesCountPrepStmt = null,
 		selectFilesNotUsedPrepStmt = null,
 		selectFilesWithMatchingNamePrepStmt = null,
+		selectTasksWithMatchingNamePrepStmt = null,
 		selectDerivedFilesPrepStmt = null,
 		selectTasksAccessingFilesPrepStmt = null,
 		selectTasksAccessingFilesAnyPrepStmt = null,
@@ -91,6 +92,9 @@ public class Reports {
 		
 		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
 				"select files.id from files where name like ? and pathType = " + PathType.TYPE_FILE.ordinal());
+
+		selectTasksWithMatchingNamePrepStmt = db.prepareStatement(
+				"select taskId from buildTasks where command like ?");
 
 		selectDerivedFilesPrepStmt = db.prepareStatement(
 				"select distinct fileId from buildTaskFiles where taskId in " +
@@ -227,6 +231,27 @@ public class Reports {
 		}
 		
 		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the set of tasks whose command matches the user-specified pattern.
+	 * @param pattern The user-specified pattern to match
+	 * @return The TaskSet of matching file names.
+	 */
+	public TaskSet reportTasksThatMatchName(String pattern) {
+		
+		Integer results[];
+		try {
+			selectTasksWithMatchingNamePrepStmt.setString(1, pattern);
+			results = db.executePrepSelectIntegerColumn(selectTasksWithMatchingNamePrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return new TaskSet(bts, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
