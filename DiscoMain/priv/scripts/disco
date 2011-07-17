@@ -3,6 +3,10 @@
 # Simple launcher script for the "disco" command.
 #
 
+# make sure that wildcards (* and ?) aren't expanded. If the user passes in "*.h", we want to
+# pass "*.h" onto the Java code.
+set -f
+
 # Figure out what this script was executed as.
 export DISCO_HOME=`dirname $0`/..
 
