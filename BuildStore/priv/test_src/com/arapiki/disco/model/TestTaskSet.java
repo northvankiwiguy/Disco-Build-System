@@ -425,13 +425,13 @@ public class TestTaskSet {
 		
 		/* look for the word "task" */
 		results = new TaskSet(bts);
-		results.populateWithTasks(new String[] {"%match/*task*"});
+		results.populateWithTasks(new String[] {"%match/task"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2}));
 		
 		/* try with an empty pattern */
 		results = new TaskSet(bts);
 		results.populateWithTasks(new String[] {"%m/"});
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3, task4, task5}));
 	
 		/* try with a single * */
 		results = new TaskSet(bts);

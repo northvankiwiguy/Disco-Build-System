@@ -251,7 +251,7 @@ public class Reports {
 		
 		Integer results[];
 		try {
-			selectTasksWithMatchingNamePrepStmt.setString(1, pattern);
+			selectTasksWithMatchingNamePrepStmt.setString(1, "%" + pattern + "%");
 			results = db.executePrepSelectIntegerColumn(selectTasksWithMatchingNamePrepStmt);
 			
 		} catch (SQLException e) {
