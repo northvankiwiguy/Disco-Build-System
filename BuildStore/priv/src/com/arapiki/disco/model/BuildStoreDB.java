@@ -240,7 +240,8 @@ class BuildStoreDB  {
 	/**
 	 * 
 	 */
-	public void dropDatabase() {
+	/* package private */ 
+	void dropDatabase() {
 		try {
 			Statement stat = dbConn.createStatement();
 			stat.executeUpdate("drop table if exists schemaVersion");
@@ -302,7 +303,8 @@ class BuildStoreDB  {
 	/**
 	 * @param insertChildPrepStmt
 	 */
-	public int executePrepUpdate(PreparedStatement stmt) {
+	/* package private */
+	int executePrepUpdate(PreparedStatement stmt) {
 		int rowCount = 0;
 		try {
 			rowCount = stmt.executeUpdate();
@@ -318,7 +320,8 @@ class BuildStoreDB  {
 	 * @param cmd
 	 * @return
 	 */
-	public String[] executeSelectColumn(String sql) {
+	/* package private */
+	String[] executeSelectColumn(String sql) {
 		Statement stmt;
 		ArrayList<String> result;
 		try {
@@ -346,7 +349,8 @@ class BuildStoreDB  {
 	 * @param stmt The prepared statement to be executed.
 	 * @return Returns a (possibly empty) array of results. 
 	 */
-	public String[] executePrepSelectStringColumn(PreparedStatement stmt) {
+	/* package private */
+	String[] executePrepSelectStringColumn(PreparedStatement stmt) {
 		
 		ArrayList<String> result;
 		try {
@@ -373,7 +377,8 @@ class BuildStoreDB  {
 	 * @param stmt The prepared statement to be executed.
 	 * @return Returns a (possibly empty) array of results. 
 	 */
-	public Integer[] executePrepSelectIntegerColumn(PreparedStatement stmt) {
+	/* package private */
+	Integer[] executePrepSelectIntegerColumn(PreparedStatement stmt) {
 		
 		ArrayList<Integer> result;
 		try {
@@ -398,7 +403,8 @@ class BuildStoreDB  {
 	 * @param cmd
 	 * @return
 	 */
-	public ResultSet executePrepSelectResultSet(PreparedStatement stmt) {
+	/* package private */
+	ResultSet executePrepSelectResultSet(PreparedStatement stmt) {
 		ResultSet rs;
 		try {
 			rs = stmt.executeQuery();
@@ -417,7 +423,8 @@ class BuildStoreDB  {
 	 * to have the database automatically select a suitable unique primary key.
 	 * @return The last inserted primary key.
 	 */
-	public int getLastRowID() {
+	/* package private */
+	int getLastRowID() {
 		Integer lastRowID[] = executePrepSelectIntegerColumn(lastRowIDPrepStmt);
 		return lastRowID[0];
 	}
@@ -430,7 +437,8 @@ class BuildStoreDB  {
 	 * @param string
 	 * @return
 	 */
-	public PreparedStatement prepareStatement(String sql) {
+	/* package private */
+	PreparedStatement prepareStatement(String sql) {
 		try {
 			return dbConn.prepareStatement(sql);
 		} catch (SQLException e) {
