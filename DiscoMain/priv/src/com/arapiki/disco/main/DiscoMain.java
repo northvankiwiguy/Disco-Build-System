@@ -419,8 +419,7 @@ public final class DiscoMain {
 			try {
 				 buildStore = new BuildStore(buildStoreFileName);
 			} catch (FileNotFoundException ex) {
-				System.err.println(ex.getMessage());
-				System.exit(1);
+				CliUtils.reportErrorAndExit(ex.getMessage());
 			}
 			
 			/*
@@ -457,7 +456,8 @@ public final class DiscoMain {
 			 */
 			cmd.invoke(buildStore, remainingArgs);
 			
-			// TODO: do we need to close the database? How about in reportErrorAndExit()?
+			/* release resources */
+			buildStore.close();
 			
 		} catch (Exception e) {
 			System.err.println("Error: Unexpected software problem. Please report the following error:\n");

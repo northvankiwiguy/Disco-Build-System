@@ -127,6 +127,9 @@ class BuildStoreDB  {
 		Statement stat = null;
 		ResultSet rs = null;
 		
+		/* make sure the database connection is still open */
+		checkDatabase();
+		
 		/* 
 		 * Create a new statement. If this fails, it's really bad and
 		 * we can't use the database at all.
@@ -175,6 +178,9 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	void initDatabase() {
+		
+		/* make sure the database connection is still open */
+		checkDatabase();
 
 		dropDatabase();
 		try {
@@ -238,10 +244,15 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * 
+	 * Delete the content of the database, normally in preparation to recreate it with
+	 * a fresh schema.
 	 */
 	/* package private */ 
 	void dropDatabase() {
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		try {
 			Statement stat = dbConn.createStatement();
 			stat.executeUpdate("drop table if exists schemaVersion");
@@ -269,6 +280,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */	
 	void setFastAccessMode(boolean fast){
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		try {
 			dbConn.setAutoCommit(!fast);
 		} catch (SQLException e) {
@@ -286,6 +301,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	int executeUpdate(String sql) {
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		Statement stmt;
 		int rowCount = 0;
 		try {
@@ -305,6 +324,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	int executePrepUpdate(PreparedStatement stmt) {
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		int rowCount = 0;
 		try {
 			rowCount = stmt.executeUpdate();
@@ -321,7 +344,11 @@ class BuildStoreDB  {
 	 * @return
 	 */
 	/* package private */
-	String[] executeSelectColumn(String sql) {
+	String[] executeSelectColumn(String sql) {		
+		
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		Statement stmt;
 		ArrayList<String> result;
 		try {
@@ -352,6 +379,9 @@ class BuildStoreDB  {
 	/* package private */
 	String[] executePrepSelectStringColumn(PreparedStatement stmt) {
 		
+		/* make sure the database connection is still open */
+		checkDatabase();
+		
 		ArrayList<String> result;
 		try {
 			ResultSet rs = stmt.executeQuery();
@@ -379,7 +409,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	Integer[] executePrepSelectIntegerColumn(PreparedStatement stmt) {
-		
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		ArrayList<Integer> result;
 		try {
 			ResultSet rs = stmt.executeQuery();
@@ -405,6 +438,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	ResultSet executePrepSelectResultSet(PreparedStatement stmt) {
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
 		ResultSet rs;
 		try {
 			rs = stmt.executeQuery();
@@ -425,6 +462,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	int getLastRowID() {
+		
+		/* make sure the database connection is still open */
+		checkDatabase();
+		
 		Integer lastRowID[] = executePrepSelectIntegerColumn(lastRowIDPrepStmt);
 		return lastRowID[0];
 	}
@@ -439,6 +480,10 @@ class BuildStoreDB  {
 	 */
 	/* package private */
 	PreparedStatement prepareStatement(String sql) {
+		
+		/* make sure the database connection is still open */
+		checkDatabase();
+		
 		try {
 			return dbConn.prepareStatement(sql);
 		} catch (SQLException e) {
@@ -446,5 +491,48 @@ class BuildStoreDB  {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Close a database connection, releasing all resources. From this point on,
+	 * none of the methods in the class may be used (they'll simply throw an
+	 * exception).
+	 */
+	/* package private */
+	void close() {
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
+		/* make sure all changes are committed */
+		setFastAccessMode(false);
+		try {
+			dbConn.close();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to close database connection: " + e);
+		}
+		
+		/* 
+		 * Make the connection variable unusable - this will result in exceptions being
+		 * thrown if somebody try to use it.
+		 */
+		dbConn = null;
+	}
+		
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * Check that our database connection is open, else throw an exception. This stops
+	 * us from getting weird SQL errors when somebody tries to use the database after
+	 * it's closed.
+	 */
+	private void checkDatabase() {
+		if (dbConn == null) {
+			throw new FatalBuildStoreError("BuildStore has been closed.");
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

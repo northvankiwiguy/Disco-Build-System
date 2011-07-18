@@ -194,6 +194,19 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Close the BuildStore, and release any resources associated with it. Attempting to
+	 * access the BuildStore's content after it's closed will likely cause a
+	 * FatalBuildStoreError.
+	 */
+	public void close() {
+		db.close();
+	}
+	
+	/*=====================================================================================*
+	 * PACKAGE-LEVEL METHODS
+	 *=====================================================================================*/
+	
+	/**
 	 * Fetch a reference to this BuildStore's underlying database. This is a package-scope
 	 * method to be used only by delegate classes (such as FileNameSpaces).
 	 * @return Reference to this BuildStore's underlying database
