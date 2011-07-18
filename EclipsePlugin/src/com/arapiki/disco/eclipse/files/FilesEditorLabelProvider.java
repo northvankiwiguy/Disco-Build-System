@@ -14,9 +14,12 @@ package com.arapiki.disco.eclipse.files;
 
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileRecord;
+import com.arapiki.disco.model.FileNameSpaces.PathType;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -29,14 +32,27 @@ public class FilesEditorLabelProvider extends LabelProvider {
 	 *=====================================================================================*/
 
 	/** The FileNameSpaces object we'll use for querying file information from the BuildStore */
-	private FileNameSpaces fns = null;
+	private FileNameSpaces fns;
+	
+	/** Images we'll use when displaying a tree of files */
+	Image 
+		folderImage,
+		fileImage,
+		symlinkImage;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
 	public FilesEditorLabelProvider(FileNameSpaces fns) {
+		
+		/* save the FileNameSpaces object we'll use for querying file information */
 		this.fns = fns;
+		
+		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
+		folderImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
+		fileImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FILE);
+		symlinkImage = null; // TODO: create an image for symlinks		
 	}
 
 	/*=====================================================================================*
@@ -48,6 +64,24 @@ public class FilesEditorLabelProvider extends LabelProvider {
 	 */
 	@Override
 	public Image getImage(Object element) {
+
+		/* we only care about FileRecord types */
+		if (element instanceof FileRecord) {
+			FileRecord fr = (FileRecord)element;
+			PathType pathType = fns.getPathType(fr.getId());
+			switch (pathType) {
+			case TYPE_INVALID:
+				return null;
+			case TYPE_DIR:
+				return folderImage;
+			case TYPE_FILE:
+				return fileImage;
+			case TYPE_SYMLINK:
+				return symlinkImage;
+			}
+		}
+		
+		/* by default, show nothing */
 		return null;
 	}
 
