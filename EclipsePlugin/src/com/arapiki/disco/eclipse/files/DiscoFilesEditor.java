@@ -13,6 +13,9 @@
 package com.arapiki.disco.eclipse.files;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -142,6 +145,22 @@ public class DiscoFilesEditor extends EditorPart {
 		filesTreeViewer = new TreeViewer(parent, SWT.MULTI | SWT.FULL_SELECTION);
 		filesTreeViewer.setContentProvider(new FilesEditorContentProvider(fns));
 		filesTreeViewer.setLabelProvider(new FilesEditorLabelProvider(fns));
+		
+		/* automatically expand the first few levels of the tree */
+		filesTreeViewer.setAutoExpandLevel(5);
+		
+		/* double-clicking on an expandable node will expand/contract that node */
+		filesTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
+				FileRecord node = (FileRecord)selection.getFirstElement();
+				if (filesTreeViewer.isExpandable(node)){
+					filesTreeViewer.setExpandedState(node, 
+							!filesTreeViewer.getExpandedState(node));
+				}
+			}
+		});
 
 		/* start by displaying from the root */
 		FileRecord rootFileRecord = new FileRecord(fns.getRootPath("root")); 
