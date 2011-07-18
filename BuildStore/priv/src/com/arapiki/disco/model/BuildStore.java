@@ -20,6 +20,10 @@ import java.io.FileNotFoundException;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class BuildStore {
+	
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
 
 	/* the BuildStoreDB object that manages our DB access */
 	private BuildStoreDB db;
@@ -41,6 +45,10 @@ public class BuildStore {
 	
 	/* the Components object we'll delegate work to */
 	private Components components;
+	
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
 	
 	/**
 	 * Open or create a new BuildStore database. If the database already
@@ -81,6 +89,10 @@ public class BuildStore {
 		components = new Components(this);		
 	}
 	
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+	
 	/**
 	 * Return the database's schema version.
 	 * @return The schema version as an integer, or 0 if there's no schema in place.
@@ -88,6 +100,8 @@ public class BuildStore {
 	public int getBuildStoreVersion() {
 		return db.getBuildStoreVersion();
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Fetch the FileNamesSpaces object associated with this BuildStore. This object
@@ -97,6 +111,8 @@ public class BuildStore {
 	public FileNameSpaces getFileNameSpaces() {
 		return fileSpaces;
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Fetch the FileIncludes object associated with this BuildStore. This object
@@ -108,6 +124,8 @@ public class BuildStore {
 		return fileIncludes;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Fetch the BuildTasks object associated with this BuildStore. This object
 	 * contains a list of all build tasks.
@@ -116,7 +134,9 @@ public class BuildStore {
 	public BuildTasks getBuildTasks() {
 		return buildTasks;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Fetch the Reports object associated with this BuildStore. This object
 	 * contains methods for generating 
@@ -125,7 +145,9 @@ public class BuildStore {
 	public Reports getReports() {
 		return reports;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Fetch the FileAttributes object associated with this BuildStore. This object
 	 * encapsulates knowledge of which attributes are attached to the paths in
@@ -135,7 +157,9 @@ public class BuildStore {
 	public FileAttributes getFileAttributes() {
 		return fileAttributes;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Fetch the Components object associated with this BuildStore. This object
 	 * encapsulates knowledge of which component names (and their IDs) are stored
@@ -145,7 +169,9 @@ public class BuildStore {
 	public Components getComponents() {
 		return components;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
@@ -156,6 +182,8 @@ public class BuildStore {
 		db.setFastAccessMode(fast);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Force the database to be empty. This is primarily for testing purposes.
 	 */
@@ -163,6 +191,7 @@ public class BuildStore {
 		db.initDatabase();
 	}
 
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Fetch a reference to this BuildStore's underlying database. This is a package-scope
@@ -172,4 +201,6 @@ public class BuildStore {
 	/* package */ BuildStoreDB getBuildStoreDB() {
 		return db;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

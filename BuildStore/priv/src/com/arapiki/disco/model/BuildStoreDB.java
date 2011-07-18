@@ -30,6 +30,10 @@ import java.util.ArrayList;
  */
 class BuildStoreDB  {
 
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+	
 	/**
 	 * Our connection to the BuildStore's SQL database.
 	 */
@@ -45,6 +49,10 @@ class BuildStoreDB  {
 
 	/* Prepared Statements to make database access faster */
 	private PreparedStatement lastRowIDPrepStmt = null;
+	
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
 	
 	/**
 	 * Create a new BuildStoreDB object.
@@ -105,6 +113,10 @@ class BuildStoreDB  {
 		}
 	}
 	
+	/*=====================================================================================*
+	 * PACKAGE METHODS
+	 *=====================================================================================*/
+	
 	/**
 	 * Retrieve the schema version of this database.
 	 * @return The schema version, or 0 if the schema isn't yet initialized.
@@ -155,6 +167,8 @@ class BuildStoreDB  {
 	    return version;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Initialize the database by adding an entirely new schema. Remove any
 	 * fields that already exist.
@@ -221,6 +235,8 @@ class BuildStoreDB  {
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * 
 	 */
@@ -242,6 +258,8 @@ class BuildStoreDB  {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
@@ -256,6 +274,8 @@ class BuildStoreDB  {
 			throw new FatalBuildStoreError("Unable to setFastAccessMode", e);
 		}
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * A helper method to perform any type of "update" command in SQL. That is,
@@ -277,6 +297,8 @@ class BuildStoreDB  {
 		return rowCount;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * @param insertChildPrepStmt
 	 */
@@ -290,6 +312,8 @@ class BuildStoreDB  {
 		return rowCount;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * @param cmd
 	 * @return
@@ -311,6 +335,8 @@ class BuildStoreDB  {
 		
 		return result.toArray(new String[0]);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Execute a prepared database statement that returns a value
@@ -337,6 +363,8 @@ class BuildStoreDB  {
 		return result.toArray(new String[0]);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Execute a prepared database statement that returns a value
 	 * (such as a select statement). The query should only return
@@ -362,6 +390,8 @@ class BuildStoreDB  {
 		return result.toArray(new Integer[0]);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Execute a database query using a prepared statement, and
 	 * return the full ResultSet object.
@@ -379,7 +409,7 @@ class BuildStoreDB  {
 		return rs;
 	}
 
-
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Returns the integer value of the last auto-increment row ID. This is used to
@@ -391,6 +421,8 @@ class BuildStoreDB  {
 		Integer lastRowID[] = executePrepSelectIntegerColumn(lastRowIDPrepStmt);
 		return lastRowID[0];
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Create a prepared statement. Some other class will use this later on. We're
@@ -406,6 +438,5 @@ class BuildStoreDB  {
 		}
 	}
 
-
-	
+	/*-------------------------------------------------------------------------------------*/
 }
