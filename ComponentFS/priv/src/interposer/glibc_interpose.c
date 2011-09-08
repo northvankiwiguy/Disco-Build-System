@@ -431,7 +431,7 @@ int open(const char *filename, int flags, ...)
 	 * pass that junk value onto the real library function.
 	 */
 	va_list ap;
-	va_start(ap, &flags);
+	va_start(ap, flags);
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
@@ -455,7 +455,7 @@ int open64(const char *filename, int flags, ...)
 	 * pass that junk value onto the real library function.
 	 */
 	va_list ap;
-	va_start(ap, &flags);
+	va_start(ap, flags);
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
