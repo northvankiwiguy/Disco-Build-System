@@ -133,6 +133,13 @@ static char **parse_options(int argc, char *argv[])
 
 int main(int argc, char *argv[], char *envp[])
 {
+	/* we need to know where our libraries are installed */
+	char *disco_home = getenv("DISCO_HOME");
+	if (disco_home == NULL){
+		fprintf(stderr, "Error: DISCO_HOME environment variable not set. Can't continue.\n");
+		exit(-1);
+	}
+
 	/*
 	 * Check whether we're already running a cfs command. If so, don't proceed.
 	 * The CFS_ID environment is set by the originating cfs process, so if it's
@@ -168,7 +175,7 @@ int main(int argc, char *argv[], char *envp[])
 	 * or transformation features to each library call.
 	 */
 	char libcfs_path[PATH_MAX];
-	sprintf(libcfs_path, "%s/lib/libcfs.so", INSTALL_PATH);
+	snprintf(libcfs_path, PATH_MAX, "%s/lib/libcfs.so", disco_home);
 	setenv("LD_PRELOAD", libcfs_path, 1);
 
 	/*
