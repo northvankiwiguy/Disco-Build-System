@@ -28,6 +28,7 @@
 	<!-- Make sure that all upstream components are up to date -->
 	<target name="build-upstream-components">
 		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="build" inheritall="false"/>
 	</target>
 
 	<!-- import the common build file definitions -->	

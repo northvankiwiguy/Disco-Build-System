@@ -77,6 +77,10 @@
 		<!-- copy the native Utilities library -->
 		<copy file="${project-root}/../Utilities/pub/libnativeLib.so" todir="${pkg-dir}/lib" />
 		
+		<!-- copy the CFS binary/library -->
+		<copy file="${project-root}/../ComponentFS/pub/bin/cfs" todir="${pkg-dir}/bin" />
+		<copy file="${project-root}/../ComponentFS/pub/lib/libcfs.so" todir="${pkg-dir}/lib" />
+		
 		<!-- finally, tar up the whole release package -->
 		<delete file="${pub-dir}/disco-${version}.tar.gz" />
 		<tar destfile="${pub-dir}/disco-${version}.tar.gz" compression="gzip" > 
@@ -106,6 +110,7 @@
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="clean" inheritall="false" />
 	</target>
 	
 	<!--
@@ -117,6 +122,7 @@
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="test" inheritall="false" />
+		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="test" inheritall="false" />
 	</target>
 		
 </project>
