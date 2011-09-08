@@ -11,15 +11,14 @@
 #*******************************************************************************/ 
 
 #
-# Top-level build descriptiobn fot the ComponentFS component.
+# Top-level build description for the ComponentFS component.
 #
 
 # what's the default location for installing cfs (and libraries)
-pub_dir = '/usr/local'
+pub_dir = '#../pub'
 
 # set up the default environment for compiling cfs.
-env = Environment(CFLAGS=['-g', '-Wall', '-Werror'], 
-	CPPDEFINES=[('INSTALL_PATH', '\\"' + pub_dir + '\\"')])
+env = Environment(CFLAGS=['-g', '-Wall', '-Werror'])
 
 # export these values to any SConscript files we may call upon.
 Export('env pub_dir')
