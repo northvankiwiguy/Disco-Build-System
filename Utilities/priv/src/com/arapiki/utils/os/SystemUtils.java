@@ -94,11 +94,14 @@ public class SystemUtils {
 	 * Execute a shell command and capture the return code and output.
 	 * @param cmd The command to be executed.
 	 * @param stdin The text to be passed to the command's standard input.
-	 * @return The command's standard output, error and return code in the form of a ShellResult object.
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * @param echoToOutput Should the stdout and stderr be echoed to our own process's output channels?
+	 * @param saveToBuffer Should the stdout and stderr be saved in buffers?
+	 * @return The command's standard output, error and return code in the form of a ShellResult object. If
+	 * saveToBuffer is false, then the output/error fields will be empty.
+	 * @throws IOException For some reason the shell command failed to execute
+	 * @throws InterruptedException The command was interrupted before it completed
 	 */
-	public static ShellResult executeShellCmd(String cmd, String stdin) 
+	public static ShellResult executeShellCmd(String cmd, String stdin, boolean echoToOutput, boolean saveToBuffer) 
 		throws IOException, InterruptedException {
 		
 		/* invoke the command as a sub process */
@@ -115,8 +118,10 @@ public class SystemUtils {
 		 * thread reads the child process's stream into a string buffer, then terminates when the
 		 * EOF is reached.
 		 */
-		StreamToStringBufferWorker stdOutWorker = new StreamToStringBufferWorker(pr.getInputStream());
-		StreamToStringBufferWorker stdErrWorker = new StreamToStringBufferWorker(pr.getErrorStream());
+		StreamToStringBufferWorker stdOutWorker = new StreamToStringBufferWorker(pr.getInputStream(),
+				echoToOutput, saveToBuffer, System.out);
+		StreamToStringBufferWorker stdErrWorker = new StreamToStringBufferWorker(pr.getErrorStream(),
+				echoToOutput, saveToBuffer, System.err);
 		
 		/* Start the threads and wait for them both to terminate */
 		Thread stdOutThread = new Thread(stdOutWorker);
@@ -136,6 +141,22 @@ public class SystemUtils {
 		 */
 		ShellResult res = new ShellResult(stdOutWorker.getString(), stdErrWorker.getString(), pr.exitValue());
 		return res;
+	}	
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * A variant of executeShellCmd that defaults to saving output/error to a buffer, but not echoing it
+	 * @param cmd The command to be executed.
+	 * @param stdin The text to be passed to the command's standard input.
+	 * @return The command's standard output, error and return code in the form of a ShellResult object.
+	 * @throws IOException For some reason the shell command failed to execute
+	 * @throws InterruptedException The command was interrupted before it completed
+	 */
+	public static ShellResult executeShellCmd(String cmd, String stdin) 
+		throws IOException, InterruptedException {
+	
+		return executeShellCmd(cmd, stdin, false, true);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

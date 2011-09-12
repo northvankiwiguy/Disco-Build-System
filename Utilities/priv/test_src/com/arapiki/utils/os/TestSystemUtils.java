@@ -183,6 +183,19 @@ public class TestSystemUtils {
 			assertEquals(i % 10, num);
 		}
 		
+		/*
+		 * Test the non-buffering variant. Even though there's output, we shouldn't get any
+		 * of it.
+		 */
+		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", false, false);
+		assertEquals(sr.getReturnCode(), 0);
+		assertEquals("", sr.getStdout());
+		assertEquals("", sr.getStderr());
+		
+		/*
+		 * Note: we can't automatically test the echoToOutput option, unless we had a way to
+		 * observe our own standard output.
+		 */
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

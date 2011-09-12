@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 /**
  * Special purpose Thread class for capturing a stream's output and storing it into
@@ -34,6 +35,15 @@ public class StreamToStringBufferWorker extends Thread {
 	/* the StringBuffer we'll write into */
 	private StringBuffer sb;
 	
+	/* should we echo the stdout/stderr of the sub-process to our own stdout/stderr? */
+	boolean echoToOutput;
+	
+	/* if echoToOutput is true, which stream do we echo to? */
+	PrintStream outStream;
+	
+	/* should we save the stdout/stderr of the sub-process to buffers? */
+	boolean saveToBuffer;
+	
 	/* 
 	 * If we encounter an exception in this Thread, we'll save it and return it to
 	 * whoever calls the getString() method.
@@ -47,10 +57,18 @@ public class StreamToStringBufferWorker extends Thread {
 	/**
 	 * Create a new StreamToStringBufferWorker object.
 	 * @param str The InputStream to read from.
+	 * @param echoToOutput Should the stdout and stderr be echoed to our own process's channels?
+	 * @param saveToBuffer Should the stdout and stderr be saved in buffers?
+	 * @param outStream if echoToOutput is true, where do we echo to?
+	 * @param out 
 	 */
-	public StreamToStringBufferWorker(InputStream str) {
+	public StreamToStringBufferWorker(InputStream str, 
+			boolean echoToOutput, boolean saveToBuffer, PrintStream outStream) {
 		reader = new BufferedReader(new InputStreamReader(str));
 		sb = new StringBuffer();
+		this.echoToOutput = echoToOutput;
+		this.saveToBuffer = saveToBuffer;
+		this.outStream = outStream;
 	}
 
 	/*=====================================================================================*
@@ -66,8 +84,13 @@ public class StreamToStringBufferWorker extends Thread {
 		String line;
 		try {
 			while ((line = reader.readLine()) != null){
-				sb.append(line);
-				sb.append('\n');
+				if (saveToBuffer) {
+					sb.append(line);
+					sb.append('\n');
+				}
+				if (echoToOutput) {
+					outStream.println(line);
+				}
 			}
 		} catch (IOException e) {
 			savedException = e;
