@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Simple launcher script for the "disco" command.
 #
@@ -7,8 +7,8 @@
 # pass "*.h" onto the Java code.
 set -f
 
-# Figure out what this script was executed as.
-export DISCO_HOME=`dirname $0`/..
+# Figure out what this script was executed as - 
+export SCRIPT_DIR=`dirname $0`
 
 #
 # Now we have two cases for setting up the classpath, depending on where the files are installed.
@@ -20,19 +20,29 @@ export DISCO_HOME=`dirname $0`/..
 #
 # Case 1 for a development installation - all .class and .jar files are in the Eclipse project layout.
 #
-if [ -e "$DISCO_HOME/../../DiscoMain" ];
+if [ -e "$SCRIPT_DIR/../../../DiscoMain" ];
 then
-    WORK="$DISCO_HOME/../../"
+    WORK="$SCRIPT_DIR/../../../"
     
 	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
 	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	export LD_LIBRARY_PATH="$WORK/Utilities/pub"
+	
+	# set up a fake root directory, with the latest libraries and binaries. The disco Java code dynamically
+	# loads these things
+	export DISCO_HOME=$SCRIPT_DIR/../fake-home
+	mkdir -p $DISCO_HOME/{bin,lib}
+	cp $WORK/ComponentFS/pub/bin/cfs $DISCO_HOME/bin
+	cp $WORK/ComponentFS/pub/lib/libcfs.so $DISCO_HOME/lib
+	cp $WORK/Utilities/pub/libnativeLib.so $DISCO_HOME/lib
+	
 #
 # Case 2 for a fully installed disco release - everything is in a single jar file.
 #
-elif [ -e "$DISCO_HOME/lib/disco.jar" ];
+elif [ -e "$SCRIPT_DIR/../lib/disco.jar" ];
 then
+    export DISCO_HOME=$SCRIPT_DIR/..
 	export CLASSPATH="$DISCO_HOME/lib/disco.jar"
 	export LD_LIBRARY_PATH="$DISCO_HOME/lib"
 
