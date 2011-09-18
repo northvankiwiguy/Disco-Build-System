@@ -6,6 +6,14 @@
 	
 	<!-- name of the jar file we'll create -->
 	<property name="project-jar" value="disco-main.jar" />
+	
+	<!-- 
+	   - Location of our "fake" root package directory. This is similar to the final release
+	   - package's file system layout, but can be used to access the not-yet-packaged files
+	   - in the build tree. This allows the code to access $DISCO_HOME/{bin,lib} during
+	   - development.
+	  -->
+	<property name="fake-home-dir" location="fake-home" />
 
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
@@ -91,6 +99,9 @@
 				<include name="disco-${version}/lib/**"/>
 			</tarfileset>
 		</tar>
+		
+		<!-- ensure the fake home directory is created, for development purposes -->
+		<antcall target="fake-home" />
 			
 	</target>
 	
@@ -111,6 +122,7 @@
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="clean" inheritall="false" />
+		<antcall target="clean-fake-home" />
 	</target>
 	
 	<!--
@@ -123,6 +135,27 @@
 		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="test" inheritall="false" />
+	</target>
+	
+	<!--
+	   - fake-home - create a fake disco packaging directory (containing binaries and .so files only) so
+	   - that our code can access $DISCO_HOME/{bin,lib} and access development files. This mirrors the
+	   - package directory layout 
+	  -->
+	<target name="fake-home" depends="clean-fake-home">
+		<mkdir dir="${fake-home-dir}" />
+		<mkdir dir="${fake-home-dir}/bin" />
+		<mkdir dir="${fake-home-dir}/lib" />
+		<symlink resource="${project-root}/../ComponentFS/pub/bin/cfs" link="${fake-home-dir}/bin/" />
+		<symlink resource="${project-root}/../ComponentFS/pub/lib/libcfs.so" link="${fake-home-dir}/lib/" />
+		<symlink resource="${project-root}/../Utilities/pub/libnativeLib.so" link="${fake-home-dir}/lib/" />
+	</target>
+	
+	<!--
+	   - Remove our fake-home directory.
+	  -->
+	<target name="clean-fake-home">
+		<delete dir="${fake-home-dir}" />
 	</target>
 		
 </project>

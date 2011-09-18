@@ -27,15 +27,6 @@ then
 	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
 	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
-	
-	# set up a fake root directory, with the latest libraries and binaries. The disco Java code dynamically
-	# loads these things
-	export DISCO_HOME=$SCRIPT_DIR/../fake-home
-	mkdir -p $DISCO_HOME/{bin,lib}
-	cp $WORK/ComponentFS/pub/bin/cfs $DISCO_HOME/bin
-	cp $WORK/ComponentFS/pub/lib/libcfs.so $DISCO_HOME/lib
-	cp $WORK/Utilities/pub/libnativeLib.so $DISCO_HOME/lib
-	
 #
 # Case 2 for a fully installed disco release - everything is in a single jar file.
 #
