@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="priv/src"/>
+	<classpathentry kind="src" output="priv/test_bin" path="priv/test_src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildStore"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Utilities"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="priv/bin"/>
 </classpath>
