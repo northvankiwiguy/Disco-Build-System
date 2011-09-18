@@ -56,6 +56,11 @@ static char *trace_file_name = "cfs.trace";
  */
 int traverse_source = FALSE;
 
+/*
+ * Amount of debug output to display. Valid values are currently 0, 1 or 2.
+ */
+int debug_level = 0;
+
 /*======================================================================
  * parse_args()
  *
@@ -68,7 +73,7 @@ int traverse_source = FALSE;
 static char **parse_options(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "+hro:")) != -1){
+	while ((opt = getopt(argc, argv, "+hro:d:")) != -1){
 		switch (opt){
 		case 'o':
 			/* -o <trace-file> */
@@ -78,11 +83,20 @@ static char **parse_options(int argc, char *argv[])
 			/* -r - traverse the directory hierarchy to locate source files */
 			traverse_source = TRUE;
 			break;
+		case 'd':
+			/* -d - set debugging output level. Restrict to 0, 1 or 2 */
+			if (!strcmp(optarg, "0") || !strcmp(optarg, "1") || !strcmp(optarg, "2")){
+				debug_level = optarg[0] - '0';
+			} else {
+				fprintf(stderr, "Error: debug level (-d option) must be 0, 1 or 2\n");
+				exit(-1);
+			}
+			break;
 
 		case '?':
 		case 'h':
 			fprintf(stderr, "Usage:\n");
-			fprintf(stderr, "    cfs [-h | -o trace-file] [ command args ...]\n");
+			fprintf(stderr, "    cfs [-h | -o trace-file | -d debug-level] [ command args ...]\n");
 			exit(-1);
 		default:
 			/* ignore */
@@ -196,6 +210,15 @@ int main(int argc, char *argv[], char *envp[])
 				printf("Searching for source files... ");
 				traverse_and_trace_source();
 				printf("done.\n");
+			}
+
+			/*
+			 * Export the CFS_DEBUG environment variable, if our user provided the -d option
+			 */
+			if (debug_level != 0) {
+				char cfs_debug_string[strlen("N")];
+				sprintf(cfs_debug_string, "%d", debug_level);
+				setenv("CFS_DEBUG", cfs_debug_string, 1);
 			}
 
 			/*

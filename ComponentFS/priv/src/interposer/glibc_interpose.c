@@ -71,6 +71,11 @@ static int my_process_number;
  */
 static int my_parent_process_number;
 
+/*
+ * Debug level. Set this by setting the CFS_DEBUG environment variable
+ */
+static int debug_level;
+
 
 /*======================================================================
  * _init_interposer()
@@ -85,6 +90,9 @@ void _init_interposer() __attribute__ ((constructor));
 void _init_interposer()
 {
 	static char argv_and_envp[NCARGS];
+
+	/* disable debugging for now */
+	debug_level = 0;
 
 	/*
 	 * If the CFS_ID environment variable is defined, then this current process
@@ -141,6 +149,21 @@ void _init_interposer()
 	}
 
 	/*
+	 * Enable debugging, if desired. An non-numeric value in the CFS_DEBUG environment
+	 * variable will be dealt with by disabling debugging. Debug levels that are too
+	 * high will be reduce to level 2.
+	 */
+	char *cfs_debug = getenv("CFS_DEBUG");
+	if (cfs_debug != NULL) {
+		debug_level = atoi(cfs_debug);
+		if (debug_level < 0){
+			debug_level = 0;
+		} else if (debug_level > 2){
+			debug_level = 2;
+		}
+	}
+
+	/*
 	 * Allocate a process number for this newly started process. This process
 	 * number is added to each trace message.
 	 */
@@ -166,6 +189,24 @@ void _init_interposer()
 		}
 	}
 }
+
+/*======================================================================
+ * cfs_debug
+ * 
+ * Display debug output. Only display debug output that's within the
+ * current debug_level (set via the CFS_DEBUG environment variable).
+ *======================================================================*/
+
+static void cfs_debug(int level, char *string, ...) {
+	va_list args;
+
+	va_start(args, string);
+	if (level <= debug_level) {
+		vprintf(string, args);
+		printf("\n");
+	}
+}
+
 
 /*======================================================================
  * Interposer functions
@@ -281,7 +322,7 @@ FILE *fopen(const char *filename, const char *opentype)
 {
 	FETCH_REAL_FN(FILE *, real_fopen, "fopen");
 
-	//printf("fopen(%s, %s)\n", filename, opentype);
+	cfs_debug(1, "fopen(\"%s\", \"%s\")", filename, opentype);
 	fopen_common(filename, opentype);
 	FILE *f = real_fopen(filename, opentype);
 	return f;
@@ -295,7 +336,7 @@ FILE *fopen64(const char *filename, const char *opentype)
 {
 	FETCH_REAL_FN(FILE *, real_fopen64, "fopen64");
 
-	//printf("fopen64(%s, %s)\n", filename, opentype);
+	cfs_debug(1, "fopen64(\"%s\", \"%s\")", filename, opentype);
 	fopen_common(filename, opentype);
 	FILE *f = real_fopen64(filename, opentype);
 	return f;
@@ -435,7 +476,7 @@ int open(const char *filename, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	//printf("open(%s, %d, 0x%x)\n", filename, flags, mode);
+	cfs_debug(1, "open(\"%s\", %d, 0x%x)", filename, flags, mode);
 	open_common(filename, flags);
 	int fd = real_open(filename, flags, mode);
 	return fd;
@@ -459,7 +500,7 @@ int open64(const char *filename, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	//printf("open64(%s, %d, 0x%x)\n", filename, flags, mode);
+	cfs_debug(1, "open64(\"%s\", %d, 0x%x)", filename, flags, mode);
 	open_common(filename, flags);
 	int fd = real_open64(filename, flags, mode);
 	return fd;
