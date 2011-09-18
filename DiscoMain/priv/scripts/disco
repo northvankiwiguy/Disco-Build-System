@@ -27,7 +27,6 @@ then
 	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/DiscoMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
 	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/DiscoMain/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
-	export LD_LIBRARY_PATH="$WORK/Utilities/pub"
 	
 	# set up a fake root directory, with the latest libraries and binaries. The disco Java code dynamically
 	# loads these things
@@ -44,7 +43,6 @@ elif [ -e "$SCRIPT_DIR/../lib/disco.jar" ];
 then
     export DISCO_HOME=$SCRIPT_DIR/..
 	export CLASSPATH="$DISCO_HOME/lib/disco.jar"
-	export LD_LIBRARY_PATH="$DISCO_HOME/lib"
 
 #
 # Else, it's an error

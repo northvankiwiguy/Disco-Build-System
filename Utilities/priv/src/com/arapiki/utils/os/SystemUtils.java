@@ -48,10 +48,20 @@ public class SystemUtils {
 	 * libraries that we need.
 	 */
 	static {
+		/* 
+		 * Use the DISCO_HOME environment variable to determine where our dynamically loadable
+		 * libraries are stored.
+		 */
+		String discoHome = System.getenv("DISCO_HOME");
+		if (discoHome == null) {
+			throw new FatalError("The DISCO_HOME environment variable is not set.");
+		}
+
+		/* load our JNI libraries */
 		try {
-			System.loadLibrary("nativeLib");
-		} catch (Exception ex) {
-			throw new FatalError("Unable to load native methods.", ex);
+			System.load(discoHome + "/lib/libnativeLib.so");
+		} catch (UnsatisfiedLinkError ex) {
+			throw new FatalError("Unable to load native methods: " + ex.getMessage(), ex);
 		}
 	}
 	
