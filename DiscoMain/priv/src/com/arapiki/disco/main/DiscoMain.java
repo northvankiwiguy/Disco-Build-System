@@ -291,7 +291,8 @@ public final class DiscoMain {
 		registerCommandGroup("Commands for scanning builds and build trees",
 			new ICliCommand[] {
 				new CliCommandScanTree(),
-				new CliCommandScanEaAnno()
+				new CliCommandScanEaAnno(),
+				new CliCommandScanBuild()
 			});
 		
 		registerCommandGroup("Commands for displaying file/path information",

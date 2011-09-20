@@ -1,0 +1,150 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Arapiki Solutions Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    "Peter Smith <psmith@arapiki.com>" - initial API and 
+ *        implementation and/or initial documentation
+ *******************************************************************************/ 
+
+package com.arapiki.disco.scanner.legacy;
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import java.io.FileNotFoundException;
+
+import org.junit.Test;
+
+import com.arapiki.disco.model.BuildStore;
+
+/**
+ * Test methods for validating the LegacyBuildScanner class. Note that
+ * since the legacy build scanner is very complex, we have multiple
+ * test files (in this directory). This test class only tests the basic
+ * accessor methods.
+ * 
+ * @author "Peter Smith <psmith@arapiki.com>"
+ */
+public class TestLegacyBuildScanner {
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the setTraceFile()/getTraceFile() methods
+	 */
+	@Test
+	public void testSetTraceFile() throws Exception {
+		
+		/* create a new LegacyBuildScanner, with default settings */
+		LegacyBuildScanner buildScanner = new LegacyBuildScanner();
+		
+		/* the default trace file name */
+		assertEquals("cfs.trace", buildScanner.getTraceFile());
+		
+		/* set the trace file name to something else */
+		buildScanner.setTraceFile("my_path_name.trace");
+		assertEquals("my_path_name.trace", buildScanner.getTraceFile());
+		buildScanner.setTraceFile("another_path_name");
+		assertEquals("another_path_name", buildScanner.getTraceFile());
+		
+		/* set the default again */
+		buildScanner.setTraceFile(null);
+		assertEquals("cfs.trace", buildScanner.getTraceFile());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the setBuildStore()/getBuildStore() methods
+	 */
+	@Test
+	public void testSetBuildStore() throws Exception {
+		
+		/* create a new LegacyBuildScanner, with default settings */
+		LegacyBuildScanner buildScanner = new LegacyBuildScanner();
+	
+		/* create an empty build store */
+		BuildStore buildStore = CommonTestUtils.getEmptyBuildStore();
+		
+		/* by default, there's no BuildStore */
+		assertNull(buildScanner.getBuildStore());
+		
+		/* set the BuildStore, and check it's correct */
+		buildScanner.setBuildStore(buildStore);
+		assertEquals(buildStore, buildScanner.getBuildStore());
+		
+		/* now set it back to null */
+		buildScanner.setBuildStore(null);
+		assertNull(buildScanner.getBuildStore());		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the setDebugStream()/getDebugStream() methods
+	 */
+	@Test
+	public void testSetDebugStream() throws Exception {
+
+		/* create a new LegacyBuildScanner, with default settings */
+		LegacyBuildScanner buildScanner = new LegacyBuildScanner();
+
+		/* by default, there's no stream */
+		assertNull(buildScanner.getDebugStream());
+		
+		/* set it to System.out */
+		buildScanner.setDebugStream(System.out);
+		assertEquals(System.out, buildScanner.getDebugStream());
+		
+		/* set it to System.err */
+		buildScanner.setDebugStream(System.err);
+		assertEquals(System.err, buildScanner.getDebugStream());
+		
+		/* set it back to null */
+		buildScanner.setDebugStream(null);		
+		assertNull(buildScanner.getDebugStream());		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the setDebugLevel()/getDebugLevel() methods
+	 */
+	@Test
+	public void testSetDebugLevel() throws Exception {
+		
+		/* create a new LegacyBuildScanner, with default settings */
+		LegacyBuildScanner buildScanner = new LegacyBuildScanner();
+		
+		/* check the default is 0 */
+		assertEquals(0, buildScanner.getDebugLevel());
+		
+		/* set to 0 */
+		buildScanner.setDebugLevel(0);
+		assertEquals(0, buildScanner.getDebugLevel());
+		
+		/* set to 1 */
+		buildScanner.setDebugLevel(1);
+		assertEquals(1, buildScanner.getDebugLevel());
+		
+		/* set to 2 */
+		buildScanner.setDebugLevel(2);
+		assertEquals(2, buildScanner.getDebugLevel());
+
+		/* set to 3 - should revert to 2 */
+		buildScanner.setDebugLevel(3);
+		assertEquals(2, buildScanner.getDebugLevel());
+
+		/* set to -1 - should revert to 0*/
+		buildScanner.setDebugLevel(-1);
+		assertEquals(0, buildScanner.getDebugLevel());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+}

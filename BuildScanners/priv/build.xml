@@ -23,7 +23,11 @@
 	<path id="project-classpath">
 		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
 		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
+		<pathelement location="${project-root}/../BuildStore/priv/lib/sqlitejdbc-v056.jar" />
 	</path>
+	
+	<!-- no extra classpath for unit testing -->
+	<path id="extra-test-classpath" />
 
 	<!-- Make sure that all upstream components are up to date -->
 	<target name="build-upstream-components">
