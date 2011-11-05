@@ -13,15 +13,21 @@
 package com.arapiki.disco.eclipse.files;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
@@ -161,6 +167,21 @@ public class DiscoFilesEditor extends EditorPart {
 				}
 			}
 		});
+		
+		/* create the context menu */
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				manager.add(new Separator("discoactions"));
+				manager.add(new Separator("additions"));
+			}
+		});
+		Menu menu = menuMgr.createContextMenu(filesTreeViewer.getControl());
+		filesTreeViewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, filesTreeViewer);
+		getSite().setSelectionProvider(filesTreeViewer);
 
 		/* start by displaying from the root */
 		FileRecord rootFileRecord = new FileRecord(fns.getRootPath("root")); 

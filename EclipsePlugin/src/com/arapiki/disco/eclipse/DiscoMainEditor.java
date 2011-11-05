@@ -148,6 +148,15 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 		super.dispose();
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The BuildStore associated with this instance of the editor
+	 */
+	public BuildStore getBuildStore() {
+		return buildStore;
+	}
+
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
