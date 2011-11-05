@@ -24,10 +24,10 @@
 #include "cunit_helper.h"
 
 /* each suite initializes itself via one of these functions */
+extern int init_file_name_utils_suite();
 extern int init_regress_glibc_suite();
 extern int init_trace_buffer_suite();
 extern int init_trace_glibc_suite();
-
 
 /*======================================================================
  * main - The main entry point for unit-testing the CFS interposer.
@@ -38,6 +38,13 @@ int main(int argc, char *argv[])
 
 	/* initialize the CUnit test registry */
 	NEW_REGISTRY();
+
+	/*
+	 * Test our file_name_utils helper functions.
+	 */
+	if (init_file_name_utils_suite() != CUE_SUCCESS) {
+		return CU_get_error();
+	}
 
 	/*
 	 * Make sure glibc calls don't lose their normal behavior when accessing files

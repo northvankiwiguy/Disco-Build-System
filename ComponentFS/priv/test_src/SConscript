@@ -20,6 +20,7 @@ Import('*')
 # available on this build machine (it's not included in this source tree).
 env.Program('run_test_interposer', 
 	['test_interposer/main.c', 
+	 'test_interposer/file_name_utils_suite.c',
 	 'test_interposer/regress_glibc_suite.c',
 	 'test_interposer/trace_buffer_suite.c',
 	 'test_interposer/trace_glibc_suite.c'], 
