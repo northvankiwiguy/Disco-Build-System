@@ -35,6 +35,14 @@
 	<property name="test-bin-dir" location="${priv-dir}/test_bin" />
 	<property name="jar-file" location="${pub-dir}/${project-jar}" />
 	
+	<!-- 
+	   - Location of our "fake" root package directory. This is similar to the final release
+	   - package's file system layout, but can be used to access the not-yet-packaged files
+	   - in the build tree. This allows the code to access $DISCO_HOME/{bin,lib} during
+	   - development.
+	  -->
+	<property name="fake-home-dir" location="${project-root}/../DiscoMain/priv/fake-home" />
+	
 	<!--
 	   - Build the output jar file for the project. 
       -->
@@ -122,6 +130,7 @@
 	   - Execute unit tests using junit
 	  -->
 	<target name="test" depends="test-java, check-for-tests" if="tests-available">
+		<property name="env.DISCO_HOME" value="${fake-home-dir}" />
 		<junit fork="yes" printsummary="false" haltonfailure="true">
 		
 			<!-- ensure that the correct classpath and library path is set up -->

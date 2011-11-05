@@ -6,14 +6,6 @@
 	
 	<!-- name of the jar file we'll create -->
 	<property name="project-jar" value="disco-main.jar" />
-	
-	<!-- 
-	   - Location of our "fake" root package directory. This is similar to the final release
-	   - package's file system layout, but can be used to access the not-yet-packaged files
-	   - in the build tree. This allows the code to access $DISCO_HOME/{bin,lib} during
-	   - development.
-	  -->
-	<property name="fake-home-dir" location="fake-home" />
 
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
@@ -128,7 +120,7 @@
 	<!--
 	   - Test all projects.
 	  -->
-	<target name="test-all">
+	<target name="test-all" depends="fake-home">
 		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="test" inheritall="false" />
 		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="test" inheritall="false" />
