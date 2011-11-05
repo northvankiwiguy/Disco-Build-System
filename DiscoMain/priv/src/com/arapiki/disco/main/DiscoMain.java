@@ -23,6 +23,7 @@ import com.arapiki.disco.main.commands.*;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.utils.print.PrintUtils;
 import com.arapiki.utils.string.StringArray;
+import com.arapiki.utils.version.Version;
 
 /**
  * This is the main entry point for the "disco" command line program. All other projects (with
@@ -41,6 +42,9 @@ public final class DiscoMain {
 	
 	/** did the user select the -h option? */
 	private boolean optionHelp = false;
+	
+	/** did the user select the -v option? */
+	private boolean optionVersion = false;
 	
 	/** The global command line options, as used by the Apache Commons CLI library */
 	private Options globalOpts = null;
@@ -88,6 +92,10 @@ public final class DiscoMain {
 		Option hOpt = new Option("h", "help", false, "Show this help information");
 		globalOpts.addOption(hOpt);
 		
+		/* add the -v / --version option */
+		Option vOpt = new Option("v", "version", false, "Show version information");
+		globalOpts.addOption(vOpt);
+		
 		/* how many columns of output should we show (default is 80) */
 		Option widthOpt = new Option("w", "width", true, "Number of output columns in reports (default is " +
 				CliUtils.getColumnWidth() + ")");
@@ -115,6 +123,10 @@ public final class DiscoMain {
 		
 		if (line.hasOption('h')) {
 			optionHelp = true;
+		}
+		
+		if (line.hasOption('v')) {
+			optionVersion = true;
 		}
 		
 		String argWidth = line.getOptionValue("width");
@@ -380,6 +392,10 @@ public final class DiscoMain {
 		 * but also with an error message.
 		 */
 		if (cmdArgs.length == 0) {
+			if (optionVersion) {
+				System.out.println(Version.getVersion());
+				CliUtils.reportErrorAndExit(null);
+			}
 			if (optionHelp) {
 				displayHelpAndExit(null);
 			} else {

@@ -29,8 +29,27 @@
 	<target name="extra-compilation" depends="extra-comp-1, extra-comp-2" />
 	
 	<target name="extra-comp-1">
+		<!-- generate JNI header files -->
 		<mkdir dir="${gen-src}" />
-		<javah class="com.arapiki.utils.os.SystemUtils" classpath="bin" destdir="${gen-src}" />		
+		<javah class="com.arapiki.utils.os.SystemUtils" classpath="bin" destdir="${gen-src}" />	
+		
+		<!-- 
+		   - Generate and compile the Version.java file, containing version number and copyright year
+		   - Note that our copied version of Version.java should be used because the Version.class 
+		   - we're creating here will be newer than Version.java, and therefore won't be 
+		   - recompiled by the "jars" target.
+		  -->
+		<tstamp>
+		    <format property="YEAR" pattern="yyyy" />
+		</tstamp>
+		<copy file="src/com/arapiki/utils/version/Version.java" 
+			tofile="${gen-src}/com/arapiki/utils/version/Version.java" overwrite="true">
+			<filterset>
+				<filter token="YEAR" value="${YEAR}"/>
+				<filter token="VERSION" value="${version}"/>
+			</filterset>
+		</copy>
+		<javac srcdir="${gen-src}" destdir="${bin-dir}" includeantruntime="false"/>
 	</target>
 	
 	<target name="check-native-uptodate">
