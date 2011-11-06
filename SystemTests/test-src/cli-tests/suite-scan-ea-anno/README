@@ -1,0 +1,4 @@
+This test suite validates the functionality of the "scan-ea-anno" command, using various reporting commands
+to validate the content of the BuildStore. Naturally, we're also testing the functionality of
+those reporting commands, and the optional parameters.
+

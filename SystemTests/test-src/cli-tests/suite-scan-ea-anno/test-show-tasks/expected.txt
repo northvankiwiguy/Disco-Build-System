@@ -1,0 +1,4191 @@
+show-tasks - with default settings
+- Task 1 (/home/psmith/t/cvs-1.11.23)
+    if test ! -f config.h; then \
+    	  rm -f stamp-h1; \
+    	  emake  stamp-h1; \
+    	else :; fi
+
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
+        -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
+      mv -f .deps/argmatch.Tpo .deps/argmatch.Po
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
+        .deps/getdate.Tpo -c -o getdate.o getdate.c
+      mv -f .deps/getdate.Tpo .deps/getdate.Po
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
+        .deps/getline.Tpo -c -o getline.o getline.c
+      mv -f .deps/getline.Tpo .deps/getline.Po
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
+        .deps/getopt.Tpo -c -o getopt.o getopt.c
+      mv -f .deps/getopt.Tpo .deps/getopt.Po
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
+        .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
+      mv -f .deps/getopt1.Tpo .deps/getopt1.Po
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
+        .deps/getpass.Tpo -c -o getpass.o getpass.c
+      mv -f .deps/getpass.Tpo .deps/getpass.Po
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
+        .deps/md5.Tpo -c -o md5.o md5.c
+      mv -f .deps/md5.Tpo .deps/md5.Po
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
+        .deps/regex.Tpo -c -o regex.o regex.c
+      mv -f .deps/regex.Tpo .deps/regex.Po
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
+        .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
+      mv -f .deps/savecwd.Tpo .deps/savecwd.Po
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
+        -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
+      mv -f .deps/sighandle.Tpo .deps/sighandle.Po
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
+        -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
+      mv -f .deps/stripslash.Tpo .deps/stripslash.Po
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
+        .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
+      mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
+        .deps/yesno.Tpo -c -o yesno.o yesno.c
+      mv -f .deps/yesno.Tpo .deps/yesno.Po
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+      rm -f libcvs.a
+      ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
+        getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
+        yesno.o 
+      ranlib libcvs.a
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o adler32.o adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o compress.o compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o uncompr.o uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o deflate.o deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inflate.o inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infblock.o infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inftrees.o inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infcodes.o infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infutil.o infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inffast.o inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+      ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o \
+        trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o \
+        inffast.o 
+      (ranlib libz.a || true) >/dev/null 2>&1
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
+        .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
+        .deps/diff3.Tpo -c -o diff3.o diff3.c
+      mv -f .deps/diff3.Tpo .deps/diff3.Po
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
+        .deps/analyze.Tpo -c -o analyze.o analyze.c
+      mv -f .deps/analyze.Tpo .deps/analyze.Po
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
+        .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
+      mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
+        .deps/io.Tpo -c -o io.o io.c
+      mv -f .deps/io.Tpo .deps/io.Po
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
+        .deps/context.Tpo -c -o context.o context.c
+      mv -f .deps/context.Tpo .deps/context.Po
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
+        .deps/ed.Tpo -c -o ed.o ed.c
+      mv -f .deps/ed.Tpo .deps/ed.Po
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
+        .deps/normal.Tpo -c -o normal.o normal.c
+      mv -f .deps/normal.Tpo .deps/normal.Po
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
+        .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
+      mv -f .deps/ifdef.Tpo .deps/ifdef.Po
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
+        .deps/util.Tpo -c -o util.o util.c
+      mv -f .deps/util.Tpo .deps/util.Po
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
+        .deps/dir.Tpo -c -o dir.o dir.c
+      mv -f .deps/dir.Tpo .deps/dir.Po
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
+        .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
+        .deps/side.Tpo -c -o side.o side.c
+      mv -f .deps/side.Tpo .deps/side.Po
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
+        normal.o ifdef.o util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
+      mv -f .deps/add.Tpo .deps/add.Po
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
+      mv -f .deps/admin.Tpo .deps/admin.Po
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
+      mv -f .deps/annotate.Tpo .deps/annotate.Po
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
+      mv -f .deps/buffer.Tpo .deps/buffer.Po
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
+      mv -f .deps/checkin.Tpo .deps/checkin.Po
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
+      mv -f .deps/checkout.Tpo .deps/checkout.Po
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
+      mv -f .deps/classify.Tpo .deps/classify.Po
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
+      mv -f .deps/client.Tpo .deps/client.Po
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
+      mv -f .deps/commit.Tpo .deps/commit.Po
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
+        create_adm.c
+      mv -f .deps/create_adm.Tpo .deps/create_adm.Po
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
+      mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
+      mv -f .deps/edit.Tpo .deps/edit.Po
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
+      mv -f .deps/entries.Tpo .deps/entries.Po
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
+      mv -f .deps/error.Tpo .deps/error.Po
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
+        expand_path.c
+      mv -f .deps/expand_path.Tpo .deps/expand_path.Po
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
+      mv -f .deps/fileattr.Tpo .deps/fileattr.Po
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
+      mv -f .deps/filesubr.Tpo .deps/filesubr.Po
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
+        find_names.c
+      mv -f .deps/find_names.Tpo .deps/find_names.Po
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
+      mv -f .deps/hardlink.Tpo .deps/hardlink.Po
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
+      mv -f .deps/hash.Tpo .deps/hash.Po
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
+      mv -f .deps/history.Tpo .deps/history.Po
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
+      mv -f .deps/ignore.Tpo .deps/ignore.Po
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
+      mv -f .deps/import.Tpo .deps/import.Po
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
+      mv -f .deps/lock.Tpo .deps/lock.Po
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
+      mv -f .deps/log.Tpo .deps/log.Po
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
+      mv -f .deps/login.Tpo .deps/login.Po
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
+      mv -f .deps/logmsg.Tpo .deps/logmsg.Po
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
+      mv -f .deps/main.Tpo .deps/main.Po
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
+        mkmodules.c
+      mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
+      mv -f .deps/modules.Tpo .deps/modules.Po
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
+      mv -f .deps/myndbm.Tpo .deps/myndbm.Po
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
+      mv -f .deps/no_diff.Tpo .deps/no_diff.Po
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
+        parseinfo.c
+      mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
+      mv -f .deps/patch.Tpo .deps/patch.Po
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
+      mv -f .deps/rcs.Tpo .deps/rcs.Po
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
+      mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
+      mv -f .deps/recurse.Tpo .deps/recurse.Po
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
+      mv -f .deps/release.Tpo .deps/release.Po
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
+      mv -f .deps/remove.Tpo .deps/remove.Po
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
+      mv -f .deps/repos.Tpo .deps/repos.Po
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
+      mv -f .deps/root.Tpo .deps/root.Po
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
+      mv -f .deps/run.Tpo .deps/run.Po
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
+      mv -f .deps/scramble.Tpo .deps/scramble.Po
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
+      mv -f .deps/server.Tpo .deps/server.Po
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
+      mv -f .deps/stack.Tpo .deps/stack.Po
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
+      mv -f .deps/status.Tpo .deps/status.Po
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
+      mv -f .deps/subr.Tpo .deps/subr.Po
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
+      mv -f .deps/tag.Tpo .deps/tag.Po
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
+      mv -f .deps/update.Tpo .deps/update.Po
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
+      mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
+      mv -f .deps/watch.Tpo .deps/watch.Po
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
+      mv -f .deps/wrapper.Tpo .deps/wrapper.Po
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvs2vendor
+      cp cvs2vendor.sh cvs2vendor
+      chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvscheck
+      cp cvscheck.sh cvscheck
+      chmod +x cvscheck
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f debug_check_log
+      cp debug_check_log.sh debug_check_log
+      chmod +x debug_check_log
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f rcs-to-cvs
+      cp rcs-to-cvs.sh rcs-to-cvs
+      chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; \
+      	for f in x $MAKEFLAGS; do \
+      	  case $f in \
+      	    *=* | --[!k]*);; \
+      	    *k*) failcom='fail=yes';; \
+      	  esac; \
+      	done; \
+      	dot_seen=no; \
+      	target=`echo all-recursive | sed s/-recursive//`; \
+      	list='SCC'; for subdir in $list; do \
+      	  echo "Making $target in $subdir"; \
+      	  if test "$subdir" = "."; then \
+      	    dot_seen=yes; \
+      	    local_target="$target-am"; \
+      	  else \
+      	    local_target="$target"; \
+      	  fi; \
+      	  (cd $subdir && emake  $local_target) \
+      	  || eval $failcom; \
+      	done; \
+      	if test "$dot_seen" = "no"; then \
+      	  emake  "$target-am" || exit 1; \
+      	fi; test -z "$fail"
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+      echo "/* This file is generated via a rule in Makefile.am from the" \
+      	  >config.tmp
+      echo " * config.h.in file." >>config.tmp
+      echo " *" >>config.tmp
+      echo " * *** DO NOT EDIT THIS FILE DIRECTLY ***" >>config.tmp
+      echo " *" >>config.tmp
+      echo " * Edit config.h.in instead." >>config.tmp
+      echo " */" >>config.tmp
+      sed -e "s/%25PACKAGE_STRING%25/Concurrent Versions System (CVS) 1.11.23/"  \
+        \
+      	    -e "s/%25PACKAGE_BUGREPORT%25/bug-cvs@nongnu.org/" \
+      	  <./config.h.in >>config.tmp
+      cmp -s config.tmp ./config.h \
+      	  || (echo "Updating config.h"; \
+      	      cp config.tmp ./config.h)
+      rm -f config.tmp
+      cp ./config.h stamp-ch
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+      if test ! -f config.h; then \
+      	  rm -f stamp-h1; \
+      	  emake  stamp-h1; \
+      	else :; fi
+
+
+show-tasks - with restricted column width
+- Task 1 (/home/psmith/t/cvs-1.11.23)
+    if test ! -f config.h; then \
+    	  rm -f stamp-h1; \
+    	  emake  stamp-h1; \
+    	else :; fi
+
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed \
+           s/-recursive//`; \
+     	list='lib zlib diff src man doc \
+           contrib tools windows-NT os2 \
+           emx vms'; for subdir in \
+           $list; do \
+     	  echo "Making $target in \
+             $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  \
+             $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        argmatch.o -MD -MP -MF \
+        .deps/argmatch.Tpo -c -o \
+        argmatch.o argmatch.c
+      mv -f .deps/argmatch.Tpo \
+        .deps/argmatch.Po
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        getdate.o -MD -MP -MF \
+        .deps/getdate.Tpo -c -o \
+        getdate.o getdate.c
+      mv -f .deps/getdate.Tpo \
+        .deps/getdate.Po
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        getline.o -MD -MP -MF \
+        .deps/getline.Tpo -c -o \
+        getline.o getline.c
+      mv -f .deps/getline.Tpo \
+        .deps/getline.Po
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT getopt.o \
+        -MD -MP -MF .deps/getopt.Tpo -c \
+        -o getopt.o getopt.c
+      mv -f .deps/getopt.Tpo \
+        .deps/getopt.Po
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        getopt1.o -MD -MP -MF \
+        .deps/getopt1.Tpo -c -o \
+        getopt1.o getopt1.c
+      mv -f .deps/getopt1.Tpo \
+        .deps/getopt1.Po
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        getpass.o -MD -MP -MF \
+        .deps/getpass.Tpo -c -o \
+        getpass.o getpass.c
+      mv -f .deps/getpass.Tpo \
+        .deps/getpass.Po
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT md5.o \
+        -MD -MP -MF .deps/md5.Tpo -c -o \
+        md5.o md5.c
+      mv -f .deps/md5.Tpo .deps/md5.Po
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT regex.o \
+        -MD -MP -MF .deps/regex.Tpo -c \
+        -o regex.o regex.c
+      mv -f .deps/regex.Tpo \
+        .deps/regex.Po
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        savecwd.o -MD -MP -MF \
+        .deps/savecwd.Tpo -c -o \
+        savecwd.o savecwd.c
+      mv -f .deps/savecwd.Tpo \
+        .deps/savecwd.Po
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        sighandle.o -MD -MP -MF \
+        .deps/sighandle.Tpo -c -o \
+        sighandle.o sighandle.c
+      mv -f .deps/sighandle.Tpo \
+        .deps/sighandle.Po
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT \
+        stripslash.o -MD -MP -MF \
+        .deps/stripslash.Tpo -c -o \
+        stripslash.o stripslash.c
+      mv -f .deps/stripslash.Tpo \
+        .deps/stripslash.Po
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT xgetwd.o \
+        -MD -MP -MF .deps/xgetwd.Tpo -c \
+        -o xgetwd.o xgetwd.c
+      mv -f .deps/xgetwd.Tpo \
+        .deps/xgetwd.Po
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../src     -g -O2 -MT yesno.o \
+        -MD -MP -MF .deps/yesno.Tpo -c \
+        -o yesno.o yesno.c
+      mv -f .deps/yesno.Tpo \
+        .deps/yesno.Po
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+      rm -f libcvs.a
+      ar cru libcvs.a argmatch.o \
+        getdate.o getline.o getopt.o \
+        getopt1.o getpass.o md5.o \
+        regex.o savecwd.o sighandle.o \
+        stripslash.o xgetwd.o yesno.o 
+      ranlib libcvs.a
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o adler32.o \
+        adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o compress.o \
+        compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o uncompr.o \
+        uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o deflate.o \
+        deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inflate.o \
+        inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infblock.o \
+        infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inftrees.o \
+        inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infcodes.o \
+        infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infutil.o \
+        infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inffast.o \
+        inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+      ar rc libz.a adler32.o compress.o \
+        crc32.o gzio.o uncompr.o \
+        deflate.o trees.o zutil.o \
+        inflate.o infblock.o inftrees.o \
+        infcodes.o infutil.o inffast.o 
+      (ranlib libz.a || true) >/dev/null \
+        2>&1
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT diff.o \
+        -MD -MP -MF .deps/diff.Tpo -c -o \
+        diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT diff3.o \
+        -MD -MP -MF .deps/diff3.Tpo -c \
+        -o diff3.o diff3.c
+      mv -f .deps/diff3.Tpo \
+        .deps/diff3.Po
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT analyze.o \
+        -MD -MP -MF .deps/analyze.Tpo -c \
+        -o analyze.o analyze.c
+      mv -f .deps/analyze.Tpo \
+        .deps/analyze.Po
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT cmpbuf.o \
+        -MD -MP -MF .deps/cmpbuf.Tpo -c \
+        -o cmpbuf.o cmpbuf.c
+      mv -f .deps/cmpbuf.Tpo \
+        .deps/cmpbuf.Po
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT io.o -MD \
+        -MP -MF .deps/io.Tpo -c -o io.o \
+        io.c
+      mv -f .deps/io.Tpo .deps/io.Po
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT context.o \
+        -MD -MP -MF .deps/context.Tpo -c \
+        -o context.o context.c
+      mv -f .deps/context.Tpo \
+        .deps/context.Po
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT ed.o -MD \
+        -MP -MF .deps/ed.Tpo -c -o ed.o \
+        ed.c
+      mv -f .deps/ed.Tpo .deps/ed.Po
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT normal.o \
+        -MD -MP -MF .deps/normal.Tpo -c \
+        -o normal.o normal.c
+      mv -f .deps/normal.Tpo \
+        .deps/normal.Po
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT ifdef.o \
+        -MD -MP -MF .deps/ifdef.Tpo -c \
+        -o ifdef.o ifdef.c
+      mv -f .deps/ifdef.Tpo \
+        .deps/ifdef.Po
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT util.o \
+        -MD -MP -MF .deps/util.Tpo -c -o \
+        util.o util.c
+      mv -f .deps/util.Tpo .deps/util.Po
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT dir.o -MD \
+        -MP -MF .deps/dir.Tpo -c -o \
+        dir.o dir.c
+      mv -f .deps/dir.Tpo .deps/dir.Po
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT version.o \
+        -MD -MP -MF .deps/version.Tpo -c \
+        -o version.o version.c
+      mv -f .deps/version.Tpo \
+        .deps/version.Po
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib    -g -O2 -MT side.o \
+        -MD -MP -MF .deps/side.Tpo -c -o \
+        side.o side.c
+      mv -f .deps/side.Tpo .deps/side.Po
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o \
+        analyze.o cmpbuf.o io.o \
+        context.o ed.o normal.o ifdef.o \
+        util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT add.o -MD -MP -MF \
+        .deps/add.Tpo -c -o add.o add.c
+      mv -f .deps/add.Tpo .deps/add.Po
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT admin.o -MD -MP -MF \
+        .deps/admin.Tpo -c -o admin.o \
+        admin.c
+      mv -f .deps/admin.Tpo \
+        .deps/admin.Po
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT annotate.o -MD -MP \
+        -MF .deps/annotate.Tpo -c -o \
+        annotate.o annotate.c
+      mv -f .deps/annotate.Tpo \
+        .deps/annotate.Po
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT buffer.o -MD -MP -MF \
+        .deps/buffer.Tpo -c -o buffer.o \
+        buffer.c
+      mv -f .deps/buffer.Tpo \
+        .deps/buffer.Po
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT checkin.o -MD -MP -MF \
+        .deps/checkin.Tpo -c -o \
+        checkin.o checkin.c
+      mv -f .deps/checkin.Tpo \
+        .deps/checkin.Po
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT checkout.o -MD -MP \
+        -MF .deps/checkout.Tpo -c -o \
+        checkout.o checkout.c
+      mv -f .deps/checkout.Tpo \
+        .deps/checkout.Po
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT classify.o -MD -MP \
+        -MF .deps/classify.Tpo -c -o \
+        classify.o classify.c
+      mv -f .deps/classify.Tpo \
+        .deps/classify.Po
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT client.o -MD -MP -MF \
+        .deps/client.Tpo -c -o client.o \
+        client.c
+      mv -f .deps/client.Tpo \
+        .deps/client.Po
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT commit.o -MD -MP -MF \
+        .deps/commit.Tpo -c -o commit.o \
+        commit.c
+      mv -f .deps/commit.Tpo \
+        .deps/commit.Po
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT create_adm.o -MD -MP \
+        -MF .deps/create_adm.Tpo -c -o \
+        create_adm.o create_adm.c
+      mv -f .deps/create_adm.Tpo \
+        .deps/create_adm.Po
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT cvsrc.o -MD -MP -MF \
+        .deps/cvsrc.Tpo -c -o cvsrc.o \
+        cvsrc.c
+      mv -f .deps/cvsrc.Tpo \
+        .deps/cvsrc.Po
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT diff.o -MD -MP -MF \
+        .deps/diff.Tpo -c -o diff.o \
+        diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT edit.o -MD -MP -MF \
+        .deps/edit.Tpo -c -o edit.o \
+        edit.c
+      mv -f .deps/edit.Tpo .deps/edit.Po
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT entries.o -MD -MP -MF \
+        .deps/entries.Tpo -c -o \
+        entries.o entries.c
+      mv -f .deps/entries.Tpo \
+        .deps/entries.Po
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT error.o -MD -MP -MF \
+        .deps/error.Tpo -c -o error.o \
+        error.c
+      mv -f .deps/error.Tpo \
+        .deps/error.Po
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT expand_path.o -MD -MP \
+        -MF .deps/expand_path.Tpo -c -o \
+        expand_path.o expand_path.c
+      mv -f .deps/expand_path.Tpo \
+        .deps/expand_path.Po
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT fileattr.o -MD -MP \
+        -MF .deps/fileattr.Tpo -c -o \
+        fileattr.o fileattr.c
+      mv -f .deps/fileattr.Tpo \
+        .deps/fileattr.Po
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT filesubr.o -MD -MP \
+        -MF .deps/filesubr.Tpo -c -o \
+        filesubr.o filesubr.c
+      mv -f .deps/filesubr.Tpo \
+        .deps/filesubr.Po
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT find_names.o -MD -MP \
+        -MF .deps/find_names.Tpo -c -o \
+        find_names.o find_names.c
+      mv -f .deps/find_names.Tpo \
+        .deps/find_names.Po
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT hardlink.o -MD -MP \
+        -MF .deps/hardlink.Tpo -c -o \
+        hardlink.o hardlink.c
+      mv -f .deps/hardlink.Tpo \
+        .deps/hardlink.Po
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT hash.o -MD -MP -MF \
+        .deps/hash.Tpo -c -o hash.o \
+        hash.c
+      mv -f .deps/hash.Tpo .deps/hash.Po
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT history.o -MD -MP -MF \
+        .deps/history.Tpo -c -o \
+        history.o history.c
+      mv -f .deps/history.Tpo \
+        .deps/history.Po
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT ignore.o -MD -MP -MF \
+        .deps/ignore.Tpo -c -o ignore.o \
+        ignore.c
+      mv -f .deps/ignore.Tpo \
+        .deps/ignore.Po
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT import.o -MD -MP -MF \
+        .deps/import.Tpo -c -o import.o \
+        import.c
+      mv -f .deps/import.Tpo \
+        .deps/import.Po
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT lock.o -MD -MP -MF \
+        .deps/lock.Tpo -c -o lock.o \
+        lock.c
+      mv -f .deps/lock.Tpo .deps/lock.Po
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT log.o -MD -MP -MF \
+        .deps/log.Tpo -c -o log.o log.c
+      mv -f .deps/log.Tpo .deps/log.Po
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT login.o -MD -MP -MF \
+        .deps/login.Tpo -c -o login.o \
+        login.c
+      mv -f .deps/login.Tpo \
+        .deps/login.Po
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT logmsg.o -MD -MP -MF \
+        .deps/logmsg.Tpo -c -o logmsg.o \
+        logmsg.c
+      mv -f .deps/logmsg.Tpo \
+        .deps/logmsg.Po
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT main.o -MD -MP -MF \
+        .deps/main.Tpo -c -o main.o \
+        main.c
+      mv -f .deps/main.Tpo .deps/main.Po
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT mkmodules.o -MD -MP \
+        -MF .deps/mkmodules.Tpo -c -o \
+        mkmodules.o mkmodules.c
+      mv -f .deps/mkmodules.Tpo \
+        .deps/mkmodules.Po
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT modules.o -MD -MP -MF \
+        .deps/modules.Tpo -c -o \
+        modules.o modules.c
+      mv -f .deps/modules.Tpo \
+        .deps/modules.Po
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT myndbm.o -MD -MP -MF \
+        .deps/myndbm.Tpo -c -o myndbm.o \
+        myndbm.c
+      mv -f .deps/myndbm.Tpo \
+        .deps/myndbm.Po
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT no_diff.o -MD -MP -MF \
+        .deps/no_diff.Tpo -c -o \
+        no_diff.o no_diff.c
+      mv -f .deps/no_diff.Tpo \
+        .deps/no_diff.Po
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT parseinfo.o -MD -MP \
+        -MF .deps/parseinfo.Tpo -c -o \
+        parseinfo.o parseinfo.c
+      mv -f .deps/parseinfo.Tpo \
+        .deps/parseinfo.Po
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT patch.o -MD -MP -MF \
+        .deps/patch.Tpo -c -o patch.o \
+        patch.c
+      mv -f .deps/patch.Tpo \
+        .deps/patch.Po
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT rcs.o -MD -MP -MF \
+        .deps/rcs.Tpo -c -o rcs.o rcs.c
+      mv -f .deps/rcs.Tpo .deps/rcs.Po
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT rcscmds.o -MD -MP -MF \
+        .deps/rcscmds.Tpo -c -o \
+        rcscmds.o rcscmds.c
+      mv -f .deps/rcscmds.Tpo \
+        .deps/rcscmds.Po
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT recurse.o -MD -MP -MF \
+        .deps/recurse.Tpo -c -o \
+        recurse.o recurse.c
+      mv -f .deps/recurse.Tpo \
+        .deps/recurse.Po
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT release.o -MD -MP -MF \
+        .deps/release.Tpo -c -o \
+        release.o release.c
+      mv -f .deps/release.Tpo \
+        .deps/release.Po
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT remove.o -MD -MP -MF \
+        .deps/remove.Tpo -c -o remove.o \
+        remove.c
+      mv -f .deps/remove.Tpo \
+        .deps/remove.Po
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT repos.o -MD -MP -MF \
+        .deps/repos.Tpo -c -o repos.o \
+        repos.c
+      mv -f .deps/repos.Tpo \
+        .deps/repos.Po
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT root.o -MD -MP -MF \
+        .deps/root.Tpo -c -o root.o \
+        root.c
+      mv -f .deps/root.Tpo .deps/root.Po
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT run.o -MD -MP -MF \
+        .deps/run.Tpo -c -o run.o run.c
+      mv -f .deps/run.Tpo .deps/run.Po
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT scramble.o -MD -MP \
+        -MF .deps/scramble.Tpo -c -o \
+        scramble.o scramble.c
+      mv -f .deps/scramble.Tpo \
+        .deps/scramble.Po
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT server.o -MD -MP -MF \
+        .deps/server.Tpo -c -o server.o \
+        server.c
+      mv -f .deps/server.Tpo \
+        .deps/server.Po
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT stack.o -MD -MP -MF \
+        .deps/stack.Tpo -c -o stack.o \
+        stack.c
+      mv -f .deps/stack.Tpo \
+        .deps/stack.Po
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT status.o -MD -MP -MF \
+        .deps/status.Tpo -c -o status.o \
+        status.c
+      mv -f .deps/status.Tpo \
+        .deps/status.Po
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT subr.o -MD -MP -MF \
+        .deps/subr.Tpo -c -o subr.o \
+        subr.c
+      mv -f .deps/subr.Tpo .deps/subr.Po
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT tag.o -MD -MP -MF \
+        .deps/tag.Tpo -c -o tag.o tag.c
+      mv -f .deps/tag.Tpo .deps/tag.Po
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT update.o -MD -MP -MF \
+        .deps/update.Tpo -c -o update.o \
+        update.c
+      mv -f .deps/update.Tpo \
+        .deps/update.Po
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT version.o -MD -MP -MF \
+        .deps/version.Tpo -c -o \
+        version.o version.c
+      mv -f .deps/version.Tpo \
+        .deps/version.Po
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT vers_ts.o -MD -MP -MF \
+        .deps/vers_ts.Tpo -c -o \
+        vers_ts.o vers_ts.c
+      mv -f .deps/vers_ts.Tpo \
+        .deps/vers_ts.Po
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT watch.o -MD -MP -MF \
+        .deps/watch.Tpo -c -o watch.o \
+        watch.c
+      mv -f .deps/watch.Tpo \
+        .deps/watch.Po
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT wrapper.o -MD -MP -MF \
+        .deps/wrapper.Tpo -c -o \
+        wrapper.o wrapper.c
+      mv -f .deps/wrapper.Tpo \
+        .deps/wrapper.Po
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. \
+        -I../lib -I../diff -I../zlib     \
+        -g -O2 -MT zlib.o -MD -MP -MF \
+        .deps/zlib.Tpo -c -o zlib.o \
+        zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o \
+        annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o \
+        commit.o create_adm.o cvsrc.o \
+        diff.o edit.o entries.o error.o \
+        expand_path.o fileattr.o \
+        filesubr.o find_names.o \
+        hardlink.o hash.o history.o \
+        ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o \
+        mkmodules.o modules.o myndbm.o \
+        no_diff.o parseinfo.o patch.o \
+        rcs.o rcscmds.o recurse.o \
+        release.o remove.o repos.o \
+        root.o run.o scramble.o server.o \
+        stack.o status.o subr.o tag.o \
+        update.o version.o vers_ts.o \
+        watch.o wrapper.o zlib.o \
+        ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a \
+        -lcrypt -lnsl 
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvs2vendor
+      cp cvs2vendor.sh cvs2vendor
+      chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvscheck
+      cp cvscheck.sh cvscheck
+      chmod +x cvscheck
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f debug_check_log
+      cp debug_check_log.sh \
+        debug_check_log
+      chmod +x debug_check_log
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f rcs-to-cvs
+      cp rcs-to-cvs.sh rcs-to-cvs
+      chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; \
+      	for f in x $MAKEFLAGS; do \
+      	  case $f in \
+      	    *=* | --[!k]*);; \
+      	    *k*) failcom='fail=yes';; \
+      	  esac; \
+      	done; \
+      	dot_seen=no; \
+      	target=`echo all-recursive | sed \
+            s/-recursive//`; \
+      	list='SCC'; for subdir in $list; \
+            do \
+      	  echo "Making $target in \
+              $subdir"; \
+      	  if test "$subdir" = "."; then \
+      	    dot_seen=yes; \
+      	    local_target="$target-am"; \
+      	  else \
+      	    local_target="$target"; \
+      	  fi; \
+      	  (cd $subdir && emake  \
+              $local_target) \
+      	  || eval $failcom; \
+      	done; \
+      	if test "$dot_seen" = "no"; then \
+            \
+      	  emake  "$target-am" || exit 1; \
+              \
+      	fi; test -z "$fail"
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+      echo "/* This file is generated \
+        via a rule in Makefile.am from \
+        the" \
+      	  >config.tmp
+      echo " * config.h.in file." \
+        >>config.tmp
+      echo " *" >>config.tmp
+      echo " * *** DO NOT EDIT THIS FILE \
+        DIRECTLY ***" >>config.tmp
+      echo " *" >>config.tmp
+      echo " * Edit config.h.in \
+        instead." >>config.tmp
+      echo " */" >>config.tmp
+      sed -e "s/%25PACKAGE_STRING%25/Con\
+        current Versions System (CVS) \
+        1.11.23/"  \
+      	    -e "s/%25PACKAGE_BUGREPORT%25\
+                /bug-cvs@nongnu.org/" \
+      	  <./config.h.in >>config.tmp
+      cmp -s config.tmp ./config.h \
+      	  || (echo "Updating config.h"; \
+      	      cp config.tmp ./config.h)
+      rm -f config.tmp
+      cp ./config.h stamp-ch
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+      if test ! -f config.h; then \
+      	  rm -f stamp-h1; \
+      	  emake  stamp-h1; \
+      	else :; fi
+
+
+show-tasks - with short output
+- Task 1 (/home/psmith/t/cvs-1.11.23)
+    if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :; fi
+
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; for f in x $MAKEFLAGS; do case $f in *=* | --[!k]*);; ...
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP...
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP ...
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP ...
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -...
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP ...
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP ...
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF ...
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -M...
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP ...
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -M...
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -...
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -...
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -M...
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+      rm -f libcvs.a && ar cru libcvs.a argmatch.o getdate.o getline.o getopt...
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o adler32.o adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o compress.o compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o uncompr.o uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o deflate.o deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inflate.o inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infblock.o infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inftrees.o inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infcodes.o infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infutil.o infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inffast.o inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+      ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o tr...
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF ...
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF...
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -...
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -M...
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF .d...
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -...
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF .d...
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -M...
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF...
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF ...
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF ....
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -...
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF ...
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a && ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o i...
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -M...
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs && gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o che...
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvs2vendor && cp cvs2vendor.sh cvs2vendor && chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvscheck && cp cvscheck.sh cvscheck && chmod +x cvscheck
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f debug_check_log && cp debug_check_log.sh debug_check_log && chmod...
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f rcs-to-cvs && cp rcs-to-cvs.sh rcs-to-cvs && chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; for f in x $MAKEFLAGS; do case $f in *=* | --[!k]*);;...
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+      echo "/* This file is generated via a rule in Makefile.am from the" >co...
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+      if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :; fi
+
+
+show-tasks - with long output
+- Task 1 (/home/psmith/t/cvs-1.11.23)
+if test ! -f config.h; then \
+	  rm -f stamp-h1; \
+	  emake  stamp-h1; \
+	else :; fi
+
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+failcom='exit 1'; \
+	for f in x $MAKEFLAGS; do \
+	  case $f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	target=`echo all-recursive | sed s/-recursive//`; \
+	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for subdir in $list; do \
+	  echo "Making $target in $subdir"; \
+	  if test "$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$target-am"; \
+	  else \
+	    local_target="$target"; \
+	  fi; \
+	  (cd $subdir && emake  $local_target) \
+	  || eval $failcom; \
+	done; \
+	if test "$dot_seen" = "no"; then \
+	  emake  "$target-am" || exit 1; \
+	fi; test -z "$fail"
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
+mv -f .deps/argmatch.Tpo .deps/argmatch.Po
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF .deps/getdate.Tpo -c -o getdate.o getdate.c
+mv -f .deps/getdate.Tpo .deps/getdate.Po
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF .deps/getline.Tpo -c -o getline.o getline.c
+mv -f .deps/getline.Tpo .deps/getline.Po
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF .deps/getopt.Tpo -c -o getopt.o getopt.c
+mv -f .deps/getopt.Tpo .deps/getopt.Po
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
+mv -f .deps/getopt1.Tpo .deps/getopt1.Po
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF .deps/getpass.Tpo -c -o getpass.o getpass.c
+mv -f .deps/getpass.Tpo .deps/getpass.Po
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF .deps/md5.Tpo -c -o md5.o md5.c
+mv -f .deps/md5.Tpo .deps/md5.Po
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF .deps/regex.Tpo -c -o regex.o regex.c
+mv -f .deps/regex.Tpo .deps/regex.Po
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
+mv -f .deps/savecwd.Tpo .deps/savecwd.Po
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
+mv -f .deps/sighandle.Tpo .deps/sighandle.Po
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
+mv -f .deps/stripslash.Tpo .deps/stripslash.Po
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
+mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF .deps/yesno.Tpo -c -o yesno.o yesno.c
+mv -f .deps/yesno.Tpo .deps/yesno.Po
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+rm -f libcvs.a
+ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o yesno.o 
+ranlib libcvs.a
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o adler32.o adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o compress.o compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o uncompr.o uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o deflate.o deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o inflate.o inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o infblock.o infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o inftrees.o inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o infcodes.o infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o infutil.o infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+gcc -g -O2   -c -o inffast.o inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o inffast.o 
+(ranlib libz.a || true) >/dev/null 2>&1
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
+mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF .deps/diff3.Tpo -c -o diff3.o diff3.c
+mv -f .deps/diff3.Tpo .deps/diff3.Po
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF .deps/analyze.Tpo -c -o analyze.o analyze.c
+mv -f .deps/analyze.Tpo .deps/analyze.Po
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
+mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF .deps/io.Tpo -c -o io.o io.c
+mv -f .deps/io.Tpo .deps/io.Po
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF .deps/context.Tpo -c -o context.o context.c
+mv -f .deps/context.Tpo .deps/context.Po
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF .deps/ed.Tpo -c -o ed.o ed.c
+mv -f .deps/ed.Tpo .deps/ed.Po
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF .deps/normal.Tpo -c -o normal.o normal.c
+mv -f .deps/normal.Tpo .deps/normal.Po
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
+mv -f .deps/ifdef.Tpo .deps/ifdef.Po
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF .deps/util.Tpo -c -o util.o util.c
+mv -f .deps/util.Tpo .deps/util.Po
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF .deps/dir.Tpo -c -o dir.o dir.c
+mv -f .deps/dir.Tpo .deps/dir.Po
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
+mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF .deps/side.Tpo -c -o side.o side.c
+mv -f .deps/side.Tpo .deps/side.Po
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+rm -f libdiff.a
+ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o normal.o ifdef.o util.o dir.o version.o side.o 
+ranlib libdiff.a
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
+mv -f .deps/add.Tpo .deps/add.Po
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
+mv -f .deps/admin.Tpo .deps/admin.Po
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
+mv -f .deps/annotate.Tpo .deps/annotate.Po
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
+mv -f .deps/buffer.Tpo .deps/buffer.Po
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
+mv -f .deps/checkin.Tpo .deps/checkin.Po
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
+mv -f .deps/checkout.Tpo .deps/checkout.Po
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
+mv -f .deps/classify.Tpo .deps/classify.Po
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
+mv -f .deps/client.Tpo .deps/client.Po
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
+mv -f .deps/commit.Tpo .deps/commit.Po
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o create_adm.c
+mv -f .deps/create_adm.Tpo .deps/create_adm.Po
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
+mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
+mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
+mv -f .deps/edit.Tpo .deps/edit.Po
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
+mv -f .deps/entries.Tpo .deps/entries.Po
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
+mv -f .deps/error.Tpo .deps/error.Po
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o expand_path.c
+mv -f .deps/expand_path.Tpo .deps/expand_path.Po
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
+mv -f .deps/fileattr.Tpo .deps/fileattr.Po
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
+mv -f .deps/filesubr.Tpo .deps/filesubr.Po
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o find_names.c
+mv -f .deps/find_names.Tpo .deps/find_names.Po
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
+mv -f .deps/hardlink.Tpo .deps/hardlink.Po
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
+mv -f .deps/hash.Tpo .deps/hash.Po
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
+mv -f .deps/history.Tpo .deps/history.Po
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
+mv -f .deps/ignore.Tpo .deps/ignore.Po
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
+mv -f .deps/import.Tpo .deps/import.Po
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
+mv -f .deps/lock.Tpo .deps/lock.Po
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
+mv -f .deps/log.Tpo .deps/log.Po
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
+mv -f .deps/login.Tpo .deps/login.Po
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
+mv -f .deps/logmsg.Tpo .deps/logmsg.Po
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
+mv -f .deps/main.Tpo .deps/main.Po
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o mkmodules.c
+mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
+mv -f .deps/modules.Tpo .deps/modules.Po
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
+mv -f .deps/myndbm.Tpo .deps/myndbm.Po
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
+mv -f .deps/no_diff.Tpo .deps/no_diff.Po
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o parseinfo.c
+mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
+mv -f .deps/patch.Tpo .deps/patch.Po
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
+mv -f .deps/rcs.Tpo .deps/rcs.Po
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
+mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
+mv -f .deps/recurse.Tpo .deps/recurse.Po
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
+mv -f .deps/release.Tpo .deps/release.Po
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
+mv -f .deps/remove.Tpo .deps/remove.Po
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
+mv -f .deps/repos.Tpo .deps/repos.Po
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
+mv -f .deps/root.Tpo .deps/root.Po
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
+mv -f .deps/run.Tpo .deps/run.Po
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
+mv -f .deps/scramble.Tpo .deps/scramble.Po
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
+mv -f .deps/server.Tpo .deps/server.Po
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
+mv -f .deps/stack.Tpo .deps/stack.Po
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
+mv -f .deps/status.Tpo .deps/status.Po
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
+mv -f .deps/subr.Tpo .deps/subr.Po
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
+mv -f .deps/tag.Tpo .deps/tag.Po
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
+mv -f .deps/update.Tpo .deps/update.Po
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
+mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
+mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
+mv -f .deps/watch.Tpo .deps/watch.Po
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
+mv -f .deps/wrapper.Tpo .deps/wrapper.Po
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+rm -f cvs
+gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o edit.o entries.o error.o expand_path.o fileattr.o filesubr.o find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+rm -f cvs2vendor
+cp cvs2vendor.sh cvs2vendor
+chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+rm -f cvscheck
+cp cvscheck.sh cvscheck
+chmod +x cvscheck
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+rm -f debug_check_log
+cp debug_check_log.sh debug_check_log
+chmod +x debug_check_log
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+rm -f rcs-to-cvs
+cp rcs-to-cvs.sh rcs-to-cvs
+chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+failcom='exit 1'; \
+	for f in x $MAKEFLAGS; do \
+	  case $f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	target=`echo all-recursive | sed s/-recursive//`; \
+	list='SCC'; for subdir in $list; do \
+	  echo "Making $target in $subdir"; \
+	  if test "$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$target-am"; \
+	  else \
+	    local_target="$target"; \
+	  fi; \
+	  (cd $subdir && emake  $local_target) \
+	  || eval $failcom; \
+	done; \
+	if test "$dot_seen" = "no"; then \
+	  emake  "$target-am" || exit 1; \
+	fi; test -z "$fail"
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+echo "/* This file is generated via a rule in Makefile.am from the" \
+	  >config.tmp
+echo " * config.h.in file." >>config.tmp
+echo " *" >>config.tmp
+echo " * *** DO NOT EDIT THIS FILE DIRECTLY ***" >>config.tmp
+echo " *" >>config.tmp
+echo " * Edit config.h.in instead." >>config.tmp
+echo " */" >>config.tmp
+sed -e "s/%25PACKAGE_STRING%25/Concurrent Versions System (CVS) 1.11.23/"  \
+	    -e "s/%25PACKAGE_BUGREPORT%25/bug-cvs@nongnu.org/" \
+	  <./config.h.in >>config.tmp
+cmp -s config.tmp ./config.h \
+	  || (echo "Updating config.h"; \
+	      cp config.tmp ./config.h)
+rm -f config.tmp
+cp ./config.h stamp-ch
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+if test ! -f config.h; then \
+	  rm -f stamp-h1; \
+	  emake  stamp-h1; \
+	else :; fi
+
+
+show-tasks - with a single task (and it's parents)
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; \
+      	for f in x $MAKEFLAGS; do \
+      	  case $f in \
+      	    *=* | --[!k]*);; \
+      	    *k*) failcom='fail=yes';; \
+      	  esac; \
+      	done; \
+      	dot_seen=no; \
+      	target=`echo all-recursive | sed s/-recursive//`; \
+      	list='SCC'; for subdir in $list; do \
+      	  echo "Making $target in $subdir"; \
+      	  if test "$subdir" = "."; then \
+      	    dot_seen=yes; \
+      	    local_target="$target-am"; \
+      	  else \
+      	    local_target="$target"; \
+      	  fi; \
+      	  (cd $subdir && emake  $local_target) \
+      	  || eval $failcom; \
+      	done; \
+      	if test "$dot_seen" = "no"; then \
+      	  emake  "$target-am" || exit 1; \
+      	fi; test -z "$fail"
+
+
+show-tasks - with all tasks underneath a specific task
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
+        -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
+      mv -f .deps/argmatch.Tpo .deps/argmatch.Po
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
+        .deps/getdate.Tpo -c -o getdate.o getdate.c
+      mv -f .deps/getdate.Tpo .deps/getdate.Po
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
+        .deps/getline.Tpo -c -o getline.o getline.c
+      mv -f .deps/getline.Tpo .deps/getline.Po
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
+        .deps/getopt.Tpo -c -o getopt.o getopt.c
+      mv -f .deps/getopt.Tpo .deps/getopt.Po
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
+        .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
+      mv -f .deps/getopt1.Tpo .deps/getopt1.Po
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
+        .deps/getpass.Tpo -c -o getpass.o getpass.c
+      mv -f .deps/getpass.Tpo .deps/getpass.Po
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
+        .deps/md5.Tpo -c -o md5.o md5.c
+      mv -f .deps/md5.Tpo .deps/md5.Po
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
+        .deps/regex.Tpo -c -o regex.o regex.c
+      mv -f .deps/regex.Tpo .deps/regex.Po
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
+        .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
+      mv -f .deps/savecwd.Tpo .deps/savecwd.Po
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
+        -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
+      mv -f .deps/sighandle.Tpo .deps/sighandle.Po
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
+        -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
+      mv -f .deps/stripslash.Tpo .deps/stripslash.Po
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
+        .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
+      mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
+        .deps/yesno.Tpo -c -o yesno.o yesno.c
+      mv -f .deps/yesno.Tpo .deps/yesno.Po
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+      rm -f libcvs.a
+      ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
+        getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
+        yesno.o 
+      ranlib libcvs.a
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o adler32.o adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o compress.o compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o uncompr.o uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o deflate.o deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inflate.o inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infblock.o infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inftrees.o inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infcodes.o infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infutil.o infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inffast.o inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+      ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o \
+        trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o \
+        inffast.o 
+      (ranlib libz.a || true) >/dev/null 2>&1
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
+        .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
+        .deps/diff3.Tpo -c -o diff3.o diff3.c
+      mv -f .deps/diff3.Tpo .deps/diff3.Po
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
+        .deps/analyze.Tpo -c -o analyze.o analyze.c
+      mv -f .deps/analyze.Tpo .deps/analyze.Po
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
+        .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
+      mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
+        .deps/io.Tpo -c -o io.o io.c
+      mv -f .deps/io.Tpo .deps/io.Po
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
+        .deps/context.Tpo -c -o context.o context.c
+      mv -f .deps/context.Tpo .deps/context.Po
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
+        .deps/ed.Tpo -c -o ed.o ed.c
+      mv -f .deps/ed.Tpo .deps/ed.Po
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
+        .deps/normal.Tpo -c -o normal.o normal.c
+      mv -f .deps/normal.Tpo .deps/normal.Po
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
+        .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
+      mv -f .deps/ifdef.Tpo .deps/ifdef.Po
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
+        .deps/util.Tpo -c -o util.o util.c
+      mv -f .deps/util.Tpo .deps/util.Po
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
+        .deps/dir.Tpo -c -o dir.o dir.c
+      mv -f .deps/dir.Tpo .deps/dir.Po
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
+        .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
+        .deps/side.Tpo -c -o side.o side.c
+      mv -f .deps/side.Tpo .deps/side.Po
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
+        normal.o ifdef.o util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
+      mv -f .deps/add.Tpo .deps/add.Po
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
+      mv -f .deps/admin.Tpo .deps/admin.Po
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
+      mv -f .deps/annotate.Tpo .deps/annotate.Po
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
+      mv -f .deps/buffer.Tpo .deps/buffer.Po
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
+      mv -f .deps/checkin.Tpo .deps/checkin.Po
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
+      mv -f .deps/checkout.Tpo .deps/checkout.Po
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
+      mv -f .deps/classify.Tpo .deps/classify.Po
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
+      mv -f .deps/client.Tpo .deps/client.Po
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
+      mv -f .deps/commit.Tpo .deps/commit.Po
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
+        create_adm.c
+      mv -f .deps/create_adm.Tpo .deps/create_adm.Po
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
+      mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
+      mv -f .deps/edit.Tpo .deps/edit.Po
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
+      mv -f .deps/entries.Tpo .deps/entries.Po
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
+      mv -f .deps/error.Tpo .deps/error.Po
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
+        expand_path.c
+      mv -f .deps/expand_path.Tpo .deps/expand_path.Po
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
+      mv -f .deps/fileattr.Tpo .deps/fileattr.Po
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
+      mv -f .deps/filesubr.Tpo .deps/filesubr.Po
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
+        find_names.c
+      mv -f .deps/find_names.Tpo .deps/find_names.Po
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
+      mv -f .deps/hardlink.Tpo .deps/hardlink.Po
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
+      mv -f .deps/hash.Tpo .deps/hash.Po
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
+      mv -f .deps/history.Tpo .deps/history.Po
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
+      mv -f .deps/ignore.Tpo .deps/ignore.Po
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
+      mv -f .deps/import.Tpo .deps/import.Po
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
+      mv -f .deps/lock.Tpo .deps/lock.Po
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
+      mv -f .deps/log.Tpo .deps/log.Po
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
+      mv -f .deps/login.Tpo .deps/login.Po
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
+      mv -f .deps/logmsg.Tpo .deps/logmsg.Po
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
+      mv -f .deps/main.Tpo .deps/main.Po
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
+        mkmodules.c
+      mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
+      mv -f .deps/modules.Tpo .deps/modules.Po
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
+      mv -f .deps/myndbm.Tpo .deps/myndbm.Po
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
+      mv -f .deps/no_diff.Tpo .deps/no_diff.Po
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
+        parseinfo.c
+      mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
+      mv -f .deps/patch.Tpo .deps/patch.Po
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
+      mv -f .deps/rcs.Tpo .deps/rcs.Po
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
+      mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
+      mv -f .deps/recurse.Tpo .deps/recurse.Po
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
+      mv -f .deps/release.Tpo .deps/release.Po
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
+      mv -f .deps/remove.Tpo .deps/remove.Po
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
+      mv -f .deps/repos.Tpo .deps/repos.Po
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
+      mv -f .deps/root.Tpo .deps/root.Po
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
+      mv -f .deps/run.Tpo .deps/run.Po
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
+      mv -f .deps/scramble.Tpo .deps/scramble.Po
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
+      mv -f .deps/server.Tpo .deps/server.Po
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
+      mv -f .deps/stack.Tpo .deps/stack.Po
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
+      mv -f .deps/status.Tpo .deps/status.Po
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
+      mv -f .deps/subr.Tpo .deps/subr.Po
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
+      mv -f .deps/tag.Tpo .deps/tag.Po
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
+      mv -f .deps/update.Tpo .deps/update.Po
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
+      mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
+      mv -f .deps/watch.Tpo .deps/watch.Po
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
+      mv -f .deps/wrapper.Tpo .deps/wrapper.Po
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvs2vendor
+      cp cvs2vendor.sh cvs2vendor
+      chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvscheck
+      cp cvscheck.sh cvscheck
+      chmod +x cvscheck
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f debug_check_log
+      cp debug_check_log.sh debug_check_log
+      chmod +x debug_check_log
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f rcs-to-cvs
+      cp rcs-to-cvs.sh rcs-to-cvs
+      chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; \
+      	for f in x $MAKEFLAGS; do \
+      	  case $f in \
+      	    *=* | --[!k]*);; \
+      	    *k*) failcom='fail=yes';; \
+      	  esac; \
+      	done; \
+      	dot_seen=no; \
+      	target=`echo all-recursive | sed s/-recursive//`; \
+      	list='SCC'; for subdir in $list; do \
+      	  echo "Making $target in $subdir"; \
+      	  if test "$subdir" = "."; then \
+      	    dot_seen=yes; \
+      	    local_target="$target-am"; \
+      	  else \
+      	    local_target="$target"; \
+      	  fi; \
+      	  (cd $subdir && emake  $local_target) \
+      	  || eval $failcom; \
+      	done; \
+      	if test "$dot_seen" = "no"; then \
+      	  emake  "$target-am" || exit 1; \
+      	fi; test -z "$fail"
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+      echo "/* This file is generated via a rule in Makefile.am from the" \
+      	  >config.tmp
+      echo " * config.h.in file." >>config.tmp
+      echo " *" >>config.tmp
+      echo " * *** DO NOT EDIT THIS FILE DIRECTLY ***" >>config.tmp
+      echo " *" >>config.tmp
+      echo " * Edit config.h.in instead." >>config.tmp
+      echo " */" >>config.tmp
+      sed -e "s/%25PACKAGE_STRING%25/Concurrent Versions System (CVS) 1.11.23/"  \
+        \
+      	    -e "s/%25PACKAGE_BUGREPORT%25/bug-cvs@nongnu.org/" \
+      	  <./config.h.in >>config.tmp
+      cmp -s config.tmp ./config.h \
+      	  || (echo "Updating config.h"; \
+      	      cp config.tmp ./config.h)
+      rm -f config.tmp
+      cp ./config.h stamp-ch
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+      if test ! -f config.h; then \
+      	  rm -f stamp-h1; \
+      	  emake  stamp-h1; \
+      	else :; fi
+
+
+show-tasks - with two levels of task
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+
+show-tasks - with three levels of task
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
+        -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
+      mv -f .deps/argmatch.Tpo .deps/argmatch.Po
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
+        .deps/getdate.Tpo -c -o getdate.o getdate.c
+      mv -f .deps/getdate.Tpo .deps/getdate.Po
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
+        .deps/getline.Tpo -c -o getline.o getline.c
+      mv -f .deps/getline.Tpo .deps/getline.Po
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
+        .deps/getopt.Tpo -c -o getopt.o getopt.c
+      mv -f .deps/getopt.Tpo .deps/getopt.Po
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
+        .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
+      mv -f .deps/getopt1.Tpo .deps/getopt1.Po
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
+        .deps/getpass.Tpo -c -o getpass.o getpass.c
+      mv -f .deps/getpass.Tpo .deps/getpass.Po
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
+        .deps/md5.Tpo -c -o md5.o md5.c
+      mv -f .deps/md5.Tpo .deps/md5.Po
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
+        .deps/regex.Tpo -c -o regex.o regex.c
+      mv -f .deps/regex.Tpo .deps/regex.Po
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
+        .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
+      mv -f .deps/savecwd.Tpo .deps/savecwd.Po
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
+        -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
+      mv -f .deps/sighandle.Tpo .deps/sighandle.Po
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
+        -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
+      mv -f .deps/stripslash.Tpo .deps/stripslash.Po
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
+        .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
+      mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
+        .deps/yesno.Tpo -c -o yesno.o yesno.c
+      mv -f .deps/yesno.Tpo .deps/yesno.Po
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+      rm -f libcvs.a
+      ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
+        getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
+        yesno.o 
+      ranlib libcvs.a
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o adler32.o adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o compress.o compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o uncompr.o uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o deflate.o deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inflate.o inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infblock.o infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inftrees.o inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infcodes.o infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infutil.o infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inffast.o inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+      ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o \
+        trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o \
+        inffast.o 
+      (ranlib libz.a || true) >/dev/null 2>&1
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
+        .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
+        .deps/diff3.Tpo -c -o diff3.o diff3.c
+      mv -f .deps/diff3.Tpo .deps/diff3.Po
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
+        .deps/analyze.Tpo -c -o analyze.o analyze.c
+      mv -f .deps/analyze.Tpo .deps/analyze.Po
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
+        .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
+      mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
+        .deps/io.Tpo -c -o io.o io.c
+      mv -f .deps/io.Tpo .deps/io.Po
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
+        .deps/context.Tpo -c -o context.o context.c
+      mv -f .deps/context.Tpo .deps/context.Po
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
+        .deps/ed.Tpo -c -o ed.o ed.c
+      mv -f .deps/ed.Tpo .deps/ed.Po
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
+        .deps/normal.Tpo -c -o normal.o normal.c
+      mv -f .deps/normal.Tpo .deps/normal.Po
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
+        .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
+      mv -f .deps/ifdef.Tpo .deps/ifdef.Po
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
+        .deps/util.Tpo -c -o util.o util.c
+      mv -f .deps/util.Tpo .deps/util.Po
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
+        .deps/dir.Tpo -c -o dir.o dir.c
+      mv -f .deps/dir.Tpo .deps/dir.Po
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
+        .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
+        .deps/side.Tpo -c -o side.o side.c
+      mv -f .deps/side.Tpo .deps/side.Po
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
+        normal.o ifdef.o util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
+      mv -f .deps/add.Tpo .deps/add.Po
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
+      mv -f .deps/admin.Tpo .deps/admin.Po
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
+      mv -f .deps/annotate.Tpo .deps/annotate.Po
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
+      mv -f .deps/buffer.Tpo .deps/buffer.Po
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
+      mv -f .deps/checkin.Tpo .deps/checkin.Po
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
+      mv -f .deps/checkout.Tpo .deps/checkout.Po
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
+      mv -f .deps/classify.Tpo .deps/classify.Po
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
+      mv -f .deps/client.Tpo .deps/client.Po
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
+      mv -f .deps/commit.Tpo .deps/commit.Po
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
+        create_adm.c
+      mv -f .deps/create_adm.Tpo .deps/create_adm.Po
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
+      mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
+      mv -f .deps/edit.Tpo .deps/edit.Po
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
+      mv -f .deps/entries.Tpo .deps/entries.Po
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
+      mv -f .deps/error.Tpo .deps/error.Po
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
+        expand_path.c
+      mv -f .deps/expand_path.Tpo .deps/expand_path.Po
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
+      mv -f .deps/fileattr.Tpo .deps/fileattr.Po
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
+      mv -f .deps/filesubr.Tpo .deps/filesubr.Po
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
+        find_names.c
+      mv -f .deps/find_names.Tpo .deps/find_names.Po
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
+      mv -f .deps/hardlink.Tpo .deps/hardlink.Po
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
+      mv -f .deps/hash.Tpo .deps/hash.Po
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
+      mv -f .deps/history.Tpo .deps/history.Po
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
+      mv -f .deps/ignore.Tpo .deps/ignore.Po
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
+      mv -f .deps/import.Tpo .deps/import.Po
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
+      mv -f .deps/lock.Tpo .deps/lock.Po
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
+      mv -f .deps/log.Tpo .deps/log.Po
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
+      mv -f .deps/login.Tpo .deps/login.Po
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
+      mv -f .deps/logmsg.Tpo .deps/logmsg.Po
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
+      mv -f .deps/main.Tpo .deps/main.Po
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
+        mkmodules.c
+      mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
+      mv -f .deps/modules.Tpo .deps/modules.Po
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
+      mv -f .deps/myndbm.Tpo .deps/myndbm.Po
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
+      mv -f .deps/no_diff.Tpo .deps/no_diff.Po
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
+        parseinfo.c
+      mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
+      mv -f .deps/patch.Tpo .deps/patch.Po
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
+      mv -f .deps/rcs.Tpo .deps/rcs.Po
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
+      mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
+      mv -f .deps/recurse.Tpo .deps/recurse.Po
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
+      mv -f .deps/release.Tpo .deps/release.Po
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
+      mv -f .deps/remove.Tpo .deps/remove.Po
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
+      mv -f .deps/repos.Tpo .deps/repos.Po
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
+      mv -f .deps/root.Tpo .deps/root.Po
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
+      mv -f .deps/run.Tpo .deps/run.Po
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
+      mv -f .deps/scramble.Tpo .deps/scramble.Po
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
+      mv -f .deps/server.Tpo .deps/server.Po
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
+      mv -f .deps/stack.Tpo .deps/stack.Po
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
+      mv -f .deps/status.Tpo .deps/status.Po
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
+      mv -f .deps/subr.Tpo .deps/subr.Po
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
+      mv -f .deps/tag.Tpo .deps/tag.Po
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
+      mv -f .deps/update.Tpo .deps/update.Po
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
+      mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
+      mv -f .deps/watch.Tpo .deps/watch.Po
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
+      mv -f .deps/wrapper.Tpo .deps/wrapper.Po
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvs2vendor
+      cp cvs2vendor.sh cvs2vendor
+      chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvscheck
+      cp cvscheck.sh cvscheck
+      chmod +x cvscheck
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f debug_check_log
+      cp debug_check_log.sh debug_check_log
+      chmod +x debug_check_log
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f rcs-to-cvs
+      cp rcs-to-cvs.sh rcs-to-cvs
+      chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; \
+      	for f in x $MAKEFLAGS; do \
+      	  case $f in \
+      	    *=* | --[!k]*);; \
+      	    *k*) failcom='fail=yes';; \
+      	  esac; \
+      	done; \
+      	dot_seen=no; \
+      	target=`echo all-recursive | sed s/-recursive//`; \
+      	list='SCC'; for subdir in $list; do \
+      	  echo "Making $target in $subdir"; \
+      	  if test "$subdir" = "."; then \
+      	    dot_seen=yes; \
+      	    local_target="$target-am"; \
+      	  else \
+      	    local_target="$target"; \
+      	  fi; \
+      	  (cd $subdir && emake  $local_target) \
+      	  || eval $failcom; \
+      	done; \
+      	if test "$dot_seen" = "no"; then \
+      	  emake  "$target-am" || exit 1; \
+      	fi; test -z "$fail"
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+      echo "/* This file is generated via a rule in Makefile.am from the" \
+      	  >config.tmp
+      echo " * config.h.in file." >>config.tmp
+      echo " *" >>config.tmp
+      echo " * *** DO NOT EDIT THIS FILE DIRECTLY ***" >>config.tmp
+      echo " *" >>config.tmp
+      echo " * Edit config.h.in instead." >>config.tmp
+      echo " */" >>config.tmp
+      sed -e "s/%25PACKAGE_STRING%25/Concurrent Versions System (CVS) 1.11.23/"  \
+        \
+      	    -e "s/%25PACKAGE_BUGREPORT%25/bug-cvs@nongnu.org/" \
+      	  <./config.h.in >>config.tmp
+      cmp -s config.tmp ./config.h \
+      	  || (echo "Updating config.h"; \
+      	      cp config.tmp ./config.h)
+      rm -f config.tmp
+      cp ./config.h stamp-ch
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+      if test ! -f config.h; then \
+      	  rm -f stamp-h1; \
+      	  emake  stamp-h1; \
+      	else :; fi
+
+
+show-tasks - a small number of tasks, specified by task ID
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 105 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f debug_check_log
+      cp debug_check_log.sh debug_check_log
+      chmod +x debug_check_log
+
+--- Task 106 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f rcs-to-cvs
+      cp rcs-to-cvs.sh rcs-to-cvs
+      chmod +x rcs-to-cvs
+
+--- Task 107 (/home/psmith/t/cvs-1.11.23/windows-NT)
+      failcom='exit 1'; \
+      	for f in x $MAKEFLAGS; do \
+      	  case $f in \
+      	    *=* | --[!k]*);; \
+      	    *k*) failcom='fail=yes';; \
+      	  esac; \
+      	done; \
+      	dot_seen=no; \
+      	target=`echo all-recursive | sed s/-recursive//`; \
+      	list='SCC'; for subdir in $list; do \
+      	  echo "Making $target in $subdir"; \
+      	  if test "$subdir" = "."; then \
+      	    dot_seen=yes; \
+      	    local_target="$target-am"; \
+      	  else \
+      	    local_target="$target"; \
+      	  fi; \
+      	  (cd $subdir && emake  $local_target) \
+      	  || eval $failcom; \
+      	done; \
+      	if test "$dot_seen" = "no"; then \
+      	  emake  "$target-am" || exit 1; \
+      	fi; test -z "$fail"
+
+
+show-tasks - a small number of tasks removed from a larger set
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 4 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
+        -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
+      mv -f .deps/argmatch.Tpo .deps/argmatch.Po
+
+--- Task 5 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
+        .deps/getdate.Tpo -c -o getdate.o getdate.c
+      mv -f .deps/getdate.Tpo .deps/getdate.Po
+
+--- Task 6 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
+        .deps/getline.Tpo -c -o getline.o getline.c
+      mv -f .deps/getline.Tpo .deps/getline.Po
+
+--- Task 7 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
+        .deps/getopt.Tpo -c -o getopt.o getopt.c
+      mv -f .deps/getopt.Tpo .deps/getopt.Po
+
+--- Task 8 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
+        .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
+      mv -f .deps/getopt1.Tpo .deps/getopt1.Po
+
+--- Task 9 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
+        .deps/getpass.Tpo -c -o getpass.o getpass.c
+      mv -f .deps/getpass.Tpo .deps/getpass.Po
+
+--- Task 10 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
+        .deps/md5.Tpo -c -o md5.o md5.c
+      mv -f .deps/md5.Tpo .deps/md5.Po
+
+--- Task 11 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
+        .deps/regex.Tpo -c -o regex.o regex.c
+      mv -f .deps/regex.Tpo .deps/regex.Po
+
+--- Task 12 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
+        .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
+      mv -f .deps/savecwd.Tpo .deps/savecwd.Po
+
+--- Task 13 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
+        -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
+      mv -f .deps/sighandle.Tpo .deps/sighandle.Po
+
+--- Task 14 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
+        -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
+      mv -f .deps/stripslash.Tpo .deps/stripslash.Po
+
+--- Task 15 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
+        .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
+      mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
+
+--- Task 16 (/home/psmith/t/cvs-1.11.23/lib)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
+        .deps/yesno.Tpo -c -o yesno.o yesno.c
+      mv -f .deps/yesno.Tpo .deps/yesno.Po
+
+--- Task 17 (/home/psmith/t/cvs-1.11.23/lib)
+      rm -f libcvs.a
+      ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
+        getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
+        yesno.o 
+      ranlib libcvs.a
+
+--- Task 18 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o adler32.o adler32.c
+
+--- Task 19 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o compress.o compress.c
+
+--- Task 20 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o crc32.o crc32.c
+
+--- Task 21 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o gzio.o gzio.c
+
+--- Task 22 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o uncompr.o uncompr.c
+
+--- Task 23 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o deflate.o deflate.c
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+--- Task 25 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o zutil.o zutil.c
+
+--- Task 26 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inflate.o inflate.c
+
+--- Task 27 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infblock.o infblock.c
+
+--- Task 28 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inftrees.o inftrees.c
+
+--- Task 29 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infcodes.o infcodes.c
+
+--- Task 30 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o infutil.o infutil.c
+
+--- Task 31 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o inffast.o inffast.c
+
+--- Task 32 (/home/psmith/t/cvs-1.11.23/zlib)
+      ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o \
+        trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o \
+        inffast.o 
+      (ranlib libz.a || true) >/dev/null 2>&1
+
+--- Task 33 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
+        .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 34 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
+        .deps/diff3.Tpo -c -o diff3.o diff3.c
+      mv -f .deps/diff3.Tpo .deps/diff3.Po
+
+--- Task 35 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
+        .deps/analyze.Tpo -c -o analyze.o analyze.c
+      mv -f .deps/analyze.Tpo .deps/analyze.Po
+
+--- Task 36 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
+        .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
+      mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
+
+--- Task 37 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
+        .deps/io.Tpo -c -o io.o io.c
+      mv -f .deps/io.Tpo .deps/io.Po
+
+--- Task 38 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
+        .deps/context.Tpo -c -o context.o context.c
+      mv -f .deps/context.Tpo .deps/context.Po
+
+--- Task 39 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
+        .deps/ed.Tpo -c -o ed.o ed.c
+      mv -f .deps/ed.Tpo .deps/ed.Po
+
+--- Task 40 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
+        .deps/normal.Tpo -c -o normal.o normal.c
+      mv -f .deps/normal.Tpo .deps/normal.Po
+
+--- Task 41 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
+        .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
+      mv -f .deps/ifdef.Tpo .deps/ifdef.Po
+
+--- Task 42 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
+        .deps/util.Tpo -c -o util.o util.c
+      mv -f .deps/util.Tpo .deps/util.Po
+
+--- Task 43 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
+        .deps/dir.Tpo -c -o dir.o dir.c
+      mv -f .deps/dir.Tpo .deps/dir.Po
+
+--- Task 44 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
+        .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 45 (/home/psmith/t/cvs-1.11.23/diff)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
+        .deps/side.Tpo -c -o side.o side.c
+      mv -f .deps/side.Tpo .deps/side.Po
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
+        normal.o ifdef.o util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+--- Task 47 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
+      mv -f .deps/add.Tpo .deps/add.Po
+
+--- Task 48 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
+      mv -f .deps/admin.Tpo .deps/admin.Po
+
+--- Task 49 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
+      mv -f .deps/annotate.Tpo .deps/annotate.Po
+
+--- Task 50 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
+      mv -f .deps/buffer.Tpo .deps/buffer.Po
+
+--- Task 51 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
+      mv -f .deps/checkin.Tpo .deps/checkin.Po
+
+--- Task 52 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
+      mv -f .deps/checkout.Tpo .deps/checkout.Po
+
+--- Task 53 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
+      mv -f .deps/classify.Tpo .deps/classify.Po
+
+--- Task 54 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
+      mv -f .deps/client.Tpo .deps/client.Po
+
+--- Task 55 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
+      mv -f .deps/commit.Tpo .deps/commit.Po
+
+--- Task 56 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
+        create_adm.c
+      mv -f .deps/create_adm.Tpo .deps/create_adm.Po
+
+--- Task 57 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
+      mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
+
+--- Task 58 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
+      mv -f .deps/diff.Tpo .deps/diff.Po
+
+--- Task 59 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
+      mv -f .deps/edit.Tpo .deps/edit.Po
+
+--- Task 60 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
+      mv -f .deps/entries.Tpo .deps/entries.Po
+
+--- Task 61 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
+      mv -f .deps/error.Tpo .deps/error.Po
+
+--- Task 62 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
+        expand_path.c
+      mv -f .deps/expand_path.Tpo .deps/expand_path.Po
+
+--- Task 63 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
+      mv -f .deps/fileattr.Tpo .deps/fileattr.Po
+
+--- Task 64 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
+      mv -f .deps/filesubr.Tpo .deps/filesubr.Po
+
+--- Task 65 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
+        find_names.c
+      mv -f .deps/find_names.Tpo .deps/find_names.Po
+
+--- Task 66 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
+      mv -f .deps/hardlink.Tpo .deps/hardlink.Po
+
+--- Task 67 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
+      mv -f .deps/hash.Tpo .deps/hash.Po
+
+--- Task 68 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
+      mv -f .deps/history.Tpo .deps/history.Po
+
+--- Task 69 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
+      mv -f .deps/ignore.Tpo .deps/ignore.Po
+
+--- Task 70 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
+      mv -f .deps/import.Tpo .deps/import.Po
+
+--- Task 71 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
+      mv -f .deps/lock.Tpo .deps/lock.Po
+
+--- Task 72 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
+      mv -f .deps/log.Tpo .deps/log.Po
+
+--- Task 73 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
+      mv -f .deps/login.Tpo .deps/login.Po
+
+--- Task 74 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
+      mv -f .deps/logmsg.Tpo .deps/logmsg.Po
+
+--- Task 75 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
+      mv -f .deps/main.Tpo .deps/main.Po
+
+--- Task 76 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
+        mkmodules.c
+      mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
+
+--- Task 77 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
+      mv -f .deps/modules.Tpo .deps/modules.Po
+
+--- Task 78 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
+      mv -f .deps/myndbm.Tpo .deps/myndbm.Po
+
+--- Task 79 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
+      mv -f .deps/no_diff.Tpo .deps/no_diff.Po
+
+--- Task 80 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
+        parseinfo.c
+      mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
+
+--- Task 81 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
+      mv -f .deps/patch.Tpo .deps/patch.Po
+
+--- Task 82 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
+      mv -f .deps/rcs.Tpo .deps/rcs.Po
+
+--- Task 83 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
+      mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
+
+--- Task 84 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
+      mv -f .deps/recurse.Tpo .deps/recurse.Po
+
+--- Task 85 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
+      mv -f .deps/release.Tpo .deps/release.Po
+
+--- Task 86 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
+      mv -f .deps/remove.Tpo .deps/remove.Po
+
+--- Task 87 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
+      mv -f .deps/repos.Tpo .deps/repos.Po
+
+--- Task 88 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
+      mv -f .deps/root.Tpo .deps/root.Po
+
+--- Task 89 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
+      mv -f .deps/run.Tpo .deps/run.Po
+
+--- Task 90 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
+      mv -f .deps/scramble.Tpo .deps/scramble.Po
+
+--- Task 91 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
+      mv -f .deps/server.Tpo .deps/server.Po
+
+--- Task 92 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
+      mv -f .deps/stack.Tpo .deps/stack.Po
+
+--- Task 93 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
+      mv -f .deps/status.Tpo .deps/status.Po
+
+--- Task 94 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
+      mv -f .deps/subr.Tpo .deps/subr.Po
+
+--- Task 95 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
+      mv -f .deps/tag.Tpo .deps/tag.Po
+
+--- Task 96 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
+      mv -f .deps/update.Tpo .deps/update.Po
+
+--- Task 97 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
+      mv -f .deps/version.Tpo .deps/version.Po
+
+--- Task 98 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
+      mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
+
+--- Task 99 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
+      mv -f .deps/watch.Tpo .deps/watch.Po
+
+--- Task 100 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
+      mv -f .deps/wrapper.Tpo .deps/wrapper.Po
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+--- Task 103 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvs2vendor
+      cp cvs2vendor.sh cvs2vendor
+      chmod +x cvs2vendor
+
+--- Task 104 (/home/psmith/t/cvs-1.11.23/contrib)
+      rm -f cvscheck
+      cp cvscheck.sh cvscheck
+      chmod +x cvscheck
+
+--- Task 108 (/home/psmith/t/cvs-1.11.23/vms)
+      echo "/* This file is generated via a rule in Makefile.am from the" \
+      	  >config.tmp
+      echo " * config.h.in file." >>config.tmp
+      echo " *" >>config.tmp
+      echo " * *** DO NOT EDIT THIS FILE DIRECTLY ***" >>config.tmp
+      echo " *" >>config.tmp
+      echo " * Edit config.h.in instead." >>config.tmp
+      echo " */" >>config.tmp
+      sed -e "s/%25PACKAGE_STRING%25/Concurrent Versions System (CVS) 1.11.23/"  \
+        \
+      	    -e "s/%25PACKAGE_BUGREPORT%25/bug-cvs@nongnu.org/" \
+      	  <./config.h.in >>config.tmp
+      cmp -s config.tmp ./config.h \
+      	  || (echo "Updating config.h"; \
+      	      cp config.tmp ./config.h)
+      rm -f config.tmp
+      cp ./config.h stamp-ch
+
+--- Task 109 (/home/psmith/t/cvs-1.11.23)
+      if test ! -f config.h; then \
+      	  rm -f stamp-h1; \
+      	  emake  stamp-h1; \
+      	else :; fi
+
