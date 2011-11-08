@@ -131,13 +131,13 @@ sub executeSuite {
 			$ENV{'TEST_SRC'} = $testSrcDir;
 			
 			# Run the setup.sh script (after cd'ing to the output directory)
-			if (system("cd $testOutputDir && $testSrcDir/../setup.sh > setup.log") != 0){
+			if (system("cd $testOutputDir && $testSrcDir/../setup.sh > setup.log 2>&1") != 0){
 				testFailed("Problem while executing the setup.sh script");
 			}
 			
 			# Setup was OK, so execute the script.
 			else {
-				if (system("cd $testOutputDir && $testSrcDir/run.sh > actual.log") != 0){
+				if (system("cd $testOutputDir && $testSrcDir/run.sh > actual.log 2>&1") != 0){
 					testFailed("Problem while executing the run.sh script");
 				}
 				
@@ -153,7 +153,7 @@ sub executeSuite {
 						testPassed();
 						
 						# Run the teardown script, to clean-up files.
-						if (system("cd $testOutputDir && $testSrcDir/../teardown.sh > teardown.log") != 0){
+						if (system("cd $testOutputDir && $testSrcDir/../teardown.sh > teardown.log 2>&1") != 0){
 							# no error
 						}
 					}
