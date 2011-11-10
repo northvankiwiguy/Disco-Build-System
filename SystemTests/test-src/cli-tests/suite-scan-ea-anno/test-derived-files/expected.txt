@@ -1,0 +1,1000 @@
+
+Show files immediately derived from trees.c
+/home/psmith/t/cvs-1.11.23/zlib/trees.o
+
+Show all files derived from tree.c
+/home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/zlib/libz.a
+/home/psmith/t/cvs-1.11.23/zlib/trees.o
+
+Show all files derived from config.h
+/home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/io.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+/home/psmith/t/cvs-1.11.23/diff/analyze.o
+/home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
+/home/psmith/t/cvs-1.11.23/diff/context.o
+/home/psmith/t/cvs-1.11.23/diff/diff.o
+/home/psmith/t/cvs-1.11.23/diff/diff3.o
+/home/psmith/t/cvs-1.11.23/diff/dir.o
+/home/psmith/t/cvs-1.11.23/diff/ed.o
+/home/psmith/t/cvs-1.11.23/diff/ifdef.o
+/home/psmith/t/cvs-1.11.23/diff/io.o
+/home/psmith/t/cvs-1.11.23/diff/libdiff.a
+/home/psmith/t/cvs-1.11.23/diff/normal.o
+/home/psmith/t/cvs-1.11.23/diff/side.o
+/home/psmith/t/cvs-1.11.23/diff/util.o
+/home/psmith/t/cvs-1.11.23/diff/version.o
+/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+/home/psmith/t/cvs-1.11.23/lib/argmatch.o
+/home/psmith/t/cvs-1.11.23/lib/getdate.o
+/home/psmith/t/cvs-1.11.23/lib/getline.o
+/home/psmith/t/cvs-1.11.23/lib/getopt.o
+/home/psmith/t/cvs-1.11.23/lib/getopt1.o
+/home/psmith/t/cvs-1.11.23/lib/getpass.o
+/home/psmith/t/cvs-1.11.23/lib/libcvs.a
+/home/psmith/t/cvs-1.11.23/lib/md5.o
+/home/psmith/t/cvs-1.11.23/lib/regex.o
+/home/psmith/t/cvs-1.11.23/lib/savecwd.o
+/home/psmith/t/cvs-1.11.23/lib/sighandle.o
+/home/psmith/t/cvs-1.11.23/lib/stripslash.o
+/home/psmith/t/cvs-1.11.23/lib/xgetwd.o
+/home/psmith/t/cvs-1.11.23/lib/yesno.o
+/home/psmith/t/cvs-1.11.23/src/.deps/add.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/classify.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/client.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/commit.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/diff.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/edit.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/entries.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/error.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/hash.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/history.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/import.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/lock.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/log.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/login.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/main.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/modules.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/patch.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/release.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/remove.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/repos.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/root.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/run.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/server.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/stack.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/status.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/subr.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/tag.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/update.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/version.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/watch.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+/home/psmith/t/cvs-1.11.23/src/add.o
+/home/psmith/t/cvs-1.11.23/src/admin.o
+/home/psmith/t/cvs-1.11.23/src/annotate.o
+/home/psmith/t/cvs-1.11.23/src/buffer.o
+/home/psmith/t/cvs-1.11.23/src/checkin.o
+/home/psmith/t/cvs-1.11.23/src/checkout.o
+/home/psmith/t/cvs-1.11.23/src/classify.o
+/home/psmith/t/cvs-1.11.23/src/client.o
+/home/psmith/t/cvs-1.11.23/src/commit.o
+/home/psmith/t/cvs-1.11.23/src/create_adm.o
+/home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/src/cvsrc.o
+/home/psmith/t/cvs-1.11.23/src/diff.o
+/home/psmith/t/cvs-1.11.23/src/edit.o
+/home/psmith/t/cvs-1.11.23/src/entries.o
+/home/psmith/t/cvs-1.11.23/src/error.o
+/home/psmith/t/cvs-1.11.23/src/expand_path.o
+/home/psmith/t/cvs-1.11.23/src/fileattr.o
+/home/psmith/t/cvs-1.11.23/src/filesubr.o
+/home/psmith/t/cvs-1.11.23/src/find_names.o
+/home/psmith/t/cvs-1.11.23/src/hardlink.o
+/home/psmith/t/cvs-1.11.23/src/hash.o
+/home/psmith/t/cvs-1.11.23/src/history.o
+/home/psmith/t/cvs-1.11.23/src/ignore.o
+/home/psmith/t/cvs-1.11.23/src/import.o
+/home/psmith/t/cvs-1.11.23/src/lock.o
+/home/psmith/t/cvs-1.11.23/src/log.o
+/home/psmith/t/cvs-1.11.23/src/login.o
+/home/psmith/t/cvs-1.11.23/src/logmsg.o
+/home/psmith/t/cvs-1.11.23/src/main.o
+/home/psmith/t/cvs-1.11.23/src/mkmodules.o
+/home/psmith/t/cvs-1.11.23/src/modules.o
+/home/psmith/t/cvs-1.11.23/src/myndbm.o
+/home/psmith/t/cvs-1.11.23/src/no_diff.o
+/home/psmith/t/cvs-1.11.23/src/parseinfo.o
+/home/psmith/t/cvs-1.11.23/src/patch.o
+/home/psmith/t/cvs-1.11.23/src/rcs.o
+/home/psmith/t/cvs-1.11.23/src/rcscmds.o
+/home/psmith/t/cvs-1.11.23/src/recurse.o
+/home/psmith/t/cvs-1.11.23/src/release.o
+/home/psmith/t/cvs-1.11.23/src/remove.o
+/home/psmith/t/cvs-1.11.23/src/repos.o
+/home/psmith/t/cvs-1.11.23/src/root.o
+/home/psmith/t/cvs-1.11.23/src/run.o
+/home/psmith/t/cvs-1.11.23/src/scramble.o
+/home/psmith/t/cvs-1.11.23/src/server.o
+/home/psmith/t/cvs-1.11.23/src/stack.o
+/home/psmith/t/cvs-1.11.23/src/status.o
+/home/psmith/t/cvs-1.11.23/src/subr.o
+/home/psmith/t/cvs-1.11.23/src/tag.o
+/home/psmith/t/cvs-1.11.23/src/update.o
+/home/psmith/t/cvs-1.11.23/src/vers_ts.o
+/home/psmith/t/cvs-1.11.23/src/version.o
+/home/psmith/t/cvs-1.11.23/src/watch.o
+/home/psmith/t/cvs-1.11.23/src/wrapper.o
+/home/psmith/t/cvs-1.11.23/src/zlib.o
+/home/psmith/t/cvs-1.11.23/vms/stamp-ch
+
+Show all .a files derived from config.h
+/home/psmith/t/cvs-1.11.23/diff/libdiff.a
+/home/psmith/t/cvs-1.11.23/lib/libcvs.a
+
+Show all files derived from zlib.c
+/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+/home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/src/zlib.o
+
+Show all files derived from zlib.c (using full path name)
+/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+/home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/src/zlib.o
+
+Show files used to create zlib.h (none)
+
+Show files used to create zlib.o
+/home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib/getopt.h
+/home/psmith/t/cvs-1.11.23/lib/regex.h
+/home/psmith/t/cvs-1.11.23/lib/system.h
+/home/psmith/t/cvs-1.11.23/lib/wait.h
+/home/psmith/t/cvs-1.11.23/lib/xsize.h
+/home/psmith/t/cvs-1.11.23/lib/xtime.h
+/home/psmith/t/cvs-1.11.23/src/buffer.h
+/home/psmith/t/cvs-1.11.23/src/client.h
+/home/psmith/t/cvs-1.11.23/src/cvs.h
+/home/psmith/t/cvs-1.11.23/src/error.h
+/home/psmith/t/cvs-1.11.23/src/hash.h
+/home/psmith/t/cvs-1.11.23/src/myndbm.h
+/home/psmith/t/cvs-1.11.23/src/rcs.h
+/home/psmith/t/cvs-1.11.23/src/root.h
+/home/psmith/t/cvs-1.11.23/src/server.h
+/home/psmith/t/cvs-1.11.23/src/stack.h
+/home/psmith/t/cvs-1.11.23/src/update.h
+/home/psmith/t/cvs-1.11.23/src/zlib.c
+/home/psmith/t/cvs-1.11.23/zlib/zconf.h
+/home/psmith/t/cvs-1.11.23/zlib/zlib.h
+
+Show files directly used to create libz.a
+/home/psmith/t/cvs-1.11.23/zlib/adler32.o
+/home/psmith/t/cvs-1.11.23/zlib/compress.o
+/home/psmith/t/cvs-1.11.23/zlib/crc32.o
+/home/psmith/t/cvs-1.11.23/zlib/deflate.o
+/home/psmith/t/cvs-1.11.23/zlib/gzio.o
+/home/psmith/t/cvs-1.11.23/zlib/infblock.o
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+/home/psmith/t/cvs-1.11.23/zlib/inffast.o
+/home/psmith/t/cvs-1.11.23/zlib/inflate.o
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+/home/psmith/t/cvs-1.11.23/zlib/infutil.o
+/home/psmith/t/cvs-1.11.23/zlib/trees.o
+/home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+/home/psmith/t/cvs-1.11.23/zlib/zutil.o
+
+Show all files used to create libz.a
+/home/psmith/t/cvs-1.11.23/zlib/adler32.c
+/home/psmith/t/cvs-1.11.23/zlib/adler32.o
+/home/psmith/t/cvs-1.11.23/zlib/compress.c
+/home/psmith/t/cvs-1.11.23/zlib/compress.o
+/home/psmith/t/cvs-1.11.23/zlib/crc32.c
+/home/psmith/t/cvs-1.11.23/zlib/crc32.o
+/home/psmith/t/cvs-1.11.23/zlib/deflate.c
+/home/psmith/t/cvs-1.11.23/zlib/deflate.h
+/home/psmith/t/cvs-1.11.23/zlib/deflate.o
+/home/psmith/t/cvs-1.11.23/zlib/gzio.c
+/home/psmith/t/cvs-1.11.23/zlib/gzio.o
+/home/psmith/t/cvs-1.11.23/zlib/infblock.c
+/home/psmith/t/cvs-1.11.23/zlib/infblock.h
+/home/psmith/t/cvs-1.11.23/zlib/infblock.o
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+/home/psmith/t/cvs-1.11.23/zlib/inffast.c
+/home/psmith/t/cvs-1.11.23/zlib/inffast.h
+/home/psmith/t/cvs-1.11.23/zlib/inffast.o
+/home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+/home/psmith/t/cvs-1.11.23/zlib/inflate.c
+/home/psmith/t/cvs-1.11.23/zlib/inflate.o
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+/home/psmith/t/cvs-1.11.23/zlib/infutil.c
+/home/psmith/t/cvs-1.11.23/zlib/infutil.h
+/home/psmith/t/cvs-1.11.23/zlib/infutil.o
+/home/psmith/t/cvs-1.11.23/zlib/trees.c
+/home/psmith/t/cvs-1.11.23/zlib/trees.h
+/home/psmith/t/cvs-1.11.23/zlib/trees.o
+/home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+/home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+/home/psmith/t/cvs-1.11.23/zlib/zconf.h
+/home/psmith/t/cvs-1.11.23/zlib/zlib.h
+/home/psmith/t/cvs-1.11.23/zlib/zutil.c
+/home/psmith/t/cvs-1.11.23/zlib/zutil.h
+/home/psmith/t/cvs-1.11.23/zlib/zutil.o
+
+Show all .h files used to create libz.a
+/home/psmith/t/cvs-1.11.23/zlib/deflate.h
+/home/psmith/t/cvs-1.11.23/zlib/infblock.h
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+/home/psmith/t/cvs-1.11.23/zlib/inffast.h
+/home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+/home/psmith/t/cvs-1.11.23/zlib/infutil.h
+/home/psmith/t/cvs-1.11.23/zlib/trees.h
+/home/psmith/t/cvs-1.11.23/zlib/zconf.h
+/home/psmith/t/cvs-1.11.23/zlib/zlib.h
+/home/psmith/t/cvs-1.11.23/zlib/zutil.h
+
+Show all .h files used to create libz.a (using full path name)
+/home/psmith/t/cvs-1.11.23/zlib/deflate.h
+/home/psmith/t/cvs-1.11.23/zlib/infblock.h
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+/home/psmith/t/cvs-1.11.23/zlib/inffast.h
+/home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+/home/psmith/t/cvs-1.11.23/zlib/infutil.h
+/home/psmith/t/cvs-1.11.23/zlib/trees.h
+/home/psmith/t/cvs-1.11.23/zlib/zconf.h
+/home/psmith/t/cvs-1.11.23/zlib/zlib.h
+/home/psmith/t/cvs-1.11.23/zlib/zutil.h
+
+Show tasks that use zlib.o
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+
+Show tasks that read zlib.o
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+
+Show tasks that write zlib.o
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+      gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
+        zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
+      mv -f .deps/zlib.Tpo .deps/zlib.Po
+
+
+Show tasks that use trees.c
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+
+Show tasks that read trees.c
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+      gcc -g -O2   -c -o trees.o trees.c
+
+
+Show tasks that write trees.c (none)
+
+Show tasks that use libdiff.a
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
+        normal.o ifdef.o util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+
+Show tasks that read libdiff.a
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+      rm -f cvs
+      gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
+        checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
+        edit.o entries.o error.o expand_path.o fileattr.o filesubr.o \
+        find_names.o hardlink.o hash.o history.o ignore.o import.o lock.o log.o \
+        login.o logmsg.o main.o mkmodules.o modules.o myndbm.o no_diff.o \
+        parseinfo.o patch.o rcs.o rcscmds.o recurse.o release.o remove.o repos.o \
+        root.o run.o scramble.o server.o stack.o status.o subr.o tag.o update.o \
+        version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
+        ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
+
+
+Show tasks that write libdiff.a
+- Task 2 (/home/psmith/t/cvs-1.11.23)
+    emake  all-recursive
+
+-- Task 3 (/home/psmith/t/cvs-1.11.23)
+     failcom='exit 1'; \
+     	for f in x $MAKEFLAGS; do \
+     	  case $f in \
+     	    *=* | --[!k]*);; \
+     	    *k*) failcom='fail=yes';; \
+     	  esac; \
+     	done; \
+     	dot_seen=no; \
+     	target=`echo all-recursive | sed s/-recursive//`; \
+     	list='lib zlib diff src man doc contrib tools windows-NT os2 emx vms'; for \
+           subdir in $list; do \
+     	  echo "Making $target in $subdir"; \
+     	  if test "$subdir" = "."; then \
+     	    dot_seen=yes; \
+     	    local_target="$target-am"; \
+     	  else \
+     	    local_target="$target"; \
+     	  fi; \
+     	  (cd $subdir && emake  $local_target) \
+     	  || eval $failcom; \
+     	done; \
+     	if test "$dot_seen" = "no"; then \
+     	  emake  "$target-am" || exit 1; \
+     	fi; test -z "$fail"
+
+--- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+      rm -f libdiff.a
+      ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
+        normal.o ifdef.o util.o dir.o version.o side.o 
+      ranlib libdiff.a
+
+
+Show files used by task 1 (none)
+
+Show files used by task 4
+/home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+/home/psmith/t/cvs-1.11.23/lib/argmatch.c
+/home/psmith/t/cvs-1.11.23/lib/argmatch.o
+
+Show files read by task 4
+/home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib/argmatch.c
+
+Show files written by task 4
+/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+/home/psmith/t/cvs-1.11.23/lib/argmatch.o
+
+Show files used by task 4, 5 or 6
+/home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+/home/psmith/t/cvs-1.11.23/lib/argmatch.c
+/home/psmith/t/cvs-1.11.23/lib/argmatch.o
+/home/psmith/t/cvs-1.11.23/lib/getdate.c
+/home/psmith/t/cvs-1.11.23/lib/getdate.o
+/home/psmith/t/cvs-1.11.23/lib/getline.c
+/home/psmith/t/cvs-1.11.23/lib/getline.h
+/home/psmith/t/cvs-1.11.23/lib/getline.o
+/home/psmith/t/cvs-1.11.23/lib/xtime.h
+
+Show files written by task 2's children
+/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
+/home/psmith/t/cvs-1.11.23/contrib/cvscheck
+/home/psmith/t/cvs-1.11.23/contrib/debug_check_log
+/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+/home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/io.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
+/home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+/home/psmith/t/cvs-1.11.23/diff/analyze.o
+/home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
+/home/psmith/t/cvs-1.11.23/diff/context.o
+/home/psmith/t/cvs-1.11.23/diff/diff.o
+/home/psmith/t/cvs-1.11.23/diff/diff3.o
+/home/psmith/t/cvs-1.11.23/diff/dir.o
+/home/psmith/t/cvs-1.11.23/diff/ed.o
+/home/psmith/t/cvs-1.11.23/diff/ifdef.o
+/home/psmith/t/cvs-1.11.23/diff/io.o
+/home/psmith/t/cvs-1.11.23/diff/libdiff.a
+/home/psmith/t/cvs-1.11.23/diff/normal.o
+/home/psmith/t/cvs-1.11.23/diff/side.o
+/home/psmith/t/cvs-1.11.23/diff/util.o
+/home/psmith/t/cvs-1.11.23/diff/version.o
+/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
+/home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+/home/psmith/t/cvs-1.11.23/lib/argmatch.o
+/home/psmith/t/cvs-1.11.23/lib/getdate.o
+/home/psmith/t/cvs-1.11.23/lib/getline.o
+/home/psmith/t/cvs-1.11.23/lib/getopt.o
+/home/psmith/t/cvs-1.11.23/lib/getopt1.o
+/home/psmith/t/cvs-1.11.23/lib/getpass.o
+/home/psmith/t/cvs-1.11.23/lib/libcvs.a
+/home/psmith/t/cvs-1.11.23/lib/md5.o
+/home/psmith/t/cvs-1.11.23/lib/regex.o
+/home/psmith/t/cvs-1.11.23/lib/savecwd.o
+/home/psmith/t/cvs-1.11.23/lib/sighandle.o
+/home/psmith/t/cvs-1.11.23/lib/stripslash.o
+/home/psmith/t/cvs-1.11.23/lib/xgetwd.o
+/home/psmith/t/cvs-1.11.23/lib/yesno.o
+/home/psmith/t/cvs-1.11.23/src/.deps/add.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/classify.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/client.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/commit.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/diff.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/edit.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/entries.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/error.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/hash.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/history.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/import.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/lock.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/log.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/login.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/main.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/modules.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/patch.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/release.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/remove.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/repos.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/root.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/run.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/server.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/stack.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/status.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/subr.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/tag.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/update.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/version.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/watch.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
+/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+/home/psmith/t/cvs-1.11.23/src/add.o
+/home/psmith/t/cvs-1.11.23/src/admin.o
+/home/psmith/t/cvs-1.11.23/src/annotate.o
+/home/psmith/t/cvs-1.11.23/src/buffer.o
+/home/psmith/t/cvs-1.11.23/src/checkin.o
+/home/psmith/t/cvs-1.11.23/src/checkout.o
+/home/psmith/t/cvs-1.11.23/src/classify.o
+/home/psmith/t/cvs-1.11.23/src/client.o
+/home/psmith/t/cvs-1.11.23/src/commit.o
+/home/psmith/t/cvs-1.11.23/src/create_adm.o
+/home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/src/cvsrc.o
+/home/psmith/t/cvs-1.11.23/src/diff.o
+/home/psmith/t/cvs-1.11.23/src/edit.o
+/home/psmith/t/cvs-1.11.23/src/entries.o
+/home/psmith/t/cvs-1.11.23/src/error.o
+/home/psmith/t/cvs-1.11.23/src/expand_path.o
+/home/psmith/t/cvs-1.11.23/src/fileattr.o
+/home/psmith/t/cvs-1.11.23/src/filesubr.o
+/home/psmith/t/cvs-1.11.23/src/find_names.o
+/home/psmith/t/cvs-1.11.23/src/hardlink.o
+/home/psmith/t/cvs-1.11.23/src/hash.o
+/home/psmith/t/cvs-1.11.23/src/history.o
+/home/psmith/t/cvs-1.11.23/src/ignore.o
+/home/psmith/t/cvs-1.11.23/src/import.o
+/home/psmith/t/cvs-1.11.23/src/lock.o
+/home/psmith/t/cvs-1.11.23/src/log.o
+/home/psmith/t/cvs-1.11.23/src/login.o
+/home/psmith/t/cvs-1.11.23/src/logmsg.o
+/home/psmith/t/cvs-1.11.23/src/main.o
+/home/psmith/t/cvs-1.11.23/src/mkmodules.o
+/home/psmith/t/cvs-1.11.23/src/modules.o
+/home/psmith/t/cvs-1.11.23/src/myndbm.o
+/home/psmith/t/cvs-1.11.23/src/no_diff.o
+/home/psmith/t/cvs-1.11.23/src/parseinfo.o
+/home/psmith/t/cvs-1.11.23/src/patch.o
+/home/psmith/t/cvs-1.11.23/src/rcs.o
+/home/psmith/t/cvs-1.11.23/src/rcscmds.o
+/home/psmith/t/cvs-1.11.23/src/recurse.o
+/home/psmith/t/cvs-1.11.23/src/release.o
+/home/psmith/t/cvs-1.11.23/src/remove.o
+/home/psmith/t/cvs-1.11.23/src/repos.o
+/home/psmith/t/cvs-1.11.23/src/root.o
+/home/psmith/t/cvs-1.11.23/src/run.o
+/home/psmith/t/cvs-1.11.23/src/scramble.o
+/home/psmith/t/cvs-1.11.23/src/server.o
+/home/psmith/t/cvs-1.11.23/src/stack.o
+/home/psmith/t/cvs-1.11.23/src/status.o
+/home/psmith/t/cvs-1.11.23/src/subr.o
+/home/psmith/t/cvs-1.11.23/src/tag.o
+/home/psmith/t/cvs-1.11.23/src/update.o
+/home/psmith/t/cvs-1.11.23/src/vers_ts.o
+/home/psmith/t/cvs-1.11.23/src/version.o
+/home/psmith/t/cvs-1.11.23/src/watch.o
+/home/psmith/t/cvs-1.11.23/src/wrapper.o
+/home/psmith/t/cvs-1.11.23/src/zlib.o
+/home/psmith/t/cvs-1.11.23/vms/stamp-ch
+/home/psmith/t/cvs-1.11.23/zlib/adler32.o
+/home/psmith/t/cvs-1.11.23/zlib/compress.o
+/home/psmith/t/cvs-1.11.23/zlib/crc32.o
+/home/psmith/t/cvs-1.11.23/zlib/deflate.o
+/home/psmith/t/cvs-1.11.23/zlib/gzio.o
+/home/psmith/t/cvs-1.11.23/zlib/infblock.o
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+/home/psmith/t/cvs-1.11.23/zlib/inffast.o
+/home/psmith/t/cvs-1.11.23/zlib/inflate.o
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+/home/psmith/t/cvs-1.11.23/zlib/infutil.o
+/home/psmith/t/cvs-1.11.23/zlib/libz.a
+/home/psmith/t/cvs-1.11.23/zlib/trees.o
+/home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+/home/psmith/t/cvs-1.11.23/zlib/zutil.o
+
+Show .h files read by task 2's children
+/home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
+/home/psmith/t/cvs-1.11.23/diff/diff.h
+/home/psmith/t/cvs-1.11.23/diff/diffrun.h
+/home/psmith/t/cvs-1.11.23/diff/system.h
+/home/psmith/t/cvs-1.11.23/lib/getline.h
+/home/psmith/t/cvs-1.11.23/lib/getopt.h
+/home/psmith/t/cvs-1.11.23/lib/md5.h
+/home/psmith/t/cvs-1.11.23/lib/regex.h
+/home/psmith/t/cvs-1.11.23/lib/savecwd.h
+/home/psmith/t/cvs-1.11.23/lib/system.h
+/home/psmith/t/cvs-1.11.23/lib/wait.h
+/home/psmith/t/cvs-1.11.23/lib/xselect.h
+/home/psmith/t/cvs-1.11.23/lib/xsize.h
+/home/psmith/t/cvs-1.11.23/lib/xtime.h
+/home/psmith/t/cvs-1.11.23/src/buffer.h
+/home/psmith/t/cvs-1.11.23/src/client.h
+/home/psmith/t/cvs-1.11.23/src/cvs.h
+/home/psmith/t/cvs-1.11.23/src/edit.h
+/home/psmith/t/cvs-1.11.23/src/error.h
+/home/psmith/t/cvs-1.11.23/src/fileattr.h
+/home/psmith/t/cvs-1.11.23/src/hardlink.h
+/home/psmith/t/cvs-1.11.23/src/hash.h
+/home/psmith/t/cvs-1.11.23/src/history.h
+/home/psmith/t/cvs-1.11.23/src/myndbm.h
+/home/psmith/t/cvs-1.11.23/src/rcs.h
+/home/psmith/t/cvs-1.11.23/src/root.h
+/home/psmith/t/cvs-1.11.23/src/server.h
+/home/psmith/t/cvs-1.11.23/src/stack.h
+/home/psmith/t/cvs-1.11.23/src/update.h
+/home/psmith/t/cvs-1.11.23/src/watch.h
+/home/psmith/t/cvs-1.11.23/vms/config.h
+/home/psmith/t/cvs-1.11.23/zlib/deflate.h
+/home/psmith/t/cvs-1.11.23/zlib/infblock.h
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+/home/psmith/t/cvs-1.11.23/zlib/inffast.h
+/home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+/home/psmith/t/cvs-1.11.23/zlib/infutil.h
+/home/psmith/t/cvs-1.11.23/zlib/trees.h
+/home/psmith/t/cvs-1.11.23/zlib/zconf.h
+/home/psmith/t/cvs-1.11.23/zlib/zlib.h
+/home/psmith/t/cvs-1.11.23/zlib/zutil.h
+
+Show .o files read by task 102
+/home/psmith/t/cvs-1.11.23/src/add.o
+/home/psmith/t/cvs-1.11.23/src/admin.o
+/home/psmith/t/cvs-1.11.23/src/annotate.o
+/home/psmith/t/cvs-1.11.23/src/buffer.o
+/home/psmith/t/cvs-1.11.23/src/checkin.o
+/home/psmith/t/cvs-1.11.23/src/checkout.o
+/home/psmith/t/cvs-1.11.23/src/classify.o
+/home/psmith/t/cvs-1.11.23/src/client.o
+/home/psmith/t/cvs-1.11.23/src/commit.o
+/home/psmith/t/cvs-1.11.23/src/create_adm.o
+/home/psmith/t/cvs-1.11.23/src/cvsrc.o
+/home/psmith/t/cvs-1.11.23/src/diff.o
+/home/psmith/t/cvs-1.11.23/src/edit.o
+/home/psmith/t/cvs-1.11.23/src/entries.o
+/home/psmith/t/cvs-1.11.23/src/error.o
+/home/psmith/t/cvs-1.11.23/src/expand_path.o
+/home/psmith/t/cvs-1.11.23/src/fileattr.o
+/home/psmith/t/cvs-1.11.23/src/filesubr.o
+/home/psmith/t/cvs-1.11.23/src/find_names.o
+/home/psmith/t/cvs-1.11.23/src/hardlink.o
+/home/psmith/t/cvs-1.11.23/src/hash.o
+/home/psmith/t/cvs-1.11.23/src/history.o
+/home/psmith/t/cvs-1.11.23/src/ignore.o
+/home/psmith/t/cvs-1.11.23/src/import.o
+/home/psmith/t/cvs-1.11.23/src/lock.o
+/home/psmith/t/cvs-1.11.23/src/log.o
+/home/psmith/t/cvs-1.11.23/src/login.o
+/home/psmith/t/cvs-1.11.23/src/logmsg.o
+/home/psmith/t/cvs-1.11.23/src/main.o
+/home/psmith/t/cvs-1.11.23/src/mkmodules.o
+/home/psmith/t/cvs-1.11.23/src/modules.o
+/home/psmith/t/cvs-1.11.23/src/myndbm.o
+/home/psmith/t/cvs-1.11.23/src/no_diff.o
+/home/psmith/t/cvs-1.11.23/src/parseinfo.o
+/home/psmith/t/cvs-1.11.23/src/patch.o
+/home/psmith/t/cvs-1.11.23/src/rcs.o
+/home/psmith/t/cvs-1.11.23/src/rcscmds.o
+/home/psmith/t/cvs-1.11.23/src/recurse.o
+/home/psmith/t/cvs-1.11.23/src/release.o
+/home/psmith/t/cvs-1.11.23/src/remove.o
+/home/psmith/t/cvs-1.11.23/src/repos.o
+/home/psmith/t/cvs-1.11.23/src/root.o
+/home/psmith/t/cvs-1.11.23/src/run.o
+/home/psmith/t/cvs-1.11.23/src/scramble.o
+/home/psmith/t/cvs-1.11.23/src/server.o
+/home/psmith/t/cvs-1.11.23/src/stack.o
+/home/psmith/t/cvs-1.11.23/src/status.o
+/home/psmith/t/cvs-1.11.23/src/subr.o
+/home/psmith/t/cvs-1.11.23/src/tag.o
+/home/psmith/t/cvs-1.11.23/src/update.o
+/home/psmith/t/cvs-1.11.23/src/vers_ts.o
+/home/psmith/t/cvs-1.11.23/src/version.o
+/home/psmith/t/cvs-1.11.23/src/watch.o
+/home/psmith/t/cvs-1.11.23/src/wrapper.o
+/home/psmith/t/cvs-1.11.23/src/zlib.o
+
+Show .o files read by task 102, with components
+/home/psmith/t/cvs-1.11.23/src/add.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/admin.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/annotate.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/buffer.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/checkin.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/checkout.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/classify.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/client.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/commit.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/create_adm.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/cvsrc.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/diff.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/edit.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/entries.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/error.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/expand_path.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/fileattr.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/filesubr.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/find_names.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/hardlink.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/hash.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/history.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/ignore.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/import.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/lock.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/log.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/login.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/logmsg.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/main.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/mkmodules.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/modules.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/myndbm.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/no_diff.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/parseinfo.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/patch.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/rcs.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/rcscmds.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/recurse.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/release.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/remove.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/repos.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/root.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/run.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/scramble.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/server.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/stack.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/status.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/subr.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/tag.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/update.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/vers_ts.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/version.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/watch.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/wrapper.o  (None/None)
+/home/psmith/t/cvs-1.11.23/src/zlib.o  (None/None)
