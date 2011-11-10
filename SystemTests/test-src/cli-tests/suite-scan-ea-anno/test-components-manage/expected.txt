@@ -1,0 +1,35 @@
+Showing components, before having defined any
+None
+Remove a component that doesn't exist yet - should fail
+Error: Component comp1 is not defined
+       Use disco -h for more help.
+Status is 1
+Add a couple of new components, then show the list again
+New component component2 added.
+New component my-comp3 added.
+component2
+my-comp3
+None
+Try to add the same component name twice
+Error: Component my-comp3 is already defined.
+       Use disco -h for more help.
+Status is 1
+component2
+my-comp3
+None
+Delete a component, making sure it no longer exists
+Component my-comp3 removed.
+component2
+None
+Add a component name back, essentially reusing it
+New component my-comp3 added.
+component2
+my-comp3
+None
+Try to delete the default component
+Error: Component None can't be deleted while it still contains files or tasks
+       Use disco -h for more help.
+Status is 1
+component2
+my-comp3
+None
