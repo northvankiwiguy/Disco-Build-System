@@ -12,7 +12,14 @@
 
 package com.arapiki.disco.main;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.StringTokenizer;
+
+import org.apache.commons.io.IOUtils;
 
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.Components;
@@ -326,6 +333,27 @@ public class CliUtils {
 		return opType;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Generate a localized help message, which depends on the currently-selected
+	 * language of display (e.g. "en" for English). The message will most likely use
+	 * a "#include" directive to pull in other text files. When searching for an
+	 * included text file, we'll look in the "messages/<lang>/" directory.
+	 * @param message Message to display, which most likely contains a #include
+	 * @return The full message string.
+	 */
+	public static String genLocalizedMessage(String message) {
+		
+		/* 
+		 * We use recursion to pull all the messages (and possibly nested files)
+		 * into the final string.
+		 */
+		StringBuffer sb = new StringBuffer();
+		genLocalizedMessageHelper("en", message, sb);	
+		return sb.toString();
+	}
+	
 	/*=====================================================================================*
 	 * Private methods
 	 *=====================================================================================*/
@@ -591,6 +619,65 @@ public class CliUtils {
 		
 		return ((resultFileSet == null) || (resultFileSet.isMember(thisPathId))) &&
 				((filterFileSet == null) || (filterFileSet.isMember(thisPathId)));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * A helper function for genLocalizedMessage, used for recursion.
+	 * @param lang The language to localize into (e.g. "en" or "fr").
+	 * @param message The message to be displayed (possibly including #include)
+	 * @param sb The StringBuffer we'll use to build up the final string.
+	 */
+	private static void genLocalizedMessageHelper(
+			String lang,
+			String message,
+			StringBuffer sb) {
+		
+		/* tokenize the string, and handle each line separately */
+		String [] lines = message.split("\n");
+		for (int i = 0; i < lines.length; i++) {
+			String thisLine = lines[i];
+			
+			/* 
+			 * If this line contains an #include directive, read the file content, then
+			 * call ourselves recursively to process the content.
+			 */
+			if (thisLine.matches("#include .*")){
+				String includeLine[] = thisLine.split(" ");
+				
+				/* try to open the file (resource) as a stream */
+				String fileName = "messages/" + lang + "/" + includeLine[1];
+				InputStream inStream = ClassLoader.getSystemResourceAsStream(fileName);
+				if (inStream == null) {
+					sb.append("<missing include: " + fileName + ">\n");	
+				} 
+				
+				/* read the stream into a string, then recursively process it */
+				else {
+					try {
+						String content = IOUtils.toString(inStream, "UTF-8");
+						genLocalizedMessageHelper(lang, content, sb);
+
+					} catch (IOException e1) {
+						sb.append("<invalid include: " + fileName + ">\n");							
+					}
+					
+					try {
+						inStream.close();
+					} catch (IOException e) {
+						/* nothing */
+					}
+				}
+			}
+			
+			/* no #include directive, so just include the line verbatim */
+			else {
+				sb.append(lines[i]);
+				sb.append('\n');
+			}
+		}
+		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

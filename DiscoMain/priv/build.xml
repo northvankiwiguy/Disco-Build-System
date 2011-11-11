@@ -65,8 +65,16 @@
 		<unjar src="${project-root}/../BuildScanners/pub/build-scanners.jar" dest="${tmp-dir}" />
 		<unjar src="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
 		<unjar src="${project-root}/../DiscoMain/pub/disco-main.jar" dest="${tmp-dir}" />		
-		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />				
+		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />
+		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-io-2.1.jar" dest="${tmp-dir}" />
 		<unjar src="${project-root}/../Utilities/pub/utilities.jar" dest="${tmp-dir}" />
+		
+		<!-- copy all of the help messages -->
+		<copy todir="${tmp-dir}">
+			<fileset dir="${project-root}/../DiscoMain/priv">
+				<include name="messages/**" />
+			</fileset>
+		</copy>
 		
 		<!-- now create a single jar file, placing it in the release package -->
 		<jar basedir="${tmp-dir}" destfile="${pkg-dir}/lib/disco.jar" />

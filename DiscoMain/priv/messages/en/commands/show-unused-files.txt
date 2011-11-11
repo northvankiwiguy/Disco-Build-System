@@ -1,0 +1,13 @@
+Show the files in the build system that are not referenced by any build tasks.
+These are typically files that reside in the source tree, but are never
+accessed during the build process. In some cases, these files are considered
+"useless" and can be deleted. The output of this report can be controlled 
+by command-specific options.
+
+Command-specific options are:
+
+#include options/show-comps.txt
+
+#include options/show-roots.txt
+
+#include options/file-filter.txt

@@ -1,0 +1,13 @@
+Show the files in the build system that written-to, but are never read-from. 
+These files typically represent the final output of the build process, 
+although in some cases they're intermediate files that are generated but
+never used. In that case, they are ideal candidates for being removed from
+the build system.
+
+Command-specific options are:
+
+#include options/show-comps.txt
+
+#include options/show-roots.txt
+
+#include options/file-filter.txt

@@ -37,8 +37,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO: Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-unused-files.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -68,7 +67,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Report on files that are never used by the build system";
+		return "Report on files that are never used by the build system.";
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

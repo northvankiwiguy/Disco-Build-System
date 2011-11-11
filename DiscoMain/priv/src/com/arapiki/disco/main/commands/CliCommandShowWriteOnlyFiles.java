@@ -36,8 +36,7 @@ public class CliCommandShowWriteOnlyFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO: Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-write-only-files.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/

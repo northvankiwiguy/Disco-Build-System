@@ -251,18 +251,19 @@ public final class DiscoMain {
 		System.err.println("\nSynopsis:\n\n    " + cmd.getName() + " - " + cmd.getShortDescription());
 		System.err.println("\nSyntax:\n\n    " + cmd.getName() + " " + cmd.getParameterDescription());
 	
+		System.err.println("\nOptions:\n");
+		displayOptions(cmd.getOptions());
+
 		System.err.println("\nDescription:\n");
 		String longHelp = cmd.getLongDescription();
 		if (longHelp != null) {
-			PrintUtils.indentAndWrap(System.err, longHelp, 4, CliUtils.getColumnWidth());
+			/* indent by 4, we'll manage the wrapping ourselves */
+			PrintUtils.indentAndWrap(System.err, longHelp, 4, 1000);
 		} else {
 			System.err.println("    No detailed help available for this command.");
 		}
-	
-		System.err.println("\nOptions:\n");
-		displayOptions(cmd.getOptions());
 		System.err.println();
-		
+
 		/* exit, with no particular error message */
 		CliUtils.reportErrorAndExit(null);
 	}

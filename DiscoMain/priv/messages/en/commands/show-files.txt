@@ -1,0 +1,13 @@
+Show all the files used in the build system. This provides a complete list of
+files, regardless of how each file is used (source or generated file), or
+which build tasks reference the file. By default, all files are shown,
+although the set of files can be controlled by various command-specific
+options.
+		
+Command-specific options are:
+
+#include options/show-comps.txt
+
+#include options/show-roots.txt
+
+#include options/file-filter.txt

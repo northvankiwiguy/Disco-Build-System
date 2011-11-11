@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="priv/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="priv/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="priv/lib/commons-io-2.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildStore"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildTreeScanner"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Utilities"/>

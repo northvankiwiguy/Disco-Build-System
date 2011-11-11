@@ -53,8 +53,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-files.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
