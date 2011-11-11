@@ -1,0 +1,43 @@
+Show all files in the build tree
+/build-tree/dirA/dirD/file4.java
+/build-tree/dirA/dirD/file5.java
+/build-tree/dirA/file1.java
+/build-tree/dirA/file2.java
+/build-tree/dirA/file3.java
+/build-tree/dirB/README
+/build-tree/dirB/file1.cpp
+/build-tree/dirB/file2.cpp
+/build-tree/dirB/file3.h
+/build-tree/dirC/file1.doc
+/build-tree/dirC/file2.doc
+/build-tree/dirC/file3.doc
+/build-tree/file1.c
+/build-tree/file2.c
+/build-tree/file3.c
+/build-tree/file4.h
+
+Show all files with suffix .c
+/build-tree/file1.c
+/build-tree/file2.c
+/build-tree/file3.c
+
+Show all files with suffix .h
+/build-tree/dirB/file3.h
+/build-tree/file4.h
+
+Show all files with name file3.*
+/build-tree/dirA/file3.java
+/build-tree/dirB/file3.h
+/build-tree/dirC/file3.doc
+/build-tree/file3.c
+
+Show all the files in the dirA subdirectory
+/build-tree/dirA/dirD/file4.java
+/build-tree/dirA/dirD/file5.java
+/build-tree/dirA/file1.java
+/build-tree/dirA/file2.java
+/build-tree/dirA/file3.java
+
+Show all the files in the dirD subdirectory
+/build-tree/dirA/dirD/file4.java
+/build-tree/dirA/dirD/file5.java
