@@ -14,6 +14,7 @@ package com.arapiki.disco.main.commands;
 
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileRecord;
 import com.arapiki.disco.model.Reports;
@@ -35,8 +36,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO: Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-popular-files.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -81,6 +81,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
+		Components cmpts = buildStore.getComponents();
 
 		/* fetch the list of most popular files */
 		FileRecord results[] = reports.reportMostCommonlyAccessedFiles();
@@ -91,7 +92,19 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 			if ((filterFileSet == null) || (filterFileSet.isMember(id))){
 				int count = fileRecord.getCount();
 				String pathName = fns.getPathName(id, optionShowRoots);
-				System.out.println(count + "\t" + pathName);
+				
+				/* should we show component names? */
+				if (optionShowComps) {
+					Integer cmptSectIds[] = cmpts.getFileComponent(id);
+					String cmptName = cmpts.getComponentName(cmptSectIds[0]);
+					String sectName = cmpts.getSectionName(cmptSectIds[1]);
+					System.out.println(count + "\t" + pathName + "  (" + cmptName + "/" + sectName + ")");
+				}
+				
+				/* no, just the file names without components */
+				else {
+					System.out.println(count + "\t" + pathName);
+				}
 			}
 		}
 	}

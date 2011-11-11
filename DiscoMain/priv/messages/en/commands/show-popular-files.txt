@@ -1,0 +1,12 @@
+Show all the files used in the build system, ordered by how often they are 
+accessed by build tasks. That is, the most frequently accessed files will
+appear at the top of the report, and the least frequently at the bottom.
+Command-specific options can be used to filter the output.
+		
+Command-specific options are:
+
+#include options/show-comps.txt
+
+#include options/show-roots.txt
+
+#include options/file-filter.txt
