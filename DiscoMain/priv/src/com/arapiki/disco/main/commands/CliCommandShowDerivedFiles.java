@@ -47,8 +47,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-derived-files.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -1,4 +1,5 @@
 -r | --show-roots
+
    When file system roots are defined within the build system, show the root's
    name instead of each file's absolute path. This is useful when you'd rather
    being using a file's relative name, rather than a much longer absolute 

@@ -1,2 +1,3 @@
 -c | --show-comps
+
    In addition to file names, also show which component the file belongs to.

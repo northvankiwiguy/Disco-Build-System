@@ -47,8 +47,7 @@ public class CliCommandShowInputFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-input-files.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
