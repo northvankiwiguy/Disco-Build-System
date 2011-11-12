@@ -1,0 +1,38 @@
+Add a new file root tag to the current build system. This allows the user to
+refer to a particular sub-tree of files by using a meaningful name. For
+example, the top of the source file tree could be labeled with "src_root",
+whereas the top of the object file tree could be "obj_root".
+
+Once a root is defined, the root name may be used in any place where an
+absolute path name is expected. For example:
+
+    disco add-root src_root /home/psmith/mysrc
+    
+The root can then be access by using the @ prefix. For example:
+
+    disco show-files -f @src_root/libraries
+    
+To show the list of currently defined roots, use the show-root command, 
+whereas to remove a root definition, use the rm-root command. Note that
+to change the definition of a root, simply reissue the add-root command
+with the new path. For example:
+
+    disco add-root src_root /home/psmith/my_new_src
+    
+This will replace the old definition with the new path.
+    
+The command arguments are:
+
+<name>
+
+  An arbitrary text name for the root. Must not contain the @ or :
+  characters.
+  
+<path>
+
+  The file location to attach the root. The can either be an absolute
+  path name, or a path that references a root. For example, the following
+  two statements have the same effect.
+        
+      disco add-root libraries_root /home/psmith/mysrc/libraries
+      disco add-root libraries_root @src_root/libraries

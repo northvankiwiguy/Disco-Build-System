@@ -37,8 +37,7 @@ public class CliCommandShowRoot implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-root.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
