@@ -17,26 +17,37 @@ package com.arapiki.disco.scanner.buildtree;
  * to indicate that a fatal error occurred. The receiver of the FatalBuildTreeScannerError
  * must simply catch and display the error. There isn't intended to be any way to
  * recovery from this type of error.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 @SuppressWarnings("serial")
 public class FatalBuildTreeScannerError extends Error {
-	
+
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
+
 	/**
-	 * Create a new FataBuildTreeScannerError
+	 * Create a new FataBuildTreeScannerError, with a string message
+	 * and an embedded Exception.
+	 * 
 	 * @param message A string message to indicate the cause of the failure.
 	 * @param e An embedded Exception that caused the failure.
 	 */
 	public FatalBuildTreeScannerError(String message, Throwable e) {
 		super(message, e);
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
-	 * Create a new FataBuildTreeScannerError.
+	 * Create a new FataBuildTreeScannerError, with a string message.
+	 * 
 	 * @param message A string message to indicate the cause of the failure.
 	 */
 	public FatalBuildTreeScannerError(String message) {
 		super(message);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
 }

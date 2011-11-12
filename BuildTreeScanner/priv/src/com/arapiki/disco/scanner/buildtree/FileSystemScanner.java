@@ -21,8 +21,10 @@ import com.arapiki.utils.os.FileSystemTraverseCallback;
 import com.arapiki.utils.os.SystemUtils;
 
 /**
+ * A class for scanning the content of a local file system, and inserting the file
+ * information into a BuildStore.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class FileSystemScanner {
 
@@ -33,7 +35,7 @@ public class FileSystemScanner {
 	/**
 	 * The BuildStore associated with this FileSystemScanner.
 	 */
-	private BuildStore bs;
+	private BuildStore buildStore;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -41,10 +43,11 @@ public class FileSystemScanner {
 
 	/**
 	 * Create a new FileSystemScanner object.
-	 * @param buildStore The BuildStore into which the scanned information should be added
+	 * 
+	 * @param buildStore The BuildStore into which the scanned information should be added.
 	 */
 	public FileSystemScanner(BuildStore buildStore) {
-		this.bs = buildStore;
+		this.buildStore = buildStore;
 	}
 	
 	/*=====================================================================================*
@@ -52,21 +55,25 @@ public class FileSystemScanner {
 	 *=====================================================================================*/
 
 	/**
-	 * Scan a real file system tree (on our local disk, not in the BuildStore), and add the
-	 * paths into the BuildStore. It's important to note that the entire file path will be
-	 * added into the BuildStore. For example, adding "/usr/include/sys" will result in all
-	 * paths starting with the /usr/include/sys prefix. However, adding "sys" will result 
-	 * in everything starting with just "/sys".
-	 * @param rootName The BuildStore root under which the files will be added (e.g. "root")
-	 * @param fileSystemPath The path on the real Unix files where the scanning should start
+	 * Scan a real file system tree (which is on our Unix file system), and add the
+	 * paths into the BuildStore. The user-specified root path is the top location of the
+	 * scan. All paths beneath that root will be added to the BuildStore.
+     * <p>
+     * It's important to note that the absolute file path will be added into the BuildStore. 
+     * For example, using a rootName of "/usr/include/sys" will result in all paths
+     * in the BuildStore having the /usr/include/sys prefix. 
+     * 
+	 * @param rootName The BuildStore root under which the files will be added (e.g. "root").
+	 * @param fileSystemPath The path on the real Unix file system where the scanning
+	 * should start.
 	 */
 	public void scanForFiles(final String rootName, String fileSystemPath) {
 		
 		/* these need to be final so the callback class (see later) can access them */
-		final FileNameSpaces fns = bs.getFileNameSpaces();
+		final FileNameSpaces fns = buildStore.getFileNameSpaces();
 		
 		/* make the database really fast (turn off auto-commit ). */
-		bs.setFastAccessMode(true);
+		buildStore.setFastAccessMode(true);
 		
 		/* now traverse the file system */
 		SystemUtils.traverseFileSystem(fileSystemPath, 
@@ -89,8 +96,8 @@ public class FileSystemScanner {
 				});
 		
 		/* now commit everything */
-		bs.setFastAccessMode(false);
+		buildStore.setFastAccessMode(false);
 	}
 
-	/*=====================================================================================*/
+	/*-------------------------------------------------------------------------------------*/
 }
