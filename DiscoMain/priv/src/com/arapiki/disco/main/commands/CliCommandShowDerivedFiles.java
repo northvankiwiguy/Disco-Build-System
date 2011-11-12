@@ -24,8 +24,7 @@ import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 
 /**
- * Disco CLI Command class that implements the "show-derived-files" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "show-derived-files" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -35,7 +34,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Should we all show the indirect files? */
+	/** Set if we should show all the indirect files too. */
 	protected static boolean optionAll = false;
 	
 	/*=====================================================================================*

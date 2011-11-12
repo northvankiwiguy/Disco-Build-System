@@ -22,8 +22,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
- * Disco CLI Command class that implements the "rm-root" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "rm-root" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

@@ -19,7 +19,7 @@ import com.arapiki.disco.model.BuildStore;
 
 /**
  * This interface must be implemented by any class that provides a disco CLI
- * command. The DiscoMain class uses these class to identify each CLI command's
+ * command. The DiscoMain class uses these classes to identify each CLI command's
  * name, options, arguments, and human-readable descriptions. It also processes
  * command line options and invokes the command via this interface.
  * 
@@ -28,26 +28,27 @@ import com.arapiki.disco.model.BuildStore;
 public interface ICliCommand {
 
 	/**
-	 * Fetch the name of this CLI command (this is what the user actually types)
-	 * @return The command's name
+	 * Fetch the name of this CLI command (such as "show-files" or "show-tasks").
+	 * @return The command's name.
 	 */
 	public String getName();
 	
 	/**
 	 * Fetch the command's parameter description, which is the syntax of the parameters that 
-	 * the command accepts (e.g. "<comp-name> <path>, ...").
-	 * @return The command's parameter description
+	 * the command accepts. For example, "&lt;comp-name&gt; &lt;path&gt;, ...".
+	 * @return The command's parameter description.
 	 */
 	public String getParameterDescription();
 	
 	/**
 	 * Fetch the command's one-line description. For example, "Show the list of tasks".
-	 * @return The command's one-line description
+	 * @return The command's one-line description.
 	 */
 	public String getShortDescription();
 	
 	/**
-	 * Fetch the command's multi-line description. This is the full help text for this command.
+	 * Fetch the command's multi-line description. This is the full help text for this command
+	 * which may contain many hundreds of lines of output.
 	 * @return The command's full multi-line description.
 	 */
 	public String getLongDescription();
@@ -59,19 +60,21 @@ public interface ICliCommand {
 	public Options getOptions();
 	
 	/**
-	 * DiscoMain invokes this method to process the user-supplied options. Each CliCommand*
-	 * object should process these options in its own way and set its internal state
-	 * appropriately. 
-	 * @param buildStore The BuildStore we'll operate on
-	 * @param cmdLine The already-processed command line.
+	 * Pre-process the user-supplied options, in preparation for invoking the command. 
+	 * Each CliCommand* object should process these options in its own way and set its internal 
+	 * state appropriately. This method will be called immediately before invoke() is called.
+	 * @param buildStore The BuildStore we'll operate on.
+	 * @param cmdLine The pre-parsed command line, which contains the command's options.
 	 */
 	public void processOptions(BuildStore buildStore, CommandLine cmdLine);
 	
 	/**
 	 * Invoke this command, using the provided command line arguments. If an error occurs,
-	 * this method is entitled to exit the whole program.
-	 * @param buildStore The BuildStore to perform the command on
-	 * @param args The command line arguments (options and normal arguments)
+	 * this method is entitled to abort the whole program without returning. 
+	 * It can be assumed that processOptions() has already been called to configure 
+	 * the command's options.
+	 * @param buildStore The BuildStore to perform the command on.
+	 * @param args The command line arguments (normal "non-option" arguments only).
 	 */
 	public void invoke(BuildStore buildStore, String [] args);
 	

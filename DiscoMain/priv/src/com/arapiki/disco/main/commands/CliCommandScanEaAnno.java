@@ -27,8 +27,7 @@ import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
 import com.arapiki.utils.files.ProgressFileInputStreamListener;
 
 /**
- * Disco CLI Command class that implements the "scan-ea-anno" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "scan-ea-anno" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

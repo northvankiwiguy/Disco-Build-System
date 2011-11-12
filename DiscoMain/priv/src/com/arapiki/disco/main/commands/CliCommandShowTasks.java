@@ -26,8 +26,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.TaskSet;
 
 /**
- * Disco CLI Command class that implements the "show-tasks" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "show-tasks" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -37,19 +36,19 @@ public class CliCommandShowTasks implements ICliCommand {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Should we show component membership when displaying reports? */
+	/** Set if we should show component membership when displaying reports. */
 	protected static boolean optionShowComps = false;
 
-	/** Do we want short output? */
+	/** Set if we want short output. */
 	protected static boolean optionShort = false;
 	
-	/** Do we want long output? */
+	/** Set if we want long output. */
 	protected static boolean optionLong = false;
 
-	/** The output format of the report (ONE_LINE, WRAPPED, NOT_WRAPPED) */
+	/** The output format of the report (ONE_LINE, WRAPPED, NOT_WRAPPED). */
 	protected DisplayWidth outputFormat = DisplayWidth.WRAPPED;
 	
-	/** The TaskSet used to filter our results (if -f/--filter is used) */
+	/** The TaskSet used to filter our results (if -f/--filter is used). */
 	protected TaskSet filterTaskSet = null;
 	
 	/*=====================================================================================*

@@ -22,8 +22,7 @@ import com.arapiki.disco.model.Components;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
- * Disco CLI Command class that implements the "rm-comp" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "rm-comp" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

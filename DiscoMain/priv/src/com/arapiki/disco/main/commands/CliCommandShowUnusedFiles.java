@@ -21,8 +21,7 @@ import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 
 /**
- * Disco CLI Command class that implements the "show-unused-files" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "show-unused-files" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

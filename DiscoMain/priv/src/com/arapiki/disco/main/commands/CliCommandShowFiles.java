@@ -24,8 +24,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 
 /**
- * Disco CLI Command class that implements the "show-files" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "show-files" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -35,13 +34,13 @@ public class CliCommandShowFiles implements ICliCommand {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Should we show roots when displaying reports? */
+	/** Set if we should show roots when displaying reports. */
 	protected boolean optionShowRoots = false;
 	
-	/** Should we show component membership when displaying reports? */
+	/** Set if we should show component membership when displaying reports. */
 	protected boolean optionShowComps = false;
 	
-	/** The FileSet used to filter our results (if -f/--filter is used) */
+	/** The FileSet used to filter our results (if -f/--filter is used). */
 	protected FileSet filterFileSet = null;
 	
 	/*=====================================================================================*

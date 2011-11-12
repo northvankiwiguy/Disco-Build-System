@@ -21,8 +21,7 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Components;
 
 /**
- * Disco CLI Command class that implements the "show-comp" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "show-comp" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

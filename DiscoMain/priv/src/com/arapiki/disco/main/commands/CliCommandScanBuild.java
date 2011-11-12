@@ -22,23 +22,22 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.scanner.legacy.LegacyBuildScanner;
 
 /**
- * Disco CLI Command class that implements the "scan-build" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "scan-build" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class CliCommandScanBuild implements ICliCommand {
 
-	/** If not-null, the name of the trace file to write/read */
+	/** If not-null, the name of the trace file to write/read. */
 	private String traceFileName = null;
 	
-	/** Did the user specify --trace-only? */
+	/** Set if the user specified --trace-only. */
 	private boolean optionTraceOnly = false;
 	
-	/** Did the user specify --read-trace? */
+	/** Set if the user specified --read-trace. */
 	private boolean optionReadTrace = false;
 	
-	/** Did the user specify --trace-level=? */
+	/** Set if the user specified --trace-level=. */
 	private int optionDebugLevel = 0;
 
 	/*=====================================================================================*

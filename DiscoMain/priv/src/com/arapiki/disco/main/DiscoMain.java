@@ -26,8 +26,8 @@ import com.arapiki.utils.string.StringArray;
 import com.arapiki.utils.version.Version;
 
 /**
- * This is the main entry point for the "disco" command line program. All other projects (with
- * the exception of the Eclipse plug-in are invoked from this point.
+ * This is the main entry point for the "disco" command line program. All other parts
+ * of the code (with the exception of the Eclipse plug-in) are invoked via this point.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -37,23 +37,22 @@ public final class DiscoMain {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 	
-	/** which file to use for the BuildStore database */
+	/** The file name to use for the BuildStore database (defaults to "buildstore"). */
 	private String buildStoreFileName = "buildstore";	
 	
-	/** did the user select the -h option? */
+	/** Set if the user selected the -h option. */
 	private boolean optionHelp = false;
 	
-	/** did the user select the -v option? */
+	/** Set if the user selected the -v option. */
 	private boolean optionVersion = false;
 	
-	/** The global command line options, as used by the Apache Commons CLI library */
+	/** The global command line options, as managed by the Apache Commons CLI library. */
 	private Options globalOpts = null;
 	
 	/**
 	 * All CLI command are "plugged into" the DiscoMain class, from where they can then
-	 * be invoked. The CommandGroup class is used to associate logical groups of commands
-	 * with the list of commands that fall in that group (for example, one group could be
-	 * all the commands that display FileSet listings.
+	 * be invoked. The CommandGroup class is used to encapsulate logical groups of commands.
+	 * For example, one group could be all the commands that display FileSet listings.
 	 */
 	private class CommandGroup {
 		
@@ -64,7 +63,7 @@ public final class DiscoMain {
 		ICliCommand commands[];
 	}
 	
-	/** The list of command groups that are registered with DiscoMain */
+	/** The list of command groups that are registered with DiscoMain. */
 	private ArrayList<CommandGroup> commandGroups = null;
 	
 	/*=====================================================================================*
@@ -72,12 +71,23 @@ public final class DiscoMain {
 	 *=====================================================================================*/
 	
 	/**
+	 * Create a new DiscoMain instance. This should only be done once, from the standard
+	 * Java main() function.
+	 */
+	private DiscoMain() {
+		/* empty */
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
 	 * Process the global command line arguments, using the Apache Commons CLI library.
 	 * Global options are defined as being those arguments that appear before the sub-command
 	 * name. They are distinct from "command options" that are specific to each sub-command.
 	 * 
 	 * @param args The standard command line array from the main() method.
-	 * @return The remaining command line arguments, with the first being the command name
+	 * @return The remaining command line arguments (with global options excluded), with the first
+	 * being the command name.
 	 */
 	private String [] processGlobalOptions(String[] args) {
 		
@@ -156,7 +166,7 @@ public final class DiscoMain {
 	/**
 	 * Display a set of options (as defined by the Options class). This methods is used
 	 * in displaying the help text
-	 * @param opts A set of command line options, as defined by the Options class
+	 * @param opts A set of command line options, as defined by the Options class.
 	 */
 	@SuppressWarnings("unchecked")
 	private void displayOptions(Options opts) {
@@ -218,7 +228,7 @@ public final class DiscoMain {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Display the main help text for the "disco" comand. The includes the global command line
+	 * Display the main help text for the "disco" command. The includes the global command line
 	 * options and the list of sub-commands. Note: this method never returns, instead the whole program
 	 * is aborted. Optionally, a text message will be displayed.
 	 * @param message A special purpose string error message.
@@ -248,7 +258,11 @@ public final class DiscoMain {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * @param cmd
+	 * Display detailed help text about a specific CLI command. The output from this
+	 * command may be hundreds of lines long, depending on the length of the command-specific
+	 * help message. Note that this method aborts the whole program, and never returns.
+	 * 
+	 * @param cmd The CLI command to display detailed information about.
 	 */
 	private void displayDetailedHelpAndExit(ICliCommand cmd) {
 		
@@ -275,9 +289,9 @@ public final class DiscoMain {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Register a group of CLI commands. This is a helper method for registerCommands()
-	 * @param heading The title to be printed at the start of this group of commands
-	 * @param commandList An array of commands to be added into this group. 
+	 * Register a group of CLI commands. This is a helper method for registerCommands().
+	 * @param heading The title to be printed at the start of this group of commands.
+	 * @param commandList An array of commands to be added into this group.
 	 */
 	private void registerCommandGroup(String heading,
 			ICliCommand[] commandList) {
@@ -349,9 +363,9 @@ public final class DiscoMain {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a CLI command name, find the associate ICliCommand object that describes the
+	 * Given a CLI command name, find the associated ICliCommand object that describes the
 	 * command.
-	 * @param cmdName The name of the CLI command, as entered by the user on the command line
+	 * @param cmdName The name of the CLI command, as entered by the user on the command line.
 	 * @return The associated ICliCommand object, or null if the command wasn't registered.
 	 */
 	private ICliCommand findCommand(String cmdName) {
@@ -377,8 +391,7 @@ public final class DiscoMain {
 	/**
 	 * This is the main entry point for the disco command. This method parses the global
 	 * command line arguments, determines which sub-command is being invoked, parses that
-	 * command's options, then invokes the commands. All command functionality is kept
-	 * in the CliCommand* classes.
+	 * command's options, then invokes the command. 
 	 * 
 	 * @param args Standard Java command line arguments - passed to us by the 
 	 * "disco" shell script.
@@ -491,7 +504,7 @@ public final class DiscoMain {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * The main entry point. Does nothing by delegate to invokeCommand().
+	 * The standard Java main() function, which does nothing by delegate to invokeCommand().
 	 * @param args The standard command line argument array.
 	 */
 	public static void main(String[] args) {

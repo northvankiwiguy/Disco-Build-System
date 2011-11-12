@@ -23,8 +23,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
 
 /**
- * Disco CLI Command class that implements the "set-file-comp" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "set-file-comp" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

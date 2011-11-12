@@ -27,8 +27,7 @@ import com.arapiki.disco.model.TaskSet;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 
 /**
- * Disco CLI Command class that implements the "show-files-used-by" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "show-files-used-by" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -38,10 +37,10 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Should we only show files that are "read" - set by the --read option */
+	/** Set if we should only show files that are "read" - set by the --read option. */
 	protected static boolean optionRead = false;
 	
-	/** Should we only show files that are "written" - set by the --write option */
+	/** Set if we should only show files that are "written" - set by the --write option. */
 	protected static boolean optionWrite = false;
 
 	/*=====================================================================================*

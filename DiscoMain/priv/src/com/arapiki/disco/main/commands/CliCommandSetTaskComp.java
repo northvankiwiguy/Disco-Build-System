@@ -23,8 +23,7 @@ import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.TaskSet;
 
 /**
- * Disco CLI Command class that implements the "set-task-comp" command. See the 
- * getLongDescription() method for details of this command's features.
+ * Disco CLI Command class that implements the "set-task-comp" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

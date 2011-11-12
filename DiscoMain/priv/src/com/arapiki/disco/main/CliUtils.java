@@ -34,6 +34,10 @@ import com.arapiki.utils.print.PrintUtils;
  * a TaskSet. These methods are all static, so no object is required for them to be
  * invoked.
  * 
+ * Note: A number of these methods are used for command-line validation, and could 
+ * potentially abort the program without returning. They should therefore only be
+ * used for command-line-based applications.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class CliUtils {
@@ -42,23 +46,38 @@ public class CliUtils {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
-	/** how are tasks commands displayed? */
+	/** Enumeration for specifying how a task's command string should be displayed. */
 	public enum DisplayWidth { 
 		
-		/** As much as possible of the task's command line should be displayed on one line. */
+		/** 
+		 * As much as possible of the task's command line should be displayed on one line 
+		 * (truncate the remainder of the line if it's too long).
+		 */
 		ONE_LINE, 
 		
-		/** If the command line is too long, wrap it onto multiple lines */
+		/** 
+		 * If the command line is too long, wrap it onto multiple lines, using our custom-set
+		 * line width when splitting lines. Try to be intelligent about breaking lines at spaces,
+		 * rather than in the middle of words.
+		 */
 		WRAPPED, 
 		
-		/** Don't do any wrapping, and just let the terminal wrap the line if it's too long */
+		/** 
+		 * Don't do any command-line wrapping, and just let the terminal wrap the line 
+		 * if it's too long. The whole string will be shown, across multiple lines.
+		 */
 		NOT_WRAPPED 
 	}
 	
-	/** the number of columns (characters) per output line */
+	/** 
+	 * The number of columns (characters) per output line. This is used when wrapping text.
+	 */
 	private static int columnWidth = 80;
 	
-	/** When validating command line args - this value is considered infinite */
+	/** 
+	 * When validating command line arguments, this value is used to represent an unlimited
+	 * number of arguments.
+	 */
 	public static final int ARGS_INFINITE = -1;
 	
 	/*=====================================================================================*
@@ -66,8 +85,19 @@ public class CliUtils {
 	 *=====================================================================================*/
 
 	/**
-	 * Given zero or more command line arguments, create a FileSet that stores all the files
-	 * mention in those command-line arguments
+	 * Given a user-specified string (from the command line), parse the specification into
+	 * a FileSet data structure containing all the relevant files. The string specification
+	 * is a colon-separated list of:
+	 *    <ol>
+	 * 	  <li> An absolute path name (starting with /), either a directory name or a file name. 
+	 *       If the path is a directory, add all files and directories below that point in the tree.</li>
+	 *    <li>A path name starting with a "root:" - the same rules apply as for #1.</li>
+	 *    <li>A single file name, with one or more wildcard (*) characters. All files that match
+     *       the name are added, no matter what their directory.</li>
+     *    <li>A component spec, starting with %comp, or the complement of a component, starting 
+     *       with %not-comp.</li>
+     *    </ol>
+     *    
 	 * @param fns The FileNameSpaces object that manages the files.
 	 * @param pathSpecs A String of ":"-separated path specs (files, directories, or regular expressions).
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
@@ -89,11 +119,23 @@ public class CliUtils {
 
 	/**
 	 * Given a user-supplied set of command line arguments, parse those arguments and create
-	 * a suitable TaskSet. If no arguments are provided, the null TaskSet is returned (indicating
-	 * that all files should be shown).
-	 * @param bts The BuildTasks object to query.
-	 * @param taskSpecs The command line arguments that specify the TaskSet to show.
-	 * @return The TaskSet, as described by the input task specs
+	 * a suitable TaskSet containing all the relevant tasks that match the specification. The
+	 * specification string is a colon-separated list of:
+	 * <ol>
+	 * 	 <li>A specific task number, which will be added to the TaskSet.</li>
+	 *   <li>The task number followed by [/depth] to indicate that all tasks in the sub tree,
+	 *      starting at the specified task and moving down the task tree "depth" level, should
+	 *      be added.</li>
+	 *   <li>If 'depth' is omitted (only the '/' is provided), all tasks is the subtree are added
+	 *      (regardless of their depth).</li>
+	 *   <li>If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
+	 *      than being added. The "/depth" and "/" suffix can be used to remove subtasks as well.
+	 *   <li>The special syntax "%comp/foo" means all tasks in the component "foo".</li>
+	 *   <li>The special syntax "%not-comp/foo" means all tasks outside the component "foo".</li>
+	 * </ol>
+	 * @param bts The BuildTasks manager object to query.
+	 * @param taskSpecs The command line argument providing the task specification string.
+	 * @return The TaskSet, as described by the input task specification.
 	 */
 	public static TaskSet getCmdLineTaskSet(BuildTasks bts, String taskSpecs) {
 		
@@ -111,18 +153,18 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Generic function for displaying a FileSet. This is used primarily for displaying
-	 * the result of reports.
+	 * Given a FileSet, display the files in that set in a pretty-printed format. This is 
+	 * used primarily for displaying the result of reports.
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
-	 * @param fns The FileNameSpaces manager object containing the files to be listed
-	 * @param cmpts The Components manager object containing the component information
-	 * @param resultFileSet The set of files to be displayed (if null, show them all)
+	 * @param fns The FileNameSpaces manager object containing the files to be listed.
+	 * @param cmpts The Components manager object containing the component information.
+	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
 	 *         displayed (set to null to display everything).
-	 * @param showRoots Indicates whether path roots should be displayed (true), or whether absolute paths
-	 * 		   should be used (false).
-	 * @param showComps Indicates whether the component names should be displayed
+	 * @param showRoots Indicates whether path roots should be displayed (true), or whether 
+	 *         absolute paths should be used (false).
+	 * @param showComps Indicates whether the component names should be displayed.S
 	 */
 	public static void printFileSet(
 			PrintStream outStream, FileNameSpaces fns, Components cmpts, FileSet resultFileSet,
@@ -177,13 +219,14 @@ public class CliUtils {
 	/**
 	 * Given a TaskSet, display the tasks in that set in a pretty-printed format. To ensure
 	 * that all tasks are displayed, you should first call TaskSet.populateWithParents().
-	 * @param outStream The PrintStream to display the output on
-	 * @param bts The BuildTasks object containing the task information
-	 * @param fns The FileNameSpaces manager object containing file name information
-	 * @param cmpts The Components manager object contain component information
-	 * @param resultTaskSet The set of tasks to be displayed
-	 * @param filterTaskSet Currently unused
-	 * @param outputFormat Set to true if the full command strings should be displayed.
+	 * 
+	 * @param outStream The PrintStream on which to display the output.
+	 * @param bts The BuildTasks manager object containing the task information.
+	 * @param fns The FileNameSpaces manager object containing file name information.
+	 * @param cmpts The Components manager object containing component information.
+	 * @param resultTaskSet The set of tasks to be displayed (the results of some previous query).
+	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
+	 * @param outputFormat Mode for formatting the command strings.
 	 * @param showComps Set to true if the component names should be shown.
 	 */
 	public static void printTaskSet(
@@ -209,7 +252,7 @@ public class CliUtils {
 
 	/**
 	 * Return the number of columns (characters) of output to be printed per report line.
-	 * @return The number of columns 
+	 * @return The number of columns.
 	 */
 	public static int getColumnWidth() {
 		return columnWidth;
@@ -220,7 +263,7 @@ public class CliUtils {
 	/**
 	 * Set the number of columns (characters) of output to be printed per report line. The
 	 * minimum width is 40 characters. Any attempt to set a narrower width will revert to 40.
-	 * @param newWidth The new column width to set
+	 * @param newWidth The new column width to set.
 	 */
 	public static void setColumnWidth(int newWidth) {
 		if (newWidth < 40) {
@@ -232,14 +275,18 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Parses the user-supplied component/section string, and returns the corresponding
+	 * Parse the user-supplied component/section string, and return the corresponding
 	 * component ID and section ID. The string should be in the format "component" or 
 	 * "component/section". If "section" is not provided (and sectionAllowed is true),
 	 * "private" is assumed. If the input is invalid, display a meaningful error message
 	 * and exit the program.
-	 * @param cmpts The Components manager object containing the component information
-	 * @param compString The user-supplied input string (could be anything)
-	 * @param sectionAllowed Is the user allowed to provide a section? 
+	 * 
+	 * This method may abort the whole program (never returning) if the input string
+	 * is invalid.
+	 * 
+	 * @param cmpts The Components manager object containing the component information.
+	 * @param compString The user-supplied input string (could be anything).
+	 * @param sectionAllowed True if the input string is allowed to provide a section name. 
 	 * @return An array of two integers. The first is the component's ID number,
 	 * and the second is the section's ID number.
 	 */
@@ -284,13 +331,17 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Validate function to ensure that the number of arguments provided to a command
+	 * Validation function to ensure that the number of arguments provided to a command
 	 * is in range between minArgs and maxArgs.
-	 * @param cmdName The name of the command being executed
-	 * @param cmdArgs The actual array of arguments
-	 * @param minArgs The minimum number of arguments required (0 or higher)
-	 * @param maxArgs The maximum number of arguments required (0 or higher - possibly ARGS_INFINITE)
-	 * @param message An error message to provide if an invalid number of arguments is included
+	 * 
+	 * This method may abort the whole program (never returning) if the number of input
+	 * arguments is invalid.
+	 * 
+	 * @param cmdName The name of the command being executed.
+	 * @param cmdArgs The array of input arguments.
+	 * @param minArgs The minimum number of arguments required (0 or higher).
+	 * @param maxArgs The maximum number of arguments required (0 or higher - possibly ARGS_INFINITE).
+	 * @param message An error message to display if an invalid number of arguments is included.
 	 */
 	public static void validateArgs(String cmdName, String[] cmdArgs, int minArgs, int maxArgs,
 			String message) {
@@ -313,6 +364,7 @@ public class CliUtils {
 	/**
 	 * Display an error message in a standard format, then exit the program with a non-zero
 	 * error code. This method call never returns.
+	 * 
 	 * @param message The message to be display. If null, just exit without displaying.
 	 */
 	public static void reportErrorAndExit(String message) {
@@ -326,10 +378,11 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given the possible use of the --read and --write command line flags, return an
-	 * OperationType value that can be used for querying the database
-	 * @param optionRead Whether the user provided the --read flag
-	 * @param optionWrite Whether the user provided the --write flag
+	 * Given that a command-line user may have specified the --read and --write command line 
+	 * options, return the appropriate OperationType value that can be used for querying the database.
+	 * 
+	 * @param optionRead Set if the user provided the --read flag.
+	 * @param optionWrite Set if the user provided the --write flag.
 	 * @return Either OP_UNSPECIFIED (search for either), OP_READ, or OP_WRITE
 	 */
 	public static OperationType getOperationType(boolean optionRead,
@@ -353,12 +406,17 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Generate a localized help message, which depends on the currently-selected
-	 * language of display (e.g. "en" for English). The message will most likely use
-	 * a "#include" directive to pull in other text files. When searching for an
-	 * included text file, we'll look in the "messages/<lang>/" directory.
-	 * @param message Message to display, which most likely contains a #include
-	 * @return The full message string.
+	 * Generate a localized help message, for use when displaying online help.
+	 * The provided message string will most likely contain a single line with
+	 * an "#include" directive, which has the effect of pulling in another text
+	 * file containing the main body of the message. This text file may also pull
+	 * in other text files for inclusion.
+	 * 
+	 * When searching for an included text file, the "messages/&lt;lang%gt;/" directory
+	 * is searched, where %lt;lang%gt; is a language specifier, such as "en".
+	 * 
+	 * @param message Message to display, which most likely contains a #include directive.
+	 * @return The full message string, which may be hundreds of lines long.
 	 */
 	public static String genLocalizedMessage(String message) {
 		
@@ -376,19 +434,28 @@ public class CliUtils {
 	 *=====================================================================================*/
 
 	/**
-	 * Helper method for displaying a path and all it's children. This should only be called
-	 * by printFileSet().
+	 * The CliUtils class can not be instantiated. Use the static methods only.
+	 */
+	private CliUtils() {
+		/* empty */
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for displaying a path and all it's children, called exclusively by
+	 * printFileSet().
 	 * 
-	 * @param outStream The PrintStream to display the paths on
-	 * @param pathSoFar This path's parent path as a string, complete with trailing "/"
-	 * @param fns The FileNameSpaces manager object in which these paths belong
-	 * @param cmpts The Components manager object that contains the component information
+	 * @param outStream The PrintStream on which to display paths.
+	 * @param pathSoFar This path's parent path as a string, complete with trailing "/".
+	 * @param fns The FileNameSpaces manager object in which these paths belong.
+	 * @param cmpts The Components manager object that contains the component information.
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
-	 * @param resultFileSet The set of files to be displayed (if null, show them all)
+	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
 	 * 		   should be displayed (set to null to display everything).
-	 * @param showRoots Whether to show path roots (true) or absolute paths (false)
-	 * @param showComps Whether to show the component names
+	 * @param showRoots Whether to show path roots (true) or absolute paths (false).
+	 * @param showComps Whether to show the component names.
 	 */
 	private static void printFileSetHelper(
 			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, Components cmpts, int thisPathId,
@@ -533,18 +600,19 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A helper method, used exclusively by printTaskSet. This method calls itself recursively
+	 * A helper method, called exclusively by printTaskSet(). This method calls itself recursively
 	 * as it traverses the TaskSet's tree structure.
-	 * @param outStream The PrintStream to display the output on
-	 * @param bts The BuildTasks manager object containing the task information
-	 * @param fns The FileNameSpaces manager object containing file name information
-	 * @param cmpts The Components manager object containing the component information
-	 * @param taskId The ID of the task we're currently displaying
-	 * @param resultTaskSet The full set of tasks to be displayed
-	 * @param filterTaskSet Currently unused
-	 * @param outputFormat The way in which the tasks should be formatted
-	 * @param showComps Set to true if we should display component names
-	 * @param indentLevel The number of spaces to indent this task by
+	 * 
+	 * @param outStream The PrintStream on which to display the output.
+	 * @param bts The BuildTasks manager object containing the task information.
+	 * @param fns The FileNameSpaces manager object containing file name information.
+	 * @param cmpts The Components manager object containing the component information.
+	 * @param taskId The ID of the task we're currently displaying (at this level of recursion).
+	 * @param resultTaskSet The full set of tasks to be displayed (the result of some previous query).
+	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
+	 * @param outputFormat The way in which the tasks should be formatted.
+	 * @param showComps Set to true if we should display component names.
+	 * @param indentLevel The number of spaces to indent this task by (at this recursion level).
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
 			BuildTasks bts, FileNameSpaces fns, Components cmpts, 
@@ -630,12 +698,13 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Is this path in the set of paths to be displayed? That is, is it in the resultFileSet
-	 * as well as being part of filterFileSet?
-	 * @param thisPathId The ID of the path we might want to display
-	 * @param resultFileSet The set of paths in the result set
-	 * @param filterFileSet The set of paths in the filter set
-	 * @return Whether or not the path should be displayed
+	 * Determine whether this path is in the set of paths to be displayed. That is, it's
+	 * in the resultFileSet as well as being part of filterFileSet.
+	 * 
+	 * @param thisPathId The ID of the path we might want to display.
+	 * @param resultFileSet The set of paths in the result set.
+	 * @param filterFileSet The set of paths in the filter set.
+	 * @return Whether or not the path should be displayed.
 	 */
 	private static boolean shouldBeDisplayed(int thisPathId, 
 			FileSet resultFileSet, FileSet filterFileSet) {
@@ -648,8 +717,9 @@ public class CliUtils {
 
 	/**
 	 * A helper function for genLocalizedMessage, used for recursion.
+	 * 
 	 * @param lang The language to localize into (e.g. "en" or "fr").
-	 * @param message The message to be displayed (possibly including #include)
+	 * @param message The message to be displayed (possibly including #include).
 	 * @param sb The StringBuffer we'll use to build up the final string.
 	 */
 	private static void genLocalizedMessageHelper(
@@ -704,6 +774,5 @@ public class CliUtils {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
-
 }
 
