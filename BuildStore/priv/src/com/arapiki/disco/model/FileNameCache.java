@@ -150,7 +150,7 @@ public class FileNameCache {
 
 	/**
 	 * Constructor for the FileNameCache class.
-	 * @parap maxSize the maximum number of items to hold in the cache.
+	 * @param maxSize the maximum number of items to hold in the cache.
 	 */
 	public FileNameCache(int maxSize) {
 		map = new LRULinkedHashMap<FileNameCacheKey, FileNameCacheValue>(maxSize);
@@ -186,8 +186,8 @@ public class FileNameCache {
 
 	/**
 	 * Add a new mapping to the cache.
-	 * @param parentFileId The parent's file ID (actually, a directory)
-	 * @param The name of the file within that parent's directory
+	 * @param parentFileId The parent's file ID (actually, a directory ID)
+	 * @param childFileName The name of the file within that parent's directory
 	 * @param childFileId The child's file ID to be used as the target of the mapping
 	 * @param childType What type is the child (file, directory, etc), to be used as
 	 * the target of the mapping.

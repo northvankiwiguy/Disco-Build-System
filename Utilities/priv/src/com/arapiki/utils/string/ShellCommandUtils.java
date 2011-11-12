@@ -28,6 +28,8 @@ public class ShellCommandUtils {
 	 * to be the same command. If not, the current line and next line will be joined together
 	 * with && (as opposed to ; which would allow the second command to continue, even if 
 	 * the first command failed). Finally, leading spaces/tabs are removed off all lines.
+	 * @param cmdLine The (possibly) multi-line shell command
+	 * @return The joined-together shell command
 	 */
 	public static String joinCommandLine(String cmdLine) {
 		

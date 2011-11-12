@@ -64,7 +64,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.BuildTasks#addBuildTask(java.lang.String)}.
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#addBuildTask(int, int, String)}.
 	 */
 	@Test
 	public void testAddBuildTask() {
@@ -123,6 +123,7 @@ public class TestBuildTasks {
 
 	/**
 	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getParent(int)}
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetParent() throws Exception {
@@ -152,6 +153,7 @@ public class TestBuildTasks {
 
 	/**
 	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getDirectory(int)}
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetDirectory() throws Exception {
@@ -178,6 +180,7 @@ public class TestBuildTasks {
 
 	/**
 	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getParent(int)}
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetChildren() throws Exception {
@@ -206,7 +209,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.BuildTasks#addFileAccess(int, int, char)}.
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#addFileAccess(int, int, OperationType)}.
 	 */
 	@Test
 	public void testAddGetFileAccess() {
@@ -261,7 +264,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getTasksThatAccess(int, char)}.
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getTasksThatAccess(int, OperationType)}.
 	 */
 	@Test
 	public void testGetTasksThatAccess() {
@@ -338,6 +341,9 @@ public class TestBuildTasks {
 
 	/*-------------------------------------------------------------------------------------*/
 	
+	/**
+	 * Test the scalability of adding build tasks and file accesses.
+	 */
 	@Test
 	public void testScalability() {
 
@@ -371,7 +377,7 @@ public class TestBuildTasks {
 			}
 			
 			/* now read the files that were added */
-			Integer result[] = bts.getFilesAccessed(taskId, OperationType.OP_UNSPECIFIED);
+			bts.getFilesAccessed(taskId, OperationType.OP_UNSPECIFIED);
 		}
 		bs.setFastAccessMode(false);
 	}

@@ -48,11 +48,11 @@ public class FileIncludes {
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new FileDependencies object.
-	 * @param db The database manager who provides this object with database access.
+	 * Create a new FileDependencies manager object.
+	 * @param buildStore The database manager who provides this object with database access.
 	 */
-	public FileIncludes(BuildStore bs) {
-		this.db = bs.getBuildStoreDB();
+	public FileIncludes(BuildStore buildStore) {
+		this.db = buildStore.getBuildStoreDB();
 		
 		/* create prepared database statements */
 		insertFileIncludesPrepStmt = db.prepareStatement("insert into fileIncludes values (?, ?, 1)");
@@ -160,15 +160,15 @@ public class FileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * 
-	 * @param file
-	 * @return
+	 * Return an Integer array of all files that include the specified file
+	 * @param fileId ID of the file that is being included
+	 * @return An Integer array of all files that include the specified file
 	 */
-	public Integer[] getFilesThatInclude(int file) {
+	public Integer[] getFilesThatInclude(int fileId) {
 		
 		Integer results[];
 		try {
-			selectFile1FromFileIncludesPrepStmt.setInt(1, file);
+			selectFile1FromFileIncludesPrepStmt.setInt(1, fileId);
 			results = db.executePrepSelectIntegerColumn(selectFile1FromFileIncludesPrepStmt);
 			
 		} catch (SQLException e) {
@@ -181,15 +181,15 @@ public class FileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * 
-	 * @param file
-	 * @return
+	 * Return an Integer array of all files that are included by the specified file.
+	 * @param fileId ID of the file that does the including
+	 * @return An Integer array of all files that are included by the specified file
 	 */
-	public Integer[] getFilesIncludedBy(int file) {
+	public Integer[] getFilesIncludedBy(int fileId) {
 		
 		Integer results[];
 		try {
-			selectFile2FromFileIncludesPrepStmt.setInt(1, file);
+			selectFile2FromFileIncludesPrepStmt.setInt(1, fileId);
 			results = db.executePrepSelectIntegerColumn(selectFile2FromFileIncludesPrepStmt);
 			
 		} catch (SQLException e) {

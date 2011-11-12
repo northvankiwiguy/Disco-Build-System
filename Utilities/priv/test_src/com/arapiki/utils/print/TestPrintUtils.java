@@ -53,11 +53,11 @@ public class TestPrintUtils {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the PrintUtils.test() method.
 	 */
 	@Test
-	public void testIndent() throws Exception {
+	public void testIndent() {
 		
 		/* we perform the test by writing spaces into a ByteArrayOutputStream */
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -88,11 +88,11 @@ public class TestPrintUtils {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the PrintUtils.indentAndWrap() method.
 	 */
 	@Test
-	public void testIndentAndWrap() throws Exception {
+	public void testIndentAndWrap() {
 		
 		/* all output is stored here, so we can easily analysis it */
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

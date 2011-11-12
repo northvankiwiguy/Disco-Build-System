@@ -71,12 +71,14 @@ public class Reports {
 	 *=====================================================================================*/
 
 	/**
-	 * @param db
+	 * Create a new Reports manager object, which performs a lot of the reporting work
+	 * on behalf of the BuildStore that owns this Reports object.
+	 * @param buildStore The BuildStore than owns this Reports object
 	 */
-	public Reports(BuildStore bs) {
-		this.db = bs.getBuildStoreDB();
-		this.fns = bs.getFileNameSpaces();
-		this.bts = bs.getBuildTasks();
+	public Reports(BuildStore buildStore) {
+		this.db = buildStore.getBuildStoreDB();
+		this.fns = buildStore.getFileNameSpaces();
+		this.bts = buildStore.getBuildTasks();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from buildTaskFiles, files " +
@@ -162,7 +164,10 @@ public class Reports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * TODO: finish implementing this
+	 * Generate a report to show which files are the most common includers of the specified
+	 * file. This provides information on where the specified file is used the most often.
+	 * @param includedFile The file that is being included
+	 * @return An ordered list of FileRecord objects, containing the output of the report
 	 */
 	public FileRecord[] reportMostCommonIncludersOfFile(int includedFile) {
 		

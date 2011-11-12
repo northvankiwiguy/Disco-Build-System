@@ -29,22 +29,22 @@ public class StreamToStringBufferWorker extends Thread {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
-	/* the Reader we'll used to read the stream on a line-by-line basis. */
+	/** The Reader we'll used to read the stream on a line-by-line basis. */
 	private BufferedReader reader;
 	
-	/* the StringBuffer we'll write into */
+	/** The StringBuffer we'll write into */
 	private StringBuffer sb;
 	
-	/* should we echo the stdout/stderr of the sub-process to our own stdout/stderr? */
-	boolean echoToOutput;
+	/** Should we echo the stdout/stderr of the sub-process to our own stdout/stderr? */
+	private boolean echoToOutput;
 	
-	/* if echoToOutput is true, which stream do we echo to? */
-	PrintStream outStream;
+	/** If echoToOutput is true, which stream do we echo to? */
+	private PrintStream outStream;
 	
-	/* should we save the stdout/stderr of the sub-process to buffers? */
-	boolean saveToBuffer;
+	/** Should we save the stdout/stderr of the sub-process to buffers? */
+	private boolean saveToBuffer;
 	
-	/* 
+	/**
 	 * If we encounter an exception in this Thread, we'll save it and return it to
 	 * whoever calls the getString() method.
 	 */
@@ -60,7 +60,6 @@ public class StreamToStringBufferWorker extends Thread {
 	 * @param echoToOutput Should the stdout and stderr be echoed to our own process's channels?
 	 * @param saveToBuffer Should the stdout and stderr be saved in buffers?
 	 * @param outStream if echoToOutput is true, where do we echo to?
-	 * @param out 
 	 */
 	public StreamToStringBufferWorker(InputStream str, 
 			boolean echoToOutput, boolean saveToBuffer, PrintStream outStream) {

@@ -25,25 +25,25 @@ public class BuildStore {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
-	/* the BuildStoreDB object that manages our DB access */
+	/** The BuildStoreDB object that manages our DB access */
 	private BuildStoreDB db;
 	
-	/* the FileNameSpaces object we'll delegate work to */
+	/** The FileNameSpaces manager object we'll delegate work to */
 	private FileNameSpaces fileSpaces;
 
-	/* the FileIncludes object we'll delegate work to */
+	/** The FileIncludes manager object we'll delegate work to */
 	private FileIncludes fileIncludes;
 
-	/* the BuildTasks object we'll delegate work to */
+	/** The BuildTasks manager object we'll delegate work to */
 	private BuildTasks buildTasks;
 	
-	/* the Reports object we'll delegate work to */
+	/** The Reports manager object we'll delegate work to */
 	private Reports reports;
 	
-	/* the FileAttributes object we'll delegate work to */
+	/** The FileAttributes object we'll delegate work to */
 	private FileAttributes fileAttributes;
 	
-	/* the Components object we'll delegate work to */
+	/** The Components manager object we'll delegate work to */
 	private Components components;
 	
 	/*=====================================================================================*
@@ -55,7 +55,7 @@ public class BuildStore {
 	 * exists, open it for updating. If there's no database by this name,
 	 * create a fresh database.
 	 * 
-	 * @param databaseName Name of the database to open or create
+	 * @param buildStoreName Name of the database to open or create
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable
 	 */
 	public BuildStore(String buildStoreName) throws FileNotFoundException {

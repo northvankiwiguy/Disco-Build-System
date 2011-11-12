@@ -49,6 +49,7 @@ public class TestFileNameSpaces {
 	/**
 	 * Test the getRootPath() method - by default there's always a "root" root, associated
 	 * with path ID 0.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetRootPath() throws Exception {
@@ -59,8 +60,9 @@ public class TestFileNameSpaces {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getChildofPath() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetChildOfPath() throws Exception {
@@ -100,8 +102,9 @@ public class TestFileNameSpaces {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the addChildOfPath() method. 
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testAddChildOfPath() throws Exception {
@@ -141,8 +144,9 @@ public class TestFileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the addFile() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testAddFile() throws Exception {
@@ -162,8 +166,9 @@ public class TestFileNameSpaces {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the addDirectory() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testAddDirectory() throws Exception {
@@ -211,8 +216,9 @@ public class TestFileNameSpaces {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getPathType() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetPathType() throws Exception {
@@ -233,7 +239,7 @@ public class TestFileNameSpaces {
 		assertEquals(PathType.TYPE_DIR, bsfs.getPathType(path5));
 		
 		/* test that you can't add a file within a file */
-		int path6 = bsfs.addFile("/a/b/c");
+		bsfs.addFile("/a/b/c");
 		int path7 = bsfs.addFile("/a/b/c/d");
 		assertEquals(ErrorCode.BAD_PATH, path7);
 		
@@ -244,8 +250,9 @@ public class TestFileNameSpaces {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * Test the getPath() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetPath() throws Exception {
@@ -272,8 +279,9 @@ public class TestFileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getBaseName() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetBaseName() throws Exception {
@@ -294,8 +302,9 @@ public class TestFileNameSpaces {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test test getParentPath() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetParentPath() throws Exception {
@@ -316,13 +325,14 @@ public class TestFileNameSpaces {
 		assertEquals(path5, bsfs.getParentPath(path5));
 		
 		/* an invalid path should return -1 */
-		assertEquals(-1, bsfs.getParentPath(1000));
+		assertEquals(ErrorCode.NOT_FOUND, bsfs.getParentPath(1000));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getPathName() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetPathName() throws Exception {
@@ -345,8 +355,9 @@ public class TestFileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getChildPaths() method.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetChildPaths() throws Exception {
@@ -379,13 +390,6 @@ public class TestFileNameSpaces {
 		assertEquals(path5, children[1].intValue());
 		assertEquals(path6, children[2].intValue());
 	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	//@Test
-	//public void testGetChildPathsWithAttrs() throws Exception {
-	//	fail("Not yet implemented");
-	//}
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -431,25 +435,6 @@ public class TestFileNameSpaces {
 			bsfs.addFile(sb.toString());
 		}
 		bs.setFastAccessMode(false);
-
-		/*
-		 * Now traverse the list of files.
-		 */
-		traverseAndDisplay(bsfs.getRootPath("root"));
-	}
-
-	/**
-	 * For debugging purposes, traverse and display all the paths in the file system.
-	 * @param rootPath
-	 */
-	private void traverseAndDisplay(int parentID) {
-		Integer children [] = bsfs.getChildPaths(parentID);
-		for (int i = 0; i < children.length; i++) {
-			int thisID = children[i];
-			String name = bsfs.getPathName(thisID);
-			//System.out.println(name);
-			traverseAndDisplay(thisID);
-		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/	

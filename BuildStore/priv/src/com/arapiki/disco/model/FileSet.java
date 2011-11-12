@@ -40,6 +40,7 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 
 	/**
 	 * Constructor - creates a new FileSet and initializes it to being empty.
+	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet
 	 */	
 	public FileSet(FileNameSpaces fns) {
 		
@@ -54,6 +55,8 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 
 	/**
 	 * Constructor - creates a new FileSet and initializes it from an array of pathId values
+	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet
+	 * @param paths The IDs of the paths to be added to the FileSet
 	 */
 	public FileSet(FileNameSpaces fns, Integer paths[]) {
 		
@@ -72,17 +75,17 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 *=====================================================================================*/
 
 	/**
-	 * Given zero or more textual path names, populate the FileSet with the relevant files. Each
-	 * pathArg String can be one of the following:
+	 * Given zero or more textual path names, populate the FileSet with the relevant files. 
+	 * @param pathArgs Each pathArg String can be one of the following:
 	 *    1) An absolute path name (starting with /), either a directory name or a file name. If the
 	 *       path is a directory, add all files and directories below that point in the tree.
 	 *    2) A path name starting with a root: - the same rules apply as for #1
 	 *    3) A single file name, with one or more wildcard (*) characters. All files that match
      *       the name are added, no matter what their directory.
-     *    4) A component spec, starting with @, or the complement of a component, starting with ^@.
-	 * 
-	 *    @returns ErrorCode.OK on success, or ErrorCode.BAD_PATH if an invalid path name was
-	 *    provided.
+     *    4) A component spec, starting with %comp, or the complement of a component, starting 
+     *       with %not-comp.
+	 * @return ErrorCode.OK on success, or ErrorCode.BAD_PATH if an invalid path name was
+	 * provided.
 	 */
 	public int populateWithPaths(String [] pathArgs) {
 		
@@ -170,8 +173,8 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#mergeSet()
+	 * Merge the content of a second FileSet into this FileSet.
+	 * @param second The second FileSet
 	 */
 	public void mergeSet(FileSet second) {
 		

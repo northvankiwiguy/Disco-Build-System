@@ -45,11 +45,11 @@ public class TestShellCommandUtils {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * Test the joinCommandLine method()
 	 */
 	@Test
-	public void testJoinCommandLine() throws Exception {
+	public void testJoinCommandLine() {
 		
 		/* test the empty command */
 		assertEquals("", ShellCommandUtils.joinCommandLine(""));

@@ -19,7 +19,6 @@ import org.junit.Test;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileRecord;
 import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.CommonTestUtils;
@@ -30,7 +29,10 @@ import com.arapiki.disco.model.CommonTestUtils;
  */
 public class TestFileSystemScanner {
 
+	/** Our test BuildStore object */
 	private BuildStore bs;
+
+	/** Our test FileNameSpaces object */
 	private FileNameSpaces fns;
 
 	/*-------------------------------------------------------------------------------------*/
@@ -55,11 +57,11 @@ public class TestFileSystemScanner {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * TODO: This isn't a unit test. Needs to be fixed.
 	 */
 	@Test
-	public void testScanForFiles() throws Exception {
+	public void testScanForFiles() {
 		FileSystemScanner fss = new FileSystemScanner(bs);
 		
 		fss.scanForFiles("root", "/home/psmith/work");
@@ -68,7 +70,7 @@ public class TestFileSystemScanner {
 		Reports reports = bs.getReports();
 		FileSet results = reports.reportFilesNeverAccessed();
 		for (Integer pathId : results) {			
-			String pathName = fns.getPathName(pathId);
+			/*String pathName = */fns.getPathName(pathId);
 			//System.out.println(pathName);
 		}
 		//System.out.println("Found " + results.size() + " files");

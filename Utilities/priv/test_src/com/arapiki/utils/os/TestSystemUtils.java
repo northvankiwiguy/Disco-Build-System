@@ -32,12 +32,10 @@ import com.arapiki.utils.os.FileSystemTraverseCallback;
  */
 public class TestSystemUtils {
 
-	/*
-	 * A temporary file that contains a simple executable program
-	 */
+	/** A temporary file that contains a simple executable program */
 	private static File ourTempExe;
 	
-	/*
+	/**
 	 * A temporary directory that we'll fill up with interesting files and directories.
 	 * This is used for testing the traverseFileSystem() method.
 	 */
@@ -200,8 +198,13 @@ public class TestSystemUtils {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test class for capturing file system traversal callbacks. As we encounter names,
+	 * gather them in a list, ready to be returned for later analysis.
+	 */
 	private class TestCallback extends FileSystemTraverseCallback {
 		
+		/** For accumulating path names as we encounter them */
 		private ArrayList<String> names = new ArrayList<String>();
 		
 		@Override
@@ -209,6 +212,9 @@ public class TestSystemUtils {
 			names.add(thisPath.toString());
 		}
 		
+		/**
+		 * @return The names we've captured.
+		 */
 		public String [] getNames() {
 			String result[] = names.toArray(new String[0]);
 			names = new ArrayList<String>();
@@ -218,6 +224,10 @@ public class TestSystemUtils {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test method for traverseFileSystem
+	 * @throws Exception
+	 */
 	@Test
 	public void testTraverseFileSystem() throws Exception {
 
@@ -294,10 +304,13 @@ public class TestSystemUtils {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* 
+	/**
 	 * Helper method to determine whether two arrays of path names contain the same elements, 
 	 * even if those elements aren't in the same order in both arrays. Also, remove a prefix
 	 * from each path in arr1 before comparing. 
+	 * @param arr1prefix The String prefix to remove
+	 * @param arr1 The first array of Strings
+	 * @param arr2 The second array of Strings
 	 */
 	public static void assertSortedPathArraysEqual(String arr1prefix, String[] arr1, String[] arr2) {
 		

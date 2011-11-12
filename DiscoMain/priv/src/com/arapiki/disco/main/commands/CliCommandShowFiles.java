@@ -35,13 +35,13 @@ public class CliCommandShowFiles implements ICliCommand {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/* should we show roots when displaying reports? */
+	/** Should we show roots when displaying reports? */
 	protected boolean optionShowRoots = false;
 	
-	/* should we show component membership when displaying reports? */
+	/** Should we show component membership when displaying reports? */
 	protected boolean optionShowComps = false;
 	
-	/* the FileSet used to filter our results (if -f/--filter is used) */
+	/** The FileSet used to filter our results (if -f/--filter is used) */
 	protected FileSet filterFileSet = null;
 	
 	/*=====================================================================================*

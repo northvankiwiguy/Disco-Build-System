@@ -15,7 +15,6 @@ package com.arapiki.disco.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,15 +27,19 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
  */
 public class TestReports2 {
 
-	/* our BuildStore, and sub-objects, used for testing */
+	/** Our test BuildStore object */
 	private BuildStore bs;
+
+	/** Our test FileNameSpaces object */
 	private FileNameSpaces fns;
+	
+	/** Our test BuildTasks object */
 	private BuildTasks bts;
 	
-	/* our Reports object, used for testing */
+	/** Our test Reports object */
 	private Reports reports;
 	
-	/* various file IDs and task IDs */
+	/** various file IDs and task IDs */
 	private int filePetH, fileHousePetH;
 	private int fileCatC, fileDogC, fileBunnyC, fileGiraffeC;
 	private int fileCatO, fileDogO, fileBunnyO, fileGiraffeO;
@@ -57,7 +60,6 @@ public class TestReports2 {
 		fns = bs.getFileNameSpaces();
 		bts = bs.getBuildTasks();
 		reports = bs.getReports();
-		int rootTaskId = bts.getRootTask("root");
 		
 		/* add a realistic-looking set of files, including .h, .c, .o, .a and .exe files */
 		filePetH = fns.addFile("/home/pets.h");
@@ -153,10 +155,10 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportDerivedFiles()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportDerivedFiles(FileSet, boolean)}.
 	 */
 	@Test
-	public void testReportDerivedFiles() throws Exception {
+	public void testReportDerivedFiles() {
 
 		/*
 		 * Test directly derived relationships
@@ -259,10 +261,10 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportInputFiles()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportInputFiles(FileSet, boolean)}.
 	 */
 	@Test
-	public void testReportInputFiles() throws Exception {
+	public void testReportInputFiles() {
 
 		/*
 		 * Test directly input relationships

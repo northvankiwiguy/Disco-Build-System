@@ -35,7 +35,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/* should we all show the indirect files? */
+	/** Should we all show the indirect files? */
 	protected static boolean optionAll = false;
 	
 	/*=====================================================================================*

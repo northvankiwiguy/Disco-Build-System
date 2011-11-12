@@ -31,12 +31,18 @@ public class SystemUtils {
 	 * FIELDS/TYPE
 	 *=====================================================================================*/
 	
-	/**
+	/*
 	 * These flags are used as a bit map to inform traverseFileSystem which type of
 	 * files/directories/symlinks we're interested in knowing about.
 	 */
+	
+	/** We're interested in seeing files */ 
 	public static final int REPORT_FILES = 1;
+	
+	/** We're interested in seeing directories */
 	public static final int REPORT_DIRECTORIES = 2;
+
+	/** We're interested in seeing symlinks */
 	public static final int REPORT_SYMLINKS = 4;
 	
 	/*=====================================================================================*
@@ -69,7 +75,7 @@ public class SystemUtils {
 
 	/**
 	 * Test whether a local file is a symlink (as opposed to a regular file or directory)
-	 * @param The file's name.
+	 * @param fileName The file's name.
 	 * @return True if the file is a symlink, else false.
 	 * @exception FileNotFoundException If the file doesn't exist
 	 */
@@ -172,7 +178,14 @@ public class SystemUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * 
+	 * Traverse a file system and invoke a callback method on each file system entry (file,
+	 * directory or symlink).
+	 * @param rootPath The starting (top) path for the traversal. The traversal will start
+	 * at this point, and traverse down the filesystem into subdirectories.
+	 * @param pathsToReport The types of paths to report - a bitmap of REPORT_FILES, 
+	 * REPORT_DIRECTORIES and REPORT_SYMLINKS.
+	 * @param callbackObj The callback object to be invoked as each file system entry
+	 * is encountered.
 	 */
 	public static void traverseFileSystem(String rootPath, int pathsToReport, 
 			FileSystemTraverseCallback callbackObj) {
@@ -185,12 +198,16 @@ public class SystemUtils {
 
 
 	/**
-	 * 
-	 * @param rootPath
+	 * Traverse a file system and invoke a callback method on each file system entry (file,
+	 * directory or symlink).
+	 * @param rootPath The starting (top) path for the traversal. The traversal will start
+	 * at this point, and traverse down the filesystem into subdirectories.
 	 * @param matchFilePattern
 	 * @param ignoreDirPattern
-	 * @param pathsToReport
-	 * @param callbackObj
+	 * @param pathsToReport The types of paths to report - a bitmap of REPORT_FILES, 
+	 * REPORT_DIRECTORIES and REPORT_SYMLINKS.
+	 * @param callbackObj The callback object to be invoked as each file system entry
+	 * is encountered.
 	 */
 	public static void traverseFileSystem(String rootPath, String matchFilePattern, String ignoreDirPattern, 
 			int pathsToReport, FileSystemTraverseCallback callbackObj) {
@@ -211,8 +228,10 @@ public class SystemUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * 
-	 * @param thisPath
+	 * A helper function for traverseFileSystem which handles the recursion.
+	 * @param thisPath The current path being traversed
+	 * @param mfPattern 
+	 * @param idPattern 
 	 * @param pathsToReport
 	 * @param callbackObj
 	 */

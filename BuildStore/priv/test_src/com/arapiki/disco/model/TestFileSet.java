@@ -27,8 +27,13 @@ import com.arapiki.utils.errors.ErrorCode;
  */
 public class TestFileSet {
 	
+	/** Our test FileSet object */
 	private FileSet fs;
+	
+	/** Our test BuildStore object */
 	private BuildStore bs;
+	
+	/** Our test FileNameSpaces object */
 	private FileNameSpaces fns;
 
 	/*-------------------------------------------------------------------------------------*/
@@ -38,7 +43,7 @@ public class TestFileSet {
 	 * @param pathId The new FileRecord's pathId
 	 * @param count The new FileRecord's count field
 	 * @param size The new FileRecord's size field
-	 * @return
+	 * @return The newly created FileRecord object
 	 */
 	private FileRecord newFileRecord(int pathId, int count, int size) {
 		FileRecord fr = new FileRecord(pathId);
@@ -200,7 +205,7 @@ public class TestFileSet {
 		int f5path = fns.addFile("/b/c/d/f5.c");
 		
 		/* this one won't be added, neither will its parents */
-		int f6path = fns.addFile("/c/d/e/f6.c");
+		fns.addFile("/c/d/e/f6.c");
 
 		/* add them to the file set */ 
 		fs.add(newFileRecord(f1path, 0, 0));		
@@ -270,7 +275,8 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#mergeFileSet()}.
+	 * Test method for {@link com.arapiki.disco.model.FileSet#mergeSet(FileSet)}.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testMergeFileSet() throws Exception {
@@ -332,7 +338,8 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#populateWithPaths()}.
+	 * Test method for {@link com.arapiki.disco.model.FileSet#populateWithPaths(String[])}.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testPopulateWithPaths() throws Exception {
@@ -548,11 +555,11 @@ public class TestFileSet {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * Test the scalability of the FileSet data structure.
 	 */
 	@Test
-	public void testScalability() throws Exception {
+	public void testScalability() {
 
 		/* fill the FileSet with every third path ID */
 		for (int i = 0; i != 1000000; i++) {
@@ -571,11 +578,11 @@ public class TestFileSet {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * Test the initialization of a FileSet from an array
 	 */
 	@Test
-	public void testInitialization() throws Exception {
+	public void testInitialization() {
 	
 		Integer array[] = {1, 13, 145, 7626, 23232};
 		

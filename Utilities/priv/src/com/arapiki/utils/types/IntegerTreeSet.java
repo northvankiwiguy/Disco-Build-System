@@ -28,6 +28,7 @@ import java.util.Iterator;
  * key value (FileRecord and TaskRecord).
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
+ * @param <T> The type of each Record (a subclass of IntegerTreeRecord)
  */
 public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Iterable<Integer> {
 
@@ -139,7 +140,7 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	 * must be overridden by sub-classes that actually know what the parent-child relations
 	 * should be.
 	 * @param id The ID of the element we want to find the parent of
-	 * @return The ID of this element's parent.
+	 * @return The ID of this element's parent, or ErrorCode.NOT_FOUND.
 	 */
 	public abstract int getParent(int id);
 
@@ -223,6 +224,7 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	 * essentially a bitwise "or". If a particular path is already present in "this" IntegerTreeSet,
 	 * we won't override it with the IntegerTreeRecord from "second" (this fact is only interesting if
 	 * you care about the content of the IntegerTreeRecord).
+	 * @param second The second set to merge into this set
 	 */
 	public void mergeSet(IntegerTreeSet<T> second) {
 			

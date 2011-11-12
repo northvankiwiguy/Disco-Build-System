@@ -27,7 +27,7 @@ public class PrintUtils {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/* fast access to printing an arbitrary number of spaces. Used by indent() */
+	/** Fast access to printing an arbitrary number of spaces. Used by indent() */
 	private static String spaces = "                                                                ";
 
 	/*=====================================================================================*

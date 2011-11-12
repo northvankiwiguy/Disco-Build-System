@@ -21,7 +21,6 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileSet;
-import com.arapiki.utils.string.StringArray;
 
 /**
  * Disco CLI Command class that implements the "set-file-comp" command. See the 

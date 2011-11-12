@@ -47,9 +47,13 @@ public class CommonTestUtils {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* 
+	/**
 	 * Determine whether two arrays contain the same elements, even if those elements
-	 * aren't in the same order in both arrays.
+	 * aren't in the same order in both arrays. The equals() method is used to determine
+	 * if elements are the same.
+	 * @param arr1 The first array
+	 * @param arr2 The second array
+	 * @return True if the arrays contain the same elements, else false.
 	 */
 	public static boolean sortedArraysEqual(Object[] arr1, Object[] arr2) {
 		
@@ -78,8 +82,8 @@ public class CommonTestUtils {
 
 	/**
 	 * Compare the content of a FileSet with an array of Integer values.
-	 * @param fileSet The FileSet to compare
-	 * @param integers The array of integers to compare
+	 * @param actual The FileSet to compare
+	 * @param expected The array of integers to compare
 	 * @return True if the FileSet content is the same as the array content, else False
 	 */
 	public static boolean treeSetEqual(IntegerTreeSet<?> actual, Integer[] expected) {

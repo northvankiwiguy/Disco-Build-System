@@ -30,16 +30,21 @@ import com.arapiki.utils.errors.ErrorCode;
  */
 public class TestTaskSet {
 	
+	/** Our test TaskSet object */
 	private TaskSet ts;
+	
+	/** Our test BuildStore object */
 	private BuildStore bs;
+
+	/** Our test BuildTasks object */
 	private BuildTasks bts;
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Helper function for creating a new TaskRecord and populating the id field.
-	 * @param id the TaskRecord's id
-	 * @return a new TaskRecord
+	 * @param taskId the TaskRecord's id
+	 * @return A new TaskRecord
 	 */
 	private TaskRecord newTaskRecord(int taskId) {
 		TaskRecord tr = new TaskRecord(taskId);
@@ -185,7 +190,7 @@ public class TestTaskSet {
 		int task2 = bts.addBuildTask(task1, 0, "second command");
 		int task3 = bts.addBuildTask(task1, 0, "second command as well");
 		int task4 = bts.addBuildTask(task3, 0, "third command");
-		int task5 = bts.addBuildTask(task4, 0, "fourth command");
+		bts.addBuildTask(task4, 0, "fourth command");
 		int task6 = bts.addBuildTask(task2, 0, "second command's child");
 
 		/* add only one of them to the TaskSet */
@@ -217,10 +222,10 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#mergeSet()}.
+	 * Test method for {@link com.arapiki.disco.model.TaskSet#mergeSet(TaskSet)}.
 	 */
 	@Test
-	public void testMergeSet() throws Exception {
+	public void testMergeSet() {
 
 		/* create and populate a new TaskSet to merge in */
 		TaskSet mainTaskSet = new TaskSet(bts);
@@ -290,7 +295,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks()}.
+	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks(String[])}.
 	 */
 	@Test
 	public void testPopulateWithTasks() {
@@ -304,9 +309,9 @@ public class TestTaskSet {
 		int taskA31 = bts.addBuildTask(taskA3, 0, "third-level-task-under-A3");
 		int taskA32 = bts.addBuildTask(taskA3, 0, "third-level-task-under-A3");
 		int taskA321 = bts.addBuildTask(taskA32, 0, "fourth-level-task-under-A32");
-		int taskA4 = bts.addBuildTask(taskA, 0, "second-level-task-under-A");
+		bts.addBuildTask(taskA, 0, "second-level-task-under-A");
 		int taskB = bts.addBuildTask(root, 0, "top-level-task-B");
-		int taskC = bts.addBuildTask(root, 0, "top-level-task-C");
+		bts.addBuildTask(root, 0, "top-level-task-C");
 	
 		/* populate with an empty specification string array*/
 		ts.populateWithTasks(new String[0]);
@@ -402,7 +407,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks()}.
+	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks(String[])}.
 	 */
 	@Test
 	public void testMatchingCommandNames() {

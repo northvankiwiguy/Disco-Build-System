@@ -14,7 +14,6 @@ package com.arapiki.disco.model;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,9 +45,10 @@ public class TestFileNameCache {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the basic manipulation of the FileNameCacheKey object type, which is a nested
 	 * class within the FileNameCache class.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testFileNameCacheKey() throws Exception {
@@ -81,9 +81,10 @@ public class TestFileNameCache {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the creation and use of FileNameCacheValue objects. This is even simpler than
 	 * the previous test case because there's no custom equals/hashCode.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testFileNameCacheValue() throws Exception {
@@ -104,8 +105,9 @@ public class TestFileNameCache {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test that objects can be added to the cache and then retrieved later.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testSimpleAccess() throws Exception {
@@ -151,8 +153,9 @@ public class TestFileNameCache {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the clear() method to ensure it empty the cache.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testClear() throws Exception {
@@ -173,9 +176,10 @@ public class TestFileNameCache {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the maximum size of the cache. Adding the 5th cache entry will cause the
 	 * least recently accessed item to disappear.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testOverflow() throws Exception {

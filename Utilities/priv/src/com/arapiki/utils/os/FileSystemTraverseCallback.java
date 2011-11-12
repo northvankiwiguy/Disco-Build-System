@@ -22,5 +22,10 @@ import java.io.File;
  */
 public abstract class FileSystemTraverseCallback {
 
+	/**
+	 * The callback method that will be invoked as we traverse the file system. This
+	 * method is abstract and must be overridden.
+	 * @param thisPath The path of the current point of traversal
+	 */
 	public abstract void callback(File thisPath);
 }

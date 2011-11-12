@@ -18,17 +18,35 @@ package com.arapiki.utils.errors;
  */
 public class ErrorCode {
 
-	/**
+	/*
 	 * The following error codes can be used by any application that requires them.
 	 */
-	public static final int OK 				= 0;	/* no error */
-	public static final int NOT_FOUND			= -1;	/* the item was not found */
-	public static final int ALREADY_USED 		= -2;	/* the name was already in use */
-	public static final int INVALID_NAME		= -3;	/* the name is incorrectly formatted */
-	public static final int ONLY_ONE_ALLOWED 	= -4;	/* the item can only be added once */
-	public static final int CANT_REMOVE		= -5;	/* this item can't be removed */
-	public static final int NOT_A_DIRECTORY	= -6;	/* a directory name or ID was expected */
-	public static final int BAD_PATH 			= -7;	/* an invalid path name or ID was provided */
-	public static final int BAD_VALUE 		= -8;	/* an invalid value was provided */
+	
+	/** No error */
+	public static final int OK 					= 0;
+	
+	/** The item was not found */
+	public static final int NOT_FOUND			= -1;
+	
+	/** The name was already in use */
+	public static final int ALREADY_USED 		= -2;
+	
+	/** the name is incorrectly formatted */
+	public static final int INVALID_NAME		= -3;
+	
+	/** The item can only be added once */
+	public static final int ONLY_ONE_ALLOWED 	= -4;
+	
+	/** This item can't be removed */
+	public static final int CANT_REMOVE			= -5;
+	
+	/** A directory name or ID was expected */
+	public static final int NOT_A_DIRECTORY		= -6;
+	
+	/** An invalid path name or ID was provided */
+	public static final int BAD_PATH 			= -7;
+	
+	/** An invalid value was provided */
+	public static final int BAD_VALUE 			= -8;
 
 }

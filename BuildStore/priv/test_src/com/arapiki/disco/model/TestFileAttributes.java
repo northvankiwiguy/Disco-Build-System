@@ -28,13 +28,13 @@ public class TestFileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/* our BuildStore, used for testing */
+	/** our BuildStore, used for testing */
 	private BuildStore bs;
 	
-	/* our FileAttributes object, used for testing */
+	/** our FileAttributes object, used for testing */
 	private FileAttributes fattrs;
 	
-	/* our FileNameSpaces object, used for testing */
+	/** our FileNameSpaces object, used for testing */
 	private FileNameSpaces fns;
 
 	/*-------------------------------------------------------------------------------------*/
@@ -494,7 +494,6 @@ public class TestFileAttributes {
 
 	/**
 	 * Test method for {@link com.arapiki.disco.model.FileAttributes#getPathsWithAttr(int)}
-	 * @return
 	 */
 	@Test
 	public void testGetPathsWithAttrInt() {

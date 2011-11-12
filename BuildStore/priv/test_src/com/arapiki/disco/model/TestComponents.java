@@ -121,7 +121,7 @@ public class TestComponents {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#getComponentId(int)}.
+	 * Test method for {@link com.arapiki.disco.model.Components#getComponentId(String)}.
 	 */
 	@Test
 	public void testGetComponentId() {
@@ -255,7 +255,7 @@ public class TestComponents {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#getSectionName()}.
+	 * Test method for {@link com.arapiki.disco.model.Components#getSectionName(int)}.
 	 */
 	@Test
 	public void testGetSectionName() {
@@ -274,7 +274,7 @@ public class TestComponents {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#getSectionId()}.
+	 * Test method for {@link com.arapiki.disco.model.Components#getSectionId(String)}.
 	 */
 	@Test
 	public void testGetSectionId() {
@@ -311,7 +311,8 @@ public class TestComponents {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#parseCompSpec()}.
+	 * Test method for {@link com.arapiki.disco.model.Components#parseCompSpec(String)}.
+	 * @exception Exception Something bad happened
 	 */
 	@Test
 	public void testParseCompSpec() throws Exception {
@@ -363,6 +364,7 @@ public class TestComponents {
 
 	/**
 	 * Test the setFileComponent and getFileComponent methods.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testFileComponents() throws Exception {
@@ -435,9 +437,10 @@ public class TestComponents {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getFilesInComponent(int) and getFilesInComponent(int, int) methods,
 	 * as well as the getFilesOutsideComponent(int) and getFilesOutsideComponent(int,int)
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetFilesInComponent() throws Exception {
@@ -546,8 +549,9 @@ public class TestComponents {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/*
+	/**
 	 * Test the getFilesInComponent(String) and getFilesOutsideComponent(String)
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetFilesInAndOutsideComponent() throws Exception {
@@ -624,6 +628,7 @@ public class TestComponents {
 	
 	/**
 	 * Test the setTaskComponent and getTaskComponent methods.
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testTaskComponents() throws Exception {
@@ -670,8 +675,9 @@ public class TestComponents {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * Test the getTasksInComponent(int) method
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testGetTasksInComponent() throws Exception {

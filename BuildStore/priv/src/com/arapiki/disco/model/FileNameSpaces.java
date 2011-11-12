@@ -20,8 +20,6 @@ import com.arapiki.disco.model.FileNameCache.FileNameCacheValue;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.PathUtils;
 
-// TODO: comment and clean-up this file.
-
 /**
  * A helper class to manage the file tree structures within a BuildStore.
  * The class encapsulates everything that's known about the content of the
@@ -39,7 +37,19 @@ public class FileNameSpaces {
 	/**
 	 * Path types - paths can be directories, plain files, or symlinks.
 	 */
-	public enum PathType { TYPE_INVALID, TYPE_DIR, TYPE_FILE, TYPE_SYMLINK };
+	public enum PathType { 
+		/** The path has an invalid type */
+		TYPE_INVALID, 
+		
+		/** The path refers to a directory */
+		TYPE_DIR, 
+		
+		/** The path refers to a file */
+		TYPE_FILE, 
+		
+		/** The path refers to a symlink */
+		TYPE_SYMLINK
+	};
 	
 	/**
 	 * The BuildStore object that "owns" this FileNameSpaces object.
@@ -51,13 +61,6 @@ public class FileNameSpaces {
 	 * to us when the BuildStoreFileSpace is first instantiated.
 	 */
 	private BuildStoreDB db = null;
-	
-	/**
-	 * A set of database tables may contain multiple namespaces. This name is used to
-	 * differentiate one name space from another. All operations on this object will
-	 * be done within this namespace.
-	 */
-	private String spaceName;
 	
 	/**
 	 * A cache for recording the most recently accessed file name mappings.
@@ -85,11 +88,11 @@ public class FileNameSpaces {
 
 	/**
 	 * Create a new BuildStoreFileSpace object.
-	 * @param db The BuildStoreDB object to use when accessing the underlying database.
+	 * @param buildStore The BuildStore that "owns" this FileNameSpaces manager object
 	 */
-	public FileNameSpaces(BuildStore bs) {
-		this.buildStore = bs;
-		this.db = bs.getBuildStoreDB();
+	public FileNameSpaces(BuildStore buildStore) {
+		this.buildStore = buildStore;
+		this.db = buildStore.getBuildStoreDB();
 		
 		/* initialize prepared database statements */
 		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ?");
@@ -118,6 +121,7 @@ public class FileNameSpaces {
 	
 	/**
 	 * Retrieve the ID of the path that's currently associated with this root.
+	 * @param rootName The name of the root
 	 * @return The namespace's root path ID, or ErrorCode.NOT_FOUND if it's not defined.
 	 */
 	public int getRootPath(String rootName) {
@@ -151,8 +155,10 @@ public class FileNameSpaces {
 	/**
 	 * Add a new root to be associated with a specified path ID, which must refer to an
 	 * existing directory.
-	 * Returns:
-	 * 	 ErrorCode.OK on success
+	 * @param rootName The name of the new root to be created
+	 * @param pathId The ID of the path the root should be attached to
+	 * @return 
+	 *   ErrorCode.OK on success
 	 *   ErrorCode.ONLY_ONE_ALLOWED if there's already a root associated with this path ID,
 	 *   ErrorCode.ALREADY_USED if the root name is already in use
 	 *   ErrorCode.INVALID_NAME if the new proposed name is invalid.
@@ -198,9 +204,10 @@ public class FileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/*
+	/**
 	 * Return an array of all root names that are currently valid. The list is returned
 	 * in alphabetical order.
+	 * @return A String array of root names
 	 */
 	public String [] getRoots() {
 		return db.executePrepSelectStringColumn(findRootNamesPrepStmt);
@@ -210,7 +217,9 @@ public class FileNameSpaces {
 
 	/**
 	 * Move an existing root to refer to an existing pathId.
-	 * Return codes:
+	 * @param rootName Name of the root to be moved
+	 * @param pathId The ID of the new path to attach the root to
+	 * @return
 	 *    ErrorCode.OK if the move completed successfully.
 	 *    ErrorCode.NOT_FOUND if the root doesn't exist
 	 *    ErrorCode.NOT_A_DIRECTORY if the new pathID doesn't refer to a directory
@@ -257,6 +266,8 @@ public class FileNameSpaces {
 	/**
 	 * If this path has an associated root attached to it, return the root name. If there's
 	 * no root, return null. There can be at most one root associated with this path.
+	 * @param pathId The ID of the path we're querying
+	 * @return The name of the root, or null if there's no root attached
 	 */
 	public String getRootAtPath(int pathId) {
 		
@@ -288,9 +299,11 @@ public class FileNameSpaces {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the name of the root that is encloses this path. There may be multiple roots
+	 * Return the name of the root that encloses this path. There may be multiple roots
 	 * above this path, but return the root that's closest to the path. The "root" root
 	 * will always be the default if there's no closer root.
+	 * @param pathId The ID of the path to be queried
+	 * @return The name of the root that encloses the path
 	 */
 	public String getEnclosingRoot(int pathId) {
 		
@@ -302,7 +315,7 @@ public class FileNameSpaces {
 			}
 			/* else, move up to the parent */
 			pathId = getParentPath(pathId);
-		} while (pathId != -1);
+		} while (pathId != ErrorCode.NOT_FOUND);
 			
 		return null;
 	}
@@ -312,7 +325,8 @@ public class FileNameSpaces {
 	
 	/**
 	 * Delete the specified root from the database. The very top root ("root") can't be removed.
-	 * Return:
+	 * @param rootName The name of the root to be deleted
+	 * @return 
 	 *     ErrorCode.OK on success
 	 *     ErrorCode.NOT_FOUND if the root doesn't exist.
 	 *     ErrorCode.CANT_REMOVE the "root" root can't be removed.
@@ -366,10 +380,17 @@ public class FileNameSpaces {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Add a new symlink into the FileNameSpace.
+	 * @param fullPath The full path of the symlink
+	 * @return the ID of the newly added symlink, or ErrorCode.BAD_PATH if the symlink 
+	 * couldn't be added within this part of the tree (such as when the parent itself 
+	 * is a file, not a directory).
+	 */
 	public int addSymlink(String fullPath) {
 		
 		// TODO: implement this
-		return -1;
+		return ErrorCode.BAD_VALUE;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -399,7 +420,7 @@ public class FileNameSpaces {
 	
 	/**
 	 * Similar to addFile, but return an error if the path doesn't exist, rather than automatically adding it.
-	 * @param fullPath
+	 * @param fullPathName The full path of the file
 	 * @return The path's ID, or ErrorCode.BAD_PATH if the path isn't defined.
 	 */
 	public int getPath(String fullPathName) {
@@ -474,8 +495,8 @@ public class FileNameSpaces {
 	/**
 	 * Fetch the base name of this path. For example, if the path represents "a/b/c/d", then 
 	 * return "d". If the pathId is invalid, return null.
-	 * @param The pathId of the path to determine the base name of.
-	 * @return The path's base name, or null if the pathId is invalid.
+	 * @param pathId The ID of the path to obtain the base name of.
+	 * @return The path's base name as a String, or null if the pathId is invalid.
 	 */
 	public String getBaseName(int pathId) {
 		
@@ -492,14 +513,14 @@ public class FileNameSpaces {
 	 * Fetch the ID of the parent of this path. For example, if the path represents "a/b/c/d", then 
 	 * return the ID of "a/b/c". If the pathId is invalid, return null. As a special case, the
 	 * parent of "/" is itself "/"
-	 * @param The pathId of the path to determine the parent of.
-	 * @return The path's parent ID, or -1 if the pathId is invalid.
+	 * @param pathId The ID of the path to determine the parent of.
+	 * @return The path's parent ID, or ErrorCode.NOT_FOUND if the pathId is invalid.
 	 */
 	public int getParentPath(int pathId) {
 		
 		Object pathDetails[] = getPathDetails(pathId);
 		if (pathDetails == null) {
-			return -1;
+			return ErrorCode.NOT_FOUND;
 		}
 		return (Integer)pathDetails[0];
 	}
@@ -509,8 +530,8 @@ public class FileNameSpaces {
 	/**
 	 * Return the type of the specified path. This will be one of the values in the PathType
 	 * enum, such as TYPE_DIR, TYPE_FILE, or TYPE_SYMLINK.
-	 * @param the path ID to query.
-	 * @return the type of this path.
+	 * @param pathId ID of the path to query
+	 * @return The type of this path
 	 */
 	public PathType getPathType(int pathId) {		
 		Object pathDetails[] = getPathDetails(pathId);
@@ -543,9 +564,9 @@ public class FileNameSpaces {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * For a specific parent path, fetch a list of all children of that parent.
-	 * @param The ID of the parent path.
-	 * @return An array of child path ID numbers.
+	 * For the specified parent path, fetch a list of all children of that parent.
+	 * @param pathId The ID of the parent path
+	 * @return An array of child path ID numbers
 	 */
 	public Integer[] getChildPaths(int pathId) {
 		
@@ -567,17 +588,6 @@ public class FileNameSpaces {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}	
 		return results;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/	
-	
-	/**
-	 * A variation on the one-argument getChildpathIds method that filters paths based on
-	 * whether attributes are set.
-	 * TODO: Figure this out better. How should it work for directories?
-	 */
-	public Integer[] getChildPaths(int pathId, String attrName, String attrValue) {
-		return null;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -644,7 +654,8 @@ public class FileNameSpaces {
 
 	/**
 	 * Return the given path's parent path ID, and the path's own name.
-	 * @return An array of three Objects. The first is the parent's path ID (Integer), the
+	 * @param pathId The ID of the path to query
+	 * @return An array of four Objects. The first is the parent's path ID (Integer), the
 	 * second is true if this is a directory, else false, the
 	 * third is the path's own name (String), and the fourth is the name of the attached
 	 * root (if any). Returns null if there's no matching record.
@@ -678,10 +689,10 @@ public class FileNameSpaces {
 
 	/**
 	 * Helper function for translating from an ordinal integer to a PathType. This is the
-	 * opposite of PathType.ordinal.
-	 * @param the ordinal value of a PathType value.
-	 * @return the corresponding PathType value.
-	 * @throws FatalBuildStoreError if the ordinal value is out of range.
+	 * opposite of PathType.ordinal().
+	 * @param pathTypeNum The ordinal value of a PathType value
+	 * @return The corresponding PathType value
+	 * @throws FatalBuildStoreError if the ordinal value is out of range
 	 */
 	private PathType intToPathType(int pathTypeNum)
 			throws FatalBuildStoreError {
@@ -748,8 +759,8 @@ public class FileNameSpaces {
 	/**
 	 * A helper function for fetching the named child of a specified path, along with the
 	 * path type of that child.
-	 * @param the parent path's ID.
-	 * @param the name of the child path to search for within this parent.
+	 * @param parentId The parent path's ID.
+	 * @param childName The name of the child path to search for within this parent.
 	 * @return A Object[2] array, where Object[0] is a Integer containing the path ID, and
 	 *			Object[1] is a PathType object for the child.
 	 */

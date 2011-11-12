@@ -27,10 +27,10 @@ public class TestFileIncludes {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/* our BuildStore, used for testing */
+	/** our BuildStore, used for testing */
 	private BuildStore bs;
 	
-	/* our FileDependencies object, used for testing */
+	/** our FileDependencies object, used for testing */
 	private FileIncludes fdeps;
 
 	/**
@@ -110,7 +110,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileIncludes#getFilesThatInclude(int, char)}.
+	 * Test method for {@link com.arapiki.disco.model.FileIncludes#getFilesThatInclude(int)}.
 	 */
 	@Test
 	public void testGetFilesThatInclude() {
@@ -139,7 +139,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileIncludes#getFilesIncludedBy(int, char)}.
+	 * Test method for {@link com.arapiki.disco.model.FileIncludes#getFilesIncludedBy(int)}.
 	 */
 	@Test
 	public void testGetFilesIncludedBy() {

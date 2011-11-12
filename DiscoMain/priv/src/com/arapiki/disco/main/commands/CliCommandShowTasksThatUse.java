@@ -38,10 +38,10 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/* should we only show files that are "read" - set by the --read option */
+	/** Should we only show files that are "read" - set by the --read option */
 	protected static boolean optionRead = false;
 	
-	/* should we only show files that are "written" - set by the --write option */
+	/** Should we only show files that are "written" - set by the --write option */
 	protected static boolean optionWrite = false;
 
 	/*=====================================================================================*

@@ -127,6 +127,10 @@ public class TestNativeMethods {
 		}
 	}
 
+	/**
+	 * Test method for readSymlink
+	 * @throws Exception Something bad happened
+	 */
 	@Test
 	public void testCreateSymlink() throws Exception {
 		

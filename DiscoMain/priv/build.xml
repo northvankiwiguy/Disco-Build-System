@@ -14,6 +14,7 @@
 		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
 		<pathelement location="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" />
 		<pathelement location="${project-root}/priv/lib/commons-cli-1.2.jar" />
+		<pathelement location="${project-root}/priv/lib/commons-io-2.1.jar" />
 	</path>
 	
 	<!-- sourcepath for generating documentation -->

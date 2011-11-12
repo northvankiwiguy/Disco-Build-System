@@ -37,19 +37,19 @@ public class CliCommandShowTasks implements ICliCommand {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/* should we show component membership when displaying reports? */
+	/** Should we show component membership when displaying reports? */
 	protected static boolean optionShowComps = false;
 
-	/* do we want short output? */
+	/** Do we want short output? */
 	protected static boolean optionShort = false;
 	
-	/* do we want long output? */
+	/** Do we want long output? */
 	protected static boolean optionLong = false;
 
-	/* the output format of the report (ONE_LINE, WRAPPED, NOT_WRAPPED) */
+	/** The output format of the report (ONE_LINE, WRAPPED, NOT_WRAPPED) */
 	protected DisplayWidth outputFormat = DisplayWidth.WRAPPED;
 	
-	/* the TaskSet used to filter our results (if -f/--filter is used) */
+	/** The TaskSet used to filter our results (if -f/--filter is used) */
 	protected TaskSet filterTaskSet = null;
 	
 	/*=====================================================================================*

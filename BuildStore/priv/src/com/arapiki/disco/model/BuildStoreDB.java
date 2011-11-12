@@ -47,7 +47,7 @@ class BuildStoreDB  {
 	private static final int SCHEMA_VERSION = 1;
 
 
-	/* Prepared Statements to make database access faster */
+	/** Prepared Statements to make database access faster */
 	private PreparedStatement lastRowIDPrepStmt = null;
 	
 	/*=====================================================================================*
@@ -320,7 +320,9 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @param insertChildPrepStmt
+	 * Execute a prepared SQL statement, and return the number of rows that were updated.
+	 * @param stmt The prepared SQL statement to execute
+	 * @return The number of rows updated after executing the statement
 	 */
 	/* package private */
 	int executePrepUpdate(PreparedStatement stmt) {
@@ -340,8 +342,11 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @param cmd
-	 * @return
+	 * Execute a (non-prepared) SQL statement, returning a String array of the results
+	 * (one array entry per returned row). This method is simply a helper to make this
+	 * common operation easier to use.
+	 * @param sql The SQL command to be executed
+	 * @return An array of Strings, one per returned row.
 	 */
 	/* package private */
 	String[] executeSelectColumn(String sql) {		
@@ -431,10 +436,11 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Execute a database query using a prepared statement, and
-	 * return the full ResultSet object.
-	 * @param cmd
-	 * @return
+	 * Execute a database query using a prepared statement, and return the full ResultSet 
+	 * object. This is purely a convenience function to make it easier to access the
+	 * database.
+	 * @param stmt The prepared SQL statement to be executed
+	 * @return The ResultSet from the database query
 	 */
 	/* package private */
 	ResultSet executePrepSelectResultSet(PreparedStatement stmt) {
@@ -473,10 +479,9 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Create a prepared statement. Some other class will use this later on. We're
-	 * just creating it for them, since we own the database connection.
-	 * @param string
-	 * @return
+	 * Create a prepared statement from an SQL command string.
+	 * @param sql The SQL command to be executed
+	 * @return The prepared database statement for executing the SQL command at a later time.
 	 */
 	/* package private */
 	PreparedStatement prepareStatement(String sql) {

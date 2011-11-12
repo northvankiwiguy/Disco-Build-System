@@ -49,7 +49,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileNameSpaces#addNewRoot(java.lang.String)}.
+	 * Test method for {@link com.arapiki.disco.model.FileNameSpaces#addNewRoot(String, int)}.
 	 */
 	@Test
 	public void testAddNewRoot() {
@@ -280,7 +280,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileNameSpaces#deleteRoot(int)}.
+	 * Test method for {@link com.arapiki.disco.model.FileNameSpaces#deleteRoot(String)}.
 	 */
 	@Test
 	public void testDeleteRoot() {

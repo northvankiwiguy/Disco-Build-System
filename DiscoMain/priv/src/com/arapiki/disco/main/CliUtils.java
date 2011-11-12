@@ -12,12 +12,9 @@
 
 package com.arapiki.disco.main;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.StringTokenizer;
 
 import org.apache.commons.io.IOUtils;
 
@@ -46,12 +43,22 @@ public class CliUtils {
 	 *=====================================================================================*/
 
 	/** how are tasks commands displayed? */
-	public enum DisplayWidth { ONE_LINE, WRAPPED, NOT_WRAPPED }
+	public enum DisplayWidth { 
+		
+		/** As much as possible of the task's command line should be displayed on one line. */
+		ONE_LINE, 
+		
+		/** If the command line is too long, wrap it onto multiple lines */
+		WRAPPED, 
+		
+		/** Don't do any wrapping, and just let the terminal wrap the line if it's too long */
+		NOT_WRAPPED 
+	}
 	
 	/** the number of columns (characters) per output line */
 	private static int columnWidth = 80;
 	
-	/* when validating command line args - this value is considered infinite */
+	/** When validating command line args - this value is considered infinite */
 	public static final int ARGS_INFINITE = -1;
 	
 	/*=====================================================================================*
@@ -61,7 +68,8 @@ public class CliUtils {
 	/**
 	 * Given zero or more command line arguments, create a FileSet that stores all the files
 	 * mention in those command-line arguments
-	 * @param fileSpecs A String of ":"-separated path specs (files, directories, or regular expressions).
+	 * @param fns The FileNameSpaces object that manages the files.
+	 * @param pathSpecs A String of ":"-separated path specs (files, directories, or regular expressions).
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
 	public static FileSet getCmdLineFileSet(FileNameSpaces fns, String pathSpecs) {
@@ -84,7 +92,8 @@ public class CliUtils {
 	 * a suitable TaskSet. If no arguments are provided, the null TaskSet is returned (indicating
 	 * that all files should be shown).
 	 * @param bts The BuildTasks object to query.
-	 * @param cmdArgs The command line arguments that specify the TaskSet to show.
+	 * @param taskSpecs The command line arguments that specify the TaskSet to show.
+	 * @return The TaskSet, as described by the input task specs
 	 */
 	public static TaskSet getCmdLineTaskSet(BuildTasks bts, String taskSpecs) {
 		
@@ -106,12 +115,14 @@ public class CliUtils {
 	 * the result of reports.
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
-	 * @param fns The FileNameSpaces containing the files to be listed.
+	 * @param fns The FileNameSpaces manager object containing the files to be listed
+	 * @param cmpts The Components manager object containing the component information
 	 * @param resultFileSet The set of files to be displayed (if null, show them all)
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
 	 *         displayed (set to null to display everything).
 	 * @param showRoots Indicates whether path roots should be displayed (true), or whether absolute paths
 	 * 		   should be used (false).
+	 * @param showComps Indicates whether the component names should be displayed
 	 */
 	public static void printFileSet(
 			PrintStream outStream, FileNameSpaces fns, Components cmpts, FileSet resultFileSet,
@@ -168,10 +179,12 @@ public class CliUtils {
 	 * that all tasks are displayed, you should first call TaskSet.populateWithParents().
 	 * @param outStream The PrintStream to display the output on
 	 * @param bts The BuildTasks object containing the task information
-	 * @param fns The FileNameSpaces object containing file name information
+	 * @param fns The FileNameSpaces manager object containing file name information
+	 * @param cmpts The Components manager object contain component information
 	 * @param resultTaskSet The set of tasks to be displayed
 	 * @param filterTaskSet Currently unused
-	 * @param longOutput Set to true if the full command strings should be displayed.
+	 * @param outputFormat Set to true if the full command strings should be displayed.
+	 * @param showComps Set to true if the component names should be shown.
 	 */
 	public static void printTaskSet(
 			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, Components cmpts,
@@ -224,8 +237,11 @@ public class CliUtils {
 	 * "component/section". If "section" is not provided (and sectionAllowed is true),
 	 * "private" is assumed. If the input is invalid, display a meaningful error message
 	 * and exit the program.
+	 * @param cmpts The Components manager object containing the component information
 	 * @param compString The user-supplied input string (could be anything)
 	 * @param sectionAllowed Is the user allowed to provide a section? 
+	 * @return An array of two integers. The first is the component's ID number,
+	 * and the second is the section's ID number.
 	 */
 	public static int[] parseComponentAndSection(
 			Components cmpts,
@@ -270,10 +286,11 @@ public class CliUtils {
 	/**
 	 * Validate function to ensure that the number of arguments provided to a command
 	 * is in range between minArgs and maxArgs.
-	 * @param cmdArgs The actual array of arguments.
+	 * @param cmdName The name of the command being executed
+	 * @param cmdArgs The actual array of arguments
 	 * @param minArgs The minimum number of arguments required (0 or higher)
 	 * @param maxArgs The maximum number of arguments required (0 or higher - possibly ARGS_INFINITE)
-	 * @param message An error message to provide if an invalid number of arguments is included.
+	 * @param message An error message to provide if an invalid number of arguments is included
 	 */
 	public static void validateArgs(String cmdName, String[] cmdArgs, int minArgs, int maxArgs,
 			String message) {
@@ -364,12 +381,14 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream to display the paths on
 	 * @param pathSoFar This path's parent path as a string, complete with trailing "/"
-	 * @param fns The FileNameSpaces object in which these paths belong
+	 * @param fns The FileNameSpaces manager object in which these paths belong
+	 * @param cmpts The Components manager object that contains the component information
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
 	 * @param resultFileSet The set of files to be displayed (if null, show them all)
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
 	 * 		   should be displayed (set to null to display everything).
 	 * @param showRoots Whether to show path roots (true) or absolute paths (false)
+	 * @param showComps Whether to show the component names
 	 */
 	private static void printFileSetHelper(
 			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, Components cmpts, int thisPathId,
@@ -517,12 +536,15 @@ public class CliUtils {
 	 * A helper method, used exclusively by printTaskSet. This method calls itself recursively
 	 * as it traverses the TaskSet's tree structure.
 	 * @param outStream The PrintStream to display the output on
-	 * @param bts The BuildTasks object containing the task information
-	 * @param fns The FileNameSpaces object containing file name information
-	 * @param resultTaskSet The set of tasks to be displayed
+	 * @param bts The BuildTasks manager object containing the task information
+	 * @param fns The FileNameSpaces manager object containing file name information
+	 * @param cmpts The Components manager object containing the component information
+	 * @param taskId The ID of the task we're currently displaying
+	 * @param resultTaskSet The full set of tasks to be displayed
 	 * @param filterTaskSet Currently unused
-	 * @param longOutput Set to true if the full command strings should be displayed.
-	 * @param indentLevel The number of spaces to indent this task by.
+	 * @param outputFormat The way in which the tasks should be formatted
+	 * @param showComps Set to true if we should display component names
+	 * @param indentLevel The number of spaces to indent this task by
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
 			BuildTasks bts, FileNameSpaces fns, Components cmpts, 
@@ -613,6 +635,7 @@ public class CliUtils {
 	 * @param thisPathId The ID of the path we might want to display
 	 * @param resultFileSet The set of paths in the result set
 	 * @param filterFileSet The set of paths in the filter set
+	 * @return Whether or not the path should be displayed
 	 */
 	private static boolean shouldBeDisplayed(int thisPathId, 
 			FileSet resultFileSet, FileSet filterFileSet) {

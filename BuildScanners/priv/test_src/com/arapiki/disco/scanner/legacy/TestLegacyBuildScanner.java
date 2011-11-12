@@ -36,6 +36,7 @@ public class TestLegacyBuildScanner {
 
 	/**
 	 * Test the setTraceFile()/getTraceFile() methods
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testSetTraceFile() throws Exception {
@@ -61,6 +62,7 @@ public class TestLegacyBuildScanner {
 
 	/**
 	 * Test the setBuildStore()/getBuildStore() methods
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testSetBuildStore() throws Exception {
@@ -87,6 +89,7 @@ public class TestLegacyBuildScanner {
 
 	/**
 	 * Test the setDebugStream()/getDebugStream() methods
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testSetDebugStream() throws Exception {
@@ -114,6 +117,7 @@ public class TestLegacyBuildScanner {
 
 	/**
 	 * Test the setDebugLevel()/getDebugLevel() methods
+	 * @throws Exception Something bad happened
 	 */
 	@Test
 	public void testSetDebugLevel() throws Exception {

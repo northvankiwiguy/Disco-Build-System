@@ -39,7 +39,7 @@ public class FileAttributes {
 	private FileNameSpaces fileNameSpaces;
 	
 	/**
-	 * Various prepared statement for database access.
+	 * Various prepared statements for database access.
 	 */
 	private PreparedStatement 
 		selectIdFromNamePrepStmt = null,
@@ -118,7 +118,7 @@ public class FileAttributes {
 
 	/**
 	 * For a given attribute name, return the corresponding ID number.
-	 * @param The attribute's name
+	 * @param attrName The attribute's name
 	 * @return The attributes ID number, or NOT_FOUND if the attribute name isn't defined.
 	 */
 	public int getAttrIdFromName(String attrName) {
@@ -149,7 +149,7 @@ public class FileAttributes {
 
 	/**
 	 * For a given attribute ID, return the corresponding attribute name.
-	 * @param The attribute's ID number
+	 * @param attrId The attribute's ID number
 	 * @return The attributes name, or null if the attribute name isn't defined.
 	 */
 	public String getAttrNameFromId(int attrId) {
@@ -411,8 +411,8 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the FileSet of all paths that have the attribute set (to any value).
-	 * @param The attribute to test for.
+	 * Return the FileSet containing all paths that have the attribute set (to any value).
+	 * @param attrId The attribute to test for
 	 * @return The FileSet of all files that have this attribute set
 	 */
 	public FileSet getPathsWithAttr(int attrId) {
@@ -431,10 +431,11 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the FileSet of all paths that have the attribute set to the specified value.
-	 * @param The attribute to test for
-	 * @param The value to compare against
-	 * @return The FileSet of all files that have this attribute set to the specified value.
+	 * Return the FileSet of all paths that have the specified attribute set to the
+	 * specified String value.
+	 * @param attrId The attribute to test for
+	 * @param value The value to compare against
+	 * @return The FileSet of all files that have this attribute set to the specified value
 	 */
 	public FileSet getPathsWithAttr(int attrId, String value) {
 
@@ -453,10 +454,11 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the FileSet of all paths that have the attribute set to the specified value.
-	 * @param The attribute to test for
-	 * @param The value to compare against
-	 * @return The FileSet of all files that have this attribute set to the specified value.
+	 * Return the FileSet of all paths that have the specified attribute set to the
+	 * specified Integer value.
+	 * @param attrId The attribute to test for
+	 * @param value The value to compare against
+	 * @return The FileSet of all files that have this attribute set to the specified value
 	 */
 	public FileSet getPathsWithAttr(int attrId, int value) {
 		return getPathsWithAttr(attrId, String.valueOf(value));

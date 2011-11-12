@@ -41,6 +41,7 @@ public class FileSystemScanner {
 
 	/**
 	 * Create a new FileSystemScanner object.
+	 * @param buildStore The BuildStore into which the scanned information should be added
 	 */
 	public FileSystemScanner(BuildStore buildStore) {
 		this.bs = buildStore;
@@ -56,6 +57,8 @@ public class FileSystemScanner {
 	 * added into the BuildStore. For example, adding "/usr/include/sys" will result in all
 	 * paths starting with the /usr/include/sys prefix. However, adding "sys" will result 
 	 * in everything starting with just "/sys".
+	 * @param rootName The BuildStore root under which the files will be added (e.g. "root")
+	 * @param fileSystemPath The path on the real Unix files where the scanning should start
 	 */
 	public void scanForFiles(final String rootName, String fileSystemPath) {
 		

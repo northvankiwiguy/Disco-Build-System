@@ -19,12 +19,21 @@ package com.arapiki.utils.os;
  */
 public class ShellResult {
 	
-	private String stdout;					/* the process's standard output */
-	private String stderr;					/* the process's standard error */
-	private int returnCode;				/* the process's return code */
+	/** The process's standard output */
+	private String stdout;
 	
-	/*
-	 * Create a new ShellResult object.
+	/** The process's standard error */
+	private String stderr;
+	
+	/** The process's return code */
+	private int returnCode;
+	
+	/**
+	 * Create a new ShellResult object. This object reflects the output and return code
+	 * from a shell command invocation.
+	 * @param stdout The text captured from the command's standard output
+	 * @param stderr The text captured from the command's standard error
+	 * @param returnCode The command's return code
 	 */
 	public ShellResult(String stdout, String stderr, int returnCode) {
 		this.stdout = stdout;
@@ -33,21 +42,21 @@ public class ShellResult {
 	}
 	
 	/**
-	 * @return the stdout
+	 * @return The command's standard output
 	 */
 	public String getStdout() {
 		return stdout;
 	}
 	
 	/**
-	 * @return the stderr
+	 * @return The command's standard error
 	 */
 	public String getStderr() {
 		return stderr;
 	}
 	
 	/**
-	 * @return the returnCode
+	 * @return The command's return code
 	 */
 	public int getReturnCode() {
 		return returnCode;

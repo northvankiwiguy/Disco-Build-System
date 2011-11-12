@@ -29,9 +29,13 @@ import org.junit.Test;
  */
 public class TestProgressFileInputStream {
 
-	/** The most recently reported file position, total length, and percentage */
+	/** The most recently reported file position */
 	private long currentPos;
+	
+	/** The file's total length */
 	private long length;
+	
+	/** The percentage complete */
 	private int percentComplete;
 	
 	/** indicates when the file read is complete */

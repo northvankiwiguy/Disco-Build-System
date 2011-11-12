@@ -123,6 +123,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 * @param fileName Name of the trace file.
 	 * @param buildStore The BuildStore to add the trace file information to (possibly null)
 	 * @param debugStream The PrintStream to write debug information to (possibly null)
+	 * @param debugLevel The amount of debug information desired (0, 1 or 2).
 	 * @throws IOException If opening the file fails.
 	 */
 	/* package */ TraceFileScanner(
@@ -228,7 +229,9 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 *=====================================================================================*/
 
 	/**
-	 * TODO: review and comment this method
+	 * Create a new build task in the BuildStore.
+	 * @param processNum The Unix process ID of the scanned process
+	 * @throws IOException A problem occurred while reading the trace file
 	 */
 	private void addBuildTask(int processNum) throws IOException {
 		
@@ -298,7 +301,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 * Given a CFS process number, translate it into a BuildStore task number. 
 	 * @param processNum The CFS process number
 	 * @return The corresponding BuildStore task number.
-	 * @throw FatalBuildScannerError if the the process to task mapping is unknown
+	 * @throws FatalBuildScannerError if the the process to task mapping is unknown
 	 */
 	private int getTaskId(int processNum) {
 		Integer taskId = processToTaskMap.get(Integer.valueOf(processNum));
@@ -312,7 +315,11 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * TODO: review method and comment
+	 * Record a file access in the BuildStore, based on a file access that was noted
+	 * in the trace file
+	 * @param fileName The name of the file that was accessed
+	 * @param processNum The Unix process ID of the process that did the accessing
+	 * @param direction The type of access (read, write)
 	 */
 	private void addFileAccess(String fileName, int processNum, OperationType direction) {
 
@@ -426,8 +433,11 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Like println(), but displays the message to the debug stream (if defined)
-	 * @param string The string to display
+	 * Like println(), but displays the message to the debug stream (if defined). Only
+	 * display the message if this message's debug level is less than or equal to the
+	 * overall debug level setting.
+	 * @param level The debug level for this message
+	 * @param message The message to be displayed on the debug stream
 	 */
 	private void debugln(int level, String message) {
 		if ((debugStream != null) && (level <= debugLevel)) {
@@ -439,7 +449,8 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	
 	/**
 	 * Like print(), but displays the message to the debug stream (if defined)
-	 * @param string The string to display
+ 	 * @param level The debug level for this message
+	 * @param message The message to be displayed on the debug stream
 	 */
 	private void debug(int level, String message) {
 		if ((debugStream != null) && (level <= debugLevel)) {

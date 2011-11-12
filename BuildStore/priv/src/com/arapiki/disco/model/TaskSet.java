@@ -105,8 +105,8 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#mergeSet()
+	 * Merge the content of a second TaskSet into this TaskSet.
+	 * @param second The second TaskSet
 	 */
 	public void mergeSet(TaskSet second) {
 		
@@ -133,9 +133,9 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 *     (regardless of their depth).
 	 *   - If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
 	 *     than being added.
-	 *   - The special syntax "@comp" means all tasks in the component "comp"
-	 *   - The special syntax "^@comp" means all tasks outside the component "comp"
-	 * @param taskSpecs[] An array of command line arguments that specify which tasks (or sub-trees
+	 *   - The special syntax "%comp/foo" means all tasks in the component "foo"
+	 *   - The special syntax "%not-comp/foo" means all tasks outside the component "foo"
+	 * @param taskSpecs An array of command line arguments that specify which tasks (or sub-trees
 	 * of tasks) should be added (or removed) from the task tree.
 	 * @return ErrorCode.OK on success, or Error.BAD_VALUE if one of the task specifications
 	 * is badly formed.

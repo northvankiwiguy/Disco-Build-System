@@ -150,7 +150,7 @@ public class LegacyBuildScanner {
 	/**
 	 * Set the debug level of the trace to control how much debug output is displayed
 	 * as the trace proceeds.
-	 * @param optionDebugLevel 0 (none), 1 (basic debug), 2 (extended debug). Any value > 2
+	 * @param level 0 (none), 1 (basic debug), 2 (extended debug). Any value > 2
 	 * is consider to be the same as 2.
 	 */
 	public void setDebugLevel(int level) {
@@ -178,7 +178,8 @@ public class LegacyBuildScanner {
 
 	/**
 	 * Invoke a shell command and load the file/task data into the BuildStore.
-	 * 
+	 * @param args The shell command line arguments (as is normally passed into a main()
+	 * function).
 	 * @throws InterruptedException The scan operation was interrupted before it completed fully
 	 * @throws IOException The build command was not found, or failed to execute for some reason
 	 */

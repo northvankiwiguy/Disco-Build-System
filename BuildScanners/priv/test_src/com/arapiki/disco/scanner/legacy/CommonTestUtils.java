@@ -60,7 +60,9 @@ public class CommonTestUtils {
 	 * Given a program, contained entirely within a string, compile and execute
 	 * the program, run it through CFS, and generate a BuildStore.
 	 * @param program The entire body of the C program to be compiled/executed/scanned.
-	 * @return The BuildStore created by scanning the program.
+	 * @param args The command line arguments for the program
+	 * @return The BuildStore created by scanning the program
+	 * @throws Exception Something bad happened
 	 */
 	public static BuildStore parseLegacyProgram(String program, String args[]) throws Exception {
 		

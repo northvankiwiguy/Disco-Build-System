@@ -29,9 +29,10 @@ import java.util.Map.Entry;
  * @param <K> The map's key type
  * @param <V> The map's value type
  */
+@SuppressWarnings("serial")
 public class LRULinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
-	/* the maximum number of items permitted in the cache */
+	/** The maximum number of items permitted in the cache */
 	private int maxSize;
 	
 	/**

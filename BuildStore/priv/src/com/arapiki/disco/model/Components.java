@@ -61,7 +61,7 @@ public class Components {
 	private static String sectionNames[] = new String[] {"None", "private", "public"};
 	
 	/**
-	 * Various prepared statement for database access.
+	 * Various prepared statements for database access.
 	 */
 	private PreparedStatement 
 		addComponentPrepStmt = null,

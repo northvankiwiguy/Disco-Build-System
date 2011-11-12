@@ -28,16 +28,22 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 public class TestReports {
 
 	
-	/* our BuildStore, and sub-objects, used for testing */
+	/** our test BuildStore object */
 	private BuildStore bs;
+
+	/** our test FileNameSpaces object */
 	private FileNameSpaces fns;
+	
+	/** our test BuildTasks object */
 	private BuildTasks bts;
+	
+	/** our test FileIncludes object */
 	private FileIncludes fis;
 	
-	/* our Reports object, used for testing */
+	/** our test Reports object */
 	private Reports reports;
 	
-	/* our rootTaskId, used for creating new build tasks */
+	/** Our rootTaskId, used for creating new build tasks */
 	private int rootTaskId;
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -187,17 +193,17 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 	
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportMostCommonIncludersOfFile()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportMostCommonIncludersOfFile(int)}.
 	 */
 	@Test
-	public void testreportMostCommonIncludersOfFile() throws Exception {
+	public void testreportMostCommonIncludersOfFile() {
 	
 		/* create some files */
 		int file1 = fns.addFile("/mydir/files/fileA.h");
 		int file2 = fns.addFile("/mydir/files/fileB.h");
 		int file3 = fns.addFile("/mydir/files/fileC.h");
 		int file4 = fns.addFile("/mydir/files/fileD.h");
-		int file5 = fns.addFile("/mydir/files/fileE.h");
+		fns.addFile("/mydir/files/fileE.h");
 	
 		/* register the include relationships, all for file2 */
 		fis.addFileIncludes(file1, file2);
@@ -260,7 +266,7 @@ public class TestReports {
 		bs.setFastAccessMode(false);
 
 		/* now, run a report - we don't care about the results, just the response time */
-		FileRecord results [] = reports.reportMostCommonIncludersOfFile(file1);
+		reports.reportMostCommonIncludersOfFile(file1);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	
@@ -269,7 +275,7 @@ public class TestReports {
 	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesNeverAccessed()}.
 	 */
 	@Test
-	public void testFilesNeverAccessed() throws Exception {
+	public void testFilesNeverAccessed() {
 		
 		/* without any files in the database, return the empty list */
 		FileSet results = reports.reportFilesNeverAccessed();
@@ -318,10 +324,10 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesThatMatchName()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesThatMatchName(String)}.
 	 */
 	@Test
-	public void testReportFilesThatMatchName() throws Exception {
+	public void testReportFilesThatMatchName() {
 
 		/* the null argument should return the empty set */
 		FileSet results = reports.reportFilesThatMatchName(null);
@@ -366,10 +372,10 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportTasksThatMatchName()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportTasksThatMatchName(String)}.
 	 */
 	@Test
-	public void testReportTasksThatMatchName() throws Exception {
+	public void testReportTasksThatMatchName() {
 	
 		int task1 = bts.addBuildTask(0, 0, "My command number 1");
 		int task2 = bts.addBuildTask(0, 0, "My command number 2");
@@ -405,10 +411,10 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportTasksThatAccessFiles()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportTasksThatAccessFiles(FileSet, OperationType)}.
 	 */
 	@Test
-	public void testReportTasksThatAccessFiles() throws Exception {
+	public void testReportTasksThatAccessFiles() {
 
 		/* Create a bunch of files */
 		int file1a = fns.addFile("/file1a");
@@ -523,10 +529,10 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesAccessedByTasks()}.
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesAccessedByTasks(TaskSet, OperationType)}.
 	 */
 	@Test
-	public void testFilesAccessedByTasks() throws Exception {
+	public void testFilesAccessedByTasks() {
 		
 		/* create some tasks, and some file accesses for each */
 		int file1 = fns.addFile("/a/b/c.java");
@@ -602,7 +608,7 @@ public class TestReports {
 	 * Test method for {@link com.arapiki.disco.model.Reports#reportWriteOnlyFiles()}.
 	 */
 	@Test
-	public void testWriteOnlyFiles() throws Exception {
+	public void testWriteOnlyFiles() {
 	
 		/* 
 		 * Create a bunch of files, with different characteristics.
@@ -644,7 +650,7 @@ public class TestReports {
 		bts.addFileAccess(taskC, fileCClass, OperationType.OP_WRITE);
 		
 		/* d.java is not read at all */
-		int fileDJava = fns.addFile("/d.java");		
+		fns.addFile("/d.java");		
 
 		/* Run the report - a.class, b.class and c.class should be listed */
 		result = reports.reportWriteOnlyFiles();

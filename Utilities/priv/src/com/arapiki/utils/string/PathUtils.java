@@ -209,8 +209,8 @@ public class PathUtils {
 	 * one of those directories (known as the "root"). If not, return null. If so, return
 	 * the portion of the path with the root removed. For example, with pathRoots equal to
 	 * { "/home/fred/", "/tmp" } and path equal to "/home/fred/src/foo.c", return "src/foo.c".
-	 * @param An array of path roots, in the form of absolute paths.
-	 * @param An absolute path that may or may not fall within the root.
+	 * @param pathRoots An array of path roots, in the form of absolute paths.
+	 * @param path An absolute path that may or may not fall within the root.
 	 * @return The portion of the path, with the root extracted, or null if the path isn't
 	 * within one of the roots.
 	 */

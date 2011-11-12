@@ -29,16 +29,16 @@ import com.arapiki.disco.scanner.legacy.LegacyBuildScanner;
  */
 public class CliCommandScanBuild implements ICliCommand {
 
-	/* if not-null, the name of the trace file to write/read */
+	/** If not-null, the name of the trace file to write/read */
 	private String traceFileName = null;
 	
-	/* the user specified --trace-only */
+	/** Did the user specify --trace-only? */
 	private boolean optionTraceOnly = false;
 	
-	/* the user specified --read-trace */
+	/** Did the user specify --read-trace? */
 	private boolean optionReadTrace = false;
 	
-	/* the user specified --trace-level= */
+	/** Did the user specify --trace-level=? */
 	private int optionDebugLevel = 0;
 
 	/*=====================================================================================*

@@ -56,7 +56,11 @@ public final class DiscoMain {
 	 * all the commands that display FileSet listings.
 	 */
 	private class CommandGroup {
+		
+		/** The title of the command group (e.g. "Commands for displaying task information") */
 		String groupHeading;
+		
+		/** The commands that fall within this group */
 		ICliCommand commands[];
 	}
 	

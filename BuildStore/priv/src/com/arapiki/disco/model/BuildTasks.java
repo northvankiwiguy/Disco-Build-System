@@ -31,13 +31,24 @@ public class BuildTasks {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
+	/**
+	 * Data type for specifying the type of a file access, as recorded within a BuildStore
+	 */
 	public enum OperationType {
-		OP_UNSPECIFIED,		/* an unspecified operation - used for searches */
-							/*     when we don't care which operation */
-		OP_READ,			/* a file was read */
-		OP_WRITE,			/* a file was written */
-		OP_MODIFIED,		/* a file was read and written by the same task */
-		OP_DELETE			/* a file was deleted */
+		/** An unspecified operation - when we don't care which operation */
+		OP_UNSPECIFIED,		
+		
+		/** A file was read */
+		OP_READ,
+		
+		/** A file was written */
+		OP_WRITE,
+		
+		/** A file was read and written by the same task */
+		OP_MODIFIED,
+		
+		/** A file was deleted */
+		OP_DELETE
 	}
 	
 	/**
@@ -74,11 +85,11 @@ public class BuildTasks {
 	/**
 	 * Create a new BuildTasks object. This object encapsulates information for all the build
 	 * tasks in the system.
-	 * @param db
+	 * @param buildStore The BuildStore object that "owns" this BuildTasks manager
 	 */
-	public BuildTasks(BuildStore bs) {
-		this.bs = bs;
-		this.db = bs.getBuildStoreDB();
+	public BuildTasks(BuildStore buildStore) {
+		this.bs = buildStore;
+		this.db = buildStore.getBuildStoreDB();
 
 		/* create prepared database statements */
 		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, 0, ?)");
@@ -129,10 +140,10 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Record the fact that the specific build task access the specified file. Adding a relationship
-	 * the second or successive time has no affect.
-	 * @param buildTaskID The build task to add the file access to.
-	 * @param fileNumber The file's ID number.
+	 * Record the fact that the specific build task accessed the specified file. Adding
+	 * the same relationship a second or successive time has no effect.
+	 * @param buildTaskId ID of the build task to add the file access to
+	 * @param fileNumber The file's ID number
 	 * @param operation
 	 */
 	public void addFileAccess(int buildTaskId, int fileNumber, OperationType operation) {
@@ -193,11 +204,11 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Get the list of files that are accessed by this build task.
-	 * @param taskID The build task to query.
+	 * Return the list of files that are accessed by this build task.
+	 * @param taskId The build task to query
 	 * @param operation The type of operation we're interested in. 'r' reads only, 
-	 * 			'w' writes only, 'e" either reads or writes.
-	 * @return An array of file IDs.
+	 * 			'w' writes only, 'e" either reads or writes
+	 * @return An array of file IDs
 	 */
 	public Integer [] getFilesAccessed(int taskId, OperationType operation) {
 		
@@ -280,9 +291,9 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the task's command line string.
-	 * @param taskID The build task we're interested in.
-	 * @return The build tasks command line string.
+	 * Fetch the build task's command line string.
+	 * @param taskId The build task we're querying
+	 * @return The build task's command line string
 	 */
 	public String getCommand(int taskId) {
 		String [] stringResults = null;
@@ -474,9 +485,9 @@ public class BuildTasks {
 	
 	/**
 	 * Helper function for translating from an ordinal integer to an OperationType. This is the
-	 * opposite of OperationType.ordinal.
-	 * @param the ordinal value of a OperationType value.
-	 * @return the corresponding OperationType value.
+	 * opposite of OperationType.ordinal().
+	 * @param opTypeNum The ordinal value of a OperationType value
+	 * @return The corresponding OperationType value.
 	 * @throws FatalBuildStoreError if the ordinal value is out of range.
 	 */
 	private OperationType intToOperationType(int opTypeNum)

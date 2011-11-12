@@ -21,7 +21,6 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.TaskSet;
-import com.arapiki.utils.string.StringArray;
 
 /**
  * Disco CLI Command class that implements the "set-task-comp" command. See the 
