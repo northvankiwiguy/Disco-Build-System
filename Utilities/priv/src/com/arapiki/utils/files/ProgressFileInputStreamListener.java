@@ -13,20 +13,23 @@
 package com.arapiki.utils.files;
 
 /**
- * Provided as a callback object to a ProgressFileInputStream object. The progress() method
- * is invoked on a periodic basis to indicate how much of the file has been read.
+ * An abstract class for creating callback objects that listen to a 
+ * ProgressFileInputStream object. When attached to a ProgressFileInputStream
+ * object, the progress() method will be invoked on a periodic basis to 
+ * indicate how much of the file has been read.
  */
 public abstract class ProgressFileInputStreamListener {
 	
 	/**
 	 * Called by the associated FileInputStream object to update us on the
-	 * progress of reading through the file
-	 * @param current The current position of the stream's file pointer
-	 * @param total The total number of bytes in the file
-	 * @param percentage The percentage completion (0% -> 100%)
+	 * progress of reading through the file.
+	 * 
+	 * @param current The current position of the stream's file pointer.
+	 * @param total The total number of bytes in the file.
+	 * @param percentage The percentage completion (0% to 100%).
 	 */
 	public abstract void progress(long current, long total, int percentage);
 	
-	/** Called when the reading the file is completely done */
+	/** Called when the file has been completely read. */
 	public abstract void done();
 }

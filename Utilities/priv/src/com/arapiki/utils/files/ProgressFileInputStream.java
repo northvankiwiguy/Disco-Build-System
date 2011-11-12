@@ -18,10 +18,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * A type of FileInputStream that allows us to monitor the progress of reading through
- * the file. This is extremely useful for long-running applications that read/parse
+ * A subclass of FileInputStream that allows us to monitor progress as we read through
+ * a file. This is extremely useful for long-running applications that read/parse
  * very large files. It's important to give the end user some feedback on how much of
  * the file has been processed.
+ * 
+ * This class is intended to be used as a drop-in replacement for FileInputStream.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -31,16 +33,16 @@ public class ProgressFileInputStream extends FileInputStream {
 	 * FIELDS/TYPE
 	 *=====================================================================================*/
 	
-	/** The total length of the file we're reading */
+	/** The total length of the file we're reading. */
 	private long fileLength;
 	
-	/** The current position within that file */
+	/** Our current position within the file. */
 	private long filePos;
 	
-	/** The thread that'll keep the caller updated on the progress of reading the file */
+	/** The thread that'll keep the caller updated on the progress of reading the file. */
 	private Thread progressReporter;
 	
-	/** flag set to true when the file has been completely read */
+	/** Flag set to true when the file has been completely read. */
 	private boolean fileDone = false;
 	
 	/*=====================================================================================*
@@ -49,20 +51,20 @@ public class ProgressFileInputStream extends FileInputStream {
 	
 	/**
 	 * A Thread class that'll report the current progress of reading through
-	 * the file. This thread continues until it's terminated, which is usually
+	 * a ProgressFileInputStream. This thread continues until it's terminated, which is usually
 	 * when the file is closed.
 	 */
 	private class ProgressReporterThread extends Thread {
 
-		/** The number of seconds between each successive progress report */
+		/** The number of seconds between each successive progress report. */
 		private int intervalInSeconds;
 		
-		/** The callback object to invoke */
+		/** The callback object to invoke. */
 		private ProgressFileInputStreamListener listener;
 		
 		/**
-		 * Create a new ProgressReporterThread object
-		 * @param listener The listener object that'll receive our progress updates
+		 * Create a new ProgressReporterThread object.
+		 * @param listener The listener object that'll receive our progress updates.
 		 * @param intervalInSeconds The number of seconds between consecutive progress reports.
 		 */
 		public ProgressReporterThread(ProgressFileInputStreamListener listener, 
@@ -73,7 +75,9 @@ public class ProgressFileInputStream extends FileInputStream {
 		
 		/*-------------------------------------------------------------------------------------*/
 
-		/* (non-Javadoc)
+		/**
+		 * The main loop of the listener thread. This method invokes the listener's progress()
+		 * method on a periodic basis.
 		 * @see java.lang.Thread#run()
 		 */
 		@Override
@@ -106,10 +110,11 @@ public class ProgressFileInputStream extends FileInputStream {
 	/**
 	 * Create a new ProgressFileInputStream object. This is identical to a FileInputStream object,
 	 * except that a listener object can be attached to the stream in order to monitor progress.
-	 * @param name The name of the file to be read
-	 * @param listener The ProgressFileInputStreamListener object that will be notified of progress
-	 * @param intervalInSeconds The interval (in seconds) between consecutive progress reports
-	 * @throws FileNotFoundException If the file wasn't found
+	 * 
+	 * @param name The name of the file to be read.
+	 * @param listener The ProgressFileInputStreamListener object that will be notified of progress.
+	 * @param intervalInSeconds The interval (in seconds) between consecutive progress reports.
+	 * @throws FileNotFoundException If the file wasn't found.
 	 */
 	public ProgressFileInputStream(String name, ProgressFileInputStreamListener listener,
 			int intervalInSeconds) throws FileNotFoundException {
@@ -133,7 +138,8 @@ public class ProgressFileInputStream extends FileInputStream {
 	 * PUBLIC METHODS (all are overrides of standard FileInputStream methods).
 	 *=====================================================================================*/
 	
-	/* (non-Javadoc)
+	/**
+ 	 * A wrapper around the standard read() method.
 	 * @see java.io.FileInputStream#read()
 	 */
 	@Override
@@ -147,7 +153,8 @@ public class ProgressFileInputStream extends FileInputStream {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
+	/**
+	 * A wrapper around the standard read() method.
 	 * @see java.io.FileInputStream#read(byte[], int, int)
 	 */
 	@Override
@@ -161,7 +168,8 @@ public class ProgressFileInputStream extends FileInputStream {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
+	/**
+	 * A wrapper around the standard read() method.
 	 * @see java.io.FileInputStream#read(byte[])
 	 */
 	@Override
@@ -175,7 +183,8 @@ public class ProgressFileInputStream extends FileInputStream {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
+	/**
+	 * A wrapper around the standard skip() method.
 	 * @see java.io.FileInputStream#skip(long)
 	 */
 	@Override
@@ -189,7 +198,8 @@ public class ProgressFileInputStream extends FileInputStream {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
+	/**
+	 * A wrapper around the standard close() method.
 	 * @see java.io.FileInputStream#close()
 	 */
 	@Override

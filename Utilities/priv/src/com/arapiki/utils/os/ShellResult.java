@@ -14,26 +14,35 @@ package com.arapiki.utils.os;
 
 /**
  * This class is used as a return value from the executeShellCmd() method. Upon return,
- * each of these fields contains the output from the process. The size of the String's in
- * this class will depend on the amount of output provided by the shell command.
+ * each of these fields contains the output from the process. The size of the Strings 
+ * returned in this class will depend on the amount of output provided by the shell command.
  */
 public class ShellResult {
 	
-	/** The process's standard output */
+	/*=====================================================================================*
+	 * TYPES/FIELDS
+	 *=====================================================================================*/
+
+	/** The process's captured standard output. */
 	private String stdout;
 	
-	/** The process's standard error */
+	/** The process's captured standard error. */
 	private String stderr;
 	
-	/** The process's return code */
+	/** The process's captured return code. */
 	private int returnCode;
 	
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
+
 	/**
 	 * Create a new ShellResult object. This object reflects the output and return code
 	 * from a shell command invocation.
-	 * @param stdout The text captured from the command's standard output
-	 * @param stderr The text captured from the command's standard error
-	 * @param returnCode The command's return code
+	 * 
+	 * @param stdout The text captured from the command's standard output.
+	 * @param stderr The text captured from the command's standard error.
+	 * @param returnCode The command's return code.
 	 */
 	public ShellResult(String stdout, String stderr, int returnCode) {
 		this.stdout = stdout;
@@ -41,25 +50,37 @@ public class ShellResult {
 		this.returnCode = returnCode;
 	}
 	
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+	
 	/**
-	 * @return The command's standard output
+	 * Return the command's standard output.
+	 * @return The command's standard output.
 	 */
 	public String getStdout() {
 		return stdout;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
+	 * Return the command's standard error.
 	 * @return The command's standard error
 	 */
 	public String getStderr() {
 		return stderr;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
 	/**
+	 * Return the command's return code.
 	 * @return The command's return code
 	 */
 	public int getReturnCode() {
 		return returnCode;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
 }

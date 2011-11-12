@@ -23,6 +23,7 @@ import com.arapiki.utils.errors.FatalError;
 
 /**
  * Various static methods for accessing the operating system's features.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class SystemUtils {
@@ -36,13 +37,13 @@ public class SystemUtils {
 	 * files/directories/symlinks we're interested in knowing about.
 	 */
 	
-	/** We're interested in seeing files */ 
+	/** Flag to indicate we're interested in seeing files. */ 
 	public static final int REPORT_FILES = 1;
 	
-	/** We're interested in seeing directories */
+	/** Flag to indicate we're interested in seeing directories. */
 	public static final int REPORT_DIRECTORIES = 2;
 
-	/** We're interested in seeing symlinks */
+	/** Flag to indicate we're interested in seeing symlinks. */
 	public static final int REPORT_SYMLINKS = 4;
 	
 	/*=====================================================================================*
@@ -74,10 +75,11 @@ public class SystemUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test whether a local file is a symlink (as opposed to a regular file or directory)
+	 * Test whether a local file is a symlink (as opposed to a regular file or directory).
+	 * 
 	 * @param fileName The file's name.
 	 * @return True if the file is a symlink, else false.
-	 * @exception FileNotFoundException If the file doesn't exist
+	 * @exception FileNotFoundException If the file doesn't exist.
 	 */
 	public static native boolean isSymlink(String fileName)
 		throws FileNotFoundException;
@@ -86,10 +88,11 @@ public class SystemUtils {
 
 	/**
 	 * Read the target of the specified symlink.
-	 * @param fileName The name of the symlink
+	 * 
+	 * @param fileName The name of the symlink.
 	 * @return The target of the symlink, or null if it's not a symlink, or if some other 
 	 *          error occurred.
-	 * @exception FileNotFoundException If the file doesn't exist
+	 * @exception FileNotFoundException If the file doesn't exist.
 	 */
 	public static native String readSymlink(String fileName)
 		throws FileNotFoundException;
@@ -98,6 +101,7 @@ public class SystemUtils {
 
 	/**
 	 * Create a new symlink on the local machine's file system.
+	 * 
 	 * @param fileName The name of the symlink that will be created.
 	 * @param targetFileName The destination of the symlink.
 	 * @return 0 if the symlink was created successfully, otherwise non-zero.
@@ -107,15 +111,19 @@ public class SystemUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Execute a shell command and capture the return code and output.
-	 * @param cmd The command to be executed.
+	 * Execute a shell command and capture the return code, standard output and standard error
+	 * strings.
+	 * 
+	 * @param cmd The shell command to be executed.
 	 * @param stdin The text to be passed to the command's standard input.
-	 * @param echoToOutput Should the stdout and stderr be echoed to our own process's output channels?
-	 * @param saveToBuffer Should the stdout and stderr be saved in buffers?
+	 * @param echoToOutput Set if the stdout and stderr should be echoed to our own stdout/stderr.
+	 * @param saveToBuffer Set if the stdout and stderr should be saved in buffers.
+	 * 
 	 * @return The command's standard output, error and return code in the form of a ShellResult object. If
 	 * saveToBuffer is false, then the output/error fields will be empty.
-	 * @throws IOException For some reason the shell command failed to execute
-	 * @throws InterruptedException The command was interrupted before it completed
+	 * 
+	 * @throws IOException For some reason the shell command failed to execute.
+	 * @throws InterruptedException The command was interrupted before it completed.
 	 */
 	public static ShellResult executeShellCmd(String cmd, String stdin, boolean echoToOutput, boolean saveToBuffer) 
 		throws IOException, InterruptedException {
@@ -163,11 +171,14 @@ public class SystemUtils {
 	
 	/**
 	 * A variant of executeShellCmd that defaults to saving output/error to a buffer, but not echoing it
+	 * 
 	 * @param cmd The command to be executed.
 	 * @param stdin The text to be passed to the command's standard input.
+	 * 
 	 * @return The command's standard output, error and return code in the form of a ShellResult object.
-	 * @throws IOException For some reason the shell command failed to execute
-	 * @throws InterruptedException The command was interrupted before it completed
+	 * 
+	 * @throws IOException For some reason the shell command failed to execute.
+	 * @throws InterruptedException The command was interrupted before it completed.
 	 */
 	public static ShellResult executeShellCmd(String cmd, String stdin) 
 		throws IOException, InterruptedException {
@@ -180,8 +191,9 @@ public class SystemUtils {
 	/**
 	 * Traverse a file system and invoke a callback method on each file system entry (file,
 	 * directory or symlink).
+	 * 
 	 * @param rootPath The starting (top) path for the traversal. The traversal will start
-	 * at this point, and traverse down the filesystem into subdirectories.
+	 * at this point, and traverse downwards through the file system sub-directories.
 	 * @param pathsToReport The types of paths to report - a bitmap of REPORT_FILES, 
 	 * REPORT_DIRECTORIES and REPORT_SYMLINKS.
 	 * @param callbackObj The callback object to be invoked as each file system entry
@@ -196,14 +208,16 @@ public class SystemUtils {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-
 	/**
 	 * Traverse a file system and invoke a callback method on each file system entry (file,
 	 * directory or symlink).
+	 * 
 	 * @param rootPath The starting (top) path for the traversal. The traversal will start
-	 * at this point, and traverse down the filesystem into subdirectories.
-	 * @param matchFilePattern
-	 * @param ignoreDirPattern
+	 * at this point, and traverse downwards through the file system sub-directories.
+	 * @param matchFilePattern A Regex pattern specifying the types of file name we're 
+	 * interested in hearing about (use null to match everything).
+	 * @param ignoreDirPattern A Regex pattern specifying the types of directory names we're
+	 * interested in skipping over and not traversing (use null to not skip over anything).
 	 * @param pathsToReport The types of paths to report - a bitmap of REPORT_FILES, 
 	 * REPORT_DIRECTORIES and REPORT_SYMLINKS.
 	 * @param callbackObj The callback object to be invoked as each file system entry
@@ -228,12 +242,13 @@ public class SystemUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A helper function for traverseFileSystem which handles the recursion.
-	 * @param thisPath The current path being traversed
-	 * @param mfPattern 
-	 * @param idPattern 
-	 * @param pathsToReport
-	 * @param callbackObj
+	 * A recursive helper function for traverseFileSystem().
+	 * 
+	 * @param thisPath The current path being traversed.
+	 * @param mfPattern The matching file pattern.
+	 * @param idPattern The ignore directory pattern.
+	 * @param pathsToReport A bitmap of which path types should be reported.
+	 * @param callbackObj The object to "call back" when a matching path is found.
 	 */
 	private static void traverseFileSystemHelper(File thisPath, Pattern mfPattern, Pattern idPattern,
 			int pathsToReport, FileSystemTraverseCallback callbackObj) {

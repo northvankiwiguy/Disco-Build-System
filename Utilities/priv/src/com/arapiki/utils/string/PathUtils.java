@@ -21,6 +21,7 @@ import java.util.Stack;
  * This class provides various utility functions for manipulating file system
  * paths, and their path components. All the methods in this class are static,
  * so they're essentially just worker functions without any state.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class PathUtils {
@@ -29,9 +30,10 @@ public class PathUtils {
 
 	/**
 	 * Given a single component of a file system path, validate that it's well formed. This
-	 * basically ensures that the name doesn't contain / or \, and that it's not empty, . or ..
+	 * ensures that the name doesn't contain / or \, and that it's not empty, . or ..
+	 * 
 	 * @param pathComponent The path component to validate.
-	 * @return true if name is valid, else false.
+	 * @return True if name is valid, else false.
 	 */
 	public static boolean validatePathComponent(String pathComponent) {
 		return !((pathComponent == null) ||
@@ -46,11 +48,10 @@ public class PathUtils {
 	
 	/**
 	 * Given an absolute path (starting with '/'), normalize it so that there
-	 * are no .. or . components, and no excess / characters. Note that unlike
+	 * are no ".." or "." components, and no excess / characters. Note that unlike
 	 * File.getCanonicalPath(), we do not access the underlying file system
 	 * (this allows us to process content on a different machine from which the
 	 * path actually exists).
-	 * TODO: make this work for Windows-style paths.
 	 * 
 	 * @param curDir The non-normalized path.
 	 * @return The normalized path.
@@ -158,6 +159,7 @@ public class PathUtils {
 	/**
 	 * Given a path-like string, break it into separate file/directory
 	 * component names. For example, "/a/b/c" will be broken into {"a", "b", "c"}.
+	 * 
 	 * @param path The full path
 	 * @return An array of String, one element for each component.
 	 */
@@ -207,12 +209,15 @@ public class PathUtils {
 	/**
 	 * Given an array of file system paths, detect whether this specific path falls within
 	 * one of those directories (known as the "root"). If not, return null. If so, return
-	 * the portion of the path with the root removed. For example, with pathRoots equal to
-	 * { "/home/fred/", "/tmp" } and path equal to "/home/fred/src/foo.c", return "src/foo.c".
+	 * the portion of the path with the root removed.
+	 * <p>
+	 * For example, with pathRoots equal to { "/home/fred/", "/tmp" } and path equal to 
+	 * "/home/fred/src/foo.c", return "src/foo.c".
+	 * 
 	 * @param pathRoots An array of path roots, in the form of absolute paths.
-	 * @param path An absolute path that may or may not fall within the root.
-	 * @return The portion of the path, with the root extracted, or null if the path isn't
-	 * within one of the roots.
+	 * @param path An absolute path that may or may not fall within one of the roots.
+	 * @return The portion of the path, with the matching root extracted, or null if the
+	 * path isn't within one of the roots.
 	 */
 	public static String matchPathRoot(String [] pathRoots, String path) {
 		

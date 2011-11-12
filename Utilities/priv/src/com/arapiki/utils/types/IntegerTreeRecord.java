@@ -25,7 +25,7 @@ public class IntegerTreeRecord {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
-	/** The ID of this record */
+	/** The ID of this record. */
 	protected int id;
 
 	/*=====================================================================================*
@@ -33,7 +33,7 @@ public class IntegerTreeRecord {
 	 *=====================================================================================*/
 
 	/**
-	 * @return the id
+	 * @return The id.
 	 */
 	public int getId() {
 		return id;
@@ -42,7 +42,7 @@ public class IntegerTreeRecord {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @param id the id to set
+	 * @param id The id to set.
 	 */
 	public void setId(int id) {
 		this.id = id;

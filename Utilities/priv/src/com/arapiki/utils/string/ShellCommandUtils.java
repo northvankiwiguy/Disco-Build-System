@@ -13,8 +13,9 @@
 package com.arapiki.utils.string;
 
 /**
+ * Utility methods for manipulating strings that represent shell command lines.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class ShellCommandUtils {
 
@@ -26,10 +27,12 @@ public class ShellCommandUtils {
 	 * Given a (possibly) multi-line shell command, merge that command into a single line.
 	 * If a particular line is terminated by a \ character, the next line is considered
 	 * to be the same command. If not, the current line and next line will be joined together
-	 * with && (as opposed to ; which would allow the second command to continue, even if 
-	 * the first command failed). Finally, leading spaces/tabs are removed off all lines.
-	 * @param cmdLine The (possibly) multi-line shell command
-	 * @return The joined-together shell command
+	 * with "&&".
+	 * <p>
+	 * Finally, leading spaces/tabs are removed off all lines.
+	 * 
+	 * @param cmdLine The (possibly) multi-line shell command.
+	 * @return The joined-together shell command.
 	 */
 	public static String joinCommandLine(String cmdLine) {
 		

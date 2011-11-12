@@ -19,12 +19,17 @@ package com.arapiki.utils.string;
  */
 public class StringArray {
 
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+
 	/**
 	 * Shift the entire String [] left by 'count' elements, discarding the left-most
 	 * 'count' elements, then return the resulting String[]. This is similar to the "shift" 
 	 * command in most shell languages.
-	 * @param input The input String array
-	 * @param count The number of elements to shift by
+	 * 
+	 * @param input The input String array.
+	 * @param count The number of elements to shift by.
 	 * @return A copy of the input array, but with the left-most 'count' elements removed.
 	 */
 	public static String[] shiftLeft(String [] input, int count) {
@@ -47,7 +52,9 @@ public class StringArray {
 		System.arraycopy(input, count, output, 0, input.length - count);
 		return output;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Shift the entire String [] left by one element, discarding the left-most
 	 * element, then return the resulting String[]. This is similar to the "shift" 
@@ -58,5 +65,6 @@ public class StringArray {
 	public static String[] shiftLeft(String[] input) {
 		return shiftLeft(input, 1);
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
 }

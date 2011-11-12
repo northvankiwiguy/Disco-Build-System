@@ -19,16 +19,18 @@ import java.util.Iterator;
 
 /**
  * This is an abstract class for implementing a tree-like set of integer keys, and their
- * respective values. Each entry is keyed by an integer, and is either in the set or not in the set.
- * Each key is associated with a value, whose type must extend IntegerTreeRecord.
- *
- * This data structure is described as tree-like because the elements have a parent-child relationship.
- * 
- * This class is sub-classed by FileSet and TaskSet, both of which are Integer-based Sets, with an associated
- * key value (FileRecord and TaskRecord).
+ * respective values. That is, the elements in the set are arranged in a tree structure
+ * (with parents and children), although an element may or may not exist in the set. The
+ * main use of this data structure is to select sub-sets of an overall tree structure.
+ * <p>
+ * Each entry is keyed by an integer, and is either in the set or not in the set. If the key 
+ * is in the set it will have an associated value whose type must extend IntegerTreeRecord.
+ * <p>
+ * This class is sub-classed by FileSet and TaskSet, both of which are Integer-based Sets,
+ * with an associated key value (FileRecord and TaskRecord).
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
- * @param <T> The type of each Record (a subclass of IntegerTreeRecord)
+ * @param <T> The type of each Record (a subclass of IntegerTreeRecord).
  */
 public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Iterable<Integer> {
 
@@ -61,6 +63,7 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	
 	/**
 	 * Add a new IntegerTreeRecord (or derived class) to the IntegerTreeSet.
+	 * 
 	 * @param record The file record to add. The ID field will be used as the index key and
 	 * 			must therefore be unique. If not unique, the existing record will be
 	 * 			overwritten.
@@ -74,7 +77,8 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch a IntegerTreeRecord from the IntegerTreeSet, using the id as the unique key.
+	 * Fetch a IntegerTreeRecord from the set, using the id as the unique key.
+	 * 
 	 * @param id The ID of the IntegerTreeRecord to retrieve.
 	 * @return The IntegerTreeRecord, or null if there's no corresponding record.
 	 */
@@ -87,7 +91,8 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test whether a particular IntegerTreeRecord is in the IntegerTreeSet.
+	 * Test whether a particular IntegerTreeRecord is in the set.
+	 * 
 	 * @param id The ID of the IntegerTreeRecord we're searching for.
 	 * @return True or False to indicate the IntegerTreeRecord's presence.
 	 */
@@ -100,8 +105,9 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Remove the specified IntegerTreeRecord from the IntegerTreeSet. If the record isn't
-	 * in the IntegerTreeSet, the IntegerTreeSet is left unchanged.
+	 * Remove the specified IntegerTreeRecord from the set. If the record isn't
+	 * in the set, the set is left unchanged.
+	 * 
 	 * @param id The ID of the IntegerTreeRecord we're removing.
 	 */
 	public void remove(int id) {
@@ -113,7 +119,8 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the number of IntegerTreeRecord objects in the IntegerTreeSet.
+	 * Return the number of IntegerTreeRecord objects in the set.
+	 * 
 	 * @return the number of IntegerTreeRecord objects.
 	 */
 	public int size() {
@@ -125,7 +132,8 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @return an iterator for traversing the keys in the IntegerTreeSet. The
+	 * An iterator for traversing the keys in the set.
+	 * @return An iterator for traversing the keys in the set. The
 	 * order the keys are visited is not specified.
 	 */
 	@Override
@@ -139,6 +147,7 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	 * Abstract method for fetching the parent of a particular element. This method
 	 * must be overridden by sub-classes that actually know what the parent-child relations
 	 * should be.
+	 * 
 	 * @param id The ID of the element we want to find the parent of
 	 * @return The ID of this element's parent, or ErrorCode.NOT_FOUND.
 	 */
@@ -149,7 +158,8 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/**
 	 * Abstract method for constructing a new IntegerTreeRecord, or derived class. This
 	 * must be overridden by all subclasses who know how to create a new record.
-	 * @param id The ID to insert into the new record
+	 * 
+	 * @param id The ID to insert into the new record.
 	 * @return A new record, with the ID field set appropriately.
 	 */
 	public abstract T newRecord(int id);
@@ -157,8 +167,8 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * For all the IDs already present in the IntegerTreeSet, ensure that each of it's
-	 * parent IDs are also in the IntegerTreeSet. This is useful for when displaying the
+	 * For all the IDs already present in the set, ensure that each of it's
+	 * parent IDs are also in the set. This is useful for when displaying the
 	 * report in the full tree hierarchy, in which case we must also know which parent
 	 * elements are to be shown. For example, in the case of FileSet, if "/a/b/c.c" is in
 	 * the set, then "/a/b", "/a" and "/" will also be added.
@@ -209,8 +219,9 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a second IntegerTreeSet, mask off any files from this IntegerTreeSet that 
-	 * don't appear in the second IntegerTreeSet. This is essentially a bitwise "and".
+	 * Given a second set, mask off any files from this set that 
+	 * don't appear in the second set. This is essentially a bitwise "and".
+	 * 
 	 * @param mask The second set that acts as a mask value.
 	 */
 	public void maskSet(IntegerTreeSet<T> mask) {
@@ -220,10 +231,11 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a second IntegerTreeSet, merge all the files from that second set into this set. This is
-	 * essentially a bitwise "or". If a particular path is already present in "this" IntegerTreeSet,
+	 * Given a second set, merge all the files from that second set into this set. This is
+	 * essentially a bitwise "or". If a particular path is already present in "this" set,
 	 * we won't override it with the IntegerTreeRecord from "second" (this fact is only interesting if
 	 * you care about the content of the IntegerTreeRecord).
+	 * 
 	 * @param second The second set to merge into this set
 	 */
 	public void mergeSet(IntegerTreeSet<T> second) {

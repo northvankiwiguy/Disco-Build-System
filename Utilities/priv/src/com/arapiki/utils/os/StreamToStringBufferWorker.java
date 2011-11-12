@@ -20,7 +20,9 @@ import java.io.PrintStream;
 
 /**
  * Special purpose Thread class for capturing a stream's output and storing it into
- * a StringBuffer. This type of Thread is necessary to handle multiplexing of multiple
+ * a StringBuffer. Used primarily by the executeShellCmd() method.
+ * 
+ * This type of Thread is necessary to handle multiplexing of multiple
  * streams (not supported by basic java.io.* calls).
  */
 public class StreamToStringBufferWorker extends Thread {
@@ -32,16 +34,16 @@ public class StreamToStringBufferWorker extends Thread {
 	/** The Reader we'll used to read the stream on a line-by-line basis. */
 	private BufferedReader reader;
 	
-	/** The StringBuffer we'll write into */
+	/** The StringBuffer we'll write into. */
 	private StringBuffer sb;
 	
-	/** Should we echo the stdout/stderr of the sub-process to our own stdout/stderr? */
+	/** Set if we should echo the stdout/stderr of the sub-process to our own stdout/stderr. */
 	private boolean echoToOutput;
 	
-	/** If echoToOutput is true, which stream do we echo to? */
+	/** If echoToOutput is true, the stream we should echo to. */
 	private PrintStream outStream;
 	
-	/** Should we save the stdout/stderr of the sub-process to buffers? */
+	/** Set if we should save the stdout/stderr of the sub-process to buffers. */
 	private boolean saveToBuffer;
 	
 	/**
@@ -56,10 +58,12 @@ public class StreamToStringBufferWorker extends Thread {
 	
 	/**
 	 * Create a new StreamToStringBufferWorker object.
+	 * 
 	 * @param str The InputStream to read from.
-	 * @param echoToOutput Should the stdout and stderr be echoed to our own process's channels?
-	 * @param saveToBuffer Should the stdout and stderr be saved in buffers?
-	 * @param outStream if echoToOutput is true, where do we echo to?
+	 * @param echoToOutput Set if the stdout and stderr should be echoed to our own 
+	 * process's stdout/stderr.
+	 * @param saveToBuffer Set if the stdout and stderr should be saved in buffers.
+	 * @param outStream if echoToOutput is true, the stream we should echo to.
 	 */
 	public StreamToStringBufferWorker(InputStream str, 
 			boolean echoToOutput, boolean saveToBuffer, PrintStream outStream) {
@@ -100,7 +104,8 @@ public class StreamToStringBufferWorker extends Thread {
 
 	/**
 	 * Fetch the stream's content in String form.
-	 * @return The String content
+	 * 
+	 * @return The String content.
 	 * @throws IOException If this thread encountered an IOException during the reading process.
 	 */
 	public String getString() throws IOException {

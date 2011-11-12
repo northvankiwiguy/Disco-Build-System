@@ -23,7 +23,8 @@ package com.arapiki.utils.errors;
 public class FatalError extends Error {
 	
 	/**
-	 * Create a new FataError
+	 * Create a new FatalError with a string message and an encapsulated
+	 * Exception.
 	 * @param message A string message to indicate the cause of the failure.
 	 * @param e An embedded Exception that caused the failure.
 	 */
@@ -32,7 +33,7 @@ public class FatalError extends Error {
 	}
 	
 	/**
-	 * Create a new FataError.
+	 * Create a new FatalError with a string message.
 	 * @param message A string message to indicate the cause of the failure.
 	 */
 	public FatalError(String message) {

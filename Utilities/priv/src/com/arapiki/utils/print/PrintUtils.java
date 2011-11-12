@@ -27,7 +27,7 @@ public class PrintUtils {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Fast access to printing an arbitrary number of spaces. Used by indent() */
+	/** A static string of spaces, providing fast access for printing them. Used by indent(). */
 	private static String spaces = "                                                                ";
 
 	/*=====================================================================================*
@@ -35,7 +35,7 @@ public class PrintUtils {
 	 *=====================================================================================*/
 	
 	/**
-	 * Utility function for print spaces. This is useful for indented screen output.
+	 * Utility function for printing spaces. This is useful for indented screen output.
 	 * @param out The stream to write to (such as System.out).
 	 * @param numSpaces The number of spaces to indent by.
 	 */
@@ -68,10 +68,11 @@ public class PrintUtils {
 	 * Note that the wrapWidth includes the number of spaces in indentLevel. That is,
 	 * if indentLevel is 20, and wrapWidth is 40, then up to 20 characters will be displayed
 	 * per line.
-	 * @param out The stream to write to (such as System.out) 
-	 * @param string The string to indent, wrap and display
-	 * @param indentLevel The number of characters to indent by
-	 * @param wrapWidth The column number at which to wrap
+	 * 
+	 * @param out The stream to write to (such as System.out).
+	 * @param string The string to indent, wrap and display.
+	 * @param indentLevel The number of characters to indent by.
+	 * @param wrapWidth The column number at which to wrap.
 	 */
 	public static void indentAndWrap(PrintStream out, String string, int indentLevel, int wrapWidth) {
 	
