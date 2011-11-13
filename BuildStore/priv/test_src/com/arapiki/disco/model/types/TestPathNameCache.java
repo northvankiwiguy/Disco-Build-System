@@ -17,20 +17,20 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.arapiki.disco.model.types.FileNameCache;
-import com.arapiki.disco.model.types.FileNameCache.FileNameCacheKey;
-import com.arapiki.disco.model.types.FileNameCache.FileNameCacheValue;
+import com.arapiki.disco.model.types.PathNameCache;
+import com.arapiki.disco.model.types.PathNameCache.PathNameCacheKey;
+import com.arapiki.disco.model.types.PathNameCache.PathNameCacheValue;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class TestFileNameCache {
+public class TestPathNameCache {
 
 	/**
 	 * The FileNameCache object under test
 	 */
-	FileNameCache fnc;
+	PathNameCache fnc;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -41,7 +41,7 @@ public class TestFileNameCache {
 	public void setUp() throws Exception {
 		
 		/* create a cache with maximum size of 5. The perfect size for testing */
-		fnc = new FileNameCache(5);
+		fnc = new PathNameCache(5);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -55,17 +55,17 @@ public class TestFileNameCache {
 	public void testFileNameCacheKey() throws Exception {
 		
 		/* instantiate a bunch of objects */
-		FileNameCacheKey key1 = fnc.new FileNameCacheKey(1, "banana");
-		FileNameCacheKey key2 = fnc.new FileNameCacheKey(1, "peach");
-		FileNameCacheKey key3 = fnc.new FileNameCacheKey(1, "cucumber");
-		FileNameCacheKey key4 = fnc.new FileNameCacheKey(223456, "orange");
-		FileNameCacheKey key5 = fnc.new FileNameCacheKey(1, "cucumber");
+		PathNameCacheKey key1 = fnc.new PathNameCacheKey(1, "banana");
+		PathNameCacheKey key2 = fnc.new PathNameCacheKey(1, "peach");
+		PathNameCacheKey key3 = fnc.new PathNameCacheKey(1, "cucumber");
+		PathNameCacheKey key4 = fnc.new PathNameCacheKey(223456, "orange");
+		PathNameCacheKey key5 = fnc.new PathNameCacheKey(1, "cucumber");
 		
 		/* test the accessors */
-		assertEquals(1, key1.getParentFileId());
-		assertEquals("banana", key1.getChildFileName());
-		assertEquals(223456, key4.getParentFileId());
-		assertEquals("orange", key4.getChildFileName());
+		assertEquals(1, key1.getParentPathId());
+		assertEquals("banana", key1.getChildPathName());
+		assertEquals(223456, key4.getParentPathId());
+		assertEquals("orange", key4.getChildPathName());
 		
 		/* compare various keys for equality - testing our custom-built equals method */
 		assertEquals(key1, key1);
@@ -91,16 +91,16 @@ public class TestFileNameCache {
 	public void testFileNameCacheValue() throws Exception {
 		
 		/* create a number of objects */
-		FileNameCacheValue value1 = fnc.new FileNameCacheValue(1, 1);
-		FileNameCacheValue value2 = fnc.new FileNameCacheValue(11, 2);
-		FileNameCacheValue value3 = fnc.new FileNameCacheValue(1011, 1);
+		PathNameCacheValue value1 = fnc.new PathNameCacheValue(1, 1);
+		PathNameCacheValue value2 = fnc.new PathNameCacheValue(11, 2);
+		PathNameCacheValue value3 = fnc.new PathNameCacheValue(1011, 1);
 		
 		/* test the accessors */
-		assertEquals(1, value1.getChildFileId());
+		assertEquals(1, value1.getChildPathId());
 		assertEquals(1, value1.getChildType());
-		assertEquals(11, value2.getChildFileId());
+		assertEquals(11, value2.getChildPathId());
 		assertEquals(2, value2.getChildType());
-		assertEquals(1011, value3.getChildFileId());
+		assertEquals(1011, value3.getChildPathId());
 		assertEquals(1, value3.getChildType());
 	}
 
@@ -119,9 +119,9 @@ public class TestFileNameCache {
 		
 		/* now add a value and make sure it exists */
 		fnc.put(1, "womble", 200, 1);
-		FileNameCacheValue fncv = fnc.get(1, "womble");
+		PathNameCacheValue fncv = fnc.get(1, "womble");
 		assertNotNull(fncv);
-		assertEquals(200, fncv.getChildFileId());
+		assertEquals(200, fncv.getChildPathId());
 		assertEquals(1, fncv.getChildType());
 
 		/* other entries should still not exist */
@@ -135,20 +135,20 @@ public class TestFileNameCache {
 		/* the first should still exist */
 		fncv = fnc.get(1, "womble");
 		assertNotNull(fncv);
-		assertEquals(200, fncv.getChildFileId());
+		assertEquals(200, fncv.getChildPathId());
 		assertEquals(1, fncv.getChildType());
 		
 		/* the second should too */
 		fncv = fnc.get(200, "bungle");
 		assertNotNull(fncv);
-		assertEquals(234, fncv.getChildFileId());
+		assertEquals(234, fncv.getChildPathId());
 		assertEquals(0, fncv.getChildType());
 		
 		/* overwrite the first with a new value */
 		fnc.put(1, "womble", 34, 2);
 		fncv = fnc.get(1, "womble");
 		assertNotNull(fncv);
-		assertEquals(34, fncv.getChildFileId());
+		assertEquals(34, fncv.getChildPathId());
 		assertEquals(2, fncv.getChildType());
 	}
 

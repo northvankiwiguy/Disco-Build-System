@@ -23,9 +23,10 @@ import java.util.ArrayList;
 
 /**
  * A helper class to manage and simplify all the database access performed
- * by the BuildStore class and it's helpers. This class, and all the methods
+ * by the BuildStore class and it's managers. This class, and all the methods
  * are package-private, meaning that the end user shouldn't be aware of this
  * class.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 class BuildStoreDB  {
@@ -40,14 +41,14 @@ class BuildStoreDB  {
 	private Connection dbConn = null;
 
 	/**
-	 * What is our current schema version (for newly created BuildStore objects)?
+	 * The current schema version (for newly created BuildStore objects).
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
 	private static final int SCHEMA_VERSION = 1;
 
 
-	/** Prepared Statements to make database access faster */
+	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
 	
 	/*=====================================================================================*
@@ -56,6 +57,7 @@ class BuildStoreDB  {
 	
 	/**
 	 * Create a new BuildStoreDB object.
+	 * 
 	 * @param databaseName The name of the database to create. For SQLite databases,
 	 * this is the path to the database file.
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
@@ -119,6 +121,7 @@ class BuildStoreDB  {
 	
 	/**
 	 * Retrieve the schema version of this database.
+	 * 
 	 * @return The schema version, or 0 if the schema isn't yet initialized.
 	 */
 	/* package private */
@@ -276,6 +279,7 @@ class BuildStoreDB  {
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
 	 * changes are written to the disk. Only use fast access for "large write" operations.
+	 * 
 	 * @param fast Set to true to enable fast access, or false for safe access.
 	 */
 	/* package private */	
@@ -294,8 +298,9 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A helper method to perform any type of "update" command in SQL. That is,
+	 * Execute a (non-prepared) SQL statement of any update-style command. That is,
 	 * there can't be any results returned from this command.
+	 * 
 	 * @param sql The SQL command to executed.
 	 * @return The number of rows changed (or 0 if the command in question didn't change rows).
 	 */
@@ -320,7 +325,10 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Execute a prepared SQL statement, and return the number of rows that were updated.
+	 * Execute a prepared SQL update-style statement, and return the number of rows that 
+	 * were updated. This should only be used for SQL commands that update the database,
+	 * since it can't return the result of a query.
+	 * 
 	 * @param stmt The prepared SQL statement to execute
 	 * @return The number of rows updated after executing the statement
 	 */
@@ -374,10 +382,10 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Execute a prepared database statement that returns a value
-	 * (such as a select statement). The query should only return
-	 * a single column of results (if multiple columns are queried,
-	 * only the first will be returned).
+	 * Execute a prepared database statement that performs a query on a String column. 
+	 * The query should return a single column of results, and the values will be returned as 
+	 * strings. If multiple columns are queried, only the first will be returned.
+	 * 
 	 * @param stmt The prepared statement to be executed.
 	 * @return Returns a (possibly empty) array of results. 
 	 */
@@ -405,10 +413,10 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Execute a prepared database statement that returns a value
-	 * (such as a select statement). The query should only return
-	 * a single column of results (if multiple columns are queried,
-	 * only the first will be returned).
+	 * Execute a prepared database statement that returns Integer values, such as a select
+	 * on a numeric column. The query should only return a single column of Integer results.
+	 * If multiple columns are queried, only the first will be returned.
+	 * 
 	 * @param stmt The prepared statement to be executed.
 	 * @return Returns a (possibly empty) array of results. 
 	 */
@@ -438,9 +446,10 @@ class BuildStoreDB  {
 	/**
 	 * Execute a database query using a prepared statement, and return the full ResultSet 
 	 * object. This is purely a convenience function to make it easier to access the
-	 * database.
-	 * @param stmt The prepared SQL statement to be executed
-	 * @return The ResultSet from the database query
+	 * database and catch Exceptions.
+	 * 
+	 * @param stmt The prepared SQL statement to be executed.
+	 * @return The ResultSet from the database query.
 	 */
 	/* package private */
 	ResultSet executePrepSelectResultSet(PreparedStatement stmt) {
@@ -462,8 +471,9 @@ class BuildStoreDB  {
 
 	/**
 	 * Returns the integer value of the last auto-increment row ID. This is used to
-	 * fetch the last primary key inserted into a table, when the user provided "null"
+	 * fetch the last primary key inserted into a table, when the user specified "null"
 	 * to have the database automatically select a suitable unique primary key.
+	 * 
 	 * @return The last inserted primary key.
 	 */
 	/* package private */
@@ -480,7 +490,8 @@ class BuildStoreDB  {
 
 	/**
 	 * Create a prepared statement from an SQL command string.
-	 * @param sql The SQL command to be executed
+	 * 
+	 * @param sql The SQL command to be prepared.
 	 * @return The prepared database statement for executing the SQL command at a later time.
 	 */
 	/* package private */

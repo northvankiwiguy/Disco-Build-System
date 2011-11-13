@@ -26,8 +26,14 @@ import com.arapiki.disco.model.types.TaskRecord;
 import com.arapiki.disco.model.types.TaskSet;
 
 /**
+ * A manager class (that supports the BuildStore class) that handles reporting of
+ * information from the BuildStore. These reports are able to access the database
+ * directly, rather than using the standard BuildStore APIs.
+ * <p>
+ * There should be exactly one Reports object per BuildStore object. Use the
+ * BuildStore's getReports() method to obtain that one instance.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class Reports {
 	
@@ -76,8 +82,9 @@ public class Reports {
 
 	/**
 	 * Create a new Reports manager object, which performs a lot of the reporting work
-	 * on behalf of the BuildStore that owns this Reports object.
-	 * @param buildStore The BuildStore than owns this Reports object
+	 * on behalf of the BuildStore.
+	 * 
+	 * @param buildStore The BuildStore than owns this Reports object.
 	 */
 	public Reports(BuildStore buildStore) {
 		this.db = buildStore.getBuildStoreDB();
@@ -140,9 +147,10 @@ public class Reports {
 	 *=====================================================================================*/
 
 	/**
-	 * Provides an ordered list of the most commonly accessed files across the whole build store.
-	 * For each record, returns the number of unique tasks that accessed the file.
-	 * @return A list of FileRecord, sorted by most commonly accessed file first.
+	 * Provides an ordered array of the most commonly accessed files across the whole build store.
+	 * For each record in the result set, return the number of unique tasks that access the file.
+	 * 
+	 * @return An array of FileRecord, sorted with the most commonly accessed file first.
 	 */
 	public FileRecord[] reportMostCommonlyAccessedFiles() {
 		
@@ -170,8 +178,9 @@ public class Reports {
 	/**
 	 * Generate a report to show which files are the most common includers of the specified
 	 * file. This provides information on where the specified file is used the most often.
-	 * @param includedFile The file that is being included
-	 * @return An ordered list of FileRecord objects, containing the output of the report
+	 * 
+	 * @param includedFile ID of the file that is being included.
+	 * @return An ordered array of FileRecord objects, containing the output of the report.
 	 */
 	public FileRecord[] reportMostCommonIncludersOfFile(int includedFile) {
 		
@@ -197,10 +206,9 @@ public class Reports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Provides a FileSet of all files in the BuildStore that aren't accessed by any tasks.
-	 * This helps identify which source files are never used (this implies that the files
-	 * were added to the FileNameSpaces by scanning for files (--scan-tree), rather than
-	 * finding the files by scanning the build.
+	 * Return a FileSet of all files in the BuildStore that aren't accessed by any tasks.
+	 * This helps identify which source files are never used.
+	 * 
 	 * @return The set of files that are never accessed.
 	 */
 	public FileSet reportFilesNeverAccessed() {
@@ -225,7 +233,8 @@ public class Reports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of files (not directories) that match the user-specified file name
+	 * Return the set of files (not directories) that match the user-specified file name.
+	 * 
 	 * @param fileArg The name of the file(s) to match.
 	 * @return The FileSet of matching file names.
 	 */
@@ -252,8 +261,9 @@ public class Reports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of tasks whose command matches the user-specified pattern.
-	 * @param pattern The user-specified pattern to match
+	 * Return the set of tasks whose command string matches the user-specified pattern.
+	 * 
+	 * @param pattern The user-specified pattern to match.
 	 * @return The TaskSet of matching file names.
 	 */
 	public TaskSet reportTasksThatMatchName(String pattern) {
@@ -276,9 +286,10 @@ public class Reports {
 	 * Given the input FileSet (sourceFileSet), return a new FileSet containing all the 
 	 * paths that are derived from the paths listed in sourceFileSet. A file (A) is derived 
 	 * from file (B) if there's a task (or sequence of paths) that reads B and writes to A.
+	 * 
 	 * @param sourceFileSet The FileSet of all files we should consider as input to the tasks.
-	 * @param reportIndirect Should we also report on indirectly derived files (multiple tasks
-	 * between file A and file B?
+	 * @param reportIndirect Set if we should also report on indirectly derived files
+	 * (with multiple tasks between file A and file B).
 	 * @return The FileSet of derived paths.
 	 */
 	public FileSet reportDerivedFiles(FileSet sourceFileSet, boolean reportIndirect) {
@@ -292,9 +303,10 @@ public class Reports {
 	 * paths that are used as input when generating the paths listed in targetFileSet. 
 	 * A file (A) is input for file (B) if there's a task (or sequence of paths) that reads A 
 	 * and writes to B. This is the opposite of reportDerivedFiles().
+	 * 
 	 * @param targetFileSet The FileSet of all files that are the target of tasks.
-	 * @param reportIndirect Should we also report on indirectly derived files (multiple tasks
-	 * between file A and file B?
+	 * @param reportIndirect Set if we should also report on indirectly derived files
+	 * (multiple tasks between file A and file B).
 	 * @return The FileSet of input paths.
 	 */
 	public FileSet reportInputFiles(FileSet targetFileSet, boolean reportIndirect) {
@@ -306,8 +318,9 @@ public class Reports {
 	/**
 	 * Given a FileSet, return a TaskSet containing all the build tasks that access this
 	 * collection files. The opType specifies whether we want tasks that read these files,
-	 * write to these files, or either read or write. 
-	 * @param fileSet The set of input files
+	 * write to these files, or either read or write.
+	 * 
+	 * @param fileSet The set of input files.
 	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
 	 * @return a TaskSet of all tasks that access these files in the mode specified.
 	 */
@@ -364,6 +377,7 @@ public class Reports {
 	 * Given a TaskSet, return a FileSet containing all the files that are accessed by this
 	 * collection of tasks. The opType specifies whether we want files that are read by
 	 * these tasks, written by these tasks, or either read or written. 
+	 * 
 	 * @param taskSet The set of input tasks
 	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
 	 * @return a FileSet of all files that are accessed by these tasks, in the mode specified.
@@ -421,7 +435,8 @@ public class Reports {
 	 * read by a different task. This generally implies that the file is a "final"
 	 * file (such as an executable program, or release package), rather than an intermediate
 	 * file (such as an object file).
-	 * @return The FileSet of write-only files
+	 * 
+	 * @return The FileSet of write-only files.
 	 */
 	public FileSet reportWriteOnlyFiles() {
 		
@@ -442,16 +457,19 @@ public class Reports {
 		return results;
 	}
 	
-	/*-------------------------------------------------------------------------------------*/
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
 	
 	/**
 	 * A helper method for reportDerivedFiles and reportInputFiles that both use the same
 	 * algorithm, but a slightly different SQL query.
+	 * 
 	 * @param startFileSet The set of files that we're deriving from, or that are used as
 	 * the target of the derivation.
-	 * @param reportIndirect True if we should do multiple iterations of derivation
+	 * @param reportIndirect True if we should do multiple iterations of derivation.
 	 * @param sqlStatement The prepared SQL statement to find derived/input files.
-	 * @return The result FileSet 
+	 * @return The result FileSet.
 	 */
 	private FileSet reportDerivedFilesHelper(FileSet startFileSet, boolean reportIndirect,
 			PreparedStatement sqlStatement) {
@@ -522,6 +540,6 @@ public class Reports {
 		/* return the combined set of results */
 		return results;
 	}
-
-	/*=====================================================================================*/
+	
+	/*-------------------------------------------------------------------------------------*/
 }

@@ -94,7 +94,7 @@ public class BuildStore {
 		reports = new Reports(this);
 		
 		/* create a new FileAttributes object to manage the attributes on files */
-		fileAttributes = new FileAttributes(db, fileSpaces);
+		fileAttributes = new FileAttributes(this, fileSpaces);
 		
 		/* create a new Components object */
 		components = new Components(this);		

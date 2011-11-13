@@ -22,8 +22,13 @@ import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.ShellCommandUtils;
 
 /**
+ * A manager class (that supports the BuildStore class) that manages all BuildStore
+ * information pertaining to build tasks.
+ * <p>
+ * There should be exactly one BuildTasks object per BuildStore object. Use the
+ * BuildStore's getBuildTasks() method to obtain that one instance.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class BuildTasks {
 
@@ -31,40 +36,34 @@ public class BuildTasks {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
-	/**
-	 * Data type for specifying the type of a file access, as recorded within a BuildStore
-	 */
+	/** Data type for specifying the type of a file access that a task performs. */
 	public enum OperationType {
-		/** An unspecified operation - when we don't care which operation */
+		/** An unspecified operation for when we don't care which operation is performed. */
 		OP_UNSPECIFIED,		
 		
-		/** A file was read */
+		/** The file was read by the task. */
 		OP_READ,
 		
-		/** A file was written */
+		/** The file was written by the task. */
 		OP_WRITE,
 		
-		/** A file was read and written by the same task */
+		/** The file was read and written by the same task. */
 		OP_MODIFIED,
 		
-		/** A file was deleted */
+		/** The file was deleted by the task. */
 		OP_DELETE
 	}
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
-	 * to us when the FileNameSpaces object is first instantiated.
+	 * to us when the BuildTasks object is first instantiated.
 	 */
 	private BuildStoreDB db = null;
 	
-	/**
-	 * The BuildStore object that owns this BuildTasks object.
-	 */
-	private BuildStore bs = null;
+	/** The BuildStore object that owns this BuildTasks object. */
+	private BuildStore buildStore = null;
 	
-	/**
-	 * Various prepared statement for database access.
-	 */
+	/** Various prepared statement for database access. */
 	private PreparedStatement 
 		insertBuildTaskPrepStmt = null,
 		findCommandPrepStmt = null,
@@ -85,10 +84,11 @@ public class BuildTasks {
 	/**
 	 * Create a new BuildTasks object. This object encapsulates information for all the build
 	 * tasks in the system.
+	 * 
 	 * @param buildStore The BuildStore object that "owns" this BuildTasks manager
 	 */
 	public BuildTasks(BuildStore buildStore) {
-		this.bs = buildStore;
+		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 
 		/* create prepared database statements */
@@ -118,9 +118,10 @@ public class BuildTasks {
 	
 	/**
 	 * Add a new build task, and return the task ID number.
-	 * @param parentTaskId The task ID of this task's parent
-	 * @param taskDirId The ID of the path in which this task was executed
-	 * @param command The shell command to be executed.
+	 * 
+	 * @param parentTaskId The task ID of the new task's parent.
+	 * @param taskDirId The ID of the path (a directory) in which this task was executed.
+	 * @param command The shell command associated with this task.
 	 * @return The new task's ID.
 	 */
 	public int addBuildTask(int parentTaskId, int taskDirId, String command) {
@@ -142,9 +143,10 @@ public class BuildTasks {
 	/**
 	 * Record the fact that the specific build task accessed the specified file. Adding
 	 * the same relationship a second or successive time has no effect.
-	 * @param buildTaskId ID of the build task to add the file access to
-	 * @param fileNumber The file's ID number
-	 * @param operation
+	 * 
+	 * @param buildTaskId The ID of the build task that accessed the file.
+	 * @param fileNumber The file's ID number.
+	 * @param operation How the task accessed the file (read, write, delete, etc).
 	 */
 	public void addFileAccess(int buildTaskId, int fileNumber, OperationType operation) {
 		
@@ -204,11 +206,12 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of files that are accessed by this build task.
-	 * @param taskId The build task to query
+	 * Return an array of files that were accessed by this build task.
+	 * 
+	 * @param taskId The build task that accessed the files.
 	 * @param operation The type of operation we're interested in. 'r' reads only, 
-	 * 			'w' writes only, 'e" either reads or writes
-	 * @return An array of file IDs
+	 * 			'w' writes only, 'e" either reads or writes.
+	 * @return An array of file IDs.
 	 */
 	public Integer [] getFilesAccessed(int taskId, OperationType operation) {
 		
@@ -248,7 +251,8 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Get the list of tasks that access a specific file.
+	 * Return an array of tasks that accessed a specific file.
+	 * 
 	 * @param fileId The file we're interested in querying for.
 	 * @param operation The operation that the tasks perform on this file. 'r' reads only, 'w' write only,
 	 * 		'e' either reads or writes.
@@ -292,8 +296,9 @@ public class BuildTasks {
 
 	/**
 	 * Fetch the build task's command line string.
-	 * @param taskId The build task we're querying
-	 * @return The build task's command line string
+	 * 
+	 * @param taskId The build task we're querying.
+	 * @return The build task's command line string.
 	 */
 	public String getCommand(int taskId) {
 		String [] stringResults = null;
@@ -328,9 +333,10 @@ public class BuildTasks {
 	 * high-level overview of what the command does. The summary string for certain commands
 	 * may contain the command name and most important parameters, whereas for other commands
 	 * it may just be the first 'width' characters of the shell command.
-	 * @param taskId The ID of the task
-	 * @param width The maximum number of characters in the summary string
-	 * @return The summary string for this task's command
+	 * 
+	 * @param taskId The ID of the task.
+	 * @param width The maximum number of characters in the summary string.
+	 * @return The summary string for this task's command.
 	 */
 	public String getCommandSummary(int taskId, int width) {
 		
@@ -363,7 +369,8 @@ public class BuildTasks {
 
 	/**
 	 * Given the ID of a task, return the task's parent task.
-	 * @param taskId The task to return the parent of
+	 * 
+	 * @param taskId The task to return the parent of.
 	 * @return The ID of the task's parent, or NOT_FOUND if the task is at the root, or
 	 * BAD_VALUE if the task ID is invalid.
 	 */
@@ -406,8 +413,9 @@ public class BuildTasks {
 
 	/**
 	 * Return the path ID of the directory in which this task was executed.
-	 * @param taskId The ID of the task whose directory will be returned
-	 * @return The ID of the directory in which this task was executed
+	 * 
+	 * @param taskId The ID of the task.
+	 * @return The path ID of the directory in which this task was executed.
 	 */
 	public int getDirectory(int taskId) {
 		Integer [] intResults = null;
@@ -439,8 +447,9 @@ public class BuildTasks {
 
 	/**
 	 * Given the ID of task, return an array of the task's children (possibly empty).
+	 * 
 	 * @param taskId The task that is the parent of the children to be returned.
-	 * @return An array of child task Id (in no particular order). Or the empty array if there
+	 * @return An array of child task IDs (in no particular order). Or the empty array if there
 	 * are no children.
 	 */
 	public Integer [] getChildren(int taskId) {
@@ -459,7 +468,8 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the build task Id of the task with the associated root name
+	 * Return the build task ID of the task with the associated root name.
+	 * 
 	 * @param rootName The name of the root, which is attached to a task.
 	 * @return The root task's ID.
 	 */
@@ -473,10 +483,12 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @return The BuildStore object that owns this BuildTasks object
+	 * Return the BuildStore object that owns this BuildTasks object.
+	 *
+	 * @return The BuildStore object that owns this BuildTasks object.
 	 */
 	public BuildStore getBuildStore() {
-		return bs;
+		return buildStore;
 	}
 	
 	/*=====================================================================================*
@@ -486,7 +498,8 @@ public class BuildTasks {
 	/**
 	 * Helper function for translating from an ordinal integer to an OperationType. This is the
 	 * opposite of OperationType.ordinal().
-	 * @param opTypeNum The ordinal value of a OperationType value
+	 * 
+	 * @param opTypeNum The ordinal value of a OperationType value.
 	 * @return The corresponding OperationType value.
 	 * @throws FatalBuildStoreError if the ordinal value is out of range.
 	 */

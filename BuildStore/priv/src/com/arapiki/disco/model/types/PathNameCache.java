@@ -15,19 +15,22 @@ package com.arapiki.disco.model.types;
 import com.arapiki.utils.types.LRULinkedHashMap;
 
 /**
- * A FileNameCache is used as means of caching the most commonly used content
+ * A PathNameCache is used as means of caching the most commonly used content
  * in the "files" database table, rather than accessing the database every time
  * there's a need to get information. In particular, this cache stores the following
  * relationship:
- * 
- *   <parentFileId, childFileName> -> <childFileId, childFileType>
- * 
+ * <p>
+ *   &lt;parentPathId, childPathName&gt; maps to &lt;childPathId, childPathType&gt;
+ * <p>
+ * It's an extremely common operation to look up a child's path ID, given the
+ * parent's ID and the child's name, so this has to be optimized.
+ * <p>
  * An LRU algorithm is used so that only the most recent N mappings are kept (to
  * avoid endless growth of the cache).
  *
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FileNameCache {
+public class PathNameCache {
 	
 	/*=====================================================================================*
 	 * FIELDS
@@ -37,47 +40,50 @@ public class FileNameCache {
 	 * The customized HashMap that will automatically remove the least recently accessed
 	 * item once the cache fills up.
 	 */
-	private LRULinkedHashMap<FileNameCacheKey, FileNameCacheValue> map;
+	private LRULinkedHashMap<PathNameCacheKey, PathNameCacheValue> map;
 	
 	/*=====================================================================================*
 	 * NESTED CLASSES
 	 *=====================================================================================*/
 
 	/**
-	 * This nested class is used as the key value in the FileNameCache. It simply contains
-	 * the parent's file ID (int) and the child's file name (String). Given that it's used
+	 * This nested class is used as the "key" in the PathNameCache. It simply contains
+	 * the parent's path ID (int) and the child's path name (String). Given that it's used
 	 * as the key in a hash table, we need custom-written equals() and hashCode() methods.
 	 */
-	public class FileNameCacheKey {
+	public class PathNameCacheKey {
 		
-		/** The parent's file ID */
-		private int parentFileId;
+		/** The parent's path ID. */
+		private int parentPathId;
 		
-		/** The child's file name */
-		private String childFileName;
+		/** The child's path name. */
+		private String childPathName;
 		
 		/**
-		 * Create a new FileNameCacheKey object
-		 * @param parentFileId The parent's file ID
-		 * @param childFileName The child's file name
+		 * Create a new PathNameCacheKey object.
+		 * 
+		 * @param parentPathId The parent's path ID.
+		 * @param childPathName The child's path name.
 		 */
-		public FileNameCacheKey(int parentFileId, String childFileName) {
-			this.parentFileId = parentFileId;
-			this.childFileName = childFileName;
+		public PathNameCacheKey(int parentPathId, String childPathName) {
+			this.parentPathId = parentPathId;
+			this.childPathName = childPathName;
 		}
 
 		/**
-		 * @return the parentFileId
+		 * Return the parent's path ID.
+		 * @return The parent's path ID.
 		 */
-		public int getParentFileId() {
-			return parentFileId;
+		public int getParentPathId() {
+			return parentPathId;
 		}
 
 		/**
-		 * @return the childFileName
+		 * Return the child's path name.
+		 * @return The child's path name.
 		 */
-		public String getChildFileName() {
-			return childFileName;
+		public String getChildPathName() {
+			return childPathName;
 		}
 
 		/* (non-Javadoc)
@@ -85,11 +91,11 @@ public class FileNameCache {
 		 */
 		@Override
 		public boolean equals(Object obj) {
-			if (!(obj instanceof FileNameCacheKey)) {
+			if (!(obj instanceof PathNameCacheKey)) {
 				return false;
 			}
-			FileNameCacheKey keyObj = (FileNameCacheKey)obj;
-			return (parentFileId == keyObj.parentFileId) && (childFileName.equals(keyObj.childFileName));
+			PathNameCacheKey keyObj = (PathNameCacheKey)obj;
+			return (parentPathId == keyObj.parentPathId) && (childPathName.equals(keyObj.childPathName));
 		}
 
 		/* (non-Javadoc)
@@ -97,7 +103,7 @@ public class FileNameCache {
 		 */
 		@Override
 		public int hashCode() {
-			return parentFileId + childFileName.hashCode();
+			return parentPathId + childPathName.hashCode();
 		}
 	}
 	
@@ -105,36 +111,39 @@ public class FileNameCache {
 
 	/**
 	 * This nested class is used as the "value" of the cache. The value
-	 * is a pair consisting of <childFileId, childType>, which childType is
+	 * is a pair consisting of <childPathId, childType>, where childType is
 	 * the ordinal value of a FileNameSpaces.PathType value. 
 	 */
-	public class FileNameCacheValue {
+	public class PathNameCacheValue {
 		
-		/** The child's file ID */
-		private int childFileId;
+		/** The child's path ID. */
+		private int childPathId;
 		
 		/** The child's type (directory, file, etc). */
 		private int childType;
 
 		/**
-		 * Create a new FileNameCacheValue object.
-		 * @param childFileId The child's file ID
-		 * @param childType The child's type (directory, file, etc)
+		 * Create a new PathNameCacheValue object.
+		 * 
+		 * @param childPathId The child's path ID.
+		 * @param childType The child's type (directory, file, etc).
 		 */
-		public FileNameCacheValue(int childFileId, int childType) {
-			this.childFileId = childFileId;
+		public PathNameCacheValue(int childPathId, int childType) {
+			this.childPathId = childPathId;
 			this.childType = childType;
 		}
 
 		/**
-		 * @return the childFileId
+		 * Return the child's path ID.
+		 * @return The child's path ID.
 		 */
-		public int getChildFileId() {
-			return childFileId;
+		public int getChildPathId() {
+			return childPathId;
 		}
 
 		/**
-		 * @return the childType
+		 * Return the child's type.
+		 * @return The child's type.
 		 */
 		public int getChildType() {
 			return childType;
@@ -147,11 +156,12 @@ public class FileNameCache {
 	 *=====================================================================================*/
 
 	/**
-	 * Constructor for the FileNameCache class.
+	 * Constructor for the PathNameCache class.
+	 * 
 	 * @param maxSize the maximum number of items to hold in the cache.
 	 */
-	public FileNameCache(int maxSize) {
-		map = new LRULinkedHashMap<FileNameCacheKey, FileNameCacheValue>(maxSize);
+	public PathNameCache(int maxSize) {
+		map = new LRULinkedHashMap<PathNameCacheKey, PathNameCacheValue>(maxSize);
 	}
 	
 	/*=====================================================================================*
@@ -168,15 +178,16 @@ public class FileNameCache {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a parent File ID number and the child's file name look up the value in
+	 * Given a parent Path ID number and the child's path name look up the value in
 	 * the cache.
-	 * @param parentFileId The parent's file ID number (actually, a directory)
-	 * @param childFileName The name of the file within the parent's directory
-	 * @return a FileNameCacheValue object containing the cache mapping, or null if the mapping
-	 * isn't in the cache.
+	 * 
+	 * @param parentPathId The parent's path (directory) ID number.
+	 * @param childPathName The name of the path within the parent's directory
+	 * @return a PathNameCacheValue object containing the cache mapping, or null if
+	 * the mapping isn't in the cache.
 	 */
-	public FileNameCacheValue get(int parentFileId, String childFileName) {
-		FileNameCacheKey key = new FileNameCacheKey(parentFileId, childFileName);
+	public PathNameCacheValue get(int parentPathId, String childPathName) {
+		PathNameCacheKey key = new PathNameCacheKey(parentPathId, childPathName);
 		return map.get(key);		
 	}
 
@@ -184,15 +195,16 @@ public class FileNameCache {
 
 	/**
 	 * Add a new mapping to the cache.
-	 * @param parentFileId The parent's file ID (actually, a directory ID)
-	 * @param childFileName The name of the file within that parent's directory
-	 * @param childFileId The child's file ID to be used as the target of the mapping
+	 * 
+	 * @param parentPathId The parent's path ID (actually, a directory ID).
+	 * @param childPathName The name of the path within that parent's directory.
+	 * @param childPathId The child's path ID to be used as the target of the mapping.
 	 * @param childType What type is the child (file, directory, etc), to be used as
 	 * the target of the mapping.
 	 */
-	public void put(int parentFileId, String childFileName, int childFileId, int childType) {
-		FileNameCacheKey key = new FileNameCacheKey(parentFileId, childFileName);
-		FileNameCacheValue value = new FileNameCacheValue(childFileId, childType);
+	public void put(int parentPathId, String childPathName, int childPathId, int childType) {
+		PathNameCacheKey key = new PathNameCacheKey(parentPathId, childPathName);
+		PathNameCacheValue value = new PathNameCacheValue(childPathId, childType);
 		map.put(key, value);
 	}
 

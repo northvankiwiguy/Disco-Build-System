@@ -19,10 +19,14 @@ import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
- * The FileAttributes class manages the attributes that can be applied to each path in
- * a FileNameSpaces object. Each attribute must first be added to the system (by name),
- * which provides a unique ID number for each attribute. Attributes (and their int/string
- * values) can then be associated with paths.
+ * A manager class (that supports the BuildStore class) that manages all BuildStore
+ * information on which attributes are attached to the build system's files. 
+ * Each attribute must first be added to the system (by name), which provides a
+ * unique ID number for the attribute. Attributes (and their int/string values)
+ * can then be associated with paths.
+ * <p>
+ * There should be exactly one FileAttributes object per BuildStore object. Use the
+ * BuildStore's getFileAttributes() method to obtain that one instance.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -61,13 +65,15 @@ public class FileAttributes {
 
 	/**
 	 * Create a new FileAttributes object.
-	 * @param db The database manager who provides this object with database access
+	 * 
+	 * @param buildStore The BuildStore object that owns this FileAttributes object.
 	 * @param fns The FileNameSpaces object that these attributes are attached to
 	 */
-	public FileAttributes(BuildStoreDB db, FileNameSpaces fns) {
-		this.db = db;
+	public FileAttributes(BuildStore buildStore, FileNameSpaces fns) {
+		this.db = buildStore.getBuildStoreDB();
 		this.fileNameSpaces = fns;
 		
+		/* Prepare our database statements */
 		selectIdFromNamePrepStmt = db.prepareStatement("select id from fileAttrsName where name = ?");
 		selectNameFromIdPrepStmt = db.prepareStatement("select name from fileAttrsName where id = ?");
 		selectOrderedNamePrepStmt = db.prepareStatement("select name from fileAttrsName order by name");
@@ -90,11 +96,12 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Adds a new attribute name to the list of attributes that could possibly be associated
+	 * Add a new attribute name to the list of attributes that can be associated
 	 * with a path.
-	 * @param attrName The name of the new attribute
+	 * 
+	 * @param attrName The name of the new attribute.
 	 * @return The new attribute's ID number, or ALREADY_USED if this attribute name is
-	 * already in use. 
+	 * already in use.
 	 */
 	public int newAttrName(String attrName) {
 		
@@ -119,8 +126,9 @@ public class FileAttributes {
 
 	/**
 	 * For a given attribute name, return the corresponding ID number.
-	 * @param attrName The attribute's name
-	 * @return The attributes ID number, or NOT_FOUND if the attribute name isn't defined.
+	 * 
+	 * @param attrName The attribute's name.
+	 * @return The attribute's ID number, or NOT_FOUND if the attribute name isn't defined.
 	 */
 	public int getAttrIdFromName(String attrName) {
 		
@@ -150,7 +158,8 @@ public class FileAttributes {
 
 	/**
 	 * For a given attribute ID, return the corresponding attribute name.
-	 * @param attrId The attribute's ID number
+	 * 
+	 * @param attrId The attribute's ID number.
 	 * @return The attributes name, or null if the attribute name isn't defined.
 	 */
 	public String getAttrNameFromId(int attrId) {
@@ -180,7 +189,8 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return a list of all attribute names.
+	 * Return an array of all attribute names.
+	 * 
 	 * @return A String array of attribute names. The names will be returned in 
 	 * alphabetical order.
 	 */
@@ -192,9 +202,10 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Remove the attribute's name from the list of attributes that could possibly be associated
-	 * with a path.
-	 * @param attrName The name of the attribute to be removed
+	 * Remove the attribute's name from the list of attributes that can be associated
+	 * with a path. An attribute can only be removed if it's no longer in use.
+	 * 
+	 * @param attrName The name of the attribute to be removed.
 	 * @return OK on successful deletion, NOT_FOUND if the attribute name doesn't exist, or
 	 * CANT_REMOVE if there are files still making use of this attribute.
 	 */
@@ -241,9 +252,10 @@ public class FileAttributes {
 	 * value (attrValue). Note that for performance reasons, there's no error checking on
 	 * the pathId and attrId values - Any integer values are acceptable, and could potentially
 	 * overwrite the existing value of this attribute for this path.
+	 * 
 	 * @param pathId The path to attach the attribute to.
 	 * @param attrId The attribute to be set
-	 * @param attrValue The String value to set the attribute to
+	 * @param attrValue The String value to set the attribute to.
 	 */
 	public void setAttr(int pathId, int attrId, String attrValue) {
 
@@ -280,11 +292,12 @@ public class FileAttributes {
 	/**
 	 * For the specific path (pathId), set the attribute (attrId) to the specified integer
 	 * value (attrValue). Note that for performance reasons, there's no error checking on
-	 * the pathId and attrId values - Any integer values are acceptable, and could potential
+	 * the pathId and attrId values - Any integer values are acceptable, and could potentially
 	 * overwrite the existing value of this attribute for this path.
-	 * @param pathId The path to attach the attribute to
-	 * @param attrId The attribute to be set
-	 * @param attrValue The integer value to set the attribute to
+	 * 
+	 * @param pathId The path to attach the attribute to.
+	 * @param attrId The attribute to be set.
+	 * @param attrValue The integer value to set the attribute to.
 	 * @return OK if the attribute was added successfully, or BAD_VALUE if the integer
 	 * is not valid (i.e. not >= 0).
 	 */
@@ -301,9 +314,10 @@ public class FileAttributes {
 
 	/**
 	 * Fetch the specified attribute value from the specified path, returning it as a String.
-	 * @param pathId The path on which the attribute is attached
-	 * @param attrId The attribute whose value we want to fetch
-	 * @return The attributes String value, or null if the attribute isn't set on this path
+	 * 
+	 * @param pathId The path on which the attribute is attached.
+	 * @param attrId The attribute whose value we want to fetch.
+	 * @return The attributes String value, or null if the attribute isn't set on this path.
 	 */
 	public String getAttrAsString(int pathId, int attrId) {
 		String results[];
@@ -334,8 +348,9 @@ public class FileAttributes {
 
 	/**
 	 * Fetch the specified attribute value from the specified path, returning it as an int.
-	 * @param pathId The path on which the attribute is attached
-	 * @param attrId The attribute whose value we want to fetch
+	 * 
+	 * @param pathId The path on which the attribute is attached.
+	 * @param attrId The attribute whose value we want to fetch.
 	 * @return The attributes positive integer value, BAD_VALUE if the attribute's
 	 * value isn't a positive integer, or NOT_FOUND if the attribute wasn't set.
 	 */
@@ -373,8 +388,9 @@ public class FileAttributes {
 	 * path (pathId). For performance reasons, no error checking is done to validate
 	 * the path or attribute values. This method succeeds regardless of whether the
 	 * attribute is set or not.
-	 * @param pathId The path on which the attribute is attached
-	 * @param attrId The attribute to be removed
+	 * 
+	 * @param pathId The path on which the attribute is attached.
+	 * @param attrId The attribute to be removed.
 	 */
 	public void deleteAttr(int pathId, int attrId) {
 		
@@ -392,9 +408,10 @@ public class FileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a file path ID, return an array of attributes that are attached to that file.
-	 * @param pathId The ID of the path the attributes are attached to
-	 * @return An Integer [] array of all attributes attached to this path
+	 * Given a path ID, return an array of attributes that are attached to that path.
+	 * 
+	 * @param pathId The ID of the path the attributes are attached to.
+	 * @return An Integer [] array of all attributes attached to this path.
 	 */
 	public Integer[] getAttrsOnPath(int pathId) {
 
@@ -413,8 +430,9 @@ public class FileAttributes {
 
 	/**
 	 * Return the FileSet containing all paths that have the attribute set (to any value).
-	 * @param attrId The attribute to test for
-	 * @return The FileSet of all files that have this attribute set
+	 * 
+	 * @param attrId The attribute to test for.
+	 * @return The FileSet of all files that have this attribute set.
 	 */
 	public FileSet getPathsWithAttr(int attrId) {
 
@@ -434,9 +452,10 @@ public class FileAttributes {
 	/**
 	 * Return the FileSet of all paths that have the specified attribute set to the
 	 * specified String value.
-	 * @param attrId The attribute to test for
-	 * @param value The value to compare against
-	 * @return The FileSet of all files that have this attribute set to the specified value
+	 * 
+	 * @param attrId The attribute to test for.
+	 * @param value The value to compare against.
+	 * @return The FileSet of all files that have this attribute set to the specified value.
 	 */
 	public FileSet getPathsWithAttr(int attrId, String value) {
 
@@ -457,9 +476,10 @@ public class FileAttributes {
 	/**
 	 * Return the FileSet of all paths that have the specified attribute set to the
 	 * specified Integer value.
-	 * @param attrId The attribute to test for
-	 * @param value The value to compare against
-	 * @return The FileSet of all files that have this attribute set to the specified value
+	 * 
+	 * @param attrId The attribute to test for.
+	 * @param value The value to compare against.
+	 * @return The FileSet of all files that have this attribute set to the specified value.
 	 */
 	public FileSet getPathsWithAttr(int attrId, int value) {
 		return getPathsWithAttr(attrId, String.valueOf(value));

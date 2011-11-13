@@ -71,7 +71,7 @@ public class TestFileNameSpaces {
 		
 		/* check that a new path starts out as missing */
 		int missingPath = bsfs.getChildOfPath(rootPath, "apple");
-		assertEquals(-1, missingPath);
+		assertEquals(ErrorCode.NOT_FOUND, missingPath);
 		
 		/* now add the path, and make sure it's no longer missing */
 		int newPath = bsfs.addChildOfPath(rootPath, PathType.TYPE_DIR, "apple");
@@ -83,7 +83,7 @@ public class TestFileNameSpaces {
 		
 		/* let's add a sub-path, but at first it's considered missing */
 		int missingSubPath = bsfs.getChildOfPath(newPath, "banana");
-		assertEquals(-1, missingSubPath);
+		assertEquals(ErrorCode.NOT_FOUND, missingSubPath);
 		
 		/* now add the sub-path, and make sure it's no longer missing */
 		int newSubPath = bsfs.addChildOfPath(newPath, PathType.TYPE_DIR, "banana");
@@ -96,8 +96,8 @@ public class TestFileNameSpaces {
 		/* ensure that similar names aren't matched by mistake */
 		int badMatch1 = bsfs.getChildOfPath(rootPath, "banan");
 		int badMatch2 = bsfs.getChildOfPath(rootPath, "banana!");
-		assertEquals(-1, badMatch1);
-		assertEquals(-1, badMatch2);
+		assertEquals(ErrorCode.NOT_FOUND, badMatch1);
+		assertEquals(ErrorCode.NOT_FOUND, badMatch2);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -15,13 +15,11 @@ package com.arapiki.disco.model.types;
 import com.arapiki.utils.types.IntegerTreeRecord;
 
 /**
- * This class is used when returning results from a report query, provided by methods 
- * in the Reports class. Each report returns 0 or more of these objects, either as an array
- * or within a TaskSet. The set of TaskRecord fields that are filled out by the report
- * depends on the nature of the report.
+ * This class contains a summary of a single build task. TaskRecord is used as the element
+ * type in a TaskSet, as well as other methods that return information about a collection
+ * of tasks.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class TaskRecord extends IntegerTreeRecord {
 
@@ -30,8 +28,9 @@ public class TaskRecord extends IntegerTreeRecord {
 	 *=====================================================================================*/
 	
 	/**
-	 * Create a new instance of TaskRecord, with the id field set
-	 * @param id The ID number of this TaskRecord
+	 * Create a new instance of TaskRecord, with the id field set.
+	 * 
+	 * @param id The ID number of this TaskRecord.
 	 */
 	public TaskRecord(int id) {
 		super();

@@ -21,12 +21,22 @@ import com.arapiki.disco.model.types.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
- * Class for recording the "component" names in the BuildStore database. A component's name
- * is simply a text identifier that maps to underlying numeric ID. These IDs are then 
- * associated with files and tasks. Each component is associated with a number of pre-defined
- * sections, such as "private" and "public". That is, if a file or task is associated with
- * component "foo", the file/task will either belong to the foo/private section, or the
+ * A manager class (that supports the BuildStore class) that manages all BuildStore
+ * information relating to component definitions. That is, it keeps information on
+ * which files and tasks belong in each component.
+ * <p>
+ * A component's name is simply a text identifier that maps to underlying numeric ID.
+ * These IDs are then associated with files and tasks as a means of grouping them
+ * together into logical units.
+ * <p>
+ * In the case of files, a component is also associated with a section within that
+ * component, such as "private" and "public". That is, if a file is associated
+ * with component "foo", the file will either belong to the foo/private section, or the
  * foo/public section.
+ * <p>
+ * Note: tasks can only belong to the component as a whole, rather than belonging to
+ * an individual section within that component. 
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class Components {
@@ -35,9 +45,7 @@ public class Components {
 	 * FIELDS
 	 *=====================================================================================*/
 	
-	/**
-	 * The BuildStore object that "owns" this Components object.
-	 */
+	/** The BuildStore object that "owns" this Components object. */
 	private BuildStore buildStore;
 	
 	/**
@@ -46,14 +54,10 @@ public class Components {
 	 */
 	private BuildStoreDB db = null;
 	
-	/**
-	 * The FileNameSpaces object used to managed the files in this component
-	 */
+	/** The FileNameSpaces object that manages the files in our components. */
 	private FileNameSpaces fns = null;
 	
-	/**
-	 * The BuildTasks object used to managed the files in this component
-	 */
+	/** The BuildTasks object that manages the tasks in our components. */
 	private BuildTasks bts = null;
 	
 	/**
@@ -89,10 +93,11 @@ public class Components {
 	/**
 	 * Create a new Components object, which represents the file/task components that
 	 * are part of the BuildStore.
-	 * @param bs The BuildStore that this Component object belongs to.
+	 * 
+	 * @param buildStore The BuildStore that this Component object belongs to.
 	 */
-	public Components(BuildStore bs) {
-		this.buildStore = bs;
+	public Components(BuildStore buildStore) {
+		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 		this.fns = buildStore.getFileNameSpaces();
 		this.bts = buildStore.getBuildTasks();
@@ -128,6 +133,7 @@ public class Components {
 	
 	/**
 	 * Add a new component to the BuildStore.
+	 * 
 	 * @param componentName The name of the new component to be added.
 	 * @return The component's ID if the addition was successful, ErrorCode.INVALID_NAME
 	 * if the component's name isn't valid, or ErrorCode.ALREADY_USED if the component 
@@ -161,7 +167,8 @@ public class Components {
 
 	/**
 	 * Given a component's ID number, return the component's name.
-	 * @param componentId The component's ID number
+	 * 
+	 * @param componentId The component's ID number.
 	 * @return The component's name, or null if the component ID is invalid.
 	 */
 	public String getComponentName(int componentId) {
@@ -195,8 +202,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a component's name, return it's ID number.
-	 * @param componentName The component's name
+	 * Given a component's name, return its ID number.
+	 * 
+	 * @param componentName The component's name.
 	 * @return The component's ID number, ErrorCode.NOT_FOUND if there's no component
 	 * with this name.
 	 */
@@ -233,6 +241,7 @@ public class Components {
 	/**
 	 * Remove the specified component from the BuildStore. The component can only be removed
 	 * if there are no files or tasks associated with the component.
+	 * 
 	 * @param componentName The name of the component to be removed.
 	 * @return ErrorCode.OK if the component was successfully removed, ErrorCode.CANT_REMOVE
 	 * if the component is still in use, and ErrorCode.NOT_FOUND if there's no component
@@ -277,8 +286,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Return an alphabetically sorted list of all the components. The case (upper versus
+	 * Return an alphabetically sorted array of all the components. The case (upper versus
 	 * lower) is ignored when sorting the results.
+	 * 
 	 * @return A non-empty array of component names (will always contain the "None" component).
 	 */
 	public String[] getComponents() {
@@ -291,7 +301,8 @@ public class Components {
 
 	/**
 	 * Given a section's ID number, return the corresponding section name.
-	 * @param id The section's ID number
+	 * 
+	 * @param id The section's ID number.
 	 * @return The section's name, or null if the ID number is invalid.
 	 */
 	public String getSectionName(int id) {
@@ -312,10 +323,11 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a section's name, return it's ID number. There can be many names for the same
+	 * Given a section's name, return its ID number. There can be many names for the same
 	 * section, so there isn't a 1:1 mapping of names to IDs. For example, both "private" and
 	 * "priv" will return the same ID number.
-	 * @param name The section's name
+	 * 
+	 * @param name The section's name.
 	 * @return The section's ID number, or ErrorCode.NOT_FOUND if the section name isn't valid.
 	 */
 	public int getSectionId(String name) {
@@ -338,6 +350,7 @@ public class Components {
 	/**
 	 * Return all the section names. If there are multiple names for the same section, only
 	 * one of them is returned.
+	 * 
 	 * @return A String array of the section names, in alphabetical order.
 	 */
 	public String[] getSections() {
@@ -350,14 +363,17 @@ public class Components {
 	 * Parse a component specification string, and return the ID of the component and
 	 * (optionally) the ID of the section within that component. The syntax of the component
 	 * spec must be of the form:
-	 * 		1) <comp-name>
-	 * 		2) <comp-name>/<section-name>
+	 *  <ol>
+	 * 	  <li>&lt;comp-name&gt;</li>
+	 * 	  <li>&lt;comp-name&gt;/&lt;section-name&gt;</li>
+	 *  </ol>
 	 * That is, the section name is optional.
-	 * @param compSpec The component specification string
+	 * 
+	 * @param compSpec The component specification string.
 	 * @return An Integer[2] array, where [0] is the component's ID and [1] is the section
 	 * ID. If either portion of the compSpec was invalid (not a registered component or section),
-	 * the ID will be ErrorCode.NOT_FOUND. If there was no section name specified, the section ID
-	 * will be 0, which represents the "None" section.
+	 * the ID for that portion will be ErrorCode.NOT_FOUND. If there was no section name
+	 * specified, the section ID will be 0, which represents the "None" section.
 	 */
 	public Integer[] parseCompSpec(String compSpec) {
 
@@ -390,9 +406,10 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set the component/section associated with this file.
-	 * @param fileId The ID of the file whose component will be set
-	 * @param compId The ID of the component to be associated with this file
+	 * Set the component/section associated with this path.
+	 * 
+	 * @param fileId The ID of the file whose component will be set.
+	 * @param compId The ID of the component to be associated with this file.
 	 * @param compSectionId The ID of the component's section.
 	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this file doesn't exist
 	 */
@@ -416,8 +433,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Get the component/section associated with this file.
-	 * @param fileId The ID of the file whose component we're interested in
+	 * Get the component/section associated with this path.
+	 * 
+	 * @param fileId The ID of the path whose component we're interested in
 	 * @return A Integer[2] array where [0] is the component ID, and [1] is the section ID,
 	 * or null if the file doesn't exist.
 	 */
@@ -447,7 +465,8 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of files that are within the specified component.
+	 * Return the set of files that are within the specified component (any section).
+	 * 
 	 * @param compId The ID of the component we're examining.
 	 * @return The set of files that reside inside that component.
 	 */
@@ -468,8 +487,9 @@ public class Components {
 
 	/**
 	 * Return the set of files that are within the specified component/section.
-	 * @param compId The ID of the component we're examining
-	 * @param compSectionId The section within the component we're interested in
+	 * 
+	 * @param compId The ID of the component we're examining.
+	 * @param compSectionId The section within the component we're interested in.
 	 * @return The set of files that reside inside that component/section.
 	 */
 	public FileSet getFilesInComponent(int compId, int compSectionId) {
@@ -490,9 +510,10 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of files that are within the specified component/section. This method
-	 * takes a string specification of the component/section.
-	 * @param compSpec - The component name, or the component/section name
+	 * Return the set of files that are within the specified component/section, given a
+	 * string specification of the component/section.
+	 * 
+	 * @param compSpec The component name, or the component/section name.
 	 * @return The FileSet of all files in this component or component/section, or null if
 	 * there's a an error in parsing the comp/spec name.
 	 */
@@ -524,7 +545,8 @@ public class Components {
 
 	/**
 	 * Return the set of files that are outside the specified component.
-	 * @param compId The ID of the component we're examining
+	 * 
+	 * @param compId The ID of the component we're examining.
 	 * @return The set of files that reside outside that component.
 	 */
 	public FileSet getFilesOutsideComponent(int compId) {
@@ -544,8 +566,9 @@ public class Components {
 
 	/**
 	 * Return the set of files that are outside the specified component/section.
-	 * @param compId The ID of the component we're examining
-	 * @param compSectionId The ID of the section within the component we're interested in
+	 * 
+	 * @param compId The ID of the component we're examining.
+	 * @param compSectionId The ID of the section within the component we're interested in.
 	 * @return The set of files that reside outside that component/section.
 	 */
 	public FileSet getFilesOutsideComponent(int compId, int compSectionId) {
@@ -565,8 +588,10 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Returns the set of files that fall outside of the component boundaries.
-	 * @param compSpec The component name, or the component/section name
+	 * Returns the set of files that fall outside of the component boundaries, using a string
+	 * to specify the component/section.
+	 * 
+	 * @param compSpec The component name, or the component/section name.
 	 * @return The FileSet of all files outside of this component or component/section, or null if
 	 * there's a an error in parsing the comp/spec name.
 	 */
@@ -596,9 +621,10 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set the component/section associated with this task.
-	 * @param taskId The ID of the task whose component will be set
-	 * @param compId The ID of the component to be associated with this task
+	 * Set the component associated with this task.
+	 * 
+	 * @param taskId The ID of the task whose component will be set.
+	 * @param compId The ID of the component to be associated with this task.
 	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this task doesn't exist
 	 */
 	public int setTaskComponent(int taskId, int compId) {
@@ -620,9 +646,10 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Get the component/section associated with this task.
-	 * @param taskId The ID of the task whose component we're interested in
-	 * @return The task's component, or ErrorCode.NOT_FOUND if the task doesn't exist
+	 * Get the component associated with this task.
+	 * 
+	 * @param taskId The ID of the task whose component we're interested in.
+	 * @return The task's component, or ErrorCode.NOT_FOUND if the task doesn't exist.
 	 */
 	public int getTaskComponent(int taskId) {
 		
@@ -649,8 +676,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of tasks that are within the specified component.
-	 * @param compId The component we're examining
+	 * Return the set of tasks that are within the specified component.
+	 * 
+	 * @param compId The component we're examining.
 	 * @return The set of tasks that reside inside that component.
 	 */
 	public TaskSet getTasksInComponent(int compId) {
@@ -667,8 +695,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of tasks that are within the specified component.
-	 * @param compSpec The name of the component to query
+	 * Return the set of tasks that are within the specified component.
+	 * 
+	 * @param compSpec The name of the component to query.
 	 * @return The set of tasks that reside inside that component, null if the
 	 * component name is invalid.
 	 */
@@ -686,8 +715,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of tasks that are outside the specified component.
-	 * @param compId The component we're examining
+	 * Return the set of tasks that are outside the specified component.
+	 * 
+	 * @param compId The component we're examining.
 	 * @return The set of tasks that reside outside that component.
 	 */
 	public TaskSet getTasksOutsideComponent(int compId) {
@@ -704,8 +734,9 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the list of tasks that are outside the specified component.
-	 * @param compSpec The name of the component to query
+	 * Return the set of tasks that are outside the specified component.
+	 * 
+	 * @param compSpec The name of the component to query.
 	 * @return An array of tasks that reside outside that component, null if the
 	 * component name is invalid.
 	 */
@@ -728,8 +759,9 @@ public class Components {
 	 * Validate a component's name. Valid characters are digits, letters (upper or lower case),
 	 * '-' and '_'. No other characters are permitted. Component names must contain at least
 	 * three characters and start with a letter.
-	 * @param componentName The component name to be validated
-	 * @return True if the name is valid, else false
+	 * 
+	 * @param componentName The component name to be validated.
+	 * @return True if the name is valid, else false.
 	 */
 	private boolean isValidName(String componentName) {
 		

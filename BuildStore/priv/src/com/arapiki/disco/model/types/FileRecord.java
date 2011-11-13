@@ -15,11 +15,13 @@ package com.arapiki.disco.model.types;
 import com.arapiki.utils.types.IntegerTreeRecord;
 
 /**
- * This class is used when returning results from a report query, provided by methods 
- * in the Reports class. Each report returns 0 or more of these objects, either as an array
- * or within a FileSet. The set of FileRecord fields that are filled out by the report
- * depends on the nature of the report. For example, if the 'size' field isn't provided
- * by the report, it's left empty.
+ * This class contains a summary of a single path with the BuildStore. FileRecord is 
+ * used as the element type in a FileSet, as well as other "report" methods that return 
+ * information about a collection of files.
+ *
+ * The set of FileRecord fields that are filled out by the report depends on the nature
+ * of the report. For example, if the 'size' field isn't provided by the report, it's
+ * left empty.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -56,7 +58,8 @@ public class FileRecord extends IntegerTreeRecord {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Create a new instance of FileRecord, with the id field set
+	 * Create a new instance of FileRecord, with the id field set.
+	 * 
 	 * @param id The ID number of this FileRecord
 	 */
 	public FileRecord(int id) {
@@ -69,7 +72,8 @@ public class FileRecord extends IntegerTreeRecord {
 	 *=====================================================================================*/
 
 	/**
-	 * @return the count
+	 * Return the count field.
+	 * @return The count field.
 	 */
 	public int getCount() {
 		return count;
@@ -78,7 +82,9 @@ public class FileRecord extends IntegerTreeRecord {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @param count the count to set
+	 * Set the count field.
+	 * 
+	 * @param count The count value to set.
 	 */
 	public void setCount(int count) {
 		this.count = count;
@@ -87,7 +93,8 @@ public class FileRecord extends IntegerTreeRecord {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @return the size
+	 * Return the size field.
+	 * @return The size value.
 	 */
 	public int getSize() {
 		return size;
@@ -96,7 +103,8 @@ public class FileRecord extends IntegerTreeRecord {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @param size the size to set
+	 * Set the size field.
+	 * @param size The size value to set.
 	 */
 	public void setSize(int size) {
 		this.size = size;
