@@ -16,9 +16,11 @@ import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.types.IntegerTreeSet;
 
 /**
- * Implements an unordered set of FileRecord objects. This is used as the return
- * value from any method in the Reports class where the order of the returned values
- * is irrelevant (otherwise a FileRecord[] is used).
+ * Implements an unordered set of FileRecord objects. This is used in numerous places
+ * where a set of files must be passed as a single data value.
+ * 
+ * The FileSet data type is different from a regular set, since the parent/child
+ * relationship between entries is maintained.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -29,8 +31,7 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 *=====================================================================================*/
 
 	/**
-	 * The FileNameSpaces object that contains the files referenced in this FileSet
-	 * object.
+	 * The FileNameSpaces manager object containing the files referenced in this FileSet.
 	 */
 	private FileNameSpaces fns;
 
@@ -39,8 +40,9 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 *=====================================================================================*/
 
 	/**
-	 * Constructor - creates a new FileSet and initializes it to being empty.
-	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet
+	 * Creates a new FileSet and initializes it to empty.
+	 * 
+	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet.
 	 */	
 	public FileSet(FileNameSpaces fns) {
 		
@@ -54,9 +56,10 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Constructor - creates a new FileSet and initializes it from an array of pathId values
-	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet
-	 * @param paths The IDs of the paths to be added to the FileSet
+	 * Creates a new FileSet and initializes it from an array of path ID values.
+	 * 
+	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet.
+	 * @param paths The IDs of the paths to be added to the FileSet.
 	 */
 	public FileSet(FileNameSpaces fns, Integer paths[]) {
 		
@@ -75,15 +78,19 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 *=====================================================================================*/
 
 	/**
-	 * Given zero or more textual path names, populate the FileSet with the relevant files. 
+	 * Given zero or more text-based path name specifications, populate the FileSet with
+	 * the relevant files. 
+	 * 
 	 * @param pathArgs Each pathArg String can be one of the following:
-	 *    1) An absolute path name (starting with /), either a directory name or a file name. If the
-	 *       path is a directory, add all files and directories below that point in the tree.
-	 *    2) A path name starting with a root: - the same rules apply as for #1
-	 *    3) A single file name, with one or more wildcard (*) characters. All files that match
-     *       the name are added, no matter what their directory.
-     *    4) A component spec, starting with %comp, or the complement of a component, starting 
-     *       with %not-comp.
+	 *  <ol>
+	 *    <li>An absolute path name (starting with /), either a directory name or a file name. If the
+	 *       path is a directory, all files and directories below that point in the tree are added.</li>
+	 *    <li>A path name starting with a root: - the same rules apply as for #1.</li>
+	 *    <li>A single file name, with one or more wildcard (*) characters. All files that match
+     *       the name are added, no matter what their directory.</li>
+     *    <li>A component spec, starting with %comp, or the complement of a component, starting 
+     *       with %not-comp.</li>
+     *  </ol>
 	 * @return ErrorCode.OK on success, or ErrorCode.BAD_PATH if an invalid path name was
 	 * provided.
 	 */
@@ -174,7 +181,8 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 
 	/**
 	 * Merge the content of a second FileSet into this FileSet.
-	 * @param second The second FileSet
+	 * 
+	 * @param second The second FileSet.
 	 */
 	public void mergeSet(FileSet second) {
 		
@@ -187,8 +195,11 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#getParent(int)
+	/**
+	 * Given a path ID, return the ID of that path's parent.
+	 * 
+	 * @param id The ID of the path whose parent we wish to determine.
+	 * @return The ID of the path's parent.
 	 */
 	@Override
 	public int getParent(int id) {
@@ -197,8 +208,11 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#newRecord(int)
+	/**
+	 * Create a new FileRecord object, which can be used as an entry in the FileSet.
+	 * 
+	 * @param id The ID to assign to the new object.
+	 * @return A new FileRecord object.
 	 */
 	@Override
 	public FileRecord newRecord(int id) {
@@ -212,6 +226,7 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	/**
 	 * Helper function for populateWithPaths. Recursively add a path and its children to 
 	 * this FileSet.
+	 * 
 	 * @param pathId The ID of the path to be added.
 	 */
 	private void populateWithPathsHelper(int pathId) {

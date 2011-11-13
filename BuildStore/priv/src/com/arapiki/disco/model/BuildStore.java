@@ -16,7 +16,15 @@ import java.io.FileNotFoundException;
 
 
 /**
- * Represents a full Disco build system.
+ * A BuildStore object is the main class that implements a Disco build system. By creating
+ * a new BuildStore object, we create all the necessary data structures and databases
+ * to store an entire Disco build.
+ * 
+ * Note that although BuildStore is the main entry point, most of the work is done by
+ * its delegate classes, such as FileNameSpaces, BuildTasks etc. These "Managers" each deal
+ * with a specific part of the build system, providing business logic and database access
+ * to implement features.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class BuildStore {
@@ -25,25 +33,28 @@ public class BuildStore {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
-	/** The BuildStoreDB object that manages our DB access */
+	/** 
+	 * The BuildStoreDB manager object that manages our connection to the underlying
+	 * database.
+	 */
 	private BuildStoreDB db;
 	
-	/** The FileNameSpaces manager object we'll delegate work to */
+	/** The FileNameSpaces manager object we'll delegate work to. */
 	private FileNameSpaces fileSpaces;
 
-	/** The FileIncludes manager object we'll delegate work to */
+	/** The FileIncludes manager object we'll delegate work to. */
 	private FileIncludes fileIncludes;
 
-	/** The BuildTasks manager object we'll delegate work to */
+	/** The BuildTasks manager object we'll delegate work to. */
 	private BuildTasks buildTasks;
 	
-	/** The Reports manager object we'll delegate work to */
+	/** The Reports manager object we'll delegate work to. */
 	private Reports reports;
 	
-	/** The FileAttributes object we'll delegate work to */
+	/** The FileAttributes object we'll delegate work to. */
 	private FileAttributes fileAttributes;
 	
-	/** The Components manager object we'll delegate work to */
+	/** The Components manager object we'll delegate work to. */
 	private Components components;
 	
 	/*=====================================================================================*
@@ -55,8 +66,8 @@ public class BuildStore {
 	 * exists, open it for updating. If there's no database by this name,
 	 * create a fresh database.
 	 * 
-	 * @param buildStoreName Name of the database to open or create
-	 * @throws FileNotFoundException The database file can't be found, or isn't writable
+	 * @param buildStoreName Name of the database to open or create.
+	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
 	 */
 	public BuildStore(String buildStoreName) throws FileNotFoundException {
 		
@@ -94,7 +105,8 @@ public class BuildStore {
 	 *=====================================================================================*/
 	
 	/**
-	 * Return the database's schema version.
+	 * Return the Disco database's schema version.
+	 * 
 	 * @return The schema version as an integer, or 0 if there's no schema in place.
 	 */
 	public int getBuildStoreVersion() {
@@ -104,9 +116,10 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the FileNamesSpaces object associated with this BuildStore. This object
+	 * Fetch the FileNamesSpaces manager associated with this BuildStore. This object
 	 * encapsulates all knowledge about files/directories within the build system.
-	 * @return A FileNameSpaces object
+	 * 
+	 * @return A FileNameSpaces manager object.
 	 */
 	public FileNameSpaces getFileNameSpaces() {
 		return fileSpaces;
@@ -115,10 +128,11 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the FileIncludes object associated with this BuildStore. This object
+	 * Fetch the FileIncludes manager associated with this BuildStore. This object
 	 * encapsulates knowledge of which source files textually include which other
 	 * source files.
-	 * @return A FileIncludes object
+	 * 
+	 * @return A FileIncludes manager object.
 	 */
 	public FileIncludes getFileIncludes() {
 		return fileIncludes;
@@ -127,9 +141,10 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the BuildTasks object associated with this BuildStore. This object
-	 * contains a list of all build tasks.
-	 * @return A BuildTasks object.
+	 * Fetch the BuildTasks manager associated with this BuildStore. This object
+	 * contains information about all build tasks.
+	 * 
+	 * @return A BuildTasks manager object.
 	 */
 	public BuildTasks getBuildTasks() {
 		return buildTasks;
@@ -138,9 +153,10 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the Reports object associated with this BuildStore. This object
-	 * contains methods for generating 
-	 * @return A BuildTasks object.
+	 * Fetch the Reports manager associated with this BuildStore. This object
+	 * contains methods for generating summary reports from the Disco database.
+	 *  
+	 * @return A Reports manager object.
 	 */
 	public Reports getReports() {
 		return reports;
@@ -149,10 +165,11 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the FileAttributes object associated with this BuildStore. This object
+	 * Fetch the FileAttributes manager associated with this BuildStore. This object
 	 * encapsulates knowledge of which attributes are attached to the paths in
 	 * our FileNameSpaces object.
-	 * @return A FileAttributes object
+	 * 
+	 * @return A FileAttributes manager object.
 	 */
 	public FileAttributes getFileAttributes() {
 		return fileAttributes;
@@ -161,10 +178,10 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the Components object associated with this BuildStore. This object
-	 * encapsulates knowledge of which component names (and their IDs) are stored
-	 * in the BuildStore
-	 * @return A Components object
+	 * Fetch the Components manager associated with this BuildStore. This object
+	 * encapsulates knowledge of the component names used in the BuildStore.
+	 * 
+	 * @return A Components manager object.
 	 */
 	public Components getComponents() {
 		return components;
@@ -176,6 +193,7 @@ public class BuildStore {
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
 	 * changes are written to the disk. Only use fast access for "large write" operations.
+	 * 
 	 * @param fast Set to true to enable fast access, or false for safe access.
 	 */
 	public void setFastAccessMode(boolean fast) {
@@ -209,7 +227,8 @@ public class BuildStore {
 	/**
 	 * Fetch a reference to this BuildStore's underlying database. This is a package-scope
 	 * method to be used only by delegate classes (such as FileNameSpaces).
-	 * @return Reference to this BuildStore's underlying database
+	 * 
+	 * @return Reference to this BuildStore's underlying database.
 	 */
 	/* package */ BuildStoreDB getBuildStoreDB() {
 		return db;

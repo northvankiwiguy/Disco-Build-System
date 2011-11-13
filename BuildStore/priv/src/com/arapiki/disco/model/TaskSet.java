@@ -16,9 +16,11 @@ import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.types.IntegerTreeSet;
 
 /**
- * Implements an unordered set of TaskRecord objects. This is used as the return
- * value from any method in the Reports class where the order of the returned values
- * is irrelevant.
+ * Implements an unordered set of TaskRecord objects. This is used in numerous places
+ * where a collection of Tasks must be grouped together into a single unit.
+ * 
+ * The TaskSet data type is different from a regular set, since the parent/child
+ * relationship between entries is maintained.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -29,8 +31,7 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 *=====================================================================================*/
 
 	/**
-	 * The BuildTasks object that contains the tasks referenced in this TaskSet
-	 * object.
+	 * The BuildTasks manager object that contains the tasks referenced in this TaskSet.
 	 */
 	private BuildTasks bts;
 
@@ -39,8 +40,9 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 *=====================================================================================*/
 
 	/**
-	 * Constructor - creates a new TaskSet and initializes it to being empty.
-	 * @param bts The BuildTasks object that contains the tasks in this set
+	 * Creates a new TaskSet and initializes it to being empty.
+	 * 
+	 * @param bts The BuildTasks manager object that owns the tasks in this set.
 	 */	
 	public TaskSet(BuildTasks bts) {
 		
@@ -54,9 +56,10 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Constructor - creates a new TaskSet and initializes it from an array of integer values.
-	 * @param bts The BuildTasks object that contains the tasks in this set
-	 * @param initValues The initial values to be added to the task set
+	 * Creates a new TaskSet and initializes it from an array of integer values.
+	 * 
+	 * @param bts The BuildTasks manager object that owns the tasks in this set.
+	 * @param initValues The initial values to be added to the task set.
 	 */
 	public TaskSet(BuildTasks bts, Integer[] initValues) {
 
@@ -72,13 +75,15 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 		}
 	}
 
-
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
-	/* (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#getParent(int)
+	/**
+	 * Given a task's ID, return the ID of the task's parent.
+	 * 
+	 *  @param id The ID of the task whose parent we're interested in.
+	 *  @return The ID of the task's parent.
 	 */
 	@Override
 	public int getParent(int id) {
@@ -94,8 +99,11 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.arapiki.utils.types.IntegerTreeSet#newRecord(int)
+	/**
+	 * Create a new TaskRecord object, which can be used as an entry in the TaskSet.
+	 * 
+	 * @param id The ID to assign to the new object.
+	 * @return A new TaskRecord object.
 	 */
 	@Override
 	public TaskRecord newRecord(int id) {
@@ -106,7 +114,8 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	
 	/**
 	 * Merge the content of a second TaskSet into this TaskSet.
-	 * @param second The second TaskSet
+	 * 
+	 * @param second The second TaskSet.
 	 */
 	public void mergeSet(TaskSet second) {
 		
@@ -123,18 +132,21 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 * Given the String-formatted specification of a set of tasks, populate this TaskSet
 	 * with those task values. A task specification has the format: {[-]taskNum[/[depth]]}
 	 * That is, we use the following syntax rules:
-	 *   - A task specification can have zero or more entries
-	 *   - Each entry contains a mandatory task number, which will be added to the TaskSet
-	 *     (or removed - see later).
-	 *   - The task number may be followed by [/depth] to indicate that all tasks in the sub tree,
+	 *  <ol>
+	 *   <li>A task specification can have zero or more entries.</li>
+	 *   <li>Each entry contains a mandatory task number, which will be added to the TaskSet
+	 *     (or removed - see later).</li>
+	 *   <li>The task number may be followed by [/depth] to indicate that all tasks in the sub tree,
 	 *     starting at the specified task and moving down the task tree "depth" level, should
-	 *     be added (or removed)
-	 *   - If 'depth' is omitted (only the '/' is provided), all tasks is the subtree are added
-	 *     (regardless of their depth).
-	 *   - If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
-	 *     than being added.
-	 *   - The special syntax "%comp/foo" means all tasks in the component "foo"
-	 *   - The special syntax "%not-comp/foo" means all tasks outside the component "foo"
+	 *     be added (or removed).</li>
+	 *   <li>If 'depth' is omitted (only the '/' is provided), all tasks is the subtree are added
+	 *     (regardless of their depth).</li>
+	 *   <li>If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
+	 *     than being added.</li>
+	 *   <li>The special syntax "%comp/foo" means all tasks in the component "foo".</li>
+	 *   <li>The special syntax "%not-comp/foo" means all tasks outside the component "foo".</li>
+	 *  </ol>
+	 *  
 	 * @param taskSpecs An array of command line arguments that specify which tasks (or sub-trees
 	 * of tasks) should be added (or removed) from the task tree.
 	 * @return ErrorCode.OK on success, or Error.BAD_VALUE if one of the task specifications
@@ -262,7 +274,8 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	 *=====================================================================================*/
 
 	/**
-	 * This is a helper method, to be used only by populateWithTasks.
+	 * This is a helper method, to be used only by populateWithTasks().
+	 * 
 	 * @param taskNum The task number to be added to the TaskSet.
 	 * @param depth The number of tree levels to add. Use 1 to indicate that only this
 	 * task should be added, 2 to indicate that this task and it's immediate children be

@@ -16,14 +16,17 @@ package com.arapiki.disco.model;
  * A Java Error that can be thrown from any part of the BuildStore mechanism
  * to indicate that a fatal error occurred. The receiver of the FatalBuildStoreError
  * must simply catch and display the error. There isn't intended to be any way to
- * recovery from this type of error.
+ * recover from this type of error.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 @SuppressWarnings("serial")
 public class FatalBuildStoreError extends Error {
 	
 	/**
-	 * Create a new FataBuildStoreError
+	 * Create a new FataBuildStoreError, with a string message and an embedded
+	 * Exception.
+	 * 
 	 * @param message A string message to indicate the cause of the failure.
 	 * @param e An embedded Exception that caused the failure.
 	 */
@@ -32,7 +35,7 @@ public class FatalBuildStoreError extends Error {
 	}
 	
 	/**
-	 * Create a new FataBuildStoreError.
+	 * Create a new FataBuildStoreError, with a string message.
 	 * @param message A string message to indicate the cause of the failure.
 	 */
 	public FatalBuildStoreError(String message) {
