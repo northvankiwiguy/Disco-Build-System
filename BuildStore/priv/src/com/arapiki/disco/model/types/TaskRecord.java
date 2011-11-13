@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.model;
+package com.arapiki.disco.model.types;
 
 import com.arapiki.utils.types.IntegerTreeRecord;
 

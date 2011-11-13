@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.arapiki.disco.model.types.FileSet;
+import com.arapiki.disco.model.types.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**

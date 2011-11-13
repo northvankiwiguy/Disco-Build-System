@@ -21,10 +21,10 @@ import org.apache.commons.io.IOUtils;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileSet;
-import com.arapiki.disco.model.TaskSet;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.disco.model.types.FileSet;
+import com.arapiki.disco.model.types.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.print.PrintUtils;
 

@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.model;
+package com.arapiki.disco.model.types;
 
 import static org.junit.Assert.*;
 
@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.CommonTestUtils;
+import com.arapiki.disco.model.Components;
+import com.arapiki.disco.model.types.TaskRecord;
+import com.arapiki.disco.model.types.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
@@ -68,7 +74,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#get(int)}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#get(int)}.
 	 */
 	@Test
 	public void testGet() {
@@ -93,7 +99,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#isMember(int)}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#isMember(int)}.
 	 */
 	@Test
 	public void testIsMember() {
@@ -117,7 +123,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#remove(int)}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#remove(int)}.
 	 */
 	@Test
 	public void testRemove() {
@@ -154,7 +160,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#iterator()}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#iterator()}.
 	 */
 	@Test
 	public void testIterator() {
@@ -180,7 +186,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithParents()}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#populateWithParents()}.
 	 */
 	@Test
 	public void testPopulateWithParents() {
@@ -222,7 +228,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#mergeSet(TaskSet)}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#mergeSet(TaskSet)}.
 	 */
 	@Test
 	public void testMergeSet() {
@@ -263,7 +269,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#size()}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#size()}.
 	 */
 	@Test
 	public void testSize() {
@@ -295,7 +301,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks(String[])}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#populateWithTasks(String[])}.
 	 */
 	@Test
 	public void testPopulateWithTasks() {
@@ -407,7 +413,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.TaskSet#populateWithTasks(String[])}.
+	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#populateWithTasks(String[])}.
 	 */
 	@Test
 	public void testMatchingCommandNames() {

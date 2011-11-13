@@ -16,7 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.arapiki.disco.model.FileNameCache.FileNameCacheValue;
+import com.arapiki.disco.model.types.FileNameCache;
+import com.arapiki.disco.model.types.FileNameCache.FileNameCacheValue;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.PathUtils;
 

@@ -21,10 +21,10 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.TaskSet;
 import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.model.types.FileSet;
+import com.arapiki.disco.model.types.TaskSet;
 
 /**
  * Disco CLI Command class that implements the "show-files-used-by" command.

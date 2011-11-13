@@ -10,15 +10,16 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.model;
+package com.arapiki.disco.model.types;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.arapiki.disco.model.FileNameCache.FileNameCacheKey;
-import com.arapiki.disco.model.FileNameCache.FileNameCacheValue;
+import com.arapiki.disco.model.types.FileNameCache;
+import com.arapiki.disco.model.types.FileNameCache.FileNameCacheKey;
+import com.arapiki.disco.model.types.FileNameCache.FileNameCacheValue;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

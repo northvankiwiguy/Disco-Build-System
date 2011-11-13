@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.model.types.FileRecord;
+import com.arapiki.disco.model.types.FileSet;
 
 /**
  * The class contains test cases for some of the methods in the Report class

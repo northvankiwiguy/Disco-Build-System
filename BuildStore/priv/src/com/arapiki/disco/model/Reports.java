@@ -20,6 +20,10 @@ import java.util.Iterator;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.disco.model.types.FileRecord;
+import com.arapiki.disco.model.types.FileSet;
+import com.arapiki.disco.model.types.TaskRecord;
+import com.arapiki.disco.model.types.TaskSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

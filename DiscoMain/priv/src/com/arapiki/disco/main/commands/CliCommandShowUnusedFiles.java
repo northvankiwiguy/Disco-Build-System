@@ -17,8 +17,8 @@ import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileSet;
 import com.arapiki.disco.model.Reports;
+import com.arapiki.disco.model.types.FileSet;
 
 /**
  * Disco CLI Command class that implements the "show-unused-files" command.

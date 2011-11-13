@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.model;
+package com.arapiki.disco.model.types;
 
 import static org.junit.Assert.*;
 
@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.CommonTestUtils;
+import com.arapiki.disco.model.Components;
+import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.types.FileRecord;
+import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.utils.errors.ErrorCode;
 
 /**
@@ -69,7 +75,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#get(int)}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#get(int)}.
 	 */
 	@Test
 	public void testGet() {
@@ -105,7 +111,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#isMember(int)}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#isMember(int)}.
 	 */
 	@Test
 	public void testIsMember() {
@@ -129,7 +135,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#remove(int)}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#remove(int)}.
 	 */
 	@Test
 	public void testRemove() {
@@ -166,7 +172,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#iterator()}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#iterator()}.
 	 */
 	@Test
 	public void testIterator() {
@@ -192,7 +198,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#populateWithParents()}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#populateWithParents()}.
 	 */
 	@Test
 	public void testPopulateWithParents() {
@@ -275,7 +281,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#mergeSet(FileSet)}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#mergeSet(FileSet)}.
 	 * @throws Exception Something bad happened
 	 */
 	@Test
@@ -338,7 +344,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#populateWithPaths(String[])}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#populateWithPaths(String[])}.
 	 * @throws Exception Something bad happened
 	 */
 	@Test
@@ -506,7 +512,7 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.FileSet#size()}.
+	 * Test method for {@link com.arapiki.disco.model.types.FileSet#size()}.
 	 */
 	@Test
 	public void testSize() {

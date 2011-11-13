@@ -10,8 +10,12 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.model;
+package com.arapiki.disco.model.types;
 
+import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.Components;
+import com.arapiki.disco.model.Reports;
 import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.types.IntegerTreeSet;
 

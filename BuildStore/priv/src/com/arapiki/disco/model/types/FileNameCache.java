@@ -10,9 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.model;
-
-import java.util.LinkedHashMap;
+package com.arapiki.disco.model.types;
 
 import com.arapiki.utils.types.LRULinkedHashMap;
 

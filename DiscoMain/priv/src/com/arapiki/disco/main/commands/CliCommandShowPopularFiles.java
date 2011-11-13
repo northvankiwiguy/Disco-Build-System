@@ -16,8 +16,8 @@ import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileRecord;
 import com.arapiki.disco.model.Reports;
+import com.arapiki.disco.model.types.FileRecord;
 
 /**
  * Disco CLI Command class that implements the "show-popular-files" command.
