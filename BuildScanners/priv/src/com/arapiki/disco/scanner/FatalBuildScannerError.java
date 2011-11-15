@@ -13,27 +13,38 @@
 package com.arapiki.disco.scanner;
 
 /**
- * This exception indicates that an error occurred while scanning a legacy
+ * An Exception indicating that an error occurred while scanning a
  * build and reading it into the BuildStore.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 @SuppressWarnings("serial")
 public class FatalBuildScannerError extends Error {
 
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
+
 	/**
-	 * Create a new ScannerError
+	 * Create a new ScannerError, with a string message and an embedded
+	 * Exception.
+	 * 
 	 * @param message A string message to indicate the cause of the failure.
-	 * @param e An embedded Exception that caused the failure.
+	 * @param e An embedded Exception/Error that caused the failure.
 	 */
 	public FatalBuildScannerError(String message, Throwable e) {
 		super(message, e);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
-	 * Create a new ScannerError
+	 * Create a new ScannerError, with a string message.
 	 * @param message A string message to indicate the cause of the failure.
 	 */
 	public FatalBuildScannerError(String message) {
 		super(message);
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

@@ -26,21 +26,20 @@ import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.string.PathUtils;
 
 /**
- * A SAX Handler class for use when parsing an Electric Accelerator annotation file. The
- * XML elements in the file are parsed, with the data being added into the BuildStore. The
- * most relevant parts of the XML structure are:
- * 
- * <job type="...">
- * ...
- *   <op type="..." file="..." />
- * ...
- * </job>
- * 
+ * A SAX Handler class used when parsing an Electric Accelerator annotation file. The
+ * XML elements in the file are parsed, and the associated data is added into the
+ * BuildStore. The most relevant parts of the XML structure are:
+ * <p>
+ * &lt;job type="..."&gt;<br>
+ * ...<br>
+ *   &lt;op type="..." file="..." /&gt;<br>
+ * ...<br>
+ * &lt;/job&gt;<br>
+ * <p>
  * For each job, we extract the details of each file access (read, write or create), along
  * with the file's name.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 /* package */ class ElectricAnnoSAXHandler extends DefaultHandler {
 
@@ -48,53 +47,49 @@ import com.arapiki.utils.string.PathUtils;
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
-	/**
-	 * The command argv StringBuffer starts out this size.
-	 */
+	/** The command argv StringBuffer starts out this size. */
 	private static final int INITIAL_COMMAND_SB_SIZE = 256;
 
 	/**
-	 * Are we parsing the content within a <job>...</job> pair of elements? This is used 
+	 * Set if we're parsing the content within a &lt;job&gt;...&lt;/job&gt; pair of elements. This is used 
 	 * for optimizing the decision making in our code.
 	 */
 	private boolean withinJob = false;
 	
-	/**
-	 * Are we parsing the content with a <argv>...</argv> pair of elements?
-	 */
+	/** Set if we're parsing the content within a &lt;argv&gt;...&lt;/argv&gt; pair of elements. */
 	private boolean withinArgv = false;
 	
 	/**
 	 * The command line for this job. This is a StringBuffer, since command lines are often
-	 * multiline and we append to them as we seen new <argv> tags.
+	 * multiline and we append to them as we seen new &lt;argv&gt; tags.
 	 */
 	StringBuffer commandArgv;
 	
-	/** the BuildTasks object associated with this BuildStore */
+	/** The BuildTasks object associated with this BuildStore. */
 	private BuildTasks buildTasks;
 	
-	/** the FileNameSpaces object associated with this BuildStore */
+	/** The FileNameSpaces object associated with this BuildStore. */
 	private FileNameSpaces fns;
 	
-	/** the set of files that have been read in the current <job> */
+	/** The set of files that have been read in the current &lt;job&gt;. */
 	private ArrayList<String> filesRead;
 	
-	/** the set of files that have been written in the current <job> */	
+	/** The set of files that have been written in the current &lt;job&gt;. */	
 	private ArrayList<String> filesWritten;
 	
-	/** The ID of the current task's parent task */
+	/** The ID of the current task's parent task. */
 	private int currentParentTask;
 	
-	/** The ID of the task we most recently processed */
+	/** The ID of the task we most recently processed. */
 	private int mostRecentTask;
 	
-	/** our stack of parent tasks, recording our progress through the <make> </make> tags */
+	/** Our stack of parent tasks, recording our progress through the &lt;make&gt; &lt;/make&gt; tags. */
 	private ArrayList<Integer> taskStack;
 	
-	/** what directory was the current task performed in? */
+	/** The file system directory in which the current task was performed. */
 	private int currentDirId;
 	
-	/** Maintain a stack of directories, pushing and popping as we encounter <make> and </make> */
+	/** Maintain a stack of directories, pushing and popping as we encounter &lt;make&gt; and &lt;/make&gt;. */
 	private ArrayList<Integer> directoryStack;
 	
 	/*=====================================================================================*
@@ -104,7 +99,8 @@ import com.arapiki.utils.string.PathUtils;
 	/**
 	 * Instantiate a new ElectricAnnoSAXHandler object, with a reference
 	 * to the BuildStore to be populated.
-	 * @param buildStore The BuildStore object to be populated
+	 * 
+	 * @param buildStore The BuildStore object to be populated.
 	 */
 	public ElectricAnnoSAXHandler(BuildStore buildStore) {
 		buildTasks = buildStore.getBuildTasks();
@@ -128,7 +124,7 @@ import com.arapiki.utils.string.PathUtils;
 
 	/**
 	 * Handle occurrences of an element start tag. This method is invoked by the SAX Parser
-	 * whenever a new element start tag (e.g. <job>) is identified. See the definition of
+	 * whenever a new element start tag (e.g. &lt;job&gt;) is identified. See the definition of
 	 * import org.xml.sax.helpers.DefaultHandler for parameter details.
 	 */
 	@Override
@@ -224,7 +220,7 @@ import com.arapiki.utils.string.PathUtils;
 
 	/**
 	 * Handle occurrences of an element end tag. This method is invoked by the SAX Parser
-	 * whenever a new element end tag (e.g. </job>) is identified. See the definition of
+	 * whenever a new element end tag (e.g. &lt;/job&gt;) is identified. See the definition of
 	 * import org.xml.sax.helpers.DefaultHandler for parameter details.
 	 */
 	@Override
@@ -310,7 +306,7 @@ import com.arapiki.utils.string.PathUtils;
 
 	/**
 	 * Handle occurrences of raw character in an XML stream. That is, the text that appears
-	 * between the start and end tags. FOr example, <job>this is the text</job>.
+	 * between the start and end tags. FOr example, &lt;job&gt;this is the text&lt;/job&gt;.
 	 * See the definition of import org.xml.sax.helpers.DefaultHandler for parameter details.
 	 */
 	@Override

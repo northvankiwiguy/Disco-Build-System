@@ -40,7 +40,7 @@ public class ElectricAnnoScanner {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
-	/** The BuildStore object to which the annotation data will be added */
+	/** The BuildStore object to which the annotation data will be added. */
 	private BuildStore buildStore;
 	
 	/*=====================================================================================*
@@ -48,7 +48,8 @@ public class ElectricAnnoScanner {
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new ECAnnoScanner object, which will add data to the specified BuildStore
+	 * Create a new ElectricAnnoScanner object, which will add data to the specified BuildStore.
+	 * 
 	 * @param buildStore The BuildStore to add the EC Annotation data into.
 	 */
 	public ElectricAnnoScanner(BuildStore buildStore) {
@@ -60,11 +61,12 @@ public class ElectricAnnoScanner {
 	 *=====================================================================================*/
 
 	/**
-	 * Parse and store the content of the specified annotation file name.
+	 * Parse and store the content of the specified Electric Accelerator annotation file.
+	 * 
 	 * @param annoFileName The Electric Accelerator annotation file.
-	 * @param listener The callback to receive progress reports
-	 * @throws IOException Something when wrong as the file was being read
-	 * @throws FileNotFoundException The annotation file couldn't be found
+	 * @param listener The callback to receive progress reports.
+	 * @throws IOException Something when wrong as the file was being read.
+	 * @throws FileNotFoundException The annotation file couldn't be found.
 	 * @throws SAXException The XML structure of this file is incorrect.
 	 */
 	public void parse(String annoFileName, ProgressFileInputStreamListener listener) 

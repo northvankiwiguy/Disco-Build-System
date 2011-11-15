@@ -26,8 +26,9 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 /**
- * The TraceFileScanner class parses the output from a cfs (component file system)
+ * This class parses the output from a CFS (component file system)
  * trace file (by default, "cfs.trace") and creates a corresponding BuildStore.
+ * Typically this class would only be instantiated by the LegacyBuildScanner class.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -35,7 +36,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	
 	/*
 	 * Important note: the content of this file must be kept in sync with the 
-	 * interposer functions in cfs. If any changes are made to the data being
+	 * interposer functions in CFS. If any changes are made to the data being
 	 * stored in the trace buffer, the follow methods must also be updated.
 	 */
 	
@@ -49,67 +50,70 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 * for details.
 	 */
 	
-	/** The end of file has been reached - note, this isn't actually stored in the trace file */
+	/** The end of file has been reached. Note this tag isn't actually stored in the trace file. */
 	private final int TRACE_FILE_EOF = -1;
 	
-	/** cfs is registering the existence of a source file */
+	/** CFS is registering the existence of a source file. */
 	private final int TRACE_FILE_REGISTER = 1;
 	
-	/** a file write operation has taken place */
+	/** A file write operation has taken place. */
 	private final int TRACE_FILE_WRITE = 2;
 	
-	/** a file read operation has taken place */
+	/** A file read operation has taken place. */
 	private final int TRACE_FILE_READ = 3;
 	
-	/** a file has been removed */
+	/** A file has been removed. */
 	private final int TRACE_FILE_REMOVE = 4;
 	
-	/** a file has been renamed */
+	/** A file has been renamed. */
 	private final int TRACE_FILE_RENAME	= 5;
 	
-	/** a new symlink has been created */
+	/** A new symlink has been created. */
 	private final int TRACE_FILE_NEW_LINK = 6;
 	
-	/** a new program has been executed */
+	/** A new program has been executed. */
 	private final int TRACE_FILE_NEW_PROGRAM = 7;
 	
-	/** When reading data from the trace file, how much data should we read at a time? */
+	
+	/** 
+	 * When reading data from the trace file, the amount of data we should read each time.
+	 */
 	private final int readBufferMax = 65536;
 	
-	/** The input stream for reading the trace file */
+	/** The input stream for reading the trace file. */
 	private InputStream inputStream;
 	
-	/** The BuildStore we should add trace file information to (possibly null) */
+	/** The BuildStore we should add trace file information to (null = don't add to BuildStore). */
 	private BuildStore buildStore;
 	
-	/** The BuildTasks object contained within our BuildStore */
+	/** The BuildTasks object contained within our BuildStore (null = don't add to BuildStore). */
 	private BuildTasks buildTasks;
 	
-	/** The FileNameSpace object contained within our BuildStore */
+	/** The FileNameSpace object contained within our BuildStore (null = don't add to BuildStore). */
 	private FileNameSpaces fileNameSpaces;
 	
-	/** The PrintStream to write debug information to (possibly null) */
+	/** The PrintStream to write debug information to (null = don't write debug information). */
 	private PrintStream debugStream;
 	
-	/** How much debug output should we provide? 0, 1 or 2 */
+	/** The amount of debug output to provide (0, 1 or 2). */
 	private int debugLevel;
 	
 	/** 
-	 * an in-memory buffer of bytes read from the trace file. This will
+	 * An in-memory buffer of bytes read from the trace file. This will
 	 * be at most readBufferMax bytes in size.
 	 */
 	private byte[] readBuffer;
 	
-	/** the index of the next byte within readBuffer to be processed */
+	/** The index of the next byte within readBuffer to be processed. */
 	private int bufferOffset = 0;
 	
-	/** the number of bytes still to be processed from readBuffer */
+	/** The number of bytes still to be processed from readBuffer. */
 	private int bytesRemaining = 0;
 	
 	/** 
 	 * Mapping between the process numbers that CFS (and the trace file) provides us with
 	 * to the "task ID" numbers that BuildStore uses. As we encounter new processes, and
-	 * add them to the BuildStore, we'll be allocated corresponding task IDs.
+	 * add them to the BuildStore, we'll be allocated corresponding build task IDs.
 	 */
 	private HashMap<Integer, Integer> processToTaskMap = null;
 	
@@ -120,9 +124,10 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	/**
 	 * Instantiate a new TraceFileScanner object. The trace file is opened, ready
 	 * to have trace data read from it.
-	 * @param fileName Name of the trace file.
-	 * @param buildStore The BuildStore to add the trace file information to (possibly null)
-	 * @param debugStream The PrintStream to write debug information to (possibly null)
+	 * 
+	 * @param fileName Name of the trace file to read.
+	 * @param buildStore The BuildStore to add the trace file information to (possibly null).
+	 * @param debugStream The PrintStream to write debug information to (possibly null).
 	 * @param debugLevel The amount of debug information desired (0, 1 or 2).
 	 * @throws IOException If opening the file fails.
 	 */
@@ -162,8 +167,10 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 *=====================================================================================*/
 
 	/**
-	 * Parse the whole trace file and process the data. As each tag is
-	 * read, the values associated with that tag and also fetched and processed.
+	 * Parse the whole trace file and process the data. As each tag is read, the values 
+	 * associated with that tag are also fetched and processed. The appropriate methods
+	 * are then called on the BuildStore (and it's managers) to reconstruct the build process.
+	 * 
 	 * @throws IOException If an I/O operation occurs while reading the file.
 	 */
 	public void parse() throws IOException {
@@ -218,6 +225,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Close the trace file.
+	 * 
 	 * @throws IOException If closing the file fails.
 	 */
 	public void close() throws IOException {
@@ -230,8 +238,9 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Create a new build task in the BuildStore.
-	 * @param processNum The Unix process ID of the scanned process
-	 * @throws IOException A problem occurred while reading the trace file
+	 * 
+	 * @param processNum The Unix process ID of the scanned process.
+	 * @throws IOException A problem occurred while reading the trace file.
 	 */
 	private void addBuildTask(int processNum) throws IOException {
 		
@@ -282,7 +291,8 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Add a new mapping from a CFS process number to a BuildStore taskID.
-	 * @param processNum The CFS process number
+	 * 
+	 * @param processNum The CFS process number.
 	 * @param newTaskId The corresponding BuildStore taskId.
 	 * @throws FatalBuildScannerError If there's already a mapping for this process.
 	 */
@@ -299,9 +309,10 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Given a CFS process number, translate it into a BuildStore task number. 
-	 * @param processNum The CFS process number
+	 * 
+	 * @param processNum The CFS process number.
 	 * @return The corresponding BuildStore task number.
-	 * @throws FatalBuildScannerError if the the process to task mapping is unknown
+	 * @throws FatalBuildScannerError Ff the process-to-task mapping is unknown.
 	 */
 	private int getTaskId(int processNum) {
 		Integer taskId = processToTaskMap.get(Integer.valueOf(processNum));
@@ -316,10 +327,11 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Record a file access in the BuildStore, based on a file access that was noted
-	 * in the trace file
-	 * @param fileName The name of the file that was accessed
-	 * @param processNum The Unix process ID of the process that did the accessing
-	 * @param direction The type of access (read, write)
+	 * in the trace file.
+	 * 
+	 * @param fileName The name of the file that was accessed.
+	 * @param processNum The Unix process ID of the process that did the accessing.
+	 * @param direction The type of access (read, write).
 	 */
 	private void addFileAccess(String fileName, int processNum, OperationType direction) {
 
@@ -347,6 +359,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	/**
 	 * Read a single byte from the trace file, and return it as an
 	 * integer.
+	 * 
 	 * @return The byte of data, or TRACE_FILE_EOF (-1) if there's no more data left.
 	 * @throws IOException If anything abnormal happens when reading the data.
 	 */
@@ -377,7 +390,8 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Fetch a trace file tag from the trace file.
-	 * @return The next tag in the file (e.g. TRACE_FILE_READ)
+	 * 
+	 * @return The next tag in the file (e.g. TRACE_FILE_READ).
 	 * @throws IOException If something fails when reading the file.
 	 */
 	private int getTag() throws IOException {
@@ -388,7 +402,8 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Fetch a NUL-terminated string from the trace file.
-	 * @return The string
+	 * 
+	 * @return The string that was read from the trace file.
 	 * @throws IOException If something fails when reading the file. For example,
 	 * if the EOF is reached before a NUL character is seen.
 	 */
@@ -415,7 +430,8 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 	/**
 	 * Fetch a 4-byte little-endian integer from the trace file.
-	 * @return The integer.
+	 * 
+	 * @return The integer that was read from the trace file.
 	 * @throws IOException If something fails while reading the integer.
 	 */
 	private int getInt() throws IOException {
@@ -433,11 +449,12 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Like println(), but displays the message to the debug stream (if defined). Only
+	 * Like println(), but display the message to the debug stream (if defined). Only
 	 * display the message if this message's debug level is less than or equal to the
 	 * overall debug level setting.
-	 * @param level The debug level for this message
-	 * @param message The message to be displayed on the debug stream
+	 * 
+	 * @param level The debug level for this message.
+	 * @param message The message to be displayed on the debug stream.
 	 */
 	private void debugln(int level, String message) {
 		if ((debugStream != null) && (level <= debugLevel)) {
@@ -448,9 +465,10 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Like print(), but displays the message to the debug stream (if defined)
- 	 * @param level The debug level for this message
-	 * @param message The message to be displayed on the debug stream
+	 * Like print(), but display the message to the debug stream (if defined).
+	 * 
+ 	 * @param level The debug level for this message.
+	 * @param message The message to be displayed on the debug stream.
 	 */
 	private void debug(int level, String message) {
 		if ((debugStream != null) && (level <= debugLevel)) {
