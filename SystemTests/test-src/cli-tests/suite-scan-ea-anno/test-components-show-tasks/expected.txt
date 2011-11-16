@@ -1805,7 +1805,7 @@ Show only those tasks outside the zlib component
 
 
 Try to delete the zlib component (should fail)
-Error: Component zlib can't be deleted while it still contains files or tasks
+Error: Component zlib can't be deleted while it still contains files or tasks.
        Use disco -h for more help.
 Status is 1
 

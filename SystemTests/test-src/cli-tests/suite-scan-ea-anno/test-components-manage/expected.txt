@@ -1,7 +1,7 @@
 Showing components, before having defined any
 None
 Remove a component that doesn't exist yet - should fail
-Error: Component comp1 is not defined
+Error: Component comp1 is not defined.
        Use disco -h for more help.
 Status is 1
 Add a couple of new components, then show the list again
@@ -27,7 +27,7 @@ component2
 my-comp3
 None
 Try to delete the default component
-Error: Component None can't be deleted while it still contains files or tasks
+Error: Component None can't be deleted while it still contains files or tasks.
        Use disco -h for more help.
 Status is 1
 component2

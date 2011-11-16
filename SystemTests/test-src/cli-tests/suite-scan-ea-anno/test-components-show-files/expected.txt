@@ -1096,7 +1096,7 @@ Now show all the files in zlib
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/private)
 
 Try to remove zlib (should fail)
-Error: Component zlib can't be deleted while it still contains files or tasks
+Error: Component zlib can't be deleted while it still contains files or tasks.
        Use disco -h for more help.
 Status is 1
 
@@ -1470,12 +1470,12 @@ New component source added.
 /home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/public)
 
 Try to remove zlib (should fail)
-Error: Component zlib can't be deleted while it still contains files or tasks
+Error: Component zlib can't be deleted while it still contains files or tasks.
        Use disco -h for more help.
 Status is 1
 
 Remove the final file from the zlib component, then try to delete the component
-Error: Component zlib can't be deleted while it still contains files or tasks
+Error: Component zlib can't be deleted while it still contains files or tasks.
        Use disco -h for more help.
 Status is 1
 

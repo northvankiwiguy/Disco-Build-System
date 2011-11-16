@@ -339,7 +339,7 @@ Show all files, with roots displayed
 @root/home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Remove a root that doesn't exist (should fail)
-Error: Error removing root. psmith_root doesn't exist
+Error: Error removing root. psmith_root doesn't exist.
        Use disco -h for more help.
 Status is 1
 
@@ -357,19 +357,19 @@ Show just psmith_root by itself
 /home/psmith
 
 Show an invalid root name (should fail)
-Error: Root name not found - bad_root
+Error: Root name not found - bad_root.
        Use disco -h for more help.
 Status is 1
 
 Try to double-add cvs_root at the same location (should fail)
-Error: Unable to set root. /home/psmith/t/cvs-1.11.23 already has a root associated with it
+Error: Unable to set root. /home/psmith/t/cvs-1.11.23 already has a root associated with it.
        Use disco -h for more help.
 Status is 1
 
 Try to double-add cvs_root at a different location (should succeed)
 
 Try to add a new root at a location that already has a root (should fail)
-Error: Unable to set root. /home/psmith already has a root associated with it
+Error: Unable to set root. /home/psmith already has a root associated with it.
        Use disco -h for more help.
 Status is 1
 
@@ -379,7 +379,7 @@ psmith_root /home/psmith
 root /
 
 Remove zlib again (should fail)
-Error: Error removing root. zlib doesn't exist
+Error: Error removing root. zlib doesn't exist.
        Use disco -h for more help.
 Status is 1
 
