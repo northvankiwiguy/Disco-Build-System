@@ -1,8 +1,11 @@
 
-<project name="Utilities" default="jars" basedir=".">
+<project name="Utilities" default="help" basedir=".">
 
 	<!-- root of this component's build tree -->
 	<property name="project-root" location=".." />
+	
+	<!-- root of the entire workspace -->
+	<property name="workspace-root" location="../.." />
 	
 	<!-- name of the jar file we'll create -->
 	<property name="project-jar" value="utilities.jar" />
@@ -19,8 +22,8 @@
 	<!-- location of native src code -->
 	<property name="native-src" location="src/native" />
 		
-	<!-- import the common build file definitions -->	
-	<import file="build-common.xml" />
+	<!-- import the common build file definitions -->
+	<import file="${workspace-root}/Admin/priv/shared/build/build-common.xml" />
 
 	<!-- name of the native library we'll build -->
 	<property name="native-lib" location="${pub-dir}/libnativeLib.so" />

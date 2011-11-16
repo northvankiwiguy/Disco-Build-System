@@ -1,27 +1,30 @@
 
-<project name="BuildStore" default="jars">
+<project name="BuildStore" default="help">
 
 	<!-- root of this component's build tree -->
 	<property name="project-root" location=".." />
+	
+	<!-- root of the entire workspace -->
+	<property name="workspace-root" location="../.." />
 	
 	<!-- name of the jar file we'll create -->
 	<property name="project-jar" value="build-store.jar" />
 
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
-		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
+		<pathelement location="${workspace-root}/Utilities/pub/utilities.jar" />
 		<pathelement location="${project-root}/priv/lib/sqlitejdbc-v056.jar" />
 	</path>
 
 	<!-- no extra classpath for unit testing -->
 	<path id="extra-test-classpath" />
 
-	<!-- import the common build file definitions -->	
-	<import file="${project-root}/../Utilities/priv/build-common.xml" />
+	<!-- import the common build file definitions -->
+	<import file="${workspace-root}/Admin/priv/shared/build/build-common.xml" />
 		
 	<!-- Make sure that all upstream components are up to date -->
 	<target name="build-upstream-components">
-		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
 		
 </project>

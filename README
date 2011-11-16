@@ -1,40 +1,6 @@
-Release 0.1.0 on November 15, 2011
-----------------------------------
+This is an early release version of the Disco build tool. 
 
-This is an early release version of Disco. It has only been tested
-on two variants of Linux: OpenSuSE 11.4 on x86 and Redhat Enterprise
-Linux 5.2.
-
-There are likely to be a specific set of development tools necessary
-to compile Disco, but these have not yet been identified.
-
-------
-
-To build Disco, do the following:
-
-  % cd DiscoMain/priv
-  % ant all -Dversion=<major.minor.bugfix>
-
-------
-
-To run all unit tests, do the following
-
-  % cd DiscoMain/priv
-  % ant test-all
-
-  Note: The build will break if any of the tests fail.
-
-------
-
-To run all system regression tests, do the following:
-
-  % cd SystemTests/test-src/cli-tests
-  % ./run_tests.pl  ../../../DiscoMain/pub/disco-0.1.0.tar.gz
-
-Make sure you substitute 0.1.0 for the version you built earlier.
-
-------
+For details on compiling the software, see Admin/priv/README.
 
 If you're interested in participating in the development of
 Disco, please contact Peter Smith at psmith@arapiki.com
-

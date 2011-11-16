@@ -1,0 +1,8 @@
+To compile Disco, execute the following commands in this directory:
+
+  % ant all
+  
+To run all tests, execute the following:
+
+  % ant test
+

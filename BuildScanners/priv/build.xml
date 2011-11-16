@@ -11,19 +11,22 @@
  -->
 
 <!-- Build the BuildScanners project -->
-<project name="legacy-scanners" default="jars">
+<project name="legacy-scanners" default="help">
 
 	<!-- root of this component's build tree -->
 	<property name="project-root" location=".." />
+
+	<!-- root of the entire workspace -->
+	<property name="workspace-root" location="../.." />
 	
 	<!-- name of the jar file we'll create -->
 	<property name="project-jar" value="build-scanners.jar" />
 	
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
-		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
-		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
-		<pathelement location="${project-root}/../BuildStore/priv/lib/sqlitejdbc-v056.jar" />
+		<pathelement location="${workspace-root}/BuildStore/pub/build-store.jar" />
+		<pathelement location="${workspace-root}/Utilities/pub/utilities.jar" />
+		<pathelement location="${workspace-root}/BuildStore/priv/lib/sqlitejdbc-v056.jar" />
 	</path>
 	
 	<!-- no extra classpath for unit testing -->
@@ -31,11 +34,11 @@
 
 	<!-- Make sure that all upstream components are up to date -->
 	<target name="build-upstream-components">
-		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="jars" inheritall="false"/>
-		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="build" inheritall="false"/>
+		<ant antfile="${workspace-root}/BuildStore/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="build" inheritall="false"/>
 	</target>
 
-	<!-- import the common build file definitions -->	
-	<import file="${project-root}/../Utilities/priv/build-common.xml" />
+	<!-- import the common build file definitions -->
+	<import file="${workspace-root}/Admin/priv/shared/build/build-common.xml" />
 
 </project>

@@ -1,39 +1,32 @@
 
-<project name="DiscoMain" default="jars">
+<project name="DiscoMain" default="help">
 
 	<!-- root of this component's build tree -->
 	<property name="project-root" location=".." />
-	
+
+	<!-- root of the entire workspace -->
+	<property name="workspace-root" location="../.." />
+
 	<!-- name of the jar file we'll create -->
 	<property name="project-jar" value="disco-main.jar" />
 
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
-		<pathelement location="${project-root}/../BuildScanners/pub/build-scanners.jar" />
-		<pathelement location="${project-root}/../Utilities/pub/utilities.jar" />
-		<pathelement location="${project-root}/../BuildStore/pub/build-store.jar" />
-		<pathelement location="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" />
-		<pathelement location="${project-root}/priv/lib/commons-cli-1.2.jar" />
-		<pathelement location="${project-root}/priv/lib/commons-io-2.1.jar" />
+		<pathelement location="${workspace-root}/BuildScanners/pub/build-scanners.jar" />
+		<pathelement location="${workspace-root}/Utilities/pub/utilities.jar" />
+		<pathelement location="${workspace-root}/BuildStore/pub/build-store.jar" />
+		<pathelement location="${workspace-root}/BuildTreeScanner/pub/build-tree-scanner.jar" />
+		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-cli-1.2.jar" />
+		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-io-2.1.jar" />
 	</path>
 	
-	<!-- sourcepath for generating documentation -->
-	<path id="javadoc-path">
-		<pathelement location="${project-root}/../BuildScanners/priv/src" />
-		<pathelement location="${project-root}/../BuildStore/priv/src" />
-		<pathelement location="${project-root}/../BuildTreeScanner/priv/src" />
-		<pathelement location="${project-root}/../DiscoMain/priv/src" />
-		<pathelement location="${project-root}/../Utilities/priv/src" />
-	</path>
-	
-
 	<!-- import the common build file definitions -->	
-	<import file="${project-root}/../Utilities/priv/build-common.xml" />
+	<import file="${workspace-root}/Admin/priv/shared/build/build-common.xml" />
 		
 	<!-- Make sure that all upstream components are up to date -->
 	<target name="build-upstream-components">
-		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="jars" inheritall="false"/>
-		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
 	
 	<!-- specific cleaning operation for this project only -->
@@ -42,121 +35,4 @@
 		<delete dir="${priv-dir}/doc" />
 	</target>
 	
-	<!--
-	   - Build and package everything to create the disco (command line) installation package. However, the
-	   - Disco eclipse plugin and Disco web application aren't built here. 
-	   -->
-	<target name="all">
-		
-		<fail unless="version" message="Missing version number. Please use -Dversion=" />
-		
-		<!-- build everything -->
-		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="jars" />
-			
-		<!-- make the packaging directory -->
-		<property name="pkg-dir" location="${priv-dir}/pkg/disco-${version}" />
-		<property name="tmp-dir" location="${priv-dir}/pkg/tmp" />
-		<mkdir dir="${pkg-dir}/bin" />
-		<mkdir dir="${pkg-dir}/lib" />
-		<mkdir dir="${tmp-dir}" />
-		
-		<!-- place all the .class files into a single directory, ready to create a single jar file -->
-		<unjar src="${project-root}/../BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
-		<unjar src="${project-root}/../BuildStore/priv/lib/sqlitejdbc-v056.jar" dest="${tmp-dir}" />
-		<unjar src="${project-root}/../BuildScanners/pub/build-scanners.jar" dest="${tmp-dir}" />
-		<unjar src="${project-root}/../BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
-		<unjar src="${project-root}/../DiscoMain/pub/disco-main.jar" dest="${tmp-dir}" />		
-		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />
-		<unjar src="${project-root}/../DiscoMain/priv/lib/commons-io-2.1.jar" dest="${tmp-dir}" />
-		<unjar src="${project-root}/../Utilities/pub/utilities.jar" dest="${tmp-dir}" />
-		
-		<!-- copy all of the help messages -->
-		<copy todir="${tmp-dir}">
-			<fileset dir="${project-root}/../DiscoMain/priv">
-				<include name="messages/**" />
-			</fileset>
-		</copy>
-		
-		<!-- now create a single jar file, placing it in the release package -->
-		<jar basedir="${tmp-dir}" destfile="${pkg-dir}/lib/disco.jar" />
-		
-		<!-- copy the "disco" shell script -->
-		<copy file="scripts/disco" todir="${pkg-dir}/bin" />
-		
-		<!-- copy the native Utilities library -->
-		<copy file="${project-root}/../Utilities/pub/libnativeLib.so" todir="${pkg-dir}/lib" />
-		
-		<!-- copy the CFS binary/library -->
-		<copy file="${project-root}/../ComponentFS/pub/bin/cfs" todir="${pkg-dir}/bin" />
-		<copy file="${project-root}/../ComponentFS/pub/lib/libcfs.so" todir="${pkg-dir}/lib" />
-		
-		<!-- finally, tar up the whole release package -->
-		<delete file="${pub-dir}/disco-${version}.tar.gz" />
-		<tar destfile="${pub-dir}/disco-${version}.tar.gz" compression="gzip" > 
-			<tarfileset dir="${pkg-dir}/.." dirmode="555" mode="555">
-				<include name="disco-${version}/bin/**"/>
-			</tarfileset>
-			<tarfileset dir="${pkg-dir}/.." dirmode="555" mode="444">
-				<include name="disco-${version}/lib/**"/>
-			</tarfileset>
-		</tar>
-		
-		<!-- ensure the fake home directory is created, for development purposes -->
-		<antcall target="fake-home" />
-			
-	</target>
-	
-	<target name="doc">
-		<javadoc destdir="${priv-dir}/doc" access="private"
-			packagenames="com.arapiki.*"
-			sourcepathref="javadoc-path"
-			classpathref="project-classpath" />
-	</target>
-		
-	<!--
-	   - Clean all projects.
-	  -->
-	<target name="clean-all">
-		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="clean" inheritall="false" />
-		<antcall target="clean-fake-home" />
-	</target>
-	
-	<!--
-	   - Test all projects.
-	  -->
-	<target name="test-all" depends="fake-home">
-		<ant antfile="${project-root}/../BuildStore/priv/build.xml" target="test" inheritall="false" />
-		<ant antfile="${project-root}/../BuildScanners/priv/build.xml" target="test" inheritall="false" />
-		<ant antfile="${project-root}/../BuildTreeScanner/priv/build.xml" target="test" inheritall="false" />
-		<ant antfile="${project-root}/../DiscoMain/priv/build.xml" target="test" inheritall="false" />
-		<ant antfile="${project-root}/../Utilities/priv/build.xml" target="test" inheritall="false" />
-		<ant antfile="${project-root}/../ComponentFS/priv/build.xml" target="test" inheritall="false" />
-	</target>
-	
-	<!--
-	   - fake-home - create a fake disco packaging directory (containing binaries and .so files only) so
-	   - that our code can access $DISCO_HOME/{bin,lib} and access development files. This mirrors the
-	   - package directory layout 
-	  -->
-	<target name="fake-home" depends="clean-fake-home">
-		<mkdir dir="${fake-home-dir}" />
-		<mkdir dir="${fake-home-dir}/bin" />
-		<mkdir dir="${fake-home-dir}/lib" />
-		<symlink resource="${project-root}/../ComponentFS/pub/bin/cfs" link="${fake-home-dir}/bin/" />
-		<symlink resource="${project-root}/../ComponentFS/pub/lib/libcfs.so" link="${fake-home-dir}/lib/" />
-		<symlink resource="${project-root}/../Utilities/pub/libnativeLib.so" link="${fake-home-dir}/lib/" />
-	</target>
-	
-	<!--
-	   - Remove our fake-home directory.
-	  -->
-	<target name="clean-fake-home">
-		<delete dir="${fake-home-dir}" />
-	</target>
-		
 </project>

@@ -1,0 +1,222 @@
+
+<!--
+   - This Ant project is called upon by all other Ant projects in order to get
+   - standard build definitions and targets. All the targets here should be
+   - 100% generic and reusable, no matter which project is being built.
+   - 
+   - Note that a build.xml file that includes this build-common.xml file must
+   - define:
+   -     project-root - The directory at the top of the project being built.
+   -     project-jar  - The name of the JAR file the project produces.
+   -     project-classpath - The classpath for compiling the project's Java files.
+   -
+   - It should also consider overriding the following targets:
+   -     project-clean
+   -     build-upstream-componentss
+   -     extra-compilation
+  -->
+<project name="build-common" default="jars" basedir=".">
+
+	<!--================================================================================
+	   - Path/Property definitions
+	   =================================================================================-->
+
+	<!-- get the current Disco version number -->
+	<import file="build-version.xml" />
+	
+	<!-- these properties must be defined by the build.xml that imports build-common.xml -->
+	<fail unless="project-root" message="project-root property not set" />
+	<fail unless="project-jar" message="project-jar property not set" />
+	
+	<!-- check that we're using the minimum Java version level -->
+	<condition property="java-ok">
+		<or>
+			<equals arg1="${ant.java.version}" arg2="1.5" />
+			<equals arg1="${ant.java.version}" arg2="1.6" />
+		</or>
+	</condition>
+	<fail message="A JDK of version 1.5 or greater is required" unless="java-ok" />
+	
+	<!-- Check the minimum version of ant -->
+	<condition property="ant-ok">
+		<contains string="${ant.version}" substring="version 1.8" />
+	</condition>
+	<fail message="Ant version 1.8 or greater is required" unless="ant-ok" />
+	
+	<!-- project definitions - all projects must have the same directory layout -->
+	<property name="priv-dir" location="${project-root}/priv" />
+	<property name="pub-dir" location="${project-root}/pub" />
+	<property name="src-dir" location="${priv-dir}/src" />
+	<property name="test-src-dir" location="${priv-dir}/test_src" />
+	<property name="bin-dir" location="${priv-dir}/bin" />
+	<property name="test-bin-dir" location="${priv-dir}/test_bin" />
+	<property name="jar-file" location="${pub-dir}/${project-jar}" />
+	
+	<!-- 
+	   - This is where the full release package can be found in its expanded form. We
+	   - need these files for unit tests when we need to load native libraries.
+	  -->
+	<property name="pkg-dir" location="${project-root}/../Admin/priv/pkg/disco-${version}" />
+	
+	<!-- The classpath to use when unit testing -->
+	<path id="test-classpath">
+		<path refid="project-classpath" />
+		<path location="${bin-dir}" />
+		<path location="${test-bin-dir}" />
+		<path refid="extra-test-classpath" />
+	</path>
+	
+	<!--================================================================================
+	   - Build Targets
+	   =================================================================================-->
+
+	<!--
+	   - Build the output jar file for the project. 
+      -->
+	<target name="jars" depends="java, extra-compilation"
+			description="Build this project's JAR files.">
+		<echo>Checking ${jar-file}</echo>
+		<mkdir dir="${pub-dir}" />
+		<jar basedir="${bin-dir}" jarfile="${jar-file}"/>
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Compile all the (non-test) java files in this project.
+      -->
+	<target name="java" depends="build-upstream-components">
+		<echo>Checking ${ant.project.name} Java code</echo>
+		<mkdir dir="${bin-dir}" />
+		<depend srcdir="${src-dir}" destdir="${bin-dir}" />
+		<javac srcdir="${src-dir}" destdir="${bin-dir}" debug="true" 
+			classpathref="project-classpath" includeantruntime="false">
+			<exclude name="**/package-info.java" />
+		</javac>
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Clean everything in this project.
+	  -->
+	<target name="clean" description="Clean the content of this project.">
+		<echo>Cleaning project ${ant.project.name}</echo>
+		<delete dir="${bin-dir}" />
+		<delete dir="${test-bin-dir}" />
+		<delete dir="${pub-dir}" />
+		<antcall target="project-clean" />
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Default "build-upstream-components" target, in case it's not overidden. This
+	   - target provides steps for compiling any upstream projects that this project
+	   - depends on. It will normally be overridden by any build.xml files that
+	   - include build-common.xml.
+	  -->
+	<target name="build-upstream-components" />
+
+	<!--================================================================================-->
+
+	<!--
+	   - Default "extra-compilation" target, in case it's not overidden. This target
+	   - provides steps for compiling anything additional in this project, above and
+	   - beyond just compiling the Java files into class files. It will normally
+	   - be overridden by any build.xml files that include build-common.xml.
+	  -->
+	<target name="extra-compilation" />
+
+	<!--================================================================================-->
+
+	<!--
+	   - Default "project-clean" target, in case it's not overidden. This target provides
+	   - steps for cleaning any non-standard files and directories that may reside in
+	   - this project. It will normally be overridden by any build.xml files that
+	   - include build-common.xml.
+	  -->
+	<target name="project-clean" />
+
+	<!--================================================================================-->
+
+	<!--
+	   - Compile all the (non-test) java files in this project.
+      -->
+	<target name="test-java" depends="java, check-for-tests" if="tests-available">
+		<echo>Checking ${ant.project.name} Java test code</echo>
+		<mkdir dir="${test-bin-dir}" />
+		<depend srcdir="${test-src-dir}" destdir="${test-bin-dir}" />
+		<javac srcdir="${test-src-dir}" destdir="${test-bin-dir}" debug="true" 
+				classpathref="test-classpath" includeantruntime="true" />
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Not all projects have tests. Set "tests-available" if this project does
+	  -->
+	<target name="check-for-tests">
+		<available file="${test-src-dir}" property="tests-available" />			
+	</target>
+
+	<!--
+	   - Check that our release package has been built. We need this to exist before
+	   - we do any unit testing, otherwise we won't have access to our JVM loadable
+	   - modules.
+	  -->
+	<target name="check-for-pkgdir">
+		<available file="${pkg-dir}" property="pkgdir-available" />
+		<fail unless="pkgdir-available" 
+			message="You must build the full release package (from the Admin project) before running unit tests."/>
+	</target>
+
+	<!--
+	   - Execute unit tests using junit
+	  -->
+	<target name="unit-test" depends="test-java, check-for-tests, check-for-pkgdir"
+		if="tests-available" description="Run unit tests for this project.">
+		
+		<!-- remove the stale database, to avoid obscure errors with bad content. -->
+		<delete file="/tmp/testBuildStore" />
+		
+		<junit fork="yes" printsummary="false" haltonfailure="true">
+		
+			<!-- ensure that the correct classpath is set up -->
+			<classpath refid="test-classpath" />
+			
+			<formatter type="brief" usefile="false" />
+			
+			<!-- set DISCO_HOME so we can find native libraries. Normally the
+			   - "disco" shell script will do this for us.
+			  -->
+			<env key="DISCO_HOME" value="${pkg-dir}"/>
+			
+			<!--
+			   - Attempt to run all classes that start with "Test", although
+			   - skip any inner classes, since these aren't usually test classes.
+			  -->
+			<batchtest fork="yes">
+				<fileset dir="${test-bin-dir}">
+					<include name="**/Test*.class" />
+					<exclude name="**/Test*$*.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Provide help information. This is mostly deferred to the ant -p
+	   - output.
+	  -->
+	<target name="help" description="Provide help on building.">
+		<exec executable="ant">
+			<arg value="-p" />
+		</exec>
+	</target>
+
+	<!--================================================================================-->
+
+</project>

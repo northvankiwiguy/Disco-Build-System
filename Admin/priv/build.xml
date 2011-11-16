@@ -1,0 +1,221 @@
+
+<project name="DiscoMain" default="help">
+
+	<description>
+This is the main top-level entry point for compiling the Disco build tool. 
+Use the targets in this build.xml if you want to build/test the complete
+system. Otherwise use the targets in the individual project directories.
+	</description>
+
+	<!--================================================================================
+	   - Constant definitions
+	   =================================================================================-->
+
+	<import file="shared/build/build-version.xml"/>
+
+	<!--================================================================================
+	   - Path definitions
+	   =================================================================================-->
+
+	<!-- useful path definitions -->
+	<property name="project-root" location=".." />
+	<property name="workspace-root" location="../.." />
+	<property name="priv-dir" location="${project-root}/priv" />
+	<property name="pub-dir" location="${project-root}/pub" />
+	
+	<!-- sourcepath for generating javadoc documentation -->
+	<path id="javadoc-path">
+		<pathelement location="${workspace-root}/BuildScanners/priv/src" />
+		<pathelement location="${workspace-root}/BuildStore/priv/src" />
+		<pathelement location="${workspace-root}/BuildTreeScanner/priv/src" />
+		<pathelement location="${workspace-root}/Utilities/priv/src" />
+		<pathelement location="${workspace-root}/DiscoMain/priv/src" />
+	</path>
+	
+	<!-- classpath for generating javadoc documentation (thirdparty libraries) -->
+	<path id="javadoc-classpath">
+		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-cli-1.2.jar" />
+		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-io-2.1.jar" />
+	</path>	
+		
+	<!--================================================================================
+	   - Build Targets
+	   =================================================================================-->
+
+	<!--
+	   - Provide help information. This is mostly deferred to the ant -p
+	   - output.
+	  -->
+	<target name="help" description="Provide help on building.">
+		<exec executable="ant">
+			<arg value="-p" />
+		</exec>
+	</target>
+
+	<!--================================================================================-->
+	
+	<!--
+	   - Build and package everything in the Disco software, including
+	   - the command line application and the Eclipse plugin.
+	   -->
+	<target name="all" description="Build the complete release package."
+		depends="cli" />
+	
+	<!--================================================================================-->
+
+	<!--
+	   - Build the command-line based application, which includes associated
+	   - libraries, binaries and help text. This is essentially everything
+	   - except for the Eclipse plugin.
+	  -->
+	<target name="cli" description="Build only the command-line application.">
+				
+		<!-- 
+		   - Build everything, from the DiscoMain project down. This will recursively 
+		   - compile other projects too.
+		  -->
+		<ant antfile="${workspace-root}/DiscoMain/priv/build.xml" target="jars" inheritall="false"/>
+			
+		<!-- make the packaging directory -->
+		<property name="pkg-dir" location="${priv-dir}/pkg/disco-${version}" />
+		<property name="tmp-dir" location="${priv-dir}/pkg/tmp" />
+		<mkdir dir="${pkg-dir}/bin" />
+		<mkdir dir="${pkg-dir}/lib" />
+		<mkdir dir="${tmp-dir}" />
+		
+		<!-- place all the .class files into a single directory, ready to create a single jar file -->
+		<unjar src="${workspace-root}/BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/BuildStore/priv/lib/sqlitejdbc-v056.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/BuildScanners/pub/build-scanners.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/DiscoMain/pub/disco-main.jar" dest="${tmp-dir}" />		
+		<unjar src="${workspace-root}/Utilities/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/Utilities/priv/lib/commons-io-2.1.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/Utilities/pub/utilities.jar" dest="${tmp-dir}" />
+		
+		<!-- copy all of the help messages -->
+		<copy todir="${tmp-dir}">
+			<fileset dir="${workspace-root}/DiscoMain/priv">
+				<include name="messages/**" />
+			</fileset>
+		</copy>
+		
+		<!-- now create a single jar file, placing it in the release package -->
+		<jar basedir="${tmp-dir}" destfile="${pkg-dir}/lib/disco.jar" />
+		
+		<!-- copy the "disco" shell script -->
+		<copy file="${workspace-root}/DiscoMain/priv/scripts/disco" todir="${pkg-dir}/bin" />
+		<chmod file="${pkg-dir}/bin/disco" perm="755" />
+		
+		<!-- copy the native Utilities library -->
+		<copy file="${workspace-root}/Utilities/pub/libnativeLib.so" todir="${pkg-dir}/lib" />
+		
+		<!-- copy the CFS binary/library -->
+		<copy file="${workspace-root}/ComponentFS/pub/bin/cfs" todir="${pkg-dir}/bin" />
+		<chmod file="${pkg-dir}/bin/cfs" perm="755" />
+		<copy file="${workspace-root}/ComponentFS/pub/lib/libcfs.so" todir="${pkg-dir}/lib" />
+		
+		<!-- finally, tar up the whole release package -->
+		<delete file="${pub-dir}/disco-${version}.tar.gz" />
+		<tar destfile="${pub-dir}/disco-${version}.tar.gz" compression="gzip" > 
+			<tarfileset dir="${pkg-dir}/.." dirmode="755" mode="755">
+				<include name="disco-${version}/bin/**"/>
+			</tarfileset>
+			<tarfileset dir="${pkg-dir}/.." dirmode="755" mode="644">
+				<include name="disco-${version}/lib/**"/>
+			</tarfileset>
+		</tar>
+			
+	</target>
+		
+	<!--================================================================================-->
+
+	<!--
+	   - Generate the javadoc API document for public/protected scope only. This is
+	   - what we'd normally publish as part of a release
+	   -->
+	<target name="javadoc" description="Generate javadoc for public/protected scope only.">
+		<javadoc destdir="${pub-dir}/javadoc" access="protected"
+			packagenames="com.arapiki.*"
+			sourcepathref="javadoc-path"
+			classpathref="javadoc-classpath" />
+	</target>
+
+	<!--
+	   - Generate the javadoc API document for all scopes (private, public, etc).
+	   - This is used internally by developers, to ensure their javadoc comments
+	   - are sufficient.
+	   -->
+	<target name="javadoc-private" description="Generate javadoc for all scopes (including private).">
+		<javadoc destdir="${pub-dir}/javadoc-private" access="private"
+			packagenames="com.arapiki.*"
+			sourcepathref="javadoc-path"
+			classpathref="javadoc-classpath" />
+	</target>
+
+	<!--
+	   - Clean the generated javadoc files.
+	  -->
+	<target name="clean-javadoc" description="Clean the generated javadoc files.">
+		<delete dir="${pub-dir}/javadoc" />
+		<delete dir="${pub-dir}/javadoc-private" />		
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Clean all projects.
+	  -->
+	<target name="clean" description="Clean all generated files, in all projects.">
+		<ant antfile="${workspace-root}/BuildStore/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/DiscoMain/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="clean" inheritall="false" />
+		<antcall target="clean-javadoc" />
+		
+		<!-- clean our packaging directories -->
+		<delete dir="${project-root}/pub" />
+		<delete dir="${project-root}/priv/bin" />
+		<delete dir="${project-root}/priv/pkg" />
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Run unit tests for all projects (we must build the entire "cli" product first,
+	   - to make sure we have all the dynamically loadable libraries).
+	  -->
+	<target name="unit-test" depends="cli" description="Run all unit tests.">
+		<ant antfile="${workspace-root}/BuildStore/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/DiscoMain/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="unit-test" inheritall="false" />
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Run the CLI-based system tests. This means we invoking the "disco" script, rather
+	   - than invoking individual classes.
+	  -->
+	<target name="cli-test" depends="cli" description="Run all CLI-based tests.">
+		<exec executable="${workspace-root}/SystemTests/test-src/cli-tests/run_tests.pl"
+			dir="${workspace-root}/SystemTests/test-src/cli-tests"
+			failonerror="true">
+			<arg value="${workspace-root}/Admin/pub/disco-${version}.tar.gz" />
+		</exec>
+	</target>
+	
+	<!--================================================================================-->
+	
+	<!--
+	   - Run all tests (unit tests and CLI tests).
+	  -->
+	<target name="test" depends="unit-test, cli-test" 
+		description="Run all regression tests (unit tests and CLI tests)." />
+	
+</project>
