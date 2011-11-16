@@ -173,6 +173,7 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/DiscoMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/SystemTests/build.xml" target="clean" inheritall="false" />
 		<antcall target="clean-javadoc" />
 		
 		<!-- clean our packaging directories -->
@@ -203,11 +204,7 @@ system. Otherwise use the targets in the individual project directories.
 	   - than invoking individual classes.
 	  -->
 	<target name="cli-test" depends="cli" description="Run all CLI-based tests.">
-		<exec executable="${workspace-root}/SystemTests/test-src/cli-tests/run_tests.pl"
-			dir="${workspace-root}/SystemTests/test-src/cli-tests"
-			failonerror="true">
-			<arg value="${workspace-root}/Admin/pub/disco-${version}.tar.gz" />
-		</exec>
+		<ant antfile="${workspace-root}/SystemTests/build.xml" target="cli-test" inheritall="false" />
 	</target>
 	
 	<!--================================================================================-->

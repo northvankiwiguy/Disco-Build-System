@@ -111,6 +111,7 @@ public class CommonTestUtils {
 			 * Invoke the legacy build scanner to create a trace the file
 			 */
 			LegacyBuildScanner lbs = new LegacyBuildScanner();
+			lbs.setTraceFile(tmpDirName + "/cfs.trace");
 			lbs.setDebugStream(System.out);
 			
 			/* set this to 1 or 2 for more debug information */

@@ -1,0 +1,60 @@
+<!--
+ - Copyright (c) 2011 Arapiki Solutions Inc.
+ - All rights reserved. This program and the accompanying materials
+ - are made available under the terms of the Eclipse Public License v1.0
+ - which accompanies this distribution, and is available at
+ - http://www.eclipse.org/legal/epl-v10.html
+ -
+ - Contributors:
+ -    "Peter Smith <psmith@arapiki.com>" - initial API and 
+ -        implementation and/or initial documentation
+ -->
+
+<!-- Build the SystemTests project -->
+<project name="system-tests" basedir="." default="help">
+
+	<!--================================================================================
+	   - Path/Property definitions
+	   =================================================================================-->
+
+	<!-- root of the entire workspace -->
+	<property name="workspace-root" location=".." />
+	
+	<!-- find out the Disco version number -->
+	<import file="${workspace-root}/Admin/priv/shared/build/build-version.xml" />
+	
+	<!--================================================================================
+	   - Build Targets
+	   =================================================================================-->
+
+	<!-- clean our test results directory -->
+	<target name="clean" description="Clean all the test results.">
+		<delete dir="test-output"/>
+	</target>
+	
+	<!--================================================================================-->
+
+	<!-- run the CLI tests -->
+	<target name="cli-test" description="Execute the CLI tests.">
+		<exec executable="./run_tests.pl"
+			dir="test-src/cli-tests"
+			failonerror="true">
+			<arg value="${workspace-root}/Admin/pub/disco-${version}.tar.gz" />
+		</exec>
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Provide help information. This is mostly deferred to the ant -p
+	   - output.
+	  -->
+	<target name="help" description="Provide help on building.">
+		<exec executable="ant">
+			<arg value="-p" />
+		</exec>
+	</target>
+
+	<!--================================================================================-->
+
+</project>

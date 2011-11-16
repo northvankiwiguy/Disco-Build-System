@@ -32,6 +32,9 @@
 			<arg value="-c"/>
 			<arg value="install"/>
 		</exec>
+		<delete dir="obj"/>
+		<delete dir="test_obj"/>
+		<delete dir="../pub" />
 	</target>
 	
 	<!-- unit test the CFS code -->
