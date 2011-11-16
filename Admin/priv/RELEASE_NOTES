@@ -1,0 +1,17 @@
+Release 0.1.0 - November 15th, 2011
+-----------------------------------
+
+- CLI support for:
+   - Scanning an Electric Accelerator annotation file into a Disco build system.
+   - Very limited support for scanning a shell-command build into a Disco build
+     system.
+   - Ability to show files and tasks, with filters for narrowing-down the output.
+   - Support for assigning tasks and files into components.
+   - Support for adding file path roots.
+   - Reports include:
+      - Showing unused files.
+      - Showing write-only files.
+      - Showing the most popular files.
+      - Showing files used by a specific task (or set of tasks).
+      - Showing tasks that use a specific file (or set of files).
+- No Eclipse support in this release.
