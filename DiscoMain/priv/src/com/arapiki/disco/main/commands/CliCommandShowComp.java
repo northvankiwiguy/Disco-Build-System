@@ -36,8 +36,7 @@ public class CliCommandShowComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-comp.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -77,7 +76,7 @@ public class CliCommandShowComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Show the components defined in the build system";
+		return "Show the components defined in the build system.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,7 +97,7 @@ public class CliCommandShowComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 	
 		Components cmpts = buildStore.getComponents();
 		

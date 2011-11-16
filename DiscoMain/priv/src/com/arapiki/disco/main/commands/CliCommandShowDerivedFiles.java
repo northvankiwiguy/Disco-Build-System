@@ -71,7 +71,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 		Options opts = super.getOptions();
 		
 		/* add the --all option */
-		Option allOpt = new Option("a", "all", false, "Also show indirectly derived files");
+		Option allOpt = new Option("a", "all", false, "Also show indirectly derived files.");
 		opts.addOption(allOpt);
 		
 		return opts;
@@ -94,7 +94,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List the files that are derived from the input file(s)";
+		return "List the files that are derived from the input files.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -120,7 +120,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "One or more colon-separated path-specs must be provided");
+		CliUtils.validateArgs(getName(), args, 1, 1, "One or more colon-separated path-specs must be provided.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();

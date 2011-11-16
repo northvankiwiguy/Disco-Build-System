@@ -49,8 +49,7 @@ public class CliCommandScanBuild implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/scan-build.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -73,21 +72,21 @@ public class CliCommandScanBuild implements ICliCommand {
 		Options opts = new Options();
 
 		/* add the --trace-file option */
-		Option traceFileOpt = new Option("f", "trace-file", true, "Specify the name of the trace file to write/read");
+		Option traceFileOpt = new Option("f", "trace-file", true, "Specify the name of the trace file to write/read.");
 		traceFileOpt.setArgName("file-name");
 		opts.addOption(traceFileOpt);
 		
 		/* add the --trace-only option */
-		Option traceOnlyOpt = new Option("t", "trace-only", false, "Trace the shell command, but don't create a build store");
+		Option traceOnlyOpt = new Option("t", "trace-only", false, "Trace the shell command, but don't create a database.");
 		opts.addOption(traceOnlyOpt);
 
 		/* add the --read-trace option */
-		Option readTraceOpt = new Option("r", "read-trace", false, "Read an existing trace file, creating a new build store");
+		Option readTraceOpt = new Option("r", "read-trace", false, "Read an existing trace file, creating a new database.");
 		opts.addOption(readTraceOpt);
 
 		/* add the --debug-level option */
 		Option dumpTraceOpt = new Option("d", "debug-level", true, 
-				"Amount of debug information to display (0 = none, 1 = brief, 2 = detailed)");
+				"Debug level (0 = none, 1 = brief, 2 = detailed).");
 		opts.addOption(dumpTraceOpt);
 		
 		return opts;
@@ -100,7 +99,7 @@ public class CliCommandScanBuild implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[ <options> ] <build-command> <args> ...";
+		return "<build-command> <args> ...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -110,7 +109,7 @@ public class CliCommandScanBuild implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Scan a legacy shell-based build command";
+		return "Scan a legacy shell-based build command.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -130,7 +129,7 @@ public class CliCommandScanBuild implements ICliCommand {
 		 * We can't specify both --trace-only and --read-trace
 		 */
 		if (optionTraceOnly && optionReadTrace) {
-			CliUtils.reportErrorAndExit("Options --trace-only and --read-trace can't be used together");
+			CliUtils.reportErrorAndExit("Options --trace-only and --read-trace can't be used together.");
 		}
 		
 		if (cmdLine.hasOption("debug-level")) {
@@ -142,7 +141,7 @@ public class CliCommandScanBuild implements ICliCommand {
 			} else if (level.equals("2")) {
 				optionDebugLevel = 2;		/* extended debugging output */
 			} else {
-				CliUtils.reportErrorAndExit("Invalid argument to --debug-level: " + level);
+				CliUtils.reportErrorAndExit("Invalid argument to --debug-level: " + level + ".");
 			}
 		}
 

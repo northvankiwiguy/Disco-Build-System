@@ -14,17 +14,17 @@ specifying the -f or --filter. For example:
     disco show-input-files file1.o:file2.o
     
 will show all files used as input while creating file1.o and file2.o (such 
-as file1.c, file2.c, and a number of header files).
+as file1.c, file2.c, and a number of header files). Whereas,
 
     disco show-input-files "*.a"
     
 will show all the files used as input to any of the build tree's .a files
-(typically these will be .o files).
+(typically these will be .o files). Next,
 
     disco show-input-files /home/psmith/myobj/libsrc/graphics/
     
 will show all the files used as input when generating the graphics directory
-and its contents.
+and its contents. Also,
 
     disco show-input-files %c/obj_files
     
@@ -55,10 +55,10 @@ Command-specific options are:
 
 -a | --all
   
-   Display all files that are used as input, regardless of how many build
-   tasks are involved in the derivation.
+  Display all files that are used as input, regardless of how many build
+  tasks are involved in the derivation.
 
-#include options/show-comps.txt
+#include options/file-show-comps.txt
 
 #include options/show-roots.txt
 

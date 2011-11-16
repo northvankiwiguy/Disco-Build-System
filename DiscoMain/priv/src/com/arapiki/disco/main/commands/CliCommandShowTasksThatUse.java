@@ -52,8 +52,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-tasks-that-use.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -78,11 +77,11 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		Options opts = super.getOptions();
 		
 		/* add the --read option */
-		Option readOpt = new Option("r", "read", false, "Only show tasks that read the specified files");
+		Option readOpt = new Option("r", "read", false, "Only show tasks that read the specified files.");
 		opts.addOption(readOpt);
 
 		/* add the --write option */
-		Option writeOpt = new Option("w", "write", false, "Only show tasks that write the specified files");
+		Option writeOpt = new Option("w", "write", false, "Only show tasks that write the specified files.");
 		opts.addOption(writeOpt);	
 		
 		return opts;
@@ -105,7 +104,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List all tasks that use (read and/or write) the specified file(s)";
+		return "List all tasks that access (read and/or write) the specified files.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -132,7 +131,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided");
+		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();

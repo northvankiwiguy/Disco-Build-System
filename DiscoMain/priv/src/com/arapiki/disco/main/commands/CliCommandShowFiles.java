@@ -76,15 +76,15 @@ public class CliCommandShowFiles implements ICliCommand {
 		Options opts = new Options();
 
 		/* add the --show-roots option */
-		Option showRootsOpt = new Option("r", "show-roots", false, "Show file name space roots when displaying report output");
+		Option showRootsOpt = new Option("r", "show-roots", false, "Show path roots when displaying report output.");
 		opts.addOption(showRootsOpt);
 
 		/* add the --show-comps option */
-		Option showCompsOpt = new Option("c", "show-comps", false, "Show component of each file in report output");
+		Option showCompsOpt = new Option("c", "show-comps", false, "Show component of each path in report output.");
 		opts.addOption(showCompsOpt);
 
 		/* add the -f/--filter option */
-		Option filterOpt = new Option("f", "filter", true, "Colon-separated path-specs used to filter the output results");
+		Option filterOpt = new Option("f", "filter", true, "Path-specs used to filter the output.");
 		filterOpt.setArgName("path-spec:...");
 		opts.addOption(filterOpt);
 		
@@ -108,7 +108,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List all files in the build system";
+		return "List all files in the build system.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -141,7 +141,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String [] args) {
 		
-		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Components cmpts = buildStore.getComponents();

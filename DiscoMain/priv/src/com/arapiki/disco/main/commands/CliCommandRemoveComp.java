@@ -37,8 +37,7 @@ public class CliCommandRemoveComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/rm-comp.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -78,7 +77,7 @@ public class CliCommandRemoveComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Remove an existing (but unused) component";
+		return "Remove an existing (but unused) component.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -99,17 +98,17 @@ public class CliCommandRemoveComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a component name");
+		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a component name.");
 
 		Components cmpts = buildStore.getComponents();
 
 		String compName = args[0];
 		int result = cmpts.removeComponent(compName);
 		if (result == ErrorCode.CANT_REMOVE) {
-			CliUtils.reportErrorAndExit("Component " + compName + " can't be deleted while it still contains files or tasks");
+			CliUtils.reportErrorAndExit("Component " + compName + " can't be deleted while it still contains files or tasks.");
 		}
 		if (result == ErrorCode.NOT_FOUND) {
-			CliUtils.reportErrorAndExit("Component " + compName + " is not defined");
+			CliUtils.reportErrorAndExit("Component " + compName + " is not defined.");
 		}
 
 		/* else, all is good */

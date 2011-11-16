@@ -1,0 +1,7 @@
+-l | --long
+
+  Display the task's command string on a single line, without any forced
+  wrapping of the text (as is the default behaviour). In reality, the
+  display terminal will likely wrap the content, but for the purpose of
+  cutting-and-pasting, or when writing to a text file, the command string
+  will appear on a single line.

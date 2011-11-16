@@ -1,0 +1,50 @@
+Execute a shell-command-based build system, such as those using a Make-based
+tool, importing the build task and file access information. The result is
+a fully-populated Disco database containing a complete view of how the
+legacy build system functions. For example:
+
+    disco scan-build gmake all
+    
+will invoke the "gmake all" shell command, monitor everything that the command
+does (such as invoking compilers and other tools), and record the complete set
+of information in the database.
+
+This does not create a fully functional Disco build system, but the database
+can be used for better understanding the legacy build process.
+    
+The command arguments are:
+
+<build-command> <args>
+
+  Any shell-command-based program or script, and its associated command-line
+  arguments. This would normally represent an invocation of a legacy build
+  tool, such as GNU Make.
+
+Command-specific options are:
+
+-f | --trace-file <file-name>
+
+  During the scanning process, a large amount of trace data is gathered. Due
+  to the size of this data (possibly > 1GB), a temporary file is used. This
+  option allows you to specify the name of the file (by default, "cfs.trace").
+  
+-d | --debug-level <arg>
+
+  If desired, copious amounts of debug data can be displayed, as a means of
+  monitoring the scanning process. By default, the debug level is 0 (nothing
+  displayed), but can be elevated to 1 for brief debug output or 2 for more
+  detailed information.
+  
+-t | --trace-only
+
+  If specified, only trace the shell commands, but do not construct a new
+  Disco database. This option is used to generate the intermediate trace file
+  for later use, or it can be used for debugging purposes (if -d is also
+  provided).
+
+-r | --read-trace                 
+
+  If specified, read an intermediate trace file that was produced previously,
+  and construct a Disco database. This option is useful if you don't wish to
+  invoke the shell commands again, since you've already collected the trace
+  file.

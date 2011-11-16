@@ -42,8 +42,7 @@ public class CliCommandScanEaAnno implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/scan-ea-anno.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -83,7 +82,7 @@ public class CliCommandScanEaAnno implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Scan an Electric Accelerator annotation file";
+		return "Scan an Electric Accelerator annotation file.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -128,10 +127,10 @@ public class CliCommandScanEaAnno implements ICliCommand {
 			CliUtils.reportErrorAndExit("ElectricAccelerator annotation file " + fileName + " not found.");
 
 		} catch (IOException e) {
-			CliUtils.reportErrorAndExit("I/O error while reading ElectricAccelerator annotation file " + fileName);
+			CliUtils.reportErrorAndExit("I/O error while reading ElectricAccelerator annotation file " + fileName + ".");
 
 		} catch (SAXException e) {
-			CliUtils.reportErrorAndExit("Unexpected syntax in ElectricAccelerator annotation file " + fileName);
+			CliUtils.reportErrorAndExit("Unexpected syntax in ElectricAccelerator annotation file " + fileName + ".");
 
 		} catch (FatalBuildScannerError e) {
 			CliUtils.reportErrorAndExit("Logic problem while scanning ElectricAccelerator annotation file " + 

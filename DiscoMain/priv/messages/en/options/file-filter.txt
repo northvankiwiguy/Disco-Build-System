@@ -7,58 +7,6 @@
   in the union of the two being shown.
    
   Filter specifications can be one of:
-   
-    <full-path-name>
-       
-      A full path name, relative to the root of the file system. For example:
-           
-          disco show-files -f /home/psmith/mycode/src/file.c
-                
-      If the path is a directory, all files (and subdirectories) within that
-      path will be shown.
-           
-    <file-name-pattern>
-       
-      A standard file name, possibly using one or more * wildcard characters.
-      This shows all files that match the name (or pattern), without concern
-      for which directory the file is within. For example:
-           
-          disco show-files -f "*.h"
-                
-      This filter is useful for locating a file by name, rather than
-      directory.
-           
-    @<root-name>/<path>
-       
-      A root name, and a path relative to that root. For example:
-           
-          disco show-files -f @src/lib/graphics
-                
-      Use the show-root, add-root and rm-root commands to manage file system
-      roots.
-           
-    %c/<comp-name> or %comp/<comp-name>
-       
-      A component name, specifying the set of files to be shown. Only files
-      that reside within that component will be shown. For example:
-           
-          disco show-files -f %comp/kernel_src
-                
-      Use the show-comp, add-comp, rm-comp commands to define component names,
-      and the set-file-comp command to add files into a component. Component 
-      names may also include a component section name, such as 'public' or
-      'private'. For example:
-           
-          disco show-files -f %comp/kernel_src/private
-                
-      This will limit the output to only those files within the specific
-      component section.
-           
-    %nc/<comp-name> or %not-comp/<comp-name>
-       
-      Similar to %c and %comp, but only show the files that reside outside
-      that component. For example:
-           
-          disco show-files -f %comp/kernel_src
-                
-      Component section names (private, public) can also be used.
+  
+#include options/path-spec.txt
+

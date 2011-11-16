@@ -52,8 +52,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-files-used-by.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -76,11 +75,11 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		Options opts = super.getOptions();
 		
 		/* add the --read option */
-		Option readOpt = new Option("r", "read", false, "Only show files that are read by these tasks");
+		Option readOpt = new Option("r", "read", false, "Only show files that are read by these tasks.");
 		opts.addOption(readOpt);
 
 		/* add the --write option */
-		Option writeOpt = new Option("w", "write", false, "Only show files that are written by these tasks");
+		Option writeOpt = new Option("w", "write", false, "Only show files that are written by these tasks.");
 		opts.addOption(writeOpt);	
 		
 		return opts;
@@ -93,7 +92,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[ <task-spec>, ... ]";
+		return "<task-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -103,7 +102,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Report on files that are used by the specified tasks";
+		return "Report on files that are used by the specified tasks.";
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -130,7 +129,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 		
-		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of task-specs must be provided");
+		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of task-specs must be provided.");
 
 		/* are we searching for reads, writes, or both? */
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite);

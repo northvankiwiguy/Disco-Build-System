@@ -1,0 +1,6 @@
+<comp-name>
+
+  An identifier representing a component name. The name must be at least three
+  characters long, starting with a letter. The remaining characters may be
+  letters, numbers, an underscore (_) or a dash (-). The name "None" is
+  reserved for the default component.

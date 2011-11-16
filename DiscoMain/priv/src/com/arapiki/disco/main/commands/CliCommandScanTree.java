@@ -40,8 +40,7 @@ public class CliCommandScanTree implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/scan-tree.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -71,7 +70,7 @@ public class CliCommandScanTree implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<path>, ...";
+		return "<path> ...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -81,7 +80,7 @@ public class CliCommandScanTree implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Scan one or more file system directories and record file names";
+		return "Scan one or more file system directories and record file names.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -102,14 +101,14 @@ public class CliCommandScanTree implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "one or more directory names required");
+		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "one or more directory names required.");
 
 		/* validate that the directories exist */
 		for (int i = 0; i < args.length; i++) {
 
 			File thisFile = new File(args[i]);
 			if (!thisFile.exists()){
-				CliUtils.reportErrorAndExit("Error: directory (or file) doesn't exist: " + args[i]);
+				CliUtils.reportErrorAndExit("Error: directory (or file) doesn't exist: " + args[i] + ".");
 			}
 		}
 
@@ -123,7 +122,7 @@ public class CliCommandScanTree implements ICliCommand {
 			try {
 				dirNameAbs = new File(dirName).getCanonicalPath();
 			} catch (IOException e) {
-				throw new FatalBuildTreeScannerError("Can't determine absolute path of " + dirName);
+				throw new FatalBuildTreeScannerError("Can't determine absolute path of " + dirName + ".");
 			}
 			System.out.println("Scanning " + dirNameAbs);
 			fss.scanForFiles("root", dirNameAbs);

@@ -60,8 +60,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/show-tasks.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -85,19 +84,19 @@ public class CliCommandShowTasks implements ICliCommand {
 		Options opts = new Options();
 
 		/* add the --show-comps option */
-		Option showCompsOpt = new Option("c", "show-comps", false, "Show component of each task in report output");
+		Option showCompsOpt = new Option("c", "show-comps", false, "Show the component of each task.");
 		opts.addOption(showCompsOpt);
 		
 		/* add the -s/--short option */
-		Option shortOpt = new Option("s", "short", false, "Provide abbreviated output");
-		opts.addOption(shortOpt);	
+		Option shortOpt = new Option("s", "short", false, "Provide abbreviated output.");
+		opts.addOption(shortOpt);
 
 		/* add the -l/--long option */
-		Option longOpt = new Option("l", "long", false, "Provide detailed/long output");
+		Option longOpt = new Option("l", "long", false, "Provide detailed/long output.");
 		opts.addOption(longOpt);
 		
 		/* add the -f/--filter option */
-		Option filterOpt = new Option("f", "filter", true, "Colon-separated task-specs used to filter the output results");
+		Option filterOpt = new Option("f", "filter", true, "Task-specs used to filter the output.");
 		filterOpt.setArgName("task-spec:...");
 		opts.addOption(filterOpt);
 		
@@ -121,7 +120,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List all tasks in the build system";
+		return "List all tasks in the build system.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -137,7 +136,7 @@ public class CliCommandShowTasks implements ICliCommand {
 		
 		/* do we want short or long command output? We can't have both */
 		if (optionShort && optionLong) {
-			CliUtils.reportErrorAndExit("Can't select --short and --long in the same command");
+			CliUtils.reportErrorAndExit("Can't select --short and --long in the same command.");
 		}
 		
 		outputFormat = optionShort ? DisplayWidth.ONE_LINE :
@@ -162,7 +161,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 		
 		BuildTasks bts = buildStore.getBuildTasks();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();		

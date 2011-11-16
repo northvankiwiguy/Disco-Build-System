@@ -77,7 +77,7 @@ public class CliCommandShowRoot implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Show the file system path referred to by this root";
+		return "Show the file system path roots.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,7 +98,7 @@ public class CliCommandShowRoot implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 		
-		CliUtils.validateArgs(getName(), args, 0, 1, "Only one root name can be specified");
+		CliUtils.validateArgs(getName(), args, 0, 1, "Only one root name can be specified.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 
@@ -117,7 +117,7 @@ public class CliCommandShowRoot implements ICliCommand {
 			String rootName = args[0];
 			int rootId = fns.getRootPath(rootName);
 			if (rootId == ErrorCode.NOT_FOUND) {
-				CliUtils.reportErrorAndExit("Root name not found - " + rootName);
+				CliUtils.reportErrorAndExit("Root name not found - " + rootName + ".");
 			}
 			String associatedPath = fns.getPathName(rootId);
 			System.out.println(associatedPath);

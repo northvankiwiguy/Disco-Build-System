@@ -1,0 +1,40 @@
+    <task-number>
+ 
+      The unique ID number of the task to be included. To specify multiple
+      tasks, separate the task number with colons (for example, 1:2:3).
+ 
+    <task-number>/
+    
+      The unique ID number of a parent task that will be included. Also
+      include all sub-tasks that are invoked by that parent task.
+    
+    <task-number>/<depth>
+    
+      Similar to <task-number>/, but only include tasks up to <depth> levels
+      beneath the specified task. A depth of 1 includes only the task itself,
+      whereas a depth of 2 includes the task and its immediate children.
+    
+    -<task-number>
+    
+      Exclude the specified task from the resulting set. This is most useful
+      when combined with a previous task inclusion. For example, to include
+      all tasks below task 2, with the exception of tasks 45 and 93, use the
+      following syntax: 2/:-45:-93.
+    
+    -<task-number>/
+    
+      Exclude the specified tasks, and all of its children.
+      
+    -<task-number>/<depth>
+  
+      Exclude the specified tasks, and <depth> levels of its child tasks.
+         
+    %c/<comp-name> or %comp/<comp-name>
+      
+      Include all the tasks that have previously been added to the <comp-name>
+      component (using the set-task-comp command).
+      
+    %nc/<comp-name> or %not-comp/<comp-name>
+    
+      Include all the tasks that have NOT been added to the <comp-name>
+      component.

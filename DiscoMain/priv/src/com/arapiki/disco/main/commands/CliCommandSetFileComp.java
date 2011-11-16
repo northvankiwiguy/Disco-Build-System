@@ -38,8 +38,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/set-file-comp.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -79,7 +78,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Assign a set of files to a component";
+		return "Add a set of files into a component.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -100,7 +99,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a path-spec");
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a path-spec.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Components cmpts = buildStore.getComponents();

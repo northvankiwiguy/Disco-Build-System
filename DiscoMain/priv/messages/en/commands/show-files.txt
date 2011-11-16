@@ -6,7 +6,7 @@ options.
 		
 Command-specific options are:
 
-#include options/show-comps.txt
+#include options/file-show-comps.txt
 
 #include options/show-roots.txt
 

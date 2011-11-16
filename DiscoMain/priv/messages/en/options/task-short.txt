@@ -1,0 +1,6 @@
+-s | --short
+
+  Show an abbreviated version of the task, with only the first portion of
+  the task's command string displayed (controlled by the --width flag).
+  This is in contrast to the default mode that displays the entire command
+  string, wrapped appropriately.

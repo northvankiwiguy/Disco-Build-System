@@ -12,4 +12,3 @@ The command arguments are:
 
   An arbitrary text name for the root. Must not contain the @ or :
   characters.
-  

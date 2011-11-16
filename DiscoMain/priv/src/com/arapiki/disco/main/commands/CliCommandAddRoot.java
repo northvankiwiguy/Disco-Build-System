@@ -77,7 +77,7 @@ public class CliCommandAddRoot implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Set the root so it refers to the specified path";
+		return "Set the root to refer to the specified path.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,7 +98,7 @@ public class CliCommandAddRoot implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify both a root name and a single path");
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify both a root name and a single path.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		String rootName = args[0];
@@ -134,19 +134,19 @@ public class CliCommandAddRoot implements ICliCommand {
 
 			switch (rc) {
 			case ErrorCode.NOT_A_DIRECTORY:
-				msg = pathName + " is not a directory";
+				msg = pathName + " is not a directory.";
 				break;
 
 			case ErrorCode.INVALID_NAME:
-				msg = rootName + " is not a valid root name";
+				msg = rootName + " is not a valid root name.";
 				break;
 
 			case ErrorCode.ONLY_ONE_ALLOWED:
-				msg = pathName + " already has a root associated with it";
+				msg = pathName + " already has a root associated with it.";
 				break;
 
 			case ErrorCode.BAD_PATH:
-				msg = pathName + " is an invalid path";
+				msg = pathName + " is an invalid path.";
 				break;
 			}
 

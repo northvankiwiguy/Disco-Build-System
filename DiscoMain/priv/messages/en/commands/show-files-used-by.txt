@@ -1,0 +1,23 @@
+Show the files that are used by a specific build task, or set of tasks. 
+By default, all relevant files are shown, although this can be controlled
+by various command-specific options.
+
+A colon-separated list of tasks must be provided, using the following syntax:
+
+#include options/task-spec.txt
+		
+The show-files-used-by command has further options for controlling the output:
+
+-r | --read
+
+  Only show files that the specified tasks read from. By default, all files
+  that are accessed (read or written) will be shown.
+
+-w | --write
+
+  Only show files that the specified tasks write to. By default, all files
+  that are accessed (read or written) will be shown. 
+  
+#include options/file-show-comps.txt
+
+#include options/file-filter.txt

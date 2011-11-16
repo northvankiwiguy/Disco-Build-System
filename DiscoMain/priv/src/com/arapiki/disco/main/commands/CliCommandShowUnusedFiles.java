@@ -77,7 +77,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected");
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();

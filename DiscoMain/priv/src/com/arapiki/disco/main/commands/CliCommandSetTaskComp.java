@@ -38,8 +38,7 @@ public class CliCommandSetTaskComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Add a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/set-task-comp.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -79,7 +78,7 @@ public class CliCommandSetTaskComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Assign a set of tasks to a component";
+		return "Add a set of tasks into a component.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -100,7 +99,7 @@ public class CliCommandSetTaskComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a colon-separated list of task-specs");
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a colon-separated list of task-specs.");
 		
 		Components cmpts = buildStore.getComponents();
 		BuildTasks bts = buildStore.getBuildTasks();

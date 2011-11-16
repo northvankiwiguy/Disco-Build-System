@@ -77,7 +77,7 @@ public class CliCommandRemoveRoot implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Remove the root so it no long references a path";
+		return "Remove the root so it no long references a path.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,7 +98,7 @@ public class CliCommandRemoveRoot implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must specify a root name");
+		CliUtils.validateArgs(getName(), args, 1, 1, "You must specify a root name.");
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		String rootName = args[0];
@@ -110,11 +110,11 @@ public class CliCommandRemoveRoot implements ICliCommand {
 			
 			switch (rc) {
 			case ErrorCode.NOT_FOUND:
-				msg = rootName + " doesn't exist";
+				msg = rootName + " doesn't exist.";
 				break;
 				
 			case ErrorCode.CANT_REMOVE:
-				msg = rootName + " can't be removed";
+				msg = rootName + " can't be removed.";
 				break;
 			}
 			

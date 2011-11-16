@@ -176,7 +176,7 @@ public final class DiscoMain {
 		
 		/* if there are no options for this command ... */
 		if (optList.size() == 0){
-			System.err.println("    No options available");	
+			System.err.println("    No options available.");	
 		} 
 		
 		/* 

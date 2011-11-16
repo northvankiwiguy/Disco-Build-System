@@ -1,0 +1,16 @@
+Show all the tasks in the build system. This provides a complete list of
+tasks and their parent/child hierarchy. That is, one task may invoke a number
+of sub-tasks, which in turn may invoke further tasks.
+
+By default all tasks are shown, although this can be controlled by various
+command-specific options.
+		
+Command-specific options are:
+
+#include options/task-short.txt
+
+#include options/task-long.txt
+
+#include options/task-show-comps.txt
+
+#include options/task-filter.txt

@@ -37,8 +37,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		// TODO Write a description
-		return null;
+		return CliUtils.genLocalizedMessage("#include commands/add-comp.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -78,7 +77,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Add a new (empty) component";
+		return "Add a new (empty) component.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -99,7 +98,7 @@ public class CliCommandAddComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a component name");
+		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a component name.");
 
 		Components cmpts = buildStore.getComponents();
 
@@ -108,7 +107,7 @@ public class CliCommandAddComp implements ICliCommand {
 
 		/* was the syntax of the name valid? */
 		if (compId == ErrorCode.INVALID_NAME){
-			CliUtils.reportErrorAndExit("Invalid component name " + compName);
+			CliUtils.reportErrorAndExit("Invalid component name " + compName + ".");
 		}
 
 		/* was the name already defined in the buildstore? */

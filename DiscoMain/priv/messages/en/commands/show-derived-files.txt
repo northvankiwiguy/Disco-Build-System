@@ -15,19 +15,19 @@ specifying the -f or --filter. For example:
 
     disco show-derived-files file1.c:file2.c
     
-will show all files derived from file1.c and file2.c (such as file1.o
-and file2.o).
+shows all files derived from file1.c and file2.c (such as file1.o and
+file2.o). Whereas
 
     disco show-derived-files "*.o"
     
-will show all the files that are derived from the complete collection of .o
+shows all the files that are derived from the complete collection of .o
 files. This will typically include archive libraries (.a files) and 
-executable files that link any .o files.
+executable files that link any of those .o files. Next,
 
     disco show-derived-files /home/psmith/mysrc/libsrc/graphics/
     
 will show all the files derived from files in the graphics/ subdirectory
-and it's contents.
+and it's contents. Also,
 
     disco show-derived-files %c/src_files
     
@@ -58,10 +58,10 @@ Command-specific options are:
 
 -a | --all
   
-   Display all files that are derived from the input files, regardless of
-   how many build tasks are involved in the derivation.
+  Display all files that are derived from the input files, regardless of
+  how many build tasks are involved in the derivation.
 
-#include options/show-comps.txt
+#include options/file-show-comps.txt
 
 #include options/show-roots.txt
 
