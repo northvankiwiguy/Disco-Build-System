@@ -56,10 +56,11 @@ system. Otherwise use the targets in the individual project directories.
 	
 	<!--
 	   - Build and package everything in the Disco software, including
-	   - the command line application and the Eclipse plugin.
+	   - the command line application, the Eclipse plugin, the javadoc
+	   - API, and the PDF user guide.
 	   -->
 	<target name="all" description="Build the complete release package."
-		depends="cli" />
+		depends="cli, javadoc, userdoc" />
 	
 	<!--================================================================================-->
 
@@ -160,7 +161,33 @@ system. Otherwise use the targets in the individual project directories.
 		<delete dir="${pub-dir}/javadoc" />
 		<delete dir="${pub-dir}/javadoc-private" />		
 	</target>
+	
+	<!--================================================================================-->
 
+	<!--
+	   - Generate the user document, as a PDF file.
+	  -->
+	<target name="userdoc" description="Generate the user documentation in PDF format.">
+		<exec dir="user-docs" executable="latex" failonerror="true">
+			<arg value="disco-user-guide.tex"/>
+		</exec>
+		<exec dir="user-docs" executable="dvipdf" failonerror="true">
+			<arg value="disco-user-guide.dvi"/>
+		</exec>
+		<move file="user-docs/disco-user-guide.pdf" todir="${pub-dir}/" />	
+	</target>
+		
+	<!--
+	   - Clean all the .aux, .log and .dvi files from the user doc directory.
+	  -->
+	<target name="clean-userdoc" description="Clean the user documentation files.">
+		<delete dir="user-docs">
+			<include name="*.dvi"/>
+			<include name="*.log"/>
+			<include name="*.aux"/>
+		</delete>
+	</target>
+	
 	<!--================================================================================-->
 
 	<!--
@@ -175,11 +202,13 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/SystemTests/build.xml" target="clean" inheritall="false" />
 		<antcall target="clean-javadoc" />
+		<antcall target="clean-userdoc" />
 		
 		<!-- clean our packaging directories -->
 		<delete dir="${project-root}/pub" />
 		<delete dir="${project-root}/priv/bin" />
 		<delete dir="${project-root}/priv/pkg" />
+		
 	</target>
 
 	<!--================================================================================-->
