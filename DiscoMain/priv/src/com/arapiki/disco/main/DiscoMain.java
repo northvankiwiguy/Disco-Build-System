@@ -21,6 +21,7 @@ import org.apache.commons.cli.*;
 
 import com.arapiki.disco.main.commands.*;
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.errors.BuildStoreVersionException;
 import com.arapiki.utils.print.PrintUtils;
 import com.arapiki.utils.string.StringArray;
 import com.arapiki.utils.version.Version;
@@ -455,6 +456,8 @@ public final class DiscoMain {
 				 buildStore = new BuildStore(buildStoreFileName);
 			} catch (FileNotFoundException ex) {
 				CliUtils.reportErrorAndExit(ex.getMessage());
+			} catch (BuildStoreVersionException ex) {
+				CliUtils.reportErrorAndExit(ex.getMessage());				
 			}
 			
 			/*

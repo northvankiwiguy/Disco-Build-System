@@ -17,6 +17,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.arapiki.utils.version.Version;
+
 
 /**
  * Test cases for validating the BuildStore class.
@@ -55,7 +57,7 @@ public class TestBuildStore {
 		 * Test that a new BuildStore has the correct schema version.
 		 */
 		try {
-			assertEquals(1, bs.getBuildStoreVersion());
+			assertEquals(Version.getVersionNumberAsInt(), bs.getBuildStoreVersion());
 		} catch (FatalBuildStoreError e) {
 			e.printStackTrace();
 			fail("Unexpected BuildStoreException");

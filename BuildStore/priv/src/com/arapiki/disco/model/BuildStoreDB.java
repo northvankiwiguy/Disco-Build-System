@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.arapiki.utils.version.Version;
+
 /**
  * A helper class to manage and simplify all the database access performed
  * by the BuildStore class and it's managers. This class, and all the methods
@@ -194,7 +196,7 @@ class BuildStoreDB  {
 			 * use this field to detect older versions of the database.
 			 */
 			stat.executeUpdate("create table schemaVersion ( version integer )");
-			stat.executeUpdate("insert into schemaVersion values ( " + SCHEMA_VERSION + ")");
+			stat.executeUpdate("insert into schemaVersion values ( " + Version.getVersionNumberAsInt() + ")");
 
 			/* Create the "files" table. */
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, " +

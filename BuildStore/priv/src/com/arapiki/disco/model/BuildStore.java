@@ -14,6 +14,9 @@ package com.arapiki.disco.model;
 
 import java.io.FileNotFoundException;
 
+import com.arapiki.disco.model.errors.BuildStoreVersionException;
+import com.arapiki.utils.version.Version;
+
 
 /**
  * A BuildStore object is the main class that implements a Disco build system. By creating
@@ -68,17 +71,33 @@ public class BuildStore {
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
+	 * @throws BuildStoreVersionException The database schema of an existing database is the wrong version.
 	 */
-	public BuildStore(String buildStoreName) throws FileNotFoundException {
+	public BuildStore(String buildStoreName)
+			throws FileNotFoundException, BuildStoreVersionException {
 		
 		/* create a new DB manager to handle all the SQL connection issues */
 		db = new BuildStoreDB(buildStoreName);
 		
 		/* if necessary, initialize the database with required tables */
-		if (getBuildStoreVersion() == 0){
+		int buildStoreVersion = getBuildStoreVersion();
+		if (buildStoreVersion == 0){
 			/* changes must be committed promptly */
 			db.setFastAccessMode(false); 
 			db.initDatabase();
+		}
+		
+		/* 
+		 * Else, it's an existing database. Validate that the schema is the
+		 * correct version.
+		 */
+		else {
+			int actualVersion = Version.getVersionNumberAsInt();
+			if (buildStoreVersion != actualVersion){
+				throw new BuildStoreVersionException(
+						"Database \"" + buildStoreName + "\" has schema version " + buildStoreVersion +
+						". Expected version " + actualVersion + ".");
+			}
 		}
 		
 		/* create a new FileNameSpaces object to manage our list of files */

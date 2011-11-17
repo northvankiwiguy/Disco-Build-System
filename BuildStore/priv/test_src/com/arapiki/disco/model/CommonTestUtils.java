@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.arapiki.disco.model.errors.BuildStoreVersionException;
 import com.arapiki.utils.types.IntegerTreeSet;
 
 
@@ -37,8 +38,13 @@ public class CommonTestUtils {
 	 * @throws FileNotFoundException If the database file can't be opened
 	 */
 	public static BuildStore getEmptyBuildStore() throws FileNotFoundException {
-		BuildStore bs = new BuildStore(tempDbFile);
-		
+		BuildStore bs;
+		try {
+			bs = new BuildStore(tempDbFile);
+		} catch (BuildStoreVersionException e) {
+			/* we can't handle schema version problems - make it a fatal error */
+			throw new FatalBuildStoreError(e.getMessage());
+		}
 		// force the schema to be dropped and recreated.
 		bs.forceInitialize();
 		

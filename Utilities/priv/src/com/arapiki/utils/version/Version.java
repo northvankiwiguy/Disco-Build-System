@@ -31,11 +31,34 @@ public class Version {
 	}
 	
 	/**
-	 * Return the numeric version number of Disco.
+	 * Return the numeric version number of Disco as a string in the
+	 * form X.Y.Z.
 	 * @return the numeric version number of Disco.
 	 */
 	public static String getVersionNumber() {
 		return "@VERSION@";
+	}
+	
+	/**
+	 * Return the version string as an integer. For example, if the
+	 * version is "1.2.3", return "010203". Note that if we build
+	 * this class via the Eclipse GUI, the real version number won't
+	 * have been embedded into the Version.java file, so we'll instead
+	 * return 0.
+	 * 
+	 * @return The version string in integer form.
+	 */
+	public static int getVersionNumberAsInt() {
+		String verString = getVersionNumber();
+		String digits[] = verString.split("\\.");
+		
+		int num = 0;
+		for (String string : digits) {
+			int digit = Integer.valueOf(string);
+			num = (num * 100) + digit; 
+		}
+		
+		return num;
 	}
 	
 	/**
