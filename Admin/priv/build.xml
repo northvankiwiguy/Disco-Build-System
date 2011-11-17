@@ -12,6 +12,9 @@ system. Otherwise use the targets in the individual project directories.
 	   =================================================================================-->
 
 	<import file="shared/build/build-version.xml"/>
+	
+	<!-- check for that we have the correct compilers installed -->
+	<import file="shared/build/build-toolcheck.xml" />
 
 	<!--================================================================================
 	   - Path definitions

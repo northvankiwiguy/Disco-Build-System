@@ -1,0 +1,57 @@
+
+	<!--
+		- This file contains sanity checks to ensure that our build machine -
+		has the necessary tools installed. This avoids the annoyance of -
+		getting obscure compiler errors because the wrong version of tool -
+		was used.
+	-->
+
+<project name="build-toolcheck">
+
+	<!--
+	   - Check that we're using the minimum Java version level
+	  -->
+	<condition property="java-ok">
+		<or>
+			<equals arg1="${ant.java.version}" arg2="1.5" />
+			<equals arg1="${ant.java.version}" arg2="1.6" />
+		</or>
+	</condition>
+	<fail unless="java-ok">
+		A Java Development Kit (JDK) of version 1.5 or greater is required. Please make sure this is installed before trying to build Disco.
+	</fail>
+	
+	<!--
+	   - Check the minimum version of ant
+	  -->
+	<condition property="ant-ok">
+		<contains string="${ant.version}" substring="version 1.8" />
+	</condition>
+	<fail unless="ant-ok">
+		Ant version 1.8 or greater is required. Please make sure this is installed before trying to build Disco.
+	</fail>
+
+	<!--
+	   - Check that LaTex is installed (for compiling .tex files into a .dvi file)
+	 -->
+	<exec executable="latex" resultproperty="latex-ok" failifexecutionfails="false"
+			errorproperty="latex-error" outputproperty="latex-output">
+		<arg value="-v" />
+	</exec>
+	<fail unless="latex-ok">
+		The LaTeX documentation tool is required. Please make sure this is installed before trying to build Disco.
+	</fail>
+	
+	<!--
+	   - Check that dvips/dvipdf is installed (for compiling a .dvi file to a .pdf file). We look for
+	   - the underlying dvips command here, since it returns a 0 exit code if we pass -v.
+	 -->
+	<exec executable="dvips" resultproperty="dvipdf-ok" failifexecutionfails="false"
+			errorproperty="dvipdf-error" outputproperty="dvipdf-output">
+		<arg value="-v" />
+	</exec>
+	<fail unless="dvipdf-ok">
+		The dvipdf documentation tool is required. Please make sure this is installed before trying to build Disco.
+	</fail>
+	
+</project>
