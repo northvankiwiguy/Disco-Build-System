@@ -10,6 +10,26 @@ set -f
 # Figure out what this script was executed as - 
 export SCRIPT_DIR=`dirname $0`
 
+# Figure out our current working directory (this may fail, so disable bash's -e for a while)
+set +e
+CUR_DIR=`pwd 2>/dev/null`
+set -e
+if [ -z "$CUR_DIR" ];
+then
+	echo "Can't locate current working directory. Aborting."
+	exit 1
+fi
+
+#
+# If SCRIPT_DIR is relative, that means the user executed the disco script as a relative
+# path (e.g. ./disco-0.0.0/bin/disco) rather than as an absolute path or via $PATH. In this
+# case, we need to prepend our current directory to SCRIPT_DIR.
+#
+if [ ${SCRIPT_DIR:0:1} != "/" ];
+then
+	SCRIPT_DIR=$CUR_DIR/$SCRIPT_DIR
+fi
+
 #
 # Now we have two cases for setting up the classpath, depending on where the files are installed.
 #
