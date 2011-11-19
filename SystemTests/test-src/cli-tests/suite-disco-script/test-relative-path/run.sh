@@ -15,5 +15,5 @@ discoDir=`dirname $discoPath`
 # to load the native libraries (but was failing).
 #
 
-cd $discoDir && ./disco -f $discoDir/buildstore.disco scan-tree /usr/include
+cd $discoDir && ./disco -f $thisDir/buildstore.disco scan-tree /usr/include
 
