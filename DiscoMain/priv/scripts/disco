@@ -28,6 +28,7 @@ then
 	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-io-2.1.jar:$WORK/DiscoMain/priv:$CLASSPATH"
+	export DISCO_HOME=$WORK/Admin/priv/pkg/disco-0.0.0/
 	
 #
 # Case 2 for a fully installed disco release - everything is in a single jar file.
@@ -43,6 +44,15 @@ then
 else
     echo Unable to locate disco.jar file.
     exit 1
+fi
+
+#
+# Sanity check
+#
+if [ ! -d $DISCO_HOME ];
+then
+	echo "Internal error: The $DISCO_HOME directory is missing."
+	exit 1
 fi
 
 #

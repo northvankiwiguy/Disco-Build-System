@@ -1,8 +1,59 @@
-To compile Disco, execute the following commands in this directory:
+How to Compile Disco
+--------------------
+
+To compile the Disco release from source code, execute the following commands
+in this directory:
 
   % ant all
   
-To run all tests, execute the following:
+This will generate a release "tar-ball" in Admin/pub/ directory. The release
+image is named disco-W.X.Y.tar.gz, where W.X.Y is the version number of the
+current code base.
+
+To build with a different version number, use:
+
+  % ant all -Dversion=W.Y.Z
+
+To run all tests (unit tests and cli tests), execute the following:
 
   % ant test
 
+These tests could easily take at least 5 minutes. The test scripts will halt
+immediately upon finding a problem.
+
+For more choices on what to build, see the help information:
+
+  % ant help
+
+
+Building Disco in a Development Envionment
+------------------------------------------
+
+Given that the above procedure for compiling Disco is rather time-consuming
+for Disco developers, there's a faster way to get a runnable program. This 
+feature allows you to edit source code using Eclipse, then immediately run
+the "disco" command to test your changes.
+
+There are two steps required to make this work:
+
+1) Set your shell $PATH variable to include:
+
+   .../DiscoMain/priv/scripts/
+   
+   you'll be able to run the "disco" shell script that's resident in that
+   directory (as opposed to extracting the disco-W.Y.Z.tar.gz in order to run 
+   it). When used in this mode, the "disco" script picks up .class files and
+   .jar files directly from your source tree. 
+
+2) Make sure you've built version 0.0.0 of the full disco package. This is
+   required since the dynamically loadable .so files, and the "cfs" executable
+   program must be in a well-known place. The disco script will look in this
+   directory when loading those programs. Unfortunately, this implies that
+   native C/C++ code must be compiled with the full "ant all" build step.
+   
+It's very important that you build with version 0.0.0 ("ant all 
+-Dversion=0.0.0"), and that all disco databases you use have the embedded
+schema version of 0. When executing .class files directly from the source
+tree, they'll automatically use schema version 0, and the code and the
+database content must use the exact same schema version numbers.
+ 
