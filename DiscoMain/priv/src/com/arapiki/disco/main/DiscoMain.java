@@ -441,77 +441,91 @@ public final class DiscoMain {
 		}
 		
 		/*
+		 * Open the build store file, or create a new file.
+		 */
+		BuildStore buildStore = null;
+		try {
+			buildStore = new BuildStore(buildStoreFileName);
+		} catch (FileNotFoundException ex) {
+			CliUtils.reportErrorAndExit(ex.getMessage());
+		} catch (BuildStoreVersionException ex) {
+			CliUtils.reportErrorAndExit(ex.getMessage());				
+		}
+
+		/*
+		 * Fetch the command's command line options (Options object) which
+		 * is then used to parse the user-provided arguments.
+		 */
+		CommandLineParser parser = new PosixParser();
+		CommandLine cmdLine = null;
+		Options cmdOpts = cmd.getOptions();
+		try {
+			cmdLine = parser.parse(cmdOpts, cmdArgs, true);
+		} catch (ParseException e) {
+			CliUtils.reportErrorAndExit(e.getMessage());
+		}
+		cmd.processOptions(buildStore, cmdLine);
+
+		/*
+		 * Check for unprocessed command options. That is, if the first
+		 * non-option argument starts with '-', then it's actually an
+		 * unprocessed option.
+		 */
+		String remainingArgs[] = cmdLine.getArgs();
+		if (remainingArgs.length > 0) {
+			String firstArg = remainingArgs[0];
+			if (firstArg.startsWith("-")) {
+				CliUtils.reportErrorAndExit("Unrecognized option " + firstArg);
+			}
+		}
+
+		/*
+		 * Now, invoke the command. If the invoke() method wants to, it may completely
+		 * exit from the program. This is the typical case when an error is reported
+		 * via the CliUtils.reportErrorAndExit() method.
+		 */
+		cmd.invoke(buildStore, remainingArgs);
+
+		/* release resources */
+		buildStore.close();
+
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * The standard Java main() function, which does its work by delegating to invokeCommand().
+	 * We also use this opportunity to catch and report any stray Exceptions/Errors.
+	 * 
+	 * @param args The standard command line argument array.
+	 */
+	public static void main(String[] args) {
+		
+		/*
 		 * We wrap everything in a global "try", to catch any uncaught Exception
 		 * exceptions that might be thrown. This is a catch all for all errors and
 		 * exceptions that don't get caught anywhere else. We'll do our best to 
 		 * display a meaningful error message.
 		 */
 		try {
+			new DiscoMain().invokeCommand(args);
 			
-			/*
-			 * Open the build store file, or create a new file.
-			 */
-			BuildStore buildStore = null;
-			try {
-				 buildStore = new BuildStore(buildStoreFileName);
-			} catch (FileNotFoundException ex) {
-				CliUtils.reportErrorAndExit(ex.getMessage());
-			} catch (BuildStoreVersionException ex) {
-				CliUtils.reportErrorAndExit(ex.getMessage());				
-			}
-			
-			/*
-			 * Fetch the command's command line options (Options object) which
-			 * is then used to parse the user-provided arguments.
-			 */
-			CommandLineParser parser = new PosixParser();
-			CommandLine cmdLine = null;
-			Options cmdOpts = cmd.getOptions();
-		    try {
-		    	cmdLine = parser.parse(cmdOpts, cmdArgs, true);
-			} catch (ParseException e) {
-				CliUtils.reportErrorAndExit(e.getMessage());
-			}
-			cmd.processOptions(buildStore, cmdLine);
-			
-			/*
-			 * Check for unprocessed command options. That is, if the first
-			 * non-option argument starts with '-', then it's actually an
-			 * unprocessed option.
-			 */
-			String remainingArgs[] = cmdLine.getArgs();
-			if (remainingArgs.length > 0) {
-				String firstArg = remainingArgs[0];
-				if (firstArg.startsWith("-")) {
-					CliUtils.reportErrorAndExit("Unrecognized option " + firstArg);
-				}
-			}
-			
-			/*
-			 * Now, invoke the command. If the invoke() method wants to, it may completely
-			 * exit from the program. This is the typical case when an error is reported
-			 * via the CliUtils.reportErrorAndExit() method.
-			 */
-			cmd.invoke(buildStore, remainingArgs);
-			
-			/* release resources */
-			buildStore.close();
-			
-		} catch (Exception e) {
-			System.err.println("Error: Unexpected software problem. Please report the following error:\n");
+		} catch (Throwable e) {
+			System.err.println("\n============================================================\n");
+			System.err.println("Error: Unexpected software problem, which was probably an internal");
+			System.err.println("programming error, rather than something you did wrong. Please cut");
+			System.err.println("and paste the following error and email it to disco@arapiki.com,");
+			System.err.println("along with a description of what you were doing at the time.");
+			System.err.println("\n============================================================\n");
+			System.err.println(Version.getVersion());
+			System.err.println("Java version is " + System.getProperty("java.vendor" ) + " " +
+					System.getProperty("java.version"));
+			System.err.println("Operating system version is " + System.getProperty("os.name") +
+					" " + System.getProperty("os.version"));			
 			e.printStackTrace(System.err);
+			System.err.println("\n============================================================");
 			System.exit(1);
 		}
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * The standard Java main() function, which does nothing by delegate to invokeCommand().
-	 * @param args The standard command line argument array.
-	 */
-	public static void main(String[] args) {
-		new DiscoMain().invokeCommand(args);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	
