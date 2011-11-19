@@ -1,0 +1,4 @@
+This test suite validates the functionality of the basic "disco" script,
+as opposed to any of the Java code that's invoked by this script.
+
+
