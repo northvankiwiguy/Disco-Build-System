@@ -364,7 +364,7 @@ static void test_trace_buffer_lock(void)
 		/* parent */
 
 		/* wait just long enough for the child to acquire the lock. */
-		usleep(1000);
+		usleep(10000);
 
 		/*
 		 * acquire the lock - this could take a while, since the child has it locked
