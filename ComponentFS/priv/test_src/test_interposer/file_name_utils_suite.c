@@ -74,10 +74,25 @@ static int teardown(void)
 
 static void test_simple_paths(void)
 {
+	/* test with . and .. */
 	_cfs_combine_paths("/etc/../usr/", "bin/.//zip", output_buffer);
 	CU_ASSERT_STRING_EQUAL("/usr/bin/zip", output_buffer);
+	_cfs_combine_paths("/./etc/../usr/", "bin/.//zip", output_buffer);
+	CU_ASSERT_STRING_EQUAL("/usr/bin/zip", output_buffer);
+	_cfs_combine_paths("/etc/../usr/../usr/./", "../usr/bin/.//zip", output_buffer);
+	CU_ASSERT_STRING_EQUAL("/usr/bin/zip", output_buffer);
 
-	/* TODO: A lot more tests required here */
+	/* test with too many slashes */
+	_cfs_combine_paths("//", "/etc/passwd", output_buffer);
+	CU_ASSERT_STRING_EQUAL("/etc/passwd", output_buffer);
+
+	/* test with files that don't exist (yet) - should be OK */
+	CU_ASSERT_EQUAL(0, _cfs_combine_paths("/usr", "bin/sillysed", output_buffer));
+	CU_ASSERT_STRING_EQUAL("/usr/bin/sillysed", output_buffer);
+	CU_ASSERT_EQUAL(0, _cfs_combine_paths("/usr", "bin/sillydir/", output_buffer));
+	CU_ASSERT_STRING_EQUAL("/usr/bin/sillydir/", output_buffer);
+	CU_ASSERT_EQUAL(0, _cfs_combine_paths("/", "sillyfile", output_buffer));
+	CU_ASSERT_STRING_EQUAL("/sillyfile", output_buffer);
 }
 
 /*======================================================================
@@ -110,12 +125,25 @@ static void test_bad_args(void)
 	CU_ASSERT_EQUAL(ENAMETOOLONG,
 			_cfs_combine_paths(input_buffer1, input_buffer2, output_buffer));
 
-	/* test with a path/file name that doesn't exist - ENOENT */
-	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/usr", "bin/sillysed", output_buffer));
+	/* test with a parent path that doesn't exist - ENOENT */
 	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/sillyusr", "bin/sed", output_buffer));
+	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/sillyusr", "..", output_buffer));
+	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/usr/bin", "missing/dir", output_buffer));
 
 	/* test with a directory name that's actually a file name - ENOTDIR */
 	CU_ASSERT_EQUAL(ENOTDIR, _cfs_combine_paths("/etc/passwd", "bin/sed", output_buffer));
+}
+
+/*======================================================================
+ * test_with_symlinks
+ *
+ * Test with symlinks.
+ *
+ *======================================================================*/
+
+static void test_symlinks(void)
+{
+	/* TODO: add test cases for symlinks */
 }
 
 /*======================================================================
