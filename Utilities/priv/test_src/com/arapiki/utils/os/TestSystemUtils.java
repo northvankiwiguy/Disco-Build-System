@@ -349,4 +349,39 @@ public class TestSystemUtils {
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test for the SystemUtils.createTempDir() and SystemUtils.deleteDirectory() methods.
+	 * @throws Exception 
+	 */
+	@Test
+	public void testCreateDeleteTempDir() throws Exception {
+		
+		/* create a temporary directory, making sure that it exists after it's created */
+		File dir1 = SystemUtils.createTempDir();
+		assertTrue(dir1.exists());
+		
+		/* create a second temporary directory, making sure it's different from the first */
+		File dir2 = SystemUtils.createTempDir();
+		assertTrue(dir1.exists());
+		assertNotSame(dir1.toString(), dir2.toString());
+		
+		/* store some additional files/directories in the first temp directory */
+		File subdir1 = new File(dir1, "subdir1");
+		File subdir2 = new File(dir1, "subdir2");
+		assertTrue(subdir1.mkdir());
+		assertTrue(subdir2.mkdir());
+		assertTrue(new File(dir1, "file1").createNewFile());
+		assertTrue(new File(dir1, "file2").createNewFile());
+		assertTrue(new File(subdir1, "file3").createNewFile());
+		assertTrue(new File(subdir1, "file4").createNewFile());		
+		
+		/* delete the second temp dir */
+		assertTrue(SystemUtils.deleteDirectory(dir2));
+		
+		/* delete the first temp dir */
+		assertTrue(SystemUtils.deleteDirectory(dir1));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

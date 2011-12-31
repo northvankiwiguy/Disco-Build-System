@@ -309,4 +309,41 @@ public class SystemUtils {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a temporary directory on the file system.
+	 * @return The newly-created directory.
+	 * @throws IOException If the directory couldn't be created.
+	 */
+	public static File createTempDir() throws IOException {
+		
+		File tmpDir = File.createTempFile("tempDir", null);
+		if (!tmpDir.delete() || !tmpDir.mkdir()) {
+			throw new IOException("Couldn't make temporary directory: " + tmpDir);
+		}
+		return tmpDir;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Delete a file system file or directory (and all the files and sub-directories it may
+	 * contain).
+	 * @param fileOrDir The file or directory to be deleted.
+	 * @return True or false, to indicate whether the deletion was successful.
+	 */
+	public static boolean deleteDirectory(File fileOrDir) {
+	    if (fileOrDir.isDirectory()) {
+	        String[] children = fileOrDir.list();
+	        for (int i=0; i < children.length; i++) {
+	            if (!deleteDirectory(new File(fileOrDir, children[i]))){
+	                return false;
+	            }
+	        }
+	    }
+	    return fileOrDir.delete();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 }
