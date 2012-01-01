@@ -124,11 +124,11 @@ class BuildStoreDB  {
 	/**
 	 * Retrieve the schema version of this database.
 	 * 
-	 * @return The schema version, or 0 if the schema isn't yet initialized.
+	 * @return The schema version, or -1 if the schema isn't yet initialized.
 	 */
 	/* package private */
 	int getBuildStoreVersion() {
-		int version = 0;
+		int version = -1;
 		Statement stat = null;
 		ResultSet rs = null;
 		
@@ -156,7 +156,7 @@ class BuildStoreDB  {
 			}			
 		} catch (SQLException e) {
 			/* there's no schema in place, return 0 */
-			version = 0;
+			version = -1;
 		}
 		
 		/* close everything - if this fails, things are really bad */

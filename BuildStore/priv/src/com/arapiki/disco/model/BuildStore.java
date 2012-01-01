@@ -81,7 +81,7 @@ public class BuildStore {
 		
 		/* if necessary, initialize the database with required tables */
 		int buildStoreVersion = getBuildStoreVersion();
-		if (buildStoreVersion == 0){
+		if (buildStoreVersion == -1){
 			/* changes must be committed promptly */
 			db.setFastAccessMode(false); 
 			db.initDatabase();
@@ -126,7 +126,7 @@ public class BuildStore {
 	/**
 	 * Return the Disco database's schema version.
 	 * 
-	 * @return The schema version as an integer, or 0 if there's no schema in place.
+	 * @return The schema version as an integer, or -1 if there's no schema in place.
 	 */
 	public int getBuildStoreVersion() {
 		return db.getBuildStoreVersion();
