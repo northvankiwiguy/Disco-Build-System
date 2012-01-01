@@ -187,6 +187,7 @@ class BuildStoreDB  {
 		/* make sure the database connection is still open */
 		checkDatabase();
 
+		setFastAccessMode(true);
 		dropDatabase();
 		try {
 			Statement stat = dbConn.createStatement();
@@ -244,6 +245,7 @@ class BuildStoreDB  {
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to initialize database schema", e);
 		}
+		setFastAccessMode(false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
