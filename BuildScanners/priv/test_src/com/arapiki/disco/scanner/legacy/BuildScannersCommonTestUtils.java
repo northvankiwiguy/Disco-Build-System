@@ -20,8 +20,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.FatalBuildStoreError;
-import com.arapiki.disco.model.errors.BuildStoreVersionException;
+import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.utils.os.ShellResult;
 import com.arapiki.utils.os.SystemUtils;
 
@@ -31,49 +30,11 @@ import com.arapiki.utils.os.SystemUtils;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class CommonTestUtils {
+public class BuildScannersCommonTestUtils {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
-
-	/**
-	 * Create a new empty BuildStore, with an empty database. For
-	 * testing purposes only.
-	 * @return The empty BuildStore database
-	 * @throws FileNotFoundException If the database file can't be opened
-	 */
-	public static BuildStore getEmptyBuildStore() throws FileNotFoundException {
-		return getEmptyBuildStore(new File("/tmp"));
-	}	
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Create a new empty BuildStore in the user-specified directory. For testing
-	 * purposes only.
-	 * @param tmpDir The directory in which to place the BuildStore file.
-	 * @return The empty BuildStore database.
-	 * @throws FileNotFoundException If the database file can't be opened.
-	 */
-	public static BuildStore getEmptyBuildStore(File tmpDir) throws FileNotFoundException {
-		BuildStore bs;
-		try {
-			File bsFile = new File(tmpDir, "testBuildStore");
-			bsFile.delete();
-			bs = new BuildStore(bsFile.toString());
-		} catch (BuildStoreVersionException e) {
-			/* we can't handle schema version problems - make it a fatal error */
-			throw new FatalBuildStoreError(e.getMessage());
-		}
-		
-		// force the schema to be dropped and recreated.
-		bs.forceInitialize();
-		
-		return bs;
-	}	
-
-	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Given a program, contained entirely within a string, compile and execute
@@ -148,7 +109,7 @@ public class CommonTestUtils {
 		}
 
 		/* create an empty BuildStore for the tracer to populate */
-		bs = getEmptyBuildStore(tmpDir);
+		bs = CommonTestUtils.getEmptyBuildStore(tmpDir);
 		lbs.setBuildStore(bs);
 
 		/* trace the file, while displaying debug output */

@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import org.junit.Test;
 
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.CommonTestUtils;
 
 /**
  * Test methods for validating the LegacyBuildScanner class. Note that

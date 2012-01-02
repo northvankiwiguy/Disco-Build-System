@@ -87,7 +87,7 @@ public class TestCFuncOpen {
 	private void traceOneProgram(String programCode, String args[]) throws Exception {
 		
 		/* compile, run, and trace the program */
-		bs = CommonTestUtils.parseLegacyProgram(tmpDir, programCode, args);
+		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, programCode, args);
 		
 		/* fetch references to sub objects */
 		bts = bs.getBuildTasks();

@@ -12,13 +12,13 @@
 
 package com.arapiki.disco.model;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.arapiki.disco.model.errors.BuildStoreVersionException;
 import com.arapiki.utils.types.IntegerTreeSet;
-
 
 /**
  * Common methods for testing BuildStore and related classes.
@@ -28,9 +28,6 @@ public class CommonTestUtils {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/** The name of the temporary database file */
-	private static String tempDbFile = "/tmp/testBuildStore";
-	
 	/**
 	 * Create a new empty BuildStore, with an empty database. For
 	 * testing purposes only.
@@ -38,14 +35,30 @@ public class CommonTestUtils {
 	 * @throws FileNotFoundException If the database file can't be opened
 	 */
 	public static BuildStore getEmptyBuildStore() throws FileNotFoundException {
+		return getEmptyBuildStore(new File("/tmp"));
+	}	
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a new empty BuildStore in the user-specified directory. For testing
+	 * purposes only.
+	 * @param tmpDir The directory in which to place the BuildStore file.
+	 * @return The empty BuildStore database.
+	 * @throws FileNotFoundException If the database file can't be opened.
+	 */
+	public static BuildStore getEmptyBuildStore(File tmpDir) throws FileNotFoundException {
 		BuildStore bs;
 		try {
-			bs = new BuildStore(tempDbFile);
+			File bsFile = new File(tmpDir, "testBuildStore");
+			bsFile.delete();
+			bs = new BuildStore(bsFile.toString());
 		} catch (BuildStoreVersionException e) {
 			/* we can't handle schema version problems - make it a fatal error */
 			throw new FatalBuildStoreError(e.getMessage());
 		}
-		// force the schema to be dropped and recreated.
+		
+		/* force the schema to be dropped and recreated. */
 		bs.forceInitialize();
 		
 		return bs;
