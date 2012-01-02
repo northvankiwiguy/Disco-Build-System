@@ -71,6 +71,7 @@ public class BuildTasks {
 		findDirectoryPrepStmt = null,
 		findChildrenPrepStmt = null,
 		insertBuildTaskFilesPrepStmt = null,
+		updateBuildTaskFilesPrepStmt = null,
 		findOperationInBuildTaskFilesPrepStmt = null,
 		findFilesInBuildTaskFilesPrepStmt = null,
 		findFilesByOperationInBuildTaskFilesPrepStmt = null,
@@ -99,6 +100,8 @@ public class BuildTasks {
 		findChildrenPrepStmt = db.prepareStatement("select taskId from buildTasks where parentTaskId = ?" +
 				" and parentTaskId != taskId");
 		insertBuildTaskFilesPrepStmt = db.prepareStatement("insert into buildTaskFiles values (?, ?, ?)");
+		updateBuildTaskFilesPrepStmt = 
+			db.prepareStatement("update buildTaskFiles set operation = ? where taskId = ? and fileId = ?");
 		findOperationInBuildTaskFilesPrepStmt = 
 			db.prepareStatement("select operation from buildTaskFiles where taskId = ? and fileId = ?");
 		findFilesInBuildTaskFilesPrepStmt =
@@ -139,6 +142,53 @@ public class BuildTasks {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * A two-dimensional mapping table for tracking the state of each file access. If a file
+	 * is accessed multiple times by a single task, the state of that access can also change. 
+	 * Given an "existing" file-access state, and a "new" file-access state, this matrix tells
+	 * us the state to transition to. For example, if "existing" is OP_READ and "new" is 
+	 * OP_WRITE, then the combined state is OP_MODIFIED.
+	 */
+	private OperationType operationTypeMapping[][] = {
+			{ /* For Existing == OP_UNSPECIFIED */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_UNSPECIFIED */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_READ */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_WRITE */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_MODIFIED */
+				OperationType.OP_UNSPECIFIED  	/* New == OP_DELETE */
+			}, 
+			{ /* For Existing == OP_READ */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_UNSPECIFIED */
+				OperationType.OP_READ, 			/* New == OP_READ */
+				OperationType.OP_MODIFIED, 		/* New == OP_WRITE */
+				OperationType.OP_MODIFIED, 		/* New == OP_MODIFIED */
+				OperationType.OP_DELETE	  		/* New == OP_DELETE */
+			}, 
+			{ /* For Existing == OP_WRITE */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_UNSPECIFIED */
+				OperationType.OP_WRITE, 		/* New == OP_READ */
+				OperationType.OP_WRITE, 		/* New == OP_WRITE */
+				OperationType.OP_MODIFIED, 		/* New == OP_MODIFIED */
+				OperationType.OP_DELETE  		/* New == OP_DELETE */
+			}, 
+			{ /* For Existing == OP_MODIFIED */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_UNSPECIFIED */
+				OperationType.OP_MODIFIED, 		/* New == OP_READ */
+				OperationType.OP_MODIFIED, 		/* New == OP_WRITE */
+				OperationType.OP_MODIFIED, 		/* New == OP_MODIFIED */
+				OperationType.OP_DELETE  		/* New == OP_DELETE */
+			},
+			{ /* For Existing == OP_DELETED */
+				OperationType.OP_UNSPECIFIED, 	/* New == OP_UNSPECIFIED */
+				OperationType.OP_READ, 			/* New == OP_READ */
+				OperationType.OP_WRITE, 		/* New == OP_WRITE */
+				OperationType.OP_MODIFIED, 		/* New == OP_MODIFIED */
+				OperationType.OP_DELETE  		/* New == OP_DELETE */
+			}
+	};			
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Record the fact that the specific build task accessed the specified file. Adding
@@ -146,20 +196,20 @@ public class BuildTasks {
 	 * 
 	 * @param buildTaskId The ID of the build task that accessed the file.
 	 * @param fileNumber The file's ID number.
-	 * @param operation How the task accessed the file (read, write, delete, etc).
+	 * @param newOperation How the task accessed the file (read, write, delete, etc).
 	 */
-	public void addFileAccess(int buildTaskId, int fileNumber, OperationType operation) {
+	public void addFileAccess(int buildTaskId, int fileNumber, OperationType newOperation) {
 		
 		/* 
 		 * We don't want to add the same record twice, but we might want to merge the two
 		 * operations together. That is, if a task reads a file, then writes a file, we want
-		 * to mark it as OP_READWRITE.
+		 * to mark it as OP_MODIFIED.
 		 */
-		String stringResults[] = null;
+		Integer intResults[] = null;
 		try {
 			findOperationInBuildTaskFilesPrepStmt.setInt(1, buildTaskId);
 			findOperationInBuildTaskFilesPrepStmt.setInt(2, fileNumber);
-			stringResults = db.executePrepSelectStringColumn(findOperationInBuildTaskFilesPrepStmt);
+			intResults = db.executePrepSelectIntegerColumn(findOperationInBuildTaskFilesPrepStmt);
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -168,11 +218,11 @@ public class BuildTasks {
 		/*
 		 * If there was no existing record, we'll insert a fresh record.
 		 */
-		if (stringResults.length == 0) {
+		if (intResults.length == 0) {
 			try {
 				insertBuildTaskFilesPrepStmt.setInt(1, buildTaskId);
 				insertBuildTaskFilesPrepStmt.setInt(2, fileNumber);
-				insertBuildTaskFilesPrepStmt.setInt(3, operation.ordinal());
+				insertBuildTaskFilesPrepStmt.setInt(3, newOperation.ordinal());
 				db.executePrepUpdate(insertBuildTaskFilesPrepStmt);
 			} catch (SQLException e) {
 				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -190,10 +240,18 @@ public class BuildTasks {
 		 *             Modify  |  Modify  Modify  Modify  Delete
 		 *             Delete  |  Read    Write   Modify  Delete
 		 */
-		else if (stringResults.length == 1) {
-			// TODO: make this work.
-			//OperationType existingOp = intToOperationType(opTypeNum)
+		else if (intResults.length == 1) {
+			OperationType existingOp = intToOperationType(intResults[0]);
+			OperationType combinedOp = operationTypeMapping[existingOp.ordinal()][newOperation.ordinal()];
 			
+			try {
+				updateBuildTaskFilesPrepStmt.setInt(1, combinedOp.ordinal());
+				updateBuildTaskFilesPrepStmt.setInt(2, buildTaskId);
+				updateBuildTaskFilesPrepStmt.setInt(3, fileNumber);
+				db.executePrepUpdate(updateBuildTaskFilesPrepStmt);
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
 		}
 		
 		/* else, there's an error - can't have multiple entries */
@@ -209,14 +267,12 @@ public class BuildTasks {
 	 * Return an array of files that were accessed by this build task.
 	 * 
 	 * @param taskId The build task that accessed the files.
-	 * @param operation The type of operation we're interested in. 'r' reads only, 
-	 * 			'w' writes only, 'e" either reads or writes.
+	 * @param operation The type of operation we're interested in (such as OP_READ,
+	 *    OP_WRITE, or OP_UNSPECIFIED if you don't care).
 	 * @return An array of file IDs.
 	 */
 	public Integer [] getFilesAccessed(int taskId, OperationType operation) {
-		
-		// TODO: think about what operation = OP_MODIFIED should search for.
-		
+				
 		List<Integer> results;
 		
 		try {
@@ -254,8 +310,8 @@ public class BuildTasks {
 	 * Return an array of tasks that accessed a specific file.
 	 * 
 	 * @param fileId The file we're interested in querying for.
-	 * @param operation The operation that the tasks perform on this file. 'r' reads only, 'w' write only,
-	 * 		'e' either reads or writes.
+	 * @param operation The operation that the tasks perform on this file (such as OP_READ,
+	 *    OP_WRITE, or OP_UNSPECIFIED if you don't care).
 	 * @return An array of task IDs that access this file.
 	 */
 	public Integer [] getTasksThatAccess(int fileId, OperationType operation) {

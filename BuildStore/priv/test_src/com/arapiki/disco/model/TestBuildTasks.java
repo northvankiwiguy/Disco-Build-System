@@ -256,9 +256,79 @@ public class TestBuildTasks {
 	 * Test what happens when a single file is accessed multiple times, in many different
 	 * modes (e.g. reading, then writing, then delete, etc).
 	 */
-	/* @Test - Disabled for now */
+	@Test
 	public void testMultipleFilesAccesses() {
-		fail("Not yet implemented");
+		Integer result[];
+		
+		int task = bts.addBuildTask(rootTaskId, 0, "my mystery task");
+		
+		/* create a number of new files */
+		int file1 = bsfs.addFile("/file1");
+		int file2 = bsfs.addFile("/file2");
+		int file3 = bsfs.addFile("/file3");
+		int file4 = bsfs.addFile("/file4");
+		int file5 = bsfs.addFile("/file5");
+		int file6 = bsfs.addFile("/file6");
+		int file7 = bsfs.addFile("/file7");
+		int file8 = bsfs.addFile("/file8");
+				
+		/* test read, read => read */
+		bts.addFileAccess(task, file1, OperationType.OP_READ);
+		bts.addFileAccess(task, file1, OperationType.OP_READ);
+		assertEquals(1, bts.getTasksThatAccess(file1, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file1, OperationType.OP_WRITE).length);
+		
+		/* test read, write => modify */
+		bts.addFileAccess(task, file2, OperationType.OP_READ);
+		bts.addFileAccess(task, file2, OperationType.OP_WRITE);
+		assertEquals(1, bts.getTasksThatAccess(file2, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file2, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file2, OperationType.OP_WRITE).length);
+		
+		/* test write, write => write */
+		bts.addFileAccess(task, file3, OperationType.OP_WRITE);
+		bts.addFileAccess(task, file3, OperationType.OP_WRITE);
+		assertEquals(0, bts.getTasksThatAccess(file3, OperationType.OP_READ).length);
+		assertEquals(1, bts.getTasksThatAccess(file3, OperationType.OP_WRITE).length);
+		
+		/* test write, modify => modify */
+		bts.addFileAccess(task, file4, OperationType.OP_WRITE);
+		bts.addFileAccess(task, file4, OperationType.OP_MODIFIED);
+		assertEquals(1, bts.getTasksThatAccess(file4, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file4, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file4, OperationType.OP_WRITE).length);
+
+		/* test delete, read => read */
+		bts.addFileAccess(task, file5, OperationType.OP_DELETE);
+		bts.addFileAccess(task, file5, OperationType.OP_READ);
+		assertEquals(0, bts.getTasksThatAccess(file5, OperationType.OP_MODIFIED).length);
+		assertEquals(1, bts.getTasksThatAccess(file5, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file5, OperationType.OP_WRITE).length);
+		
+		/* test delete, modify => modify */
+		bts.addFileAccess(task, file6, OperationType.OP_DELETE);
+		bts.addFileAccess(task, file6, OperationType.OP_MODIFIED);
+		assertEquals(1, bts.getTasksThatAccess(file6, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file6, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file6, OperationType.OP_WRITE).length);
+
+		/* test read, write, delete => delete */
+		bts.addFileAccess(task, file7, OperationType.OP_READ);
+		bts.addFileAccess(task, file7, OperationType.OP_WRITE);
+		bts.addFileAccess(task, file7, OperationType.OP_DELETE);
+		assertEquals(0, bts.getTasksThatAccess(file7, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file7, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file7, OperationType.OP_WRITE).length);
+		assertEquals(1, bts.getTasksThatAccess(file7, OperationType.OP_DELETE).length);
+		
+		/* test delete, read, write => modify */
+		bts.addFileAccess(task, file8, OperationType.OP_DELETE);
+		bts.addFileAccess(task, file8, OperationType.OP_READ);
+		bts.addFileAccess(task, file8, OperationType.OP_WRITE);
+		assertEquals(1, bts.getTasksThatAccess(file8, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_WRITE).length);
+		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_DELETE).length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
