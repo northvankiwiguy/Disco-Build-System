@@ -67,12 +67,20 @@ typedef struct trace_file_header {
 #define TRACE_FILE_READ 			3
 
 /*
+ * TRACE_FILE_MODIFY - a file has been opened for reading or writing.
+ * 		- 1 byte : TRACE_FILE_MODIFY
+ * 		- 4 bytes : process number (doing the reading)
+ *      - nul-terminated string : the file's absolute path name.
+ */
+#define TRACE_FILE_MODIFY 			4
+
+/*
  * TRACE_FILE_REMOVE - a file has been deleted.
  * 		- 1 byte : TRACE_FILE_REMOVE
  * 		- 4 bytes : process number (doing the remove)
  *      - nul-terminated string : the file's absolute path name.
  */
-#define TRACE_FILE_REMOVE 			4
+#define TRACE_FILE_REMOVE 			5
 
 /*
  * TRACE_FILE_RENAME - a file has been renamed.
@@ -81,7 +89,7 @@ typedef struct trace_file_header {
  *      - nul-terminated string : the file's original absolute path name.
  *      - nul-terminated string : the file's new absolute path name.
  */
-#define TRACE_FILE_RENAME			5
+#define TRACE_FILE_RENAME			6
 
 /*
  * TRACE_FILE_NEW_LINK - a file has been hard/soft linked to a new location.
@@ -90,7 +98,7 @@ typedef struct trace_file_header {
  *      - nul-terminated string : the file's source absolute path name.
  *      - nul-terminated string : the absolute path name of the link.
  */
-#define TRACE_FILE_NEW_LINK			6
+#define TRACE_FILE_NEW_LINK			7
 
 /*
  * TRACE_FILE_NEW_PROGRAM - a new program has been started
@@ -102,7 +110,31 @@ typedef struct trace_file_header {
  *      - sequence of nul-terminated strings : ENVP[0] .. [ENVP[n-1]]
  *      - a final empty string, to indicate the end of environment variables.
  */
-#define TRACE_FILE_NEW_PROGRAM 		7
+#define TRACE_FILE_NEW_PROGRAM 		8
+
+/*
+ * TRACE_DIR_WRITE - a directory has been opened for writing.
+ * 		- 1 byte : TRACE_DIR_WRITE
+ * 		- 4 bytes : process number (doing the writing)
+ *      - nul-terminated string : the directory's absolute path name.
+ */
+#define TRACE_DIR_WRITE 			9
+
+/*
+ * TRACE_DIR_READ - a directory has been opened for reading.
+ * 		- 1 byte : TRACE_DIR_READ
+ * 		- 4 bytes : process number (doing the reading)
+ *      - nul-terminated string : the directory's absolute path name.
+ */
+#define TRACE_DIR_READ 				10
+
+/*
+ * TRACE_DIR_MODIFY - a directory has been opened for reading or writing.
+ * 		- 1 byte : TRACE_DIR_MODIFY
+ * 		- 4 bytes : process number (doing the reading)
+ *      - nul-terminated string : the directory's absolute path name.
+ */
+#define TRACE_DIR_MODIFY 			11
 
 
 #endif /* TRACE_FILE_FORMAT_H_ */

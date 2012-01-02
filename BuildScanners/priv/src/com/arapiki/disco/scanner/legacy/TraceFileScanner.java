@@ -23,6 +23,7 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 /**
@@ -51,34 +52,45 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 */
 	
 	/** The end of file has been reached. Note this tag isn't actually stored in the trace file. */
-	private final int TRACE_FILE_EOF = -1;
+	private static final int TRACE_FILE_EOF = -1;
 	
 	/** CFS is registering the existence of a source file. */
-	private final int TRACE_FILE_REGISTER = 1;
+	private static final int TRACE_FILE_REGISTER = 1;
 	
-	/** A file write operation has taken place. */
-	private final int TRACE_FILE_WRITE = 2;
+	/** A file has been opened for write. */
+	private static final int TRACE_FILE_WRITE = 2;
 	
-	/** A file read operation has taken place. */
-	private final int TRACE_FILE_READ = 3;
-	
+	/** A file has been opened for read. */
+	private static final int TRACE_FILE_READ = 3;
+
+	/** A file has been opened for update. */
+	private static final int TRACE_FILE_MODIFY = 4;
+
 	/** A file has been removed. */
-	private final int TRACE_FILE_REMOVE = 4;
+	private static final int TRACE_FILE_REMOVE = 5;
 	
 	/** A file has been renamed. */
-	private final int TRACE_FILE_RENAME	= 5;
+	private static final int TRACE_FILE_RENAME	= 6;
 	
 	/** A new symlink has been created. */
-	private final int TRACE_FILE_NEW_LINK = 6;
+	private static final int TRACE_FILE_NEW_LINK = 7;
 	
 	/** A new program has been executed. */
-	private final int TRACE_FILE_NEW_PROGRAM = 7;
+	private static final int TRACE_FILE_NEW_PROGRAM = 8;
+
+	/** A directory has been opened for write. */
+	private static final int TRACE_DIR_WRITE = 9;
 	
-	
+	/** A directory has been opened for read. */
+	private static final int TRACE_DIR_READ = 10;
+
+	/** A directory has been opened for update. */
+	private static final int TRACE_DIR_MODIFY = 11;
+
 	/** 
 	 * When reading data from the trace file, the amount of data we should read each time.
 	 */
-	private final int readBufferMax = 65536;
+	private static final int readBufferMax = 65536;
 	
 	/** The input stream for reading the trace file. */
 	private InputStream inputStream;
@@ -175,6 +187,9 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 */
 	public void parse() throws IOException {
 		
+		/* we'll do a lot of writing to the database, speed up access in favour of safety. */
+		buildStore.setFastAccessMode(true);
+		
 		String fileName = null;
 		boolean eof = false;
 		do {
@@ -195,15 +210,26 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 				break;
 				
 			case TRACE_FILE_WRITE:
+			case TRACE_DIR_WRITE:
 				fileName = getString();
-				addFileAccess(fileName, processNum, OperationType.OP_WRITE);
+				addPathAccess(fileName, processNum, OperationType.OP_WRITE,
+						(tag == TRACE_FILE_WRITE) ? PathType.TYPE_FILE : PathType.TYPE_DIR);
 				break;
 
 			case TRACE_FILE_READ:
+			case TRACE_DIR_READ:
 				fileName = getString();
-				addFileAccess(fileName, processNum, OperationType.OP_READ);
+				addPathAccess(fileName, processNum, OperationType.OP_READ,
+						(tag == TRACE_FILE_READ) ? PathType.TYPE_FILE : PathType.TYPE_DIR);
 				break;
-
+				
+			case TRACE_FILE_MODIFY:
+			case TRACE_DIR_MODIFY:
+				fileName = getString();
+				addPathAccess(fileName, processNum, OperationType.OP_MODIFIED,
+						(tag == TRACE_FILE_MODIFY) ? PathType.TYPE_FILE : PathType.TYPE_DIR);
+				break;
+				
 			case TRACE_FILE_REMOVE:
 				break;
 
@@ -215,10 +241,15 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 
 			case TRACE_FILE_NEW_PROGRAM:
 				addBuildTask(processNum);
-				break;	
+				break;
+				
+			default:
+				throw new FatalBuildScannerError("Invalid tag in trace file: " + tag);
 			}
 				
 		} while (!eof);
+		
+		buildStore.setFastAccessMode(false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -332,20 +363,32 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	 * @param fileName The name of the file that was accessed.
 	 * @param processNum The Unix process ID of the process that did the accessing.
 	 * @param direction The type of access (read, write).
+	 * @param type Is this a file, directory or symlink.
 	 */
-	private void addFileAccess(String fileName, int processNum, OperationType direction) {
+	private void addPathAccess(String fileName, int processNum, OperationType direction, PathType type) {
 
 		/* debug output */
 		debugln(1, "Process " + processNum + 
 				((direction == OperationType.OP_READ) ?
-						" reading " :
-						" writing ") + fileName);
+					" reading " :
+					(direction == OperationType.OP_WRITE) ? 
+							" writing " : " modified ") + 
+				fileName + 
+					" (" + ((type == PathType.TYPE_FILE) ? "File" :
+						(type == PathType.TYPE_DIR) ? "Directory" : "Symlink") + ")");
 		
 		/* get the BuildStore taskId for the current process */
 		int taskId = getTaskId(processNum);
 		
 		/* get the BuildStore fileId */
-		int fileId = fileNameSpaces.addFile(fileName);
+		int fileId;
+		if (type == PathType.TYPE_FILE) {
+			fileId = fileNameSpaces.addFile(fileName);
+		} else if (type == PathType.TYPE_DIR) {
+			fileId = fileNameSpaces.addDirectory(fileName);
+		} else {
+			fileId = fileNameSpaces.addSymlink(fileName);
+		}
 		if (fileId < 0){
 			throw new FatalBuildScannerError("Failed to add file: " + fileName + " to the BuildStore");
 		}

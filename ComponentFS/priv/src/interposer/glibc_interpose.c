@@ -43,6 +43,7 @@
 
 #include "trace_buffer.h"
 #include "trace_file_format.h"
+#include "file_name_utils.h"
 
 /*
  * A useful macro for fetching a pointer to the real version of the function
@@ -67,7 +68,8 @@
 /*
  * Each process must have a unique process number. This is not the same
  * as a Unix process ID, since those are only 16-bit in size and may easily
- * be reused during a single build process.
+ * be reused during a single build process. We instead need a non-reusable
+ * 32-bit process number.
  */
 static int my_process_number;
 
@@ -80,6 +82,11 @@ static int my_parent_process_number;
  * Debug level. Set this by setting the CFS_DEBUG environment variable
  */
 static int debug_level;
+
+/*
+ * The current working directory of this process.
+ */
+static char saved_cwd[PATH_MAX];
 
 
 /*======================================================================
@@ -233,6 +240,102 @@ static void cfs_debug_env(int level, char * const *envp) {
 }
 
 /*======================================================================
+ * cfs_get_cwd
+ *
+ * Return the absolute path to this process's current working directory.
+ * If use_cache is TRUE, using a cached version of the cwd is acceptable.
+ *
+ *======================================================================*/
+
+static char *cfs_get_cwd(int use_cache) {
+
+	/*
+	 * If we don't already have the cwd cached, we need to ask the OS, and then
+	 * save it in a buffer. This function will be called whenever a relative
+	 * path is accessed, so it must be fast.
+	 */
+	if ((saved_cwd[0] == '\0') || !use_cache) {
+		if (getcwd(saved_cwd, PATH_MAX) == NULL){
+			fprintf(stderr, "Error: cfs couldn't determine current working directory.\n");
+			exit(1);
+		}
+	}
+	return saved_cwd;
+}
+
+/*======================================================================
+ * cfs_get_path_of_dirfd
+ *
+ * Given a directory file descriptor ("dirfd"), determine the path of the
+ * directory it refers to. Append to this the content of the "pathname"
+ * string, and write the concatenated result into "result_path".
+ *
+ * Return 0 on success, or -1 on failure.
+ *======================================================================*/
+
+static int cfs_get_path_of_dirfd(char *result_path, int dirfd, const char *pathname)
+{
+	FETCH_REAL_FN(int, real_open, "open");
+	FETCH_REAL_FN(int, real_fchdir, "fchdir");
+
+	/* save the current directory */
+	int saved_dir = real_open(".", O_RDONLY);
+	if (saved_dir == -1) {
+		return -1;
+	}
+
+	/* change to the "dirfd" directory */
+	if (real_fchdir(dirfd) == -1){
+		return -1;
+	}
+
+	/* fetch the current working directory into the user-supplied buffer */
+	if (getcwd(result_path, PATH_MAX) == NULL){
+		real_fchdir(saved_dir);
+		close(saved_dir);
+		return -1;
+	}
+
+	/* switch back to the real current directory */
+	if (real_fchdir(saved_dir) == -1){
+		close(saved_dir);
+		return -1;
+	}
+
+	/* we're done with the saved directory fd */
+	close(saved_dir);
+
+	/* append the "pathname" onto the directory (assuming it's not too long). */
+	if (strlen(result_path) + strlen(pathname) + 2 >= PATH_MAX){
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+
+	/* TODO: make this more efficient */
+	strcat(result_path, "/");
+	strcat(result_path, pathname);
+	return 0;
+}
+
+/*======================================================================
+ * Helper - cfs_isdirectory(char *path)
+ *
+ * Return TRUE if the "path" refers to a directory, or FALSE if it's
+ * not a directory, or if it doesn't exist.
+ *
+ *======================================================================*/
+
+static int
+cfs_isdirectory(const char *pathname)
+{
+	struct stat buf;
+	if (stat(pathname, &buf) == -1){
+		return FALSE;
+	}
+	return S_ISDIR(buf.st_mode);
+}
+
+/*======================================================================
  * Interposer functions
  *
  * Each of these functions interposes the "real" glibc calls. Each
@@ -247,6 +350,12 @@ static void cfs_debug_env(int level, char * const *envp) {
  *======================================================================*/
 
 // TODO: ensure that errno is saved in every function where it needs to be.
+/*
+ * TODO: many of these interposed functions only exist since we will one
+ * day want to validate the pathname argument to ensure that the program
+ * is not violating component boundaries. For now, we just silently
+ * pass through the arguments and return value.
+ */
 
 /*======================================================================
  * Interposed - access()
@@ -258,7 +367,6 @@ int access(const char *pathname, int mode)
 
 	cfs_debug(1, "access(\"%s\", %d)", pathname, mode);
 
-	// TODO: validate pathname based on component location.
 	return real_access(pathname, mode);
 }
 
@@ -282,11 +390,25 @@ chdir(const char *path)
 	cfs_debug(1, "chdir(\"%s\")", path);
 
 	/*
-	 * TODO: validate path based on component location.
-	 * TODO: record the new current directory for future use when
-	 * handling relative path names.
+	 * Perform the real chdir() operation. If it fails, then we
+	 * fail too.
 	 */
-	return real_chdir(path);
+	if (real_chdir(path) != 0){
+		return -1;
+	}
+
+	/*
+	 * Else, we must figure out our new current directory (which, due to
+	 * ., .., and symlinks, may not be what the user called chdir() with).
+	 * If the getcwd fails, we completely abort the process (we're lost without
+	 * a cwd).
+	 */
+
+	/* discard the cached copy, then re-cache the new copy. Abort on error. */
+	cfs_get_cwd(FALSE);
+
+	/* all is good, we're now in the new directory, and we've saved its path */
+	return 0;
 }
 
 /*======================================================================
@@ -301,9 +423,7 @@ chmod(const char *path, mode_t mode)
 	cfs_debug(1, "chmod(\"%s\", 0%o)", path, mode);
 
 	/*
-	 * TODO: validate path based on component location.
-	 * TODO: log the fact that the file's attributes have changed. This
-	 * is useful in Disco.
+	 * TODO: log the fact that the file's attributes have changed.
 	 */
 	return real_chmod(path, mode);
 }
@@ -320,9 +440,7 @@ chown(const char *path, uid_t owner, gid_t group)
 	cfs_debug(1, "chown(\"%s\", %d, %d)", path, owner, group);
 
 	/*
-	 * TODO: validate path based on component location.
-	 * TODO: log the fact that the file's attributes have changed. This
-	 * is useful in Disco.
+	 * TODO: log the fact that the file's attributes have changed.
 	 * NOTE: if path is a symlink, it'll be dereferenced. See lchown
 	 * for a variant of this command that doesn't dereference.
 	 */
@@ -359,6 +477,49 @@ chown(const char *path, uid_t owner, gid_t group)
  *======================================================================*/
 
 /*======================================================================
+ * open_common()
+ *
+ * A common function for tracing detail of open, open64 or related library
+ * calls.
+ *======================================================================*/
+
+static int
+cfs_open_common(const char *filename, int flags)
+{
+	extern int errno;
+	int tmp_errno = errno; 				/* save errno, in case we change it */
+
+	/* compute the absolute and normalized path */
+	char new_path[PATH_MAX];
+	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, new_path);
+	if (status != 0) {
+		errno = status;
+		return -1;
+	}
+
+	/* determine if we're opening a directory */
+	int isdir = cfs_isdirectory(new_path);
+
+	/* if there's a trace buffer, write the file name to it */
+	if (trace_buffer_lock() == 0){
+		if ((flags & (O_APPEND|O_CREAT|O_WRONLY)) != 0) {
+			trace_buffer_write_byte(isdir ? TRACE_DIR_WRITE : TRACE_FILE_WRITE);
+		} else if (flags & O_RDWR) {
+			trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
+		} else {
+			trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
+		}
+		trace_buffer_write_int(my_process_number);
+		trace_buffer_write_string(new_path);
+		trace_buffer_unlock();
+	}
+	errno = tmp_errno;					/* restore original errno value */
+
+	/* all is good */
+	return 0;
+}
+
+/*======================================================================
  * Interposed - creat
  *======================================================================*/
 
@@ -369,11 +530,15 @@ creat(const char *path, mode_t mode)
 
 	cfs_debug(1, "creat(\"%s\", 0%o)", path, mode);
 
-	/*
-	 * TODO: validate path based on component location.
-	 * TODO: log the fact that the a new file has been created.
-	 */
-	return real_creat(path, mode);
+	int fd = real_creat(path, mode);
+
+	/* on success, log the access to the trace file */
+	if (fd != -1) {
+		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC) != 0){
+			return -1;
+		}
+	}
+	return fd;
 }
 
 /*======================================================================
@@ -387,16 +552,25 @@ creat64(const char *path, mode_t mode)
 
 	cfs_debug(1, "creat64(\"%s\", 0%o)", path, mode);
 
-	/*
-	 * TODO: validate path based on component location.
-	 * TODO: log the fact that the a new file has been created.
-	 */
-	return real_creat64(path, mode);
+	int fd = real_creat64(path, mode);
+
+	/* on success, log the access to the trace file */
+	if (fd != -1) {
+		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC) != 0){
+			return -1;
+		}
+	}
+	return fd;
 }
 
 /*======================================================================
  * Interposed - dlopen
+ *
+ * It's not clear if this needs to be interposed. We'll deal with it
+ * if a situation arises.
  *======================================================================*/
+
+#if DISABLED
 
 void *
 dlopen(const char *file, int mode)
@@ -406,11 +580,11 @@ dlopen(const char *file, int mode)
 	cfs_debug(1, "dlopen(\"%s\", 0%o)", file, mode);
 
 	/*
-	 * TODO: validate path based on component location.
 	 * TODO: log the fact that the a new file has been read.
 	 */
 	return real_dlopen(file, mode);
 }
+#endif /* DISABLED */
 
 /*======================================================================
  * Interposed - eaccess
@@ -422,7 +596,6 @@ int eaccess(const char *pathname, int mode)
 
 	cfs_debug(1, "eaccess(\"%s\", 0%o)", pathname, mode);
 
-	// TODO: validate path based on component location.
 	return real_eaccess(pathname, mode);
 }
 
@@ -436,7 +609,6 @@ int euidaccess(const char *pathname, int mode)
 
 	cfs_debug(1, "euidaccess(\"%s\", 0%o)", pathname, mode);
 
-	// TODO: validate path based on component location.
 	return real_euidaccess(pathname, mode);
 }
 
@@ -453,8 +625,8 @@ int euidaccess(const char *pathname, int mode)
  * but the success of CFS depends on them being set.
  *======================================================================*/
 
-char * const *
-modify_envp(char *const * envp)
+static char * const *
+cfs_modify_envp(char *const * envp)
 {
 	extern int errno;
 	int tmp_errno = errno; 		/* take care not to disrupt errno */
@@ -470,8 +642,8 @@ modify_envp(char *const * envp)
  * This function cleans up any memory allocated by modify_envp.
  *======================================================================*/
 
-void
-cleanup_envp(char * const *envp)
+static void
+cfs_cleanup_envp(char * const *envp)
 {
 	extern int errno;
 	int tmp_errno = errno; 		/* take care not to disrupt errno */
@@ -482,14 +654,14 @@ cleanup_envp(char * const *envp)
 }
 
 /*======================================================================
- * Helper - execve_common()
+ * Helper - cfs_execve_common()
  *
  * This function is a helper for many of the interposed exec functions.
  *
  *======================================================================*/
 
-int
-execve_common(const char *filename, char *const argv[], char *const envp[])
+static int
+cfs_execve_common(const char *filename, char *const argv[], char *const envp[])
 {
 	FETCH_REAL_FN(int, real_execve, "execve");
 
@@ -498,12 +670,12 @@ execve_common(const char *filename, char *const argv[], char *const envp[])
 	 * variables are in place.
 	 */
 	cfs_debug_env(2, envp);
-	char * const *new_envp = modify_envp(envp);
+	char * const *new_envp = cfs_modify_envp(envp);
 
 	int rc = real_execve(filename, argv, new_envp);
 
 	/* if we get here, the execve failed */
-	cleanup_envp(new_envp);
+	cfs_cleanup_envp(new_envp);
 	return rc;
 }
 
@@ -519,7 +691,7 @@ execl(const char *path, const char *arg0, ...)
 	cfs_debug(1, "execl(\"%s\", ..., ...)", path);
 
 	/* execl is simply a wrapper for execve()s */
-	return execve_common(path, (char * const *)&arg0, environ);
+	return cfs_execve_common(path, (char * const *)&arg0, environ);
 }
 
 /*======================================================================
@@ -544,15 +716,15 @@ execle(const char *path, const char *arg0, ... /*, 0, char *const envp[] */)
 	/* finally, grab the environment pointer */
 	char * const *envp = (char * const *)*p;
 
-	return execve_common(path, (char * const *)&arg0, envp);
+	return cfs_execve_common(path, (char * const *)&arg0, envp);
 }
 
 /*======================================================================
  * Helper - execvpe_common()
  *======================================================================*/
 
-int
-execvpe_common(const char *file, char *const argv[], char *const envp[])
+static int
+cfs_execvpe_common(const char *file, char *const argv[], char *const envp[])
 {
 	FETCH_REAL_FN(int, real_execvpe, "execvpe");
 
@@ -560,11 +732,11 @@ execvpe_common(const char *file, char *const argv[], char *const envp[])
 	 * Before calling the real execvpe, make sure our custom environment
 	 * variables are in place.
 	 */
-	char * const *new_envp = modify_envp(envp);
+	char * const *new_envp = cfs_modify_envp(envp);
 	int rc = real_execvpe(file, argv, new_envp);
 
 	/* if we get here, the execvpe failed */
-	cleanup_envp(new_envp);
+	cfs_cleanup_envp(new_envp);
 	return rc;
 }
 
@@ -572,7 +744,8 @@ execvpe_common(const char *file, char *const argv[], char *const envp[])
  * Interposed - execlp()
  *======================================================================*/
 
-int execlp(const char *file, const char *arg0, ...)
+int
+execlp(const char *file, const char *arg0, ...)
 {
 	extern char **environ;
 
@@ -581,7 +754,7 @@ int execlp(const char *file, const char *arg0, ...)
 	/*
 	 * execlp is a wrapper for execvpe().
 	 */
-	return execvpe_common(file, (char * const *)&arg0, environ);
+	return cfs_execvpe_common(file, (char * const *)&arg0, environ);
 }
 
 /*======================================================================
@@ -597,7 +770,7 @@ execv(const char *path, char *const argv[])
 	/*
 	 * execv is a wrapper for execve().
 	 */
-	return execve_common(path, argv, environ);
+	return cfs_execve_common(path, argv, environ);
 }
 
 /*======================================================================
@@ -609,7 +782,7 @@ execve(const char *filename, char *const argv[], char *const envp[])
 {
 	cfs_debug(1, "execve(\"%s\", ..., ...)", filename);
 
-	return execve_common(filename, argv, envp);
+	return cfs_execve_common(filename, argv, envp);
 }
 
 /*======================================================================
@@ -638,7 +811,7 @@ execvpe(const char *file, char *const argv[], char *const envp[])
 {
 	cfs_debug(1, "execvpe(\"%s\", ..., ...)", file);
 
-	return execvpe_common(file, argv, envp);
+	return cfs_execvpe_common(file, argv, envp);
 }
 
 /*======================================================================
@@ -652,7 +825,7 @@ exit(int status)
 
 	cfs_debug(1, "exit(%d)", status);
 
-	// TODO: log fact that the process is exiting (helps with detecting
+	// TODO: log the fact that the process is exiting (helps with detecting
 	// parallel processes.
 	real_exit(status);
 
@@ -709,13 +882,13 @@ void _Exit(int status)
  * Interposed - faccessat()
  *======================================================================*/
 
-int faccessat(int dirfd, const char *pathname, int mode, int flags)
+int
+faccessat(int dirfd, const char *pathname, int mode, int flags)
 {
 	FETCH_REAL_FN(int, real_faccessat, "faccessat");
 
 	cfs_debug(1, "faccessat(%d, \"%s\", 0%o, %d)", dirfd, pathname, mode, flags);
 
-	// TODO: validate access path, given component boundaries.
 	return real_faccessat(dirfd, pathname, mode, flags);
 }
 
@@ -740,9 +913,17 @@ fchdir(int fd)
 
 	cfs_debug(1, "fchdir(%d)", fd);
 
-	// TODO: compute the path of the new current working directory,
-	// and record it for future use when computing relative path names.
-	return real_fchdir(fd);
+	/* attempt the real fchdir operation */
+	if (real_fchdir(fd) != 0){
+		return -1;
+	}
+
+	/*
+	 * Now that we've successfully changed directory, cache the
+	 * new current working directory.
+	 */
+	cfs_get_cwd(FALSE);
+	return 0;
 }
 
 /*======================================================================
@@ -856,11 +1037,11 @@ fexecve(int fd, char *const argv[], char *const envp[])
 	 * the trace information once it's exec'ed. We therefore don't need
 	 * to know the name of the program being started.
 	 */
-	char * const *new_envp = modify_envp(envp);
+	char * const *new_envp = cfs_modify_envp(envp);
 	int rc = real_fexecve(fd, argv, new_envp);
 
 	/* if we get here, the fexecve failed */
-	cleanup_envp(envp);
+	cfs_cleanup_envp(envp);
 	return rc;
 }
 
@@ -885,43 +1066,76 @@ fexecve(int fd, char *const argv[], char *const envp[])
  *
  * A common function for tracing the arguments of fopen, fopen64 and
  * other related commands.
+ *
+ * Returns 0 on success, or -1 on failure (with errno set).
  *======================================================================*/
 
-static void fopen_common(const char *filename, const char *opentype)
+static int
+cfs_fopen_common(const char *filename, const char *opentype)
 {
+	extern int errno;
+	int tmp_errno = errno;
+
+	/*
+	 * Normalize the path before writing the trace information. That is,
+	 * . and .. should be removed, and so should symlinks. Also, convert
+	 * relative path names to absolute paths. On failure, return our own
+	 * error number.
+	 */
+	char new_path[PATH_MAX];
+	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, new_path);
+	if (status != 0) {
+		errno = status;
+		return -1;
+	}
+
+	/* determine if we're opening a directory */
+	int isdir = cfs_isdirectory(new_path);
+
 	/*
 	 * Grab a lock on the trace buffer. If it hasn't been initialized yet,
 	 * just return and don't trace anything.
 	 */
-	extern int errno;
-	int tmp_errno = errno;
-
 	if (trace_buffer_lock() == 0){
-		/* for 'r' and 'rb' modes, the operation is a read, else it's a write */
+		/*
+		 * for 'r' and 'rb' modes, the operation is a read, for "r+" and "rb+",
+		 * or "r+b" it's modify, else it's a write.
+		 */
 		if ((strcmp(opentype, "r") == 0) ||
 			(strcmp(opentype, "rb") == 0)){
-			trace_buffer_write_byte(TRACE_FILE_READ);
+			trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
+		} else if ((strcmp(opentype, "r+") == 0) ||
+				   (strcmp(opentype, "rb+") == 0) ||
+				   (strcmp(opentype, "r+b") == 0)) {
+			trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
 		} else {
-			trace_buffer_write_byte(TRACE_FILE_WRITE);
+			trace_buffer_write_byte(isdir ? TRACE_DIR_WRITE : TRACE_FILE_WRITE);
 		}
 		trace_buffer_write_int(my_process_number);
-		trace_buffer_write_string(filename);
+		trace_buffer_write_string(new_path);
 		trace_buffer_unlock();
 	}
 	errno = tmp_errno;
+	return 0;
 }
+
 /*======================================================================
  * Interposed - fopen()
  *======================================================================*/
 
-FILE *fopen(const char *filename, const char *mode)
+FILE *
+fopen(const char *filename, const char *mode)
 {
 	FETCH_REAL_FN(FILE *, real_fopen, "fopen");
 
 	cfs_debug(1, "fopen(\"%s\", \"%s\")", filename, mode);
 	FILE *f = real_fopen(filename, mode);
+
+	/* on success, log the access to the trace file. */
 	if (f != NULL) {
-		fopen_common(filename, mode);
+		if (cfs_fopen_common(filename, mode) != 0){
+			return NULL;
+		}
 	}
 	return f;
 }
@@ -930,14 +1144,19 @@ FILE *fopen(const char *filename, const char *mode)
  * Interposed - fopen64()
  *======================================================================*/
 
-FILE *fopen64(const char *filename, const char *mode)
+FILE *
+fopen64(const char *filename, const char *mode)
 {
 	FETCH_REAL_FN(FILE *, real_fopen64, "fopen64");
 
 	cfs_debug(1, "fopen64(\"%s\", \"%s\")", filename, mode);
 	FILE *f = real_fopen64(filename, mode);
+
+	/* on success, log the access to the trace file. */
 	if (f != NULL) {
-		fopen_common(filename, mode);
+		if (cfs_fopen_common(filename, mode) != 0){
+			return NULL;
+		}
 	}
 	return f;
 }
@@ -988,8 +1207,18 @@ freopen(const char *path, const char *mode, FILE *stream)
 	cfs_debug(1, "freopen(\"%s\", \"%s\", %p)", path, mode, stream);
 
 	FILE *f = real_freopen(path, mode, stream);
-	if (f != NULL) {
-		fopen_common(path, mode);
+	if ((f != NULL) && (path != NULL)) {
+		/*
+		 * TODO: if path is NULL then we're actually reopening the
+		 * same file with a different mode. To correctly handle
+		 * this situation, we need a way of mapping a FILE * back
+		 * to the path of the path of the file that was opened.
+		 * This can possibly be done by accessing /proc/self/fd/<fd>,
+		 * but that's not very portable.
+		 */
+		if (cfs_fopen_common(path, mode) != 0){
+			return NULL;
+		}
 	}
 	return f;
 }
@@ -1006,8 +1235,11 @@ freopen64(const char *path, const char *mode, FILE *stream)
 	cfs_debug(1, "freopen64(\"%s\", \"%s\", %p)", path, mode, stream);
 
 	FILE *f = real_freopen64(path, mode, stream);
-	if (f != NULL) {
-		fopen_common(path, mode);
+	if ((f != NULL) && (path != NULL)) {
+		/* TODO: see comment in freopen() function */
+		if (cfs_fopen_common(path, mode) != 0){
+			return NULL;
+		}
 	}
 	return f;
 }
@@ -1106,10 +1338,15 @@ ftok(const char *pathname, int proj_id)
 
 	cfs_debug(1, "ftok(\"%s\", %d)", pathname, proj_id);
 
-	// TODO: validate pathname with respect to component boundaries.
-	// TODO: register that the pathname is accessed
+	key_t key = real_ftok(pathname, proj_id);
 
-	return real_ftok(pathname, proj_id);
+	/* on success, log the access to the trace file. */
+	if (key != (key_t)-1) {
+		if (cfs_open_common(pathname, O_RDONLY) != 0){
+			return -1;
+		}
+	}
+	return key;
 }
 
 /*======================================================================
@@ -1272,8 +1509,6 @@ link(const char *oldname, const char *newname)
 	cfs_debug(1, "link(\"%s\", \"%s\")", oldname, newname);
 
 	// TODO: log the creation of the link.
-	// TODO: validate oldname and new name, based on component
-	// boundaries.
 	return real_link(oldname, newname);
 }
 
@@ -1291,8 +1526,6 @@ linkat(int olddirfd, const char *oldpath,
 			newdirfd, newpath, flags);
 
 	// TODO: log the creation of the link.
-	// TODO: validate oldname and new name, based on component
-	// boundaries.
 	return real_linkat(olddirfd, oldpath, newdirfd, newpath, flags);
 }
 
@@ -1368,7 +1601,6 @@ mkdir(const char *path, mode_t mode)
 	cfs_debug(1, "mkdir(\"%s\", 0%o)", path, mode);
 
 	// TODO: log the creation of the directory
-	// TODO: validate path based on component boundaries.
 	return real_mkdir(path, mode);
 }
 
@@ -1384,7 +1616,6 @@ mkdirat(int dirfd, const char *pathname, mode_t mode)
 	cfs_debug(1, "mkdirat(%d, \"%s\", 0%o)", dirfd, pathname, mode);
 
 	// TODO: log the creation of the directory
-	// TODO: validate path based on component boundaries.
 	return real_mkdirat(dirfd, pathname, mode);
 }
 
@@ -1451,35 +1682,11 @@ mkdirat(int dirfd, const char *pathname, mode_t mode)
  *======================================================================*/
 
 /*======================================================================
- * open_common()
- *
- * A common function for tracing detail of open, open64 or related library
- * calls.
- *======================================================================*/
-
-static void open_common(const char *filename, int flags)
-{
-	/* if there's a trace buffer, write the file name to it */
-	extern int errno;
-	int tmp_errno = errno; 				/* save errno, in case we change it */
-	if (trace_buffer_lock() == 0){
-		if ((flags & (O_APPEND|O_CREAT|O_WRONLY|O_RDWR)) != 0) {
-			trace_buffer_write_byte(TRACE_FILE_WRITE);
-		} else {
-			trace_buffer_write_byte(TRACE_FILE_READ);
-		}
-		trace_buffer_write_int(my_process_number);
-		trace_buffer_write_string(filename);
-		trace_buffer_unlock();
-	}
-	errno = tmp_errno;					/* restore original errno value */
-}
-
-/*======================================================================
  * Interposed - open()
  *======================================================================*/
 
-int open(const char *filename, int flags, ...)
+int
+open(const char *filename, int flags, ...)
 {
 	FETCH_REAL_FN(int, real_open, "open");
 
@@ -1496,8 +1703,12 @@ int open(const char *filename, int flags, ...)
 	cfs_debug(1, "open(\"%s\", 0x%x, 0%o)", filename, flags, mode);
 
 	int fd = real_open(filename, flags, mode);
+
+	/* on success, log the access to the trace file. */
 	if (fd != -1) {
-		open_common(filename, flags);
+		if (cfs_open_common(filename, flags) != 0){
+			return -1;
+		}
 	}
 	return fd;
 }
@@ -1506,7 +1717,8 @@ int open(const char *filename, int flags, ...)
  * Interposed - open64()
  *======================================================================*/
 
-int open64(const char *filename, int flags, ...)
+int
+open64(const char *filename, int flags, ...)
 {
 	FETCH_REAL_FN(int, real_open64, "open64");
 
@@ -1523,8 +1735,61 @@ int open64(const char *filename, int flags, ...)
 	cfs_debug(1, "open64(\"%s\", 0x%x, 0%o)", filename, flags, mode);
 
 	int fd = real_open64(filename, flags, mode);
+
+	/* on success, log the access to the trace file. */
 	if (fd != -1) {
-		open_common(filename, flags);
+		if (cfs_open_common(filename, flags) != 0){
+			return -1;
+		}
+	}
+	return fd;
+}
+
+/*======================================================================
+ * Helper: cfs_openat_common.
+ *
+ * Function shared by openat() and openat64().
+ *======================================================================*/
+
+int
+cfs_openat_common(int fd, int dirfd, const char *pathname, int flags)
+{
+	/*
+	 * if the openat operation succeeded, we must now send the file
+	 * name details to the trace log.
+	 */
+	if (fd != -1){
+
+		/*
+		 * Case 1: pathname is absolute.
+		 * Case 2: dirfd is AT_FDCWD - relative to current directory.
+		 */
+		if ((pathname[0] == '/') || (dirfd == AT_FDCWD)) {
+			if (cfs_open_common(pathname, flags) == -1){
+				return -1;
+			}
+		}
+
+		/* case 3: dirfd is a valid directory descriptor */
+		else {
+			char result_path[PATH_MAX];
+
+			/*
+			 * Figure out the directory that dirfd refers to, then concatenate
+			 * pathname onto it.
+			 */
+			if (cfs_get_path_of_dirfd(result_path, dirfd, pathname) == -1){
+				/* couldn't determine directory for this dirfd. */
+				return -1;
+			}
+
+			/* we've computed dir(dirfd) + pathname, so trace it */
+			else {
+				if (cfs_open_common(result_path, flags) == -1){
+					return -1;
+				}
+			}
+		}
 	}
 	return fd;
 }
@@ -1533,7 +1798,8 @@ int open64(const char *filename, int flags, ...)
  * Interposed - openat()
  *======================================================================*/
 
-int openat(int dirfd, const char *pathname, int flags, ...)
+int
+openat(int dirfd, const char *pathname, int flags, ...)
 {
 	FETCH_REAL_FN(int, real_openat, "openat");
 
@@ -1549,19 +1815,19 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 
 	cfs_debug(1, "openat(%d, \"%s\", 0x%x, 0%o)", dirfd, pathname, flags, mode);
 
-	// TODO: log the access to dirfd + pathname
-	// TODO: validate the path, based on component boundaries.
-
+	/* call the real openat function */
 	int fd = real_openat(dirfd, pathname, flags, mode);
 
-	return fd;
+	/* on success, trace the pathname information */
+	return cfs_openat_common(fd, dirfd, pathname, flags);
 }
 
 /*======================================================================
  * Interposed - openat64()
  *======================================================================*/
 
-int openat64(int dirfd, const char *pathname, int flags, ...)
+int
+openat64(int dirfd, const char *pathname, int flags, ...)
 {
 	FETCH_REAL_FN(int, real_openat64, "openat64");
 
@@ -1577,12 +1843,10 @@ int openat64(int dirfd, const char *pathname, int flags, ...)
 
 	cfs_debug(1, "openat64(%d, \"%s\", 0x%x, 0%o)", dirfd, pathname, flags, mode);
 
-	// TODO: log the access to dirfd + pathname
-	// TODO: validate the path, based on component boundaries.
-
 	int fd = real_openat64(dirfd, pathname, flags, mode);
 
-	return fd;
+	/* on success, trace the pathname information */
+	return cfs_openat_common(fd, dirfd, pathname, flags);
 }
 
 /*======================================================================
@@ -1608,7 +1872,8 @@ int openat64(int dirfd, const char *pathname, int flags, ...)
  * Interposed - popen()
  *======================================================================*/
 
-FILE *popen(const char *command, const char *mode)
+FILE *
+popen(const char *command, const char *mode)
 {
 	extern char **environ;
 	char **old_environ = environ;
@@ -1618,7 +1883,7 @@ FILE *popen(const char *command, const char *mode)
 	cfs_debug(1, "popen(\"%s\", 0%x)", command, mode);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	environ = (char **)modify_envp(environ);
+	environ = (char **)cfs_modify_envp(environ);
 
 	/* now invoke the original popen() call */
 	FILE *result = real_popen(command, mode);
@@ -1626,7 +1891,7 @@ FILE *popen(const char *command, const char *mode)
 	/* restore our original environment */
 	char **tmp_environ = environ;
 	environ = old_environ;
-	cleanup_envp(tmp_environ);
+	cfs_cleanup_envp(tmp_environ);
 
 	return result;
 }
@@ -1647,11 +1912,11 @@ posix_spawn(pid_t *pid, const char *path,
 			pid, path, file_actions, attrp, argv, envp);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	char **new_envp = (char **)modify_envp(environ);
+	char **new_envp = (char **)cfs_modify_envp(environ);
 	int result = real_posix_spawn(pid, path, file_actions, attrp, argv, new_envp);
 
 	/* restore our original environment */
-	cleanup_envp(new_envp);
+	cfs_cleanup_envp(new_envp);
 	return result;
 }
 
@@ -1671,11 +1936,11 @@ posix_spawnp(pid_t *pid, const char *file,
 			pid, file, file_actions, attrp, argv, envp);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	char **new_envp = (char **)modify_envp(environ);
+	char **new_envp = (char **)cfs_modify_envp(environ);
 	int result = real_posix_spawnp(pid, file, file_actions, attrp, argv, new_envp);
 
 	/* restore our original environment */
-	cleanup_envp(new_envp);
+	cfs_cleanup_envp(new_envp);
 	return result;
 }
 
@@ -1752,7 +2017,8 @@ posix_spawnp(pid_t *pid, const char *file,
  * Interposed - remove()
  *======================================================================*/
 
-int remove(const char *path)
+int
+remove(const char *path)
 {
 	FETCH_REAL_FN(int, real_remove, "remove");
 
@@ -1774,7 +2040,8 @@ int remove(const char *path)
  * Interposed - rename()
  *======================================================================*/
 
-int rename(const char *oldname, const char *newname)
+int
+rename(const char *oldname, const char *newname)
 {
 	FETCH_REAL_FN(int, real_rename, "rename");
 
@@ -1788,7 +2055,8 @@ int rename(const char *oldname, const char *newname)
  * Interposed - renameat
  *======================================================================*/
 
-int renameat(int olddirfd, const char *oldpath,
+int
+renameat(int olddirfd, const char *oldpath,
              int newdirfd, const char *newpath)
 {
 	FETCH_REAL_FN(int, real_renameat, "renameat");
@@ -1960,7 +2228,7 @@ system(const char *command)
 	cfs_debug(1, "system(\"%s\")", command);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	environ = (char **)modify_envp(environ);
+	environ = (char **)cfs_modify_envp(environ);
 
 	/* now invoke the original system() call */
 	int result = real_system(command);
@@ -1968,7 +2236,7 @@ system(const char *command)
 	/* restore our original environment */
 	char **tmp_environ = environ;
 	environ = old_environ;
-	cleanup_envp(tmp_environ);
+	cfs_cleanup_envp(tmp_environ);
 
 	return result;
 }
@@ -2003,8 +2271,17 @@ truncate(const char *filename, off_t length)
 
 	cfs_debug(1, "truncate(\"%s\", %d)", filename, length);
 
-	// TODO: log the write of this file.
-	return real_truncate(filename, length);
+	/*
+	 * Call the real truncate function, and if it succeeds,
+	 * we trace that the file was "opened for read/write".
+	 */
+	int status = real_truncate(filename, length);
+	if (status != -1) {
+		if (cfs_open_common(filename, O_RDWR) != 0){
+			return -1;
+		}
+	}
+	return status;
 }
 
 /*======================================================================
@@ -2014,12 +2291,28 @@ truncate(const char *filename, off_t length)
 int
 truncate64(const char *filename, off64_t length)
 {
-	FETCH_REAL_FN(int, real_truncate64, "truncate64");
+	/*
+	 * We can't use the FETCH_REAL_FN macro here, since we need
+	 * the prototype of real_truncate64 to include a 64-bit offset.
+	 */
+	static int (*(real_truncate64))(const char *, off64_t) = NULL;
+	if (!real_truncate64){
+		real_truncate64 = dlsym(RTLD_NEXT, ("truncate64"));
+	}
 
-	cfs_debug(1, "truncate64(\"%s\", %d)", filename, length);
+	cfs_debug(1, "truncate64(\"%s\", %lld)", filename, length);
 
-	// TODO: log the write of this file.
-	return real_truncate64(filename, length);
+	/*
+	 * Call the real truncate64 function, and if it succeeds,
+	 * we trace that the file was "opened for read/write".
+	 */
+	int status = real_truncate64(filename, (off_t)length);
+	if (status != -1) {
+		if (cfs_open_common(filename, O_RDWR) != 0){
+			return -1;
+		}
+	}
+	return status;
 }
 
 /*======================================================================
@@ -2114,7 +2407,8 @@ unlinkat(int dirfd, const char *pathname, int flags)
  * is performance.
  *======================================================================*/
 
-pid_t vfork(void)
+pid_t
+vfork(void)
 {
 	FETCH_REAL_FN(pid_t, real_fork, "fork");
 

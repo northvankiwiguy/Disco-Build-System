@@ -17,7 +17,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildStore;
@@ -38,9 +37,6 @@ public class CommonTestUtils {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
-	/** The name of the temporary database file */
-	private static String tempDbFile = "/tmp/testBuildStore";
-	
 	/**
 	 * Create a new empty BuildStore, with an empty database. For
 	 * testing purposes only.
@@ -48,9 +44,24 @@ public class CommonTestUtils {
 	 * @throws FileNotFoundException If the database file can't be opened
 	 */
 	public static BuildStore getEmptyBuildStore() throws FileNotFoundException {
+		return getEmptyBuildStore(new File("/tmp"));
+	}	
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a new empty BuildStore in the user-specified directory. For testing
+	 * purposes only.
+	 * @param tmpDir The directory in which to place the BuildStore file.
+	 * @return The empty BuildStore database.
+	 * @throws FileNotFoundException If the database file can't be opened.
+	 */
+	public static BuildStore getEmptyBuildStore(File tmpDir) throws FileNotFoundException {
 		BuildStore bs;
 		try {
-			bs = new BuildStore(tempDbFile);
+			File bsFile = new File(tmpDir, "testBuildStore");
+			bsFile.delete();
+			bs = new BuildStore(bsFile.toString());
 		} catch (BuildStoreVersionException e) {
 			/* we can't handle schema version problems - make it a fatal error */
 			throw new FatalBuildStoreError(e.getMessage());
@@ -61,105 +72,88 @@ public class CommonTestUtils {
 		
 		return bs;
 	}	
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Given a program, contained entirely within a string, compile and execute
-	 * the program, run it through CFS, and generate a BuildStore.
+	 * the program, run it through CFS, and generate a BuildStore. All the temporary
+	 * files and generated files will be stored in the directory specified by tmpDir.
+	 * @param tmpDir The directory into which temporary files should be placed.
 	 * @param program The entire body of the C program to be compiled/executed/scanned.
 	 * @param args The command line arguments for the program
 	 * @return The BuildStore created by scanning the program
 	 * @throws Exception Something bad happened
 	 */
-	public static BuildStore parseLegacyProgram(String program, String args[]) throws Exception {
+	public static BuildStore parseLegacyProgram(File tmpDir, String program, String args[]) throws Exception {
 		
 		/* our return value */
 		BuildStore bs = null;
-		
-		/* 
-		 * Create a temporary directory to hold all our files 
-		 */
-		File tmpDir = null;
-		try {
-			tmpDir = File.createTempFile("cfs", ".tmpdir");
-			tmpDir.delete();
-			tmpDir.mkdir();
-		} catch (IOException e) {
-			fail("Unable to create temporary directory");
-		}
-		String tmpDirName = tmpDir.getAbsolutePath();
-		
-		try {
-			/*
-			 * Write our program into a .c file (called "prog.c")
-			 */
-			PrintStream out = null;
-			try {
-				out = new PrintStream(new FileOutputStream(tmpDirName + "/prog.c"));
-			} catch (FileNotFoundException e1) {
-				fail("Unable to write program content to a file");
-			}
-			out.println(program);
-			out.close();
 
-			/*
-			 * Compile the program, using the default C compiler
-			 */
-			try {
-				ShellResult sr = SystemUtils.executeShellCmd("cc -o " + tmpDirName + "/prog " + tmpDirName + "/prog.c", "");
-				if (sr.getReturnCode() != 0) {
-					throw new Exception("Compile error: " + sr.getStderr());
-				}
-			} catch (Exception ex) {
-				fail("Unable to compile program: " + ex.getMessage());
-			}
-
-			/*
-			 * Invoke the legacy build scanner to create a trace the file
-			 */
-			LegacyBuildScanner lbs = new LegacyBuildScanner();
-			lbs.setTraceFile(tmpDirName + "/cfs.trace");
-			lbs.setDebugStream(System.out);
-			
-			/* set this to 1 or 2 for more debug information */
-			lbs.setDebugLevel(0);
-			
-			/* invoke the newly compiled "prog" executable, and trace it with cfs */
-			try {
-				StringBuffer argString = new StringBuffer();
-				if (args != null) {
-					for (String arg : args) {
-						argString.append(arg);
-						argString.append(' ');
-					}
-				}
-				lbs.traceShellCommand(new String[] { tmpDirName + "/prog " + argString.toString()});
-			} catch (Exception ex) {
-				fail("Unable to trace shell command: " + ex.getMessage());
-			}
-
-			/* create an empty BuildStore for the tracer to populate */
-			bs = getEmptyBuildStore();
-			lbs.setBuildStore(bs);
-
-			/* trace the file, while displaying debug output */
-			lbs.parseTraceFile();	
-		} 
-		
 		/*
-		 * No matter what happens, we need to remove our temporary directory
+		 * Write our program into a .c file (called "prog.c")
 		 */
-		finally {
-			/*
-			 * Remove our temporary directory, and all the files within it
-			 */
+		PrintStream out = null;
+		try {
+			out = new PrintStream(new FileOutputStream(tmpDir + "/prog.c"));
+		} catch (FileNotFoundException e1) {
+			fail("Unable to write program content to a file");
+		}
+		out.println(program);
+		out.close();
+
+		/*
+		 * Compile the program, using the default C compiler
+		 */
+		try {
+			ShellResult sr = SystemUtils.executeShellCmd("cc -o " + tmpDir + "/prog " + tmpDir + "/prog.c", "");
+			if (sr.getReturnCode() != 0) {
+				throw new Exception("Compile error: " + sr.getStderr());
+			}
+		} catch (Exception ex) {
+			fail("Unable to compile program: " + ex.getMessage());
+		}
+
+		/*
+		 * Invoke the legacy build scanner to create a trace the file
+		 */
+		LegacyBuildScanner lbs = new LegacyBuildScanner();
+		lbs.setTraceFile(tmpDir + "/cfs.trace");
+		lbs.setDebugStream(System.out);
+
+		/* set this to 1 or 2 for more debug information */
+		String debugLevelString = System.getenv("CFS_DEBUG");
+		int debugLevel = 0;
+		if (debugLevelString != null) {
 			try {
-				SystemUtils.executeShellCmd("rm -rf " + tmpDirName, "");
-			} catch (Exception ex) {
-				fail("Unable to remove temporary directory: " + tmpDirName);
+				debugLevel = Integer.valueOf(debugLevelString);
+			} catch (NumberFormatException ex) {
+				fail("Invalid value for CFS_DEBUG environment variable.");
 			}
 		}
+		lbs.setDebugLevel(debugLevel);
+		
+		/* invoke the newly compiled "prog" executable, and trace it with cfs */
+		try {
+			StringBuffer argString = new StringBuffer();
+			if (args != null) {
+				for (String arg : args) {
+					argString.append(arg);
+					argString.append(' ');
+				}
+			}
+			lbs.traceShellCommand(new String[] { tmpDir + "/prog " + argString.toString()});
+		} catch (Exception ex) {
+			fail("Unable to trace shell command: " + ex.getMessage());
+		}
+
+		/* create an empty BuildStore for the tracer to populate */
+		bs = getEmptyBuildStore(tmpDir);
+		lbs.setBuildStore(bs);
+
+		/* trace the file, while displaying debug output */
+		lbs.parseTraceFile();	
+
 		return bs;
 	}
 	
