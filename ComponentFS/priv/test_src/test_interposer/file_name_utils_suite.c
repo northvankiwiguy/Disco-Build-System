@@ -158,6 +158,7 @@ int init_file_name_utils_suite()
 	/* add test cases */
 	ADD_TEST_CASE(test_bad_args, "bad_args()");
 	ADD_TEST_CASE(test_simple_paths, "simple_paths()");
+	ADD_TEST_CASE(test_symlinks, "symlinks()");
 
 	return 0;
 }
