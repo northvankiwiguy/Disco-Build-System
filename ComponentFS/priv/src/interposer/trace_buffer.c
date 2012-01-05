@@ -291,7 +291,7 @@ int trace_buffer_fetch(void **base_ptr, unsigned long *size_ptr)
  * This internal function is used as a helper by a number of functions
  * that write to the trace buffer. The goal is to make sure there's
  * enough room in the trace buffer to write the new data, as well as to
- * figure out where the data should be written. If there's no enough
+ * figure out where the data should be written. If there's not enough
  * data, this function signals the consumer process to write the
  * existing data to disk. When a child process calls this function, they
  * may block for a period of time.
@@ -313,7 +313,7 @@ static char *trace_buffer_get_pos(int size)
 			return NULL;
 		}
 		/*
-		 * when we get here, the consumer as emptied the buffer and
+		 * when we get here, the consumer has emptied the buffer and
 		 * trace_buffer->tb_size is now 0.
 		 */
 	}

@@ -88,6 +88,29 @@ static int debug_level;
  */
 static char saved_cwd[PATH_MAX];
 
+/*======================================================================
+ * cfs_get_cwd
+ *
+ * Return the absolute path to this process's current working directory.
+ * If use_cache is TRUE, using a cached version of the cwd is acceptable.
+ *
+ *======================================================================*/
+
+static char *cfs_get_cwd(int use_cache) {
+
+	/*
+	 * If we don't already have the cwd cached, we need to ask the OS, and then
+	 * save it in a buffer. This function will be called whenever a relative
+	 * path is accessed, so it must be fast.
+	 */
+	if ((saved_cwd[0] == '\0') || !use_cache) {
+		if (getcwd(saved_cwd, PATH_MAX) == NULL){
+			fprintf(stderr, "Error: cfs couldn't determine current working directory.\n");
+			exit(1);
+		}
+	}
+	return saved_cwd;
+}
 
 /*======================================================================
  * _init_interposer()
@@ -114,6 +137,9 @@ void _init_interposer()
 	if (!cfs_id){
 		return;
 	}
+
+	/* ensure that we have an up-to-date copy of the process's working directory */
+	cfs_get_cwd(FALSE);
 
 	/* Grab a copy of the command line arguments and environment (argv/envp) */
 	int fd = open("/proc/self/cmdline", O_RDONLY);
@@ -185,6 +211,7 @@ void _init_interposer()
 		trace_buffer_write_byte(TRACE_FILE_NEW_PROGRAM);
 		trace_buffer_write_int(my_process_number);
 		trace_buffer_write_int(my_parent_process_number);
+		trace_buffer_write_string(saved_cwd);
 		trace_buffer_write_bytes(argv_and_envp, argv_size + 1 + envp_size + 1);
 		trace_buffer_unlock();
 
@@ -237,30 +264,6 @@ static void cfs_debug_env(int level, char * const *envp) {
 			ptr++;
 		}
 	}
-}
-
-/*======================================================================
- * cfs_get_cwd
- *
- * Return the absolute path to this process's current working directory.
- * If use_cache is TRUE, using a cached version of the cwd is acceptable.
- *
- *======================================================================*/
-
-static char *cfs_get_cwd(int use_cache) {
-
-	/*
-	 * If we don't already have the cwd cached, we need to ask the OS, and then
-	 * save it in a buffer. This function will be called whenever a relative
-	 * path is accessed, so it must be fast.
-	 */
-	if ((saved_cwd[0] == '\0') || !use_cache) {
-		if (getcwd(saved_cwd, PATH_MAX) == NULL){
-			fprintf(stderr, "Error: cfs couldn't determine current working directory.\n");
-			exit(1);
-		}
-	}
-	return saved_cwd;
 }
 
 /*======================================================================

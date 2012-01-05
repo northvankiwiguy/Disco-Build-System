@@ -25,6 +25,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
+import com.arapiki.utils.errors.ErrorCode;
 
 /**
  * This class parses the output from a CFS (component file system)
@@ -94,6 +95,9 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 	
 	/** The input stream for reading the trace file. */
 	private InputStream inputStream;
+	
+	/** Tracks the current position within the input stream */
+	private int traceFilePos;
 	
 	/** The BuildStore we should add trace file information to (null = don't add to BuildStore). */
 	private BuildStore buildStore;
@@ -172,6 +176,7 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 		readBuffer = new byte[readBufferMax];
 		bufferOffset = 0;
 		bytesRemaining = 0;
+		traceFilePos = 0;
 	}
 	
 	/*=====================================================================================*
@@ -244,7 +249,8 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 				break;
 				
 			default:
-				throw new FatalBuildScannerError("Invalid tag in trace file: " + tag);
+				throw new FatalBuildScannerError("Invalid tag in trace file: " + tag +
+						" at trace file position " + traceFilePos);
 			}
 				
 		} while (!eof);
@@ -278,8 +284,11 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 		/* which process spawned this new process? */
 		int parentProcessNum = getInt();
 		
-		/* fetch the trace file entry */
-		debug(1, "New Process " + processNum + " (parent " + parentProcessNum + ") - ");
+		/* what was the current working directory for the process */
+		String cwd = getString();
+		
+		debug(1, "New Process " + processNum + " (parent " + parentProcessNum + 
+				", directory " + cwd + ") - ");
 		
 		StringBuffer commandArgs = new StringBuffer();
 		boolean first = true;
@@ -309,8 +318,13 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 			/* map the process number (from cfs) into the BuildStore's taskId */
 			Integer parentTaskId = getTaskId(parentProcessNum);
 		
-			// TODO: add taskDirId
-			int taskDirId = 0;
+			/* fetch the current working directory ID */
+			int taskDirId = fileNameSpaces.addDirectory(cwd);
+			if (taskDirId == ErrorCode.BAD_PATH){
+				throw new FatalBuildScannerError("Invalid current working directory: " + cwd);
+			}
+			
+			/* add the new task to the build store */
 			int newTaskId = buildTasks.addBuildTask(parentTaskId, taskDirId, command);
 			
 			/* associate CFS's process number with BuildStore's taskID */
@@ -421,6 +435,9 @@ import com.arapiki.disco.scanner.FatalBuildScannerError;
 		
 		bytesRemaining--;
 		int val = readBuffer[bufferOffset++];
+		
+		/* track the position within the input stream (regardless of buffer location) */
+		traceFilePos++;
 		
 		/* Java doesn't have unsigned bytes, so do the adjustment */
 		if (val < 0) {
