@@ -141,14 +141,40 @@ void _init_interposer()
 	/* ensure that we have an up-to-date copy of the process's working directory */
 	cfs_get_cwd(FALSE);
 
+	/* determine the absolute path of the executable that is currently running */
+	int abs_path_size = readlink("/proc/self/exe", argv_and_envp, NCARGS);
+	if (abs_path_size == -1) {
+		fprintf(stderr, "Error: cfs couldn't determine absolute path to running executable.\n");
+		exit(1);
+	}
+
 	/* Grab a copy of the command line arguments and environment (argv/envp) */
 	int fd = open("/proc/self/cmdline", O_RDONLY);
-	int argv_size = read(fd, argv_and_envp, NCARGS);
+	int argv_size = read(fd, &argv_and_envp[abs_path_size], NCARGS - abs_path_size);
 	if (argv_size == -1) {
 		fprintf(stderr, "Error: cfs couldn't determine command line arguments.\n");
 		exit(1);
 	}
 	close(fd);
+
+	/*
+	 * Now that we know the absolute path to the currently running executable,
+	 * and we know the command's arguments (including argv[0]), we need to
+	 * merge them together. The goal is to discard argv[0] (the command name)
+	 * since it's probably a relative path, rather than an absolute path.
+	 *
+	 * We do this by finding the NUL-byte at the end of argv[0], and moving
+	 * everything after that earlier in the array. This essentially does
+	 * a "shift argv" operation.
+	 */
+	int first_nul_index = strlen(argv_and_envp); /* 0-byte after argv[0] */
+	int count = argv_size - (first_nul_index - abs_path_size);
+	char *src_ptr = &argv_and_envp[first_nul_index];
+	char *dst_ptr = &argv_and_envp[abs_path_size];
+	while (count-- != 0){
+		*dst_ptr++ = *src_ptr++;
+	}
+	argv_size = dst_ptr - argv_and_envp;
 
 	/* Write an empty string immediately after the last argument string. */
 	argv_and_envp[argv_size] = '\0';
