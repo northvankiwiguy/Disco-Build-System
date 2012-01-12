@@ -24,10 +24,8 @@
  */
 
 #define _GNU_SOURCE
-#include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <nl_types.h>
 #include <spawn.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -44,22 +42,7 @@
 #include "trace_buffer.h"
 #include "trace_file_format.h"
 #include "file_name_utils.h"
-
-/*
- * A useful macro for fetching a pointer to the real version of the function
- * We search the list of dynamic libraries to find the next occurrence of this symbol,
- * which should be the "real" version of the function. Each interposed function can
- * use this macro to efficiently find the location of the real function. Note that we
- * only need to initialize the variable once.
- * For example:
- * 		FETCH_REAL_FN(FILE *, real_fopen, "fopen");
- * assigns the memory address of the real "fopen" function to the real_fopen variable.
- */
-#define FETCH_REAL_FN(type, fn_var, fn_name) \
-		static type (*(fn_var))() = NULL; \
-		if (!(fn_var)){ \
-			(fn_var) = dlsym(RTLD_NEXT, (fn_name)); \
-		}
+#include "interpose_utils.h"
 
 /*======================================================================
  * Global variables
@@ -80,12 +63,6 @@ static int my_process_number;
 static int my_parent_process_number;
 
 /*
- * Debug level. Set this by setting the CFS_DEBUG environment variable
- * (which will be passed from each process to all its children).
- */
-static int cfs_debug_level;
-
-/*
  * The shared memory segment ID, used for sharing the trace buffer between
  * multiple processes. Passed to each new process via the CFS_ID environment
  * variable.
@@ -98,92 +75,6 @@ static trace_buffer_id cfs_id;
  * processes also have this set.
  */
 static char *cfs_ld_preload;
-
-/*
- * The current working directory of this process.
- */
-static char saved_cwd[PATH_MAX];
-
-/*======================================================================
- * cfs_get_cwd
- *
- * Return the absolute path to this process's current working directory.
- * If use_cache is TRUE, using a cached version of the cwd is acceptable.
- *
- *======================================================================*/
-
-static char *cfs_get_cwd(int use_cache) {
-
-	/*
-	 * If we don't already have the cwd cached, we need to ask the OS, and then
-	 * save it in a buffer. This function will be called whenever a relative
-	 * path is accessed, so it must be fast.
-	 */
-	if ((saved_cwd[0] == '\0') || !use_cache) {
-		if (getcwd(saved_cwd, PATH_MAX) == NULL){
-			fprintf(stderr, "Error: cfs couldn't determine current working directory.\n");
-			exit(1);
-		}
-	}
-	return saved_cwd;
-}
-
-/*======================================================================
- * cfs_malloc
- *
- * Wrapper around the standard malloc function that terminates the
- * program if there's a shortage of memory.
- *======================================================================*/
-
-static void *cfs_malloc(size_t size)
-{
-	void *ptr = malloc(size);
-	if (ptr == NULL) {
-		fprintf(stderr, "Error: cfs couldn't allocate memory.\n");
-		exit(1);
-	}
-
-	return ptr;
-}
-
-
-/*======================================================================
- * cfs_debug
- *
- * Display debug output. Only display debug output that's within the
- * current debug_level (set via the CFS_DEBUG environment variable).
- *======================================================================*/
-
-static void cfs_debug(int level, char *string, ...) {
-	va_list args;
-
-	va_start(args, string);
-	if (level <= cfs_debug_level) {
-		vfprintf(stderr, string, args);
-		fprintf(stderr, "\n");
-	}
-}
-
-/*======================================================================
- * cfs_debug_env
- *
- * Display the given set of environment variables as a debug message.
- *  - level - The debug level of the output (for filtering whether
- *            the output is displayed).
- *  - envp  - The environment to display.
- *
- *======================================================================*/
-
-static void cfs_debug_env(int level, char * const *envp) {
-	if (level <= cfs_debug_level) {
-		char * const *ptr = envp;
-		fprintf(stderr, "Environment Variables:\n");
-		while (*ptr != NULL) {
-			fprintf(stderr, "  %s\n", *ptr);
-			ptr++;
-		}
-	}
-}
 
 /*======================================================================
  * _init_interposer()
@@ -200,7 +91,7 @@ void _init_interposer()
 	static char argv_and_envp[NCARGS];
 
 	/* disable debugging for now */
-	cfs_debug_level = 0;
+	cfs_set_debug_level(0);
 
 	/*
 	 * If the CFS_ID environment variable is defined, then this current process
@@ -308,12 +199,7 @@ void _init_interposer()
 	 */
 	char *cfs_debug_str = getenv("CFS_DEBUG");
 	if (cfs_debug_str != NULL) {
-		cfs_debug_level = atoi(cfs_debug_str);
-		if (cfs_debug_level < 0){
-			cfs_debug_level = 0;
-		} else if (cfs_debug_level > 2){
-			cfs_debug_level = 2;
-		}
+		cfs_set_debug_level(atoi(cfs_debug_str));
 	}
 
 	/*
@@ -327,7 +213,7 @@ void _init_interposer()
 		trace_buffer_write_byte(TRACE_FILE_NEW_PROGRAM);
 		trace_buffer_write_int(my_process_number);
 		trace_buffer_write_int(my_parent_process_number);
-		trace_buffer_write_string(saved_cwd);
+		trace_buffer_write_string(cfs_get_cwd(TRUE));
 		trace_buffer_write_bytes(argv_and_envp, argv_size + 1 + envp_size + 1);
 		trace_buffer_unlock();
 	}
@@ -347,78 +233,6 @@ void _init_interposer()
 	}
 	cfs_ld_preload = cfs_malloc(strlen("LD_PRELOAD=") + strlen(ld_preload) + 1);
 	sprintf(cfs_ld_preload, "LD_PRELOAD=%s", ld_preload);
-}
-
-/*======================================================================
- * cfs_get_path_of_dirfd
- *
- * Given a directory file descriptor ("dirfd"), determine the path of the
- * directory it refers to. Append to this the content of the "pathname"
- * string, and write the concatenated result into "result_path".
- *
- * Return 0 on success, or -1 on failure.
- *======================================================================*/
-
-static int cfs_get_path_of_dirfd(char *result_path, int dirfd, const char *pathname)
-{
-	FETCH_REAL_FN(int, real_open, "open");
-	FETCH_REAL_FN(int, real_fchdir, "fchdir");
-
-	/* save the current directory */
-	int saved_dir = real_open(".", O_RDONLY);
-	if (saved_dir == -1) {
-		return -1;
-	}
-
-	/* change to the "dirfd" directory */
-	if (real_fchdir(dirfd) == -1){
-		return -1;
-	}
-
-	/* fetch the current working directory into the user-supplied buffer */
-	if (getcwd(result_path, PATH_MAX) == NULL){
-		real_fchdir(saved_dir);
-		close(saved_dir);
-		return -1;
-	}
-
-	/* switch back to the real current directory */
-	if (real_fchdir(saved_dir) == -1){
-		close(saved_dir);
-		return -1;
-	}
-
-	/* we're done with the saved directory fd */
-	close(saved_dir);
-
-	/* append the "pathname" onto the directory (assuming it's not too long). */
-	if (strlen(result_path) + strlen(pathname) + 2 >= PATH_MAX){
-		errno = ENAMETOOLONG;
-		return -1;
-	}
-
-	/* TODO: make this more efficient */
-	strcat(result_path, "/");
-	strcat(result_path, pathname);
-	return 0;
-}
-
-/*======================================================================
- * Helper - cfs_isdirectory(char *path)
- *
- * Return TRUE if the "path" refers to a directory, or FALSE if it's
- * not a directory, or if it doesn't exist.
- *
- *======================================================================*/
-
-static int
-cfs_isdirectory(const char *pathname)
-{
-	struct stat buf;
-	if (stat(pathname, &buf) == -1){
-		return FALSE;
-	}
-	return S_ISDIR(buf.st_mode);
 }
 
 /*======================================================================
@@ -811,7 +625,7 @@ cfs_modify_envp(char *const * envp)
 	new_envp[pos_cfs_id] = new_str;
 
 	new_str = (char *)cfs_malloc(strlen("CFS_DEBUG=NNN\0"));
-	sprintf(new_str, "CFS_DEBUG=%d", cfs_debug_level);
+	sprintf(new_str, "CFS_DEBUG=%d", cfs_get_debug_level());
 	new_envp[pos_cfs_debug] = new_str;
 
 	new_str = (char *)cfs_malloc(strlen("CFS_PARENT_ID=NNNNNNNNNNN\0"));
