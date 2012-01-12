@@ -111,7 +111,7 @@ void _init_interposer()
 	/* determine the absolute path of the executable that is currently running */
 	int abs_path_size = readlink("/proc/self/exe", argv_and_envp, NCARGS);
 	if (abs_path_size == -1) {
-		fprintf(stderr, "Error: cfs couldn't determine absolute path to running executable.\n");
+		cfs_debug(0, "Error: cfs couldn't determine absolute path to running executable.\n");
 		exit(1);
 	}
 
@@ -119,7 +119,7 @@ void _init_interposer()
 	int fd = open("/proc/self/cmdline", O_RDONLY);
 	int argv_size = read(fd, &argv_and_envp[abs_path_size], NCARGS - abs_path_size);
 	if (argv_size == -1) {
-		fprintf(stderr, "Error: cfs couldn't determine command line arguments.\n");
+		cfs_debug(0, "Error: cfs couldn't determine command line arguments.\n");
 		exit(1);
 	}
 	close(fd);
@@ -162,7 +162,7 @@ void _init_interposer()
 	fd = open("/proc/self/environ", O_RDONLY);
 	int envp_size = read(fd, &argv_and_envp[argv_size + 1], NCARGS - argv_size - 2);
 	if (envp_size == -1) {
-		fprintf(stderr, "Error: cfs couldn't determine command environment.\n");
+		cfs_debug(0, "Error: cfs couldn't determine command environment.\n");
 		exit(1);
 	}
 	close(fd);
@@ -173,7 +173,7 @@ void _init_interposer()
 	/* Yes, there's an existing CFS trace buffer. Attach to it */
 	cfs_id = atoi(cfs_id_string);
 	if (trace_buffer_use_existing(cfs_id) == -1){
-		fprintf(stderr, "Error: couldn't attach to cfs trace buffer\n");
+		cfs_debug(0, "Error: couldn't attach to cfs trace buffer\n");
 		exit(1);
 	}
 
@@ -228,7 +228,7 @@ void _init_interposer()
 	 */
 	char *ld_preload = getenv("LD_PRELOAD");
 	if (ld_preload == NULL) {
-		fprintf(stderr, "Error: cfs can't access LD_PRELOAD environment variable.\n");
+		cfs_debug(0, "Error: cfs can't access LD_PRELOAD environment variable.\n");
 		exit(1);
 	}
 	cfs_ld_preload = cfs_malloc(strlen("LD_PRELOAD=") + strlen(ld_preload) + 1);
@@ -642,7 +642,7 @@ cfs_modify_envp(char *const * envp)
 	char *existing_ld_preload = new_envp[pos_ld_preload];
 	if ((existing_ld_preload != NULL) &&
 		(strcmp(existing_ld_preload, cfs_ld_preload) != 0)){
-		fprintf(stderr, "WARNING: LD_PRELOAD has been modified - program may malfunction.");
+		cfs_debug(0, "WARNING: LD_PRELOAD has been modified - program may malfunction.");
 	}
 	new_envp[pos_ld_preload] = cfs_ld_preload;
 
