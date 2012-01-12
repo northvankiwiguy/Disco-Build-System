@@ -37,6 +37,45 @@ public class BuildScannersCommonTestUtils {
 	 *=====================================================================================*/
 
 	/**
+	 * Given the source code to a small C-language program, compile that program to produce
+	 * an executable binary.
+	 * @param tmpDir The directory into which the program will be stored.
+	 * @param programName The file name of the program to be created.
+	 * @param programSource The C-language source code for the program.
+	 * @return The path name of the executable program.
+	 */
+	public static String compileProgram(File tmpDir, String programName, String programSource) {
+		/*
+		 * Write our program into a .c file (called "prog.c")
+		 */
+		PrintStream out = null;
+		try {
+			out = new PrintStream(new FileOutputStream(tmpDir + "/" + programName + ".c"));
+		} catch (FileNotFoundException e1) {
+			fail("Unable to write program content to a file");
+		}
+		out.println(programSource);
+		out.close();
+
+		/*
+		 * Compile the program, using the default C compiler
+		 */
+		try {
+			ShellResult sr = SystemUtils.executeShellCmd("cc -o " + tmpDir + "/" + 
+					programName + " " + tmpDir + "/" + programName + ".c", "");
+			if (sr.getReturnCode() != 0) {
+				throw new Exception("Compile error: " + sr.getStderr());
+			}
+		} catch (Exception ex) {
+			fail("Unable to compile program: " + ex.getMessage());
+		}
+		
+		return tmpDir + "/" + programName;
+	}
+	
+    /*-------------------------------------------------------------------------------------*/
+	
+	/**
 	 * Given a program, contained entirely within a string, compile and execute
 	 * the program, run it through CFS, and generate a BuildStore. All the temporary
 	 * files and generated files will be stored in the directory specified by tmpDir.
@@ -51,29 +90,7 @@ public class BuildScannersCommonTestUtils {
 		/* our return value */
 		BuildStore bs = null;
 
-		/*
-		 * Write our program into a .c file (called "prog.c")
-		 */
-		PrintStream out = null;
-		try {
-			out = new PrintStream(new FileOutputStream(tmpDir + "/prog.c"));
-		} catch (FileNotFoundException e1) {
-			fail("Unable to write program content to a file");
-		}
-		out.println(program);
-		out.close();
-
-		/*
-		 * Compile the program, using the default C compiler
-		 */
-		try {
-			ShellResult sr = SystemUtils.executeShellCmd("cc -o " + tmpDir + "/prog " + tmpDir + "/prog.c", "");
-			if (sr.getReturnCode() != 0) {
-				throw new Exception("Compile error: " + sr.getStderr());
-			}
-		} catch (Exception ex) {
-			fail("Unable to compile program: " + ex.getMessage());
-		}
+		String exeProgram = compileProgram(tmpDir, "prog", program);
 
 		/*
 		 * Invoke the legacy build scanner to create a trace the file
@@ -103,7 +120,7 @@ public class BuildScannersCommonTestUtils {
 					argString.append(' ');
 				}
 			}
-			lbs.traceShellCommand(new String[] { tmpDir + "/prog " + argString.toString()});
+			lbs.traceShellCommand(new String[] { exeProgram + " " + argString.toString()});
 		} catch (Exception ex) {
 			fail("Unable to trace shell command: " + ex.getMessage());
 		}

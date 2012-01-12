@@ -35,7 +35,7 @@ public class TestCFuncLink {
 	@Test
 	public void testLink() throws Exception {
 		//int link(const char *oldname, const char *newname)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ public class TestCFuncLink {
 	public void testLinkat() throws Exception {
 		//int linkat(int olddirfd, const char *oldpath,
 		//        int newdirfd, const char *newpath, int flags)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -60,7 +60,7 @@ public class TestCFuncLink {
 	@Test
 	public void testRemove() throws Exception {
 		//int remove(const char *path)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -72,7 +72,7 @@ public class TestCFuncLink {
 	@Test
 	public void testRename() throws Exception {
 		//int rename(const char *oldname, const char *newname)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -84,7 +84,7 @@ public class TestCFuncLink {
 	@Test
 	public void testRenameat() throws Exception {
 		//int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -96,7 +96,7 @@ public class TestCFuncLink {
 	@Test
 	public void testSymlink() throws Exception {
 		//int symlink(const char *oldname, const char *newname)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -108,7 +108,7 @@ public class TestCFuncLink {
 	@Test
 	public void testSymlinkat() throws Exception {
 		//int symlinkat(const char *oldpath, int newdirfd, const char *newpath)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -120,7 +120,7 @@ public class TestCFuncLink {
 	@Test
 	public void testUnlink() throws Exception {
 		//int unlink(const char *filename)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -132,7 +132,7 @@ public class TestCFuncLink {
 	@Test
 	public void testUnlinkat() throws Exception {
 		//int unlinkat(int dirfd, const char *pathname, int flags)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/

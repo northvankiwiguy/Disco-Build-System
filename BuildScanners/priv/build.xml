@@ -34,7 +34,9 @@
 	</path>
 	
 	<!-- no extra classpath for unit testing -->
-	<path id="extra-test-classpath" />
+	<path id="extra-test-classpath">
+		<pathelement location="${workspace-root}/BuildStore/priv/test_bin" />
+	</path>
 
 	<!--================================================================================
 	   - Build Targets

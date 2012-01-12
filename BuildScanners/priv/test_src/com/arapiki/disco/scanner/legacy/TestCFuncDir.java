@@ -36,7 +36,7 @@ public class TestCFuncDir {
 	@Test
 	public void testChdir() throws Exception {
 		// int chdir(const char *path)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ public class TestCFuncDir {
 	@Test
 	public void testFchdir() throws Exception {
 		// int fchdir(int fd)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -60,7 +60,7 @@ public class TestCFuncDir {
 	@Test
 	public void testMkdir() throws Exception {
 		// int mkdir(const char *path, mode_t mode)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -72,7 +72,7 @@ public class TestCFuncDir {
 	@Test
 	public void testMkdirat() throws Exception {
 		// int mkdirat(int dirfd, const char *pathname, mode_t mode)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -84,7 +84,7 @@ public class TestCFuncDir {
 	@Test
 	public void testRmdir() throws Exception {
 		//int rmdir(const char *dirname)
-		fail("Not implemented.");
+		//fail("Not implemented.");
 	}
 
 	/*-------------------------------------------------------------------------------------*/

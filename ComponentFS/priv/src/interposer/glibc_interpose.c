@@ -74,14 +74,30 @@
 static int my_process_number;
 
 /*
- * Same, but for this process's parent.
+ * Same, but for this process's parent. This is passed to each new process
+ * via the CFS_PARENT_ID environment variable.
  */
 static int my_parent_process_number;
 
 /*
  * Debug level. Set this by setting the CFS_DEBUG environment variable
+ * (which will be passed from each process to all its children).
  */
-static int debug_level;
+static int cfs_debug_level;
+
+/*
+ * The shared memory segment ID, used for sharing the trace buffer between
+ * multiple processes. Passed to each new process via the CFS_ID environment
+ * variable.
+ */
+static trace_buffer_id cfs_id;
+
+/*
+ * The value of the LD_PRELOAD environment variable that caused this
+ * interposer library to be loaded. We need to ensure that all child
+ * processes also have this set.
+ */
+static char *cfs_ld_preload;
 
 /*
  * The current working directory of this process.
@@ -113,6 +129,63 @@ static char *cfs_get_cwd(int use_cache) {
 }
 
 /*======================================================================
+ * cfs_malloc
+ *
+ * Wrapper around the standard malloc function that terminates the
+ * program if there's a shortage of memory.
+ *======================================================================*/
+
+static void *cfs_malloc(size_t size)
+{
+	void *ptr = malloc(size);
+	if (ptr == NULL) {
+		fprintf(stderr, "Error: cfs couldn't allocate memory.\n");
+		exit(1);
+	}
+
+	return ptr;
+}
+
+
+/*======================================================================
+ * cfs_debug
+ *
+ * Display debug output. Only display debug output that's within the
+ * current debug_level (set via the CFS_DEBUG environment variable).
+ *======================================================================*/
+
+static void cfs_debug(int level, char *string, ...) {
+	va_list args;
+
+	va_start(args, string);
+	if (level <= cfs_debug_level) {
+		vfprintf(stderr, string, args);
+		fprintf(stderr, "\n");
+	}
+}
+
+/*======================================================================
+ * cfs_debug_env
+ *
+ * Display the given set of environment variables as a debug message.
+ *  - level - The debug level of the output (for filtering whether
+ *            the output is displayed).
+ *  - envp  - The environment to display.
+ *
+ *======================================================================*/
+
+static void cfs_debug_env(int level, char * const *envp) {
+	if (level <= cfs_debug_level) {
+		char * const *ptr = envp;
+		fprintf(stderr, "Environment Variables:\n");
+		while (*ptr != NULL) {
+			fprintf(stderr, "  %s\n", *ptr);
+			ptr++;
+		}
+	}
+}
+
+/*======================================================================
  * _init_interposer()
  *
  * When this dynamic library is first loaded, the _init_interposer function
@@ -127,14 +200,17 @@ void _init_interposer()
 	static char argv_and_envp[NCARGS];
 
 	/* disable debugging for now */
-	debug_level = 0;
+	cfs_debug_level = 0;
 
 	/*
 	 * If the CFS_ID environment variable is defined, then this current process
 	 * is running within the cfs environment. If not, just return silently.
+	 * Note that the various interposed functions are able to test cfs_id != 0
+	 * to see if this initialization worked, or not.
 	 */
-	char *cfs_id = getenv("CFS_ID");
-	if (!cfs_id){
+	cfs_id = 0;
+	char *cfs_id_string = getenv("CFS_ID");
+	if (!cfs_id_string){
 		return;
 	}
 
@@ -156,6 +232,20 @@ void _init_interposer()
 		exit(1);
 	}
 	close(fd);
+
+	/*
+	 * This hacky piece of code fixes a bug (or feature?) in /proc/self/cmdline
+	 * where sometimes the command line has two (or more?) terminating NUL
+	 * characters. If this happens, we need to remove one of them. This is
+	 * implemented as a loop, just in case there's ever more than one extra.
+	 */
+	while (argv_size > 2) {
+		if (argv_and_envp[abs_path_size + argv_size - 2] == '\0'){
+			argv_size--;
+		} else {
+			break;
+		}
+	}
 
 	/*
 	 * Now that we know the absolute path to the currently running executable,
@@ -190,8 +280,8 @@ void _init_interposer()
 	argv_and_envp[argv_size + 1 + envp_size] = '\0';
 
 	/* Yes, there's an existing CFS trace buffer. Attach to it */
-	trace_buffer_id id = atoi(cfs_id);
-	if (trace_buffer_use_existing(id) == -1){
+	cfs_id = atoi(cfs_id_string);
+	if (trace_buffer_use_existing(cfs_id) == -1){
 		fprintf(stderr, "Error: couldn't attach to cfs trace buffer\n");
 		exit(1);
 	}
@@ -216,13 +306,13 @@ void _init_interposer()
 	 * variable will be dealt with by disabling debugging. Debug levels that are too
 	 * high will be reduce to level 2.
 	 */
-	char *cfs_debug = getenv("CFS_DEBUG");
-	if (cfs_debug != NULL) {
-		debug_level = atoi(cfs_debug);
-		if (debug_level < 0){
-			debug_level = 0;
-		} else if (debug_level > 2){
-			debug_level = 2;
+	char *cfs_debug_str = getenv("CFS_DEBUG");
+	if (cfs_debug_str != NULL) {
+		cfs_debug_level = atoi(cfs_debug_str);
+		if (cfs_debug_level < 0){
+			cfs_debug_level = 0;
+		} else if (cfs_debug_level > 2){
+			cfs_debug_level = 2;
 		}
 	}
 
@@ -240,56 +330,23 @@ void _init_interposer()
 		trace_buffer_write_string(saved_cwd);
 		trace_buffer_write_bytes(argv_and_envp, argv_size + 1 + envp_size + 1);
 		trace_buffer_unlock();
-
-		/*
-		 * Write our process number into CFS_PARENT_ID, ready for when we become
-		 * the parent.
-		 */
-		char id_string[strlen("NNNNNNNNNN") + 1];
-		sprintf(id_string, "%d", my_process_number);
-		if (setenv("CFS_PARENT_ID", id_string, 1) != 0){
-			fprintf(stderr, "Error: failed to set the CFS_PARENT_ID variable\n");
-			exit(1);
-		}
 	}
-}
 
-/*======================================================================
- * cfs_debug
- * 
- * Display debug output. Only display debug output that's within the
- * current debug_level (set via the CFS_DEBUG environment variable).
- *======================================================================*/
+	// TODO: should there be an else here?
 
-static void cfs_debug(int level, char *string, ...) {
-	va_list args;
-
-	va_start(args, string);
-	if (level <= debug_level) {
-		vfprintf(stderr, string, args);
-		fprintf(stderr, "\n");
+	/*
+	 * Save our LD_PRELOAD environment variable. We need to ensure that any
+	 * child processes we create also have this LD_PRELOAD set, so save it
+	 * away for later (using LD_PRELOAD=xxxx format, which is required to
+	 * add it back into the environment later).
+	 */
+	char *ld_preload = getenv("LD_PRELOAD");
+	if (ld_preload == NULL) {
+		fprintf(stderr, "Error: cfs can't access LD_PRELOAD environment variable.\n");
+		exit(1);
 	}
-}
-
-/*======================================================================
- * cfs_debug_env
- *
- * Display the given set of environment variables as a debug message.
- *  - level - The debug level of the output (for filtering whether
- *            the output is displayed).
- *  - envp  - The environment to display.
- *
- *======================================================================*/
-
-static void cfs_debug_env(int level, char * const *envp) {
-	if (level <= debug_level) {
-		char * const *ptr = envp;
-		fprintf(stderr, "Environment Variables:\n");
-		while (*ptr != NULL) {
-			fprintf(stderr, "  %s\n", *ptr);
-			ptr++;
-		}
-	}
+	cfs_ld_preload = cfs_malloc(strlen("LD_PRELOAD=") + strlen(ld_preload) + 1);
+	sprintf(cfs_ld_preload, "LD_PRELOAD=%s", ld_preload);
 }
 
 /*======================================================================
@@ -650,6 +707,7 @@ int euidaccess(const char *pathname, int mode)
  *   LD_PRELOAD - must refer to this interceptor library.
  *   CFS_ID - provides the shared memory ID for our trace buffer.
  *   CFS_PARENT_ID - provides our parent process ID.
+ *   CFS_DEBUG - provides our debug level.
  * For numerous reasons, these variable could be removed or overwritten,
  * but the success of CFS depends on them being set.
  *======================================================================*/
@@ -658,11 +716,124 @@ static char * const *
 cfs_modify_envp(char *const * envp)
 {
 	extern int errno;
+
+	/* if we're not tracing, we don't need to do any of this */
+	if (cfs_id == 0) {
+		return envp;
+	}
+
 	int tmp_errno = errno; 		/* take care not to disrupt errno */
 
-	// TODO: write this function.
+	/*
+	 * First, make a new copy of the original array, but add four extra
+	 * pointers to the array, just in case we need to add each of the
+	 * four new environment variables (however, if they're already there,
+	 * we won't need to). The first step is to figure out how many
+	 * entries there are in the environment.
+	 */
+
+	/* make sure we account for the extra four, plus the terminating NULL. */
+	int env_size = 5;
+	char * const *ptr = envp;
+	while (*ptr != NULL) {
+		env_size++;
+		ptr++;
+	}
+
+	/* allocate a replacement envp array */
+	char **new_envp = (char **)cfs_malloc(env_size * sizeof(char *));
+
+	/*
+	 * For each of the pointers in the existing envp array, check the name of the
+	 * variable to see if it's one of those we're interested in (CFS_ID, etc). If
+	 * so, we'll allocate a replacement string that has the correct value in it
+	 * (even though it may already be correct). If it's not one of our variables,
+	 * just re-use the same string.
+	 */
+
+	/* location in envp of the previous definition - -1 means not found (yet). */
+	int pos_cfs_id = -1;
+	int pos_cfs_parent_id = -1;
+	int pos_cfs_debug = -1;
+	int pos_ld_preload = -1;
+
+	/* loop through the existing envp, copying the values over to the new array */
+	int index = 0;
+	char *str;
+	while ((str = envp[index]) != NULL) {
+		/*
+		 * For each of the variables we care about, look for an existing definition
+		 * and take note of its index. Later on we'll put the correct value (if
+		 * necessary) into this location.
+		 */
+		if (strncmp("CFS_ID=", str, strlen("CFS_ID=")) == 0){
+			pos_cfs_id = index;
+		} else if (strncmp("CFS_PARENT_ID=", str, strlen("CFS_PARENT_ID=")) == 0){
+			pos_cfs_parent_id = index;
+		} else if (strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0){
+			pos_cfs_debug = index;
+		} else if (strncmp("LD_PRELOAD=", str, strlen("LD_PRELOAD=")) == 0){
+			pos_ld_preload = index;
+		}
+
+		new_envp[index] = str;
+		index++;
+	}
+
+	/*
+	 * For any variables that weren't already in envp, we need to add them. They'll
+	 * go at the end of new_envp (we left space for four additional variables).
+	 */
+	if (pos_cfs_id == -1) {
+		pos_cfs_id = index++;
+	}
+	if (pos_cfs_parent_id == -1) {
+		pos_cfs_parent_id = index++;
+	}
+	if (pos_cfs_debug == -1) {
+		pos_cfs_debug = index++;
+	}
+	if (pos_ld_preload == -1) {
+		pos_ld_preload = index++;
+	}
+
+	/* don't forget the terminating NULL */
+	new_envp[index] = NULL;
+
+	/*
+	 * Now we have a location for each of the four environment variables.
+	 * Either we're replacing an existing string, or adding it for the
+	 * first time. In either case, we malloc a new string and insert it
+	 * into new_envp.
+	 */
+	char *new_str = (char *)cfs_malloc(strlen("CFS_ID=NNNNNNNNNNNNNNNNNNNNNN\0"));
+	sprintf(new_str, "CFS_ID=%ld", cfs_id);
+	new_envp[pos_cfs_id] = new_str;
+
+	new_str = (char *)cfs_malloc(strlen("CFS_DEBUG=NNN\0"));
+	sprintf(new_str, "CFS_DEBUG=%d", cfs_debug_level);
+	new_envp[pos_cfs_debug] = new_str;
+
+	new_str = (char *)cfs_malloc(strlen("CFS_PARENT_ID=NNNNNNNNNNN\0"));
+	sprintf(new_str, "CFS_PARENT_ID=%d", my_process_number);
+	new_envp[pos_cfs_parent_id] = new_str;
+
+	/*
+	 * For LD_PRELOAD, we want to give a warning if the new value is different
+	 * from the existing value that's already in the environment. This suggests
+	 * that the user program has modified this variable (not an uncommon thing),
+	 * but if we overwrite it with our own LD_PRELOAD, we could be breaking
+	 * the program's functionality.
+	 */
+	char *existing_ld_preload = new_envp[pos_ld_preload];
+	if ((existing_ld_preload != NULL) &&
+		(strcmp(existing_ld_preload, cfs_ld_preload) != 0)){
+		fprintf(stderr, "WARNING: LD_PRELOAD has been modified - program may malfunction.");
+	}
+	new_envp[pos_ld_preload] = cfs_ld_preload;
+
 	errno = tmp_errno;			/* restore errno */
-	return envp;
+	return new_envp;
 }
 
 /*======================================================================
@@ -675,9 +846,35 @@ static void
 cfs_cleanup_envp(char * const *envp)
 {
 	extern int errno;
+
+	/* if we're not tracing, we don't need to do any of this */
+	if (cfs_id == 0) {
+		return;
+	}
+
 	int tmp_errno = errno; 		/* take care not to disrupt errno */
 
-	// TODO: write this function.
+	/*
+	 * Technically this function would normally just be called if
+	 * an exec() call failed, which is rare. However, it's not
+	 * totally impossible, so we should deallocate any memory that
+	 * we allocated in cfs_modify_envp(). Search through the envp
+	 * and look for the strings we added, then free them.
+	 */
+	char * const *ptr = envp;
+	char *str;
+	while ((str = *ptr) != NULL) {
+		if ((strncmp("CFS_ID=", str, strlen("CFS_ID=")) == 0) ||
+			(strncmp("CFS_PARENT_ID=", str, strlen("CFS_PARENT_ID=")) == 0) ||
+			(strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0) ||
+			(strncmp("LD_PRELOAD=", str, strlen("LD_PRELOAD=")) == 0)) {
+				free(*ptr);
+		}
+		ptr++;
+	}
+
+	/* finally, free our copied envp array */
+	free((void *)envp);
 
 	errno = tmp_errno;			/* restore errno */
 }
@@ -1909,7 +2106,7 @@ popen(const char *command, const char *mode)
 
 	FETCH_REAL_FN(FILE *, real_popen, "popen");
 
-	cfs_debug(1, "popen(\"%s\", 0%x)", command, mode);
+	cfs_debug(1, "popen(\"%s\", \"%s\")", command, mode);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
 	environ = (char **)cfs_modify_envp(environ);
