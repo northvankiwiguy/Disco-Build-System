@@ -12,6 +12,7 @@
 
 package com.arapiki.disco.scanner.legacy;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -134,6 +135,12 @@ public class LegacyBuildScanner {
 		else {
 			this.logFileName = DEFAULT_LOG_FILE_NAME;
 		}
+		
+		/* 
+		 * Make sure it's an absolute path, otherwise when the program being traced does
+		 * a chdir, it'll start writing the log file into that directory instead.
+		 */
+		this.logFileName = new File(this.logFileName).getAbsolutePath();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
