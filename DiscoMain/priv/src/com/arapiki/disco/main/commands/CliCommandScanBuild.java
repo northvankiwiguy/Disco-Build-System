@@ -39,6 +39,9 @@ public class CliCommandScanBuild implements ICliCommand {
 	
 	/** Set if the user specified --trace-level=. */
 	private int optionDebugLevel = 0;
+	
+	/** The name of the log file to send debug information to */
+	private String logFileName = null;
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -89,6 +92,11 @@ public class CliCommandScanBuild implements ICliCommand {
 				"Debug level (0 = none, 1 = brief, 2 = detailed).");
 		opts.addOption(dumpTraceOpt);
 		
+		/* add the --log-file option */
+		Option logFileOpt = new Option("l", "log-file", true,  "File for capturing debug information (default: cfs.log).");
+		logFileOpt.setArgName("file-name");
+		opts.addOption(logFileOpt);
+		
 		return opts;
 	}
 
@@ -124,6 +132,7 @@ public class CliCommandScanBuild implements ICliCommand {
 		optionTraceOnly = cmdLine.hasOption("trace-only");
 		optionReadTrace = cmdLine.hasOption("read-trace");
 		traceFileName = cmdLine.getOptionValue("trace-file");
+		logFileName = cmdLine.getOptionValue("log-file");
 		
 		/*
 		 * We can't specify both --trace-only and --read-trace
@@ -166,12 +175,14 @@ public class CliCommandScanBuild implements ICliCommand {
 		/* set the trace file (if this is null, the default will be used */
 		lbs.setTraceFile(traceFileName);
 		
+		/* set the log file (if this is null, the default will be used */
+		lbs.setLogFile(logFileName);
+		
 		/* 
 		 * Possibly dump the content of the trace file to the stdout. This depends on whether
 		 * --debug-level was specified.
 		 */
 		if (optionDebugLevel != 0) {
-			lbs.setDebugStream(System.out);
 			lbs.setDebugLevel(optionDebugLevel);
 		}
 		

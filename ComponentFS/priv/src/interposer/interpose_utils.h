@@ -37,6 +37,8 @@ void cfs_debug(int level, char *string, ...);
 void cfs_debug_env(int level, char * const *envp);
 int cfs_get_debug_level();
 void cfs_set_debug_level(int level);
+char *cfs_get_log_file();
+void cfs_set_log_file(char *name);
 int cfs_get_path_of_dirfd(char *result_path, int dirfd, const char *pathname);
 int cfs_isdirectory(const char *pathname);
 

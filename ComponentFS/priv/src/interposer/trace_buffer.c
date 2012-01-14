@@ -116,6 +116,13 @@ trace_buffer_id trace_buffer_create(void)
 	semctl(sem_id, TB_SEM_FULL, SETVAL, 1);
 
 	/*
+	 * Initialize the TB_SEM_LOG_FILE semaphore to 1, meaning that only one process can
+	 * be writing to the log file at one time. The avoids have different processes
+	 * stomp on each other's log messages.
+	 */
+	semctl(sem_id, TB_SEM_LOG_FILE, SETVAL, 1);
+
+	/*
 	 * Attach this memory segment to our current process. We don't know exactly where
 	 * in memory it'll end up, so it's not meaningful to store absolute pointers inside
 	 * the buffer.
@@ -421,6 +428,62 @@ int trace_buffer_write_byte(char value)
 }
 
 /*======================================================================
+ * trace_buffer_lock_common()
+ *
+ * Helper function for locking something, based on the specified
+ * semaphore name.
+ *
+ * Return 0 on success (after the lock is acquired), or -1 if an error
+ * occurred (and the lock wasn't obtained).
+ *======================================================================*/
+
+static int trace_buffer_lock_common(int semId)
+{
+	/* if there's no trace buffer, return -1 */
+	if (our_trace_buffer_id == -1){
+		return -1;
+	}
+
+	// wait until the trace buffer semaphore is available.
+	struct sembuf sem_ops[1];
+	sem_ops[0].sem_num = semId;
+	sem_ops[0].sem_op = -1;
+	sem_ops[0].sem_flg = SEM_UNDO;
+	if (semop(trace_buffer->tb_sem_id, sem_ops, 1) == -1){
+		return -1;
+	}
+
+	return 0;
+}
+
+/*======================================================================
+ * trace_buffer_unlock_common()
+ *
+ * Helper function for unlocking something, based on a semaphore.
+ *
+ * The current process has the trace buffer locked, but now it
+ * wants to release the lock. Return 0 on success, or -1 on error.
+ *======================================================================*/
+
+static int trace_buffer_unlock_common(int semId)
+{
+	// if there's no trace buffer, return FALSE
+	if (our_trace_buffer_id == -1){
+		return -1;
+	}
+	// mark the trace buffer as being available.
+	struct sembuf sem_ops[1];
+	sem_ops[0].sem_num = semId;
+	sem_ops[0].sem_op = 1;
+	sem_ops[0].sem_flg = 0;
+	if (semop(trace_buffer->tb_sem_id, sem_ops, 1) == -1){
+		return -1;
+	}
+
+	return 0;
+}
+
+/*======================================================================
  * trace_buffer_lock()
  *
  * When a process wishes to access the trace buffer, it must first
@@ -432,25 +495,13 @@ int trace_buffer_write_byte(char value)
 
 int trace_buffer_lock()
 {
-	/* if there's no trace buffer, return -1 */
-	if (our_trace_buffer_id == -1){
-		return -1;
-	}
-
-	// wait until the trace buffer semaphore is available.
-	struct sembuf sem_ops[1];
-	sem_ops[0].sem_num = TB_SEM_MASTER;
-	sem_ops[0].sem_op = -1;
-	sem_ops[0].sem_flg = SEM_UNDO;
-	if (semop(trace_buffer->tb_sem_id, sem_ops, 1) == -1){
-		return -1;
-	}
-
-	return 0;
+	return trace_buffer_lock_common(TB_SEM_MASTER);
 }
 
 /*======================================================================
  * trace_buffer_unlock()
+ *
+ * Release the lock on the trace buffer.
  *
  * The current process has the trace buffer locked, but now it
  * wants to release the lock. Return 0 on success, or -1 on error.
@@ -458,20 +509,36 @@ int trace_buffer_lock()
 
 int trace_buffer_unlock()
 {
-	// if there's no trace buffer, return FALSE
-	if (our_trace_buffer_id == -1){
-		return -1;
-	}
-	// mark the trace buffer as being available.
-	struct sembuf sem_ops[1];
-	sem_ops[0].sem_num = TB_SEM_MASTER;
-	sem_ops[0].sem_op = 1;
-	sem_ops[0].sem_flg = 0;
-	if (semop(trace_buffer->tb_sem_id, sem_ops, 1) == -1){
-		return -1;
-	}
+	return trace_buffer_unlock_common(TB_SEM_MASTER);
+}
 
-	return 0;
+/*======================================================================
+ * trace_buffer_lock_logfile()
+ *
+ * When a process wishes to write to the log file, it must first
+ * acquire a lock. If the lock's not available, the process should block.
+ *
+ * Return 0 on success (after the lock is acquired), or -1 if an error
+ * occurred (and the lock wasn't obtained).
+ *======================================================================*/
+
+int trace_buffer_lock_logfile()
+{
+	return trace_buffer_lock_common(TB_SEM_LOG_FILE);
+}
+
+/*======================================================================
+ * trace_buffer_unlock()
+ *
+ * Release the lock on the logfile.
+ *
+ * The current process has the trace buffer locked, but now it
+ * wants to release the lock. Return 0 on success, or -1 on error.
+ *======================================================================*/
+
+int trace_buffer_unlock_logfile()
+{
+	return trace_buffer_unlock_common(TB_SEM_LOG_FILE);
 }
 
 /*======================================================================

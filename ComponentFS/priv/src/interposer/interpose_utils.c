@@ -40,6 +40,14 @@ static char saved_cwd[PATH_MAX];
  */
 static int cfs_debug_level;
 
+/*
+ * Name of the file into which log messages should be stored (defaults
+ * to "cfs.log").
+ */
+#define DEFAULT_LOG_FILE_NAME 	"cfs.log"
+
+static char *cfs_log_file_name = DEFAULT_LOG_FILE_NAME;
+
 /*======================================================================
  * cfs_get_cwd
  *
@@ -84,6 +92,33 @@ void *cfs_malloc(size_t size)
 }
 
 /*======================================================================
+ * cfs_open_log
+ *
+ * Open the CFS log file, ensuring that we're the only process that
+ * is allowed to write to it.
+ *======================================================================*/
+
+FILE *cfs_open_log()
+{
+	FETCH_REAL_FN(FILE *, real_fopen, "fopen");
+
+	trace_buffer_lock_logfile();
+	return real_fopen(cfs_log_file_name, "a");
+}
+
+/*======================================================================
+ * cfs_close_log
+ *
+ * Close the CFS log file, allowing other processes to write to it.
+ *======================================================================*/
+
+void cfs_close_log(FILE *logFile)
+{
+	fclose(logFile);
+	trace_buffer_unlock_logfile();
+}
+
+/*======================================================================
  * cfs_get_debug_level
  *
  * Return the current debug level setting.
@@ -112,6 +147,34 @@ void cfs_set_debug_level(int level)
 }
 
 /*======================================================================
+ * cfs_get_log_file
+ *
+ * Return the name of the log file.
+ *
+ *======================================================================*/
+
+char *cfs_get_log_file()
+{
+	return cfs_log_file_name;
+}
+
+/*======================================================================
+ * cfs_set_log_file
+ *
+ * Set the name of the log file into which debug output is stored.
+ * Providing a NULL pointer resets the name back to the default.
+ *======================================================================*/
+
+void cfs_set_log_file(char *name)
+{
+	if (name == NULL) {
+		cfs_log_file_name = DEFAULT_LOG_FILE_NAME;
+	} else {
+		cfs_log_file_name = name;
+	}
+}
+
+/*======================================================================
  * cfs_debug
  *
  * Display debug output. Only display debug output that's within the
@@ -124,8 +187,15 @@ void cfs_debug(int level, char *string, ...)
 
 	va_start(args, string);
 	if (level <= cfs_debug_level) {
-		vfprintf(stderr, string, args);
-		fprintf(stderr, "\n");
+		FILE *out = cfs_open_log();
+
+		/* if we can't open it, discard data */
+		if (out != NULL) {
+			fprintf(out, "PID %d: ", getpid());
+			vfprintf(out, string, args);
+			fprintf(out, "\n");
+		}
+		cfs_close_log(out);
 	}
 }
 
@@ -143,11 +213,17 @@ void cfs_debug_env(int level, char * const *envp)
 {
 	if (level <= cfs_debug_level) {
 		char * const *ptr = envp;
-		fprintf(stderr, "Environment Variables:\n");
-		while (*ptr != NULL) {
-			fprintf(stderr, "  %s\n", *ptr);
-			ptr++;
+		FILE *out = cfs_open_log();
+
+		/* if we can't open it, discard data */
+		if (out != NULL) {
+			fprintf(out, "Environment Variables:\n");
+			while (*ptr != NULL) {
+				fprintf(out, "  %s\n", *ptr);
+				ptr++;
+			}
 		}
+		cfs_close_log(out);
 	}
 }
 

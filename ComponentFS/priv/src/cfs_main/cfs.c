@@ -26,6 +26,8 @@
  * The optional arguments are:
  *    -o <trace-file> - write the file system monitoring information to the
  *    trace file. If -o is not specified, write the data to "cfs.trace" by default.
+ *    -l <log-file> - write debug information to this file. Defaults to "cfs.log".
+ *    -d <level> - set the debug verbosity level, default to 0, but can be 0, 1 or 2.
  *    -h - displays help information.
  */
 
@@ -50,6 +52,9 @@ extern int traverse_and_trace_source();
 /* the default file name for trace output */
 static char *trace_file_name = "cfs.trace";
 
+/* the default log file name */
+static char *log_file_name = "cfs.log";
+
 /*
  * Should cfs first traverse the file system and report all source files
  * that it finds?
@@ -73,11 +78,15 @@ int debug_level = 0;
 static char **parse_options(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "+hro:d:")) != -1){
+	while ((opt = getopt(argc, argv, "+hro:l:d:")) != -1){
 		switch (opt){
 		case 'o':
 			/* -o <trace-file> */
 			trace_file_name = optarg;
+			break;
+		case 'l':
+			/* -l <log-file> */
+			log_file_name = optarg;
 			break;
 		case 'r':
 			/* -r - traverse the directory hierarchy to locate source files */
@@ -180,7 +189,20 @@ int main(int argc, char *argv[], char *envp[])
 		exit(-1);
 	}
 
-	printf("Starting ComponentFS shell. Writing trace output to %s.\n", trace_file_name);
+	printf("Starting ComponentFS shell. Writing trace output to %s and debug output to %s.\n",
+			trace_file_name, log_file_name);
+
+	/*
+	 * Create an empty log file, which has the effect of ensuring that we can write to it.
+	 * If we can't, abort here with a meaningful error message.
+	 */
+	FILE *logFile = fopen(log_file_name, "w");
+	if (logFile == NULL) {
+		fprintf(stderr, "Error: unable to create log file %s: ", log_file_name);
+		perror("");
+		exit(-1);
+	}
+	fclose(logFile);
 
 	/*
 	 * Set the LD_PRELOAD variable to refer to our libcfs.so library. This forces the child
@@ -220,6 +242,12 @@ int main(int argc, char *argv[], char *envp[])
 				sprintf(cfs_debug_string, "%d", debug_level);
 				setenv("CFS_DEBUG", cfs_debug_string, 1);
 			}
+
+			/*
+			 * Set an environment variable to store the log file name, so that child processes
+			 * know which file to write to.
+			 */
+			setenv("CFS_LOG_FILE", log_file_name, 1);
 
 			/*
 			 * Export the CFS_ID environment variable so that child processes know our

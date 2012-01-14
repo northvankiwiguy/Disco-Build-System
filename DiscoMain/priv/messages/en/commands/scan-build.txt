@@ -34,6 +34,13 @@ Command-specific options are:
   monitoring the scanning process. By default, the debug level is 0 (nothing
   displayed), but can be elevated to 1 for brief debug output or 2 for more
   detailed information.
+
+-l | --log-file <file-name>
+
+  Specifies the file into which the debugging information will be written.
+  If no log file is specified, the default of "cfs.log" is used. If the
+  debug level (set with -d or --debug-level) is zero, only major errors will
+  be reported in this log file.
   
 -t | --trace-only
 

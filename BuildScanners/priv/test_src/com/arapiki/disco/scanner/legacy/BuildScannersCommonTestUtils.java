@@ -97,7 +97,6 @@ public class BuildScannersCommonTestUtils {
 		 */
 		LegacyBuildScanner lbs = new LegacyBuildScanner();
 		lbs.setTraceFile(tmpDir + "/cfs.trace");
-		lbs.setDebugStream(System.out);
 
 		/* set this to 1 or 2 for more debug information */
 		String debugLevelString = System.getenv("CFS_DEBUG");

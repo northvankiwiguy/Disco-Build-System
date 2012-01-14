@@ -89,34 +89,6 @@ public class TestLegacyBuildScanner {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test the setDebugStream()/getDebugStream() methods
-	 * @throws Exception Something bad happened
-	 */
-	@Test
-	public void testSetDebugStream() throws Exception {
-
-		/* create a new LegacyBuildScanner, with default settings */
-		LegacyBuildScanner buildScanner = new LegacyBuildScanner();
-
-		/* by default, there's no stream */
-		assertNull(buildScanner.getDebugStream());
-		
-		/* set it to System.out */
-		buildScanner.setDebugStream(System.out);
-		assertEquals(System.out, buildScanner.getDebugStream());
-		
-		/* set it to System.err */
-		buildScanner.setDebugStream(System.err);
-		assertEquals(System.err, buildScanner.getDebugStream());
-		
-		/* set it back to null */
-		buildScanner.setDebugStream(null);		
-		assertNull(buildScanner.getDebugStream());		
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Test the setDebugLevel()/getDebugLevel() methods
 	 * @throws Exception Something bad happened
 	 */

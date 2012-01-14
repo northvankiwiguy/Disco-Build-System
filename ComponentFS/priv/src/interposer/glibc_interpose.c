@@ -105,6 +105,21 @@ void _init_interposer()
 		return;
 	}
 
+	/*
+	 * Enable debugging, if desired. An non-numeric value in the CFS_DEBUG environment
+	 * variable will be dealt with by disabling debugging. Debug levels that are too
+	 * high will be reduce to level 2. Also, if CFS_LOG_FILE is set, use that as the
+	 * debug log file.
+	 */
+	char *cfs_debug_str = getenv("CFS_DEBUG");
+	if (cfs_debug_str != NULL) {
+		cfs_set_debug_level(atoi(cfs_debug_str));
+	}
+	char *cfs_log_file = getenv("CFS_LOG_FILE");
+	if (cfs_log_file != NULL) {
+		cfs_set_log_file(cfs_log_file);
+	}
+
 	/* ensure that we have an up-to-date copy of the process's working directory */
 	cfs_get_cwd(FALSE);
 
@@ -190,16 +205,6 @@ void _init_interposer()
 		 * what we want.
 		 */
 		my_parent_process_number = atoi(cfs_parent_id);
-	}
-
-	/*
-	 * Enable debugging, if desired. An non-numeric value in the CFS_DEBUG environment
-	 * variable will be dealt with by disabling debugging. Debug levels that are too
-	 * high will be reduce to level 2.
-	 */
-	char *cfs_debug_str = getenv("CFS_DEBUG");
-	if (cfs_debug_str != NULL) {
-		cfs_set_debug_level(atoi(cfs_debug_str));
 	}
 
 	/*
@@ -522,6 +527,7 @@ int euidaccess(const char *pathname, int mode)
  *   CFS_ID - provides the shared memory ID for our trace buffer.
  *   CFS_PARENT_ID - provides our parent process ID.
  *   CFS_DEBUG - provides our debug level.
+ *   CFS_LOG_FILE - provides the name of the debug log file.
  * For numerous reasons, these variable could be removed or overwritten,
  * but the success of CFS depends on them being set.
  *======================================================================*/
@@ -569,6 +575,7 @@ cfs_modify_envp(char *const * envp)
 	int pos_cfs_id = -1;
 	int pos_cfs_parent_id = -1;
 	int pos_cfs_debug = -1;
+	int pos_cfs_log_file = -1;
 	int pos_ld_preload = -1;
 
 	/* loop through the existing envp, copying the values over to the new array */
@@ -586,6 +593,8 @@ cfs_modify_envp(char *const * envp)
 			pos_cfs_parent_id = index;
 		} else if (strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0){
 			pos_cfs_debug = index;
+		} else if (strncmp("CFS_LOG_FILE=", str, strlen("CFS_LOG_FILE")) == 0){
+			pos_cfs_log_file = index;
 		} else if (strncmp("LD_PRELOAD=", str, strlen("LD_PRELOAD=")) == 0){
 			pos_ld_preload = index;
 		}
@@ -606,6 +615,9 @@ cfs_modify_envp(char *const * envp)
 	}
 	if (pos_cfs_debug == -1) {
 		pos_cfs_debug = index++;
+	}
+	if (pos_cfs_log_file == -1) {
+		pos_cfs_log_file = index++;
 	}
 	if (pos_ld_preload == -1) {
 		pos_ld_preload = index++;
@@ -631,6 +643,11 @@ cfs_modify_envp(char *const * envp)
 	new_str = (char *)cfs_malloc(strlen("CFS_PARENT_ID=NNNNNNNNNNN\0"));
 	sprintf(new_str, "CFS_PARENT_ID=%d", my_process_number);
 	new_envp[pos_cfs_parent_id] = new_str;
+
+	char *cfs_log_file = cfs_get_log_file();
+	new_str = (char *)cfs_malloc(strlen("CFS_LOG_FILE=\0") + strlen(cfs_log_file));
+	sprintf(new_str, "CFS_LOG_FILE=%s", cfs_log_file);
+	new_envp[pos_cfs_log_file] = new_str;
 
 	/*
 	 * For LD_PRELOAD, we want to give a warning if the new value is different
@@ -680,8 +697,7 @@ cfs_cleanup_envp(char * const *envp)
 	while ((str = *ptr) != NULL) {
 		if ((strncmp("CFS_ID=", str, strlen("CFS_ID=")) == 0) ||
 			(strncmp("CFS_PARENT_ID=", str, strlen("CFS_PARENT_ID=")) == 0) ||
-			(strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0) ||
-			(strncmp("LD_PRELOAD=", str, strlen("LD_PRELOAD=")) == 0)) {
+			(strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0)){
 				free(*ptr);
 		}
 		ptr++;

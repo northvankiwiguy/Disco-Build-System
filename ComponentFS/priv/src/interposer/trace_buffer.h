@@ -59,7 +59,8 @@ typedef struct trace_buffer_header {
  */
 #define TB_SEM_MASTER 		0		/* The master semaphore for controlling who writes to the trace buffer. */
 #define TB_SEM_FULL			1		/* Indicates if the buffer is full and needs to be emptied. */
-#define TB_SEM_MAX			2		/* There are this many semaphores */
+#define TB_SEM_LOG_FILE		2       /* Indicates that the log file is currently locked for writing */
+#define TB_SEM_MAX			3		/* There are this many semaphores */
 
 
 /* The magic number to identify a valid trace buffer */
@@ -77,6 +78,8 @@ extern int trace_buffer_write_int(int value);
 extern int trace_buffer_write_byte(char value);
 extern int trace_buffer_lock(void);
 extern int trace_buffer_unlock(void);
+extern int trace_buffer_lock_logfile();
+extern int trace_buffer_unlock_logfile();
 extern int trace_buffer_mark_full(int);
 extern int trace_buffer_wait_until_full(void);
 extern int trace_buffer_next_process_number(void);
