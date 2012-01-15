@@ -88,6 +88,8 @@ void _init_interposer() __attribute__ ((constructor));
 
 void _init_interposer()
 {
+	FETCH_REAL_FN(int, real_open, "open");
+
 	static char argv_and_envp[NCARGS];
 
 	/* disable debugging for now */
@@ -131,7 +133,7 @@ void _init_interposer()
 	}
 
 	/* Grab a copy of the command line arguments and environment (argv/envp) */
-	int fd = open("/proc/self/cmdline", O_RDONLY);
+	int fd = real_open("/proc/self/cmdline", O_RDONLY);
 	int argv_size = read(fd, &argv_and_envp[abs_path_size], NCARGS - abs_path_size);
 	if (argv_size == -1) {
 		cfs_debug(0, "Error: cfs couldn't determine command line arguments.\n");
@@ -142,9 +144,14 @@ void _init_interposer()
 	/*
 	 * This hacky piece of code fixes a bug (or feature?) in /proc/self/cmdline
 	 * where sometimes the command line has two (or more?) terminating NUL
-	 * characters. If this happens, we need to remove one of them. This is
-	 * implemented as a loop, just in case there's ever more than one extra.
+	 * characters, and sometimes it has none. If this happens, we first add a
+	 * trailing NUL, then remove any excess NULs. This is implemented as a loop,
+	 * just in case there's ever more than one extra.
 	 */
+	if (argv_and_envp[abs_path_size + argv_size - 1] != '\0'){
+		argv_and_envp[abs_path_size + argv_size] = '\0';
+		argv_size++;
+	}
 	while (argv_size > 2) {
 		if (argv_and_envp[abs_path_size + argv_size - 2] == '\0'){
 			argv_size--;
@@ -174,7 +181,7 @@ void _init_interposer()
 
 	/* Write an empty string immediately after the last argument string. */
 	argv_and_envp[argv_size] = '\0';
-	fd = open("/proc/self/environ", O_RDONLY);
+	fd = real_open("/proc/self/environ", O_RDONLY);
 	int envp_size = read(fd, &argv_and_envp[argv_size + 1], NCARGS - argv_size - 2);
 	if (envp_size == -1) {
 		cfs_debug(0, "Error: cfs couldn't determine command environment.\n");

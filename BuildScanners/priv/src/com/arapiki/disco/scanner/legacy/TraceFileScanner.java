@@ -200,6 +200,7 @@ import com.arapiki.utils.errors.ErrorCode;
 		do {
 			
 			/* all records start with a tag, followed by a process number */
+			int tagTraceFilePos = traceFilePos;
 			int tag = getTag();
 			int processNum = getInt();
 			
@@ -250,7 +251,7 @@ import com.arapiki.utils.errors.ErrorCode;
 				
 			default:
 				throw new FatalBuildScannerError("Invalid tag in trace file: " + tag +
-						" at trace file position " + traceFilePos);
+						" at trace file position " + tagTraceFilePos);
 			}
 				
 		} while (!eof);

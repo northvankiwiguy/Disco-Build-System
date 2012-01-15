@@ -595,6 +595,123 @@ static void test_trace_buffer_next_process_number(void)
 }
 
 /*======================================================================
+ * test_trace_buffer_stress()
+ *
+ * Test that locking works when two or more processes write to the
+ * buffer at the same time. Each process writes a predetermine sequence
+ * of bytes, and assuming that buffer locking works as expected, each
+ * sequence of bytes should be written atomically.
+ *======================================================================*/
+
+static void test_trace_buffer_stress(void)
+{
+	int num_writers = 2;
+	int bytes_per_writer = (TRACE_BUFFER_SIZE / num_writers) * 0.9;
+	int bytes_written = 0;
+	int is_parent;
+
+	/* Create a new buffer - should succeed */
+	trace_buffer_id id1 = trace_buffer_create();
+	CU_ASSERT_NOT_EQUAL(id1, -1);
+
+	/*
+	 * Create a child process that will run in parallel with the parent
+	 * process.
+	 */
+	switch(fork()) {
+	case 0:
+		/* child process */
+		is_parent = FALSE;
+		break;
+
+	default:
+		/* parent process */
+		is_parent = TRUE;
+		break;
+
+	case -1:
+		/* error */
+		CU_FAIL("Unable to fork off a child process.");
+		return;
+	}
+
+	/*
+	 * Both the parent and child will execute this code - filling up the trace buffer.
+	 * We follow this algorithm:
+	 * 		- Each process picks a random number (which should be different from one the
+	 *        other process chose).
+	 *      - The process writes that number as a 4-byte integer.
+	 *      - The process writes the low-order byte of that number to the trace buffer
+	 *        a total of num % 10 times (from 0 to 9 repetitions).
+	 * This is repeated until the process has written bytesPerWriter bytes to the buffer
+	 * (to ensure we won't run out of buffer space).
+	 */
+	srand(getpid());
+	while (bytes_written < bytes_per_writer) {
+
+		/* pick a random number */
+		unsigned int num = rand();
+		int count;
+		if (trace_buffer_lock() == 0) {
+
+			/* write that integer to the trace buffer */
+			trace_buffer_write_int(num);
+
+			/* now write the low-order byte num % 10 times */
+			count = num % 10;
+			int i = 0;
+			while (i++ != count) {
+				trace_buffer_write_byte((unsigned char )(num & 0xff));
+			}
+			if (trace_buffer_unlock() != 0){
+				CU_FAIL("Unable to unlock trace buffer.");
+			}
+		} else {
+			CU_FAIL("Unable to lock trace buffer.");
+		}
+		bytes_written += sizeof(int) + count;
+	}
+
+	/*
+	 * Both parent and child are done writing, so the parent process must wait
+	 * for the child to exit.
+	 */
+	if (is_parent) {
+		int status;
+		wait(&status);
+	}
+
+	/* the child process exists, passing control back to the parent */
+	else {
+		exit(0);
+	}
+
+	/*
+	 * The parent now checks the buffer to make sure it contains valid content.
+	 */
+	void *ptr;
+	unsigned long buffer_size;
+	int bytes_checked = 0;
+	CU_ASSERT_EQUAL(trace_buffer_fetch((void **)&ptr, &buffer_size), 0);
+
+	while (bytes_checked != buffer_size) {
+
+		/* read the num */
+		unsigned int num = *(int *)ptr;
+		ptr += sizeof(int);
+
+		/* check that the low-order byte was written enough times */
+		int count = num % 10;
+		int i = 0;
+		while (i++ != count) {
+			CU_ASSERT_EQUAL((unsigned char)(num & 0xff), *(unsigned char *)ptr);
+			ptr++;
+		}
+		bytes_checked += sizeof(int) + count;
+	}
+}
+
+/*======================================================================
  * init_regress_glibc_suite - main entry point for initializing this test suite
  *======================================================================*/
 
@@ -616,6 +733,7 @@ int init_trace_buffer_suite()
 	ADD_TEST_CASE(test_trace_buffer_mark_full, "Test trace_buffer_mark_full()");
 	ADD_TEST_CASE(test_trace_buffer_large_writes, "Test that trace_buffer manages large amounts of data.");
 	ADD_TEST_CASE(test_trace_buffer_next_process_number, "Test trace_buffer_next_process_number()");
+	ADD_TEST_CASE(test_trace_buffer_stress, "Test trace_buffer_stress()");
 
 	return 0;
 }

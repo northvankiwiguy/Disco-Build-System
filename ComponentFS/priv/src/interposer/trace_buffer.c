@@ -475,7 +475,7 @@ static int trace_buffer_unlock_common(int semId)
 	struct sembuf sem_ops[1];
 	sem_ops[0].sem_num = semId;
 	sem_ops[0].sem_op = 1;
-	sem_ops[0].sem_flg = 0;
+	sem_ops[0].sem_flg = SEM_UNDO;
 	if (semop(trace_buffer->tb_sem_id, sem_ops, 1) == -1){
 		return -1;
 	}
