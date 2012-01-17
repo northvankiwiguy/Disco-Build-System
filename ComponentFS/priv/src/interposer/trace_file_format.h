@@ -106,8 +106,8 @@ typedef struct trace_file_header {
  * 		- 4 bytes : process number of the new program
  *      - 4 bytes : process number of the parent process
  *      - a nul-terminated string: the process's current working directory.
+ *      - 4 bytes : the number of NUL-terminated argument strings.
  *      - sequence of nul-terminated strings : ARGV[0] .. [ARGV[n-1]]
- *      - an empty nul-terminated string to indicate the end of the arguments.
  *      - sequence of nul-terminated strings : ENVP[0] .. [ENVP[n-1]]
  *      - a final empty string, to indicate the end of environment variables.
  */

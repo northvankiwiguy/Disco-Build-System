@@ -142,21 +142,20 @@ void _init_interposer()
 	close(fd);
 
 	/*
-	 * This hacky piece of code fixes a bug (or feature?) in /proc/self/cmdline
-	 * where sometimes the command line has two (or more?) terminating NUL
-	 * characters, and sometimes it has none. If this happens, we first add a
-	 * trailing NUL, then remove any excess NULs. This is implemented as a loop,
-	 * just in case there's ever more than one extra.
+	 * The /proc/self/cmdline string doesn't always end with a \0, so add one if
+	 * necessary.
 	 */
 	if (argv_and_envp[abs_path_size + argv_size - 1] != '\0'){
 		argv_and_envp[abs_path_size + argv_size] = '\0';
 		argv_size++;
 	}
-	while (argv_size > 2) {
-		if (argv_and_envp[abs_path_size + argv_size - 2] == '\0'){
-			argv_size--;
-		} else {
-			break;
+
+	/* determine how many arguments were passed */
+	int argv_count = 0;
+	int i;
+	for (i = 0; i != argv_size; i++){
+		if (argv_and_envp[abs_path_size + i] == '\0') {
+			argv_count++;
 		}
 	}
 
@@ -179,10 +178,9 @@ void _init_interposer()
 	}
 	argv_size = dst_ptr - argv_and_envp;
 
-	/* Write an empty string immediately after the last argument string. */
-	argv_and_envp[argv_size] = '\0';
+	/* now read the environment variables */
 	fd = real_open("/proc/self/environ", O_RDONLY);
-	int envp_size = read(fd, &argv_and_envp[argv_size + 1], NCARGS - argv_size - 2);
+	int envp_size = read(fd, &argv_and_envp[argv_size], NCARGS - argv_size - 1);
 	if (envp_size == -1) {
 		cfs_debug(0, "Error: cfs couldn't determine command environment.\n");
 		exit(1);
@@ -226,7 +224,8 @@ void _init_interposer()
 		trace_buffer_write_int(my_process_number);
 		trace_buffer_write_int(my_parent_process_number);
 		trace_buffer_write_string(cfs_get_cwd(TRUE));
-		trace_buffer_write_bytes(argv_and_envp, argv_size + 1 + envp_size + 1);
+		trace_buffer_write_int(argv_count);
+		trace_buffer_write_bytes(argv_and_envp, argv_size + envp_size + 1);
 		trace_buffer_unlock();
 	}
 

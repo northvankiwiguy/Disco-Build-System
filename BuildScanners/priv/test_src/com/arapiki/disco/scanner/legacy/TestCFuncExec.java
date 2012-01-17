@@ -344,6 +344,27 @@ public class TestCFuncExec {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test the execle() C function, with a couple of empty strings as arguments. Note that
+	 * we don't care about the return value, but if empty arguments aren't accepted, this
+	 * code will crash.
+	 * @throws Exception
+	 */
+	@Test
+	public void testExecleWithNullArgs() throws Exception {
+
+		String source = 
+			"#include <unistd.h>\n" +
+			"extern char **environ;" +
+			"int main() {" +
+			"   execle(\"true\", \"true\", \"arg1\", \"\", \"arg3\", \"\", 0, environ);" +
+			"}";
+
+		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test the execlp() C function.
 	 * @throws Exception
 	 */

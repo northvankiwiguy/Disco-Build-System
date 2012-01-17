@@ -291,11 +291,12 @@ import com.arapiki.utils.errors.ErrorCode;
 		debug(1, "New Process " + processNum + " (parent " + parentProcessNum + 
 				", directory " + cwd + ") - ");
 		
+		/* fetch all the command line arguments */
+		int argCount = getInt();
 		StringBuffer commandArgs = new StringBuffer();
 		boolean first = true;
-		while (true) {
+		while (argCount-- != 0) {
 			String arg = getString();
-			if (arg.isEmpty()) { break; }
 			if (first) {
 				first = false; /* no space separator required */
 			} else {
