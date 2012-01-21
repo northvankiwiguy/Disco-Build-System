@@ -50,16 +50,13 @@ public class CommonTestUtils {
 	public static BuildStore getEmptyBuildStore(File tmpDir) throws FileNotFoundException {
 		BuildStore bs;
 		try {
-			File bsFile = new File(tmpDir, "testBuildStore");
+			File bsFile = new File(tmpDir, "testBuildStore.disco");
 			bsFile.delete();
 			bs = new BuildStore(bsFile.toString());
 		} catch (BuildStoreVersionException e) {
 			/* we can't handle schema version problems - make it a fatal error */
 			throw new FatalBuildStoreError(e.getMessage());
 		}
-		
-		/* force the schema to be dropped and recreated. */
-		bs.forceInitialize();
 		
 		return bs;
 	}	
