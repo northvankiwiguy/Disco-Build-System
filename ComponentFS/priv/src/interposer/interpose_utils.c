@@ -298,4 +298,20 @@ int cfs_isdirectory(const char *pathname)
 	return S_ISDIR(buf.st_mode);
 }
 
+/*======================================================================
+ * Helper - cfs_is_system_path(char *path)
+ *
+ * Return TRUE if the "path" refers to a system-related file or directory,
+ * such as /dev/tty, /proc/self, or anything that's clearly not in our
+ * build tree.
+ *
+ *======================================================================*/
+
+int cfs_is_system_path(const char *pathname)
+{
+	return ((strncmp(pathname, "/dev/", 5) == 0) ||
+		(strncmp(pathname, "/proc/", 6) == 0) ||
+		(strncmp(pathname, "/sys/", 5) == 0));
+}
+
 /*======================================================================*/

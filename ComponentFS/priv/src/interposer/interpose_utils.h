@@ -41,4 +41,4 @@ char *cfs_get_log_file();
 void cfs_set_log_file(char *name);
 int cfs_get_path_of_dirfd(char *result_path, int dirfd, const char *pathname);
 int cfs_isdirectory(const char *pathname);
-
+int cfs_is_system_path(const char *pathname);

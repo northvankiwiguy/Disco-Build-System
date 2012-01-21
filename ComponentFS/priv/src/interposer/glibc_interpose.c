@@ -408,6 +408,12 @@ cfs_open_common(const char *filename, int flags)
 		return -1;
 	}
 
+	/* ignore system directories, such as /dev, /proc, etc */
+	if (cfs_is_system_path(new_path)) {
+		errno = tmp_errno;
+		return 0;
+	}
+
 	/* determine if we're opening a directory */
 	int isdir = cfs_isdirectory(new_path);
 
@@ -1149,6 +1155,12 @@ cfs_fopen_common(const char *filename, const char *opentype)
 	if (status != 0) {
 		errno = status;
 		return -1;
+	}
+
+	/* ignore system directories, such as /dev, /proc, etc */
+	if (cfs_is_system_path(new_path)) {
+		errno = tmp_errno;
+		return 0;
 	}
 
 	/* determine if we're opening a directory */
