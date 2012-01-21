@@ -291,12 +291,12 @@ public class TestBuildTasks {
 		assertEquals(0, bts.getTasksThatAccess(file3, OperationType.OP_READ).length);
 		assertEquals(1, bts.getTasksThatAccess(file3, OperationType.OP_WRITE).length);
 		
-		/* test write, modify => modify */
+		/* test write, modify => write */
 		bts.addFileAccess(task, file4, OperationType.OP_WRITE);
 		bts.addFileAccess(task, file4, OperationType.OP_MODIFIED);
-		assertEquals(1, bts.getTasksThatAccess(file4, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file4, OperationType.OP_MODIFIED).length);
 		assertEquals(0, bts.getTasksThatAccess(file4, OperationType.OP_READ).length);
-		assertEquals(0, bts.getTasksThatAccess(file4, OperationType.OP_WRITE).length);
+		assertEquals(1, bts.getTasksThatAccess(file4, OperationType.OP_WRITE).length);
 
 		/* test delete, read => read */
 		bts.addFileAccess(task, file5, OperationType.OP_DELETE);

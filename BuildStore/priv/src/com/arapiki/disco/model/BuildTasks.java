@@ -169,7 +169,7 @@ public class BuildTasks {
 				OperationType.OP_UNSPECIFIED, 	/* New == OP_UNSPECIFIED */
 				OperationType.OP_WRITE, 		/* New == OP_READ */
 				OperationType.OP_WRITE, 		/* New == OP_WRITE */
-				OperationType.OP_MODIFIED, 		/* New == OP_MODIFIED */
+				OperationType.OP_WRITE, 		/* New == OP_MODIFIED */
 				OperationType.OP_DELETE  		/* New == OP_DELETE */
 			}, 
 			{ /* For Existing == OP_MODIFIED */
@@ -236,9 +236,15 @@ public class BuildTasks {
 		 *             New:    |  Read    Write   Modify  Delete
 		 *             -----------------------------------------
 		 *             Read    |  Read    Modify  Modify  Delete
-		 *  Existing:  Write   |  Write   Write   Modify  Delete
+		 *  Existing:  Write   |  Write   Write   Write   Delete
 		 *             Modify  |  Modify  Modify  Modify  Delete
 		 *             Delete  |  Read    Write   Modify  Delete
+		 *             
+		 *  Remember:
+		 *    - Read = the process has *only* ever read this file.
+		 *    - Write = the process created this file (it didn't exist before).
+		 *    - Modify = the process read and then wrote to this file.
+		 *    - Delete = the process ended up by deleting this file.
 		 */
 		else if (intResults.length == 1) {
 			OperationType existingOp = intToOperationType(intResults[0]);
