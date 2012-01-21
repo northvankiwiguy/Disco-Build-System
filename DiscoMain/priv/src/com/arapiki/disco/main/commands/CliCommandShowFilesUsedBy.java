@@ -145,7 +145,6 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		if (ts == null) {
 			CliUtils.reportErrorAndExit("no tasks were selected.");
 		}
-		ts.populateWithParents();
 
 		/* run the report */
 		FileSet accessedFiles = reports.reportFilesAccessedByTasks(ts, opType);
