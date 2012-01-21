@@ -144,9 +144,6 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		/* fetch the FileSet of paths from the user's command line */
 		String fileSpecs = args[0];
 		FileSet fileSet = CliUtils.getCmdLineFileSet(fns, fileSpecs);
-		if (fileSet != null) {
-			fileSet.populateWithParents();
-		}
 
 		/* find all tasks that access (read, write or both) these files */
 		TaskSet taskSet = reports.reportTasksThatAccessFiles(fileSet, opType);

@@ -23,6 +23,26 @@ match()
 }
 
 #
+# function for executing a "command" and checking whether that
+# the "key" can not be found in the output.
+#
+not_match()
+{
+	command=$1
+	key=$2
+	set +e
+	$command | grep -sq -- "$key"
+	success=$?
+	set -e
+	if [ $success -eq 0 ];
+	then
+		echo "$command INCORRECTLY MATCHED output $key"
+	else
+		echo "$command did not match incorrect output $key, as expected."
+	fi
+}
+
+#
 # function for ensuring that the command provides no output
 #
 match_empty()
