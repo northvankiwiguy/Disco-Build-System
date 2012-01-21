@@ -13,9 +13,21 @@
 package com.arapiki.disco.scanner.legacy;
 
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.utils.os.SystemUtils;
 
 /**
  * Basic testing that the LegacyBuildScanner can produce a valid
@@ -26,7 +38,79 @@ import org.junit.Test;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class TestCFuncDir {
+	
+	/* variables used in many test cases */
+	private BuildStore bs = null;
+	private BuildTasks bts = null;
+	private FileNameSpaces fns = null;
+	private int rootTask;
+	private int task;
+	private Integer fileAccesses[], fileReads[], fileWrites[], fileModifies[], fileDeletes[];
+	
+	/** temporary directory into which test cases can store files */
+	private File tmpDir;
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called before each test case starts. Creates a temporary directory in which the
+	 * test case can store temporary files.
+	 * @throws Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		tmpDir = SystemUtils.createTempDir();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called after each test case ends. Removes the temporary directory and its content.
+	 * @throws Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+		SystemUtils.deleteDirectory(tmpDir);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given the source code of a small C program, compile the program and scan it into a 
+	 * BuildStore. We then retrieve the one (and only) task that was registered in the 
+	 * BuildStore, along with the lists of files that were accessed (accessed, read, written,
+	 * and deleted).
+	 * @param programCode The body of the small C program to be compiled.
+	 * @param args The command line arguments to pass to the small C program.
+	 * @throws Exception Something went wrong when compiling/running the program.
+	 */
+	private void traceOneProgram(String programCode, String args[]) throws Exception {
+		
+		/* compile, run, and trace the program */
+		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, programCode, args);
+		
+		/* fetch references to sub objects */
+		bts = bs.getBuildTasks();
+		fns = bs.getFileNameSpaces();
+		
+		/* find the root task */
+		rootTask = bts.getRootTask("root");
+		
+		/* there should only be one child task */
+		Integer childTasks[] = bts.getChildren(rootTask);
+		assertEquals(1, childTasks.length);
+		
+		/* this is the task ID of the one task */
+		task = childTasks[0];
+
+		/* fetch the file access arrays */
+		fileAccesses = bts.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
+		fileReads = bts.getFilesAccessed(task, OperationType.OP_READ);
+		fileWrites = bts.getFilesAccessed(task, OperationType.OP_WRITE);
+		fileModifies = bts.getFilesAccessed(task, OperationType.OP_MODIFIED);
+		fileDeletes = bts.getFilesAccessed(task, OperationType.OP_DELETE);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -35,8 +119,39 @@ public class TestCFuncDir {
 	 */
 	@Test
 	public void testChdir() throws Exception {
-		// int chdir(const char *path)
-		//fail("Not implemented.");
+		
+		/*
+		 * Chdir to a path that exists.
+		 */
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"" + tmpDir + "\");" +
+				"  system(\"true\");" +
+				"}", null);
+		
+		/* test that the child task ("true") executed in tmpDir */
+		Integer childTasks[] = bts.getChildren(task);
+		assertEquals(1, childTasks.length);
+		int dirId = bts.getDirectory(childTasks[0]);
+		assertEquals(tmpDir.toString(), fns.getPathName(dirId));
+		
+		/*
+		 * Chdir to a path that doesn't exist.
+		 */
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"/\");" +
+				"  chdir(\"" + tmpDir + "/invalid\");" +
+				"  system(\"true\");" +
+				"}", null);
+		
+		/* test that the child task ("true") executes in /, rather than tmpdir/invalid */
+		childTasks = bts.getChildren(task);
+		assertEquals(1, childTasks.length);
+		dirId = bts.getDirectory(childTasks[0]);
+		assertEquals("/", fns.getPathName(dirId));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -47,8 +162,42 @@ public class TestCFuncDir {
 	 */
 	@Test
 	public void testFchdir() throws Exception {
-		// int fchdir(int fd)
-		//fail("Not implemented.");
+		/*
+		 * fchdir to a path that exists.
+		 */
+		traceOneProgram(
+				"#include <fcntl.h>\n" +
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"/\");" +
+				"  int fd = open(\"" + tmpDir +"\", O_RDONLY);" +
+				"  fchdir(fd);" +
+				"  system(\"true\");" +
+				"}", null);
+		
+		/* test that the child task ("true") executed in tmpDir */
+		Integer childTasks[] = bts.getChildren(task);
+		assertEquals(1, childTasks.length);
+		int dirId = bts.getDirectory(childTasks[0]);
+		assertEquals(tmpDir.toString(), fns.getPathName(dirId));
+		
+		/*
+		 * fchdir to a bad file descriptor
+		 */
+		traceOneProgram(
+				"#include <fcntl.h>\n" +
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"/\");" +
+				"  fchdir(-1);" +
+				"  system(\"true\");" +
+				"}", null);
+		
+		/* test that the child task ("true") executes in / */
+		childTasks = bts.getChildren(task);
+		assertEquals(1, childTasks.length);
+		dirId = bts.getDirectory(childTasks[0]);
+		assertEquals("/", fns.getPathName(dirId));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -59,8 +208,34 @@ public class TestCFuncDir {
 	 */
 	@Test
 	public void testMkdir() throws Exception {
-		// int mkdir(const char *path, mode_t mode)
-		//fail("Not implemented.");
+		
+		/*
+		 * Make a valid directory, and check that the top-level task
+		 * is credited with making it.
+		 */
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"" + tmpDir + "\");" +
+				"  mkdir(\"newDir\", 0755);" +
+				"}", null);
+		
+		assertEquals(1, fileAccesses.length);
+		assertEquals(1, fileWrites.length);
+		String dirName = fns.getPathName(fileAccesses[0]);
+		assertEquals(tmpDir + "/newDir", dirName);
+		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileAccesses[0]));
+		
+		/*
+		 * Fail to make a directory - should not be logged.
+		 */
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  mkdir(\"/invalid/dir\", 0755);" +
+				"}", null);
+		
+		assertEquals(0, fileAccesses.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -71,8 +246,40 @@ public class TestCFuncDir {
 	 */
 	@Test
 	public void testMkdirat() throws Exception {
-		// int mkdirat(int dirfd, const char *pathname, mode_t mode)
-		//fail("Not implemented.");
+		
+		/*
+		 * Make a valid directory, and check that the top-level task
+		 * is credited with making it.
+		 */
+		traceOneProgram(
+				"#include <fcntl.h>\n" +
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  mkdirat(dirfd, \"anotherDir\", 0755);" +
+				"}", null);
+		
+		assertEquals(2, fileAccesses.length);
+		assertEquals(1, fileReads.length);
+		assertEquals(1, fileWrites.length);
+		String dirName = fns.getPathName(fileWrites[0]);
+		assertEquals(tmpDir + "/anotherDir", dirName);
+		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileWrites[0]));
+
+		/*
+		 * Failing to make a directory will result in no accesses.
+		 */
+		traceOneProgram(
+				"#include <fcntl.h>\n" +
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  mkdirat(dirfd, \"/invalid/dir\", 0755);" +
+				"}", null);
+		
+		assertEquals(1, fileAccesses.length);
+		assertEquals(1, fileReads.length);
+		assertEquals(0, fileWrites.length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -83,8 +290,35 @@ public class TestCFuncDir {
 	 */
 	@Test
 	public void testRmdir() throws Exception {
-		//int rmdir(const char *dirname)
-		//fail("Not implemented.");
+		
+		/*
+		 * Delete a valid directory, and check that the top-level task
+		 * is credited with removing it.
+		 */
+		assertTrue(new File(tmpDir, "newDir").mkdirs());
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"" + tmpDir + "\");" +
+				"  rmdir(\"newDir\");" +
+				"}", null);
+		
+		assertEquals(1, fileAccesses.length);
+		assertEquals(1, fileDeletes.length);
+		String dirName = fns.getPathName(fileDeletes[0]);
+		assertEquals(tmpDir + "/newDir", dirName);
+		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileDeletes[0]));
+		
+		/*
+		 * Fail to make a directory - should not be logged.
+		 */
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  rmdir(\"/invalid/dir\");" +
+				"}", null);
+		
+		assertEquals(0, fileAccesses.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

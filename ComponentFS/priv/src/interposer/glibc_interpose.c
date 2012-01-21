@@ -437,6 +437,46 @@ cfs_open_common(const char *filename, int flags)
 }
 
 /*======================================================================
+ * cfs_delete_common()
+ *
+ * A common function for tracing details of unlink, remove, rmdir and
+ * other deletion-related system calls.
+ *======================================================================*/
+
+static int
+cfs_delete_common(const char *filename, int isDir)
+{
+	extern int errno;
+	int tmp_errno = errno; 				/* save errno, in case we change it */
+
+	/* compute the absolute and normalized path */
+	char new_path[PATH_MAX];
+	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, new_path);
+	if (status != 0) {
+		errno = status;
+		return -1;
+	}
+
+	/* ignore system directories, such as /dev, /proc, etc */
+	if (cfs_is_system_path(new_path)) {
+		errno = tmp_errno;
+		return 0;
+	}
+
+	/* if there's a trace buffer, write the file name to it */
+	if (trace_buffer_lock() == 0){
+		trace_buffer_write_byte(isDir ? TRACE_DIR_DELETE : TRACE_FILE_DELETE);
+		trace_buffer_write_int(my_process_number);
+		trace_buffer_write_string(new_path);
+		trace_buffer_unlock();
+	}
+	errno = tmp_errno;					/* restore original errno value */
+
+	/* all is good */
+	return 0;
+}
+
+/*======================================================================
  * Interposed - creat
  *======================================================================*/
 
@@ -1194,6 +1234,55 @@ cfs_fopen_common(const char *filename, const char *opentype)
 }
 
 /*======================================================================
+ * Helper: cfs_openat_common.
+ *
+ * Function shared by openat() and openat64().
+ *======================================================================*/
+
+int
+cfs_openat_common(int fd, int dirfd, const char *pathname, int flags)
+{
+	/*
+	 * if the openat operation succeeded, we must now send the file
+	 * name details to the trace log.
+	 */
+	if (fd != -1){
+
+		/*
+		 * Case 1: pathname is absolute.
+		 * Case 2: dirfd is AT_FDCWD - relative to current directory.
+		 */
+		if ((pathname[0] == '/') || (dirfd == AT_FDCWD)) {
+			if (cfs_open_common(pathname, flags) == -1){
+				return -1;
+			}
+		}
+
+		/* case 3: dirfd is a valid directory descriptor */
+		else {
+			char result_path[PATH_MAX];
+
+			/*
+			 * Figure out the directory that dirfd refers to, then concatenate
+			 * pathname onto it.
+			 */
+			if (cfs_get_path_of_dirfd(result_path, dirfd, pathname) == -1){
+				/* couldn't determine directory for this dirfd. */
+				return -1;
+			}
+
+			/* we've computed dir(dirfd) + pathname, so trace it */
+			else {
+				if (cfs_open_common(result_path, flags) == -1){
+					return -1;
+				}
+			}
+		}
+	}
+	return fd;
+}
+
+/*======================================================================
  * Interposed - fopen()
  *======================================================================*/
 
@@ -1674,8 +1763,16 @@ mkdir(const char *path, mode_t mode)
 
 	cfs_debug(1, "mkdir(\"%s\", 0%o)", path, mode);
 
-	// TODO: log the creation of the directory
-	return real_mkdir(path, mode);
+	/* call the real mkdir function */
+	int rc = real_mkdir(path, mode);
+
+	/* assuming it succeeds, log the directory creation */
+	if (rc != -1) {
+		if (cfs_open_common(path, O_CREAT) != 0){
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -1689,8 +1786,10 @@ mkdirat(int dirfd, const char *pathname, mode_t mode)
 
 	cfs_debug(1, "mkdirat(%d, \"%s\", 0%o)", dirfd, pathname, mode);
 
-	// TODO: log the creation of the directory
-	return real_mkdirat(dirfd, pathname, mode);
+	int fd = real_mkdirat(dirfd, pathname, mode);
+
+	/* on success, trace the pathname information */
+	return cfs_openat_common(fd, dirfd, pathname, O_CREAT);
 }
 
 /*======================================================================
@@ -1814,55 +1913,6 @@ open64(const char *filename, int flags, ...)
 	if (fd != -1) {
 		if (cfs_open_common(filename, flags) != 0){
 			return -1;
-		}
-	}
-	return fd;
-}
-
-/*======================================================================
- * Helper: cfs_openat_common.
- *
- * Function shared by openat() and openat64().
- *======================================================================*/
-
-int
-cfs_openat_common(int fd, int dirfd, const char *pathname, int flags)
-{
-	/*
-	 * if the openat operation succeeded, we must now send the file
-	 * name details to the trace log.
-	 */
-	if (fd != -1){
-
-		/*
-		 * Case 1: pathname is absolute.
-		 * Case 2: dirfd is AT_FDCWD - relative to current directory.
-		 */
-		if ((pathname[0] == '/') || (dirfd == AT_FDCWD)) {
-			if (cfs_open_common(pathname, flags) == -1){
-				return -1;
-			}
-		}
-
-		/* case 3: dirfd is a valid directory descriptor */
-		else {
-			char result_path[PATH_MAX];
-
-			/*
-			 * Figure out the directory that dirfd refers to, then concatenate
-			 * pathname onto it.
-			 */
-			if (cfs_get_path_of_dirfd(result_path, dirfd, pathname) == -1){
-				/* couldn't determine directory for this dirfd. */
-				return -1;
-			}
-
-			/* we've computed dir(dirfd) + pathname, so trace it */
-			else {
-				if (cfs_open_common(result_path, flags) == -1){
-					return -1;
-				}
-			}
 		}
 	}
 	return fd;
@@ -2171,8 +2221,11 @@ rmdir(const char *dirname)
 
 	cfs_debug(1, "rmdir(\"%s\")", dirname);
 
-	// TODO: log the removal of this path
-	return real_rmdir(dirname);
+	int rc = real_rmdir(dirname);
+	if (rc != -1) {
+		cfs_delete_common(dirname, TRUE);
+	}
+	return rc;
 }
 
 /*======================================================================

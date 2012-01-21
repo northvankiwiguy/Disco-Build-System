@@ -618,11 +618,11 @@ public class TestCFuncOpen {
 		/*
 		 * Test openat() with a path that's relative to a valid directory fd.
 		 */
+		assertTrue(new File(tmpDir, "sub-dir").mkdirs());
 		traceOneProgram(
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
-				"  mkdir(\"sub-dir\", 0755);" + 
 				"  int dirfd = open(\"sub-dir\", O_RDONLY);" +
 				"  int fd = " + func + "(dirfd, \"test-file1\", O_CREAT|O_WRONLY, 0666);" +
 				"  close(dirfd);" + 
@@ -637,12 +637,11 @@ public class TestCFuncOpen {
 		/*
 		 * Test openat() with an absolute path name (a dirfd is provided, but shouldn't be used).
 		 */
+		assertTrue(new File(tmpDir, "sub-dir2").mkdirs());
 		traceOneProgram(
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
-				"  mkdir(\"sub-dir\", 0755);" + 
-				"  mkdir(\"sub-dir2\", 0755);" + 
 				"  int dirfd = open(\"sub-dir\", O_RDONLY);" +
 				"  int fd = " + func + "(dirfd, \"" + tmpDir + "/sub-dir2/test-file2\"," +
 						"O_CREAT|O_WRONLY, 0666);" +
@@ -660,7 +659,6 @@ public class TestCFuncOpen {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
-				"  mkdir(\"sub-dir\", 0755);" + 
 				"  int fd = " + func + "(AT_FDCWD, \"sub-dir/test-file3\"," +
 						"O_CREAT|O_WRONLY, 0666);" +
 				"}", null);
@@ -677,7 +675,6 @@ public class TestCFuncOpen {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
-				"  mkdir(\"sub-dir\");" + 
 				"  int fd = " + func + "(100, \"sub-dir/test-file4\"," +
 						"O_CREAT|O_WRONLY, 0666);" +
 				"}", null);
@@ -691,7 +688,6 @@ public class TestCFuncOpen {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
-				"  mkdir(\"sub-dir\");" + 
 				"  int dirfd = open(\"sub-dir\", O_RDONLY);" +
 				"  int fd = " + func + "(dirfd, \"sub-dir/test-file-missing\"," +
 						"O_RDONLY, 0666);" +

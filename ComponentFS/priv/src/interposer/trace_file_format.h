@@ -75,12 +75,12 @@ typedef struct trace_file_header {
 #define TRACE_FILE_MODIFY 			4
 
 /*
- * TRACE_FILE_REMOVE - a file has been deleted.
- * 		- 1 byte : TRACE_FILE_REMOVE
+ * TRACE_FILE_DELETE - a file has been deleted.
+ * 		- 1 byte : TRACE_FILE_DELETE
  * 		- 4 bytes : process number (doing the remove)
  *      - nul-terminated string : the file's absolute path name.
  */
-#define TRACE_FILE_REMOVE 			5
+#define TRACE_FILE_DELETE 			5
 
 /*
  * TRACE_FILE_RENAME - a file has been renamed.
@@ -137,5 +137,12 @@ typedef struct trace_file_header {
  */
 #define TRACE_DIR_MODIFY 			11
 
+/*
+ * TRACE_DIR_DELETE - a directory has been deleted.
+ * 		- 1 byte : TRACE_DIR_DELETE
+ * 		- 4 bytes : process number (doing the remove)
+ *      - nul-terminated string : the file's absolute path name.
+ */
+#define TRACE_DIR_DELETE 			12
 
 #endif /* TRACE_FILE_FORMAT_H_ */

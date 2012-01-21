@@ -67,8 +67,8 @@ import com.arapiki.utils.errors.ErrorCode;
 	/** A file has been opened for update. */
 	private static final int TRACE_FILE_MODIFY = 4;
 
-	/** A file has been removed. */
-	private static final int TRACE_FILE_REMOVE = 5;
+	/** A file has been deleted. */
+	private static final int TRACE_FILE_DELETE = 5;
 	
 	/** A file has been renamed. */
 	private static final int TRACE_FILE_RENAME	= 6;
@@ -87,6 +87,9 @@ import com.arapiki.utils.errors.ErrorCode;
 
 	/** A directory has been opened for update. */
 	private static final int TRACE_DIR_MODIFY = 11;
+
+	/** A directory has been deleted. */
+	private static final int TRACE_DIR_DELETE = 12;
 
 	/** 
 	 * When reading data from the trace file, the amount of data we should read each time.
@@ -236,7 +239,11 @@ import com.arapiki.utils.errors.ErrorCode;
 						(tag == TRACE_FILE_MODIFY) ? PathType.TYPE_FILE : PathType.TYPE_DIR);
 				break;
 				
-			case TRACE_FILE_REMOVE:
+			case TRACE_FILE_DELETE:
+			case TRACE_DIR_DELETE:
+				fileName = getString();
+				addPathAccess(fileName, processNum, OperationType.OP_DELETE,
+						(tag == TRACE_FILE_DELETE) ? PathType.TYPE_FILE : PathType.TYPE_DIR);
 				break;
 
 			case TRACE_FILE_RENAME:
