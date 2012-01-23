@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -392,20 +392,30 @@ chown(const char *path, uid_t owner, gid_t group)
  *
  * A common function for tracing detail of open, open64 or related library
  * calls.
+ *
+ * - filename  - the path (absolute or relative) to the file/directory
+ *               being accessed.
+ * - flags     - the standard open flags, such as O_RDONLY or O_CREAT.
+ * - normalize - TRUE if filename should be normalized (. and .. removed,
+ * 			     and symlinks followed).
  *======================================================================*/
 
 static int
-cfs_open_common(const char *filename, int flags)
+cfs_open_common(const char *filename, int flags, int normalize)
 {
 	extern int errno;
 	int tmp_errno = errno; 				/* save errno, in case we change it */
 
 	/* compute the absolute and normalized path */
-	char new_path[PATH_MAX];
-	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, new_path);
-	if (status != 0) {
-		errno = status;
-		return -1;
+	char *new_path = (char *)filename;
+	char normalized_path[PATH_MAX];
+	if (normalize) {
+		int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, normalized_path);
+		if (status != 0) {
+			errno = status;
+			return -1;
+		}
+		new_path = normalized_path;
 	}
 
 	/* ignore system directories, such as /dev, /proc, etc */
@@ -444,7 +454,7 @@ cfs_open_common(const char *filename, int flags)
  *======================================================================*/
 
 static int
-cfs_delete_common(const char *filename, int isDir)
+cfs_delete_common(const char *filename, int is_dir)
 {
 	extern int errno;
 	int tmp_errno = errno; 				/* save errno, in case we change it */
@@ -465,7 +475,7 @@ cfs_delete_common(const char *filename, int isDir)
 
 	/* if there's a trace buffer, write the file name to it */
 	if (trace_buffer_lock() == 0){
-		trace_buffer_write_byte(isDir ? TRACE_DIR_DELETE : TRACE_FILE_DELETE);
+		trace_buffer_write_byte(is_dir ? TRACE_DIR_DELETE : TRACE_FILE_DELETE);
 		trace_buffer_write_int(my_process_number);
 		trace_buffer_write_string(new_path);
 		trace_buffer_unlock();
@@ -491,7 +501,7 @@ creat(const char *path, mode_t mode)
 
 	/* on success, log the access to the trace file */
 	if (fd != -1) {
-		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC) != 0){
+		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -513,7 +523,7 @@ creat64(const char *path, mode_t mode)
 
 	/* on success, log the access to the trace file */
 	if (fd != -1) {
-		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC) != 0){
+		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1234,52 +1244,51 @@ cfs_fopen_common(const char *filename, const char *opentype)
 }
 
 /*======================================================================
- * Helper: cfs_openat_common.
+ * Helper: cfs_convert_pathat_to_path
  *
- * Function shared by openat() and openat64().
+ * Function for translating a dirfd/path combination, as would typically
+ * be passed to system calls such as openat() or mkdirat(), and
+ * returning a regular pathname (either relative or absolute). Note that
+ * this function does not make any attempt to normalize the path, so you
+ * should still pass it through _cfs_combined_paths() before using it.
+ *
+ * - dirfd - The file descriptor parameter, as passed to openat() etc.
+ * - pathname - The absolute or relative (to 'dirfd') path name.
+ * - combined_path - A pointer to the return buffer, into which the
+ *            returned path is written.
+ *
+ * Returns 0 on success, or -1 on error. Note that the returned path
+ * may either be absolute or relative to the CWD.
  *======================================================================*/
 
 int
-cfs_openat_common(int fd, int dirfd, const char *pathname, int flags)
+cfs_convert_pathat_to_path(int dirfd, const char *pathname, char *combined_path)
 {
+	int tmp_errno = errno;
+
 	/*
-	 * if the openat operation succeeded, we must now send the file
-	 * name details to the trace log.
+	 * Case 1: pathname is absolute.
+	 * Case 2: dirfd is AT_FDCWD - relative to current directory.
 	 */
-	if (fd != -1){
+	if ((pathname[0] == '/') || (dirfd == AT_FDCWD)) {
+		strncpy(combined_path, pathname, PATH_MAX);
+	}
+
+	/* case 3: dirfd is a valid directory descriptor */
+	else {
 
 		/*
-		 * Case 1: pathname is absolute.
-		 * Case 2: dirfd is AT_FDCWD - relative to current directory.
+		 * Figure out the directory that dirfd refers to, then concatenate
+		 * pathname onto it.
 		 */
-		if ((pathname[0] == '/') || (dirfd == AT_FDCWD)) {
-			if (cfs_open_common(pathname, flags) == -1){
-				return -1;
-			}
-		}
-
-		/* case 3: dirfd is a valid directory descriptor */
-		else {
-			char result_path[PATH_MAX];
-
-			/*
-			 * Figure out the directory that dirfd refers to, then concatenate
-			 * pathname onto it.
-			 */
-			if (cfs_get_path_of_dirfd(result_path, dirfd, pathname) == -1){
-				/* couldn't determine directory for this dirfd. */
-				return -1;
-			}
-
-			/* we've computed dir(dirfd) + pathname, so trace it */
-			else {
-				if (cfs_open_common(result_path, flags) == -1){
-					return -1;
-				}
-			}
+		if (cfs_get_path_of_dirfd(combined_path, dirfd, pathname) == -1){
+			/* couldn't determine directory for this dirfd. */
+			errno = tmp_errno;
+			return -1;
 		}
 	}
-	return fd;
+	errno = tmp_errno;
+	return 0;
 }
 
 /*======================================================================
@@ -1505,7 +1514,7 @@ ftok(const char *pathname, int proj_id)
 
 	/* on success, log the access to the trace file. */
 	if (key != (key_t)-1) {
-		if (cfs_open_common(pathname, O_RDONLY) != 0){
+		if (cfs_open_common(pathname, O_RDONLY, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1671,8 +1680,19 @@ link(const char *oldname, const char *newname)
 
 	cfs_debug(1, "link(\"%s\", \"%s\")", oldname, newname);
 
-	// TODO: log the creation of the link.
-	return real_link(oldname, newname);
+	int rc = real_link(oldname, newname);
+	if (rc != -1) {
+		/* mark the existing file as having being "read" */
+		if (cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
+			return -1;
+		}
+
+		/* mark the new file (the link) as being "created" */
+		if (cfs_open_common(newname, O_CREAT, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -1688,8 +1708,27 @@ linkat(int olddirfd, const char *oldpath,
 	cfs_debug(1, "linkat(%d, \"%s\", %d, \"%s\", %d)", olddirfd, oldpath,
 			newdirfd, newpath, flags);
 
-	// TODO: log the creation of the link.
-	return real_linkat(olddirfd, oldpath, newdirfd, newpath, flags);
+	int rc = real_linkat(olddirfd, oldpath, newdirfd, newpath, flags);
+	if (rc != -1) {
+		char converted_path[PATH_MAX];
+
+		/* mark the old path as being "read" */
+		if (cfs_convert_pathat_to_path(olddirfd, oldpath, converted_path) == -1) {
+			return -1;
+		}
+		if (cfs_open_common(converted_path, O_RDONLY, TRUE) == -1) {
+			return -1;
+		}
+
+		/* mark the new path as being "created" */
+		if (cfs_convert_pathat_to_path(newdirfd, newpath, converted_path) == -1) {
+			return -1;
+		}
+		if (cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -1768,7 +1807,7 @@ mkdir(const char *path, mode_t mode)
 
 	/* assuming it succeeds, log the directory creation */
 	if (rc != -1) {
-		if (cfs_open_common(path, O_CREAT) != 0){
+		if (cfs_open_common(path, O_CREAT, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1786,10 +1825,20 @@ mkdirat(int dirfd, const char *pathname, mode_t mode)
 
 	cfs_debug(1, "mkdirat(%d, \"%s\", 0%o)", dirfd, pathname, mode);
 
-	int fd = real_mkdirat(dirfd, pathname, mode);
+	int rc = real_mkdirat(dirfd, pathname, mode);
 
 	/* on success, trace the pathname information */
-	return cfs_openat_common(fd, dirfd, pathname, O_CREAT);
+	if (rc != -1) {
+		char converted_path[PATH_MAX];
+
+		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+			return -1;
+		}
+		if (cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -1879,7 +1928,7 @@ open(const char *filename, int flags, ...)
 
 	/* on success, log the access to the trace file. */
 	if (fd != -1) {
-		if (cfs_open_common(filename, flags) != 0){
+		if (cfs_open_common(filename, flags, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1911,7 +1960,7 @@ open64(const char *filename, int flags, ...)
 
 	/* on success, log the access to the trace file. */
 	if (fd != -1) {
-		if (cfs_open_common(filename, flags) != 0){
+		if (cfs_open_common(filename, flags, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1943,7 +1992,19 @@ openat(int dirfd, const char *pathname, int flags, ...)
 	int fd = real_openat(dirfd, pathname, flags, mode);
 
 	/* on success, trace the pathname information */
-	return cfs_openat_common(fd, dirfd, pathname, flags);
+	if (fd != -1) {
+		char converted_path[PATH_MAX];
+
+		/* convert to a regular path name */
+		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+			return -1;
+		}
+
+		if (cfs_open_common(converted_path, flags, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return fd;
 }
 
 /*======================================================================
@@ -1970,7 +2031,19 @@ openat64(int dirfd, const char *pathname, int flags, ...)
 	int fd = real_openat64(dirfd, pathname, flags, mode);
 
 	/* on success, trace the pathname information */
-	return cfs_openat_common(fd, dirfd, pathname, flags);
+	if (fd != -1) {
+		char converted_path[PATH_MAX];
+
+		/* convert to a regular path name */
+		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+			return -1;
+		}
+
+		if (cfs_open_common(converted_path, flags, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return fd;
 }
 
 /*======================================================================
@@ -2148,8 +2221,20 @@ remove(const char *path)
 
 	cfs_debug(1, "remove(\"%s\")", path);
 
-	// TODO: log the removal of this path
-	return real_remove(path);
+	/*
+	 * Check whether this path is a directory. Note, we're about to
+	 * delete it, so we need to find out before it's gone.
+	 */
+	int is_dir = cfs_isdirectory(path);
+
+	/* now perform the deletion, and log the access */
+	int rc = real_remove(path);
+	if (rc != -1) {
+		if (cfs_delete_common(path, is_dir) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -2171,8 +2256,29 @@ rename(const char *oldname, const char *newname)
 
 	cfs_debug(1, "rename(\"%s\", \"%s\")", oldname, newname);
 
-	// TODO: log the name change for this file/dir.
-	return real_rename(oldname, newname);
+	/*
+	 * Is oldname a directory? We need to find out now, since we're
+	 * about to delete it.
+	 */
+	int is_dir = cfs_isdirectory(oldname);
+
+	int rc = real_rename(oldname, newname);
+	if (rc != -1) {
+
+		/* Mark the oldname as deleted */
+		if (cfs_delete_common(oldname, is_dir) == -1){
+			return -1;
+		}
+
+		/*
+		 * Mark the newname as created. It could be either a file, or a
+		 * directory, but cfs_open_common will figure that out.
+		 */
+		if (cfs_open_common(newname, O_CREAT, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -2188,8 +2294,34 @@ renameat(int olddirfd, const char *oldpath,
 	cfs_debug(1, "renameat(%d, \"%s\", %d, \"%s\")", olddirfd, oldpath,
 			newdirfd, newpath);
 
-	// TODO: log the name change for this file/dir.
-	return real_renameat(olddirfd, oldpath, newdirfd, newpath);
+	/* figure out if oldpath is a file or directory, before we delete it */
+	char converted_path[PATH_MAX];
+	if (cfs_convert_pathat_to_path(olddirfd, oldpath, converted_path) == -1) {
+		return -1;
+	}
+	int is_dir = cfs_isdirectory(converted_path);
+
+	/* perform the real rename operation */
+	int rc = real_renameat(olddirfd, oldpath, newdirfd, newpath);
+	if (rc != -1) {
+
+		/* Mark the oldname as deleted */
+		if (cfs_delete_common(converted_path, is_dir) == -1){
+			return -1;
+		}
+
+		/*
+		 * Mark the newname as created. It could be either a file, or a
+		 * directory, but cfs_open_common will figure that out.
+		 */
+		if (cfs_convert_pathat_to_path(newdirfd, newpath, converted_path) == -1) {
+			return -1;
+		}
+		if (cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -2321,8 +2453,37 @@ symlink(const char *oldname, const char *newname)
 
 	cfs_debug(1, "symlink(\"%s\", \"%s\")", oldname, newname);
 
-	// TODO: log the creation of the symlink
-	return real_symlink(oldname, newname);
+	/*
+	 * Compute the normalized name for the target file. We need to do
+	 * this now (before it's created), otherwise the normalizing function
+	 * will simply refer us back to the file we created a link to.
+	 */
+	char converted_path[PATH_MAX];
+	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), newname, converted_path);
+	if (status != 0) {
+		errno = status;
+		return -1;
+	}
+
+	int rc = real_symlink(oldname, newname);
+	if (rc != -1) {
+		/* mark the existing file as having being "read" */
+		if (cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
+			return -1;
+		}
+
+		/*
+		 * Mark the symlink file as having being "created". We are using
+		 * a pre-normalized path, so ask cfs_open_common() not to normalize
+		 * it again. This would be a major problem, since converted_path
+		 * now points to a symlink, and we want to report the symlink's name,
+		 * not the file that it points to.
+		 */
+		if (cfs_open_common(converted_path, O_CREAT, FALSE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -2334,10 +2495,47 @@ symlinkat(const char *oldpath, int newdirfd, const char *newpath)
 {
 	FETCH_REAL_FN(int, real_symlinkat, "symlinkat");
 
-	cfs_debug(1, "symlink(\"%s\", %d, \"%s\")", oldpath, newdirfd, newpath);
+	cfs_debug(1, "symlinkat(\"%s\", %d, \"%s\")", oldpath, newdirfd, newpath);
 
-	// TODO: log the creation of the symlink
-	return real_symlinkat(oldpath, newdirfd, newpath);
+	/*
+	 * Compute the normalized name for the target file. We need to do
+	 * this now (before it's created), otherwise the normalizing function
+	 * will simply refer us back to the file we created a link to. We
+	 * start by converting the dirfd/path to a real path, then we normalize
+	 * it.
+	 */
+	char converted_path1[PATH_MAX];
+	char converted_path2[PATH_MAX];
+
+	if (cfs_convert_pathat_to_path(newdirfd, newpath, converted_path1) == -1) {
+		return -1;
+	}
+	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), converted_path1, converted_path2);
+	if (status != 0) {
+		errno = status;
+		return -1;
+	}
+
+	int rc = real_symlinkat(oldpath, newdirfd, newpath);
+	if (rc != -1) {
+	
+		/* mark the old file as being read */
+		if (cfs_open_common(oldpath, O_RDONLY, TRUE) == -1) {
+			return -1;
+		}
+
+		/*
+		 * Mark the symlink file as having being "created". We are using
+		 * a pre-normalized path, so ask cfs_open_common() not to normalize
+		 * it again. This would be a major problem, since converted_path
+		 * now points to a symlink, and we want to report the symlink's name,
+		 * not the file that it points to.
+		 */
+		if (cfs_open_common(converted_path2, O_CREAT, FALSE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -2404,7 +2602,7 @@ truncate(const char *filename, off_t length)
 	 */
 	int status = real_truncate(filename, length);
 	if (status != -1) {
-		if (cfs_open_common(filename, O_RDWR) != 0){
+		if (cfs_open_common(filename, O_RDWR, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -2435,7 +2633,7 @@ truncate64(const char *filename, off64_t length)
 	 */
 	int status = real_truncate64(filename, (off_t)length);
 	if (status != -1) {
-		if (cfs_open_common(filename, O_RDWR) != 0){
+		if (cfs_open_common(filename, O_RDWR, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -2453,8 +2651,14 @@ unlink(const char *filename)
 
 	cfs_debug(1, "unlink(\"%s\")", filename);
 
-	// TODO: log the removal of this file.
-	return real_unlink(filename);
+	/* perform the real "unlink" operation */
+	int rc = real_unlink(filename);
+	if (rc != -1) {
+		if (cfs_delete_common(filename, FALSE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -2468,8 +2672,17 @@ unlinkat(int dirfd, const char *pathname, int flags)
 
 	cfs_debug(1, "unlinkat(%d, \"%s\", 0x%x)", dirfd, pathname, flags);
 
-	// TODO: log the removal of this file.
-	return real_unlinkat(dirfd, pathname, flags);
+	int rc = real_unlinkat(dirfd, pathname, flags);
+	if (rc != -1) {
+		char converted_path[PATH_MAX];
+		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+			return -1;
+		}
+		if (cfs_delete_common(converted_path, flags & AT_REMOVEDIR) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================

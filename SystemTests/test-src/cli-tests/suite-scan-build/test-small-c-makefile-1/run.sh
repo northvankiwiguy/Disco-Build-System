@@ -24,9 +24,10 @@ match_empty "disco show-files-used-by -w 1"
 match "disco show-tasks -l -f 2" "/bin/make -C subdir1 all"
 match "disco show-files-used-by -r 2" "subdir1/Makefile"
 
-# test task 3 - the compile of file1.c
+# test task 3 - the compile of file1.c. Doesn't read or write files.
 match "disco show-tasks -l -f 3" "-c file1.c"
-match_empty "disco show-files-used-by 3"
+match_empty "disco show-files-used-by -r 3"
+match_empty "disco show-files-used-by -w 3"
 
 # test task4 - the cc1 operation on file1.c
 match "disco show-tasks -l -f 4" "cc1"

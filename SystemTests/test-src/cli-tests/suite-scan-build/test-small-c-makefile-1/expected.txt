@@ -4,7 +4,8 @@ disco show-files-used-by -w 1 provides empty output, as expected
 disco show-tasks -l -f 2 matched output /bin/make -C subdir1 all
 disco show-files-used-by -r 2 matched output subdir1/Makefile
 disco show-tasks -l -f 3 matched output -c file1.c
-disco show-files-used-by 3 provides empty output, as expected
+disco show-files-used-by -r 3 provides empty output, as expected
+disco show-files-used-by -w 3 provides empty output, as expected
 disco show-tasks -l -f 4 matched output cc1
 disco show-files-used-by -r 4 matched output subdir1/file1.c
 disco show-tasks -l -f 5 matched output /bin/as
