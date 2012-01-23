@@ -54,46 +54,46 @@
  * be reused during a single build process. We instead need a non-reusable
  * 32-bit process number.
  */
-static int my_process_number;
+int _cfs_my_process_number;
 
 /*
  * Same, but for this process's parent. This is passed to each new process
  * via the CFS_PARENT_ID environment variable.
  */
-static int my_parent_process_number;
+int _cfs_my_parent_process_number;
 
 /*
  * The shared memory segment ID, used for sharing the trace buffer between
  * multiple processes. Passed to each new process via the CFS_ID environment
  * variable.
  */
-static trace_buffer_id cfs_id;
+trace_buffer_id _cfs_id;
 
 /*
  * The value of the LD_PRELOAD environment variable that caused this
  * interposer library to be loaded. We need to ensure that all child
  * processes also have this set.
  */
-static char *cfs_ld_preload;
+char *_cfs_ld_preload;
 
 /*======================================================================
- * _init_interposer()
+ * _cfs_init_interposer()
  *
- * When this dynamic library is first loaded, the _init_interposer function
+ * When this dynamic library is first loaded, the _cfs_init_interposer function
  * is called as a constructor. This is where we allocate the shared memory
  * segment for cfs, as well as perform other start-up tasks.
  *======================================================================*/
 
-void _init_interposer() __attribute__ ((constructor));
+void _cfs_init_interposer() __attribute__ ((constructor));
 
-void _init_interposer()
+void _cfs_init_interposer()
 {
 	FETCH_REAL_FN(int, real_open, "open");
 
 	static char argv_and_envp[NCARGS];
 
 	/* disable debugging for now */
-	cfs_set_debug_level(0);
+	_cfs_set_debug_level(0);
 
 	/*
 	 * If the CFS_ID environment variable is defined, then this current process
@@ -101,7 +101,7 @@ void _init_interposer()
 	 * Note that the various interposed functions are able to test cfs_id != 0
 	 * to see if this initialization worked, or not.
 	 */
-	cfs_id = 0;
+	_cfs_id = 0;
 	char *cfs_id_string = getenv("CFS_ID");
 	if (!cfs_id_string){
 		return;
@@ -115,20 +115,20 @@ void _init_interposer()
 	 */
 	char *cfs_debug_str = getenv("CFS_DEBUG");
 	if (cfs_debug_str != NULL) {
-		cfs_set_debug_level(atoi(cfs_debug_str));
+		_cfs_set_debug_level(atoi(cfs_debug_str));
 	}
 	char *cfs_log_file = getenv("CFS_LOG_FILE");
 	if (cfs_log_file != NULL) {
-		cfs_set_log_file(cfs_log_file);
+		_cfs_set_log_file(cfs_log_file);
 	}
 
 	/* ensure that we have an up-to-date copy of the process's working directory */
-	cfs_get_cwd(FALSE);
+	_cfs_get_cwd(FALSE);
 
 	/* determine the absolute path of the executable that is currently running */
 	int abs_path_size = readlink("/proc/self/exe", argv_and_envp, NCARGS);
 	if (abs_path_size == -1) {
-		cfs_debug(0, "Error: cfs couldn't determine absolute path to running executable.\n");
+		_cfs_debug(0, "Error: cfs couldn't determine absolute path to running executable.\n");
 		exit(1);
 	}
 
@@ -136,7 +136,7 @@ void _init_interposer()
 	int fd = real_open("/proc/self/cmdline", O_RDONLY);
 	int argv_size = read(fd, &argv_and_envp[abs_path_size], NCARGS - abs_path_size);
 	if (argv_size == -1) {
-		cfs_debug(0, "Error: cfs couldn't determine command line arguments.\n");
+		_cfs_debug(0, "Error: cfs couldn't determine command line arguments.\n");
 		exit(1);
 	}
 	close(fd);
@@ -182,7 +182,7 @@ void _init_interposer()
 	fd = real_open("/proc/self/environ", O_RDONLY);
 	int envp_size = read(fd, &argv_and_envp[argv_size], NCARGS - argv_size - 1);
 	if (envp_size == -1) {
-		cfs_debug(0, "Error: cfs couldn't determine command environment.\n");
+		_cfs_debug(0, "Error: cfs couldn't determine command environment.\n");
 		exit(1);
 	}
 	close(fd);
@@ -191,9 +191,9 @@ void _init_interposer()
 	argv_and_envp[argv_size + 1 + envp_size] = '\0';
 
 	/* Yes, there's an existing CFS trace buffer. Attach to it */
-	cfs_id = atoi(cfs_id_string);
-	if (trace_buffer_use_existing(cfs_id) == -1){
-		cfs_debug(0, "Error: couldn't attach to cfs trace buffer\n");
+	_cfs_id = atoi(cfs_id_string);
+	if (trace_buffer_use_existing(_cfs_id) == -1){
+		_cfs_debug(0, "Error: couldn't attach to cfs trace buffer\n");
 		exit(1);
 	}
 
@@ -203,13 +203,13 @@ void _init_interposer()
 	 */
 	char *cfs_parent_id = getenv("CFS_PARENT_ID");
 	if (cfs_parent_id == NULL) {
-		my_parent_process_number = 0;
+		_cfs_my_parent_process_number = 0;
 	} else {
 		/*
 		 * Convert to an integer. Note: atoi returns 0 on an error, but that's
 		 * what we want.
 		 */
-		my_parent_process_number = atoi(cfs_parent_id);
+		_cfs_my_parent_process_number = atoi(cfs_parent_id);
 	}
 
 	/*
@@ -217,13 +217,13 @@ void _init_interposer()
 	 * number is added to each trace message.
 	 */
 	if (trace_buffer_lock() == 0){
-		my_process_number = trace_buffer_next_process_number();
+		_cfs_my_process_number = trace_buffer_next_process_number();
 
 		/* trace the argv and envp arrays */
 		trace_buffer_write_byte(TRACE_FILE_NEW_PROGRAM);
-		trace_buffer_write_int(my_process_number);
-		trace_buffer_write_int(my_parent_process_number);
-		trace_buffer_write_string(cfs_get_cwd(TRUE));
+		trace_buffer_write_int(_cfs_my_process_number);
+		trace_buffer_write_int(_cfs_my_parent_process_number);
+		trace_buffer_write_string(_cfs_get_cwd(TRUE));
 		trace_buffer_write_int(argv_count);
 		trace_buffer_write_bytes(argv_and_envp, argv_size + envp_size + 1);
 		trace_buffer_unlock();
@@ -239,11 +239,11 @@ void _init_interposer()
 	 */
 	char *ld_preload = getenv("LD_PRELOAD");
 	if (ld_preload == NULL) {
-		cfs_debug(0, "Error: cfs can't access LD_PRELOAD environment variable.\n");
+		_cfs_debug(0, "Error: cfs can't access LD_PRELOAD environment variable.\n");
 		exit(1);
 	}
-	cfs_ld_preload = cfs_malloc(strlen("LD_PRELOAD=") + strlen(ld_preload) + 1);
-	sprintf(cfs_ld_preload, "LD_PRELOAD=%s", ld_preload);
+	_cfs_ld_preload = _cfs_malloc(strlen("LD_PRELOAD=") + strlen(ld_preload) + 1);
+	sprintf(_cfs_ld_preload, "LD_PRELOAD=%s", ld_preload);
 }
 
 /*======================================================================
@@ -255,7 +255,7 @@ void _init_interposer()
  * Notes:
  *   - The real_xxx functions must be determined inside the interposer
  *     function. It's not possible to compute them from inside the
- *     constructor function (_init_interposer), since some of the system
+ *     constructor function (_cfs_init_interposer), since some of the system
  *     calls will be executed before the constructor is called.
  *   - Functions are listed alphabetically, purely for convenience.
  *======================================================================*/
@@ -276,7 +276,7 @@ int access(const char *pathname, int mode)
 {
 	FETCH_REAL_FN(int, real_access, "access");
 
-	cfs_debug(1, "access(\"%s\", %d)", pathname, mode);
+	_cfs_debug(1, "access(\"%s\", %d)", pathname, mode);
 
 	return real_access(pathname, mode);
 }
@@ -298,7 +298,7 @@ chdir(const char *path)
 {
 	FETCH_REAL_FN(int, real_chdir, "chdir");
 
-	cfs_debug(1, "chdir(\"%s\")", path);
+	_cfs_debug(1, "chdir(\"%s\")", path);
 
 	/*
 	 * Perform the real chdir() operation. If it fails, then we
@@ -316,7 +316,7 @@ chdir(const char *path)
 	 */
 
 	/* discard the cached copy, then re-cache the new copy. Abort on error. */
-	cfs_get_cwd(FALSE);
+	_cfs_get_cwd(FALSE);
 
 	/* all is good, we're now in the new directory, and we've saved its path */
 	return 0;
@@ -331,7 +331,7 @@ chmod(const char *path, mode_t mode)
 {
 	FETCH_REAL_FN(int, real_chmod, "chmod");
 
-	cfs_debug(1, "chmod(\"%s\", 0%o)", path, mode);
+	_cfs_debug(1, "chmod(\"%s\", 0%o)", path, mode);
 
 	/*
 	 * TODO: log the fact that the file's attributes have changed.
@@ -348,7 +348,7 @@ chown(const char *path, uid_t owner, gid_t group)
 {
 	FETCH_REAL_FN(int, real_chown, "chown");
 
-	cfs_debug(1, "chown(\"%s\", %d, %d)", path, owner, group);
+	_cfs_debug(1, "chown(\"%s\", %d, %d)", path, owner, group);
 
 	/*
 	 * TODO: log the fact that the file's attributes have changed.
@@ -388,105 +388,6 @@ chown(const char *path, uid_t owner, gid_t group)
  *======================================================================*/
 
 /*======================================================================
- * open_common()
- *
- * A common function for tracing detail of open, open64 or related library
- * calls.
- *
- * - filename  - the path (absolute or relative) to the file/directory
- *               being accessed.
- * - flags     - the standard open flags, such as O_RDONLY or O_CREAT.
- * - normalize - TRUE if filename should be normalized (. and .. removed,
- * 			     and symlinks followed).
- *======================================================================*/
-
-static int
-cfs_open_common(const char *filename, int flags, int normalize)
-{
-	extern int errno;
-	int tmp_errno = errno; 				/* save errno, in case we change it */
-
-	/* compute the absolute and normalized path */
-	char *new_path = (char *)filename;
-	char normalized_path[PATH_MAX];
-	if (normalize) {
-		int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, normalized_path);
-		if (status != 0) {
-			errno = status;
-			return -1;
-		}
-		new_path = normalized_path;
-	}
-
-	/* ignore system directories, such as /dev, /proc, etc */
-	if (cfs_is_system_path(new_path)) {
-		errno = tmp_errno;
-		return 0;
-	}
-
-	/* determine if we're opening a directory */
-	int isdir = cfs_isdirectory(new_path);
-
-	/* if there's a trace buffer, write the file name to it */
-	if (trace_buffer_lock() == 0){
-		if ((flags & (O_APPEND|O_CREAT|O_WRONLY)) != 0) {
-			trace_buffer_write_byte(isdir ? TRACE_DIR_WRITE : TRACE_FILE_WRITE);
-		} else if (flags & O_RDWR) {
-			trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
-		} else {
-			trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
-		}
-		trace_buffer_write_int(my_process_number);
-		trace_buffer_write_string(new_path);
-		trace_buffer_unlock();
-	}
-	errno = tmp_errno;					/* restore original errno value */
-
-	/* all is good */
-	return 0;
-}
-
-/*======================================================================
- * cfs_delete_common()
- *
- * A common function for tracing details of unlink, remove, rmdir and
- * other deletion-related system calls.
- *======================================================================*/
-
-static int
-cfs_delete_common(const char *filename, int is_dir)
-{
-	extern int errno;
-	int tmp_errno = errno; 				/* save errno, in case we change it */
-
-	/* compute the absolute and normalized path */
-	char new_path[PATH_MAX];
-	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, new_path);
-	if (status != 0) {
-		errno = status;
-		return -1;
-	}
-
-	/* ignore system directories, such as /dev, /proc, etc */
-	if (cfs_is_system_path(new_path)) {
-		errno = tmp_errno;
-		return 0;
-	}
-
-	/* if there's a trace buffer, write the file name to it */
-	if (trace_buffer_lock() == 0){
-		trace_buffer_write_byte(is_dir ? TRACE_DIR_DELETE : TRACE_FILE_DELETE);
-		trace_buffer_write_int(my_process_number);
-		trace_buffer_write_string(new_path);
-		trace_buffer_unlock();
-	}
-	errno = tmp_errno;					/* restore original errno value */
-
-	/* all is good */
-	return 0;
-}
-
-/*======================================================================
  * Interposed - creat
  *======================================================================*/
 
@@ -495,13 +396,13 @@ creat(const char *path, mode_t mode)
 {
 	FETCH_REAL_FN(int, real_creat, "creat");
 
-	cfs_debug(1, "creat(\"%s\", 0%o)", path, mode);
+	_cfs_debug(1, "creat(\"%s\", 0%o)", path, mode);
 
 	int fd = real_creat(path, mode);
 
 	/* on success, log the access to the trace file */
 	if (fd != -1) {
-		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC, TRUE) != 0){
+		if (_cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -517,13 +418,13 @@ creat64(const char *path, mode_t mode)
 {
 	FETCH_REAL_FN(int, real_creat64, "creat64");
 
-	cfs_debug(1, "creat64(\"%s\", 0%o)", path, mode);
+	_cfs_debug(1, "creat64(\"%s\", 0%o)", path, mode);
 
 	int fd = real_creat64(path, mode);
 
 	/* on success, log the access to the trace file */
 	if (fd != -1) {
-		if (cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC, TRUE) != 0){
+		if (_cfs_open_common(path, O_WRONLY | O_CREAT | O_TRUNC, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -544,7 +445,7 @@ dlopen(const char *file, int mode)
 {
 	FETCH_REAL_FN(void *, real_dlopen, "dlopen");
 
-	cfs_debug(1, "dlopen(\"%s\", 0%o)", file, mode);
+	_cfs_debug(1, "dlopen(\"%s\", 0%o)", file, mode);
 
 	/*
 	 * TODO: log the fact that the a new file has been read.
@@ -561,7 +462,7 @@ int eaccess(const char *pathname, int mode)
 {
 	FETCH_REAL_FN(int, real_eaccess, "eaccess");
 
-	cfs_debug(1, "eaccess(\"%s\", 0%o)", pathname, mode);
+	_cfs_debug(1, "eaccess(\"%s\", 0%o)", pathname, mode);
 
 	return real_eaccess(pathname, mode);
 }
@@ -574,227 +475,9 @@ int euidaccess(const char *pathname, int mode)
 {
 	FETCH_REAL_FN(int, real_euidaccess, "euidaccess");
 
-	cfs_debug(1, "euidaccess(\"%s\", 0%o)", pathname, mode);
+	_cfs_debug(1, "euidaccess(\"%s\", 0%o)", pathname, mode);
 
 	return real_euidaccess(pathname, mode);
-}
-
-/*======================================================================
- * Helper: modify_envp
- *
- * This function is a helper function for all execXX() functions. It
- * modifies the set of environment variables to ensure that they
- * contain suitable values for:
- *   LD_PRELOAD - must refer to this interceptor library.
- *   CFS_ID - provides the shared memory ID for our trace buffer.
- *   CFS_PARENT_ID - provides our parent process ID.
- *   CFS_DEBUG - provides our debug level.
- *   CFS_LOG_FILE - provides the name of the debug log file.
- * For numerous reasons, these variable could be removed or overwritten,
- * but the success of CFS depends on them being set.
- *======================================================================*/
-
-static char * const *
-cfs_modify_envp(char *const * envp)
-{
-	extern int errno;
-
-	/* if we're not tracing, we don't need to do any of this */
-	if (cfs_id == 0) {
-		return envp;
-	}
-
-	int tmp_errno = errno; 		/* take care not to disrupt errno */
-
-	/*
-	 * First, make a new copy of the original array, but add four extra
-	 * pointers to the array, just in case we need to add each of the
-	 * four new environment variables (however, if they're already there,
-	 * we won't need to). The first step is to figure out how many
-	 * entries there are in the environment.
-	 */
-
-	/* make sure we account for the extra four, plus the terminating NULL. */
-	int env_size = 5;
-	char * const *ptr = envp;
-	while (*ptr != NULL) {
-		env_size++;
-		ptr++;
-	}
-
-	/* allocate a replacement envp array */
-	char **new_envp = (char **)cfs_malloc(env_size * sizeof(char *));
-
-	/*
-	 * For each of the pointers in the existing envp array, check the name of the
-	 * variable to see if it's one of those we're interested in (CFS_ID, etc). If
-	 * so, we'll allocate a replacement string that has the correct value in it
-	 * (even though it may already be correct). If it's not one of our variables,
-	 * just re-use the same string.
-	 */
-
-	/* location in envp of the previous definition - -1 means not found (yet). */
-	int pos_cfs_id = -1;
-	int pos_cfs_parent_id = -1;
-	int pos_cfs_debug = -1;
-	int pos_cfs_log_file = -1;
-	int pos_ld_preload = -1;
-
-	/* loop through the existing envp, copying the values over to the new array */
-	int index = 0;
-	char *str;
-	while ((str = envp[index]) != NULL) {
-		/*
-		 * For each of the variables we care about, look for an existing definition
-		 * and take note of its index. Later on we'll put the correct value (if
-		 * necessary) into this location.
-		 */
-		if (strncmp("CFS_ID=", str, strlen("CFS_ID=")) == 0){
-			pos_cfs_id = index;
-		} else if (strncmp("CFS_PARENT_ID=", str, strlen("CFS_PARENT_ID=")) == 0){
-			pos_cfs_parent_id = index;
-		} else if (strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0){
-			pos_cfs_debug = index;
-		} else if (strncmp("CFS_LOG_FILE=", str, strlen("CFS_LOG_FILE")) == 0){
-			pos_cfs_log_file = index;
-		} else if (strncmp("LD_PRELOAD=", str, strlen("LD_PRELOAD=")) == 0){
-			pos_ld_preload = index;
-		}
-
-		new_envp[index] = str;
-		index++;
-	}
-
-	/*
-	 * For any variables that weren't already in envp, we need to add them. They'll
-	 * go at the end of new_envp (we left space for four additional variables).
-	 */
-	if (pos_cfs_id == -1) {
-		pos_cfs_id = index++;
-	}
-	if (pos_cfs_parent_id == -1) {
-		pos_cfs_parent_id = index++;
-	}
-	if (pos_cfs_debug == -1) {
-		pos_cfs_debug = index++;
-	}
-	if (pos_cfs_log_file == -1) {
-		pos_cfs_log_file = index++;
-	}
-	if (pos_ld_preload == -1) {
-		pos_ld_preload = index++;
-	}
-
-	/* don't forget the terminating NULL */
-	new_envp[index] = NULL;
-
-	/*
-	 * Now we have a location for each of the four environment variables.
-	 * Either we're replacing an existing string, or adding it for the
-	 * first time. In either case, we malloc a new string and insert it
-	 * into new_envp.
-	 */
-	char *new_str = (char *)cfs_malloc(strlen("CFS_ID=NNNNNNNNNNNNNNNNNNNNNN\0"));
-	sprintf(new_str, "CFS_ID=%ld", cfs_id);
-	new_envp[pos_cfs_id] = new_str;
-
-	new_str = (char *)cfs_malloc(strlen("CFS_DEBUG=NNN\0"));
-	sprintf(new_str, "CFS_DEBUG=%d", cfs_get_debug_level());
-	new_envp[pos_cfs_debug] = new_str;
-
-	new_str = (char *)cfs_malloc(strlen("CFS_PARENT_ID=NNNNNNNNNNN\0"));
-	sprintf(new_str, "CFS_PARENT_ID=%d", my_process_number);
-	new_envp[pos_cfs_parent_id] = new_str;
-
-	char *cfs_log_file = cfs_get_log_file();
-	new_str = (char *)cfs_malloc(strlen("CFS_LOG_FILE=\0") + strlen(cfs_log_file));
-	sprintf(new_str, "CFS_LOG_FILE=%s", cfs_log_file);
-	new_envp[pos_cfs_log_file] = new_str;
-
-	/*
-	 * For LD_PRELOAD, we want to give a warning if the new value is different
-	 * from the existing value that's already in the environment. This suggests
-	 * that the user program has modified this variable (not an uncommon thing),
-	 * but if we overwrite it with our own LD_PRELOAD, we could be breaking
-	 * the program's functionality.
-	 */
-	char *existing_ld_preload = new_envp[pos_ld_preload];
-	if ((existing_ld_preload != NULL) &&
-		(strcmp(existing_ld_preload, cfs_ld_preload) != 0)){
-		cfs_debug(0, "WARNING: LD_PRELOAD has been modified - program may malfunction.");
-	}
-	new_envp[pos_ld_preload] = cfs_ld_preload;
-
-	errno = tmp_errno;			/* restore errno */
-	return new_envp;
-}
-
-/*======================================================================
- * Helper: cleanup_envp
- *
- * This function cleans up any memory allocated by modify_envp.
- *======================================================================*/
-
-static void
-cfs_cleanup_envp(char * const *envp)
-{
-	extern int errno;
-
-	/* if we're not tracing, we don't need to do any of this */
-	if (cfs_id == 0) {
-		return;
-	}
-
-	int tmp_errno = errno; 		/* take care not to disrupt errno */
-
-	/*
-	 * Technically this function would normally just be called if
-	 * an exec() call failed, which is rare. However, it's not
-	 * totally impossible, so we should deallocate any memory that
-	 * we allocated in cfs_modify_envp(). Search through the envp
-	 * and look for the strings we added, then free them.
-	 */
-	char * const *ptr = envp;
-	char *str;
-	while ((str = *ptr) != NULL) {
-		if ((strncmp("CFS_ID=", str, strlen("CFS_ID=")) == 0) ||
-			(strncmp("CFS_PARENT_ID=", str, strlen("CFS_PARENT_ID=")) == 0) ||
-			(strncmp("CFS_DEBUG=", str, strlen("CFS_DEBUG")) == 0)){
-				free(*ptr);
-		}
-		ptr++;
-	}
-
-	/* finally, free our copied envp array */
-	free((void *)envp);
-
-	errno = tmp_errno;			/* restore errno */
-}
-
-/*======================================================================
- * Helper - cfs_execve_common()
- *
- * This function is a helper for many of the interposed exec functions.
- *
- *======================================================================*/
-
-static int
-cfs_execve_common(const char *filename, char *const argv[], char *const envp[])
-{
-	FETCH_REAL_FN(int, real_execve, "execve");
-
-	/*
-	 * Before calling the real execve, make sure our custom environment
-	 * variables are in place.
-	 */
-	cfs_debug_env(2, envp);
-	char * const *new_envp = cfs_modify_envp(envp);
-
-	int rc = real_execve(filename, argv, new_envp);
-
-	/* if we get here, the execve failed */
-	cfs_cleanup_envp(new_envp);
-	return rc;
 }
 
 /*======================================================================
@@ -806,10 +489,10 @@ execl(const char *path, const char *arg0, ...)
 {
 	extern char **environ;
 
-	cfs_debug(1, "execl(\"%s\", ..., ...)", path);
+	_cfs_debug(1, "execl(\"%s\", ..., ...)", path);
 
 	/* execl is simply a wrapper for execve()s */
-	return cfs_execve_common(path, (char * const *)&arg0, environ);
+	return _cfs_execve_common(path, (char * const *)&arg0, environ);
 }
 
 /*======================================================================
@@ -819,7 +502,7 @@ execl(const char *path, const char *arg0, ...)
 int
 execle(const char *path, const char *arg0, ... /*, 0, char *const envp[] */)
 {
-	cfs_debug(1, "execle(\"%s\", ..., ...)", path);
+	_cfs_debug(1, "execle(\"%s\", ..., ...)", path);
 
 	/*
 	 * execle is a wrapper for execve, but we first need to identify
@@ -834,28 +517,7 @@ execle(const char *path, const char *arg0, ... /*, 0, char *const envp[] */)
 	/* finally, grab the environment pointer */
 	char * const *envp = (char * const *)*p;
 
-	return cfs_execve_common(path, (char * const *)&arg0, envp);
-}
-
-/*======================================================================
- * Helper - execvpe_common()
- *======================================================================*/
-
-static int
-cfs_execvpe_common(const char *file, char *const argv[], char *const envp[])
-{
-	FETCH_REAL_FN(int, real_execvpe, "execvpe");
-
-	/*
-	 * Before calling the real execvpe, make sure our custom environment
-	 * variables are in place.
-	 */
-	char * const *new_envp = cfs_modify_envp(envp);
-	int rc = real_execvpe(file, argv, new_envp);
-
-	/* if we get here, the execvpe failed */
-	cfs_cleanup_envp(new_envp);
-	return rc;
+	return _cfs_execve_common(path, (char * const *)&arg0, envp);
 }
 
 /*======================================================================
@@ -867,12 +529,12 @@ execlp(const char *file, const char *arg0, ...)
 {
 	extern char **environ;
 
-	cfs_debug(1, "execlp(\"%s\", ..., ...)", file);
+	_cfs_debug(1, "execlp(\"%s\", ..., ...)", file);
 
 	/*
 	 * execlp is a wrapper for execvpe().
 	 */
-	return cfs_execvpe_common(file, (char * const *)&arg0, environ);
+	return _cfs_execvpe_common(file, (char * const *)&arg0, environ);
 }
 
 /*======================================================================
@@ -883,12 +545,12 @@ int
 execv(const char *path, char *const argv[])
 {
 	extern char **environ;
-	cfs_debug(1, "execv(\"%s\", ...)", path);
+	_cfs_debug(1, "execv(\"%s\", ...)", path);
 
 	/*
 	 * execv is a wrapper for execve().
 	 */
-	return cfs_execve_common(path, argv, environ);
+	return _cfs_execve_common(path, argv, environ);
 }
 
 /*======================================================================
@@ -898,9 +560,9 @@ execv(const char *path, char *const argv[])
 int
 execve(const char *filename, char *const argv[], char *const envp[])
 {
-	cfs_debug(1, "execve(\"%s\", ..., ...)", filename);
+	_cfs_debug(1, "execve(\"%s\", ..., ...)", filename);
 
-	return cfs_execve_common(filename, argv, envp);
+	return _cfs_execve_common(filename, argv, envp);
 }
 
 /*======================================================================
@@ -911,7 +573,7 @@ int
 execvp(const char *file, char *const argv[])
 {
 	extern char **environ;
-	cfs_debug(1, "execvp(\"%s\", ...)", file);
+	_cfs_debug(1, "execvp(\"%s\", ...)", file);
 
 	/*
 	 * execvp is a wrapper for execvpe().
@@ -927,9 +589,9 @@ execvp(const char *file, char *const argv[])
 int
 execvpe(const char *file, char *const argv[], char *const envp[])
 {
-	cfs_debug(1, "execvpe(\"%s\", ..., ...)", file);
+	_cfs_debug(1, "execvpe(\"%s\", ..., ...)", file);
 
-	return cfs_execvpe_common(file, argv, envp);
+	return _cfs_execvpe_common(file, argv, envp);
 }
 
 /*======================================================================
@@ -941,7 +603,7 @@ exit(int status)
 {
 	FETCH_REAL_FN(int, real_exit, "exit");
 
-	cfs_debug(1, "exit(%d)", status);
+	_cfs_debug(1, "exit(%d)", status);
 
 	// TODO: log the fact that the process is exiting (helps with detecting
 	// parallel processes.
@@ -962,7 +624,7 @@ void _exit(int status)
 {
 	FETCH_REAL_FN(int, real__exit, "_exit");
 
-	cfs_debug(1, "_exit(%d)", status);
+	_cfs_debug(1, "_exit(%d)", status);
 
 	// TODO: log fact that the process is exiting (helps with detecting
 	// parallel processes.
@@ -983,7 +645,7 @@ void _Exit(int status)
 {
 	FETCH_REAL_FN(int, real__Exit, "_Exit");
 
-	cfs_debug(1, "_Exit(%d)", status);
+	_cfs_debug(1, "_Exit(%d)", status);
 
 	// TODO: log fact that the process is exiting (helps with detecting
 	// parallel processes.
@@ -1005,7 +667,7 @@ faccessat(int dirfd, const char *pathname, int mode, int flags)
 {
 	FETCH_REAL_FN(int, real_faccessat, "faccessat");
 
-	cfs_debug(1, "faccessat(%d, \"%s\", 0%o, %d)", dirfd, pathname, mode, flags);
+	_cfs_debug(1, "faccessat(%d, \"%s\", 0%o, %d)", dirfd, pathname, mode, flags);
 
 	return real_faccessat(dirfd, pathname, mode, flags);
 }
@@ -1029,7 +691,7 @@ fchdir(int fd)
 {
 	FETCH_REAL_FN(int, real_fchdir, "fchdir");
 
-	cfs_debug(1, "fchdir(%d)", fd);
+	_cfs_debug(1, "fchdir(%d)", fd);
 
 	/* attempt the real fchdir operation */
 	if (real_fchdir(fd) != 0){
@@ -1040,7 +702,7 @@ fchdir(int fd)
 	 * Now that we've successfully changed directory, cache the
 	 * new current working directory.
 	 */
-	cfs_get_cwd(FALSE);
+	_cfs_get_cwd(FALSE);
 	return 0;
 }
 
@@ -1053,7 +715,7 @@ fchmod(int fd, mode_t mode)
 {
 	FETCH_REAL_FN(int, real_fchmod, "fchmod");
 
-	cfs_debug(1, "fchmod(%d, 0%o)", fd, mode);
+	_cfs_debug(1, "fchmod(%d, 0%o)", fd, mode);
 
 	// TODO: log the fact that the file has new permission bits.
 	// TODO: how do we find the file name relating to this fd?
@@ -1069,7 +731,7 @@ fchmodat(int dirfd, const char *pathname, mode_t mode, int flags)
 {
 	FETCH_REAL_FN(int, real_fchmodat, "fchmodat");
 
-	cfs_debug(1, "fchmodat(%d, \"%s\", 0%o, %d)", dirfd, pathname, mode, flags);
+	_cfs_debug(1, "fchmodat(%d, \"%s\", 0%o, %d)", dirfd, pathname, mode, flags);
 
 	// TODO: compute the absolute path of the file (see the man page for special
 	// situations to consider).
@@ -1086,7 +748,7 @@ fchown(int fd, uid_t owner, gid_t group)
 {
 	FETCH_REAL_FN(int, real_fchown, "fchown");
 
-	cfs_debug(1, "fchown(%d, %d, %d)", fd, owner, group);
+	_cfs_debug(1, "fchown(%d, %d, %d)", fd, owner, group);
 
 	// TODO: how do we find the file name relating to this fd?
 	// TODO: log the fact that the file has new attributes set.
@@ -1102,7 +764,7 @@ fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags)
 {
 	FETCH_REAL_FN(int, real_fchownat, "fchownat");
 
-	cfs_debug(1, "fchownat(%d, \"%s\", %d, %d, %d)",
+	_cfs_debug(1, "fchownat(%d, \"%s\", %d, %d, %d)",
 			dirfd, pathname, owner, group, flags);
 
 	// TODO: compute the absolute path of the file (see the man page for special
@@ -1147,7 +809,7 @@ fexecve(int fd, char *const argv[], char *const envp[])
 {
 	FETCH_REAL_FN(int, real_fexecve, "fexecve");
 
-	cfs_debug(1, "fexecve(%d, ..., ...)", fd);
+	_cfs_debug(1, "fexecve(%d, ..., ...)", fd);
 
 	/*
 	 * Before calling the real fexecve, make sure our custom environment
@@ -1155,11 +817,11 @@ fexecve(int fd, char *const argv[], char *const envp[])
 	 * the trace information once it's exec'ed. We therefore don't need
 	 * to know the name of the program being started.
 	 */
-	char * const *new_envp = cfs_modify_envp(envp);
+	char * const *new_envp = _cfs_modify_envp(envp);
 	int rc = real_fexecve(fd, argv, new_envp);
 
 	/* if we get here, the fexecve failed */
-	cfs_cleanup_envp(envp);
+	_cfs_cleanup_envp(envp);
 	return rc;
 }
 
@@ -1180,118 +842,6 @@ fexecve(int fd, char *const argv[], char *const envp[])
  *======================================================================*/
 
 /*======================================================================
- * Helper: fopen_common()
- *
- * A common function for tracing the arguments of fopen, fopen64 and
- * other related commands.
- *
- * Returns 0 on success, or -1 on failure (with errno set).
- *======================================================================*/
-
-static int
-cfs_fopen_common(const char *filename, const char *opentype)
-{
-	extern int errno;
-	int tmp_errno = errno;
-
-	/*
-	 * Normalize the path before writing the trace information. That is,
-	 * . and .. should be removed, and so should symlinks. Also, convert
-	 * relative path names to absolute paths. On failure, return our own
-	 * error number.
-	 */
-	char new_path[PATH_MAX];
-	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), filename, new_path);
-	if (status != 0) {
-		errno = status;
-		return -1;
-	}
-
-	/* ignore system directories, such as /dev, /proc, etc */
-	if (cfs_is_system_path(new_path)) {
-		errno = tmp_errno;
-		return 0;
-	}
-
-	/* determine if we're opening a directory */
-	int isdir = cfs_isdirectory(new_path);
-
-	/*
-	 * Grab a lock on the trace buffer. If it hasn't been initialized yet,
-	 * just return and don't trace anything.
-	 */
-	if (trace_buffer_lock() == 0){
-		/*
-		 * for 'r' and 'rb' modes, the operation is a read, for "r+" and "rb+",
-		 * or "r+b" it's modify, else it's a write.
-		 */
-		if ((strcmp(opentype, "r") == 0) ||
-			(strcmp(opentype, "rb") == 0)){
-			trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
-		} else if ((strcmp(opentype, "r+") == 0) ||
-				   (strcmp(opentype, "rb+") == 0) ||
-				   (strcmp(opentype, "r+b") == 0)) {
-			trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
-		} else {
-			trace_buffer_write_byte(isdir ? TRACE_DIR_WRITE : TRACE_FILE_WRITE);
-		}
-		trace_buffer_write_int(my_process_number);
-		trace_buffer_write_string(new_path);
-		trace_buffer_unlock();
-	}
-	errno = tmp_errno;
-	return 0;
-}
-
-/*======================================================================
- * Helper: cfs_convert_pathat_to_path
- *
- * Function for translating a dirfd/path combination, as would typically
- * be passed to system calls such as openat() or mkdirat(), and
- * returning a regular pathname (either relative or absolute). Note that
- * this function does not make any attempt to normalize the path, so you
- * should still pass it through _cfs_combined_paths() before using it.
- *
- * - dirfd - The file descriptor parameter, as passed to openat() etc.
- * - pathname - The absolute or relative (to 'dirfd') path name.
- * - combined_path - A pointer to the return buffer, into which the
- *            returned path is written.
- *
- * Returns 0 on success, or -1 on error. Note that the returned path
- * may either be absolute or relative to the CWD.
- *======================================================================*/
-
-int
-cfs_convert_pathat_to_path(int dirfd, const char *pathname, char *combined_path)
-{
-	int tmp_errno = errno;
-
-	/*
-	 * Case 1: pathname is absolute.
-	 * Case 2: dirfd is AT_FDCWD - relative to current directory.
-	 */
-	if ((pathname[0] == '/') || (dirfd == AT_FDCWD)) {
-		strncpy(combined_path, pathname, PATH_MAX);
-	}
-
-	/* case 3: dirfd is a valid directory descriptor */
-	else {
-
-		/*
-		 * Figure out the directory that dirfd refers to, then concatenate
-		 * pathname onto it.
-		 */
-		if (cfs_get_path_of_dirfd(combined_path, dirfd, pathname) == -1){
-			/* couldn't determine directory for this dirfd. */
-			errno = tmp_errno;
-			return -1;
-		}
-	}
-	errno = tmp_errno;
-	return 0;
-}
-
-/*======================================================================
  * Interposed - fopen()
  *======================================================================*/
 
@@ -1300,12 +850,12 @@ fopen(const char *filename, const char *mode)
 {
 	FETCH_REAL_FN(FILE *, real_fopen, "fopen");
 
-	cfs_debug(1, "fopen(\"%s\", \"%s\")", filename, mode);
+	_cfs_debug(1, "fopen(\"%s\", \"%s\")", filename, mode);
 	FILE *f = real_fopen(filename, mode);
 
 	/* on success, log the access to the trace file. */
 	if (f != NULL) {
-		if (cfs_fopen_common(filename, mode) != 0){
+		if (_cfs_fopen_common(filename, mode) != 0){
 			return NULL;
 		}
 	}
@@ -1321,12 +871,12 @@ fopen64(const char *filename, const char *mode)
 {
 	FETCH_REAL_FN(FILE *, real_fopen64, "fopen64");
 
-	cfs_debug(1, "fopen64(\"%s\", \"%s\")", filename, mode);
+	_cfs_debug(1, "fopen64(\"%s\", \"%s\")", filename, mode);
 	FILE *f = real_fopen64(filename, mode);
 
 	/* on success, log the access to the trace file. */
 	if (f != NULL) {
-		if (cfs_fopen_common(filename, mode) != 0){
+		if (_cfs_fopen_common(filename, mode) != 0){
 			return NULL;
 		}
 	}
@@ -1342,7 +892,7 @@ fork(void)
 {
 	FETCH_REAL_FN(pid_t, real_fork, "fork");
 
-	cfs_debug(1, "fork()");
+	_cfs_debug(1, "fork()");
 
 	// TODO: register the new process as being identical to the existing
 	// process. Any file accesses from the child should be considered
@@ -1376,7 +926,7 @@ freopen(const char *path, const char *mode, FILE *stream)
 {
 	FETCH_REAL_FN(FILE *, real_freopen, "freopen");
 
-	cfs_debug(1, "freopen(\"%s\", \"%s\", %p)", path, mode, stream);
+	_cfs_debug(1, "freopen(\"%s\", \"%s\", %p)", path, mode, stream);
 
 	FILE *f = real_freopen(path, mode, stream);
 	if ((f != NULL) && (path != NULL)) {
@@ -1388,7 +938,7 @@ freopen(const char *path, const char *mode, FILE *stream)
 		 * This can possibly be done by accessing /proc/self/fd/<fd>,
 		 * but that's not very portable.
 		 */
-		if (cfs_fopen_common(path, mode) != 0){
+		if (_cfs_fopen_common(path, mode) != 0){
 			return NULL;
 		}
 	}
@@ -1404,12 +954,12 @@ freopen64(const char *path, const char *mode, FILE *stream)
 {
 	FETCH_REAL_FN(FILE *, real_freopen64, "freopen64");
 
-	cfs_debug(1, "freopen64(\"%s\", \"%s\", %p)", path, mode, stream);
+	_cfs_debug(1, "freopen64(\"%s\", \"%s\", %p)", path, mode, stream);
 
 	FILE *f = real_freopen64(path, mode, stream);
 	if ((f != NULL) && (path != NULL)) {
 		/* TODO: see comment in freopen() function */
-		if (cfs_fopen_common(path, mode) != 0){
+		if (_cfs_fopen_common(path, mode) != 0){
 			return NULL;
 		}
 	}
@@ -1508,13 +1058,13 @@ ftok(const char *pathname, int proj_id)
 {
 	FETCH_REAL_FN(key_t, real_ftok, "ftok");
 
-	cfs_debug(1, "ftok(\"%s\", %d)", pathname, proj_id);
+	_cfs_debug(1, "ftok(\"%s\", %d)", pathname, proj_id);
 
 	key_t key = real_ftok(pathname, proj_id);
 
 	/* on success, log the access to the trace file. */
 	if (key != (key_t)-1) {
-		if (cfs_open_common(pathname, O_RDONLY, TRUE) != 0){
+		if (_cfs_open_common(pathname, O_RDONLY, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1654,7 +1204,7 @@ lchown(const char *path, uid_t owner, gid_t group)
 {
 	FETCH_REAL_FN(int, real_lchown, "lchown");
 
-	cfs_debug(1, "lchown(\"%s\", %d, %d)", path, owner, group);
+	_cfs_debug(1, "lchown(\"%s\", %d, %d)", path, owner, group);
 
 	// TODO: log the fact that the file has new attributes set.
 	return real_lchown(path, owner, group);
@@ -1678,17 +1228,17 @@ link(const char *oldname, const char *newname)
 {
 	FETCH_REAL_FN(int, real_link, "link");
 
-	cfs_debug(1, "link(\"%s\", \"%s\")", oldname, newname);
+	_cfs_debug(1, "link(\"%s\", \"%s\")", oldname, newname);
 
 	int rc = real_link(oldname, newname);
 	if (rc != -1) {
 		/* mark the existing file as having being "read" */
-		if (cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
+		if (_cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
 			return -1;
 		}
 
 		/* mark the new file (the link) as being "created" */
-		if (cfs_open_common(newname, O_CREAT, TRUE) == -1) {
+		if (_cfs_open_common(newname, O_CREAT, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -1705,7 +1255,7 @@ linkat(int olddirfd, const char *oldpath,
 {
 	FETCH_REAL_FN(int, real_linkat, "linkat");
 
-	cfs_debug(1, "linkat(%d, \"%s\", %d, \"%s\", %d)", olddirfd, oldpath,
+	_cfs_debug(1, "linkat(%d, \"%s\", %d, \"%s\", %d)", olddirfd, oldpath,
 			newdirfd, newpath, flags);
 
 	int rc = real_linkat(olddirfd, oldpath, newdirfd, newpath, flags);
@@ -1713,18 +1263,18 @@ linkat(int olddirfd, const char *oldpath,
 		char converted_path[PATH_MAX];
 
 		/* mark the old path as being "read" */
-		if (cfs_convert_pathat_to_path(olddirfd, oldpath, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(olddirfd, oldpath, converted_path) == -1) {
 			return -1;
 		}
-		if (cfs_open_common(converted_path, O_RDONLY, TRUE) == -1) {
+		if (_cfs_open_common(converted_path, O_RDONLY, TRUE) == -1) {
 			return -1;
 		}
 
 		/* mark the new path as being "created" */
-		if (cfs_convert_pathat_to_path(newdirfd, newpath, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(newdirfd, newpath, converted_path) == -1) {
 			return -1;
 		}
-		if (cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
+		if (_cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -1800,14 +1350,14 @@ mkdir(const char *path, mode_t mode)
 {
 	FETCH_REAL_FN(int, real_mkdir, "mkdir");
 
-	cfs_debug(1, "mkdir(\"%s\", 0%o)", path, mode);
+	_cfs_debug(1, "mkdir(\"%s\", 0%o)", path, mode);
 
 	/* call the real mkdir function */
 	int rc = real_mkdir(path, mode);
 
 	/* assuming it succeeds, log the directory creation */
 	if (rc != -1) {
-		if (cfs_open_common(path, O_CREAT, TRUE) != 0){
+		if (_cfs_open_common(path, O_CREAT, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1823,7 +1373,7 @@ mkdirat(int dirfd, const char *pathname, mode_t mode)
 {
 	FETCH_REAL_FN(int, real_mkdirat, "mkdirat");
 
-	cfs_debug(1, "mkdirat(%d, \"%s\", 0%o)", dirfd, pathname, mode);
+	_cfs_debug(1, "mkdirat(%d, \"%s\", 0%o)", dirfd, pathname, mode);
 
 	int rc = real_mkdirat(dirfd, pathname, mode);
 
@@ -1831,10 +1381,10 @@ mkdirat(int dirfd, const char *pathname, mode_t mode)
 	if (rc != -1) {
 		char converted_path[PATH_MAX];
 
-		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
 			return -1;
 		}
-		if (cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
+		if (_cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -1922,13 +1472,13 @@ open(const char *filename, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	cfs_debug(1, "open(\"%s\", 0x%x, 0%o)", filename, flags, mode);
+	_cfs_debug(1, "open(\"%s\", 0x%x, 0%o)", filename, flags, mode);
 
 	int fd = real_open(filename, flags, mode);
 
 	/* on success, log the access to the trace file. */
 	if (fd != -1) {
-		if (cfs_open_common(filename, flags, TRUE) != 0){
+		if (_cfs_open_common(filename, flags, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1954,13 +1504,13 @@ open64(const char *filename, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	cfs_debug(1, "open64(\"%s\", 0x%x, 0%o)", filename, flags, mode);
+	_cfs_debug(1, "open64(\"%s\", 0x%x, 0%o)", filename, flags, mode);
 
 	int fd = real_open64(filename, flags, mode);
 
 	/* on success, log the access to the trace file. */
 	if (fd != -1) {
-		if (cfs_open_common(filename, flags, TRUE) != 0){
+		if (_cfs_open_common(filename, flags, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -1986,7 +1536,7 @@ openat(int dirfd, const char *pathname, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	cfs_debug(1, "openat(%d, \"%s\", 0x%x, 0%o)", dirfd, pathname, flags, mode);
+	_cfs_debug(1, "openat(%d, \"%s\", 0x%x, 0%o)", dirfd, pathname, flags, mode);
 
 	/* call the real openat function */
 	int fd = real_openat(dirfd, pathname, flags, mode);
@@ -1996,11 +1546,11 @@ openat(int dirfd, const char *pathname, int flags, ...)
 		char converted_path[PATH_MAX];
 
 		/* convert to a regular path name */
-		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
 			return -1;
 		}
 
-		if (cfs_open_common(converted_path, flags, TRUE) == -1) {
+		if (_cfs_open_common(converted_path, flags, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -2026,7 +1576,7 @@ openat64(int dirfd, const char *pathname, int flags, ...)
 	mode_t mode = va_arg(ap, mode_t);
 	va_end(ap);
 
-	cfs_debug(1, "openat64(%d, \"%s\", 0x%x, 0%o)", dirfd, pathname, flags, mode);
+	_cfs_debug(1, "openat64(%d, \"%s\", 0x%x, 0%o)", dirfd, pathname, flags, mode);
 
 	int fd = real_openat64(dirfd, pathname, flags, mode);
 
@@ -2035,11 +1585,11 @@ openat64(int dirfd, const char *pathname, int flags, ...)
 		char converted_path[PATH_MAX];
 
 		/* convert to a regular path name */
-		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
 			return -1;
 		}
 
-		if (cfs_open_common(converted_path, flags, TRUE) == -1) {
+		if (_cfs_open_common(converted_path, flags, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -2077,10 +1627,10 @@ popen(const char *command, const char *mode)
 
 	FETCH_REAL_FN(FILE *, real_popen, "popen");
 
-	cfs_debug(1, "popen(\"%s\", \"%s\")", command, mode);
+	_cfs_debug(1, "popen(\"%s\", \"%s\")", command, mode);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	environ = (char **)cfs_modify_envp(environ);
+	environ = (char **)_cfs_modify_envp(environ);
 
 	/* now invoke the original popen() call */
 	FILE *result = real_popen(command, mode);
@@ -2088,7 +1638,7 @@ popen(const char *command, const char *mode)
 	/* restore our original environment */
 	char **tmp_environ = environ;
 	environ = old_environ;
-	cfs_cleanup_envp(tmp_environ);
+	_cfs_cleanup_envp(tmp_environ);
 
 	return result;
 }
@@ -2105,15 +1655,15 @@ posix_spawn(pid_t *pid, const char *path,
 {
 	FETCH_REAL_FN(int, real_posix_spawn, "posix_spawn");
 
-	cfs_debug(1, "posix_spawn(%p, \"%s\", %p, %p, %p, %p)",
+	_cfs_debug(1, "posix_spawn(%p, \"%s\", %p, %p, %p, %p)",
 			pid, path, file_actions, attrp, argv, envp);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	char **new_envp = (char **)cfs_modify_envp(environ);
+	char **new_envp = (char **)_cfs_modify_envp(environ);
 	int result = real_posix_spawn(pid, path, file_actions, attrp, argv, new_envp);
 
 	/* restore our original environment */
-	cfs_cleanup_envp(new_envp);
+	_cfs_cleanup_envp(new_envp);
 	return result;
 }
 
@@ -2129,15 +1679,15 @@ posix_spawnp(pid_t *pid, const char *file,
 {
 	FETCH_REAL_FN(int, real_posix_spawnp, "posix_spawnp");
 
-	cfs_debug(1, "posix_spawnp(%p, \"%s\", %p, %p, %p, %p)",
+	_cfs_debug(1, "posix_spawnp(%p, \"%s\", %p, %p, %p, %p)",
 			pid, file, file_actions, attrp, argv, envp);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	char **new_envp = (char **)cfs_modify_envp(environ);
+	char **new_envp = (char **)_cfs_modify_envp(environ);
 	int result = real_posix_spawnp(pid, file, file_actions, attrp, argv, new_envp);
 
 	/* restore our original environment */
-	cfs_cleanup_envp(new_envp);
+	_cfs_cleanup_envp(new_envp);
 	return result;
 }
 
@@ -2219,18 +1769,18 @@ remove(const char *path)
 {
 	FETCH_REAL_FN(int, real_remove, "remove");
 
-	cfs_debug(1, "remove(\"%s\")", path);
+	_cfs_debug(1, "remove(\"%s\")", path);
 
 	/*
 	 * Check whether this path is a directory. Note, we're about to
 	 * delete it, so we need to find out before it's gone.
 	 */
-	int is_dir = cfs_isdirectory(path);
+	int is_dir = _cfs_isdirectory(path);
 
 	/* now perform the deletion, and log the access */
 	int rc = real_remove(path);
 	if (rc != -1) {
-		if (cfs_delete_common(path, is_dir) == -1) {
+		if (_cfs_delete_common(path, is_dir) == -1) {
 			return -1;
 		}
 	}
@@ -2254,27 +1804,27 @@ rename(const char *oldname, const char *newname)
 {
 	FETCH_REAL_FN(int, real_rename, "rename");
 
-	cfs_debug(1, "rename(\"%s\", \"%s\")", oldname, newname);
+	_cfs_debug(1, "rename(\"%s\", \"%s\")", oldname, newname);
 
 	/*
 	 * Is oldname a directory? We need to find out now, since we're
 	 * about to delete it.
 	 */
-	int is_dir = cfs_isdirectory(oldname);
+	int is_dir = _cfs_isdirectory(oldname);
 
 	int rc = real_rename(oldname, newname);
 	if (rc != -1) {
 
 		/* Mark the oldname as deleted */
-		if (cfs_delete_common(oldname, is_dir) == -1){
+		if (_cfs_delete_common(oldname, is_dir) == -1){
 			return -1;
 		}
 
 		/*
 		 * Mark the newname as created. It could be either a file, or a
-		 * directory, but cfs_open_common will figure that out.
+		 * directory, but _cfs_open_common will figure that out.
 		 */
-		if (cfs_open_common(newname, O_CREAT, TRUE) == -1) {
+		if (_cfs_open_common(newname, O_CREAT, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -2291,33 +1841,33 @@ renameat(int olddirfd, const char *oldpath,
 {
 	FETCH_REAL_FN(int, real_renameat, "renameat");
 
-	cfs_debug(1, "renameat(%d, \"%s\", %d, \"%s\")", olddirfd, oldpath,
+	_cfs_debug(1, "renameat(%d, \"%s\", %d, \"%s\")", olddirfd, oldpath,
 			newdirfd, newpath);
 
 	/* figure out if oldpath is a file or directory, before we delete it */
 	char converted_path[PATH_MAX];
-	if (cfs_convert_pathat_to_path(olddirfd, oldpath, converted_path) == -1) {
+	if (_cfs_convert_pathat_to_path(olddirfd, oldpath, converted_path) == -1) {
 		return -1;
 	}
-	int is_dir = cfs_isdirectory(converted_path);
+	int is_dir = _cfs_isdirectory(converted_path);
 
 	/* perform the real rename operation */
 	int rc = real_renameat(olddirfd, oldpath, newdirfd, newpath);
 	if (rc != -1) {
 
 		/* Mark the oldname as deleted */
-		if (cfs_delete_common(converted_path, is_dir) == -1){
+		if (_cfs_delete_common(converted_path, is_dir) == -1){
 			return -1;
 		}
 
 		/*
 		 * Mark the newname as created. It could be either a file, or a
-		 * directory, but cfs_open_common will figure that out.
+		 * directory, but _cfs_open_common will figure that out.
 		 */
-		if (cfs_convert_pathat_to_path(newdirfd, newpath, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(newdirfd, newpath, converted_path) == -1) {
 			return -1;
 		}
-		if (cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
+		if (_cfs_open_common(converted_path, O_CREAT, TRUE) == -1) {
 			return -1;
 		}
 	}
@@ -2351,11 +1901,11 @@ rmdir(const char *dirname)
 {
 	FETCH_REAL_FN(int, real_rmdir, "rmdir");
 
-	cfs_debug(1, "rmdir(\"%s\")", dirname);
+	_cfs_debug(1, "rmdir(\"%s\")", dirname);
 
 	int rc = real_rmdir(dirname);
 	if (rc != -1) {
-		cfs_delete_common(dirname, TRUE);
+		_cfs_delete_common(dirname, TRUE);
 	}
 	return rc;
 }
@@ -2451,7 +2001,7 @@ symlink(const char *oldname, const char *newname)
 {
 	FETCH_REAL_FN(int, real_symlink, "symlink");
 
-	cfs_debug(1, "symlink(\"%s\", \"%s\")", oldname, newname);
+	_cfs_debug(1, "symlink(\"%s\", \"%s\")", oldname, newname);
 
 	/*
 	 * Compute the normalized name for the target file. We need to do
@@ -2459,27 +2009,25 @@ symlink(const char *oldname, const char *newname)
 	 * will simply refer us back to the file we created a link to.
 	 */
 	char converted_path[PATH_MAX];
-	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), newname, converted_path);
-	if (status != 0) {
-		errno = status;
+	if (_cfs_combine_paths(_cfs_get_cwd(TRUE), newname, converted_path) == -1) {
 		return -1;
 	}
 
 	int rc = real_symlink(oldname, newname);
 	if (rc != -1) {
 		/* mark the existing file as having being "read" */
-		if (cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
+		if (_cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
 			return -1;
 		}
 
 		/*
 		 * Mark the symlink file as having being "created". We are using
-		 * a pre-normalized path, so ask cfs_open_common() not to normalize
+		 * a pre-normalized path, so ask _cfs_open_common() not to normalize
 		 * it again. This would be a major problem, since converted_path
 		 * now points to a symlink, and we want to report the symlink's name,
 		 * not the file that it points to.
 		 */
-		if (cfs_open_common(converted_path, O_CREAT, FALSE) == -1) {
+		if (_cfs_open_common(converted_path, O_CREAT, FALSE) == -1) {
 			return -1;
 		}
 	}
@@ -2495,7 +2043,7 @@ symlinkat(const char *oldpath, int newdirfd, const char *newpath)
 {
 	FETCH_REAL_FN(int, real_symlinkat, "symlinkat");
 
-	cfs_debug(1, "symlinkat(\"%s\", %d, \"%s\")", oldpath, newdirfd, newpath);
+	_cfs_debug(1, "symlinkat(\"%s\", %d, \"%s\")", oldpath, newdirfd, newpath);
 
 	/*
 	 * Compute the normalized name for the target file. We need to do
@@ -2507,12 +2055,10 @@ symlinkat(const char *oldpath, int newdirfd, const char *newpath)
 	char converted_path1[PATH_MAX];
 	char converted_path2[PATH_MAX];
 
-	if (cfs_convert_pathat_to_path(newdirfd, newpath, converted_path1) == -1) {
+	if (_cfs_convert_pathat_to_path(newdirfd, newpath, converted_path1) == -1) {
 		return -1;
 	}
-	int status = _cfs_combine_paths(cfs_get_cwd(TRUE), converted_path1, converted_path2);
-	if (status != 0) {
-		errno = status;
+	if (_cfs_combine_paths(_cfs_get_cwd(TRUE), converted_path1, converted_path2) == -1) {
 		return -1;
 	}
 
@@ -2520,18 +2066,18 @@ symlinkat(const char *oldpath, int newdirfd, const char *newpath)
 	if (rc != -1) {
 	
 		/* mark the old file as being read */
-		if (cfs_open_common(oldpath, O_RDONLY, TRUE) == -1) {
+		if (_cfs_open_common(oldpath, O_RDONLY, TRUE) == -1) {
 			return -1;
 		}
 
 		/*
 		 * Mark the symlink file as having being "created". We are using
-		 * a pre-normalized path, so ask cfs_open_common() not to normalize
+		 * a pre-normalized path, so ask _cfs_open_common() not to normalize
 		 * it again. This would be a major problem, since converted_path
 		 * now points to a symlink, and we want to report the symlink's name,
 		 * not the file that it points to.
 		 */
-		if (cfs_open_common(converted_path2, O_CREAT, FALSE) == -1) {
+		if (_cfs_open_common(converted_path2, O_CREAT, FALSE) == -1) {
 			return -1;
 		}
 	}
@@ -2550,10 +2096,10 @@ system(const char *command)
 
 	FETCH_REAL_FN(int, real_system, "system");
 
-	cfs_debug(1, "system(\"%s\")", command);
+	_cfs_debug(1, "system(\"%s\")", command);
 
 	/* make sure that CFS_ID, LD_PRELOAD and CFS_PARENT_ID are correct */
-	environ = (char **)cfs_modify_envp(environ);
+	environ = (char **)_cfs_modify_envp(environ);
 
 	/* now invoke the original system() call */
 	int result = real_system(command);
@@ -2561,7 +2107,7 @@ system(const char *command)
 	/* restore our original environment */
 	char **tmp_environ = environ;
 	environ = old_environ;
-	cfs_cleanup_envp(tmp_environ);
+	_cfs_cleanup_envp(tmp_environ);
 
 	return result;
 }
@@ -2594,7 +2140,7 @@ truncate(const char *filename, off_t length)
 {
 	FETCH_REAL_FN(int, real_truncate, "truncate");
 
-	cfs_debug(1, "truncate(\"%s\", %d)", filename, length);
+	_cfs_debug(1, "truncate(\"%s\", %d)", filename, length);
 
 	/*
 	 * Call the real truncate function, and if it succeeds,
@@ -2602,7 +2148,7 @@ truncate(const char *filename, off_t length)
 	 */
 	int status = real_truncate(filename, length);
 	if (status != -1) {
-		if (cfs_open_common(filename, O_RDWR, TRUE) != 0){
+		if (_cfs_open_common(filename, O_RDWR, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -2625,7 +2171,7 @@ truncate64(const char *filename, off64_t length)
 		real_truncate64 = dlsym(RTLD_NEXT, ("truncate64"));
 	}
 
-	cfs_debug(1, "truncate64(\"%s\", %lld)", filename, length);
+	_cfs_debug(1, "truncate64(\"%s\", %lld)", filename, length);
 
 	/*
 	 * Call the real truncate64 function, and if it succeeds,
@@ -2633,7 +2179,7 @@ truncate64(const char *filename, off64_t length)
 	 */
 	int status = real_truncate64(filename, (off_t)length);
 	if (status != -1) {
-		if (cfs_open_common(filename, O_RDWR, TRUE) != 0){
+		if (_cfs_open_common(filename, O_RDWR, TRUE) != 0){
 			return -1;
 		}
 	}
@@ -2649,12 +2195,12 @@ unlink(const char *filename)
 {
 	FETCH_REAL_FN(int, real_unlink, "unlink");
 
-	cfs_debug(1, "unlink(\"%s\")", filename);
+	_cfs_debug(1, "unlink(\"%s\")", filename);
 
 	/* perform the real "unlink" operation */
 	int rc = real_unlink(filename);
 	if (rc != -1) {
-		if (cfs_delete_common(filename, FALSE) == -1) {
+		if (_cfs_delete_common(filename, FALSE) == -1) {
 			return -1;
 		}
 	}
@@ -2670,15 +2216,15 @@ unlinkat(int dirfd, const char *pathname, int flags)
 {
 	FETCH_REAL_FN(int, real_unlinkat, "unlinkat");
 
-	cfs_debug(1, "unlinkat(%d, \"%s\", 0x%x)", dirfd, pathname, flags);
+	_cfs_debug(1, "unlinkat(%d, \"%s\", 0x%x)", dirfd, pathname, flags);
 
 	int rc = real_unlinkat(dirfd, pathname, flags);
 	if (rc != -1) {
 		char converted_path[PATH_MAX];
-		if (cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+		if (_cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
 			return -1;
 		}
-		if (cfs_delete_common(converted_path, flags & AT_REMOVEDIR) == -1) {
+		if (_cfs_delete_common(converted_path, flags & AT_REMOVEDIR) == -1) {
 			return -1;
 		}
 	}
@@ -2752,7 +2298,7 @@ vfork(void)
 {
 	FETCH_REAL_FN(pid_t, real_fork, "fork");
 
-	cfs_debug(1, "vfork()");
+	_cfs_debug(1, "vfork()");
 
 	/* call fork, which isn't interposed */
 	return real_fork();

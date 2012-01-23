@@ -38,7 +38,8 @@
  *     we'll write the combined path.
  *
  * - returns:
- *     0 on success
+ *     0 on success, or -1 on failure and set errno to one of:
+ *
  *     EACCES Read or search permission was denied for a component of the path prefix.
  *     EIO    An I/O error occurred while reading from the file system.
  *     ELOOP  Too many symbolic links were encountered in normalizing the pathname.
@@ -64,7 +65,8 @@ int _cfs_combine_paths(
 	if ((parent_path == NULL) ||
 			(extra_path == NULL) ||
 			(combined_path == NULL)){
-		return EINVAL;
+		errno = EINVAL;
+		return -1;
 	}
 
 	/*
@@ -86,7 +88,8 @@ int _cfs_combine_paths(
 	while (*src_ptr != '\0'){
 		*out_ptr++ = *src_ptr++;
 		if (out_ptr == end_ptr){
-			return ENAMETOOLONG;
+			errno = ENAMETOOLONG;
+			return -1;
 		}
 	}
 
@@ -95,7 +98,8 @@ int _cfs_combine_paths(
 		*out_ptr++ = '/';
 	}
 	if (out_ptr == end_ptr){
-		return ENAMETOOLONG;
+		errno = ENAMETOOLONG;
+		return -1;
 	}
 
 	/* copy extra_path, taking care not to overrun the buffer */
@@ -103,7 +107,8 @@ int _cfs_combine_paths(
 	while (*src_ptr != '\0'){
 		*out_ptr++ = *src_ptr++;
 		if (out_ptr == end_ptr){
-			return ENAMETOOLONG;
+			errno = ENAMETOOLONG;
+			return -1;
 		}
 	}
 
@@ -150,13 +155,13 @@ int _cfs_combine_paths(
 			*out_ptr = '\0';
 			if (realpath(temp_buffer, combined_path) == NULL){
 				/* no, still invalid */
-				return errno;
+				return -1;
 			}
 			*out_ptr = '/';
 			strcat(combined_path, out_ptr);
 			return 0;
 		}
-		return errno;
+		return -1;
 	}
 }
 

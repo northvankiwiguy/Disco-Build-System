@@ -105,33 +105,43 @@ static void test_simple_paths(void)
 static void test_bad_args(void)
 {
 	/* test for NULL input pointers */
-	CU_ASSERT_EQUAL(EINVAL,_cfs_combine_paths(NULL, "bin/sed", output_buffer));
-	CU_ASSERT_EQUAL(EINVAL,_cfs_combine_paths("usr", NULL, output_buffer));
-	CU_ASSERT_EQUAL(EINVAL,_cfs_combine_paths("usr", "bin/sed", NULL));
+	CU_ASSERT_EQUAL(-1,_cfs_combine_paths(NULL, "bin/sed", output_buffer));
+	CU_ASSERT_EQUAL(errno, EINVAL);
+	CU_ASSERT_EQUAL(-1,_cfs_combine_paths("usr", NULL, output_buffer));
+	CU_ASSERT_EQUAL(errno, EINVAL);
+	CU_ASSERT_EQUAL(-1,_cfs_combine_paths("usr", "bin/sed", NULL));
+	CU_ASSERT_EQUAL(errno, EINVAL);
 
 	/* test with parent/extra paths that would cause the buffer to overflow */
 	fill_string(input_buffer1, PATH_MAX-10);
 	fill_string(input_buffer2, 20);
-	CU_ASSERT_EQUAL(ENAMETOOLONG,
+	CU_ASSERT_EQUAL(-1,
 			_cfs_combine_paths(input_buffer1, input_buffer2, output_buffer));
+	CU_ASSERT_EQUAL(errno, ENAMETOOLONG);
 
 	fill_string(input_buffer1, 100);
 	fill_string(input_buffer2, PATH_MAX - 50);
-	CU_ASSERT_EQUAL(ENAMETOOLONG,
+	CU_ASSERT_EQUAL(-1,
 			_cfs_combine_paths(input_buffer1, input_buffer2, output_buffer));
+	CU_ASSERT_EQUAL(errno, ENAMETOOLONG);
 
 	fill_string(input_buffer1, PATH_MAX / 2);
 	fill_string(input_buffer2, PATH_MAX / 2);
-	CU_ASSERT_EQUAL(ENAMETOOLONG,
+	CU_ASSERT_EQUAL(-1,
 			_cfs_combine_paths(input_buffer1, input_buffer2, output_buffer));
+	CU_ASSERT_EQUAL(errno, ENAMETOOLONG);
 
 	/* test with a parent path that doesn't exist - ENOENT */
-	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/sillyusr", "bin/sed", output_buffer));
-	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/sillyusr", "..", output_buffer));
-	CU_ASSERT_EQUAL(ENOENT, _cfs_combine_paths("/usr/bin", "missing/dir", output_buffer));
+	CU_ASSERT_EQUAL(-1, _cfs_combine_paths("/sillyusr", "bin/sed", output_buffer));
+	CU_ASSERT_EQUAL(errno, ENOENT);
+	CU_ASSERT_EQUAL(-1, _cfs_combine_paths("/sillyusr", "..", output_buffer));
+	CU_ASSERT_EQUAL(errno, ENOENT);
+	CU_ASSERT_EQUAL(-1, _cfs_combine_paths("/usr/bin", "missing/dir", output_buffer));
+	CU_ASSERT_EQUAL(errno, ENOENT);
 
 	/* test with a directory name that's actually a file name - ENOTDIR */
-	CU_ASSERT_EQUAL(ENOTDIR, _cfs_combine_paths("/etc/passwd", "bin/sed", output_buffer));
+	CU_ASSERT_EQUAL(-1, _cfs_combine_paths("/etc/passwd", "bin/sed", output_buffer));
+	CU_ASSERT_EQUAL(errno, ENOTDIR);
 }
 
 /*======================================================================
