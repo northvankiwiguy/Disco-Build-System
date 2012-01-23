@@ -11,12 +11,22 @@ The show-files-used-by command has further options for controlling the output:
 -r | --read
 
   Only show files that the specified tasks read from. By default, all files
-  that are accessed (read or written) will be shown.
+  that are accessed (read, written, modified, or deleted) will be shown.
 
 -w | --write
 
   Only show files that the specified tasks write to. By default, all files
-  that are accessed (read or written) will be shown. 
+  that are accessed (read, written, modified, or deleted) will be shown. 
+  
+-m | --modify
+
+  Only show files that are modified by the specified tasks. By default, all
+  files that are accessed (read, written, modified, or deleted) will be shown.
+
+-d | --delete
+
+  Only show files that are deleted by the specified tasks. By default, all 
+  files that are accessed (read, written, modified, or deleted) will be shown.
   
 #include options/file-show-comps.txt
 

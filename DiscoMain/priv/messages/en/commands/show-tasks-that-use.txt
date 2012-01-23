@@ -32,12 +32,22 @@ Command-specific options are:
 -r | --read
 
   Only show tasks that read from any of the specified files. By default, a
-  task is reported if it either reads or writes the file.
+  task is reported if it either reads, writes, modifies or deletes the file.
   
 -w | --write
 
   Only show tasks that write to any of the specified files. By default, a
-  task is reported if it either reads or writes the file.
+  task is reported if it either reads, writes, modifies or deletes the file.
+
+-m | --modify
+
+  Only show tasks that modify any of the specified files. By default, a
+  task is reported if it either reads, writes, modifies or deletes the file.
+
+-d | --delete
+
+  Only show tasks that delete any of the specified files. By default, a
+  task is reported if it either reads, writes, modifies or deletes the file.
   
 #include options/task-short.txt
 

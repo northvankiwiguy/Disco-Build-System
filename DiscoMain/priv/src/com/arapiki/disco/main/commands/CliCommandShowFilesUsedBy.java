@@ -42,6 +42,13 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	
 	/** Set if we should only show files that are "written" - set by the --write option. */
 	protected static boolean optionWrite = false;
+	
+	/** Set if we should only show files that are "modified" - set by the --modify option. */
+	protected static boolean optionModify = false;
+	
+	/** Set if we should only show files that are "deleted" - set by the --delete option. */
+	protected static boolean optionDelete = false;
+	
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -82,6 +89,13 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		Option writeOpt = new Option("w", "write", false, "Only show files that are written by these tasks.");
 		opts.addOption(writeOpt);	
 		
+		/* add the --modify option */
+		Option modifyOpt = new Option("m", "modify", false, "Only show files that are modified by these tasks.");
+		opts.addOption(modifyOpt);
+		
+		/* add the --delete option */
+		Option deleteOpt = new Option("d", "delete", false, "Only show files that are deleted by these tasks.");
+		opts.addOption(deleteOpt);
 		return opts;
 	}
 
@@ -119,6 +133,8 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		/* now the specific options for show-files-used-by */
 		optionRead = cmdLine.hasOption("read");
 		optionWrite = cmdLine.hasOption("write");
+		optionModify = cmdLine.hasOption("modify");
+		optionDelete = cmdLine.hasOption("delete");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -132,7 +148,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of task-specs must be provided.");
 
 		/* are we searching for reads, writes, or both? */
-		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite);
+		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);
 
 		BuildTasks bts = buildStore.getBuildTasks();
 		Reports reports = buildStore.getReports();

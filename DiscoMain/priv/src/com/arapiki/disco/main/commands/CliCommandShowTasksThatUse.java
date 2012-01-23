@@ -43,6 +43,12 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	/** Set if we should only show files that are "written" - set by the --write option. */
 	protected static boolean optionWrite = false;
 
+	/** Set if we should only show files that are "modified" - set by the --modify option. */
+	protected static boolean optionModify = false;
+	
+	/** Set if we should only show files that are "deleted" - set by the --delete option. */
+	protected static boolean optionDelete = false;
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -84,6 +90,14 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		Option writeOpt = new Option("w", "write", false, "Only show tasks that write the specified files.");
 		opts.addOption(writeOpt);	
 		
+		/* add the --modify option */
+		Option modifyOpt = new Option("m", "modify", false, "Only show tasks that modify the specified files.");
+		opts.addOption(modifyOpt);
+		
+		/* add the --delete option */
+		Option deleteOpt = new Option("d", "delete", false, "Only show tasks that delete the specified files.");
+		opts.addOption(deleteOpt);
+		
 		return opts;
 	}
 
@@ -104,7 +118,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List all tasks that access (read and/or write) the specified files.";
+		return "List all tasks that access (read, write, modify or delete) the specified files.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -121,6 +135,8 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		/* now the specific options for show-files-used-by */
 		optionRead = cmdLine.hasOption("read");
 		optionWrite = cmdLine.hasOption("write");
+		optionModify = cmdLine.hasOption("modify");
+		optionDelete = cmdLine.hasOption("delete");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -139,7 +155,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		Components cmpts = buildStore.getComponents();
 
 		/* are we searching for reads, writes, or both? */
-		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite);		
+		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);		
 
 		/* fetch the FileSet of paths from the user's command line */
 		String fileSpecs = args[0];

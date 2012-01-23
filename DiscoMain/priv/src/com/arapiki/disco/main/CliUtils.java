@@ -383,23 +383,38 @@ public class CliUtils {
 	 * 
 	 * @param optionRead Set if the user provided the --read flag.
 	 * @param optionWrite Set if the user provided the --write flag.
+	 * @param optionModify Set if the user provided the --modify flag.
+	 * @param optionDelete Set if the user provided the --delete flag.
 	 * @return Either OP_UNSPECIFIED (search for either), OP_READ, or OP_WRITE
 	 */
 	public static OperationType getOperationType(boolean optionRead,
-			boolean optionWrite) {
+			boolean optionWrite, boolean optionModify, boolean optionDelete) {
 		
-		/* can't have both --read and --write at the same time */
-		if (optionRead && optionWrite) {
-			System.err.println("Error: can't specify both --read and --write in the same command.");
+		OperationType opType = OperationType.OP_UNSPECIFIED;
+		int optionsProvided = 0;
+		if (optionRead) {
+			opType = OperationType.OP_READ;
+			optionsProvided++;
+		}
+		if (optionWrite) {
+			opType = OperationType.OP_WRITE;
+			optionsProvided++;
+		}
+		if (optionModify) {
+			opType = OperationType.OP_MODIFIED;
+			optionsProvided++;
+		}
+		if (optionDelete) {
+			opType = OperationType.OP_DELETE;
+			optionsProvided++;
+		}
+		
+		/* can't have more than one option provided at one time. */
+		if (optionsProvided > 1) {
+			System.err.println("Error: can't specify more than one of --read, --write, --modify or --delete.");
 			System.exit(-1);
 		}
 		
-		OperationType opType = OperationType.OP_UNSPECIFIED;
-		if (optionRead) {
-			opType = OperationType.OP_READ;
-		} else if (optionWrite) {
-			opType = OperationType.OP_WRITE;			
-		}
 		return opType;
 	}
 	
