@@ -94,7 +94,7 @@ int _cfs_combine_paths(
 	}
 
 	/* insert a '/' separator (if needed) */
-	if (out_ptr[-1] != '/') {
+	if ((out_ptr == temp_buffer) || (out_ptr[-1] != '/')) {
 		*out_ptr++ = '/';
 	}
 	if (out_ptr == end_ptr){
