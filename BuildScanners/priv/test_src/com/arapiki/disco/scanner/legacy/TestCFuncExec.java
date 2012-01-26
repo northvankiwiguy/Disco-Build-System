@@ -617,7 +617,7 @@ public class TestCFuncExec {
 	public void testSystemWithPipe() throws Exception {
 		
 		/* The command to be tested... */
-		traceSystemProgram("cat /etc/passwd | wc -l");
+		traceSystemProgram("cat /etc/passwd | wc -l > /dev/null");
 
 		/* the shell task has two children (cat and wc). */
 		Integer tasks[] = bts.getChildren(shellTaskId);
