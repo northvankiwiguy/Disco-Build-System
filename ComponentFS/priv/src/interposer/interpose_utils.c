@@ -539,7 +539,7 @@ _cfs_modify_envp(char *const * envp)
 	new_envp[pos_cfs_parent_id] = new_str;
 
 	char *cfs_log_file = _cfs_get_log_file();
-	new_str = (char *)_cfs_malloc(strlen("CFS_LOG_FILE=\0") + strlen(cfs_log_file));
+	new_str = (char *)_cfs_malloc(strlen("CFS_LOG_FILE=") + strlen(cfs_log_file) + 1);
 	sprintf(new_str, "CFS_LOG_FILE=%s", cfs_log_file);
 	new_envp[pos_cfs_log_file] = new_str;
 
