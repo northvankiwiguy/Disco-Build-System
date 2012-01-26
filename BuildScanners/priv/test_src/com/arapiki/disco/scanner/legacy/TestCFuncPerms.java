@@ -12,11 +12,19 @@
 
 package com.arapiki.disco.scanner.legacy;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
+import java.io.File;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-
+import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.BuildTasks;
+import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.utils.os.SystemUtils;
 
 /**
  * Basic testing that the LegacyBuildScanner can produce a valid
@@ -28,6 +36,74 @@ import org.junit.Test;
  */
 public class TestCFuncPerms {
 	
+	/* variables used in many test cases */
+	private BuildStore bs = null;
+	private BuildTasks bts = null;
+	private FileNameSpaces fns = null;
+	private int rootTask;
+	private int task;
+	private Integer fileModifies[];
+	
+	/** temporary directory into which test cases can store files */
+	private File tmpDir;
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called before each test case starts. Creates a temporary directory in which the
+	 * test case can store temporary files.
+	 * @throws Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		tmpDir = SystemUtils.createTempDir();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called after each test case ends. Removes the temporary directory and its content.
+	 * @throws Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+		SystemUtils.deleteDirectory(tmpDir);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given the source code of a small C program, compile the program and scan it into a 
+	 * BuildStore. We then retrieve the one (and only) task that was registered in the 
+	 * BuildStore, along with the lists of files that were accessed (accessed, read, written,
+	 * and deleted).
+	 * @param programCode The body of the small C program to be compiled.
+	 * @param args The command line arguments to pass to the small C program.
+	 * @throws Exception Something went wrong when compiling/running the program.
+	 */
+	private void traceOneProgram(String programCode, String args[]) throws Exception {
+		
+		/* compile, run, and trace the program */
+		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, programCode, args);
+		
+		/* fetch references to sub objects */
+		bts = bs.getBuildTasks();
+		fns = bs.getFileNameSpaces();
+		
+		/* find the root task */
+		rootTask = bts.getRootTask("root");
+		
+		/* there should only be one child task */
+		Integer childTasks[] = bts.getChildren(rootTask);
+		assertEquals(1, childTasks.length);
+		
+		/* this is the task ID of the one task */
+		task = childTasks[0];
+
+		/* fetch the file access arrays */
+		fileModifies = bts.getFilesAccessed(task, OperationType.OP_MODIFIED);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
@@ -36,8 +112,10 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testAccess() throws Exception {
-		//int access(const char *pathname, int mode)
-		//fail("Not implemented.");
+		/* 
+		 * Nothing to test, for now. This can be implemented when the access() function
+		 * is modified to support component-boundary checking.
+		 */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -48,8 +126,28 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testChmod() throws Exception {
-		//int chmod(const char *path, mode_t mode)
-		//fail("Not implemented.");
+		
+		/*
+		 * chmod() a file that exists.
+		 */
+		assertTrue(new File(tmpDir, "chmod-file").createNewFile());
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"int main() {" +
+				"  chmod(\"" + tmpDir + "/chmod-file\", 0644);" +
+				"}", null);
+		assertEquals(1, fileModifies.length);
+		assertEquals(fns.getPath(tmpDir + "/chmod-file"), fileModifies[0].intValue());
+		
+		/*
+		 * chmod() a file that doesn't exist - nothing should be logged.
+		 */
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"int main() {" +
+				"  chmod(\"" + tmpDir + "/no-file\", 0644);" +
+				"}", null);
+		assertEquals(0, fileModifies.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -60,8 +158,30 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testChown() throws Exception {
-		//int chown(const char *path, uid_t owner, gid_t group)
-		//fail("Not implemented.");
+		
+		/*
+		 * chmod() a file that exists (note that it's legal to change a file's
+		 * uid and gid to getuid() and getgid() respectively. This doesn't
+		 * require root elevation, so we can do it in a unit test.
+		 */
+		assertTrue(new File(tmpDir, "chown-file").createNewFile());
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"int main() {" +
+				"  chown(\"" + tmpDir + "/chown-file\", getuid(), getgid());" +
+				"}", null);
+		assertEquals(1, fileModifies.length);
+		assertEquals(fns.getPath(tmpDir + "/chown-file"), fileModifies[0].intValue());
+		
+		/*
+		 * chmod() a file that doesn't exist - nothing should be logged.
+		 */
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"int main() {" +
+				"  chown(\"" + tmpDir + "/no-file\", getuid(), getgid());" +
+				"}", null);
+		assertEquals(0, fileModifies.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -72,8 +192,10 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testEaccess() throws Exception {
-		//int eaccess(const char *pathname, int mode)
-		//fail("Not implemented.");
+		/* 
+		 * Nothing to test, for now. This can be implemented when the eaccess() function
+		 * is modified to support component-boundary checking.
+		 */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -84,8 +206,10 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testEuidaccess() throws Exception {
-		//int euidaccess(const char *pathname, int mode)
-		//fail("Not implemented.");
+		/* 
+		 * Nothing to test, for now. This can be implemented when the euidaccess() function
+		 * is modified to support component-boundary checking.
+		 */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -96,8 +220,10 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testFaccessat() throws Exception {
-		//int faccessat(int dirfd, const char *pathname, int mode, int flags)
-		//fail("Not implemented.");
+		/* 
+		 * Nothing to test, for now. This can be implemented when the faccessat() function
+		 * is modified to support component-boundary checking.
+		 */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -108,8 +234,31 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testFchmod() throws Exception {
-		//int fchmod(int fd, mode_t mode)
-		//fail("Not implemented.");
+		
+		/*
+		 * fchmod() a file that exists.
+		 */
+		assertTrue(new File(tmpDir, "fchmod-file").createNewFile());
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  chdir(\"" + tmpDir + "\");" +
+				"  int fd = open(\"fchmod-file\", O_RDONLY);" +
+				"  fchmod(fd, 0644);" +
+				"}", null);
+		assertEquals(1, fileModifies.length);
+		assertEquals(fns.getPath(tmpDir + "/fchmod-file"), fileModifies[0].intValue());
+		
+		/*
+		 * fchmod() with an invalid file descriptor.
+		 */
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"int main() {" +
+				"  fchmod(-1, 0644);" +
+				"}", null);
+		assertEquals(0, fileModifies.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -120,8 +269,32 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testFchmodat() throws Exception {
-		//int fchmodat(int dirfd, const char *pathname, mode_t mode, int flags)
-		//fail("Not implemented.");
+		
+		/*
+		 * fchmodat() a file that exists.
+		 */
+		assertTrue(new File(tmpDir, "fchmodat-file").createNewFile());
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  int fd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  fchmodat(fd, \"fchmodat-file\", 0644, 0);" +
+				"}", null);
+		assertEquals(1, fileModifies.length);
+		assertEquals(fns.getPath(tmpDir + "/fchmodat-file"), fileModifies[0].intValue());
+		
+		/*
+		 * fchmodat() with an invalid file.
+		 */
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  int fd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  fchmodat(fd, \"bad-file\", 0644, 0);" +
+				"}", null);
+		assertEquals(0, fileModifies.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -132,8 +305,32 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testFchown() throws Exception {
-		//int fchown(int fd, uid_t owner, gid_t group)
-		//fail("Not implemented.");
+		
+		/*
+		 * fchown() a file that exists (note that it's legal to change a file's
+		 * uid and gid to getuid() and getgid() respectively. This doesn't
+		 * require root elevation, so we can do it in a unit test.
+		 */
+		assertTrue(new File(tmpDir, "fchown-file").createNewFile());
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  int fd = open(\"" + tmpDir + "/fchown-file\", O_RDONLY);" +
+				"  fchown(fd, getuid(), getgid());" +
+				"}", null);
+		assertEquals(1, fileModifies.length);
+		assertEquals(fns.getPath(tmpDir + "/fchown-file"), fileModifies[0].intValue());
+		
+		/*
+		 * chmod() a file that doesn't exist - nothing should be logged.
+		 */
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"int main() {" +
+				"  fchown(-1, getuid(), getgid());" +
+				"}", null);
+		assertEquals(0, fileModifies.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -144,8 +341,32 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testFchownat() throws Exception {
-		//int fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags)
-		//fail("Not implemented.");
+		
+		/*
+		 * fchownat() a file that exists.
+		 */
+		assertTrue(new File(tmpDir, "fchownat-file").createNewFile());
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  fchownat(dirfd, \"fchownat-file\", getuid(), getgid(), 0);" +
+				"}", null);
+		assertEquals(1, fileModifies.length);
+		assertEquals(fns.getPath(tmpDir + "/fchownat-file"), fileModifies[0].intValue());
+		
+		/*
+		 * fchownat() with an invalid file.
+		 */
+		traceOneProgram(
+				"#include <sys/stat.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  fchownat(dirfd, \"bad-file\", getuid(), getgid(), 0);" +
+				"}", null);
+		assertEquals(0, fileModifies.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -156,8 +377,9 @@ public class TestCFuncPerms {
 	 */
 	@Test
 	public void testLchown() throws Exception {
-		//int lchown(const char *path, uid_t owner, gid_t group)
-		//fail("Not implemented.");
+		/*
+		 * Not implemented for now, since symlinks aren't handled very well in Disco.
+		 */
 	}
 
 	/*-------------------------------------------------------------------------------------*/

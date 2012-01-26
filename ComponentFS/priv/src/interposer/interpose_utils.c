@@ -760,4 +760,52 @@ _cfs_convert_pathat_to_path(int dirfd, const char *pathname, char *combined_path
 	return 0;
 }
 
+
+/*======================================================================
+ * Helper: _cfs_get_path_of_fd
+ *
+ * Return the file system path associated with the specific file
+ * descriptor. If the path that was used to open the fd is known, that
+ * path will be return via the "path" array, and 0 is returned. On
+ * failure to get the path, -1 is return.
+ *
+ * Note that not all OS's will support this feature, so a return code
+ * of -1 might just mean that the information wasn't available.
+ *
+ * - fd - the open file descriptor we're querying.
+ * - path - a buffer into which we'll write the fd's associate path.
+ *          Must be PATH_MAX bytes long.
+ *
+ * Returns 0 on success, or -1 on error. Note that the returned path
+ * may either be absolute or relative to the CWD.
+ *======================================================================*/
+
+
+int
+_cfs_get_path_of_fd(int fd, char *path)
+{
+	int tmp_errno = errno;
+	char procName[strlen("/proc/self/fd/NNNNNNN\0")];
+
+	sprintf(procName, "/proc/self/fd/%d", fd);
+	int len = readlink(procName, path, PATH_MAX - 1);
+	if (len == -1){
+		/* for some reason, /proc/self/fd/%d is not available */
+		return -1;
+	}
+	path[len] = '\0';
+
+	/*
+	 * Sanity check - that path should start with '/', rather than
+	 * something like "pipe:"
+	 */
+	if (path[0] != '/') {
+		return -1;
+	}
+
+	/* OK, the "path" array should contain the fd's path */
+	errno = tmp_errno;
+	return 0;
+}
+
 /*======================================================================*/

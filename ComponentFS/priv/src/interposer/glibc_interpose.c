@@ -333,10 +333,14 @@ chmod(const char *path, mode_t mode)
 
 	_cfs_debug(1, "chmod(\"%s\", 0%o)", path, mode);
 
-	/*
-	 * TODO: log the fact that the file's attributes have changed.
-	 */
-	return real_chmod(path, mode);
+	int rc = real_chmod(path, mode);
+	if (rc != -1) {
+		/* mark the file as "modified" */
+		if (_cfs_open_common(path, O_RDWR, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -350,12 +354,14 @@ chown(const char *path, uid_t owner, gid_t group)
 
 	_cfs_debug(1, "chown(\"%s\", %d, %d)", path, owner, group);
 
-	/*
-	 * TODO: log the fact that the file's attributes have changed.
-	 * NOTE: if path is a symlink, it'll be dereferenced. See lchown
-	 * for a variant of this command that doesn't dereference.
-	 */
-	return real_chown(path, owner, group);
+	int rc = real_chown(path, owner, group);
+	if (rc != -1) {
+		/* mark the file as "modified" */
+		if (_cfs_open_common(path, O_RDWR, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -717,9 +723,24 @@ fchmod(int fd, mode_t mode)
 
 	_cfs_debug(1, "fchmod(%d, 0%o)", fd, mode);
 
-	// TODO: log the fact that the file has new permission bits.
-	// TODO: how do we find the file name relating to this fd?
-	return real_fchmod(fd, mode);
+	int rc = real_fchmod(fd, mode);
+	if (rc != -1) {
+		/*
+		 * Mark the file as "modified" - start by figuring out the
+		 * path associated with this fd. Note that a failure to
+		 * get this information should result in a failure to log
+		 * the information. The actual fchmod should still succeed.
+		 * (not all OS's may be able to return this information).
+		 */
+		char path[PATH_MAX];
+		if (_cfs_get_path_of_fd(fd, path) == -1) {
+			return rc;
+		}
+		if (_cfs_open_common(path, O_RDWR, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -733,10 +754,21 @@ fchmodat(int dirfd, const char *pathname, mode_t mode, int flags)
 
 	_cfs_debug(1, "fchmodat(%d, \"%s\", 0%o, %d)", dirfd, pathname, mode, flags);
 
-	// TODO: compute the absolute path of the file (see the man page for special
-	// situations to consider).
-	// TODO: log the fact that the file has new permission bits.
-	return real_fchmodat(dirfd, pathname, mode, flags);
+	int rc = real_fchmodat(dirfd, pathname, mode, flags);
+
+	/* on success, trace the pathname information */
+	if (rc != -1) {
+		char converted_path[PATH_MAX];
+
+		if (_cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+			return -1;
+		}
+		if (_cfs_open_common(converted_path, O_RDWR, TRUE) == -1) {
+			return -1;
+		}
+	}
+
+	return rc;
 }
 
 /*======================================================================
@@ -750,9 +782,24 @@ fchown(int fd, uid_t owner, gid_t group)
 
 	_cfs_debug(1, "fchown(%d, %d, %d)", fd, owner, group);
 
-	// TODO: how do we find the file name relating to this fd?
-	// TODO: log the fact that the file has new attributes set.
-	return real_fchown(fd, owner, group);
+	int rc = real_fchown(fd, owner, group);
+	if (rc != -1) {
+		/*
+		 * Mark the file as "modified" - start by figuring out the
+		 * path associated with this fd. Note that a failure to
+		 * get this information should result in a failure to log
+		 * the information. The actual fchmod should still succeed.
+		 * (not all OS's may be able to return this information).
+		 */
+		char path[PATH_MAX];
+		if (_cfs_get_path_of_fd(fd, path) == -1) {
+			return rc;
+		}
+		if (_cfs_open_common(path, O_RDWR, TRUE) == -1) {
+			return -1;
+		}
+	}
+	return rc;
 }
 
 /*======================================================================
@@ -767,10 +814,21 @@ fchownat(int dirfd, const char *pathname, uid_t owner, gid_t group, int flags)
 	_cfs_debug(1, "fchownat(%d, \"%s\", %d, %d, %d)",
 			dirfd, pathname, owner, group, flags);
 
-	// TODO: compute the absolute path of the file (see the man page for special
-	// situations to consider).
-	// TODO: log the fact that the file has new attributes.
-	return real_fchownat(dirfd, pathname, owner, group, flags);
+	int rc = real_fchownat(dirfd, pathname, owner, group, flags);
+
+	/* on success, trace the pathname information */
+	if (rc != -1) {
+		char converted_path[PATH_MAX];
+
+		if (_cfs_convert_pathat_to_path(dirfd, pathname, converted_path) == -1) {
+			return -1;
+		}
+		if (_cfs_open_common(converted_path, O_RDWR, TRUE) == -1) {
+			return -1;
+		}
+	}
+
+	return rc;
 }
 
 /*======================================================================
@@ -1206,7 +1264,10 @@ lchown(const char *path, uid_t owner, gid_t group)
 
 	_cfs_debug(1, "lchown(\"%s\", %d, %d)", path, owner, group);
 
-	// TODO: log the fact that the file has new attributes set.
+	/*
+	 * TODO: consider how to handle this case, once symlinks are
+	 * properly handled by disco.
+	 */
 	return real_lchown(path, owner, group);
 }
 

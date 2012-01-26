@@ -59,3 +59,4 @@ int _cfs_execve_common(const char *filename, char *const argv[], char *const env
 int _cfs_execvpe_common(const char *file, char *const argv[], char *const envp[]);
 int _cfs_fopen_common(const char *filename, const char *opentype);
 int _cfs_convert_pathat_to_path(int dirfd, const char *pathname, char *combined_path);
+int _cfs_get_path_of_fd(int fd, char *path);
