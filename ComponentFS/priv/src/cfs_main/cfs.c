@@ -66,6 +66,9 @@ int traverse_source = FALSE;
  */
 int debug_level = 0;
 
+/* is cfs executing an interactive shell? */
+int is_interactive_shell = 0;
+
 /*======================================================================
  * parse_args()
  *
@@ -119,12 +122,13 @@ static char **parse_options(int argc, char *argv[])
 	 */
 	if (optind < argc) {
 		/* arguments remain, interpret them as the command to execute and it's arguments */
+		is_interactive_shell = FALSE;
 		return &argv[optind];
 
 	} else {
 		/*
 		 * Form the argv array for the default shell. This is static so we can return
-		 * it to the called.
+		 * it to the caller.
 		 */
 		static char *default_shell[2] = {NULL, NULL};
 
@@ -134,6 +138,8 @@ static char **parse_options(int argc, char *argv[])
 			fprintf(stderr, "Error: cfs unable to start - can't detect your default shell.\n");
 			exit(-1);
 		}
+
+		is_interactive_shell = TRUE;
 		return default_shell;
 	}
 }
@@ -189,8 +195,10 @@ int main(int argc, char *argv[], char *envp[])
 		exit(-1);
 	}
 
-	printf("Starting ComponentFS shell. Writing trace output to %s and debug output to %s.\n",
-			trace_file_name, log_file_name);
+	if (is_interactive_shell) {
+		printf("Starting ComponentFS shell. Writing trace output to %s and debug output to %s.\n",
+				trace_file_name, log_file_name);
+	}
 
 	/*
 	 * Create an empty log file, which has the effect of ensuring that we can write to it.
@@ -328,7 +336,9 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 	/* we're done - the child has terminated, and the resources should be deallocated. */
-	printf("ComponentFS terminated\n");
+	if (is_interactive_shell) {
+		printf("ComponentFS terminated\n");
+	}
 	gzclose(trace_file_h);
 
 	if (trace_buffer_delete() != 0){
