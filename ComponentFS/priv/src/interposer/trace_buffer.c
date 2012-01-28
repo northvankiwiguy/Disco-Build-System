@@ -233,7 +233,7 @@ int trace_buffer_delete(void)
 	 * them in the first place
 	 */
 	if (trace_buffer->tb_creator_pid == getpid()){
-		if (semctl(trace_buffer->tb_sem_id, 0, IPC_RMID) == -1){
+		if (semctl(trace_buffer->tb_sem_id, 0, IPC_RMID, 0) == -1){
 			return -1;
 		}
 	}
