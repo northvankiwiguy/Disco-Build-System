@@ -414,6 +414,26 @@ public class TestCFuncLink {
 		assertEquals(1, fileWrites.length);
 		assertEquals(tmpDir + "/badFile", fns.getPathName(fileReads[0]));
 		assertEquals(tmpDir + "/linkFile1a", fns.getPathName(fileWrites[0]));
+		
+		/*
+		 * create a symbolic link to a valid file, using a relative path. Make
+		 * sure that the absolute path of the target file is relative to the
+		 * source file's directory, not to the current directory.
+		 */
+		assertTrue(new File(tmpDir, "subdir1/subdir2").mkdirs());
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"int main() {" +
+				"  chdir(\"" + tmpDir + "\");" +
+				"  symlink(\"../../oldFile1\", \"subdir1/subdir2/linkFile1\");" +
+				"}", null);
+		assertEquals(2, fileAccesses.length);
+		assertEquals(1, fileReads.length);
+		assertEquals(1, fileWrites.length);
+		assertEquals(tmpDir + "/oldFile1", fns.getPathName(fileReads[0]));
+		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileReads[0]));
+		assertEquals(tmpDir + "/subdir1/subdir2/linkFile1", fns.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -479,6 +499,28 @@ public class TestCFuncLink {
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
 				new Integer[] { fns.getPath(tmpDir + "/badFile2"),
 								fns.getPath(tmpDir.toString()) }));
+		
+		/*
+		 * create a symbolic link to a valid file where the target file is
+		 * relative to the source file's directory, rather than the current
+		 * directory.
+		 */
+		assertTrue(new File(tmpDir, "subdir1/subdir2").mkdirs());
+		traceOneProgram(
+				"#include <unistd.h>\n" +
+				"#include <fcntl.h>\n" +
+				"int main() {" +
+				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
+				"  symlinkat(\"../../oldFile2\", dirfd, \"subdir1/subdir2/linkFile2\");" +
+				"}", null);
+		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
+		assertEquals(1, fileWrites.length);
+		assertEquals(tmpDir + "/subdir1/subdir2/linkFile2", fns.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
+				new Integer[] { fns.getPath(tmpDir + "/oldFile2"),
+								fns.getPath(tmpDir.toString()) }));
+
 	}
 
 	/*-------------------------------------------------------------------------------------*/

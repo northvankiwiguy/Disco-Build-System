@@ -15,5 +15,6 @@
 #define FILE_NAME_UTILS_H_
 
 extern int _cfs_combine_paths(char const *parent_path, char const *extra_path, char *combined_path);
+extern void _cfs_basename(const char *orig_path, char *base_path);
 
 #endif /* FILE_NAME_UTILS_H_ */

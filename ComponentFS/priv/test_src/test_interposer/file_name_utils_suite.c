@@ -157,6 +157,31 @@ static void test_symlinks(void)
 }
 
 /*======================================================================
+ * test_basename
+ *
+ *======================================================================*/
+
+static void test_basename(void)
+{
+	char result[PATH_MAX];
+
+	_cfs_basename("/a/b/c", result);
+	CU_ASSERT_STRING_EQUAL("/a/b", result);
+	_cfs_basename("/a", result);
+	CU_ASSERT_STRING_EQUAL("/", result);
+	_cfs_basename("/", result);
+	CU_ASSERT_STRING_EQUAL("/", result);
+	_cfs_basename("/apple/banana/carrot/donut", result);
+	CU_ASSERT_STRING_EQUAL("/apple/banana/carrot", result);
+	_cfs_basename("/apple/banana/carrot/donut/", result);
+	CU_ASSERT_STRING_EQUAL("/apple/banana/carrot", result);
+	_cfs_basename("//apple////banana/carrot//donut//", result);
+	CU_ASSERT_STRING_EQUAL("//apple////banana/carrot", result);
+	_cfs_basename("///", result);
+	CU_ASSERT_STRING_EQUAL("/", result);
+}
+
+/*======================================================================
  * init_regress_glibc_suite - main entry point for initializing this test suite
  *======================================================================*/
 
@@ -169,6 +194,7 @@ int init_file_name_utils_suite()
 	ADD_TEST_CASE(test_bad_args, "bad_args()");
 	ADD_TEST_CASE(test_simple_paths, "simple_paths()");
 	ADD_TEST_CASE(test_symlinks, "symlinks()");
+	ADD_TEST_CASE(test_basename, "_cfs_basename()")
 
 	return 0;
 }

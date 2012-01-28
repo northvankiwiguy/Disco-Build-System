@@ -16,6 +16,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 /*
  * This file contains functions for normalizing file names, as well as filtering
  * out files that we don't care to monitor.
@@ -162,6 +169,79 @@ int _cfs_combine_paths(
 			return 0;
 		}
 		return -1;
+	}
+}
+
+/*======================================================================
+ *
+ * _cfs_basename
+ *
+ * A thread-safe implementation of the basename() function that stores
+ * output in a user-allocated buffer (as opposed to returning static
+ * storage, making it non-threadsafe).
+ *
+ * - orig_path - the path for which we're computing the basename.
+ * - base_path - the buffer into which the basename is stored (must be
+ *               at least as many bytes as orig_path).
+ *
+ *======================================================================*/
+
+void _cfs_basename(const char *orig_path, char *base_path)
+{
+	const char *src_ptr = orig_path;
+	char *dest_ptr = base_path;
+	char *possible_last_slash = NULL;
+	char *definite_last_slash = base_path;
+	char ch;
+	int last_was_slash = FALSE;
+
+	/*
+	 * Traverse the orig_path (as we copy it), taking note of the last
+	 * '/' character we see that potentially marks the end of the basename
+	 * string. We need to handle situations such as multiple '/' in a row,
+	 * as well as trailing '/' on the end of a path.
+	 */
+	while ((ch = *src_ptr++) != '\0') {
+
+		if (ch == '/') {
+			/*
+			 * Assuming the previous char wasn't also a /, move our
+			 * last_slash pointer.
+			 */
+			if (!last_was_slash) {
+				possible_last_slash = dest_ptr;
+			}
+			last_was_slash = TRUE;
+
+		} else {
+
+			/*
+			 * we're now looking at a non-slash character, which means that
+			 * our "possible" last slash is now definite. For example, if
+			 * we see "/a/b/c/d" then the '/' after the 'c' has now become
+			 * definite, whereas with "/a/b/c/", the '/' after the 'b' is
+			 * still definite.
+			 */
+			if (last_was_slash) {
+				definite_last_slash = possible_last_slash;
+			}
+
+			/* no, not a /, this is a regular character to be copied */
+			last_was_slash = FALSE;
+		}
+		*dest_ptr++ = ch;
+	}
+
+	/*
+	 * Now back up to the last / and mark it as '\0' to terminate
+	 * the string. However, if the last / was at the first position
+	 * in the path, we must leave it there. That is, basename("/") => "/".
+	 */
+	if (definite_last_slash == base_path) {
+		base_path[0] = '/';
+		base_path[1] = '\0';
+	} else {
+		*definite_last_slash = '\0';
 	}
 }
 

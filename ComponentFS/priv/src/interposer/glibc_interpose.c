@@ -2069,17 +2069,39 @@ symlink(const char *oldname, const char *newname)
 	 * this now (before it's created), otherwise the normalizing function
 	 * will simply refer us back to the file we created a link to.
 	 */
-	char converted_path[PATH_MAX];
-	if (_cfs_combine_paths(_cfs_get_cwd(TRUE), newname, converted_path) == -1) {
+	char abs_newname[PATH_MAX];
+	if (_cfs_combine_paths(_cfs_get_cwd(TRUE), newname, abs_newname) == -1) {
 		return -1;
 	}
 
 	int rc = real_symlink(oldname, newname);
 	if (rc != -1) {
-		/* mark the existing file as having being "read" */
-		if (_cfs_open_common(oldname, O_RDONLY, TRUE) == -1) {
+		/*
+		 * Mark the existing file as having being "read". This requires extra
+		 * work, since a relative path in "oldname" should be computed relative
+		 * to "newname"'s directory, rather than our current working directory.
+		 * Also, it's possible (and legal) that "oldname" doesn't actually
+		 * exist yet.
+		 */
+		char abs_oldname[PATH_MAX];
+		char abs_newname_dir[PATH_MAX];
+
+		/*
+		 * Compute newname's directory, then compute the symlink's target as
+		 * an absolute path.
+		 */
+		_cfs_basename(abs_newname, abs_newname_dir);
+		if (_cfs_combine_paths(abs_newname_dir, oldname, abs_oldname) == -1) {
 			return -1;
 		}
+
+		/*
+		 * ask _cfs_open_common to do the rest, but not to normalize with respect
+		 * to the current directory. Note that it's legal for abs_oldname to not
+		 * exist (yet). It must clearly exist before the symlink is deferenced,
+		 * but until then it's legal for the symlink to point to a non-existent file.
+		 */
+		(void)_cfs_open_common(abs_oldname, O_RDONLY, FALSE);
 
 		/*
 		 * Mark the symlink file as having being "created". We are using
@@ -2088,7 +2110,7 @@ symlink(const char *oldname, const char *newname)
 		 * now points to a symlink, and we want to report the symlink's name,
 		 * not the file that it points to.
 		 */
-		if (_cfs_open_common(converted_path, O_CREAT, FALSE) == -1) {
+		if (_cfs_open_common(abs_newname, O_CREAT, FALSE) == -1) {
 			return -1;
 		}
 	}
@@ -2100,11 +2122,11 @@ symlink(const char *oldname, const char *newname)
  *======================================================================*/
 
 int
-symlinkat(const char *oldpath, int newdirfd, const char *newpath)
+symlinkat(const char *oldname, int newdirfd, const char *newname)
 {
 	FETCH_REAL_FN(int, real_symlinkat, "symlinkat");
 
-	_cfs_debug(1, "symlinkat(\"%s\", %d, \"%s\")", oldpath, newdirfd, newpath);
+	_cfs_debug(1, "symlinkat(\"%s\", %d, \"%s\")", oldname, newdirfd, newname);
 
 	/*
 	 * Compute the normalized name for the target file. We need to do
@@ -2113,23 +2135,45 @@ symlinkat(const char *oldpath, int newdirfd, const char *newpath)
 	 * start by converting the dirfd/path to a real path, then we normalize
 	 * it.
 	 */
-	char converted_path1[PATH_MAX];
-	char converted_path2[PATH_MAX];
+	char abs_newname_tmp[PATH_MAX];
+	char abs_newname[PATH_MAX];
 
-	if (_cfs_convert_pathat_to_path(newdirfd, newpath, converted_path1) == -1) {
+	if (_cfs_convert_pathat_to_path(newdirfd, newname, abs_newname_tmp) == -1) {
 		return -1;
 	}
-	if (_cfs_combine_paths(_cfs_get_cwd(TRUE), converted_path1, converted_path2) == -1) {
+	if (_cfs_combine_paths(_cfs_get_cwd(TRUE), abs_newname_tmp, abs_newname) == -1) {
 		return -1;
 	}
 
-	int rc = real_symlinkat(oldpath, newdirfd, newpath);
+	int rc = real_symlinkat(oldname, newdirfd, newname);
 	if (rc != -1) {
 	
-		/* mark the old file as being read */
-		if (_cfs_open_common(oldpath, O_RDONLY, TRUE) == -1) {
+		/*
+		 * Mark the existing file as having being "read". This requires extra
+		 * work, since a relative path in "oldname" should be computed relative
+		 * to "newname"'s directory, rather than our current working directory.
+		 * Also, it's possible (and legal) that "oldname" doesn't actually
+		 * exist yet.
+		 */
+		char abs_oldname[PATH_MAX];
+		char abs_newname_dir[PATH_MAX];
+
+		/*
+		 * Compute newname's directory, then compute the symlink's target as
+		 * an absolute path.
+		 */
+		_cfs_basename(abs_newname, abs_newname_dir);
+		if (_cfs_combine_paths(abs_newname_dir, oldname, abs_oldname) == -1) {
 			return -1;
 		}
+
+		/*
+		 * ask _cfs_open_common to do the rest, but not to normalize with respect
+		 * to the current directory. Note that it's legal for abs_oldname to not
+		 * exist (yet). It must clearly exist before the symlink is deferenced,
+		 * but until then it's legal for the symlink to point to a non-existent file.
+		 */
+		(void)_cfs_open_common(abs_oldname, O_RDONLY, FALSE);
 
 		/*
 		 * Mark the symlink file as having being "created". We are using
@@ -2138,7 +2182,7 @@ symlinkat(const char *oldpath, int newdirfd, const char *newpath)
 		 * now points to a symlink, and we want to report the symlink's name,
 		 * not the file that it points to.
 		 */
-		if (_cfs_open_common(converted_path2, O_CREAT, FALSE) == -1) {
+		if (_cfs_open_common(abs_newname, O_CREAT, FALSE) == -1) {
 			return -1;
 		}
 	}
