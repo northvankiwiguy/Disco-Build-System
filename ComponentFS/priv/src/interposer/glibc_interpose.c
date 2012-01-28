@@ -132,18 +132,30 @@ void _cfs_init_interposer()
 		exit(1);
 	}
 
-	/* Grab a copy of the command line arguments and environment (argv/envp) */
+	/*
+	 * Grab a copy of the command line arguments and environment (argv/envp).
+	 * Note that we're limited to PAGE_SIZE (typically 4096) bytes of information
+	 * that the kernel will give us. This is unfortunate, but perhaps in future
+	 * we could get the command line some other way. At the very least, we can
+	 * keep on reading from /proc/self/cmdline until we hit EOF.
+	 */
 	int fd = real_open("/proc/self/cmdline", O_RDONLY);
-	int argv_size = read(fd, &argv_and_envp[abs_path_size], NCARGS - abs_path_size);
-	if (argv_size == -1) {
-		_cfs_debug(0, "Error: cfs couldn't determine command line arguments.\n");
-		exit(1);
-	}
+	int argv_size = 0, this_argv_size;
+	do {
+		this_argv_size = read(fd, &argv_and_envp[abs_path_size + argv_size],
+									NCARGS - abs_path_size - argv_size);
+		if (this_argv_size == -1) {
+			_cfs_debug(0, "Error: cfs couldn't determine command line arguments.\n");
+			exit(1);
+		}
+		argv_size += this_argv_size;
+	} while (this_argv_size != 0);
 	close(fd);
 
 	/*
 	 * The /proc/self/cmdline string doesn't always end with a \0, so add one if
-	 * necessary.
+	 * necessary. The occurs when the command line is longer PAGE_SIZE, but the
+	 * kernel only gives us the first part of it.
 	 */
 	if (argv_and_envp[abs_path_size + argv_size - 1] != '\0'){
 		argv_and_envp[abs_path_size + argv_size] = '\0';
