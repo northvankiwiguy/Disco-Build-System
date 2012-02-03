@@ -57,6 +57,7 @@ public class FileAttributes {
 		selectValueFromFileAttrsPrepStmt = null,
 		updateFileAttrsPrepStmt = null,
 		deleteFileAttrsPrepStmt = null,
+		deleteAllFileAttrsPrepStmt = null,
 		findAttrsOnPathPrepStmt = null,
 		findPathsWithAttrPrepStmt = null, 
 		findPathsWithAttrValuePrepStmt = null;
@@ -87,6 +88,7 @@ public class FileAttributes {
 				+ "where pathId = ? and attrId = ?");
 		deleteFileAttrsPrepStmt = db.prepareStatement("delete from fileAttrs where " +
 				"pathId = ? and attrId = ?");
+		deleteAllFileAttrsPrepStmt = db.prepareStatement("delete from fileAttrs where pathId = ?");
 		findAttrsOnPathPrepStmt = db.prepareStatement("select attrId from fileAttrs where pathId = ?");
 		findPathsWithAttrPrepStmt = db.prepareStatement("select pathId from fileAttrs where attrId = ?");
 		findPathsWithAttrValuePrepStmt = db.prepareStatement(
@@ -405,6 +407,24 @@ public class FileAttributes {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Remove all the attributes that are associated with the specified path.
+	 * @param pathId The path to which the attributes are currently attached.
+	 */
+	public void deleteAllAttrOnPath(int pathId) {
+		
+		/* delete all records for this pathId (there are possibly none) */
+		try {
+			deleteAllFileAttrsPrepStmt.setInt(1, pathId);
+			db.executePrepUpdate(deleteAllFileAttrsPrepStmt);
+		
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

@@ -441,6 +441,48 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.arapiki.disco.model.FileAttributes#deleteAllAttrOnPath(int)}.
+	 */
+	@Test
+	public void testDeleteAllAttrOnPath() {
+		
+		/* create two paths */
+		int path1 = fns.addFile("/path1");
+		int path2 = fns.addFile("/path2");
+
+		/* create a number of attributes */
+		int attr1 = fattrs.newAttrName("attr1");
+		int attr2 = fattrs.newAttrName("attr2");
+		int attr3 = fattrs.newAttrName("attr3");
+		
+		/* add a bunch of attributes on those paths */
+		fattrs.setAttr(path1, attr1, 11);
+		fattrs.setAttr(path2, attr1, 21);
+		fattrs.setAttr(path1, attr2, 12);
+		fattrs.setAttr(path1, attr3, 13);
+		fattrs.setAttr(path2, attr2, 22);
+		fattrs.setAttr(path2, attr3, 23);
+				
+		/* check that the attributes are set */
+		assertTrue(CommonTestUtils.sortedArraysEqual(fattrs.getAttrsOnPath(path1),
+				new Integer[] { attr1, attr2, attr3 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(fattrs.getAttrsOnPath(path2),
+				new Integer[] { attr1, attr2, attr3 }));
+				
+		/* delete all the attributes from the first path */
+		fattrs.deleteAllAttrOnPath(path1);
+		
+		/* check that the attributes on the first path have gone */
+		assertEquals(0, fattrs.getAttrsOnPath(path1).length);
+	
+		/* check that the remaining path still has attributes set */
+		assertTrue(CommonTestUtils.sortedArraysEqual(fattrs.getAttrsOnPath(path2),
+				new Integer[] { attr1, attr2, attr3 }));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.arapiki.disco.model.FileAttributes#getAttrsOnPath(int)}.
 	 */
 	@Test
