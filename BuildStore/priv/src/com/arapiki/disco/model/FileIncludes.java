@@ -44,6 +44,7 @@ public class FileIncludes {
 	private PreparedStatement 
 		insertFileIncludesPrepStmt = null,
 		updateFileIncludesPrepStmt = null,
+		deleteFilesIncludedByPrepStmt = null,
 		selectUsageFromFileIncludesPrepStmt = null,
 		selectTotalUsageFromFileIncludesPrepStmt = null,
 		selectFile1FromFileIncludesPrepStmt = null,
@@ -65,6 +66,7 @@ public class FileIncludes {
 		insertFileIncludesPrepStmt = db.prepareStatement("insert into fileIncludes values (?, ?, 1)");
 		updateFileIncludesPrepStmt = db.prepareStatement("update fileIncludes set usage = usage + 1 " +
 				"where fileId1 = ? and fileId2 = ?");
+		deleteFilesIncludedByPrepStmt = db.prepareStatement("delete from fileIncludes where fileId1 = ?");
 		selectUsageFromFileIncludesPrepStmt = db.prepareStatement(
 				"select usage from fileIncludes where fileId1 = ? and fileId2 = ?");
 		selectTotalUsageFromFileIncludesPrepStmt = db.prepareStatement(
@@ -207,6 +209,24 @@ public class FileIncludes {
 		}
 
 		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Delete any file-includes relationship where the specified file does the including.
+	 * @param pathId The file that does the include.
+	 */
+	public void deleteFilesIncludedBy(int pathId) {
+		
+		try {
+			deleteFilesIncludedByPrepStmt.setInt(1, pathId);
+			db.executePrepUpdate(deleteFilesIncludedByPrepStmt);
+		
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
 	}
 	
 	/*=====================================================================================*/	

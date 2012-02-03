@@ -171,6 +171,46 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.arapiki.disco.model.FileIncludes#deleteFilesIncludedBy(int)}.
+	 */
+	@Test
+	public void deleteFilesIncludedBy() {
+		
+		/* add a number of file relationships */
+		fdeps.addFileIncludes(2, 1);
+		fdeps.addFileIncludes(2, 3);
+		fdeps.addFileIncludes(2, 4);
+		fdeps.addFileIncludes(2, 10);
+		fdeps.addFileIncludes(3, 2);
+		fdeps.addFileIncludes(3, 3);
+		fdeps.addFileIncludes(3, 9);
+		fdeps.addFileIncludes(3, 10);
+		fdeps.addFileIncludes(10, 1);
+		
+		/* delete the files-include relationship for files that are included by file 10 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1 }, fdeps.getFilesIncludedBy(10)));
+		fdeps.deleteFilesIncludedBy(10);
+		assertEquals(0, fdeps.getFilesIncludedBy(10).length);
+
+		/* the same for 3 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 2, 3, 9, 10 }, fdeps.getFilesIncludedBy(3)));
+		fdeps.deleteFilesIncludedBy(3);
+		assertEquals(0, fdeps.getFilesIncludedBy(3).length);
+
+		/* the same for 2 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1, 3, 4, 10 }, fdeps.getFilesIncludedBy(2)));
+		fdeps.deleteFilesIncludedBy(2);
+		assertEquals(0, fdeps.getFilesIncludedBy(2).length);
+
+		/* the same for 11 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { }, fdeps.getFilesIncludedBy(11)));
+		fdeps.deleteFilesIncludedBy(11);
+		assertEquals(0, fdeps.getFilesIncludedBy(11).length);	
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.arapiki.disco.model.FileIncludes#getTotalFileIncludedCount(int)}.
 	 */
 	@Test
