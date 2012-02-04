@@ -391,11 +391,25 @@ import com.arapiki.utils.errors.ErrorCode;
 	private void addPathAccess(String fileName, int processNum, OperationType direction, PathType type) {
 
 		/* debug output */
-		debugln(1, "Process " + processNum + 
-				((direction == OperationType.OP_READ) ?
-					" reading " :
-					(direction == OperationType.OP_WRITE) ? 
-							" writing " : " modified ") + 
+		String opString;
+		switch(direction) {
+		case OP_READ:
+			opString = "reading";
+			break;
+		case OP_WRITE:
+			opString = "writing";
+			break;
+		case OP_MODIFIED:
+			opString="modified";
+			break;
+		case OP_DELETE:
+			opString="deleted";
+			break;
+		default:
+			opString="unknown operation";
+			break;
+		}
+		debugln(1, "Process " + processNum + " " + opString + " " +
 				fileName + 
 					" (" + ((type == PathType.TYPE_FILE) ? "File" :
 						(type == PathType.TYPE_DIR) ? "Directory" : "Symlink") + ")");
