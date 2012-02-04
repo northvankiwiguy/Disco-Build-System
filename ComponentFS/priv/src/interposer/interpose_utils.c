@@ -356,9 +356,9 @@ _cfs_open_common(const char *filename, int flags, int normalize)
 
 	/* if there's a trace buffer, write the file name to it */
 	if (trace_buffer_lock() == 0){
-		if ((flags & (O_APPEND|O_CREAT|O_WRONLY)) != 0) {
+		if ((flags & (O_APPEND|O_CREAT)) || ((flags & O_ACCMODE) == O_WRONLY)) {
 			trace_buffer_write_byte(isdir ? TRACE_DIR_WRITE : TRACE_FILE_WRITE);
-		} else if (flags & O_RDWR) {
+		} else if ((flags & O_ACCMODE) == O_RDWR) {
 			trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
 		} else {
 			trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
