@@ -102,4 +102,25 @@ public class TestShellCommandUtils {
 		assertEquals("gcc -c -o test.o test.c && gcc -c -o foo.o foo.c", 
 				ShellCommandUtils.joinCommandLine("gcc -c -o test.o test.c\\\n\\\n\ngcc -c -o foo.o foo.c"));
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the shellEscapeString method()
+	 */
+	@Test
+	public void testShellEscapeString() {
+	
+		assertEquals("/bin/rm", ShellCommandUtils.shellEscapeString("/bin/rm"));
+		assertEquals("'echo >Hello'", ShellCommandUtils.shellEscapeString("echo >Hello"));
+		assertEquals("'echo>Hello'", ShellCommandUtils.shellEscapeString("echo>Hello"));
+		assertEquals("'foo*'", ShellCommandUtils.shellEscapeString("foo*"));
+		assertEquals("'[foo]'", ShellCommandUtils.shellEscapeString("[foo]"));
+		assertEquals("'hello'\\''world'", ShellCommandUtils.shellEscapeString("hello'world"));
+		assertEquals("'nested '\\''string'\\'' here'", 
+						ShellCommandUtils.shellEscapeString("nested 'string' here"));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 }

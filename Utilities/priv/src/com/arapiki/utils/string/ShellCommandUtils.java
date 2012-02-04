@@ -114,4 +114,65 @@ public class ShellCommandUtils {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a string containing a shell command argument, escape the string so that it may be
+	 * entered on the shell command line. For example, an argument that contains spaces must
+	 * be surrounded by quotation marks. Also, a quotation mark in an argument must be quoted
+	 * with a backslash (\").
+	 * 
+	 * @param input The unescaped shell command arguments.
+	 * @return The shell-escaped version of the argument.
+	 */
+	public static String shellEscapeString(String input) {
+
+		boolean needsQuoting = false;
+		int inputLen = input.length();
+		for (int i = 0; i != inputLen; i++) {
+			char ch = input.charAt(i);
+			if (ch == ' ' || ch == '\r' || ch == '\n' || ch == '\t' ||
+					ch == '(' || ch == ')' || ch == '<' || ch == '>' ||
+					ch == ';' || ch == '&' || ch == '!' || ch == '$' ||
+					ch == '!' || ch == '$' || ch == '\'' || ch == '*' ||
+					ch == '?' || ch == '[' || ch == ']' || ch == '{' ||
+					ch == '}') {
+				needsQuoting = true;
+				break;
+			}
+		}
+		
+		/* 
+		 * If there are no special characters, no quoting is required. Simply
+		 * return the original string.
+		 */
+		if (!needsQuoting) {
+			return input;
+		}
+		
+		/*
+		 * Else, create a replacement string, with added '...' and any internal
+		 * ' characters prefixed by \.
+		 */
+		StringBuffer sb = new StringBuffer(inputLen + 10); /* allow room for quotes */
+		sb.append('\'');
+		for (int i = 0; i != inputLen; i++) {
+			char ch = input.charAt(i);
+			
+			/*
+			 * Single quotes behave oddly. You need to terminate the first quote, then
+			 * have the \', then restart the quoted string. Therefore, Hello'World
+			 * must be escaped as 'Hello'\''World'
+			 */
+			if (ch == '\'') {
+				sb.append("'\\''");
+			} else {
+				sb.append(ch);
+			}
+		}
+		sb.append('\'');		
+		return sb.toString();	
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }
