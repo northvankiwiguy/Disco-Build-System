@@ -209,4 +209,17 @@ public class PathNameCache {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove an existing mapping from the cache.
+	 * 
+	 * @param parentPathId The parent's path (directory) ID number.
+	 * @param childPathName The name of the path within the parent's directory
+	 */
+	public void remove(int parentPathId, String childPathName) {
+		PathNameCacheKey key = new PathNameCacheKey(parentPathId, childPathName);
+		map.remove(key);		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

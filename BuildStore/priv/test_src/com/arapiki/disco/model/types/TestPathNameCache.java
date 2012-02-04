@@ -207,4 +207,39 @@ public class TestPathNameCache {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the removal of elements from the cache.
+	 * @throws Exception Something bad happened
+	 */
+	@Test
+	public void testRemoval() throws Exception {
+
+		/* add four names */
+		fnc.put(1, "womble", 200, 1);
+		fnc.put(2, "wamble", 202, 2);
+		fnc.put(3, "wimble", 204, 1);
+		fnc.put(4, "wemble", 206, 3);
+		
+		/* check that they're all there */
+		assertNotNull(fnc.get(3, "wimble"));
+		assertNotNull(fnc.get(1, "womble"));
+		assertNotNull(fnc.get(2, "wamble"));
+		assertNotNull(fnc.get(4, "wemble"));
+
+		/* remove one of them, and check that it's no longer there */
+		fnc.remove(3, "wimble");
+		assertNull(fnc.get(3, "wimble"));
+
+		/* remove a second entry */
+		fnc.remove(1, "womble");
+		assertNull(fnc.get(1, "womble"));
+
+		/* check that the remaining two are still there */
+		assertNotNull(fnc.get(2, "wamble"));
+		assertNotNull(fnc.get(4, "wemble"));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }
