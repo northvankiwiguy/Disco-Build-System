@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.types.PathNameCache;
 import com.arapiki.disco.model.types.PathNameCache.PathNameCacheValue;
 import com.arapiki.utils.errors.ErrorCode;
@@ -76,6 +77,7 @@ public class FileNameSpaces {
 		insertChildPrepStmt = null,
 		findPathDetailsPrepStmt = null,
 		findPathIdFromParentPrepStmt = null,
+		deletePathPrepStmt = null,
 		insertRootPrepStmt = null,
 		findRootPathIdPrepStmt = null,
 		findRootNamesPrepStmt = null,
@@ -103,6 +105,7 @@ public class FileNameSpaces {
 				" from files left join fileRoots on files.id = fileRoots.fileId where files.id = ?");
 		findPathIdFromParentPrepStmt = db.prepareStatement(
 				"select id from files where parentId = ? and name != \"/\" order by name");
+		deletePathPrepStmt = db.prepareStatement("delete from files where id = ?");
 		insertRootPrepStmt = db.prepareStatement("insert into fileRoots values (?, ?)");	
 		findRootPathIdPrepStmt = db.prepareStatement("select fileId from fileRoots where name = ?");
 		findRootNamesPrepStmt = db.prepareStatement("select name from fileRoots order by name");
@@ -623,6 +626,79 @@ public class FileNameSpaces {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}	
 		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove a specific path from the build store. This operation can be only be performed
+	 * on files and directories that are unused. That is, directories must be empty, and 
+	 * files/directories must not be reference by any tasks (or any other such objects).
+	 * 
+	 * @param pathId The ID of the path to be removed.
+	 * 
+	 * @return ErrorCode.OK on successful removal, or ErrorCode.CANT_REMOVE if the
+	 * path is still used in some way.
+	 */
+	public int removePath(int pathId)
+	{
+		/* 
+		 * We need to refer to all these helper objects, to see if they
+		 * use the path we're trying to delete.
+		 */
+		BuildTasks buildTasks = buildStore.getBuildTasks();
+		FileAttributes fileAttrs = buildStore.getFileAttributes();
+		FileIncludes fileIncludes = buildStore.getFileIncludes();
+		
+		/* check that this path doesn't have children */
+		if (getChildPaths(pathId).length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+
+		/* check that it's not used as the directory for any tasks */
+		if (buildTasks.getTasksInDirectory(pathId).length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* check that it's not accessed by any tasks */
+		if (buildTasks.getTasksThatAccess(pathId, 
+					OperationType.OP_UNSPECIFIED).length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* check that it's not associated with a root */
+		if (getRootAtPath(pathId) != null) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* check that it's not included by another file */
+		if (fileIncludes.getFilesThatInclude(pathId).length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* 
+		 * All checks have passed, so remove from the file name cache, in 
+		 * case it's there.
+		 */
+		fileNameCache.remove(getParentPath(pathId), getBaseName(pathId));
+		
+		/* now remove the entry from the "files" table */
+		try {
+			deletePathPrepStmt.setInt(1, pathId);
+			db.executePrepUpdate(deletePathPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}	
+		
+		/* remove any attributes that are associated with this file */
+		fileAttrs.deleteAllAttrOnPath(pathId);
+		
+		/* remove any file-includes where this file does the including */
+		fileIncludes.deleteFilesIncludedBy(pathId);
+		
+		/* success, the path has been removed */
+		return ErrorCode.OK;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

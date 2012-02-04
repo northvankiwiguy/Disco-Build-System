@@ -63,6 +63,9 @@ public class BuildTasks {
 	/** The BuildStore object that owns this BuildTasks object. */
 	private BuildStore buildStore = null;
 	
+	/** The FileNameSpaces object associated with these BuildTasks */
+	private FileNameSpaces fns = null;
+	
 	/** Various prepared statement for database access. */
 	private PreparedStatement 
 		insertBuildTaskPrepStmt = null,
@@ -71,9 +74,11 @@ public class BuildTasks {
 		findDirectoryPrepStmt = null,
 		findChildrenPrepStmt = null,
 		insertBuildTaskFilesPrepStmt = null,
+		removeBuildTaskFilesPrepStmt = null,
 		updateBuildTaskFilesPrepStmt = null,
 		findOperationInBuildTaskFilesPrepStmt = null,
 		findFilesInBuildTaskFilesPrepStmt = null,
+		findTasksInDirectoryPrepStmt = null,
 		findFilesByOperationInBuildTaskFilesPrepStmt = null,
 		findTasksByFileInBuildTaskFilesPrepStmt = null,
 		findTasksByFileAndOperationInBuildTaskFilesPrepStmt = null;
@@ -91,15 +96,20 @@ public class BuildTasks {
 	public BuildTasks(BuildStore buildStore) {
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
+		this.fns = buildStore.getFileNameSpaces();
 
 		/* create prepared database statements */
 		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, 0, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildTasks where taskId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentTaskId from buildTasks where taskId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select taskDirId from buildTasks where taskId = ?");
+		findTasksInDirectoryPrepStmt =
+			db.prepareStatement("select taskId from buildTasks where taskDirId = ?");
 		findChildrenPrepStmt = db.prepareStatement("select taskId from buildTasks where parentTaskId = ?" +
 				" and parentTaskId != taskId");
 		insertBuildTaskFilesPrepStmt = db.prepareStatement("insert into buildTaskFiles values (?, ?, ?)");
+		removeBuildTaskFilesPrepStmt = 
+			db.prepareStatement("delete from buildTaskFiles where taskId = ? and fileId = ?");
 		updateBuildTaskFilesPrepStmt = 
 			db.prepareStatement("update buildTaskFiles set operation = ? where taskId = ? and fileId = ?");
 		findOperationInBuildTaskFilesPrepStmt = 
@@ -236,7 +246,7 @@ public class BuildTasks {
 		 *             New:    |  Read    Write   Modify  Delete
 		 *             -----------------------------------------
 		 *             Read    |  Read    Modify  Modify  Delete
-		 *  Existing:  Write   |  Write   Write   Write   Delete
+		 *  Existing:  Write   |  Write   Write   Write   Temporary
 		 *             Modify  |  Modify  Modify  Modify  Delete
 		 *             Delete  |  Read    Write   Modify  Delete
 		 *             
@@ -250,13 +260,40 @@ public class BuildTasks {
 			OperationType existingOp = intToOperationType(intResults[0]);
 			OperationType combinedOp = operationTypeMapping[existingOp.ordinal()][newOperation.ordinal()];
 			
-			try {
-				updateBuildTaskFilesPrepStmt.setInt(1, combinedOp.ordinal());
-				updateBuildTaskFilesPrepStmt.setInt(2, buildTaskId);
-				updateBuildTaskFilesPrepStmt.setInt(3, fileNumber);
-				db.executePrepUpdate(updateBuildTaskFilesPrepStmt);
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			/*
+			 * Handle a special case of temporary files. That is, if the existingOp is WRITE,
+			 * and the combinedOp is DELETE, then this file was both created and deleted
+			 * by this task.
+			 */
+			if ((existingOp == OperationType.OP_WRITE) && (combinedOp == OperationType.OP_DELETE)) {
+				try {
+					removeBuildTaskFilesPrepStmt.setInt(1, buildTaskId);
+					removeBuildTaskFilesPrepStmt.setInt(2, fileNumber);
+					db.executePrepUpdate(removeBuildTaskFilesPrepStmt);
+				} catch (SQLException e) {
+					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+				}
+
+				/*
+				 * Attempt to remove the file from the FileNameSpaces. This will fail if the
+				 * same path is already used by some other task, but that's acceptable. We
+				 * only want to remove paths that were used exclusively by this task.
+				 */
+				fns.removePath(fileNumber);
+			}
+			
+			/*
+			 * else, the normal case is to replace the old state with the new state.
+			 */
+			else {
+				try {
+					updateBuildTaskFilesPrepStmt.setInt(1, combinedOp.ordinal());
+					updateBuildTaskFilesPrepStmt.setInt(2, buildTaskId);
+					updateBuildTaskFilesPrepStmt.setInt(3, fileNumber);
+					db.executePrepUpdate(updateBuildTaskFilesPrepStmt);
+				} catch (SQLException e) {
+					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+				}
 			}
 		}
 		
@@ -352,6 +389,26 @@ public class BuildTasks {
 		}
 		return results.toArray(new Integer[0]);
 		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of all tasks that execute within the directory specified by pathId.
+	 * @param pathId The directory in which the tasks must be executed.
+	 * @return The list of tasks.
+	 */
+	public Integer[] getTasksInDirectory(int pathId) {
+		
+		Integer intResults[] = null;
+		try {
+			findTasksInDirectoryPrepStmt.setInt(1, pathId);
+			intResults = db.executePrepSelectIntegerColumn(findTasksInDirectoryPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return intResults;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

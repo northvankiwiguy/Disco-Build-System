@@ -271,6 +271,7 @@ public class TestBuildTasks {
 		int file6 = bsfs.addFile("/file6");
 		int file7 = bsfs.addFile("/file7");
 		int file8 = bsfs.addFile("/file8");
+		int file9 = bsfs.addFile("/file9");
 				
 		/* test read, read => read */
 		bts.addFileAccess(task, file1, OperationType.OP_READ);
@@ -329,6 +330,17 @@ public class TestBuildTasks {
 		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_READ).length);
 		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_WRITE).length);
 		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_DELETE).length);
+		
+		/* test write, read, delete => temporary - and the file is deleted */
+		assertEquals(file9, bsfs.getPath("/file9"));
+		bts.addFileAccess(task, file9, OperationType.OP_WRITE);
+		bts.addFileAccess(task, file9, OperationType.OP_READ);
+		bts.addFileAccess(task, file9, OperationType.OP_DELETE);
+		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_MODIFIED).length);
+		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_READ).length);
+		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_WRITE).length);
+		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_DELETE).length);
+		assertEquals(ErrorCode.BAD_PATH, bsfs.getPath("/file9"));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -410,6 +422,42 @@ public class TestBuildTasks {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test method for {@link com.arapiki.disco.model.BuildTasks#getTasksInDirectory(int)}.
+	 */
+	@Test
+	public void testGetTasksInDirectory() {
+
+		/* create a couple of directories */
+		int dir1 = bsfs.addDirectory("/dir1");
+		int dir2 = bsfs.addDirectory("/dir2");
+		int dir3 = bsfs.addDirectory("/dir2/dir3");
+		
+		/* create a number of tasks, each executing in one of those directories */
+		int rootTask = bts.getRootTask("root");
+		int task11 = bts.addBuildTask(rootTask, dir1, "true");
+		int task12 = bts.addBuildTask(rootTask, dir1, "true");
+		int task21 = bts.addBuildTask(rootTask, dir2, "true");
+		int task22 = bts.addBuildTask(rootTask, dir2, "true");
+		int task23 = bts.addBuildTask(rootTask, dir2, "true");
+		int task24 = bts.addBuildTask(rootTask, dir2, "true");
+		int task13 = bts.addBuildTask(rootTask, dir1, "true");
+	
+		/* fetch the list of tasks that execute in the first directory */
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getTasksInDirectory(dir1),
+				new Integer[] {task11, task12, task13}));
+		
+		/* repeat for the second directory */
+		assertTrue(CommonTestUtils.sortedArraysEqual(bts.getTasksInDirectory(dir2),
+				new Integer[] {task21, task22, task23, task24}));
+		
+		/* and the third should be empty */
+		assertEquals(0, bts.getTasksInDirectory(dir3).length);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	
 	/**
 	 * Test the scalability of adding build tasks and file accesses.

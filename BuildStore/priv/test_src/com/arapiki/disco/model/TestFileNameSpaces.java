@@ -17,6 +17,7 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.utils.errors.ErrorCode;
 
@@ -32,6 +33,15 @@ public class TestFileNameSpaces {
 	/** The BuildStoreFileSpace associated with this BuildStore */
 	FileNameSpaces bsfs;
 	
+	/** The BuildTasks associated with this BuildStore */
+	BuildTasks bts;
+	
+	/** The FileAttributes associated with this BuildStore */
+	FileAttributes fattrs;
+
+	/** The FileIncludes associated with this BuildStore */
+	FileIncludes fincludes;
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -40,8 +50,11 @@ public class TestFileNameSpaces {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
-		/* fetch the associated FileSpace */
+		/* fetch the associated FileNameSpaces, BuildTasks, etc. */
 		bsfs = bs.getFileNameSpaces();
+		bts = bs.getBuildTasks();
+		fattrs = bs.getFileAttributes();
+		fincludes = bs.getFileIncludes();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -389,6 +402,66 @@ public class TestFileNameSpaces {
 		assertEquals(path7, children[0].intValue());
 		assertEquals(path5, children[1].intValue());
 		assertEquals(path6, children[2].intValue());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	@Test
+	public void testRemovePath()
+	{
+		/* remove a path that's not in use anywhere - should succeed. */
+		int path1 = bsfs.addFile("/april/may/june");
+		int path2 = bsfs.getPath("/april/may");
+		int path3 = bsfs.addFile("/april/may/august");
+		assertNotSame(ErrorCode.BAD_PATH, path1);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { path1, path3 }, bsfs.getChildPaths(path2)));
+		assertEquals(ErrorCode.OK, bsfs.removePath(path1));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { path3 }, bsfs.getChildPaths(path2)));
+		
+		/* test that we can't remove paths that have children */
+		assertEquals(ErrorCode.CANT_REMOVE, bsfs.removePath(path2));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { path3 }, bsfs.getChildPaths(path2)));
+
+		/* test that we can't remove a directory that a task was executed in */
+		int path4 = bsfs.addFile("/april/may/september");
+		int myBuildTask = bts.addBuildTask(bts.getRootTask("root"), path4, "/bin/true");
+		assertEquals(ErrorCode.CANT_REMOVE, bsfs.removePath(path4));
+		
+		/* test that we can't remove a path that's referenced by a task */
+		int path5 = bsfs.addFile("/april/may/october");
+		bts.addFileAccess(myBuildTask, path5, OperationType.OP_READ);
+		assertEquals(ErrorCode.CANT_REMOVE, bsfs.removePath(path5));
+		
+		/* test that we can't remove a path that's attached to root */
+		int path6 = bsfs.addDirectory("/april/may/november");
+		assertEquals(ErrorCode.OK, bsfs.addNewRoot("myroot", path6));
+		assertEquals(ErrorCode.CANT_REMOVE, bsfs.removePath(path6));
+		
+		/* test that any attributes on that path have been removed. */
+		int path7 = bsfs.addFile("/april/may/december");
+		int myAttrId = fattrs.newAttrName("myattr");
+		fattrs.setAttr(path7, myAttrId, 1);
+		assertEquals(1, fattrs.getAttrsOnPath(path7).length);
+		assertEquals(ErrorCode.OK, bsfs.removePath(path7));
+		assertEquals(0, fattrs.getAttrsOnPath(path7).length);
+		
+		/* test that we can't remove a path that is included by another path */
+		int path8 = bsfs.addFile("/april/may/january");
+		int path9 = bsfs.addFile("/april/may/february");
+		fincludes.addFileIncludes(path8, path9);
+		assertEquals(ErrorCode.CANT_REMOVE, bsfs.removePath(path9));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				fincludes.getFilesIncludedBy(path8), new Integer[] { path9 }));
+		
+		/* but, we can remove a path that does the including */
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				fincludes.getFilesThatInclude(path9), new Integer[] { path8 }));
+		assertEquals(ErrorCode.OK, bsfs.removePath(path8));
+		assertEquals(0, fincludes.getFilesThatInclude(path9).length);
+		assertEquals(0, fincludes.getFilesIncludedBy(path8).length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
