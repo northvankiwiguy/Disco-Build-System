@@ -15,3 +15,14 @@ Release 0.1.0 - November 15th, 2011
       - Showing files used by a specific task (or set of tasks).
       - Showing tasks that use a specific file (or set of files).
 - No Eclipse support in this release.
+
+Release 0.2.0 - February 6th, 2012
+-----------------------------------
+
+- Full support for scan-build command that can trace a GNU Make-based
+  build system and store the file/task information in the Disco
+  database.
+
+- Numerous bug fixes, performance improvements and refactoring of
+  the 0.1.0 features.
+
