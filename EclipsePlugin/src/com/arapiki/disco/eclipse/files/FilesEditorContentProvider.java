@@ -21,6 +21,8 @@ import com.arapiki.disco.eclipse.utils.ConversionUtils;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.model.types.FileRecord;
+import com.arapiki.utils.errors.ErrorCode;
+import com.arapiki.utils.errors.FatalError;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -158,13 +160,29 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 		int topRootId = fns.getRootPath("root");
 		if (editor.isOptionSet(DiscoFilesEditor.OPT_SHOW_ROOTS))
 		{
-			Integer childIds[] = fns.getChildPaths(topRootId);
-			return ConversionUtils.convertIntArrToFileRecordArr(childIds);
+			String rootNames[] = fns.getRoots();
+			FileRecord fileRecords[] = new FileRecord[rootNames.length];
+			for (int i = 0; i < rootNames.length; i++) {
+				int id = fns.getRootPath(rootNames[i]);
+				
+				/* 
+				 * if the name is missing, it's an internal error, but just
+				 * return "root:" instead.
+				 * TODO: throw an internal error.
+				 */
+				if (id == ErrorCode.NOT_FOUND) {
+					id = topRootId;
+				}
+				
+				fileRecords[i] = new FileRecord(id);
+			}
+			return fileRecords;
 		}
 		
 		/* else, the directories at the / level are the top-level elements */
 		else {
-			return new FileRecord[] { new FileRecord(topRootId) };			
+			Integer childIds[] = fns.getChildPaths(topRootId);
+			return ConversionUtils.convertIntArrToFileRecordArr(childIds);
 		}
 	}
 

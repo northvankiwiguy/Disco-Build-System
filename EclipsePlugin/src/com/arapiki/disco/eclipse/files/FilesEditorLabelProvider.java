@@ -131,12 +131,22 @@ public class FilesEditorLabelProvider extends LabelProvider {
 		/* for FileRecords, we return the path's base name */
 		if (element instanceof FileRecord) {
 			FileRecord fr = (FileRecord)element;
+			int pathId = fr.getId();
 			
-			if (editor.isOptionSet(DiscoFilesEditor.OPT_COALESCE_DIRS)) {
-				return getCoalescedText(fr.getId());
+			/* case: show file path roots */
+			if (editor.isOptionSet(DiscoFilesEditor.OPT_SHOW_ROOTS)) {
+				String rootName = fns.getRootAtPath(pathId);
+				if (rootName != null) {
+					return "@" + rootName;
+				}
+			}
 				
+			/* case: show the directory, but coalesce child directories */
+			if (editor.isOptionSet(DiscoFilesEditor.OPT_COALESCE_DIRS)) {
+				return getCoalescedText(pathId);
+				
+			/* case: show the directory, with no coalescing */
 			} else {
-				int pathId = fr.getId();
 				String pathName;
 				
 				if (fns.getParentPath(pathId) == topRootId) {
