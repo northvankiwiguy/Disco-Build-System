@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
+import com.arapiki.disco.eclipse.utils.ConversionUtils;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileRecord;
+import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.disco.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -31,6 +33,9 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** The DiscoFilesEditor that we provide content for */
+	private DiscoFilesEditor editor = null;
+	
 	/** The FileNameSpaces object we should query for file information */
 	private FileNameSpaces fns = null;
 
@@ -41,10 +46,12 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	/**
 	 * Create a new {@link FilesEditorContentProvider} that translates the information
 	 * in the BuildStore into something that a TreeViewer can understand.
+	 * @param editor The editor that this content provider is associated with.
+	 * @param fns The FileNameSpaces object that we're displaying information from.
 	 */
-	public FilesEditorContentProvider(FileNameSpaces fns) {
-	
-		/* save away the FileNameSpaces, so we can query it for file information */
+	public FilesEditorContentProvider(DiscoFilesEditor editor, FileNameSpaces fns) {
+
+		this.editor = editor;
 		this.fns = fns;
 	}
 	
@@ -61,17 +68,45 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 		/* We only care about FileRecord elements */
 		if (parentElement instanceof FileRecord) {
 			
-			/* Fetch the children IDs from the BuildStore */
+			Integer childIds[];
 			FileRecord fr = (FileRecord)parentElement;
-			Integer childIds[] = fns.getChildPaths(fr.getId());
+			int pathId = fr.getId();
 			
-			/* Convert this into a FileRecord[] */
-			// TODO: do this in a better way.
-			ArrayList<FileRecord> array = new ArrayList<FileRecord>();
-			for (int i = 0; i < childIds.length; i++) {
-				array.add(new FileRecord(childIds[i]));
+			/* repeat until we've found the children (or grandchildren) we want */
+			while (true) {
+				
+				/* Fetch the children IDs from the BuildStore */
+				childIds = fns.getChildPaths(pathId);
+			
+				/*
+				 * If directory coalescing is enabled, we want to skip
+				 * over single-child directories where the child is itself
+				 * a directory.
+				 */
+				if (editor.isOptionSet(DiscoFilesEditor.OPT_COALESCE_DIRS)) {
+					
+					/* if there isn't a single child, we don't care - exit */
+					if (childIds.length != 1) {
+						break;
+					}
+					
+					/* if the single child isn't a directory - exit */
+					pathId = childIds[0];
+					if (fns.getPathType(pathId) != PathType.TYPE_DIR) {
+						break;
+					}
+					
+					/* else, we loop around to compute the child of this single child */
+				}
+				
+				/* no coalescing required */
+				else {
+					break;
+				}
 			}
-			return array.toArray();
+			
+			/* Convert our child list from an Integer[] to a FileRecord[] */
+			return ConversionUtils.convertIntArrToFileRecordArr(childIds);
 		}
 		return null;
 	}
@@ -108,6 +143,29 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 		
 		/* else, we have no children */
 		return false;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the top-level elements, which represent the starting point for displaying
+	 * the tree. Depending on the DiscoFilesEditor's mode, we may have a different set
+	 * of root elements.
+	 * @return The list of FileRecord elements
+	 */
+	public FileRecord[] getRootElements() {
+		
+		int topRootId = fns.getRootPath("root");
+		if (editor.isOptionSet(DiscoFilesEditor.OPT_SHOW_ROOTS))
+		{
+			Integer childIds[] = fns.getChildPaths(topRootId);
+			return ConversionUtils.convertIntArrToFileRecordArr(childIds);
+		}
+		
+		/* else, the directories at the / level are the top-level elements */
+		else {
+			return new FileRecord[] { new FileRecord(topRootId) };			
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/

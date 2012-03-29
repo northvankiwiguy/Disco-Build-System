@@ -33,7 +33,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileRecord;
+import com.arapiki.disco.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -53,6 +53,25 @@ public class DiscoFilesEditor extends EditorPart {
 	
 	/** The FileNameSpaces object that contains all the file information for this BuildStore */
 	private FileNameSpaces fns = null;
+	
+	/**
+	 * The current options setting for this editor. The field contains a bitmap of
+	 * OPT_* values.
+	 */
+	private int editorOptionBits = OPT_COALESCE_DIRS | OPT_SHOW_ROOTS;
+	
+	/** 
+	 * Option to enable coalescing of folders in the file editor. That is, if a folder
+	 * contains a single child which is itself a folder, we display both of them on the
+	 * same line. For example, if folder "A" has a single child, "B", we display "A/B".
+	 */
+	public static final int OPT_COALESCE_DIRS		= 1;
+	
+	/**
+	 * Option to display file roots as the top-level items in the editor. Without this
+	 * feature enabled, the top-level directory names will be shown.
+	 */
+	public static final int OPT_SHOW_ROOTS			= 2;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -60,7 +79,7 @@ public class DiscoFilesEditor extends EditorPart {
 
 	/**
 	 * Create a new DiscoFilesEditor instance, using the specified BuildStore as input
-	 * @param The BuildStore to display/edit.
+	 * @param buildStore The BuildStore to display/edit.
 	 */
 	public DiscoFilesEditor(BuildStore buildStore) {
 		super();
@@ -149,11 +168,16 @@ public class DiscoFilesEditor extends EditorPart {
 		 * browse the structure of the BuildStore's file system.
 		 */
 		filesTreeViewer = new TreeViewer(parent, SWT.MULTI | SWT.FULL_SELECTION);
-		filesTreeViewer.setContentProvider(new FilesEditorContentProvider(fns));
-		filesTreeViewer.setLabelProvider(new FilesEditorLabelProvider(fns));
+		
+		FilesEditorContentProvider contentProvider = new FilesEditorContentProvider(this, fns);
+		FilesEditorLabelProvider labelProvider = new FilesEditorLabelProvider(this, fns);
+		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
+		filesTreeViewer.setContentProvider(contentProvider);
+		filesTreeViewer.setLabelProvider(labelProvider);
+		filesTreeViewer.setSorter(viewerSorter);
 		
 		/* automatically expand the first few levels of the tree */
-		filesTreeViewer.setAutoExpandLevel(5);
+		filesTreeViewer.setAutoExpandLevel(2);
 		
 		/* double-clicking on an expandable node will expand/contract that node */
 		filesTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -183,9 +207,8 @@ public class DiscoFilesEditor extends EditorPart {
 		getSite().registerContextMenu(menuMgr, filesTreeViewer);
 		getSite().setSelectionProvider(filesTreeViewer);
 
-		/* start by displaying from the root */
-		FileRecord rootFileRecord = new FileRecord(fns.getRootPath("root")); 
-		filesTreeViewer.setInput(new FileRecord[] { rootFileRecord });
+		/* start by displaying from the root (which changes, depending on our options). */
+		filesTreeViewer.setInput(contentProvider.getRootElements());
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -200,6 +223,55 @@ public class DiscoFilesEditor extends EditorPart {
 		if (filesTreeViewer != null){
 			filesTreeViewer.getControl().setFocus();
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Either set of clear specific options (e.g. OPT_COALESCE_DIR or OPT_SHOW_ROOTS) from
+	 * this editor's current option settings. This can be used to modify one or more
+	 * binary configuration settings in this control.
+	 * 
+	 * @param optionBits One of more bits that should be either set or cleared from this
+	 * 		  editor's options. The state of options that are not specified in this parameter
+	 *        will not be changed.
+	 * @param enable "true" if the options should be enabled, or "false" if they should be cleared.
+	 */
+	public void setOption(int optionBits, boolean enable)
+	{
+		/* if enable is set, then we're adding the new options */
+		if (enable) {
+			editorOptionBits |= optionBits;
+		}
+		
+		/* else, we're clearing the options */
+		else {
+			editorOptionBits &= ~optionBits;
+		}
+		
+		// TODO: inform the label and text.
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The bitmap of all editor options that are currently set 
+	 * (e.g. OPT_COALESCE_ROOTS)
+	 */
+	public int getOptions()
+	{
+		return editorOptionBits;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @param optionBit The option to test for.
+	 * @return Whether or the specified editor option is set.
+	 */
+	public boolean isOptionSet(int optionBit)
+	{
+		return (editorOptionBits & optionBit) != 0;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

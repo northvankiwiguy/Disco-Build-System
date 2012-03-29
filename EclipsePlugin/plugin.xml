@@ -7,6 +7,7 @@
             class="com.arapiki.disco.eclipse.DiscoMainEditor"
             default="true"
             extensions="disco"
+            icon="images/disco_editor_img.bmp"
             id="com.arapiki.disco.maineditor"
             name="Disco Build Editor">
       </editor>

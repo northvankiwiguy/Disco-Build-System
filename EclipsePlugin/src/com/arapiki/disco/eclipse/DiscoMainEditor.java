@@ -14,8 +14,14 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.tasks.DiscoTasksEditor;
+import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.errors.BuildStoreVersionException;
 
+/**
+ * @author "Peter Smith <psmith@arapiki.com>"
+ *
+ */
 public class DiscoMainEditor extends MultiPageEditorPart {
 
 	/*=====================================================================================*
@@ -32,6 +38,9 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 	
+	/**
+	 * 
+	 */
 	public DiscoMainEditor() {
 		super();
 	}
@@ -58,14 +67,33 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 		IFile file = fileInput.getFile();
 		IPath path = file.getLocation();
 
-		/* either open the existing BuildStore, or create a new empty BuildStore */
-		// TODO: wrap this to catch exceptions
 		// TODO: handle the case where multiple editors have the same BuildStore open.
+		
+		// TODO: put a top-level catch for FatalBuildStoreException() (and other
+		// exceptions) to display a meaningful error.
+
+		
 		try {
+			/*
+			 * Test that file exists before opening it, otherwise it'll be created
+			 * automatically, which isn't what we want. Ideally Eclipse wouldn't ask
+			 * us to open a file that doesn't exist, so this is an extra safety
+			 * check.
+			 */
+			if (!file.exists()) {
+				throw new FileNotFoundException(path + " does not exist, or is not writable.");
+			}
+			
+			/* open the existing BuildStore database */
 			buildStore = new BuildStore(path.toOSString());
+			
+		} catch (BuildStoreVersionException e) {
+			
+			EclipsePartUtils.displayErrorDialog(site.getShell(), e.getMessage());
+			throw new PartInitException("Disco database has the wrong version.");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			EclipsePartUtils.displayErrorDialog(site.getShell(), e.getMessage());
+			throw new PartInitException("Can't open the Disco database.");
 		}
 	}
 

@@ -12,10 +12,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.FileRecord;
-import com.arapiki.disco.model.FileSet;
+import com.arapiki.disco.model.types.*;
 import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.TaskSet;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 
 public class HandlerShowTasksThatUse implements IHandler {
