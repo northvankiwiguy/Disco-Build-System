@@ -137,7 +137,8 @@ public class FilesEditorLabelProvider extends LabelProvider {
 			if (editor.isOptionSet(DiscoFilesEditor.OPT_SHOW_ROOTS)) {
 				String rootName = fns.getRootAtPath(pathId);
 				if (rootName != null) {
-					return "@" + rootName;
+					String fullPath = fns.getPathName(pathId);
+					return "@" + rootName + " (" + fullPath + ")";
 				}
 			}
 				
