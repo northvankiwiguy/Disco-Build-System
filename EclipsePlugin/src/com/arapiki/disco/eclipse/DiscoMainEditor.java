@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
@@ -185,6 +186,18 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 		return buildStore;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the editor that's currently visible (on the currently selected page). This
+	 * editor (for example, a DiscoFilesEditor instance) will be the target of any selection
+	 * operations that occur.
+	 * @return The editor that's currently visible.
+	 */
+	public IEditorPart getActiveSubEditor() {
+		return this.getActiveEditor();
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/

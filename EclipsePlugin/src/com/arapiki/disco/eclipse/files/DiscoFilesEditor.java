@@ -20,6 +20,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -308,6 +309,33 @@ public class DiscoFilesEditor extends EditorPart {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
+	 * Given a directory node in the editor, expand all the descendants of that directory so
+	 * that they're visible in the tree viewer.
+	 * @param node The FileRecordDir node representing the directory in the tree to be expanded.
+	 */
+	public void expandSubtree(FileRecordDir node) {
+		filesTreeViewer.expandToLevel(node, AbstractTreeViewer.ALL_LEVELS);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+	
+		/* remove this preference store listender */
+		Activator.getDefault().getPreferenceStore().
+				removePropertyChangeListener(preferenceStoreChangeListener);
+		super.dispose();
+	}
+
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
 	 * Listener to identify changes being made to this plug-in's preference store, typically
 	 * as part of editing the Disco preferences (this could change how our editor is displayed).
 	 */
@@ -325,20 +353,6 @@ public class DiscoFilesEditor extends EditorPart {
 				filesTreeViewer.refresh();
 			}
 		};
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
-	 */
-	@Override
-	public void dispose() {
-	
-		/* remove this preference store listender */
-		Activator.getDefault().getPreferenceStore().
-				removePropertyChangeListener(preferenceStoreChangeListener);
-		super.dispose();
-	}
 
 	/*-------------------------------------------------------------------------------------*/
 }

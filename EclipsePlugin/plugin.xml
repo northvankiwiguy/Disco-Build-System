@@ -64,11 +64,39 @@
             id="com.arapiki.disco.eclipse.commands.showAllDerivedFiles"
             name="Show All Derived Files">
       </command>
+      <command
+            categoryId="com.arapiki.disco.eclipse.commands.category"
+            description="Fully expand this directory and all its children"
+            id="com.arapiki.disco.eclipse.commands.expandFileSubTree"
+            name="Expand subtree">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=discoactions">
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree"
+               label="Expand sub-tree"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="com.arapiki.disco.eclipse.commands.separator1"
+               visible="true">
+         </separator>
          <menu
                label="Show Tasks that...">
             <command
@@ -159,6 +187,10 @@
                   value="+">
             </count>
          </enabledWhen>
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
+            commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree">
       </handler>
    </extension>
    <extension

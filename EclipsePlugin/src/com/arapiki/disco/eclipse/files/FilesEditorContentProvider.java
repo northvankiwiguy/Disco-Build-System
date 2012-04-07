@@ -14,7 +14,6 @@ package com.arapiki.disco.eclipse.files;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.ui.internal.handlers.WizardHandler.New;
 
 import com.arapiki.disco.eclipse.utils.ConversionUtils;
 import com.arapiki.disco.model.FileNameSpaces;
@@ -106,7 +105,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			}
 			
 			/* Convert our child list from an Integer[] to a FileRecord[] */
-			return ConversionUtils.convertIntArrToFileRecordArr(childIds);
+			return ConversionUtils.convertIntArrToFileRecordArr(fns, childIds);
 		}
 		return null;
 	}
@@ -130,8 +129,8 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 				return null;
 			}
 			
-			/* construct a new FileRecord */
-			return new FileRecord(parentId);
+			/* construct a new FileRecord (which must be a directory) */
+			return new FileRecordDir(parentId);
 		}
 		return null;
 	}
@@ -186,7 +185,8 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 					id = topRootId;
 				}
 				
-				fileRecords[i] = new FileRecord(id);
+				/* create either a FileRecordFile, or a FileRecordDir object */
+				fileRecords[i] = ConversionUtils.createFileRecordWithType(fns, id);
 			}
 			return fileRecords;
 		}
@@ -194,7 +194,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 		/* else, the directories at the / level are the top-level elements */
 		else {
 			Integer childIds[] = fns.getChildPaths(topRootId);
-			return ConversionUtils.convertIntArrToFileRecordArr(childIds);
+			return ConversionUtils.convertIntArrToFileRecordArr(fns, childIds);
 		}
 	}
 
