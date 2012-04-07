@@ -12,17 +12,15 @@
 
 package com.arapiki.disco.eclipse.files;
 
-import java.util.ArrayList;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.ui.internal.handlers.WizardHandler.New;
 
 import com.arapiki.disco.eclipse.utils.ConversionUtils;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.errors.FatalError;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -120,7 +118,21 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 */
 	@Override
 	public Object getParent(Object element) {
-		System.out.println("Called getParent - not yet implemented");
+
+		if (element instanceof FileRecord) {
+			
+			/* query the BuildStore for this element's parent */
+			FileRecord frElement = (FileRecord)element;
+			int parentId = fns.getParentPath(frElement.getId());
+			
+			/* if there's an error, inform the caller that we can't find the parent */
+			if (parentId < 0) {
+				return null;
+			}
+			
+			/* construct a new FileRecord */
+			return new FileRecord(parentId);
+		}
 		return null;
 	}
 	
