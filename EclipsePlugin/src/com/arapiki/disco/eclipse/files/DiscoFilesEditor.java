@@ -17,6 +17,9 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -27,10 +30,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
+import com.arapiki.disco.eclipse.Activator;
+import com.arapiki.disco.eclipse.preferences.PreferenceConstants;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.types.FileRecord;
@@ -54,11 +58,14 @@ public class DiscoFilesEditor extends EditorPart {
 	/** The FileNameSpaces object that contains all the file information for this BuildStore */
 	private FileNameSpaces fns = null;
 	
+	/** The ArrayContentProvider object providing this editor's content */
+	FilesEditorContentProvider contentProvider;
+	
 	/**
 	 * The current options setting for this editor. The field contains a bitmap of
 	 * OPT_* values.
 	 */
-	private int editorOptionBits = OPT_COALESCE_DIRS | OPT_SHOW_ROOTS;
+	private int editorOptionBits = 0;
 	
 	/** 
 	 * Option to enable coalescing of folders in the file editor. That is, if a folder
@@ -169,12 +176,21 @@ public class DiscoFilesEditor extends EditorPart {
 		 */
 		filesTreeViewer = new TreeViewer(parent, SWT.MULTI | SWT.FULL_SELECTION);
 		
-		FilesEditorContentProvider contentProvider = new FilesEditorContentProvider(this, fns);
+		contentProvider = new FilesEditorContentProvider(this, fns);
 		FilesEditorLabelProvider labelProvider = new FilesEditorLabelProvider(this, fns);
 		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);
 		filesTreeViewer.setSorter(viewerSorter);
+		
+		/* 
+		 * Update this editor's option by reading the user-specified values in the
+		 * preference store. Also, attach a listener so that we hear about future
+		 * changes to the preference store and adjust our options accordingly.
+		 */
+		updateOptionsFromPreferenceStore();
+		Activator.getDefault().getPreferenceStore().
+					addPropertyChangeListener(preferenceStoreChangeListener);
 		
 		/* automatically expand the first few levels of the tree */
 		filesTreeViewer.setAutoExpandLevel(2);
@@ -247,9 +263,7 @@ public class DiscoFilesEditor extends EditorPart {
 		/* else, we're clearing the options */
 		else {
 			editorOptionBits &= ~optionBits;
-		}
-		
-		// TODO: inform the label and text.
+		}		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -272,6 +286,58 @@ public class DiscoFilesEditor extends EditorPart {
 	public boolean isOptionSet(int optionBit)
 	{
 		return (editorOptionBits & optionBit) != 0;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set this editor's options by reading the current values from the preference store.
+	 * This should be called when the editor is first created, as well as whenever the
+	 * preference store is updated.
+	 */
+	public void updateOptionsFromPreferenceStore()
+	{
+		IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
+		
+		setOption(OPT_COALESCE_DIRS, 
+				prefStore.getBoolean(PreferenceConstants.PREF_COALESCE_DIRS));
+		setOption(OPT_SHOW_ROOTS, 
+				prefStore.getBoolean(PreferenceConstants.PREF_SHOW_ROOTS));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Listener to identify changes being made to this plug-in's preference store, typically
+	 * as part of editing the Disco preferences (this could change how our editor is displayed).
+	 */
+	private IPropertyChangeListener preferenceStoreChangeListener =
+		new IPropertyChangeListener() {
+
+			/**
+			 * Completely redraw the files editor tree, based on the new preference
+			 * settings.
+			 */
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				updateOptionsFromPreferenceStore();
+				filesTreeViewer.setInput(contentProvider.getRootElements());
+				filesTreeViewer.refresh();
+			}
+		};
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+	
+		/* remove this preference store listender */
+		Activator.getDefault().getPreferenceStore().
+				removePropertyChangeListener(preferenceStoreChangeListener);
+		super.dispose();
 	}
 
 	/*-------------------------------------------------------------------------------------*/

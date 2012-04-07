@@ -5,22 +5,37 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The activator class controls the plug-in life cycle
+ * The activator class for the Disco editor. A single instance of this class is
+ * created when the plug-in is loaded. It provides a central location for
+ * accessing the plug-in's features.
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+	
+	/** The plug-in ID for the Disco editor */
 	public static final String PLUGIN_ID = "com.arapiki.disco";
 
-	// The shared instance
+	/** The shared instance of this plug-in (a singleton) */
 	private static Activator plugin;
 	
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
+	
 	/**
-	 * The constructor
+	 * Create a new Activator object (although typically you would use getDefault()
+	 * to return the single instance of this class.
 	 */
 	public Activator() {
 	}
 
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -29,6 +44,8 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/*
 	 * (non-Javadoc)
@@ -39,14 +56,19 @@ public class Activator extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
-	 * Returns the shared instance
+	 * Returns the shared instance. This is used by many different classes for
+	 * retrieving the single instance of the Activator class.
 	 *
 	 * @return the shared instance
 	 */
 	public static Activator getDefault() {
 		return plugin;
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Returns an image descriptor for the image file at the given
@@ -58,4 +80,6 @@ public class Activator extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

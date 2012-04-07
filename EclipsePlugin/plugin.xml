@@ -8,7 +8,7 @@
             default="true"
             extensions="disco"
             icon="images/disco_editor_img.bmp"
-            id="com.arapiki.disco.maineditor"
+            id="com.arapiki.disco.eclipse.editors.main"
             name="Disco Build Editor">
       </editor>
    </extension>
@@ -160,6 +160,29 @@
             </count>
          </enabledWhen>
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.arapiki.disco.eclipse.preferences.DiscoTopLevelPreferencePage"
+            id="com.arapiki.disco.eclipse.preferences.DiscoPreferencePage"
+            name="Disco">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.arapiki.disco.eclipse.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.arapiki.disco.eclipse.preferences.DiscoAppearancePreferencePage"
+            id="com.arapiki.disco.eclipse.preferences.DiscoAppearancePreferencePage"
+            category="com.arapiki.disco.eclipse.preferences.DiscoPreferencePage"
+            name="Appearance">
+      </page>
    </extension>
 
 </plugin>
