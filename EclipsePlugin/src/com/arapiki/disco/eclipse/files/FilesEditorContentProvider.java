@@ -123,7 +123,12 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			/* query the BuildStore for this element's parent */
 			FileRecord frElement = (FileRecord)element;
 			int parentId = fns.getParentPath(frElement.getId());
-			
+
+			/* base case - parent of / is null */
+			if (parentId == frElement.getId()) {
+				return null;
+			}
+						
 			/* if there's an error, inform the caller that we can't find the parent */
 			if (parentId < 0) {
 				return null;
