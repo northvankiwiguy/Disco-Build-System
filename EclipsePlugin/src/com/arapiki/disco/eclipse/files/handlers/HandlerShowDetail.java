@@ -119,15 +119,8 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 		
 		/*
 		 * Refresh the DiscoFilesEditor content as a background task.
-		 * TODO: add a progress bar, since this often takes a while to complete.
 		 */
-		PlatformUI.getWorkbench().getDisplay().asyncExec(
-				new Runnable() {
-					@Override
-					public void run() {
-						subEditor.refreshView();						
-					}
-				});
+		subEditor.refreshView();						
 		return null;
 	}
 

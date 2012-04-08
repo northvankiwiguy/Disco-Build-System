@@ -13,6 +13,9 @@
 package com.arapiki.disco.eclipse.files;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -27,11 +30,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import com.arapiki.disco.eclipse.Activator;
@@ -326,11 +331,44 @@ public class DiscoFilesEditor extends EditorPart {
 	/**
 	 * Refresh the editor's content. This is typically called when some type of display
 	 * option changes (e.g. roots or components have been added), and the content is now
-	 * different.
+	 * different. We use a progress monitor, since a redraw operation might take a while.
 	 */
 	public void refreshView() {
-		filesTreeViewer.setInput(contentProvider.getRootElements());
-		filesTreeViewer.refresh();
+		
+		/*
+		 * Create a new job that will be run in the background, and monitored by the
+		 * progress monitor. Note that only the portions of this job that update the
+		 * UI should be run as the UI thread. Otherwise the job appears to block the
+		 * whole UI.
+		 */
+		Job redrawJob = new Job("Redraw") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask("Redrawing editor content...", 3);
+				monitor.worked(1);
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						filesTreeViewer.setInput(contentProvider.getRootElements());						
+					}
+				});
+				monitor.worked(1);
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						filesTreeViewer.refresh();
+					}
+				});
+				monitor.worked(1);
+				monitor.done();
+				return Status.OK_STATUS;
+			}
+		};
+		
+		/* start up the progress monitor service so that it monitors the job */
+		PlatformUI.getWorkbench().getProgressService().showInDialog(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), redrawJob);
+		redrawJob.schedule();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
