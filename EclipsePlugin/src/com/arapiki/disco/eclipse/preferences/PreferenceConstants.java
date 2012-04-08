@@ -16,12 +16,6 @@ public class PreferenceConstants {
 	 * three separate lines in the directory tree.
 	 */
 	public static final String PREF_COALESCE_DIRS = "coalesceDirectoryPreference";
-
-	/**
-	 * Preference: whether or not file path roots should be displayed
-	 * in a file editor (otherwise only the path name is displayed).
-	 */
-	public static final String PREF_SHOW_ROOTS = "showRootsPreference";
 	
 	/*-------------------------------------------------------------------------------------*/
 }

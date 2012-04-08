@@ -70,6 +70,32 @@
             id="com.arapiki.disco.eclipse.commands.expandFileSubTree"
             name="Expand subtree">
       </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.showPathRoots"
+            name="Show path roots">
+         <commandParameter
+               id="com.arapiki.disco.eclipse.commandParameters.showDetail"
+               name="showDetail"
+               optional="false">
+         </commandParameter>
+         <state
+               class="org.eclipse.jface.commands.ToggleState"
+               id="com.arapiki.disco.eclipse.commands.showPathRoots.state">
+         </state>
+      </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.showComponents"
+            name="Show components">
+         <commandParameter
+               id="com.arapiki.disco.eclipse.commandParameters.showDetail"
+               name="showDetail"
+               optional="true">
+         </commandParameter>
+         <state
+               class="org.eclipse.jface.commands.ToggleState"
+               id="com.arapiki.disco.eclipse.commands.showComponents.state">
+         </state>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -97,6 +123,27 @@
                name="com.arapiki.disco.eclipse.commands.separator1"
                visible="true">
          </separator>
+         <menu
+               label="Show detail...">
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
+                  label="Path Roots"
+                  style="toggle">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     value="path-roots">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.showComponents"
+                  label="Components"
+                  style="toggle">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     value="components">
+               </parameter>
+            </command>
+         </menu>
          <menu
                label="Show Tasks that...">
             <command
@@ -191,6 +238,14 @@
       <handler
             class="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
             commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
+            commandId="com.arapiki.disco.eclipse.commands.showPathRoots">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
+            commandId="com.arapiki.disco.eclipse.commands.showComponents">
       </handler>
    </extension>
    <extension

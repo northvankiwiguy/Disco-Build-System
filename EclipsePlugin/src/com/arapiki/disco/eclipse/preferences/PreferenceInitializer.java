@@ -25,7 +25,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		/* Set defaults for preferences on the "Appearance" page. */
 		store.setDefault(PreferenceConstants.PREF_COALESCE_DIRS, true);
-		store.setDefault(PreferenceConstants.PREF_SHOW_ROOTS, false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

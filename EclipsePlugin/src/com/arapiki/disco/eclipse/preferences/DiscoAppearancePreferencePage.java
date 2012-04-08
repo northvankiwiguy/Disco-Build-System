@@ -40,12 +40,6 @@ public class DiscoAppearancePreferencePage
 				PreferenceConstants.PREF_COALESCE_DIRS,
 				"To save space, &coalesce directory hierarchies onto a single line.",
 				getFieldEditorParent()));
-
-		addField(
-			new BooleanFieldEditor(
-				PreferenceConstants.PREF_SHOW_ROOTS,
-				"Show file path &roots at the top level of file editors.",
-				getFieldEditorParent()));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

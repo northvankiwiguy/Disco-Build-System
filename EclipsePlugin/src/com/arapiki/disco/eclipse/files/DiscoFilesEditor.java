@@ -80,6 +80,12 @@ public class DiscoFilesEditor extends EditorPart {
 	 * feature enabled, the top-level directory names will be shown.
 	 */
 	public static final int OPT_SHOW_ROOTS			= 2;
+	
+	/**
+	 * Option to display each path's component name, alongside the path name itself.
+	 */
+	public static final int OPT_SHOW_COMPONENTS		= 4;
+	
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -302,8 +308,6 @@ public class DiscoFilesEditor extends EditorPart {
 		
 		setOption(OPT_COALESCE_DIRS, 
 				prefStore.getBoolean(PreferenceConstants.PREF_COALESCE_DIRS));
-		setOption(OPT_SHOW_ROOTS, 
-				prefStore.getBoolean(PreferenceConstants.PREF_SHOW_ROOTS));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -319,13 +323,25 @@ public class DiscoFilesEditor extends EditorPart {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Refresh the editor's content. This is typically called when some type of display
+	 * option changes (e.g. roots or components have been added), and the content is now
+	 * different.
+	 */
+	public void refreshView() {
+		filesTreeViewer.setInput(contentProvider.getRootElements());
+		filesTreeViewer.refresh();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
 	@Override
 	public void dispose() {
-	
-		/* remove this preference store listender */
+		
+		/* remove this preference store listener */
 		Activator.getDefault().getPreferenceStore().
 				removePropertyChangeListener(preferenceStoreChangeListener);
 		super.dispose();
