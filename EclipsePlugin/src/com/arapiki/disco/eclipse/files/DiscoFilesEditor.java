@@ -29,9 +29,13 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
@@ -56,7 +60,16 @@ public class DiscoFilesEditor extends EditorPart {
 	 *=====================================================================================*/
 
 	/** This editor's main control is a TreeViewer, for displaying the list of files */
-	TreeViewer filesTreeViewer = null;
+	private TreeViewer filesTreeViewer = null;
+	
+	/** The column that displays the path tree */
+	private TreeColumn treeColumn;
+	
+	/** The column that displays the component name */
+	private TreeColumn compColumn;
+	
+	/** The column that displays the path's visibility */
+	private TreeColumn visibilityColumn;
 	
 	/** The BuildStore we're editing */
 	private BuildStore buildStore = null;
@@ -72,6 +85,17 @@ public class DiscoFilesEditor extends EditorPart {
 	 * OPT_* values.
 	 */
 	private int editorOptionBits = 0;
+	
+	/**
+	 * The previous set of option bits. The refreshView() method uses this value to
+	 * determine which aspects of the TreeViewer must be redrawn.
+	 */
+	private int previousEditorOptionBits = 0;
+
+	/**
+	 * The TreeViewer's parent control.
+	 */
+	private Composite filesEditorComposite;
 	
 	/** 
 	 * Option to enable coalescing of folders in the file editor. That is, if a folder
@@ -180,16 +204,48 @@ public class DiscoFilesEditor extends EditorPart {
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
+		
+		/* create the main Tree control that the user will view/manipulate */
+		Tree fileEditorTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL |
+															SWT.MULTI | SWT.FULL_SELECTION);
+		fileEditorTree.setHeaderVisible(true);
+	    fileEditorTree.setLinesVisible(true);
 		
 		/*
 		 * The main control in this editor is a TreeViewer that allows the user to
-		 * browse the structure of the BuildStore's file system.
+		 * browse the structure of the BuildStore's file system. It has three columns:
+		 *    1) The file system path (shown as a tree).
+		 *    2) The path's component (shown as a fixed-width column);
+		 *    3) The path's visibility (private, public etc).
 		 */
-		filesTreeViewer = new TreeViewer(parent, SWT.MULTI | SWT.FULL_SELECTION);
+		filesTreeViewer = new TreeViewer(fileEditorTree);
+		treeColumn = new TreeColumn(fileEditorTree, SWT.LEFT);
+	    treeColumn.setAlignment(SWT.LEFT);
+	    treeColumn.setText("Path");
+	    compColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
+	    compColumn.setAlignment(SWT.LEFT);
+	    compColumn.setText("Component");
+	    visibilityColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
+	    visibilityColumn.setAlignment(SWT.LEFT);
+	    visibilityColumn.setText("Visibility");
+	    filesEditorComposite = parent;
+	    
+	    /*
+	     * Set the initial column widths so that the path column covers the full editor
+	     * window, and the component/section columns are empty. Setting the path column
+	     * to a non-zero pixel width causes it to be expanded to the editor's full width. 
+	     */
+	    treeColumn.setWidth(1);
+	    compColumn.setWidth(0);
+	    visibilityColumn.setWidth(0);
 		
+	    /*
+		 * Add the tree/table content and label providers.
+		 */
 		contentProvider = new FilesEditorContentProvider(this, fns);
-		FilesEditorLabelProvider labelProvider = new FilesEditorLabelProvider(this, fns);
+		FilesEditorLabelProvider labelProvider = 
+				new FilesEditorLabelProvider(this, fns, buildStore.getComponents());
 		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);
@@ -204,6 +260,12 @@ public class DiscoFilesEditor extends EditorPart {
 		Activator.getDefault().getPreferenceStore().
 					addPropertyChangeListener(preferenceStoreChangeListener);
 		
+		/*
+		 * Record the initial set of option bits so that we can later determine
+		 * which bits have been modified (this is used in refreshView()).
+		 */
+		previousEditorOptionBits = getOptions();
+		
 		/* automatically expand the first few levels of the tree */
 		filesTreeViewer.setAutoExpandLevel(2);
 		
@@ -217,6 +279,23 @@ public class DiscoFilesEditor extends EditorPart {
 					filesTreeViewer.setExpandedState(node, 
 							!filesTreeViewer.getExpandedState(node));
 				}
+			}
+		});
+		
+		/* 
+		 * Resizing the top-level shell causes columns to be realigned/redrawn. We need
+		 * to schedule this as a UI thread runnable, since we don't want it to run until
+		 * after the resizing has finished, at which point we know the new window size.
+		 * TODO: add a removeListener.
+		 */
+		parent.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						refreshView();
+					}
+				});
 			}
 		});
 		
@@ -331,11 +410,38 @@ public class DiscoFilesEditor extends EditorPart {
 	/**
 	 * Refresh the editor's content. This is typically called when some type of display
 	 * option changes (e.g. roots or components have been added), and the content is now
-	 * different. We use a progress monitor, since a redraw operation might take a while.
+	 * different, or if the user resizes the main Eclipse shell. We use a progress monitor,
+	 * since a redraw operation might take a while.
 	 */
 	public void refreshView() {
 		
+		/* compute the set of option bits that have changed since we were last called */
+		int currentOptions = getOptions();
+		int changedOptions = previousEditorOptionBits ^ currentOptions;
+		previousEditorOptionBits = currentOptions;
+		
 		/*
+		 * Determine whether the components/visibility columns should be shown. Setting the
+		 * width appropriately is important, especially if the shell was recently resized.
+		 * TODO: figure out why subtracting 20 pixels is important for matching the column
+		 * size with the size of the parent composite.
+		 */
+	    int editorWidth = filesEditorComposite.getClientArea().width - 20;
+	    int compWidth = isOptionSet(OPT_SHOW_COMPONENTS) ? 100 : 0;
+	    treeColumn.setWidth(editorWidth - 2 * compWidth);
+	    compColumn.setWidth(compWidth);
+	    visibilityColumn.setWidth(compWidth);
+
+		/*
+		 * Has the content of the tree changed, or just the visibility of columns? If
+		 * it's just the columns, then we don't need to re-query the model in order to redisplay
+		 */
+		if ((changedOptions & (OPT_COALESCE_DIRS | OPT_SHOW_ROOTS)) == 0) {
+			return;
+		}
+		
+		/*
+		 * We need to re-query the model and redisplay some (or all) of the tree items.
 		 * Create a new job that will be run in the background, and monitored by the
 		 * progress monitor. Note that only the portions of this job that update the
 		 * UI should be run as the UI thread. Otherwise the job appears to block the

@@ -188,6 +188,32 @@
             </command>
          </menu>
       </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.arapiki.disco.eclipse.toolbars.main">
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
+                  label="Show Path Roots"
+                  style="toggle"
+                  tooltip="Show path roots in the file editor.">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     value="path-roots">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.showComponents"
+                  label="Show Components"
+                  style="toggle"
+                  tooltip="Show component names in the file editor.">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     value="components">
+               </parameter>
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">

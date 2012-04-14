@@ -14,13 +14,15 @@ package com.arapiki.disco.eclipse.files;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.arapiki.disco.eclipse.Activator;
+import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
@@ -29,7 +31,7 @@ import com.arapiki.disco.model.FileNameSpaces.PathType;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class FilesEditorLabelProvider extends LabelProvider {
+public class FilesEditorLabelProvider implements ITableLabelProvider {
 	
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -40,6 +42,9 @@ public class FilesEditorLabelProvider extends LabelProvider {
 	
 	/** The FileNameSpaces object we'll use for querying file information from the BuildStore */
 	private FileNameSpaces fns;
+	
+	/** The Components object we'll use for querying path component information */
+	private Components comps;
 	
 	/** The ID of the top-root for our FileNameSpaces object */
 	private int topRootId;
@@ -58,11 +63,14 @@ public class FilesEditorLabelProvider extends LabelProvider {
 	 * labels for the DiscoFilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
 	 * @param fns The FileNameSpaces object we're graphically representing.
+	 * @param comps The Components object containing path component information.
 	 */
-	public FilesEditorLabelProvider(DiscoFilesEditor editor, FileNameSpaces fns) {
+	public FilesEditorLabelProvider(DiscoFilesEditor editor, FileNameSpaces fns,
+					Components comps) {
 
 		this.editor = editor;
 		this.fns = fns;
+		this.comps = comps;
 	
 		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
 		folderImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
@@ -76,44 +84,55 @@ public class FilesEditorLabelProvider extends LabelProvider {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+	/**
+	 * @param element
+	 * @return An Image for the specified column.
 	 */
-	@Override
-	public Image getImage(Object element) {
-
-		/* we only care about FileRecord types */
-		if (element instanceof FileRecord) {
-			FileRecord fr = (FileRecord)element;
-			PathType pathType = fns.getPathType(fr.getId());
+	public Image getColumnImage(Object element, int columnIndex) {
+	
+		switch (columnIndex) {
+		
+		 /* select an image for the tree column */
+		case 0:
 			
-			switch (pathType) {
-			case TYPE_INVALID:
-				return null;
-			case TYPE_DIR:
-				return folderImage;
-			case TYPE_FILE:
-				/*
-				 * Fetch the image that's normally associated with the file type
-				 * (based on its file suffix). Rather than creating a large number
-				 * of images, we cache them in this plugin's image registry.
-				 */
-				IEditorRegistry editorImageRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-				String name = fns.getBaseName(fr.getId());
-				ImageDescriptor imageDescr = editorImageRegistry.getImageDescriptor(name);
+			/* we only care about FileRecord types */
+			if (element instanceof FileRecord) {
+				FileRecord fr = (FileRecord)element;
+				PathType pathType = fns.getPathType(fr.getId());
 
-				/* can we get this image from the plugin's cache? */
-				ImageRegistry pluginImageRegistry = Activator.getDefault().getImageRegistry();
-				Image iconImage = pluginImageRegistry.get(imageDescr.toString());
-				if (iconImage == null) {
-					iconImage = imageDescr.createImage();
-					pluginImageRegistry.put(imageDescr.toString(), iconImage);
+				switch (pathType) {
+				case TYPE_INVALID:
+					return null;
+				case TYPE_DIR:
+					return folderImage;
+				case TYPE_FILE:
+					/*
+					 * Fetch the image that's normally associated with the file type
+					 * (based on its file suffix). Rather than creating a large number
+					 * of images, we cache them in this plugin's image registry.
+					 */
+					IEditorRegistry editorImageRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+					String name = fns.getBaseName(fr.getId());
+					ImageDescriptor imageDescr = editorImageRegistry.getImageDescriptor(name);
+
+					/* can we get this image from the plugin's cache? */
+					ImageRegistry pluginImageRegistry = Activator.getDefault().getImageRegistry();
+					Image iconImage = pluginImageRegistry.get(imageDescr.toString());
+					if (iconImage == null) {
+						iconImage = imageDescr.createImage();
+						pluginImageRegistry.put(imageDescr.toString(), iconImage);
+					}
+					return iconImage;
+
+				case TYPE_SYMLINK:
+					return symlinkImage;
 				}
-				return iconImage;
-				
-			case TYPE_SYMLINK:
-				return symlinkImage;
 			}
+
+		/* there is no image for the component column or the visibility column. */
+		case 1:
+		case 2:
+			return null;
 		}
 		
 		/* by default, show nothing */
@@ -122,42 +141,81 @@ public class FilesEditorLabelProvider extends LabelProvider {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+	/**
+	 * @param element
+	 * @return The text that will be displayed in the specified column.
 	 */
-	@Override
-	public String getText(Object element) {
+	public String getColumnText(Object element, int columnIndex) {
 
-		/* for FileRecords, we return the path's base name */
 		if (element instanceof FileRecord) {
 			FileRecord fr = (FileRecord)element;
 			int pathId = fr.getId();
-			
-			/* case: show file path roots */
-			if (editor.isOptionSet(DiscoFilesEditor.OPT_SHOW_ROOTS)) {
-				String rootName = fns.getRootAtPath(pathId);
-				if (rootName != null) {
-					String fullPath = fns.getPathName(pathId);
-					return "@" + rootName + " (" + fullPath + ")";
+
+			switch (columnIndex) {
+
+			/* select the text for the file tree column */
+			case 0:
+
+				/* for FileRecords, we return the path's base name */
+
+				/* case: show file path roots */
+				if (editor.isOptionSet(DiscoFilesEditor.OPT_SHOW_ROOTS)) {
+					String rootName = fns.getRootAtPath(pathId);
+					if (rootName != null) {
+						String fullPath = fns.getPathName(pathId);
+						return "@" + rootName + " (" + fullPath + ")";
+					}
 				}
-			}
-				
-			/* case: show the directory, but coalesce child directories */
-			if (editor.isOptionSet(DiscoFilesEditor.OPT_COALESCE_DIRS)) {
-				return getCoalescedText(pathId);
-				
-			/* case: show the directory, with no coalescing */
-			} else {
-				String pathName;
-				
-				if (fns.getParentPath(pathId) == topRootId) {
-					pathName = "/" + fns.getBaseName(pathId);
+
+				/* case: show the directory, but coalesce child directories */
+				if (editor.isOptionSet(DiscoFilesEditor.OPT_COALESCE_DIRS)) {
+					return getCoalescedText(pathId);
+
+					/* case: show the directory, with no coalescing */
 				} else {
-					pathName = fns.getBaseName(pathId);					
+					String pathName;
+
+					if (fns.getParentPath(pathId) == topRootId) {
+						pathName = "/" + fns.getBaseName(pathId);
+					} else {
+						pathName = fns.getBaseName(pathId);					
+					}
+					return pathName;
 				}
-				return pathName;
+
+			/* select text for the component column */
+			case 1:
+				Integer compInfo[] = comps.getFileComponent(pathId);
+				if (compInfo == null) {
+					break;	/* return "invalid" */
+				}
+				if (compInfo[0] == 0) {
+					return "";
+				}
+				String compName = comps.getComponentName(compInfo[0]);
+				if (compName == null) {
+					break; /* return "invalid" */
+				}
+				return compName;
+				
+			/* select text for the visibility column */
+			case 2:
+				compInfo = comps.getFileComponent(pathId);
+				if (compInfo == null) {
+					break;	/* return "invalid" */
+				}
+				if (compInfo[1] == 0) {
+					return "";
+				}
+				String sectName = comps.getSectionName(compInfo[1]);
+				if (sectName == null) {
+					break; /* return "invalid" */
+				}
+				return sectName;
+				
 			}
 		}
+
 		return "<invalid>";
 	}
 	
@@ -209,6 +267,42 @@ public class FilesEditorLabelProvider extends LabelProvider {
 		}
 		
 		return sb.toString();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 */
+	public void addListener(ILabelProviderListener listener) {
+		/* empty */
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+	 */
+	public void dispose() {
+		/* empty */
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
+	 */
+	public boolean isLabelProperty(Object element, String property) {
+		return false;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 */
+	public void removeListener(ILabelProviderListener listener) {
+		/* empty */
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
