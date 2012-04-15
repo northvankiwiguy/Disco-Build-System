@@ -7,7 +7,7 @@
             class="com.arapiki.disco.eclipse.DiscoMainEditor"
             default="true"
             extensions="disco"
-            icon="images/disco_editor_img.bmp"
+            icon="images/disco_editor_img.gif"
             id="com.arapiki.disco.eclipse.editors.main"
             name="Disco Build Editor">
       </editor>
@@ -127,6 +127,7 @@
                label="Show detail...">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
+                  icon="images/show_roots_icon.gif"
                   label="Path Roots"
                   style="toggle">
                <parameter
@@ -194,6 +195,7 @@
                id="com.arapiki.disco.eclipse.toolbars.main">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
+                  icon="images/show_roots_icon.gif"
                   label="Show Path Roots"
                   style="toggle"
                   tooltip="Show path roots in the file editor.">
@@ -204,6 +206,7 @@
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showComponents"
+                  icon="images/show_components_icon.gif"
                   label="Show Components"
                   style="toggle"
                   tooltip="Show component names in the file editor.">
