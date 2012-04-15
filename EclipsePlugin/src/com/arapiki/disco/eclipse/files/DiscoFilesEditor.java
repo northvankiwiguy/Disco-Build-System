@@ -290,12 +290,7 @@ public class DiscoFilesEditor extends EditorPart {
 		 */
 		parent.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						refreshView();
-					}
-				});
+				refreshView();
 			}
 		});
 		
@@ -426,11 +421,16 @@ public class DiscoFilesEditor extends EditorPart {
 		 * TODO: figure out why subtracting 20 pixels is important for matching the column
 		 * size with the size of the parent composite.
 		 */
-	    int editorWidth = filesEditorComposite.getClientArea().width - 20;
-	    int compWidth = isOptionSet(OPT_SHOW_COMPONENTS) ? 100 : 0;
-	    treeColumn.setWidth(editorWidth - 2 * compWidth);
-	    compColumn.setWidth(compWidth);
-	    visibilityColumn.setWidth(compWidth);
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+			    int editorWidth = filesEditorComposite.getClientArea().width - 20;
+			    int compWidth = isOptionSet(OPT_SHOW_COMPONENTS) ? 100 : 0;
+			    treeColumn.setWidth(editorWidth - 2 * compWidth);
+			    compColumn.setWidth(compWidth);
+			    visibilityColumn.setWidth(compWidth);				
+			}
+		});
 
 		/*
 		 * Has the content of the tree changed, or just the visibility of columns? If
