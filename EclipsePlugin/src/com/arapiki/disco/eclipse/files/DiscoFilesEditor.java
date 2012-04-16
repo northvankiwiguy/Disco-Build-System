@@ -26,6 +26,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -53,7 +54,7 @@ import com.arapiki.disco.model.types.FileRecord;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class DiscoFilesEditor extends EditorPart {
+public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -266,9 +267,6 @@ public class DiscoFilesEditor extends EditorPart {
 		 */
 		previousEditorOptionBits = getOptions();
 		
-		/* automatically expand the first few levels of the tree */
-		filesTreeViewer.setAutoExpandLevel(2);
-		
 		/* double-clicking on an expandable node will expand/contract that node */
 		filesTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
@@ -308,6 +306,12 @@ public class DiscoFilesEditor extends EditorPart {
 		filesTreeViewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, filesTreeViewer);
 		getSite().setSelectionProvider(filesTreeViewer);
+		
+		/* 
+		 * When the tree viewer needs to compare its elements, this class
+		 * (DiscoFilesEditor) provides the equals() and hashcode() methods.
+		 */
+		filesTreeViewer.setComparer(this);
 
 		/* start by displaying from the root (which changes, depending on our options). */
 		filesTreeViewer.setInput(contentProvider.getRootElements());
@@ -450,19 +454,23 @@ public class DiscoFilesEditor extends EditorPart {
 		Job redrawJob = new Job("Redraw") {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("Redrawing editor content...", 3);
+				monitor.beginTask("Redrawing editor content...", 2);
 				monitor.worked(1);
 				Display.getDefault().syncExec(new Runnable() {
 					@Override
 					public void run() {
-						filesTreeViewer.setInput(contentProvider.getRootElements());						
-					}
-				});
-				monitor.worked(1);
-				Display.getDefault().syncExec(new Runnable() {
-					@Override
-					public void run() {
+						Object[] expandedElements = filesTreeViewer.getExpandedElements();
+						filesTreeViewer.setInput(contentProvider.getRootElements());
 						filesTreeViewer.refresh();
+						
+						/* 
+						 * Ensure that all previously-expanded items are now expanded again.
+						 * Note: we can't use setExpandedElements(), as that won't always
+						 * open all the parent elements as well.
+						 */
+						for (int i = 0; i < expandedElements.length; i++) {
+							filesTreeViewer.expandToLevel(expandedElements[i], 1);							
+						}
 					}
 				});
 				monitor.worked(1);
@@ -489,6 +497,39 @@ public class DiscoFilesEditor extends EditorPart {
 		Activator.getDefault().getPreferenceStore().
 				removePropertyChangeListener(preferenceStoreChangeListener);
 		super.dispose();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IElementComparer#equals(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object a, Object b) {
+				
+		if (a == b) {
+			return true;
+		}
+
+		if ((a instanceof FileRecord) && (b instanceof FileRecord)) {
+			return ((FileRecord)a).getId() == ((FileRecord)b).getId();		
+		}
+		
+		return false;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IElementComparer#hashCode(java.lang.Object)
+	 */
+	@Override
+	public int hashCode(Object element) {
+
+		if (!(element instanceof FileRecord)) {
+			return 0;
+		}		
+		return ((FileRecord)element).getId();
 	}
 
 	/*=====================================================================================*
