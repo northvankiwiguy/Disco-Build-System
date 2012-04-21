@@ -213,6 +213,17 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Given a path ID, return the array of children of the path.
+	 * @param id The ID of the path whose children we wish to determine.
+	 */
+	@Override
+	public Integer[] getChildren(int id) {
+		return fns.getChildPaths(id);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Create a new FileRecord object, which can be used as an entry in the FileSet.
 	 * 
 	 * @param id The ID to assign to the new object.

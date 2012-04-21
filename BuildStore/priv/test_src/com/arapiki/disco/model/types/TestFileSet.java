@@ -23,6 +23,7 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.utils.errors.ErrorCode;
@@ -42,6 +43,32 @@ public class TestFileSet {
 	/** Our test FileNameSpaces object */
 	private FileNameSpaces fns;
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper method for checking that IDs *are* in a set.
+	 * @param fs The set to check against.
+	 * @param ids The array of IDs to check. 
+	 */
+	private void checkMembers(FileSet fs, Integer[] ids) {
+		for (Integer id : ids) {
+			assertTrue(fs.isMember(id));
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper method for checking that IDs *are not* in a set.
+	 * @param fs The set to check against.
+	 * @param ids The array of IDs to check. 
+	 */
+	private void checkNotMembers(FileSet fs, Integer[] ids) {
+		for (Integer id : ids) {
+			assertFalse(fs.isMember(id));
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -602,6 +629,85 @@ public class TestFileSet {
 		assertFalse(fs.isMember(42));		
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the addSubTree() method.
+	 */
+	@Test
+	public void testAddSubTree() {
+		
+		int fileA = fns.addFile("/1/2/3/4/A.c");
+		int fileB = fns.addFile("/1/2/3/4/B.c");
+		int fileC = fns.addFile("/1/2/3/4/C.c");
+		int fileD = fns.addFile("/1/2/3/4/5/D.c");
+		int fileE = fns.addFile("/1/2/3/4/5/E.c");
+		int fileF = fns.addFile("/1/2/3/4/5/6/F.c");
+		int fileG = fns.addFile("/1/2/7/G.c");
+		int fileH = fns.addFile("/1/2/7/H.c");
+		int fileI = fns.addFile("/1/2/7/I.c");
+		int fileJ = fns.addFile("/1/2/7/8/J.c");
+		int fileK = fns.addFile("/1/2/7/8/9/K.c");
+		int dirRoot = fns.getPath("/");
+		int dir1 = fns.getPath("/1");
+		int dir2 = fns.getPath("/1/2");
+		int dir3 = fns.getPath("/1/2/3");
+		int dir4 = fns.getPath("/1/2/3/4");
+		int dir5 = fns.getPath("/1/2/3/4/5");
+		int dir6 = fns.getPath("/1/2/3/4/5/6");
+		int dir7 = fns.getPath("/1/2/7");
+		int dir8 = fns.getPath("/1/2/7/8");
+		int dir9 = fns.getPath("/1/2/7/8/9");
+		
+		/* initially, the set is empty */
+		assertEquals(0, fs.size());
+		
+		/* 
+		 * add the sub-tree rooted at 5 (D.c, E.c, F.c and all the paths above should be added).
+		 */
+		fs.addSubTree(dir5);
+		assertEquals(10, fs.size());
+		checkMembers(fs, 
+				new Integer[] { dirRoot, dir1, dir2, dir3, dir4, dir5, dir6, fileD, fileE, fileF });
+
+		/* Nothing else should have been added	*/
+		checkNotMembers(fs, 
+				new Integer[] { dir7, dir8, dir9, fileA, fileB, fileC, fileG, fileH, fileI, fileJ, fileK});		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the removeSubTree() method.
+	 */
+	@Test
+	public void testRemoveSubTree() {
+		
+		/* add a bunch of files to the fns, then populate the FileSet with them all */
+		int fileA = fns.addFile("/1/2/3/4/A.c");
+		int fileB = fns.addFile("/1/2/3/4/B.c");
+		int fileC = fns.addFile("/1/2/3/4/C.c");
+		int fileD = fns.addFile("/1/2/3/4/5/D.c");
+		int fileE = fns.addFile("/1/2/3/4/5/E.c");
+		int fileF = fns.addFile("/1/2/3/4/5/6/F.c");
+		int fileG = fns.addFile("/1/2/7/G.c");
+		int fileH = fns.addFile("/1/2/7/H.c");
+		int fileI = fns.addFile("/1/2/7/I.c");
+		int fileJ = fns.addFile("/1/2/7/8/J.c");
+		int fileK = fns.addFile("/1/2/7/8/9/K.c");
+		int dir7 = fns.getPath("/1/2/7");
+		int dir8 = fns.getPath("/1/2/8");
+		int dir9 = fns.getPath("/1/2/9");
+		fs = bs.getReports().reportAllFiles();
+		
+		/* all files should be present now */
+		assertEquals(21, fs.size());
+		
+		/* remove the sub-tree, rooted at directory 7 */
+		fs.removeSubTree(dir7);
+		assertEquals(13, fs.size());
+		checkNotMembers(fs, new Integer[] {dir7, dir8, dir9, fileG, fileH, fileI, fileJ, fileK});
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 

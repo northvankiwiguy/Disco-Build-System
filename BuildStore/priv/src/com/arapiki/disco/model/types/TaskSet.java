@@ -100,6 +100,17 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 		
 		return parent;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a task's ID, return the array of children of the task.
+	 * @param id The ID of the task whose children we wish to determine.
+	 */
+	@Override
+	public Integer[] getChildren(int id) {
+		return bts.getChildren(id);
+	}
 
 	/*-------------------------------------------------------------------------------------*/
 

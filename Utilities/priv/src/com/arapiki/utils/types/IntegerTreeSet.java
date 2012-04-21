@@ -17,6 +17,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import com.arapiki.utils.errors.ErrorCode;
+
 /**
  * This is an abstract class for implementing a tree-like set of integer keys, and their
  * respective values. That is, the elements in the set are arranged in a tree structure
@@ -148,11 +150,24 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 	 * must be overridden by sub-classes that actually know what the parent-child relations
 	 * should be.
 	 * 
-	 * @param id The ID of the element we want to find the parent of
+	 * @param id The ID of the element we want to find the parent of.
 	 * @return The ID of this element's parent, or ErrorCode.NOT_FOUND.
 	 */
 	public abstract int getParent(int id);
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Abstract method for fetching the array of children of a particular element. This
+	 * method must be overridden by sub-classes that actually know what the parent-child
+	 * relations should be.
+	 * @param id The ID of the element we want to find the children of.
+	 * @return An Integer[] of IDs of this element's children. If there are no children,
+	 * 			return Integer[0].
+	 */
+	public abstract Integer[] getChildren(int id);
+	
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -252,5 +267,63 @@ public abstract class IntegerTreeSet<T extends IntegerTreeRecord> implements Ite
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add all the elements in the sub-tree which is rooted at "id". If necessary, the parents
+	 * of "id" will also be added so that all newly added elements are reachable from
+	 * the root.
+	 * 
+	 * @param id The tree element whose sub-tree should be added to the set.
+	 */
+	public void addSubTree(int id) {
+		
+		/* first, add this path and all it's descendants. This is done recursively */
+		addSubTreeHelper(id);
+		
+		/* now progress upwards, ensuring that all parents are added too */
+		while (true) {
+			int parentId = getParent(id);
+			
+			/* stop on error, or if we hit the root (/) */
+			if ((parentId == ErrorCode.NOT_FOUND) || (parentId == id)) {
+				break;
+			}
+			add(newRecord(parentId));
+			id = parentId;
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove all the element in the sub-tree which is rooted at "id".
+	 * @param id The tree element whose sub-tree should be removed from the set.
+	 */
+	public void removeSubTree(int id) {
+		remove(id);
+		Integer children[] = getChildren(id);
+		for (int i = 0; i < children.length; i++) {
+			removeSubTree(children[i]);
+		}
+	}
+	
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * A helper method for addSubTree() that traverses downwards through the children
+	 * of the given path.
+	 * @param id The path whose sub-tree should be added to the set.
+	 */
+	private void addSubTreeHelper(int id) {
+		add(newRecord(id));
+		Integer children [] = getChildren(id);
+		for (int i = 0; i < children.length; i++) {
+			addSubTreeHelper(children[i]);
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
