@@ -677,5 +677,60 @@ public class TestReports {
 		assertTrue(result.isMember(fileProgJar));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportAllFiles()}.
+	 */
+	@Test
+	public void testAllFiles() {
+
+		int dirRoot = fns.getPath("/");
+
+		/* an empty file store still has the "/" path in it */
+		FileSet result = reports.reportAllFiles();
+		assertEquals(1, result.size());
+		assertTrue(result.isMember(dirRoot));
+		
+		/* add a bunch of paths and test that their in the set */
+		int fileAJava = fns.addFile("/a.java");
+		int fileBJava = fns.addFile("/b.java");
+		int fileCJava = fns.addFile("/c.java");
+		int fileAC = fns.addFile("/a/A.c");
+		int fileBC = fns.addFile("/a/b/B.c");
+		int fileCC = fns.addFile("/a/b/c/C.c");
+		int dirA = fns.getPath("/a");
+		int dirB = fns.getPath("/a/b");
+		int dirC = fns.getPath("/a/b/c");
+		
+		result = reports.reportAllFiles();
+		assertEquals(10, result.size());
+		assertTrue(result.isMember(fileAJava));
+		assertTrue(result.isMember(fileBJava));
+		assertTrue(result.isMember(fileCJava));
+		assertTrue(result.isMember(fileAC));
+		assertTrue(result.isMember(fileBC));
+		assertTrue(result.isMember(fileCC));
+		assertTrue(result.isMember(dirA));
+		assertTrue(result.isMember(dirB));
+		assertTrue(result.isMember(dirC));
+		
+		/* delete a few paths and try again */
+		fns.removePath(fileAC);
+		result = reports.reportAllFiles();
+		assertEquals(9, result.size());
+		assertFalse(result.isMember(fileAC));
+
+		fns.removePath(fileCC);
+		result = reports.reportAllFiles();
+		assertEquals(8, result.size());
+		assertFalse(result.isMember(fileCC));
+
+		fns.removePath(dirC);
+		result = reports.reportAllFiles();
+		assertEquals(7, result.size());
+		assertFalse(result.isMember(dirC));
+	}
+	
 	/*-------------------------------------------------------------------------------------*/		
 }

@@ -74,7 +74,8 @@ public class Reports {
 		selectTasksAccessingFilesAnyPrepStmt = null,
 		selectFilesAccessedByTaskPrepStmt = null,
 		selectFilesAccessedByTaskAnyPrepStmt = null,
-		selectWriteOnlyFilesPrepStmt = null;
+		selectWriteOnlyFilesPrepStmt = null,
+		selectAllFilesPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -140,6 +141,8 @@ public class Reports {
 				    "left join (select distinct fileId as readFileId from buildTaskFiles " +
 				    "where operation = " + OperationType.OP_READ.ordinal() + ") on writeFileId = readFileId " +
 				      "where readFileId is null");
+		
+		selectAllFilesPrepStmt = db.prepareStatement("select id from files");
 	}
 
 	/*=====================================================================================*
@@ -443,6 +446,31 @@ public class Reports {
 		FileSet results = new FileSet(fns);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectWriteOnlyFilesPrepStmt);
+
+			while (rs.next()) {
+				FileRecord record = new FileRecord(rs.getInt(1));
+				results.add(record);
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the complete set of files in the BuildStore. The allows us to generate
+	 * a FileSet containing all known files.
+	 * @return The complete set of files in the BuildStore.
+	 */
+	public FileSet reportAllFiles() {
+		FileSet results = new FileSet(fns);
+		try {
+			ResultSet rs = db.executePrepSelectResultSet(selectAllFilesPrepStmt);
 
 			while (rs.next()) {
 				FileRecord record = new FileRecord(rs.getInt(1));
