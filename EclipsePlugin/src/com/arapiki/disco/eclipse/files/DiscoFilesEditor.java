@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -46,9 +45,11 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.arapiki.disco.eclipse.Activator;
 import com.arapiki.disco.eclipse.preferences.PreferenceConstants;
+import com.arapiki.disco.eclipse.utils.VisibilityTreeViewer;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.types.FileRecord;
+import com.arapiki.disco.model.types.FileSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -61,7 +62,7 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 *=====================================================================================*/
 
 	/** This editor's main control is a TreeViewer, for displaying the list of files */
-	private TreeViewer filesTreeViewer = null;
+	private VisibilityTreeViewer filesTreeViewer = null;
 	
 	/** The column that displays the path tree */
 	private TreeColumn treeColumn;
@@ -69,8 +70,8 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	/** The column that displays the component name */
 	private TreeColumn compColumn;
 	
-	/** The column that displays the path's visibility */
-	private TreeColumn visibilityColumn;
+	/** The column that displays the path's scope */
+	private TreeColumn scopeColumn;
 	
 	/** The BuildStore we're editing */
 	private BuildStore buildStore = null;
@@ -86,6 +87,11 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 * OPT_* values.
 	 */
 	private int editorOptionBits = 0;
+	
+	/**
+	 * The set of paths (within the FileNameSpaces) that are currently visible. 
+	 */
+	FileSet visiblePaths = null;
 	
 	/**
 	 * The previous set of option bits. The refreshView() method uses this value to
@@ -218,18 +224,18 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		 * browse the structure of the BuildStore's file system. It has three columns:
 		 *    1) The file system path (shown as a tree).
 		 *    2) The path's component (shown as a fixed-width column);
-		 *    3) The path's visibility (private, public etc).
+		 *    3) The path's scope (private, public etc).
 		 */
-		filesTreeViewer = new TreeViewer(fileEditorTree);
+		filesTreeViewer = new VisibilityTreeViewer(fileEditorTree);
 		treeColumn = new TreeColumn(fileEditorTree, SWT.LEFT);
 	    treeColumn.setAlignment(SWT.LEFT);
 	    treeColumn.setText("Path");
 	    compColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
 	    compColumn.setAlignment(SWT.LEFT);
 	    compColumn.setText("Component");
-	    visibilityColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
-	    visibilityColumn.setAlignment(SWT.LEFT);
-	    visibilityColumn.setText("Visibility");
+	    scopeColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
+	    scopeColumn.setAlignment(SWT.LEFT);
+	    scopeColumn.setText("Scope");
 	    filesEditorComposite = parent;
 	    
 	    /*
@@ -239,7 +245,7 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	     */
 	    treeColumn.setWidth(1);
 	    compColumn.setWidth(0);
-	    visibilityColumn.setWidth(0);
+	    scopeColumn.setWidth(0);
 		
 	    /*
 		 * Add the tree/table content and label providers.
@@ -251,6 +257,13 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);
 		filesTreeViewer.setSorter(viewerSorter);
+		
+		/*
+		 * Set up a visibility provider so we know which paths should be visible (at
+		 * least to start with).
+		 */
+		visiblePaths = buildStore.getReports().reportAllFiles();
+		filesTreeViewer.setVisibilityProvider(new FilesEditorVisibilityProvider(visiblePaths));
 		
 		/* 
 		 * Update this editor's option by reading the user-specified values in the
@@ -405,6 +418,45 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set the visibility state of the specified path. A visible path is rendered as per usual,
+	 * but a non-visible path will either be greyed out, or not rendered at all (depending
+	 * on the current setting of the grey-visibility mode). Making a previously visible path
+	 * invisible will also make all child paths invisible. Making a previously invisible
+	 * path visible will ensure that all parent paths are also made visible.
+	 * 
+	 * @param path The path to be hidden or revealed.
+	 * @param state True if the path should be made visible, else false.
+	 */
+	public void setPathVisibilityState(FileRecord path, boolean state) {
+		filesTreeViewer.setVisibility(path, state);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Determine whether this TreeViewer will show non-visible elements using a grey font,
+	 * as opposed to not rendering them at all.
+	 * @return True if non-visible element are being greyed-out, else false.
+	 */
+	public boolean getGreyVisibilityMode() {
+		return filesTreeViewer.getGreyVisibilityMode();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Specify whether this TreeViewer should render non-visible elements using
+	 * grey font, or whether they should not be rendered at all. 
+	 * @param greyVisibility True if non-visible element should be greyed out,
+	 * 			or false if they should not be shown at all.
+	 */
+	public void setGreyVisibilityMode(boolean greyVisibility) {
+		filesTreeViewer.setGreyVisibilityMode(greyVisibility);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Refresh the editor's content. This is typically called when some type of display
@@ -420,7 +472,7 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		previousEditorOptionBits = currentOptions;
 		
 		/*
-		 * Determine whether the components/visibility columns should be shown. Setting the
+		 * Determine whether the components/scope columns should be shown. Setting the
 		 * width appropriately is important, especially if the shell was recently resized.
 		 * TODO: figure out why subtracting 20 pixels is important for matching the column
 		 * size with the size of the parent composite.
@@ -432,7 +484,7 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 			    int compWidth = isOptionSet(OPT_SHOW_COMPONENTS) ? 100 : 0;
 			    treeColumn.setWidth(editorWidth - 2 * compWidth);
 			    compColumn.setWidth(compWidth);
-			    visibilityColumn.setWidth(compWidth);				
+			    scopeColumn.setWidth(compWidth);		
 			}
 		});
 

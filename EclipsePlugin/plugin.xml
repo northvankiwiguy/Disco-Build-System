@@ -96,6 +96,28 @@
                id="com.arapiki.disco.eclipse.commands.showComponents.state">
          </state>
       </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.showHiddenPaths"
+            name="Show hidden paths">
+         <commandParameter
+               id="com.arapiki.disco.eclipse.commandParameters.showDetail"
+               name="showDetail"
+               optional="true">
+         </commandParameter>
+         <state
+               class="org.eclipse.jface.commands.ToggleState"
+               id="com.arapiki.disco.eclipse.commands.showHiddenPaths.state">
+         </state>
+      </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.hideRevealPath"
+            name="Hide / Reveal Paths">
+         <commandParameter
+               id="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+               name="Hide / Reveal Type"
+               optional="true">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -114,6 +136,94 @@
                         operator="or">
                      <instanceof
                            value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               label="Hide sub-tree"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  value="hide">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               label="Hide path"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  value="hide">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="com.arapiki.disco.eclipse.files.FileRecordFile">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               label="Reveal sub-tree"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  value="reveal">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               label="Reveal path"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  value="reveal">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="com.arapiki.disco.eclipse.files.FileRecordFile">
                      </instanceof>
                   </iterate>
                </with>
@@ -142,6 +252,15 @@
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.showDetail"
                      value="components">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths"
+                  label="Hidden Paths"
+                  style="toggle">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     value="show-hidden">
                </parameter>
             </command>
          </menu>
@@ -215,6 +334,17 @@
                      value="components">
                </parameter>
             </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths"
+                  icon="images/show_hidden_files.gif"
+                  label="Show Hidden Paths"
+                  style="toggle"
+                  tooltip="Reveal paths that were hidden.">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     value="show-hidden">
+               </parameter>
+            </command>
          </toolbar>
       </menuContribution>
    </extension>
@@ -275,6 +405,14 @@
       <handler
             class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
             commandId="com.arapiki.disco.eclipse.commands.showComponents">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
+            commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerHideRevealPath"
+            commandId="com.arapiki.disco.eclipse.commands.hideRevealPath">
       </handler>
    </extension>
    <extension

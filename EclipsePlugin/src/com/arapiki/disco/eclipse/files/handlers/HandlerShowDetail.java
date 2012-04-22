@@ -18,6 +18,7 @@ import org.eclipse.ui.menus.UIElement;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
+import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
 
 /**
  * A handler for managing the state of various view options. These options are
@@ -61,13 +62,13 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 	/**
 	 * This method is invoke by the UI system when a user clicks on a "show detail" check-box,
 	 * such as in a popup-menu or a toolbar. Our goal is to toggle the state of the check-box
-	 * (or check-boxes), then update the editor contenet to reflect the new state. For example,
+	 * (or check-boxes), then update the editor content to reflect the new state. For example,
 	 * if the "Show Roots" check-box is currently unset, then start by setting the check-box,
 	 * then refresh the editor so that path roots are shown.
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		
+				
 		/* get details of the command that was invoked */
 		ICommandService service =
 			(ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
@@ -85,21 +86,24 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 				paramValue = event.getParameter(paramId);
 			}
 		} catch (NotDefinedException e) {
-			/* empty - there is no parameter */
+			throw new FatalDiscoError("Unable to find command: " + cmd.getId());
+		}
+		
+		/* if there was no parameter, we don't know which option to change. Exit silently */
+		if (paramValue == null) {
+			throw new FatalDiscoError("Unable to find command parameters for: " + cmd.getId());
 		}
 		
 		/* toggle the state of the command */
 		State state = cmd.getState(cmd.getId() + ".state");
+		if (state == null) {
+			throw new FatalDiscoError("Unable to find command state: " + cmd.getId() + ".state");
+		}
 		isSelected = !(Boolean)state.getValue();
 		state.setValue((Boolean)isSelected);
 		
 		/* ensure that all menu items and toolbar icons are toggled */
 		service.refreshElements(event.getCommand().getId(), null);
-		
-		/* if there was no parameter, we don't know which option to change. Exit silently */
-		if (paramValue == null) {
-			return null;
-		}
 		
 		/* 
 		 * Now update the editor itself so that the content of the editor reflects
@@ -107,14 +111,15 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 		 */
 		DiscoMainEditor editor = (DiscoMainEditor)HandlerUtil.getActiveEditor(event);
 		final DiscoFilesEditor subEditor = (DiscoFilesEditor)editor.getActiveSubEditor();
-		
+				
 		if (paramValue.equals("path-roots")) {
 			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_ROOTS, isSelected);
 		} else if (paramValue.equals("components")) {
 			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_COMPONENTS, isSelected);
+		} else if (paramValue.equals("show-hidden")) {
+			subEditor.setGreyVisibilityMode(isSelected);
 		} else {
-			/* unknown option - return silently */
-			return null;
+			throw new FatalDiscoError("Unable to handle command: " + cmd.getId());
 		}
 		
 		/*
