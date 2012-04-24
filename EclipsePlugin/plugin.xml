@@ -118,6 +118,18 @@
                optional="true">
          </commandParameter>
       </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.filterComponents"
+            name="Filter Components">
+      </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.filterByName"
+            name="Filter by Name">
+      </command>
+      <command
+            id="com.arapiki.disco.eclipse.commands.searchByName"
+            name="Search by Name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -345,6 +357,28 @@
                      value="show-hidden">
                </parameter>
             </command>
+            <separator
+                  name="com.arapiki.disco.eclipse.commands.separator2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.filterComponents"
+                  icon="images/filter_components_icon.gif"
+                  label="Filter output by selecting components to display."
+                  style="push">
+            </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.filterByName"
+                  icon="images/filter_by_name_icon.gif"
+                  label="Filter output by name."
+                  style="push">
+            </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.searchByName"
+                  icon="images/search_by_name_icon.gif"
+                  label="Search by name."
+                  style="push">
+            </command>
          </toolbar>
       </menuContribution>
    </extension>
@@ -413,6 +447,18 @@
       <handler
             class="com.arapiki.disco.eclipse.files.handlers.HandlerHideRevealPath"
             commandId="com.arapiki.disco.eclipse.commands.hideRevealPath">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerFilterComponents"
+            commandId="com.arapiki.disco.eclipse.commands.filterComponents">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerFilterByName"
+            commandId="com.arapiki.disco.eclipse.commands.filterByName">
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerSearchByName"
+            commandId="com.arapiki.disco.eclipse.commands.searchByName">
       </handler>
    </extension>
    <extension
