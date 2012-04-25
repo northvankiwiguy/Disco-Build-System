@@ -334,6 +334,11 @@
                      name="com.arapiki.disco.eclipse.commandParameters.showDetail"
                      value="path-roots">
                </parameter>
+               <visibleWhen checkEnabled="true">
+                  <with variable="activeEditorId">
+                     <equals value="com.arapiki.disco.eclipse.editors.main" />
+                  </with>
+               </visibleWhen>
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showComponents"
@@ -345,6 +350,11 @@
                      name="com.arapiki.disco.eclipse.commandParameters.showDetail"
                      value="components">
                </parameter>
+               <visibleWhen checkEnabled="true">
+                  <with variable="activeEditorId">
+                     <equals value="com.arapiki.disco.eclipse.editors.main" />
+                  </with>
+               </visibleWhen>
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths"
@@ -356,6 +366,11 @@
                      name="com.arapiki.disco.eclipse.commandParameters.showDetail"
                      value="show-hidden">
                </parameter>
+               <visibleWhen checkEnabled="true">
+                  <with variable="activeEditorId">
+                     <equals value="com.arapiki.disco.eclipse.editors.main" />
+                  </with>
+               </visibleWhen>
             </command>
             <separator
                   name="com.arapiki.disco.eclipse.commands.separator2"
@@ -366,18 +381,33 @@
                   icon="images/filter_components_icon.gif"
                   label="Filter output by selecting components to display."
                   style="push">
+                  <visibleWhen checkEnabled="true">
+                     <with variable="activeEditorId">
+                        <equals value="com.arapiki.disco.eclipse.editors.main" />
+                     </with>
+                  </visibleWhen>
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.filterByName"
                   icon="images/filter_by_name_icon.gif"
                   label="Filter output by name."
                   style="push">
+                  <visibleWhen checkEnabled="true">
+                     <with variable="activeEditorId">
+                        <equals value="com.arapiki.disco.eclipse.editors.main" />
+                     </with>
+                  </visibleWhen>
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.searchByName"
                   icon="images/search_by_name_icon.gif"
                   label="Search by name."
                   style="push">
+                  <visibleWhen checkEnabled="true">
+                     <with variable="activeEditorId">
+                        <equals value="com.arapiki.disco.eclipse.editors.main" />
+                     </with>
+                  </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>
