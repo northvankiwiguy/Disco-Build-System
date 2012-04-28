@@ -264,8 +264,8 @@ public class TestComponents {
 		
 		/* Test valid section IDs */
 		assertEquals("None", cmpts.getSectionName(0));
-		assertEquals("private", cmpts.getSectionName(1));
-		assertEquals("public", cmpts.getSectionName(2));
+		assertEquals("Private", cmpts.getSectionName(1));
+		assertEquals("Public", cmpts.getSectionName(2));
 
 		/* Test invalid section IDs */
 		assertNull(cmpts.getSectionName(3));
@@ -285,6 +285,7 @@ public class TestComponents {
 		assertEquals(0, cmpts.getSectionId("None"));
 		assertEquals(1, cmpts.getSectionId("priv"));
 		assertEquals(1, cmpts.getSectionId("private"));
+		assertEquals(1, cmpts.getSectionId("Private"));
 		assertEquals(2, cmpts.getSectionId("pub"));
 		assertEquals(2, cmpts.getSectionId("public"));
 		
@@ -306,8 +307,8 @@ public class TestComponents {
 		String sections[] = cmpts.getSections();
 		assertEquals(3, sections.length);
 		assertEquals("None", sections[0]);
-		assertEquals("private", sections[1]);
-		assertEquals("public", sections[2]);	
+		assertEquals("Private", sections[1]);
+		assertEquals("Public", sections[2]);	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

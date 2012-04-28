@@ -64,7 +64,7 @@ public class Components {
 	 * The names of the sections within a component. These are statically defined and
 	 * can't be modified by the user.
 	 */
-	private static String sectionNames[] = new String[] {"None", "private", "public"};
+	private static String sectionNames[] = new String[] {"None", "Private", "Public"};
 	
 	/**
 	 * Various prepared statements for database access.
@@ -312,9 +312,9 @@ public class Components {
 		case 0:
 			return "None";
 		case 1:
-			return "private";
+			return "Private";
 		case 2:
-			return "public";
+			return "Public";
 		default:
 			return null;
 		}
@@ -336,10 +336,10 @@ public class Components {
 		if (name.equalsIgnoreCase("None")) {
 			return 0;
 		}
-		if (name.equals("priv") || name.equals("private")) {
+		if (name.equalsIgnoreCase("priv") || name.equalsIgnoreCase("private")) {
 			return 1;
 		}
-		if (name.equals("pub") || name.equals("public")) {
+		if (name.equalsIgnoreCase("pub") || name.equalsIgnoreCase("public")) {
 			return 2;
 		}
 		return ErrorCode.NOT_FOUND;
