@@ -39,7 +39,7 @@ public class TestComponentSet {
 	private ComponentSet cs;
 	
 	/** Various component IDs */
-	private int idComp1, idComp2, idGreenComp, idBlueComp, idYellowComp;
+	private int idComp1, idComp2, idGreenComp, idBlueComp, idYellowComp, idMauveComp;
 	
 	/** The scope values */
 	private final int ID_SCOPE_NONE = 0;
@@ -65,6 +65,7 @@ public class TestComponentSet {
 		idGreenComp = compts.addComponent("GreenComp");
 		idBlueComp = compts.addComponent("BlueComp");
 		idYellowComp = compts.addComponent("YellowComp");
+		idMauveComp = compts.addComponent("MauveComp");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -81,8 +82,9 @@ public class TestComponentSet {
 		assertEquals("Comp1", compList[1]);
 		assertEquals("Comp2", compList[2]);
 		assertEquals("GreenComp", compList[3]);
-		assertEquals("None", compList[4]);
-		assertEquals("YellowComp", compList[5]);
+		assertEquals("MauveComp", compList[4]);
+		assertEquals("None", compList[5]);
+		assertEquals("YellowComp", compList[6]);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -242,8 +244,52 @@ public class TestComponentSet {
 		cs.remove(idBlueComp);
 		assertFalse(cs.isMember(idBlueComp));
 		assertFalse(cs.isMember(idBlueComp, ID_SCOPE_PRIVATE));
-		assertFalse(cs.isMember(idBlueComp, ID_SCOPE_PUBLIC));	
+		assertFalse(cs.isMember(idBlueComp, ID_SCOPE_PUBLIC));
+		
+		/* remove a single scope from a component that was true by default */
+		cs.remove(idMauveComp, ID_SCOPE_PRIVATE);
+		assertTrue(cs.isMember(idMauveComp));
+		assertFalse(cs.isMember(idMauveComp, ID_SCOPE_PRIVATE));
+		assertTrue(cs.isMember(idMauveComp, ID_SCOPE_PUBLIC));
 	}
 	
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the clone operation, which provides a deep copy of the object.
+	 */
+	@Test
+	public void testClone() {
+		
+		ComponentSet newCs = null;
+		
+		/* add a single component */
+		cs.add(idBlueComp);
+		
+		/* clone the object (deeply) */
+		try {
+			newCs = (ComponentSet)cs.clone();
+		} catch (CloneNotSupportedException e) {
+			fail("cloning failed. " + e.getMessage());
+		}
+		
+		/* add a second component to our original object.*/
+		cs.add(idGreenComp);
+		
+		/* add a second component to our clone */
+		newCs.add(idYellowComp);
+		
+		/* validate the original object */
+		assertTrue(cs.isMember(idBlueComp));
+		assertTrue(cs.isMember(idGreenComp));
+		assertFalse(cs.isMember(idYellowComp));
+
+		/* validate the clone object */
+		assertTrue(newCs.isMember(idBlueComp));
+		assertFalse(newCs.isMember(idGreenComp));
+		assertTrue(newCs.isMember(idYellowComp));	
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 }

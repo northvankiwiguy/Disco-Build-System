@@ -48,6 +48,7 @@ import com.arapiki.disco.eclipse.preferences.PreferenceConstants;
 import com.arapiki.disco.eclipse.utils.VisibilityTreeViewer;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
+import com.arapiki.disco.model.types.ComponentSet;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
 
@@ -80,7 +81,7 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	private FileNameSpaces fns = null;
 	
 	/** The ArrayContentProvider object providing this editor's content */
-	FilesEditorContentProvider contentProvider;
+	private FilesEditorContentProvider contentProvider;
 	
 	/**
 	 * The current options setting for this editor. The field contains a bitmap of
@@ -91,14 +92,26 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	/**
 	 * The set of paths (within the FileNameSpaces) that are currently visible. 
 	 */
-	FileSet visiblePaths = null;
-	
+	private FileSet visiblePaths = null;
+
+	/**
+	 * The object that provides visible/non-visible information about each
+	 * element in the file tree.
+	 */
+	private FilesEditorVisibilityProvider visibilityProvider;
+
 	/**
 	 * The previous set of option bits. The refreshView() method uses this value to
 	 * determine which aspects of the TreeViewer must be redrawn.
 	 */
 	private int previousEditorOptionBits = 0;
 
+	/**
+	 * The set of components to be displayed (that is, files will be displayed
+	 * if they belong to one of these components).
+	 */
+	private ComponentSet filterComponentSet;
+	
 	/**
 	 * The TreeViewer's parent control.
 	 */
@@ -140,6 +153,10 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		/* Save away our BuildStore information, for later use */
 		this.buildStore = buildStore;
 		fns = buildStore.getFileNameSpaces();
+		
+		/* create a new component set so we can selectively filter out components */
+		filterComponentSet = new ComponentSet(buildStore);
+		filterComponentSet.setDefault(true);
 	}
 	
 	/*=====================================================================================*
@@ -263,7 +280,9 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		 * least to start with).
 		 */
 		visiblePaths = buildStore.getReports().reportAllFiles();
-		filesTreeViewer.setVisibilityProvider(new FilesEditorVisibilityProvider(visiblePaths));
+		visibilityProvider = new FilesEditorVisibilityProvider(visiblePaths);
+		visibilityProvider.setSecondaryFileSet(null);
+		filesTreeViewer.setVisibilityProvider(visibilityProvider);
 		
 		/* 
 		 * Update this editor's option by reading the user-specified values in the
@@ -459,12 +478,53 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Fetch this editor's component filter set. This set is used by the viewer when 
+	 * deciding which files should be displayed (versus being filtered out).
+	 * @return This editor's component filter set.
+	 */
+	public ComponentSet getFilterComponentSet() {
+		return filterComponentSet;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set this editor's component filter set. This set is used by the viewer when 
+	 * deciding which files should be displayed (versus being filtered out).
+	 * @param newSet This editor's new component filter set.
+	 */
+	public void setFilterComponentSet(ComponentSet newSet) {
+		filterComponentSet = newSet;
+		FileSet compFileSet = 
+			buildStore.getReports().reportFilesFromComponentSet(newSet);
+		compFileSet.populateWithParents();
+		
+		visibilityProvider.setSecondaryFileSet(compFileSet);
+		refreshView(true);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Refresh the editor's content. This is typically called when some type of display
 	 * option changes (e.g. roots or components have been added), and the content is now
 	 * different, or if the user resizes the main Eclipse shell. We use a progress monitor,
 	 * since a redraw operation might take a while.
 	 */
 	public void refreshView() {
+		refreshView(false);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Refresh the editor's content. This is typically called when some type of display
+	 * option changes (e.g. roots or components have been added), and the content is now
+	 * different, or if the user resizes the main Eclipse shell. We use a progress monitor,
+	 * since a redraw operation might take a while.
+	 * @param forceRedraw true if we want to force a complete redraw of the viewer.
+	 */
+	public void refreshView(boolean forceRedraw) {
 		
 		/* compute the set of option bits that have changed since we were last called */
 		int currentOptions = getOptions();
@@ -490,9 +550,10 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 
 		/*
 		 * Has the content of the tree changed, or just the visibility of columns? If
-		 * it's just the columns, then we don't need to re-query the model in order to redisplay
+		 * it's just the columns, then we don't need to re-query the model in order to redisplay.
+		 * Unless our caller explicitly requested a redraw.
 		 */
-		if ((changedOptions & (OPT_COALESCE_DIRS | OPT_SHOW_ROOTS)) == 0) {
+		if (!forceRedraw && ((changedOptions & (OPT_COALESCE_DIRS | OPT_SHOW_ROOTS)) == 0)) {
 			return;
 		}
 		

@@ -474,6 +474,33 @@ class BuildStoreDB  {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Execute a database query using a (non-prepared) SQL statement, and return the 
+	 * full ResultSet object. This is purely a convenience function to make it easier to
+	 * access the database and catch Exceptions.
+	 * 
+	 * @param sql The SQL command to be executed.
+	 * @return The ResultSet from the database query.
+	 */
+	/* package private */
+	ResultSet executeSelectResultSet(String sql) {
+				
+		/* make sure the database connection is still open */
+		checkDatabase();
+
+		ResultSet rs;
+		try {
+			Statement stmt = dbConn.createStatement();
+			rs = stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error executing SQL:", e);
+		}
+		
+		return rs;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Returns the integer value of the last auto-increment row ID. This is used to
 	 * fetch the last primary key inserted into a table, when the user specified "null"
 	 * to have the database automatically select a suitable unique primary key.

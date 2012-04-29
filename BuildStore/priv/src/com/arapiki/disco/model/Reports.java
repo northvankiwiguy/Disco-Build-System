@@ -20,10 +20,12 @@ import java.util.Iterator;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.arapiki.disco.model.types.ComponentSet;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.disco.model.types.TaskRecord;
 import com.arapiki.disco.model.types.TaskSet;
+import com.arapiki.utils.errors.ErrorCode;
 
 /**
  * A manager class (that supports the BuildStore class) that handles reporting of
@@ -483,6 +485,74 @@ public class Reports {
 		}
 		
 		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a ComponentSet, return the complete FileSet of all files that belong to components
+	 * that are members of the set.
+	 * 
+	 * @param compSet The ComponentSet that selects the components to be included.
+	 * @return The FileSet of files that are within the selected components.
+	 */
+	public FileSet reportFilesFromComponentSet(ComponentSet compSet) {
+		FileSet results = new FileSet(fns);
+
+		/*
+		 * Form the (complex) query string, which considers each component/scope individually.
+		 */
+		StringBuffer sb = new StringBuffer(256);
+		sb.append("select id from files where ");
+		int memberCount = 0;
+		
+		String compList[] = compSet.getComponents();
+		for (String compName : compList) {
+			int compId = compSet.getComponentId(compName);
+			if (compId != ErrorCode.NOT_FOUND) {
+				
+				/* is this component in the set? */
+				// TODO: replace these magic numbers with symbolic constants.
+				boolean hasPrivate = compSet.isMember(compId, 1);
+				boolean hasPublic = compSet.isMember(compId, 2);
+		
+				/* do we need a "or" between neighboring tests? */
+				if (hasPrivate || hasPublic) {
+					memberCount++;
+					if (memberCount > 1) {
+						sb.append(" or ");
+					}
+				}
+				
+				/* form the condition for comparing the file's components/scope */
+				if (hasPrivate && hasPublic) {
+					sb.append("(compId == " + compId + ")");
+				} else if (hasPrivate) {
+					sb.append("((compId == " + compId + ") and (compSectionId == 1))");
+				} else if (hasPublic) {
+					sb.append("((compId == " + compId + ") and (compSectionId == 2))");
+				}
+				
+			}
+		}
+		
+		/* if the component set was empty, so to is the result set */
+		if (memberCount == 0) {
+			return results;
+		}
+		
+		ResultSet rs = db.executeSelectResultSet(sb.toString());
+		try {
+			while (rs.next()) {
+				FileRecord record = new FileRecord(rs.getInt(1));
+				results.add(record);
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;		
 	}
 	
 	/*=====================================================================================*

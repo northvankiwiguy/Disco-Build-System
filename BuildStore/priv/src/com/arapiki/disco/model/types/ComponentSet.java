@@ -24,11 +24,16 @@ import com.arapiki.disco.model.Components;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class ComponentSet {
+public class ComponentSet implements Cloneable {
 	
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
+	
+	/**
+	 * The BuildStore this ComponentSet belongs to.
+	 */
+	private BuildStore buildStore;
 	
 	/**
 	 * The Components object containing the components/scopes that this set can have as
@@ -63,6 +68,7 @@ public class ComponentSet {
 	 */
 	public ComponentSet(BuildStore buildStore) {
 		
+		this.buildStore = buildStore;
 		cmpts = buildStore.getComponents();
 		
 		/* Create a mapping of component IDs to a scope-ID bitmap */
@@ -72,7 +78,16 @@ public class ComponentSet {
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * @return The BuildStore associated with this ComponentSet.
+	 */
+	public BuildStore getBuildStore() {
+		return buildStore;
+	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Fetch the complete list of components that may appear in this set.
 	 * @return An alphabetically ordered list of component names.
@@ -207,10 +222,18 @@ public class ComponentSet {
 		Object value = membershipMap.get(compIdInteger);
 		if (value != null) {
 			existingBitMap = (Integer)value;
-			
-			/* merge in the new scopeId bit */
-			existingBitMap &= ~(1 << scopeId);
 		}
+		
+		/* 
+		 * if it doesn't exist, figure out its default state. defaultState of true 
+		 * means that all scopes are set (-1 in the bitmap).
+		 */
+		else {
+			existingBitMap = defaultState ? -1 : 0;
+		}
+		
+		/* merge in the new scopeId bit */
+		existingBitMap &= ~(1 << scopeId);
 		
 		/* write it back to the map */
 		membershipMap.put(compIdInteger, Integer.valueOf(existingBitMap));		
@@ -261,5 +284,20 @@ public class ComponentSet {
 		return ((scopeMap & (1 << scopeId)) != 0);	
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Implement the standard Object clone() method for ComponentSet, but perform a deep
+	 * copy, rather than a shallow copy.
+	 */
+	@SuppressWarnings("unchecked")
+	public Object clone() throws CloneNotSupportedException {
+		ComponentSet newCs = (ComponentSet)super.clone();
+		newCs.buildStore = this.buildStore;
+		newCs.defaultState = this.defaultState;
+		newCs.membershipMap = (HashMap<Integer, Integer>)this.membershipMap.clone();
+		return newCs;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

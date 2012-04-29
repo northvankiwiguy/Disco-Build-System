@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.model.types.ComponentSet;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
 
@@ -356,6 +357,99 @@ public class TestReports2 {
 		addFileRecord(dest, fileAnimalsExe);
 		result = reports.reportInputFiles(dest, true);
 		assertEquals(14, result.size());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.arapiki.disco.model.Reports#reportFilesFromComponentSet}.
+	 */
+	@Test
+	public void testReportFilesFromComponentSet() {
+		
+		/* create a new component set and add some components */
+		ComponentSet cs = new ComponentSet(bs);
+		Components comps = bs.getComponents();
+		int comp1Id = comps.addComponent("Comp1");
+		int comp2Id = comps.addComponent("Comp2");		
+		int comp3Id = comps.addComponent("Comp3");
+		int comp4Id = comps.addComponent("Comp4");
+		
+		int scopePrivateId = comps.getSectionId("Private");
+		int scopePublicId = comps.getSectionId("Public");
+
+		/* initially, no paths should be present (not even /) */
+		FileSet fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(0, fs.size());
+		
+		/* add a bunch of files - they should all be in the None component */
+		int file1 = fns.addFile("/file1");
+		int file2 = fns.addFile("/file2");
+		int file3 = fns.addFile("/file3");
+		int file4 = fns.addFile("/file4");
+		int file5 = fns.addFile("/file5");
+		int file6 = fns.addFile("/file6");
+		int file7 = fns.addFile("/file7");
+		int file8 = fns.addFile("/file8");
+		
+		/* empty component set still gives an empty FileSet */
+		fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(0, fs.size());
+		
+		/* map the files into components */
+		comps.setFileComponent(file1, comp1Id, scopePrivateId);
+		comps.setFileComponent(file2, comp1Id, scopePublicId);
+		comps.setFileComponent(file3, comp2Id, scopePrivateId);
+		comps.setFileComponent(file4, comp2Id, scopePublicId);
+		comps.setFileComponent(file5, comp3Id, scopePrivateId);
+		comps.setFileComponent(file6, comp3Id, scopePublicId);
+		comps.setFileComponent(file7, comp4Id, scopePrivateId);
+		comps.setFileComponent(file8, comp4Id, scopePublicId);
+	
+		/* empty component set still gives an empty FileSet */
+		fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(0, fs.size());
+		
+		/* add Comp1/Private into the component set */
+		cs.add(comp1Id, scopePrivateId);
+		fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(1, fs.size());
+		assertTrue(fs.isMember(file1));
+
+		/* add Comp1/Public into the component set */
+		cs.add(comp1Id, scopePublicId);
+		fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(2, fs.size());
+		assertTrue(fs.isMember(file1));
+		assertTrue(fs.isMember(file2));
+
+		/* add Comp2 into the component set */
+		cs.add(comp2Id);
+		fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(4, fs.size());
+		assertTrue(fs.isMember(file1));
+		assertTrue(fs.isMember(file2));
+		assertTrue(fs.isMember(file3));
+		assertTrue(fs.isMember(file4));
+		
+		/* add Comp8/Public into the component set */
+		cs.add(comp4Id, scopePublicId);
+		fs = reports.reportFilesFromComponentSet(cs);
+		assertEquals(5, fs.size());
+		assertTrue(fs.isMember(file1));
+		assertTrue(fs.isMember(file2));
+		assertTrue(fs.isMember(file3));
+		assertTrue(fs.isMember(file4));
+		assertTrue(fs.isMember(file8));
+		
+		/* add a few hundred components, and check scalability */
+		for (int i = 5; i != 200; i++) {
+			int id = comps.addComponent("Comp" + i);
+			cs.add(id, 1 + (i % 2));
+		}
+		
+		/* the simple fact that this doesn't crash is enough to pass the test */
+		fs = reports.reportFilesFromComponentSet(cs);	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

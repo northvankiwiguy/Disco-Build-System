@@ -33,6 +33,14 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	 * is in this set, it's visible, else it's non-visible.
 	 */
 	private FileSet filterSet;
+	
+	/**
+	 * A secondary filterSet which can be applied in conjunction with the first. Note that
+	 * this filter set is provided as-is and won't be modified by the setVisibility() method.
+	 * It's use is to further filter out elements after the primary filter set (filterSet)
+	 * has been applied.
+	 */
+	private FileSet secondaryFilterSet;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -61,7 +69,11 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	public boolean isVisible(Object element) {
 		if (element instanceof FileRecord) {
 			FileRecord fr = (FileRecord)element;
-			return filterSet.isMember(fr.getId());
+			int fileId = fr.getId();
+			
+			/* is this file a member of both filterSet and secondaryFilterSet. */
+			return (filterSet.isMember(fileId) && 
+					((secondaryFilterSet == null) || secondaryFilterSet.isMember(fileId)));
 		}
 		return false;
 	}
@@ -84,4 +96,16 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set the secondary FileSet that determine which components/scopes we want to
+	 * display.
+	 * @param filter The new secondary filter set.
+	 */
+	public void setSecondaryFileSet(FileSet filter) {
+		secondaryFilterSet = filter;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }
