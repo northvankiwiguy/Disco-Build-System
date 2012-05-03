@@ -498,7 +498,8 @@ public class Reports {
 	 */
 	public FileSet reportFilesFromComponentSet(ComponentSet compSet) {
 		FileSet results = new FileSet(fns);
-
+		Components compMgr = compSet.getBuildStore().getComponents();
+		
 		/*
 		 * Form the (complex) query string, which considers each component/scope individually.
 		 */
@@ -506,15 +507,14 @@ public class Reports {
 		sb.append("select id from files where ");
 		int memberCount = 0;
 		
-		String compList[] = compSet.getComponents();
+		String compList[] = compMgr.getComponents();
 		for (String compName : compList) {
-			int compId = compSet.getComponentId(compName);
+			int compId = compMgr.getComponentId(compName);
 			if (compId != ErrorCode.NOT_FOUND) {
 				
 				/* is this component in the set? */
-				// TODO: replace these magic numbers with symbolic constants.
-				boolean hasPrivate = compSet.isMember(compId, 1);
-				boolean hasPublic = compSet.isMember(compId, 2);
+				boolean hasPrivate = compSet.isMember(compId, Components.SCOPE_PRIVATE);
+				boolean hasPublic = compSet.isMember(compId, Components.SCOPE_PUBLIC);
 		
 				/* do we need a "or" between neighboring tests? */
 				if (hasPrivate || hasPublic) {
@@ -528,9 +528,11 @@ public class Reports {
 				if (hasPrivate && hasPublic) {
 					sb.append("(compId == " + compId + ")");
 				} else if (hasPrivate) {
-					sb.append("((compId == " + compId + ") and (compSectionId == 1))");
+					sb.append("((compId == " + compId + 
+								") and (compScopeId == " + Components.SCOPE_PRIVATE + "))");
 				} else if (hasPublic) {
-					sb.append("((compId == " + compId + ") and (compSectionId == 2))");
+					sb.append("((compId == " + compId + 
+								") and (compScopeId == " + Components.SCOPE_PUBLIC + "))");
 				}
 				
 			}

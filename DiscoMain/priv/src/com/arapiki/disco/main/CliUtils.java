@@ -275,9 +275,9 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Parse the user-supplied component/section string, and return the corresponding
-	 * component ID and section ID. The string should be in the format "component" or 
-	 * "component/section". If "section" is not provided (and sectionAllowed is true),
+	 * Parse the user-supplied component/scope string, and return the corresponding
+	 * component ID and scope ID. The string should be in the format "component" or 
+	 * "component/scope". If "scope" is not provided (and scopeAllowed is true),
 	 * "private" is assumed. If the input is invalid, display a meaningful error message
 	 * and exit the program.
 	 * 
@@ -286,46 +286,46 @@ public class CliUtils {
 	 * 
 	 * @param cmpts The Components manager object containing the component information.
 	 * @param compString The user-supplied input string (could be anything).
-	 * @param sectionAllowed True if the input string is allowed to provide a section name. 
+	 * @param scopeAllowed True if the input string is allowed to provide a scope name. 
 	 * @return An array of two integers. The first is the component's ID number,
-	 * and the second is the section's ID number.
+	 * and the second is the scope's ID number.
 	 */
-	public static int[] parseComponentAndSection(
+	public static int[] parseComponentAndScope(
 			Components cmpts,
 			String compString, 
-			boolean sectionAllowed) {
+			boolean scopeAllowed) {
 	
 		String cmptName = null;
-		String sectName = null;
+		String scopeName = null;
 		
-		/* check if there's a '/' in the string, to separate "component" from "section" */
+		/* check if there's a '/' in the string, to separate "component" from "scope" */
 		int slashIndex = compString.indexOf('/');
 		if (slashIndex != -1) {
 			cmptName = compString.substring(0, slashIndex);
-			sectName = compString.substring(slashIndex + 1);
-			if (!sectionAllowed) {
-				CliUtils.reportErrorAndExit("Invalid syntax - '/" + sectName + "' not allowed.");
+			scopeName = compString.substring(slashIndex + 1);
+			if (!scopeAllowed) {
+				CliUtils.reportErrorAndExit("Invalid syntax - '/" + scopeName + "' not allowed.");
 			}	
 		} 
 		
-		/* else, there's no /, assume 'private' for the section */
+		/* else, there's no /, assume 'private' for the scope */
 		else {
 			cmptName = compString;
-			sectName = "private";
+			scopeName = "private";
 		}
 
 		/* compute the IDs */
 		int cmptId = cmpts.getComponentId(cmptName);
-		int sectId = cmpts.getSectionId(sectName);
+		int scopeId = cmpts.getScopeId(scopeName);
 		
 		if (cmptId == ErrorCode.NOT_FOUND) {
 			CliUtils.reportErrorAndExit("Unknown component: " + cmptName);
 		}
-		if (sectId == ErrorCode.NOT_FOUND) {
-			CliUtils.reportErrorAndExit("Unknown section name: " + sectName);
+		if (scopeId == ErrorCode.NOT_FOUND) {
+			CliUtils.reportErrorAndExit("Unknown scope name: " + scopeName);
 		}
 		
-		return new int[]{ cmptId, sectId };
+		return new int[]{ cmptId, scopeId };
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -512,22 +512,22 @@ public class CliUtils {
 			/* to start, empty the StringBuffer */
 			compString.delete(0, compString.length());
 			
-			/* fetch the file's component and section */
-			Integer compAndSectionId[] = cmpts.getFileComponent(thisPathId);
-			if (compAndSectionId == null) {
+			/* fetch the file's component and scope */
+			Integer compAndScopeId[] = cmpts.getFileComponent(thisPathId);
+			if (compAndScopeId == null) {
 				compString.append("Invalid file");
 			} 
 			
 			/* if valid, fetch the human-readable names */
 			else {
-				int compId = compAndSectionId[0];
-				int sectId = compAndSectionId[1];
+				int compId = compAndScopeId[0];
+				int scopeId = compAndScopeId[1];
 
 				String compName = cmpts.getComponentName(compId);
-				String sectName = cmpts.getSectionName(sectId);
+				String scopeName = cmpts.getScopeName(scopeId);
 			
-				/* if we can't fetch the text name of the component or section... */
-				if (compName == null || sectName == null) {
+				/* if we can't fetch the text name of the component or scope... */
+				if (compName == null || scopeName == null) {
 					compString.append("Invalid component");
 				}
 			
@@ -536,7 +536,7 @@ public class CliUtils {
 					compString.append("  (");
 					compString.append(compName);
 					compString.append('/');
-					compString.append(sectName);
+					compString.append(scopeName);
 					compString.append(")");
 				}
 			}

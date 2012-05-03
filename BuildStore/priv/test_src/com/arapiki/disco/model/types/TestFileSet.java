@@ -470,8 +470,8 @@ public class TestFileSet {
 		/* create a new component, named "foo", with one item in foo/public and three in foo/private */
 		Components cmpts = bs.getComponents();
 		int compFooId = cmpts.addComponent("foo");
-		int sectPublic = cmpts.getSectionId("public");
-		int sectPrivate = cmpts.getSectionId("private");
+		int sectPublic = cmpts.getScopeId("public");
+		int sectPrivate = cmpts.getScopeId("private");
 		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f1path, compFooId, sectPublic));
 		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f2path, compFooId, sectPrivate));
 		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f4path, compFooId, sectPrivate));

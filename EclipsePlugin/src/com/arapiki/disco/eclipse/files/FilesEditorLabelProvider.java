@@ -207,7 +207,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				if (compInfo[1] == 0) {
 					return "";
 				}
-				String sectName = comps.getSectionName(compInfo[1]);
+				String sectName = comps.getScopeName(compInfo[1]);
 				if (sectName == null) {
 					break; /* return "invalid" */
 				}

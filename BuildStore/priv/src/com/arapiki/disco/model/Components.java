@@ -29,13 +29,13 @@ import com.arapiki.utils.errors.ErrorCode;
  * These IDs are then associated with files and tasks as a means of grouping them
  * together into logical units.
  * <p>
- * In the case of files, a component is also associated with a section within that
+ * In the case of files, a component is also associated with a scope within that
  * component, such as "private" and "public". That is, if a file is associated
- * with component "foo", the file will either belong to the foo/private section, or the
- * foo/public section.
+ * with component "foo", the file will either belong to the foo/private scope, or the
+ * foo/public scope.
  * <p>
  * Note: tasks can only belong to the component as a whole, rather than belonging to
- * an individual section within that component. 
+ * an individual scope within that component. 
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -44,6 +44,14 @@ public class Components {
 	/*=====================================================================================*
 	 * FIELDS
 	 *=====================================================================================*/
+	
+	/**
+	 * Numeric constants for each of the scopes.
+	 */
+	public static final int SCOPE_NONE 		= 0;
+	public static final int SCOPE_PRIVATE 	= 1;
+	public static final int SCOPE_PUBLIC 	= 2;
+	public static final int SCOPE_MAX		= 2;
 	
 	/** The BuildStore object that "owns" this Components object. */
 	private BuildStore buildStore;
@@ -61,10 +69,10 @@ public class Components {
 	private BuildTasks bts = null;
 	
 	/**
-	 * The names of the sections within a component. These are statically defined and
+	 * The names of the scopes within a component. These are statically defined and
 	 * can't be modified by the user.
 	 */
-	private static String sectionNames[] = new String[] {"None", "Private", "Public"};
+	private static String scopeNames[] = new String[] {"None", "Private", "Public"};
 	
 	/**
 	 * Various prepared statements for database access.
@@ -109,16 +117,16 @@ public class Components {
 		findAllComponentsPrepStmt = db.prepareStatement(
 				"select name from components order by name collate nocase");
 		removeComponentByNamePrepStmt = db.prepareStatement("delete from components where name = ?");
-		updateFileComponentPrepStmt = db.prepareStatement("update files set compId = ?, compSectionId = ? " +
+		updateFileComponentPrepStmt = db.prepareStatement("update files set compId = ?, compScopeId = ? " +
 				"where id = ?");
-		findFileComponentPrepStmt = db.prepareStatement("select compId, compSectionId from files " +
+		findFileComponentPrepStmt = db.prepareStatement("select compId, compScopeId from files " +
 				"where id = ?");
 		findFilesInComponent1PrepStmt = db.prepareStatement("select id from files where compId = ?");
 		findFilesInComponent2PrepStmt = db.prepareStatement("select id from files where " +
-				"compId = ? and compSectionId = ?");
+				"compId = ? and compScopeId = ?");
 		findFilesOutsideComponent1PrepStmt = db.prepareStatement("select id from files where compId != ?");
 		findFilesOutsideComponent2PrepStmt = db.prepareStatement("select id from files where " +
-				"not (compId = ? and compSectionId = ?)");
+				"not (compId = ? and compScopeId = ?)");
 		updateTaskComponentPrepStmt = db.prepareStatement("update buildTasks set compId = ? " +
 				"where taskId = ?");
 		findTaskComponentPrepStmt = db.prepareStatement("select compId from buildTasks where taskId = ?");
@@ -300,20 +308,20 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a section's ID number, return the corresponding section name.
+	 * Given a scope's ID number, return the corresponding scope name.
 	 * 
-	 * @param id The section's ID number.
-	 * @return The section's name, or null if the ID number is invalid.
+	 * @param id The scope's ID number.
+	 * @return The scope's name, or null if the ID number is invalid.
 	 */
-	public String getSectionName(int id) {
+	public String getScopeName(int id) {
 		
 		/* the names are a static mapping, so no need for database look-ups */
 		switch (id) {
-		case 0:
+		case SCOPE_NONE:
 			return "None";
-		case 1:
+		case SCOPE_PRIVATE:
 			return "Private";
-		case 2:
+		case SCOPE_PUBLIC:
 			return "Public";
 		default:
 			return null;
@@ -323,24 +331,24 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a section's name, return its ID number. There can be many names for the same
-	 * section, so there isn't a 1:1 mapping of names to IDs. For example, both "private" and
+	 * Given a scope's name, return its ID number. There can be many names for the same
+	 * scope, so there isn't a 1:1 mapping of names to IDs. For example, both "private" and
 	 * "priv" will return the same ID number.
 	 * 
-	 * @param name The section's name.
-	 * @return The section's ID number, or ErrorCode.NOT_FOUND if the section name isn't valid.
+	 * @param name The scope's name.
+	 * @return The scope's ID number, or ErrorCode.NOT_FOUND if the scope name isn't valid.
 	 */
-	public int getSectionId(String name) {
+	public int getScopeId(String name) {
 		
 		/* the mapping is static, so no need for a database look up */
 		if (name.equalsIgnoreCase("None")) {
-			return 0;
+			return SCOPE_NONE;
 		}
 		if (name.equalsIgnoreCase("priv") || name.equalsIgnoreCase("private")) {
-			return 1;
+			return SCOPE_PRIVATE;
 		}
 		if (name.equalsIgnoreCase("pub") || name.equalsIgnoreCase("public")) {
-			return 2;
+			return SCOPE_PUBLIC;
 		}
 		return ErrorCode.NOT_FOUND;
 	}
@@ -348,44 +356,32 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return all the section names. If there are multiple names for the same section, only
-	 * one of them is returned.
-	 * 
-	 * @return A String array of the section names, in alphabetical order.
-	 */
-	public String[] getSections() {
-		return sectionNames;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Parse a component specification string, and return the ID of the component and
-	 * (optionally) the ID of the section within that component. The syntax of the component
+	 * (optionally) the ID of the scope within that component. The syntax of the component
 	 * spec must be of the form:
 	 *  <ol>
 	 * 	  <li>&lt;comp-name&gt;</li>
-	 * 	  <li>&lt;comp-name&gt;/&lt;section-name&gt;</li>
+	 * 	  <li>&lt;comp-name&gt;/&lt;scope-name&gt;</li>
 	 *  </ol>
-	 * That is, the section name is optional.
+	 * That is, the scope name is optional.
 	 * 
 	 * @param compSpec The component specification string.
-	 * @return An Integer[2] array, where [0] is the component's ID and [1] is the section
-	 * ID. If either portion of the compSpec was invalid (not a registered component or section),
-	 * the ID for that portion will be ErrorCode.NOT_FOUND. If there was no section name
-	 * specified, the section ID will be 0, which represents the "None" section.
+	 * @return An Integer[2] array, where [0] is the component's ID and [1] is the scope
+	 * ID. If either portion of the compSpec was invalid (not a registered component or scope),
+	 * the ID for that portion will be ErrorCode.NOT_FOUND. If there was no scope name
+	 * specified, the scope ID will be 0, which represents the "None" scope.
 	 */
 	public Integer[] parseCompSpec(String compSpec) {
 
-		/* parse the compSpec to separate it into "comp" and "sect" portions */
+		/* parse the compSpec to separate it into "comp" and "scope" portions */
 		String compName = compSpec;
-		String sectName = null;
+		String scopeName = null;
 
-		/* check if there's a '/' in the string, to separate "component" from "section" */
+		/* check if there's a '/' in the string, to separate "component" from "scope" */
 		int slashIndex = compSpec.indexOf('/');
 		if (slashIndex != -1) {
 			compName = compSpec.substring(0, slashIndex);
-			sectName = compSpec.substring(slashIndex + 1);
+			scopeName = compSpec.substring(slashIndex + 1);
 		} 
 
 		/* 
@@ -394,30 +390,30 @@ public class Components {
 		 */
 		int compId = getComponentId(compName);
 
-		/* if the user provided a /section portion, convert that to an ID too */
-		int sectId = 0;
-		if (sectName != null) {
-			sectId = getSectionId(sectName);
+		/* if the user provided a /scope portion, convert that to an ID too */
+		int scopeId = 0;
+		if (scopeName != null) {
+			scopeId = getScopeId(scopeName);
 		}
 		
-		return new Integer[] {compId, sectId};
+		return new Integer[] {compId, scopeId};
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set the component/section associated with this path.
+	 * Set the component/scope associated with this path.
 	 * 
 	 * @param fileId The ID of the file whose component will be set.
 	 * @param compId The ID of the component to be associated with this file.
-	 * @param compSectionId The ID of the component's section.
+	 * @param compScopeId The ID of the component's scope.
 	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this file doesn't exist
 	 */
-	public int setFileComponent(int fileId, int compId, int compSectionId) {
+	public int setFileComponent(int fileId, int compId, int compScopeId) {
 		
 		try {
 			updateFileComponentPrepStmt.setInt(1, compId);
-			updateFileComponentPrepStmt.setInt(2, compSectionId);
+			updateFileComponentPrepStmt.setInt(2, compScopeId);
 			updateFileComponentPrepStmt.setInt(3, fileId);
 			int rowCount = db.executePrepUpdate(updateFileComponentPrepStmt);
 			if (rowCount == 0) {
@@ -433,10 +429,10 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Get the component/section associated with this path.
+	 * Get the component/scope associated with this path.
 	 * 
 	 * @param fileId The ID of the path whose component we're interested in
-	 * @return A Integer[2] array where [0] is the component ID, and [1] is the section ID,
+	 * @return A Integer[2] array where [0] is the component ID, and [1] is the scope ID,
 	 * or null if the file doesn't exist.
 	 */
 	public Integer[] getFileComponent(int fileId) {
@@ -465,7 +461,7 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of files that are within the specified component (any section).
+	 * Return the set of files that are within the specified component (any scope).
 	 * 
 	 * @param compId The ID of the component we're examining.
 	 * @return The set of files that reside inside that component.
@@ -486,18 +482,18 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of files that are within the specified component/section.
+	 * Return the set of files that are within the specified component/scope.
 	 * 
 	 * @param compId The ID of the component we're examining.
-	 * @param compSectionId The section within the component we're interested in.
-	 * @return The set of files that reside inside that component/section.
+	 * @param compScopeId The scope within the component we're interested in.
+	 * @return The set of files that reside inside that component/scope.
 	 */
-	public FileSet getFilesInComponent(int compId, int compSectionId) {
+	public FileSet getFilesInComponent(int compId, int compScopeId) {
 		
 		Integer results[] = null;
 		try {
 			findFilesInComponent2PrepStmt.setInt(1, compId);
-			findFilesInComponent2PrepStmt.setInt(2, compSectionId);
+			findFilesInComponent2PrepStmt.setInt(2, compScopeId);
 			results = db.executePrepSelectIntegerColumn(findFilesInComponent2PrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -510,11 +506,11 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of files that are within the specified component/section, given a
-	 * string specification of the component/section.
+	 * Return the set of files that are within the specified component/scope, given a
+	 * string specification of the component/scope.
 	 * 
-	 * @param compSpec The component name, or the component/section name.
-	 * @return The FileSet of all files in this component or component/section, or null if
+	 * @param compSpec The component name, or the component/scope name.
+	 * @return The FileSet of all files in this component or component/scope, or null if
 	 * there's a an error in parsing the comp/spec name.
 	 */
 	public FileSet getFilesInComponent(String compSpec) {
@@ -522,20 +518,20 @@ public class Components {
 		Integer compSpecParts[] = parseCompSpec(compSpec);
 		
 		int compId = compSpecParts[0];
-		int sectId = compSpecParts[1];
+		int scopeId = compSpecParts[1];
 		
 		/* the ID must not be invalid, else that's an error */
-		if ((compId == ErrorCode.NOT_FOUND) || (sectId == ErrorCode.NOT_FOUND)) {
+		if ((compId == ErrorCode.NOT_FOUND) || (scopeId == ErrorCode.NOT_FOUND)) {
 			return null;
 		}
 		
 		/* 
-		 * If the section ID isn't specified by the user, then sectId == 0 (the
-		 * ID of the "None" section). This indicates we should look for all paths
-		 * in the component, regardless of the section.
+		 * If the scope ID isn't specified by the user, then scopeId == 0 (the
+		 * ID of the "None" scope). This indicates we should look for all paths
+		 * in the component, regardless of the scope.
 		 */
-		if (sectId != 0) {
-			return getFilesInComponent(compId, sectId);
+		if (scopeId != 0) {
+			return getFilesInComponent(compId, scopeId);
 		} else {
 			return getFilesInComponent(compId);			
 		}
@@ -565,17 +561,17 @@ public class Components {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the set of files that are outside the specified component/section.
+	 * Return the set of files that are outside the specified component/scope.
 	 * 
 	 * @param compId The ID of the component we're examining.
-	 * @param compSectionId The ID of the section within the component we're interested in.
-	 * @return The set of files that reside outside that component/section.
+	 * @param compScopeId The ID of the scope within the component we're interested in.
+	 * @return The set of files that reside outside that component/scope.
 	 */
-	public FileSet getFilesOutsideComponent(int compId, int compSectionId) {
+	public FileSet getFilesOutsideComponent(int compId, int compScopeId) {
 		Integer results[] = null;
 		try {
 			findFilesOutsideComponent2PrepStmt.setInt(1, compId);
-			findFilesOutsideComponent2PrepStmt.setInt(2, compSectionId);
+			findFilesOutsideComponent2PrepStmt.setInt(2, compScopeId);
 			results = db.executePrepSelectIntegerColumn(findFilesOutsideComponent2PrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -589,30 +585,30 @@ public class Components {
 
 	/**
 	 * Returns the set of files that fall outside of the component boundaries, using a string
-	 * to specify the component/section.
+	 * to specify the component/scope.
 	 * 
-	 * @param compSpec The component name, or the component/section name.
-	 * @return The FileSet of all files outside of this component or component/section, or null if
+	 * @param compSpec The component name, or the component/scope name.
+	 * @return The FileSet of all files outside of this component or component/scope, or null if
 	 * there's a an error in parsing the comp/spec name.
 	 */
 	public FileSet getFilesOutsideComponent(String compSpec) {
 		
 		Integer compSpecParts[] = parseCompSpec(compSpec);
 		int compId = compSpecParts[0];
-		int sectId = compSpecParts[1];
+		int scopeId = compSpecParts[1];
 		
 		/* the ID must not be invalid, else that's an error */
-		if ((compId == ErrorCode.NOT_FOUND) || (sectId == ErrorCode.NOT_FOUND)) {
+		if ((compId == ErrorCode.NOT_FOUND) || (scopeId == ErrorCode.NOT_FOUND)) {
 			return null;
 		}
 		
 		/* 
-		 * The section ID is optional, since it still allows us to
-		 * get the component's files. Note that sectId == 0 implies
-		 * that the user didn't specify a /section value.
+		 * The scope ID is optional, since it still allows us to
+		 * get the component's files. Note that scopeId == 0 implies
+		 * that the user didn't specify a /scope value.
 		 */
-		if (sectId != 0) {
-			return getFilesOutsideComponent(compId, sectId);
+		if (scopeId != 0) {
+			return getFilesOutsideComponent(compId, scopeId);
 		} else {
 			return getFilesOutsideComponent(compId);			
 		}

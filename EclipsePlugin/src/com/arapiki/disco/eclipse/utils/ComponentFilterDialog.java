@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
 import com.arapiki.disco.model.BuildStore;
+import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.types.ComponentSet;
 
 /**
@@ -77,9 +78,6 @@ public class ComponentFilterDialog extends Dialog {
 		/** This ID of the component that this widget represents. */
 		int compId;
 		
-		/** The number of scope names that we'll display. */
-		int numScopes;
-		
 		/*---------------------------------------------------------------------------------*/
 
 		/**
@@ -93,13 +91,13 @@ public class ComponentFilterDialog extends Dialog {
 		{	
 			super(parent, 0);
 			
+			final Components compMgr = compSet.getBuildStore().getComponents();
+			
 			/* get the scope name, and prepare for a checkbox for each */
-			String scopeNames[] = compSet.getScopes();
-			numScopes = scopeNames.length - 1;
-			checkBoxes = new Button[numScopes];
+			checkBoxes = new Button[Components.SCOPE_MAX];
 			
 			/* we'll use the component's internal ID when accessing the component Set */
-			compId = compSet.getComponentId(compName);
+			compId = compMgr.getComponentId(compName);
 			
 			/* make sure this widget is stretched to the full width of the shell */
 			this.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
@@ -109,7 +107,7 @@ public class ComponentFilterDialog extends Dialog {
 			 * and a section for each of the scopes (excluding the None scope).
 			 */
 			GridLayout layout = new GridLayout();
-			layout.numColumns = 1 + (scopeNames.length - 1);
+			layout.numColumns = 1 + Components.SCOPE_MAX;
 			layout.marginHeight = 0;
 			setLayout(layout);
 			
@@ -123,11 +121,11 @@ public class ComponentFilterDialog extends Dialog {
 			 * (except for "None"). We take note of each widget (in the checkBoxes)
 			 * array so we can set/refresh it later.
 			 */
-			for (int i = 0; i < numScopes; i++) {
+			for (int i = 0; i < Components.SCOPE_MAX; i++) {
 				
 				/* the scope check boxes are on the right side */
 				final Button newButton = new Button(this, SWT.CHECK);
-				newButton.setText(scopeNames[i + 1]);
+				newButton.setText(compMgr.getScopeName(i + 1));
 				newButton.setLayoutData(new GridData());
 
 				/*
@@ -138,7 +136,7 @@ public class ComponentFilterDialog extends Dialog {
 					public void widgetSelected(SelectionEvent e) {
 						Button button = (Button)(e.getSource());
 						String buttonText = button.getText();
-						int scopeId = compSet.getScopeId(buttonText);
+						int scopeId = compMgr.getScopeId(buttonText);
 						if (button.getSelection()) {
 							compSet.add(compId, scopeId);
 						} else {
@@ -160,7 +158,7 @@ public class ComponentFilterDialog extends Dialog {
 		 */
 		public void refresh()
 		{
-			for (int i = 0; i != numScopes; i++) {
+			for (int i = 0; i != Components.SCOPE_MAX; i++) {
 				Button thisCheck = checkBoxes[i];
 				thisCheck.setSelection(compSet.isMember(compId, i + 1));
 			}
@@ -213,6 +211,8 @@ public class ComponentFilterDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		
+		final Components compMgr = compSet.getBuildStore().getComponents();
+
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
 		
@@ -228,7 +228,7 @@ public class ComponentFilterDialog extends Dialog {
 		layout.numColumns = 1;
 		listComposite.setLayout(layout);
 		
-		String componentNames[] = compSet.getComponents();
+		String componentNames[] = compMgr.getComponents();
 		lineWidgets = new CompSelectWidget[componentNames.length];
 		for (int i = 0; i != componentNames.length; i++) {
 			String compName = componentNames[i];

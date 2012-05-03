@@ -201,7 +201,7 @@ class BuildStoreDB  {
 
 			/* Create the "files" table. */
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, " +
-							   "pathType integer, compId integer, compSectionId integer, name text not null)");
+							   "pathType integer, compId integer, compScopeId integer, name text not null)");
 			stat.executeUpdate("insert into files values (0, 0, 1, 0, 0, \"/\")");
 			stat.executeUpdate("create unique index filesIdx on files (parentId, name)");
 			

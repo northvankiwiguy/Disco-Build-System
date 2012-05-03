@@ -67,68 +67,6 @@ public class TestComponentSet {
 		idYellowComp = compts.addComponent("YellowComp");
 		idMauveComp = compts.addComponent("MauveComp");
 	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test the getComponents() method.
-	 */
-	@Test
-	public void testGetComponents() {
-		
-		/* validate that the components are returned in alphabetical order */
-		String compList[] = cs.getComponents();
-		assertEquals("BlueComp", compList[0]);
-		assertEquals("Comp1", compList[1]);
-		assertEquals("Comp2", compList[2]);
-		assertEquals("GreenComp", compList[3]);
-		assertEquals("MauveComp", compList[4]);
-		assertEquals("None", compList[5]);
-		assertEquals("YellowComp", compList[6]);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test the getScopes() method.
-	 */
-	@Test
-	public void testGetScopes() {
-		String scopeList[] = cs.getScopes();
-		assertEquals("None", scopeList[ID_SCOPE_NONE]);
-		assertEquals("Private", scopeList[ID_SCOPE_PRIVATE]);
-		assertEquals("Public", scopeList[ID_SCOPE_PUBLIC]);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-	
-	/**
-	 * Test the getComponentId() method.
-	 */
-	@Test
-	public void testGetComponentId() {
-		
-		assertEquals(idBlueComp, cs.getComponentId("BlueComp"));
-		assertEquals(idComp1, cs.getComponentId("Comp1"));
-		assertEquals(idComp2, cs.getComponentId("Comp2"));
-		assertEquals(idGreenComp, cs.getComponentId("GreenComp"));
-		assertEquals(idYellowComp, cs.getComponentId("YellowComp"));
-
-		assertEquals(ErrorCode.NOT_FOUND, cs.getComponentId("InvalidComp"));
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-	
-	/**
-	 * Test the getScopeId() method.
-	 */
-	@Test
-	public void testGetScopeId() {
-		assertEquals(ID_SCOPE_NONE, cs.getScopeId("None"));
-		assertEquals(ID_SCOPE_PRIVATE, cs.getScopeId("Private"));
-		assertEquals(ID_SCOPE_PUBLIC, cs.getScopeId("Public"));
-		assertEquals(ErrorCode.NOT_FOUND, cs.getScopeId("Invalid"));
-	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	

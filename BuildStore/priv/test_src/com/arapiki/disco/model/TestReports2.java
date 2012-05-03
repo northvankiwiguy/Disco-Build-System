@@ -374,9 +374,6 @@ public class TestReports2 {
 		int comp2Id = comps.addComponent("Comp2");		
 		int comp3Id = comps.addComponent("Comp3");
 		int comp4Id = comps.addComponent("Comp4");
-		
-		int scopePrivateId = comps.getSectionId("Private");
-		int scopePublicId = comps.getSectionId("Public");
 
 		/* initially, no paths should be present (not even /) */
 		FileSet fs = reports.reportFilesFromComponentSet(cs);
@@ -397,27 +394,27 @@ public class TestReports2 {
 		assertEquals(0, fs.size());
 		
 		/* map the files into components */
-		comps.setFileComponent(file1, comp1Id, scopePrivateId);
-		comps.setFileComponent(file2, comp1Id, scopePublicId);
-		comps.setFileComponent(file3, comp2Id, scopePrivateId);
-		comps.setFileComponent(file4, comp2Id, scopePublicId);
-		comps.setFileComponent(file5, comp3Id, scopePrivateId);
-		comps.setFileComponent(file6, comp3Id, scopePublicId);
-		comps.setFileComponent(file7, comp4Id, scopePrivateId);
-		comps.setFileComponent(file8, comp4Id, scopePublicId);
+		comps.setFileComponent(file1, comp1Id, Components.SCOPE_PRIVATE);
+		comps.setFileComponent(file2, comp1Id, Components.SCOPE_PUBLIC);
+		comps.setFileComponent(file3, comp2Id, Components.SCOPE_PRIVATE);
+		comps.setFileComponent(file4, comp2Id, Components.SCOPE_PUBLIC);
+		comps.setFileComponent(file5, comp3Id, Components.SCOPE_PRIVATE);
+		comps.setFileComponent(file6, comp3Id, Components.SCOPE_PUBLIC);
+		comps.setFileComponent(file7, comp4Id, Components.SCOPE_PRIVATE);
+		comps.setFileComponent(file8, comp4Id, Components.SCOPE_PUBLIC);
 	
 		/* empty component set still gives an empty FileSet */
 		fs = reports.reportFilesFromComponentSet(cs);
 		assertEquals(0, fs.size());
 		
 		/* add Comp1/Private into the component set */
-		cs.add(comp1Id, scopePrivateId);
+		cs.add(comp1Id, Components.SCOPE_PRIVATE);
 		fs = reports.reportFilesFromComponentSet(cs);
 		assertEquals(1, fs.size());
 		assertTrue(fs.isMember(file1));
 
 		/* add Comp1/Public into the component set */
-		cs.add(comp1Id, scopePublicId);
+		cs.add(comp1Id, Components.SCOPE_PUBLIC);
 		fs = reports.reportFilesFromComponentSet(cs);
 		assertEquals(2, fs.size());
 		assertTrue(fs.isMember(file1));
@@ -433,7 +430,7 @@ public class TestReports2 {
 		assertTrue(fs.isMember(file4));
 		
 		/* add Comp8/Public into the component set */
-		cs.add(comp4Id, scopePublicId);
+		cs.add(comp4Id, Components.SCOPE_PUBLIC);
 		fs = reports.reportFilesFromComponentSet(cs);
 		assertEquals(5, fs.size());
 		assertTrue(fs.isMember(file1));

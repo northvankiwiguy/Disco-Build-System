@@ -89,52 +89,6 @@ public class ComponentSet implements Cloneable {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the complete list of components that may appear in this set.
-	 * @return An alphabetically ordered list of component names.
-	 */
-	public String[] getComponents() {
-		return cmpts.getComponents();
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Given a component's name, return its ID number.
-	 * 
-	 * @param compName The component's name.
-	 * @return The component's ID number, ErrorCode.NOT_FOUND if there's no component
-	 * with this name.
-	 */
-	public int getComponentId(String compName) {
-		return cmpts.getComponentId(compName);
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Fetch the list of scopes that can be represented in this ComponentSet.
-	 * 
-	 * @return An alphabetically ordered list of scope names.
-	 */
-	public String[] getScopes() {
-		return cmpts.getSections();
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Given a scope name, return its ID number. 
-	 * 
-	 * @param scopeName The scope's name (e.g. "Private")
-	 * @return The scope's ID number, or ErrorCode.NOT_FOUND if the name isn't valid.
-	 */
-	public int getScopeId(String scopeName) {
-		return cmpts.getSectionId(scopeName);
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * When a component has not explicitly been added or removed from this set then
 	 * a default state (true or false) is used to determine whether the member should
 	 * be considered as a member. This is useful for when a set should contain "everything

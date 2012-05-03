@@ -109,7 +109,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 		 * isn't specified, "private" will be used.
 		 */
 		String compName = args[0];
-		int compAndSectionIds[] = CliUtils.parseComponentAndSection(cmpts, compName, true);
+		int compAndSectionIds[] = CliUtils.parseComponentAndScope(cmpts, compName, true);
 		int compId = compAndSectionIds[0];
 		int sectId = compAndSectionIds[1];
 

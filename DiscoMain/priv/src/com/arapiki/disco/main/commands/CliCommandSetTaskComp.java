@@ -109,7 +109,7 @@ public class CliCommandSetTaskComp implements ICliCommand {
 		 * for tasks.
 		 */
 		String compName = args[0];
-		int compAndSectionIds[] = CliUtils.parseComponentAndSection(cmpts, compName, false);
+		int compAndSectionIds[] = CliUtils.parseComponentAndScope(cmpts, compName, false);
 		int compId = compAndSectionIds[0];
 		
 		/* compute the TaskSet from the user-supplied list of task-specs */

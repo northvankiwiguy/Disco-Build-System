@@ -194,14 +194,13 @@ public class TestComponents {
 		
 		/* assign a component to files, then try to remove the name */
 		int compA = cmpts.getComponentId("CompA");
-		int sectPrivate = cmpts.getSectionId("priv");
 		int file1 = fns.addFile("/aardvark/bunny");
-		cmpts.setFileComponent(file1, compA, sectPrivate);
+		cmpts.setFileComponent(file1, compA, Components.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.CANT_REMOVE, cmpts.removeComponent("CompA"));
 		
 		/* remove the component from the file, then try again to remove the component name */
 		int compNone = cmpts.getComponentId("None");
-		cmpts.setFileComponent(file1, compNone, sectPrivate);
+		cmpts.setFileComponent(file1, compNone, Components.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.OK, cmpts.removeComponent("CompA"));
 		
 		/* assign them to tasks, then try to remove the name */
@@ -257,58 +256,43 @@ public class TestComponents {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#getSectionName(int)}.
+	 * Test method for {@link com.arapiki.disco.model.Components#getScopeName(int)}.
 	 */
 	@Test
 	public void testGetSectionName() {
 		
 		/* Test valid section IDs */
-		assertEquals("None", cmpts.getSectionName(0));
-		assertEquals("Private", cmpts.getSectionName(1));
-		assertEquals("Public", cmpts.getSectionName(2));
+		assertEquals("None", cmpts.getScopeName(0));
+		assertEquals("Private", cmpts.getScopeName(1));
+		assertEquals("Public", cmpts.getScopeName(2));
 
 		/* Test invalid section IDs */
-		assertNull(cmpts.getSectionName(3));
-		assertNull(cmpts.getSectionName(4));
-		assertNull(cmpts.getSectionName(100));
+		assertNull(cmpts.getScopeName(3));
+		assertNull(cmpts.getScopeName(4));
+		assertNull(cmpts.getScopeName(100));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#getSectionId(String)}.
+	 * Test method for {@link com.arapiki.disco.model.Components#getScopeId(String)}.
 	 */
 	@Test
 	public void testGetSectionId() {
 		
 		/* Test valid section names */
-		assertEquals(0, cmpts.getSectionId("None"));
-		assertEquals(1, cmpts.getSectionId("priv"));
-		assertEquals(1, cmpts.getSectionId("private"));
-		assertEquals(1, cmpts.getSectionId("Private"));
-		assertEquals(2, cmpts.getSectionId("pub"));
-		assertEquals(2, cmpts.getSectionId("public"));
+		assertEquals(0, cmpts.getScopeId("None"));
+		assertEquals(1, cmpts.getScopeId("priv"));
+		assertEquals(1, cmpts.getScopeId("private"));
+		assertEquals(1, cmpts.getScopeId("Private"));
+		assertEquals(2, cmpts.getScopeId("pub"));
+		assertEquals(2, cmpts.getScopeId("public"));
 		
 		/* Test invalid section names */
-		assertEquals(ErrorCode.NOT_FOUND, cmpts.getSectionId("object"));
-		assertEquals(ErrorCode.NOT_FOUND, cmpts.getSectionId("obj"));
-		assertEquals(ErrorCode.NOT_FOUND, cmpts.getSectionId("pretty"));
-		assertEquals(ErrorCode.NOT_FOUND, cmpts.getSectionId("shiny"));
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test method for {@link com.arapiki.disco.model.Components#getSections()}.
-	 */
-	@Test
-	public void testGetSections() {
-
-		String sections[] = cmpts.getSections();
-		assertEquals(3, sections.length);
-		assertEquals("None", sections[0]);
-		assertEquals("Private", sections[1]);
-		assertEquals("Public", sections[2]);	
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.getScopeId("object"));
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.getScopeId("obj"));
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.getScopeId("pretty"));
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.getScopeId("shiny"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -323,8 +307,6 @@ public class TestComponents {
 		/* add a couple of components */
 		int comp1 = cmpts.addComponent("comp1");
 		int comp2 = cmpts.addComponent("comp2");
-		int sectPrivate = cmpts.getSectionId("private");
-		int sectPublic = cmpts.getSectionId("public");
 		
 		/* test the compSpecs with only component names */
 		Integer results[] = cmpts.parseCompSpec("comp1");
@@ -335,14 +317,14 @@ public class TestComponents {
 		assertEquals(comp2, results[0].intValue());
 		assertEquals(0, results[1].intValue());
 		
-		/* test compSpecs with both component and section names */
+		/* test compSpecs with both component and scope names */
 		results = cmpts.parseCompSpec("comp1/private");
 		assertEquals(comp1, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(Components.SCOPE_PRIVATE, results[1].intValue());
 		
 		results = cmpts.parseCompSpec("comp2/public");
 		assertEquals(comp2, results[0].intValue());
-		assertEquals(sectPublic, results[1].intValue());
+		assertEquals(Components.SCOPE_PUBLIC, results[1].intValue());
 		
 		/* test invalid compSpecs */
 		results = cmpts.parseCompSpec("badname");
@@ -359,7 +341,7 @@ public class TestComponents {
 		
 		results = cmpts.parseCompSpec("badname/public");
 		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
-		assertEquals(sectPublic, results[1].intValue());
+		assertEquals(Components.SCOPE_PUBLIC, results[1].intValue());
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -385,54 +367,49 @@ public class TestComponents {
 		int compB = cmpts.addComponent("CompB");
 		int compNone = cmpts.getComponentId("None");
 
-		/* fetch the sections IDs */
-		int sectPublic = cmpts.getSectionId("public");
-		int sectPrivate = cmpts.getSectionId("private");
-		int sectNone = cmpts.getSectionId("None");
-
 		/* by default, all files are in None/None */
 		Integer results[] = cmpts.getFileComponent(path1);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 		results = cmpts.getFileComponent(path2);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 		results = cmpts.getFileComponent(path3);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 
 		/* set one of the files into CompA/public */
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compA, sectPublic));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compA, Components.SCOPE_PUBLIC));
 		results = cmpts.getFileComponent(path1);
 		assertEquals(compA, results[0].intValue());
-		assertEquals(sectPublic, results[1].intValue());
+		assertEquals(Components.SCOPE_PUBLIC, results[1].intValue());
 		results = cmpts.getFileComponent(path2);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 		results = cmpts.getFileComponent(path3);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 		
 		/* set another file to another component */
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path3, compB, sectPrivate));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path3, compB, Components.SCOPE_PRIVATE));
 		results = cmpts.getFileComponent(path1);
 		assertEquals(compA, results[0].intValue());
-		assertEquals(sectPublic, results[1].intValue());
+		assertEquals(Components.SCOPE_PUBLIC, results[1].intValue());
 		results = cmpts.getFileComponent(path2);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 		results = cmpts.getFileComponent(path3);
 		assertEquals(compB, results[0].intValue());
-		assertEquals(sectPrivate, results[1].intValue());
+		assertEquals(Components.SCOPE_PRIVATE, results[1].intValue());
 		
 		/* set a file's component back to None/None */
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compNone, sectNone));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(path1, compNone, Components.SCOPE_NONE));
 		results = cmpts.getFileComponent(path1);
 		assertEquals(compNone, results[0].intValue());
-		assertEquals(sectNone, results[1].intValue());
+		assertEquals(Components.SCOPE_NONE, results[1].intValue());
 		
 		/* try to set a non-existent file */
-		assertEquals(ErrorCode.NOT_FOUND, cmpts.setFileComponent(1000, compA, sectPublic));
+		assertEquals(ErrorCode.NOT_FOUND, cmpts.setFileComponent(1000, compA, Components.SCOPE_PUBLIC));
 		
 		/* try to get a non-existent file */
 		assertNull(cmpts.getFileComponent(2000));
@@ -455,8 +432,8 @@ public class TestComponents {
 		int compNone = cmpts.addComponent("None");
 		
 		/* what are the sections? */
-		int sectPub = cmpts.getSectionId("public");
-		int sectPriv = cmpts.getSectionId("private");
+		int sectPub = cmpts.getScopeId("public");
+		int sectPriv = cmpts.getScopeId("private");
 		
 		/* initially, there are no files in the component (public, private, or any) */
 		FileSet results = cmpts.getFilesInComponent(compA);
@@ -571,12 +548,10 @@ public class TestComponents {
 		/* create a new component, named "foo", with one item in foo/public and three in foo/private */
 		Components cmpts = bs.getComponents();
 		int compFooId = cmpts.addComponent("foo");
-		int sectPublic = cmpts.getSectionId("public");
-		int sectPrivate = cmpts.getSectionId("private");
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f1path, compFooId, sectPublic));
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f2path, compFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f4path, compFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f5path, compFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f1path, compFooId, Components.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f2path, compFooId, Components.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f4path, compFooId, Components.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f5path, compFooId, Components.SCOPE_PRIVATE));
 
 		/* test @foo/public membership */
 		FileSet fs = cmpts.getFilesInComponent("foo/public");

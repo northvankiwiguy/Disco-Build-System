@@ -94,9 +94,9 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 				
 				/* should we show component names? */
 				if (optionShowComps) {
-					Integer cmptSectIds[] = cmpts.getFileComponent(id);
-					String cmptName = cmpts.getComponentName(cmptSectIds[0]);
-					String sectName = cmpts.getSectionName(cmptSectIds[1]);
+					Integer cmptScopeIds[] = cmpts.getFileComponent(id);
+					String cmptName = cmpts.getComponentName(cmptScopeIds[0]);
+					String sectName = cmpts.getScopeName(cmptScopeIds[1]);
 					System.out.println(count + "\t" + pathName + "  (" + cmptName + "/" + sectName + ")");
 				}
 				
