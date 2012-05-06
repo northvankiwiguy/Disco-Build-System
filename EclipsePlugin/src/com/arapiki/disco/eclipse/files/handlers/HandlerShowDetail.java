@@ -117,7 +117,7 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 		} else if (paramValue.equals("components")) {
 			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_COMPONENTS, isSelected);
 		} else if (paramValue.equals("show-hidden")) {
-			subEditor.setGreyVisibilityMode(isSelected);
+			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_HIDDEN, isSelected);
 		} else {
 			throw new FatalDiscoError("Unable to handle command: " + cmd.getId());
 		}

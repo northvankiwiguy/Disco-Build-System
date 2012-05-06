@@ -135,6 +135,10 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 */
 	public static final int OPT_SHOW_COMPONENTS		= 4;
 	
+	/**
+	 * Option to reveal hidden files in the viewer, displaying them in a greyed-out style.
+	 */
+	public static final int OPT_SHOW_HIDDEN			= 8;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -370,7 +374,7 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 * this editor's current option settings. This can be used to modify one or more
 	 * binary configuration settings in this control.
 	 * 
-	 * @param optionBits One of more bits that should be either set or cleared from this
+	 * @param optionBits One or more bits that should be either set or cleared from this
 	 * 		  editor's options. The state of options that are not specified in this parameter
 	 *        will not be changed.
 	 * @param enable "true" if the options should be enabled, or "false" if they should be cleared.
@@ -385,7 +389,12 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		/* else, we're clearing the options */
 		else {
 			editorOptionBits &= ~optionBits;
-		}		
+		}
+		
+		/* pass some of the options onto onto parts of the system */
+		if ((optionBits & OPT_SHOW_HIDDEN) != 0) {
+			filesTreeViewer.setGreyVisibilityMode(enable);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -450,29 +459,6 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 */
 	public void setPathVisibilityState(FileRecord path, boolean state) {
 		filesTreeViewer.setVisibility(path, state);
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Determine whether this TreeViewer will show non-visible elements using a grey font,
-	 * as opposed to not rendering them at all.
-	 * @return True if non-visible element are being greyed-out, else false.
-	 */
-	public boolean getGreyVisibilityMode() {
-		return filesTreeViewer.getGreyVisibilityMode();
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Specify whether this TreeViewer should render non-visible elements using
-	 * grey font, or whether they should not be rendered at all. 
-	 * @param greyVisibility True if non-visible element should be greyed out,
-	 * 			or false if they should not be shown at all.
-	 */
-	public void setGreyVisibilityMode(boolean greyVisibility) {
-		filesTreeViewer.setGreyVisibilityMode(greyVisibility);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
