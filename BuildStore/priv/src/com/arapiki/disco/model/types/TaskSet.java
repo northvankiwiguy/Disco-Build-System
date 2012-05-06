@@ -20,7 +20,7 @@ import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.types.IntegerTreeSet;
 
 /**
- * Implements an unordered set of TaskRecord objects. This is used in numerous places
+ * Implements an unordered set of task IDs. This is used in numerous places
  * where a collection of Tasks must be grouped together into a single unit.
  * 
  * The TaskSet data type is different from a regular set, since the parent/child
@@ -28,7 +28,7 @@ import com.arapiki.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class TaskSet extends IntegerTreeSet<TaskRecord>{
+public class TaskSet extends IntegerTreeSet {
 	
 	/*=====================================================================================*
 	 * TYPES/FIELDS
@@ -68,15 +68,10 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	public TaskSet(BuildTasks bts, Integer[] initValues) {
 
 		/* most of the functionality is provided by the IntegerTreeSet class */
-		super();
+		super(initValues);
 		
 		/* except we also need to record our BuildTasks object */
 		this.bts = bts;
-		
-		/* copy the initial task values from the array into the TaskSet */
-		for (int i = 0; i < initValues.length; i++) {
-			add(new TaskRecord(initValues[i]));
-		}
 	}
 
 	/*=====================================================================================*
@@ -110,19 +105,6 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	@Override
 	public Integer[] getChildren(int id) {
 		return bts.getChildren(id);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Create a new TaskRecord object, which can be used as an entry in the TaskSet.
-	 * 
-	 * @param id The ID to assign to the new object.
-	 * @return A new TaskRecord object.
-	 */
-	@Override
-	public TaskRecord newRecord(int id) {
-		return new TaskRecord(id);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -285,6 +267,19 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	}
 
 	/*=====================================================================================*
+	 * PROTECTED METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * @return the maximum number of tasks that can be represented in this TaskSet
+	 * (numbered 0 to getMaxIdNumber() - 1).
+	 */
+	protected int getMaxIdNumber()
+	{
+		return BuildTasks.MAX_TASKS;
+	}
+	
+	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
@@ -302,7 +297,7 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 		
 		/* we always add/remove the task itself */
 		if (toBeAdded) {
-			add(new TaskRecord(taskNum));
+			add(Integer.valueOf(taskNum));
 		} else {
 			remove(taskNum);
 		}
@@ -321,5 +316,4 @@ public class TaskSet extends IntegerTreeSet<TaskRecord>{
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
-
 }

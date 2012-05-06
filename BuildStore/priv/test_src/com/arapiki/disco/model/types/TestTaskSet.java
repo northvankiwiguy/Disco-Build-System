@@ -23,7 +23,6 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.types.TaskRecord;
 import com.arapiki.disco.model.types.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 
@@ -44,18 +43,6 @@ public class TestTaskSet {
 
 	/** Our test BuildTasks object */
 	private BuildTasks bts;
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Helper function for creating a new TaskRecord and populating the id field.
-	 * @param taskId the TaskRecord's id
-	 * @return A new TaskRecord
-	 */
-	private TaskRecord newTaskRecord(int taskId) {
-		TaskRecord tr = new TaskRecord(taskId);
-		return tr;
-	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -74,47 +61,22 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#get(int)}.
-	 */
-	@Test
-	public void testGet() {
-		
-		/* add a couple of TaskRecord entries to the TaskSet */
-		ts.add(newTaskRecord(1));
-		ts.add(newTaskRecord(2000));
-		
-		/* fetch TaskRecord #1, and validate the fields */
-		TaskRecord fr = ts.get(1);
-		assertEquals(1, fr.getId());
-
-		/* same for TaskRecord #2000 */
-		fr = ts.get(2000);
-		assertEquals(2000, fr.getId());
-		
-		/* this record doesn't exist - should return null */
-		fr = ts.get(100);
-		assertNull(fr);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Test method for {@link com.arapiki.disco.model.types.TaskSet#isMember(int)}.
 	 */
 	@Test
 	public void testIsMember() {
 		
-		/* add some records */
-		ts.add(newTaskRecord(134));
-		ts.add(newTaskRecord(256));
-		ts.add(newTaskRecord(23));
+		/* add some elements */
+		ts.add(134);
+		ts.add(256);
+		ts.add(23);
 		
-		/* check that the TaskSet contains those records */
+		/* check that the TaskSet contains those elements */
 		assertTrue(ts.isMember(134));
 		assertTrue(ts.isMember(256));
 		assertTrue(ts.isMember(23));
 		
-		/* but doesn't contain records we didn't add */
+		/* but doesn't contain elements we didn't add */
 		assertFalse(ts.isMember(34));
 		assertFalse(ts.isMember(1));
 		assertFalse(ts.isMember(2000));
@@ -128,10 +90,10 @@ public class TestTaskSet {
 	@Test
 	public void testRemove() {
 		
-		/* add some records */
-		ts.add(newTaskRecord(34));
-		ts.add(newTaskRecord(9275));
-		ts.add(newTaskRecord(3643));
+		/* add some elements */
+		ts.add(34);
+		ts.add(9275);
+		ts.add(3643);
 		
 		/* check they're present */
 		assertTrue(ts.isMember(34));
@@ -165,13 +127,13 @@ public class TestTaskSet {
 	@Test
 	public void testIterator() {
 		
-		/* add a bunch of records */
-		ts.add(newTaskRecord(134));
-		ts.add(newTaskRecord(256));
-		ts.add(newTaskRecord(23));
-		ts.add(newTaskRecord(34));
-		ts.add(newTaskRecord(9275));
-		ts.add(newTaskRecord(3643));
+		/* add a bunch of elements */
+		ts.add(134);
+		ts.add(256);
+		ts.add(23);
+		ts.add(34);
+		ts.add(9275);
+		ts.add(3643);
 
 		/* check that the iterator returns all the members (not in any particular order) */
 		ArrayList<Integer> returnedList = new ArrayList<Integer>();
@@ -200,7 +162,7 @@ public class TestTaskSet {
 		int task6 = bts.addBuildTask(task2, 0, "second command's child");
 
 		/* add only one of them to the TaskSet */
-		ts.add(newTaskRecord(task6));		
+		ts.add(task6);		
 
 		/* check that it's added */
 		assertEquals(1, ts.size());
@@ -216,7 +178,7 @@ public class TestTaskSet {
 		assertTrue(ts.isMember(task1));
 		
 		/* now add another task */
-		ts.add(newTaskRecord(task4));		
+		ts.add(task4);		
 		assertEquals(5, ts.size());
 		
 		/* populate it's parents - this adds task3 (task1 is already in the set) */
@@ -235,9 +197,9 @@ public class TestTaskSet {
 
 		/* create and populate a new TaskSet to merge in */
 		TaskSet mainTaskSet = new TaskSet(bts);
-		mainTaskSet.add(newTaskRecord(1));
-		mainTaskSet.add(newTaskRecord(10));
-		mainTaskSet.add(newTaskRecord(100));
+		mainTaskSet.add(1);
+		mainTaskSet.add(10);
+		mainTaskSet.add(100);
 		
 		/* merge it in */
 		ts.mergeSet(mainTaskSet);
@@ -250,9 +212,9 @@ public class TestTaskSet {
 
 		/* create a new set, with new content to merge in */
 		mainTaskSet = new TaskSet(bts);
-		mainTaskSet.add(newTaskRecord(23));
-		mainTaskSet.add(newTaskRecord(56));
-		mainTaskSet.add(newTaskRecord(100));
+		mainTaskSet.add(23);
+		mainTaskSet.add(56);
+		mainTaskSet.add(100);
 		
 		/* merge it in */
 		ts.mergeSet(mainTaskSet);
@@ -282,11 +244,11 @@ public class TestTaskSet {
 		
 		/* add them to the TaskSet, testing the size as we go along */ 
 		assertEquals(0, ts.size());
-		ts.add(newTaskRecord(task1));		
+		ts.add(task1);		
 		assertEquals(1, ts.size());
-		ts.add(newTaskRecord(task2));
+		ts.add(task2);
 		assertEquals(2, ts.size());
-		ts.add(newTaskRecord(task3));
+		ts.add(task3);
 		assertEquals(3, ts.size());
 				
 		/* now remove some of the entries, testing the size as we go */

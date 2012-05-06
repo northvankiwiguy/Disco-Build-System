@@ -20,7 +20,7 @@ import com.arapiki.utils.errors.ErrorCode;
 import com.arapiki.utils.types.IntegerTreeSet;
 
 /**
- * Implements an unordered set of FileRecord objects. This is used in numerous places
+ * Implements an unordered set of file IDs. This is used in numerous places
  * where a set of files must be passed as a single data value.
  * 
  * The FileSet data type is different from a regular set, since the parent/child
@@ -28,7 +28,7 @@ import com.arapiki.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FileSet extends IntegerTreeSet<FileRecord>  {
+public class FileSet extends IntegerTreeSet  {
 	
 	/*=====================================================================================*
 	 * TYPES/FIELDS
@@ -66,15 +66,8 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 * @param paths The IDs of the paths to be added to the FileSet.
 	 */
 	public FileSet(FileNameSpaces fns, Integer paths[]) {
-		
-		/* initialize the parent class */
-		this(fns);
-		
-		/* copy the paths from the array into a FileSet */
-		for (int i = 0; i < paths.length; i++) {
-			FileRecord fr = new FileRecord(paths[i]);
-			add(fr);
-		}
+		super(paths);
+		this.fns = fns;
 	}
 	
 	/*=====================================================================================*
@@ -221,19 +214,6 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 		return fns.getChildPaths(id);
 	}
 	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Create a new FileRecord object, which can be used as an entry in the FileSet.
-	 * 
-	 * @param id The ID to assign to the new object.
-	 * @return A new FileRecord object.
-	 */
-	@Override
-	public FileRecord newRecord(int id) {
-		return new FileRecord(id);
-	}
-	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -246,11 +226,7 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 	 */
 	private void populateWithPathsHelper(int pathId) {
 		
-		/* add a new file record for this pathId, but only if it's not already in the FileSet */
-		if (get(pathId) == null) {
-			FileRecord fr = new FileRecord(pathId);
-			add(fr);
-		}
+		add(pathId);
 		
 		/* now add all the children of this path */
 		Integer children [] = fns.getChildPaths(pathId);
@@ -259,5 +235,16 @@ public class FileSet extends IntegerTreeSet<FileRecord>  {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * @return the maximum number of files that can be represented in this FileSet
+	 * (numbered 0 to getMaxIdNumber() - 1).
+	 */
+	protected int getMaxIdNumber()
+	{
+		return FileNameSpaces.MAX_FILES;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

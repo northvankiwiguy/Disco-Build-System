@@ -102,7 +102,7 @@ public class CommonTestUtils {
 	 * @param expected The array of integers to compare
 	 * @return True if the FileSet content is the same as the array content, else False
 	 */
-	public static boolean treeSetEqual(IntegerTreeSet<?> actual, Integer[] expected) {
+	public static boolean treeSetEqual(IntegerTreeSet actual, Integer[] expected) {
 		
 		/* first, translate the FileSet into an array of Integer */
 		ArrayList<Integer> fsInts = new ArrayList<Integer>();

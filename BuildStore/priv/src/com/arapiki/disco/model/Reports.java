@@ -23,7 +23,6 @@ import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.model.types.ComponentSet;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.disco.model.types.TaskRecord;
 import com.arapiki.disco.model.types.TaskSet;
 import com.arapiki.utils.errors.ErrorCode;
 
@@ -223,8 +222,7 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesNotUsedPrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord(rs.getInt(1));
-				results.add(record);
+				results.add(rs.getInt(1));
 			}
 			rs.close();
 			
@@ -251,8 +249,7 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesWithMatchingNamePrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord(rs.getInt(1));
-				results.add(record);
+				results.add(rs.getInt(1));
 			}
 			rs.close();
 			
@@ -362,8 +359,7 @@ public class Reports {
 				
 					/* only add the result if it's not in the set */
 					if (!results.isMember(taskId)){
-						TaskRecord record = new TaskRecord(rs.getInt(1));
-						results.add(record);
+						results.add(rs.getInt(1));
 					}
 				}
 				rs.close();
@@ -419,8 +415,7 @@ public class Reports {
 				
 					/* only add the result if it's not in the set */
 					if (!results.isMember(fileId)){
-						FileRecord record = new FileRecord(rs.getInt(1));
-						results.add(record);
+						results.add(rs.getInt(1));
 					}
 				}
 				rs.close();
@@ -450,8 +445,7 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectWriteOnlyFilesPrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord(rs.getInt(1));
-				results.add(record);
+				results.add(rs.getInt(1));
 			}
 			rs.close();
 			
@@ -475,8 +469,7 @@ public class Reports {
 			ResultSet rs = db.executePrepSelectResultSet(selectAllFilesPrepStmt);
 
 			while (rs.next()) {
-				FileRecord record = new FileRecord(rs.getInt(1));
-				results.add(record);
+				results.add(rs.getInt(1));
 			}
 			rs.close();
 			
@@ -546,8 +539,7 @@ public class Reports {
 		ResultSet rs = db.executeSelectResultSet(sb.toString());
 		try {
 			while (rs.next()) {
-				FileRecord record = new FileRecord(rs.getInt(1));
-				results.add(record);
+				results.add(rs.getInt(1));
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -609,8 +601,7 @@ public class Reports {
 					ResultSet rs = db.executePrepSelectResultSet(sqlStatement);
 
 					while (rs.next()) {
-						FileRecord record = new FileRecord(rs.getInt(1));
-						thisRoundOfResults.add(record);
+						thisRoundOfResults.add(rs.getInt(1));
 					}
 					rs.close();
 

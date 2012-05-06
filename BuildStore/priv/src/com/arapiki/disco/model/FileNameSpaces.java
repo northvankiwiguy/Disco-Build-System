@@ -38,6 +38,11 @@ public class FileNameSpaces {
 	 *=====================================================================================*/
 
 	/**
+	 * The maximum number of files that this FileNamesSpaces object can handle.
+	 */
+	public static final int MAX_FILES = 16777216;
+	
+	/**
 	 * Path types - paths can be directories, plain files, or symlinks.
 	 */
 	public enum PathType { 
@@ -1005,7 +1010,11 @@ public class FileNameSpaces {
 				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 			}
 
-			return db.getLastRowID();
+			int lastRowId = db.getLastRowID();
+			if (lastRowId >= MAX_FILES) {
+				throw new FatalBuildStoreError("Exceeded maximum file number: " + MAX_FILES);
+			}
+			return lastRowId;
 		}
 		
 		/* else, it exists, but we need to make sure it's the correct type of path */

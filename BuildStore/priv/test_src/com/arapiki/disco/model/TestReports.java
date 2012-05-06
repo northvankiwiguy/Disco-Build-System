@@ -22,7 +22,6 @@ import org.junit.Test;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.disco.model.types.TaskRecord;
 import com.arapiki.disco.model.types.TaskSet;
 
 /**
@@ -63,19 +62,6 @@ public class TestReports {
 		fis = bs.getFileIncludes();
 		reports = bs.getReports();
 		rootTaskId = bts.getRootTask("root");
-	}
-	
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Helper function for creating a new FileRecord and adding it to a FileSet
-	 * @param fileSet The FileSet to add the new record to
-	 * @param pathId The new FileRecord's pathId
-	 */
-	private void addFileRecord(FileSet fileSet,int pathId) {
-		FileRecord fr = new FileRecord(pathId);
-		fileSet.add(fr);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -459,7 +445,7 @@ public class TestReports {
 		
 		/* test with only file1a */
 		source = new FileSet(fns);
-		addFileRecord(source, file1a);
+		source.add(file1a);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
 		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
@@ -471,7 +457,7 @@ public class TestReports {
 
 		/* test with only file1b */
 		source = new FileSet(fns);
-		addFileRecord(source, file1b);
+		source.add(file1b);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
 		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
@@ -483,8 +469,8 @@ public class TestReports {
 		
 		/* test with both file1a and file1b */
 		source = new FileSet(fns);
-		addFileRecord(source, file1a);
-		addFileRecord(source, file1b);
+		source.add(file1a);
+		source.add(file1b);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
 		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
@@ -498,8 +484,8 @@ public class TestReports {
 		
 		/* test with file1a and file2a */
 		source = new FileSet(fns);
-		addFileRecord(source, file1a);
-		addFileRecord(source, file2a);
+		source.add(file1a);
+		source.add(file2a);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
 		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
@@ -513,9 +499,9 @@ public class TestReports {
 
 		/* test with file1a, file2a and file3b */
 		source = new FileSet(fns);
-		addFileRecord(source, file1a);
-		addFileRecord(source, file2a);
-		addFileRecord(source, file3b);
+		source.add(file1a);
+		source.add(file2a);
+		source.add(file3b);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
 		resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
@@ -562,7 +548,7 @@ public class TestReports {
 		assertEquals(0, result.size());
 		
 		/* test with a single task, looking for all accessed files */
-		ts.add(new TaskRecord(task1));
+		ts.add(task1);
 		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_UNSPECIFIED);
 		assertEquals(2, result.size());
 		assertTrue(result.isMember(file1));
@@ -579,7 +565,7 @@ public class TestReports {
 		assertTrue(result.isMember(file1));
 
 		/* test with two tasks, looking for all accessed files */
-		ts.add(new TaskRecord(task2));
+		ts.add(task2);
 		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_UNSPECIFIED);
 		assertEquals(3, result.size());
 		assertTrue(result.isMember(file1));
@@ -599,7 +585,7 @@ public class TestReports {
 		assertTrue(result.isMember(file1));
 
 		/* test with three tasks, looking for all written files */
-		ts.add(new TaskRecord(task3));
+		ts.add(task3);
 		result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_WRITE);
 		assertEquals(2, result.size());
 		assertTrue(result.isMember(file1));

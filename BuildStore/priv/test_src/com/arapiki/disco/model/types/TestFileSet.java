@@ -23,8 +23,6 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.types.FileRecord;
 import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.utils.errors.ErrorCode;
 
@@ -72,22 +70,6 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Helper function for creating a new FileRecord and populating some of the fields.
-	 * @param pathId The new FileRecord's pathId
-	 * @param count The new FileRecord's count field
-	 * @param size The new FileRecord's size field
-	 * @return The newly created FileRecord object
-	 */
-	private FileRecord newFileRecord(int pathId, int count, int size) {
-		FileRecord fr = new FileRecord(pathId);
-		fr.setCount(count);
-		fr.setSize(size);
-		return fr;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Setup() method, run before each test case is executed. Creates a new BuildStore
 	 * and a new empty FileSet.
 	 * @throws java.lang.Exception
@@ -102,61 +84,27 @@ public class TestFileSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.arapiki.disco.model.types.FileSet#get(int)}.
-	 */
-	@Test
-	public void testGet() {
-		
-		/* add a few FileRecord entries to the FileSet */
-		fs.add(newFileRecord(1, 100, 1000));
-		fs.add(newFileRecord(2, 200, 2000));
-		fs.add(newFileRecord(2000, 2, 2000000));
-		
-		/* fetch FileRecord #1, and validate the fields */
-		FileRecord fr = fs.get(1);
-		assertEquals(1, fr.getId());
-		assertEquals(100, fr.getCount());
-		assertEquals(1000, fr.getSize());
-
-		/* same for FileRecord #2 */
-		fr = fs.get(2);
-		assertEquals(2, fr.getId());
-		assertEquals(200, fr.getCount());
-		assertEquals(2000, fr.getSize());
-
-		/* same for FileRecord #2000 */
-		fr = fs.get(2000);
-		assertEquals(2000, fr.getId());
-		assertEquals(2, fr.getCount());
-		assertEquals(2000000, fr.getSize());
-		
-		/* this record doesn't exist - should return null */
-		fr = fs.get(100);
-		assertNull(fr);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Test method for {@link com.arapiki.disco.model.types.FileSet#isMember(int)}.
 	 */
 	@Test
 	public void testIsMember() {
 		
-		/* add some records */
-		fs.add(newFileRecord(134, 1, 232));
-		fs.add(newFileRecord(256, 2, 76));
-		fs.add(newFileRecord(23, 200, 111));
+		/* add some elements */
+		fs.add(134);
+		fs.add(2559);
+		fs.add(2560);
+		fs.add(23);
 		
-		/* check that the FileSet contains those records */
+		/* check that the FileSet contains those elements */
 		assertTrue(fs.isMember(134));
-		assertTrue(fs.isMember(256));
+		assertTrue(fs.isMember(2559));
+		assertTrue(fs.isMember(2560));
 		assertTrue(fs.isMember(23));
 		
-		/* but doesn't contain records we didn't add */
+		/* but doesn't contain elements we didn't add */
 		assertFalse(fs.isMember(34));
 		assertFalse(fs.isMember(1));
-		assertFalse(fs.isMember(2000));
+		assertFalse(fs.isMember(2561));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -167,15 +115,23 @@ public class TestFileSet {
 	@Test
 	public void testRemove() {
 		
-		/* add some records */
-		fs.add(newFileRecord(34, 182, 2325));
-		fs.add(newFileRecord(9275, 214, 7236));
-		fs.add(newFileRecord(3643, 2210, 411));
+		/* add some elements */
+		fs.add(34);
+		fs.add(34);
+		fs.add(9275);
+		fs.add(3643);
 		
 		/* check they're present */
 		assertTrue(fs.isMember(34));
 		assertTrue(fs.isMember(9275));
 		assertTrue(fs.isMember(3643));
+		
+		/* check that other entries are not present */
+		assertFalse(fs.isMember(33));
+		assertFalse(fs.isMember(35));
+		assertFalse(fs.isMember(2049));
+		assertFalse(fs.isMember(6145));
+		assertFalse(fs.isMember(123450));
 		
 		/* remove one of them, and check membership */
 		fs.remove(9275);
@@ -194,6 +150,11 @@ public class TestFileSet {
 		assertFalse(fs.isMember(34));
 		assertFalse(fs.isMember(9275));
 		assertFalse(fs.isMember(3643));
+		
+		/* remove elements that were never added */
+		fs.remove(8192);
+		fs.remove(16384);
+		fs.remove(9276);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -204,13 +165,14 @@ public class TestFileSet {
 	@Test
 	public void testIterator() {
 		
-		/* add a bunch of records */
-		fs.add(newFileRecord(134, 1, 232));
-		fs.add(newFileRecord(256, 2, 76));
-		fs.add(newFileRecord(23, 200, 111));
-		fs.add(newFileRecord(34, 182, 2325));
-		fs.add(newFileRecord(9275, 214, 7236));
-		fs.add(newFileRecord(3643, 2210, 411));
+		/* add a bunch of elements */
+		fs.add(134);
+		fs.add(256);
+		fs.add(23);
+		fs.add(34);
+		fs.add(9275);
+		fs.add(3643);
+		fs.add(16777215);
 
 		/* check that the iterator returns all the members (not in any particular order) */
 		ArrayList<Integer> returnedList = new ArrayList<Integer>();
@@ -218,7 +180,7 @@ public class TestFileSet {
 			returnedList.add(pathId);
 		}
 		assertTrue(CommonTestUtils.sortedArraysEqual(
-				new Integer[] {23, 34, 134, 256, 3643, 9275}, 
+				new Integer[] {23, 34, 134, 256, 3643, 9275, 16777215}, 
 				returnedList.toArray(new Integer[0])));
 	}
 
@@ -241,11 +203,11 @@ public class TestFileSet {
 		fns.addFile("/c/d/e/f6.c");
 
 		/* add them to the file set */ 
-		fs.add(newFileRecord(f1path, 0, 0));		
-		fs.add(newFileRecord(f2path, 0, 0));
-		fs.add(newFileRecord(f3path, 0, 0));
-		fs.add(newFileRecord(f4path, 0, 0));
-		fs.add(newFileRecord(f5path, 0, 0));
+		fs.add(f1path);		
+		fs.add(f2path);
+		fs.add(f3path);
+		fs.add(f4path);
+		fs.add(f5path);
 
 		/* check that they're added */
 		assertTrue(fs.isMember(f1path));
@@ -323,7 +285,7 @@ public class TestFileSet {
 		int file6 = fns.addFile("/apple/banana/dragonfruit/iguana.h");
 
 		/* seed mainFileSet with one file */
-		mainFileSet.add(newFileRecord(file1, 10, 10));
+		mainFileSet.add(file1);
 
 		/* merge the empty FileSet, and make sure mainFileSet is unchanged */
 		FileSet fs2 = new FileSet(fns);
@@ -332,7 +294,7 @@ public class TestFileSet {
 		
 		/* merge in a single file */
 		FileSet fs3 = new FileSet(fns);
-		fs3.add(newFileRecord(file2, 100, 200));
+		fs3.add(file2);
 		mainFileSet.mergeSet(fs3);
 		assertEquals(2, mainFileSet.size());
 		assertTrue(mainFileSet.isMember(file1));
@@ -340,23 +302,17 @@ public class TestFileSet {
 		
 		/* merge in a file that already exists - this shouldn't change anything */
 		FileSet fs4 = new FileSet(fns);
-		fs4.add(newFileRecord(file1, 11, 11));
+		fs4.add(file1);
 		mainFileSet.mergeSet(fs4);
 		assertEquals(2, mainFileSet.size());
 		assertTrue(mainFileSet.isMember(file1));
 		assertTrue(mainFileSet.isMember(file2));
-
-		/* the details of file1 must not have changed */
-		FileRecord fr = mainFileSet.get(file1);
-		assertNotNull(fr);
-		assertEquals(10, fr.getCount());
-		assertEquals(10, fr.getSize());
 		
 		/* merge in three new files */
 		FileSet fs5 = new FileSet(fns);
-		fs5.add(newFileRecord(file4, 11, 11));
-		fs5.add(newFileRecord(file5, 11, 11));
-		fs5.add(newFileRecord(file6, 11, 11));
+		fs5.add(file4);
+		fs5.add(file5);
+		fs5.add(file6);
 		mainFileSet.mergeSet(fs5);
 		assertEquals(5, mainFileSet.size());
 		assertTrue(mainFileSet.isMember(file1));
@@ -554,17 +510,19 @@ public class TestFileSet {
 
 		/* add them to the file set, testing the size as we go along */ 
 		assertEquals(0, fs.size());
-		fs.add(newFileRecord(f1path, 0, 0));		
+		fs.add(f1path);		
 		assertEquals(1, fs.size());
-		fs.add(newFileRecord(f2path, 0, 0));
+		fs.add(f2path);
 		assertEquals(2, fs.size());
-		fs.add(newFileRecord(f3path, 0, 0));
+		fs.add(f3path);
 		assertEquals(3, fs.size());
-		fs.add(newFileRecord(f4path, 0, 0));
+		fs.add(f4path);
+		fs.add(f3path);
+		fs.add(f2path);
 		assertEquals(4, fs.size());
-		fs.add(newFileRecord(f5path, 0, 0));
+		fs.add(f5path);
 		assertEquals(5, fs.size());
-		fs.add(newFileRecord(f6path, 0, 0));
+		fs.add(f6path);
 		assertEquals(6, fs.size());
 		
 		/* populate with parents - should add 13 new paths */
@@ -596,16 +554,14 @@ public class TestFileSet {
 
 		/* fill the FileSet with every third path ID */
 		for (int i = 0; i != 1000000; i++) {
-			fs.add(newFileRecord(i * 3, 0, 0));
+			fs.add(i * 3);
 		}
 		
 		/* now test that everything that should be there is in place, but not the others */
 		for (int i = 0; i != 1000000; i++) {
 			assertTrue(fs.isMember(i * 3));
 			assertFalse(fs.isMember(i * 3 + 1));
-			assertFalse(fs.isMember(i * 3 + 2));
-			
-			assertEquals(i * 3, fs.get(i * 3).getId());
+			assertFalse(fs.isMember(i * 3 + 2));			
 		}
 	}
 	

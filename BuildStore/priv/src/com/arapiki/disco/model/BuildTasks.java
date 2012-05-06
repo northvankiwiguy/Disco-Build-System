@@ -36,6 +36,11 @@ public class BuildTasks {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
+	/**
+	 * The maximum number of tasks that this BuildTasks object can handle.
+	 */
+	public static final int MAX_TASKS = 16777216;
+
 	/** Data type for specifying the type of a file access that a task performs. */
 	public enum OperationType {
 		/** An unspecified operation for when we don't care which operation is performed. */
@@ -148,7 +153,11 @@ public class BuildTasks {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 
-		return db.getLastRowID();
+		int lastRowId = db.getLastRowID();
+		if (lastRowId >= MAX_TASKS) {
+			throw new FatalBuildStoreError("Exceeded maximum task number: " + MAX_TASKS);
+		}
+		return lastRowId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

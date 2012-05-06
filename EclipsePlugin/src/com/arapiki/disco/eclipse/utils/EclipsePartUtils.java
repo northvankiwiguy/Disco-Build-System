@@ -51,7 +51,7 @@ public class EclipsePartUtils {
 		while (iter.hasNext()) {
 			Object item = iter.next();
 			if (item instanceof FileRecord) {
-				fs.add((FileRecord) item);
+				fs.add(((FileRecord)item).getId());
 			}
 		}
 		return fs;
