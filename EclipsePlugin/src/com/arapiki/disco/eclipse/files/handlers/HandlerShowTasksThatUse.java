@@ -1,34 +1,28 @@
 package com.arapiki.disco.eclipse.files.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.commands.IHandlerListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.types.*;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.arapiki.disco.model.types.FileSet;
+import com.arapiki.disco.model.types.TaskSet;
 
-public class HandlerShowTasksThatUse implements IHandler {
+/**
+ * @author "Peter Smith <psmith@arapiki.com>"
+ *
+ */
+public class HandlerShowTasksThatUse extends AbstractHandler {
 
-	@Override
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-
-	}
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -63,22 +57,6 @@ public class HandlerShowTasksThatUse implements IHandler {
 		
 		return null;
 	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isHandled() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-
-	}
-
+	
+	/*-------------------------------------------------------------------------------------*/
 }

@@ -2,10 +2,9 @@ package com.arapiki.disco.eclipse.files.handlers;
 
 import java.util.Iterator;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -21,25 +20,11 @@ import com.arapiki.disco.eclipse.files.FileRecordDir;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerExpandFileSubTree implements IHandler {
+public class HandlerExpandFileSubTree extends AbstractHandler {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
-
-	@Override
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		/* empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	@Override
-	public void dispose() {
-		/* empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * The user has selected some elements on a file viewer tree, and we should proceed
@@ -74,30 +59,5 @@ public class HandlerExpandFileSubTree implements IHandler {
 		return null;
 	}
 
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isEnabled()
-	 */
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	@Override
-	public boolean isHandled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	@Override
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		/* empty */
-	}
-	
 	/*-------------------------------------------------------------------------------------*/
 }

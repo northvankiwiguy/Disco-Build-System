@@ -2,6 +2,7 @@ package com.arapiki.disco.eclipse.files.handlers;
 
 import java.util.Iterator;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
@@ -19,35 +20,12 @@ import com.arapiki.disco.model.types.FileRecord;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class HandlerHideRevealPath implements IHandler {
+public class HandlerHideRevealPath extends AbstractHandler {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
-	/*
-	 * Not implemented, but required for interface.
-	 */
-	@Override
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		/* empty */
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * Not implemented, but required for interface.
-	 */
-	@Override
-	public void dispose() {
-		/* empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * Not implemented, but required for interface.
-	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 				
@@ -86,39 +64,6 @@ public class HandlerHideRevealPath implements IHandler {
 		}
 		
 		return null;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isEnabled()
-	 */
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isHandled()
-	 */
-	@Override
-	public boolean isHandled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * Not implemented, but required for interface.
-	 */
-	@Override
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*-------------------------------------------------------------------------------------*/

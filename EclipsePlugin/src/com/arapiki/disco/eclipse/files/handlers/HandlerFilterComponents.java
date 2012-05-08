@@ -1,5 +1,6 @@
 package com.arapiki.disco.eclipse.files.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
@@ -20,25 +21,11 @@ import com.arapiki.disco.model.types.ComponentSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerFilterComponents implements IHandler {
+public class HandlerFilterComponents extends AbstractHandler {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
-
-	@Override
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		/* deliberately empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	@Override
-	public void dispose() {
-		/* deliberately empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Handle execution of the filterComponents command. 
@@ -78,34 +65,5 @@ public class HandlerFilterComponents implements IHandler {
 		return null;
 	}
 
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isEnabled()
-	 */
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isHandled()
-	 */
-	@Override
-	public boolean isHandled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	@Override
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		/* deliberately empty */
-	}
-	
 	/*-------------------------------------------------------------------------------------*/
 }

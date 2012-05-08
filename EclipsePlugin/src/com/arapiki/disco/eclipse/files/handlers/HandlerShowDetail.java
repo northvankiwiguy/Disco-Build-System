@@ -2,11 +2,10 @@ package com.arapiki.disco.eclipse.files.handlers;
 
 import java.util.Map;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -26,7 +25,7 @@ import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerShowDetail implements IHandler, IElementUpdater {
+public class HandlerShowDetail extends AbstractHandler implements IElementUpdater {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -38,26 +37,6 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
-
-	/*
-	 * Not implemented, but required for interface.
-	 */
-	@Override
-	public void addHandlerListener(IHandlerListener handlerListener) {
-		/* empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * Not implemented, but required for interface.
-	 */
-	@Override
-	public void dispose() {
-		/* empty */
-	}
-
-	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * This method is invoke by the UI system when a user clicks on a "show detail" check-box,
@@ -127,38 +106,6 @@ public class HandlerShowDetail implements IHandler, IElementUpdater {
 		 */
 		subEditor.refreshView();						
 		return null;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isEnabled()
-	 */
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#isHandled()
-	 */
-	@Override
-	public boolean isHandled() {
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/*
-	 * Not implemented, but required for interface.
-	 */
-	@Override
-	public void removeHandlerListener(IHandlerListener handlerListener) {
-		/* empty */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
