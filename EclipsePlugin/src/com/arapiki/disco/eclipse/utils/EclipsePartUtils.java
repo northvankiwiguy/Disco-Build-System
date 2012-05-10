@@ -17,6 +17,7 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.arapiki.disco.eclipse.Activator;
@@ -79,6 +80,21 @@ public class EclipsePartUtils {
 		Status status = new Status(Status.ERROR, Activator.PLUGIN_ID, message);
 		ErrorDialog.openError(parent, "Fatal Disco Error", "A fatal error occurred " +
 				"and Disco is unable to continue. The program will now exit.", status);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Display an informational dialog box in the context of the current shell. Both
+	 * a general message and an explanatory reason will be display. Given that there's
+	 * only an "OK" button, there's no return code needed.
+	 * @param message The general informational message to be displayed.
+	 * @param reason  The detailed reason for the event.
+	 */
+	public static void displayInfoDialog(String message, String reason) {
+		Shell parent = Display.getDefault().getActiveShell();
+		Status status = new Status(Status.INFO, Activator.PLUGIN_ID, reason);
+		ErrorDialog.openError(parent, "Information", message, status);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

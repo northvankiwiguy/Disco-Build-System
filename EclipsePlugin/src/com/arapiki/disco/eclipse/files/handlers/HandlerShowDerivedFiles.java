@@ -35,12 +35,21 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		 * derived files.
 		 */
 		boolean optAll = false;
+		boolean optDerived = false;
 		String cmdName = "com.arapiki.disco.eclipse.commandParameters.derivedType";
 		String opType = event.getParameter(cmdName);
-		if (opType.equals("direct")) {
+		if (opType.equals("directDerived")) {
 			optAll = false;
-		} else if (opType.equals("all")) {
+			optDerived = true;
+		} else if (opType.equals("allDerived")) {
 			optAll = true;
+			optDerived = true;
+		} else if (opType.equals("directInput")) {
+			optAll = false;
+			optDerived = false;
+		} else if (opType.equals("allInput")) {
+			optAll = true;
+			optDerived = false;
 		} else {
 			throw new FatalDiscoError("Unable to handle command: " + cmdName);
 		}
@@ -59,14 +68,27 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 
 		/* get the set of all derived files */
 		Reports reports = buildStore.getReports();
-		FileSet derivedFiles = reports.reportDerivedFiles(selectedFiles, optAll);
-		derivedFiles.populateWithParents();
+		FileSet resultFiles;
+		if (optDerived) {
+			resultFiles = reports.reportDerivedFiles(selectedFiles, optAll);
+		} else {
+			resultFiles = reports.reportInputFiles(selectedFiles, optAll);			
+		}
+		
+		/* if the result set is empty, don't open an editor, but instead open a dialog */
+		if (resultFiles.size() == 0) {
+			EclipsePartUtils.displayInfoDialog("No results", 
+					"There were no " + (optDerived ? "derived" : "input") + " files to be displayed.");
+			return null;
+		}
+		
+		resultFiles.populateWithParents();
 		
 		/* create a new editor that will display the resulting set */
 		DiscoFilesEditor newEditor = 
 			new DiscoFilesEditor(buildStore, "Derived files");
 		newEditor.setOptions(existingEditor.getOptions());
-		newEditor.setVisibilityFilterSet(derivedFiles);
+		newEditor.setVisibilityFilterSet(resultFiles);
 		
 		/* add the new editor as a new tab */
 		mainEditor.newTab(newEditor);
