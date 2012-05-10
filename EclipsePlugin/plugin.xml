@@ -158,7 +158,7 @@
          </command>
          <command
                commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
-               label="Hide sub-tree"
+               label="Hide Sub-Tree"
                style="push">
             <parameter
                   name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
@@ -180,7 +180,7 @@
          </command>
          <command
                commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
-               label="Hide path"
+               label="Hide Path"
                style="push">
             <parameter
                   name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
@@ -202,7 +202,7 @@
          </command>
          <command
                commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
-               label="Reveal sub-tree"
+               label="Reveal Sub-Tree"
                style="push">
             <parameter
                   name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
@@ -224,7 +224,7 @@
          </command>
          <command
                commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
-               label="Reveal path"
+               label="Reveal Path"
                style="push">
             <parameter
                   name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
@@ -249,7 +249,7 @@
                visible="true">
          </separator>
          <menu
-               label="Show detail...">
+               label="Show Detail...">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
                   icon="images/show_roots_icon.gif"
@@ -280,10 +280,10 @@
             </command>
          </menu>
          <menu
-               label="Show Tasks that...">
+               label="Show Tasks That...">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showTasksThatUse"
-                  label="Use (read or write) these Files"
+                  label="Use (Read or Write) These Files"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.accessType"
@@ -292,7 +292,7 @@
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showTasksThatRead"
-                  label="Read from these Files"
+                  label="Read From These Files"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.accessType"
@@ -301,7 +301,7 @@
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showTasksThatWrite"
-                  label="Write to these Files"
+                  label="Write To These Files"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.accessType"
