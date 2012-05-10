@@ -280,10 +280,12 @@
             </command>
          </menu>
          <menu
-               label="Show Tasks That...">
+               label="Show Tasks That..."
+               mnemonic="T">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showTasksThatUse"
                   label="Use (Read or Write) These Files"
+                  mnemonic="U"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.accessType"
@@ -293,6 +295,7 @@
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showTasksThatRead"
                   label="Read From These Files"
+                  mnemonic="R"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.accessType"
@@ -302,6 +305,7 @@
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showTasksThatWrite"
                   label="Write To These Files"
+                  mnemonic="W"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.accessType"
@@ -310,10 +314,12 @@
             </command>
          </menu>
          <menu
-               label="Show Derived Files...">
+               label="Show Derived Files..."
+               mnemonic="D">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
                   label="Directly Derived Files"
+                  mnemonic="D"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.derivedType"
@@ -323,6 +329,7 @@
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
                   label="All Derived Files"
+                  mnemonic="A"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.derivedType"
@@ -331,10 +338,12 @@
             </command>
          </menu>
          <menu
-               label="Show Input Files...">
+               label="Show Input Files..."
+               mnemonic="I">
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
                   label="Directly Input Files"
+                  mnemonic="D"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.derivedType"
@@ -344,6 +353,7 @@
             <command
                   commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
                   label="All Input Files"
+                  mnemonic="A"
                   style="push">
                <parameter
                      name="com.arapiki.disco.eclipse.commandParameters.derivedType"
@@ -536,6 +546,44 @@
             category="com.arapiki.disco.eclipse.preferences.DiscoPreferencePage"
             name="Appearance">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+E">
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="DEL">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+               value="hide">
+         </parameter>
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="INSERT">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+               value="reveal">
+         </parameter>
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="Disco Editor"
+            id="com.arapiki.disco.eclipse.contexts.discoeditor"
+            name="Disco Editor"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
    </extension>
 
 </plugin>

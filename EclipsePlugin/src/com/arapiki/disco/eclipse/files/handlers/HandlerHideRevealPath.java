@@ -35,6 +35,9 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		boolean reveal = false;
 		String cmdName = "com.arapiki.disco.eclipse.commandParameters.hideRevealType";
 		String opType = event.getParameter(cmdName);
+		if (opType == null) {
+			return null;
+		}
 		if (opType.equals("hide")) {
 			reveal = false;
 		} else if (opType.equals("reveal")) {

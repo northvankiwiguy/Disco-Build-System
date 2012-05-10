@@ -41,6 +41,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.EditorPart;
 
 import com.arapiki.disco.eclipse.Activator;
@@ -360,6 +361,11 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		/* start by displaying from the root (which changes, depending on our options). */
 		filesTreeViewer.setInput(contentProvider.getRootElements());
 		
+		/* enable the "discoeditor" context, used for keyboard acceleration */
+		IContextService contextService = 
+			(IContextService) getSite().getService(IContextService.class);
+		contextService.activateContext("com.arapiki.disco.eclipse.contexts.discoeditor");
+	
 		/* 
 		 * Now that we've created all the widgets, force options to take effect. Note
 		 * that these setters have side effects that wouldn't have taken effect if
