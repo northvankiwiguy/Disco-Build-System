@@ -65,7 +65,6 @@
       </command>
       <command
             categoryId="com.arapiki.disco.eclipse.commands.category"
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
             description="Fully expand this directory and all its children"
             id="com.arapiki.disco.eclipse.commands.expandFileSubTree"
             name="Expand subtree">
@@ -156,19 +155,6 @@
                commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree"
                label="Expand sub-tree"
                style="push">
-            <visibleWhen
-                  checkEnabled="true">
-               <with
-                     variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="com.arapiki.disco.eclipse.files.FileRecordDir">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
          </command>
          <command
                commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
@@ -488,6 +474,22 @@
             <count
                   value="+">
             </count>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
+            commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree">
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <instanceof
+                        value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                  </instanceof>
+               </iterate>
+            </with>
          </enabledWhen>
       </handler>
    </extension>
