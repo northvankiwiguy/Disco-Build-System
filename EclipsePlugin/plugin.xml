@@ -54,15 +54,14 @@
       </command>
       <command
             categoryId="com.arapiki.disco.eclipse.commands.category"
-            description="Show the files that are directly derived from these files (via a single build task)"
+            description="Show the files that are derived from these files."
             id="com.arapiki.disco.eclipse.commands.showDerivedFiles"
-            name="Show Directly Derived Files">
-      </command>
-      <command
-            categoryId="com.arapiki.disco.eclipse.commands.category"
-            description="Show the files that are derived from these files (via any number of build tasks)"
-            id="com.arapiki.disco.eclipse.commands.showAllDerivedFiles"
-            name="Show All Derived Files">
+            name="Show Derived Files">
+         <commandParameter
+               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               name="derivedType"
+               optional="false">
+         </commandParameter>
       </command>
       <command
             categoryId="com.arapiki.disco.eclipse.commands.category"
@@ -330,11 +329,19 @@
                   commandId="com.arapiki.disco.eclipse.commands.showDerivedFiles"
                   label="Directly Derived Files"
                   style="push">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.derivedType"
+                     value="direct">
+               </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showAllDerivedFiles"
+                  commandId="com.arapiki.disco.eclipse.commands.showDerivedFiles"
                   label="All Derived Files"
                   style="push">
+               <parameter
+                     name="com.arapiki.disco.eclipse.commandParameters.derivedType"
+                     value="all">
+               </parameter>
             </command>
          </menu>
       </menuContribution>
@@ -477,15 +484,6 @@
       <handler
             class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDerivedFiles"
             commandId="com.arapiki.disco.eclipse.commands.showDerivedFiles">
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowAllDerivedFiles"
-            commandId="com.arapiki.disco.eclipse.commands.showAllDerivedFiles">
          <enabledWhen>
             <count
                   value="+">

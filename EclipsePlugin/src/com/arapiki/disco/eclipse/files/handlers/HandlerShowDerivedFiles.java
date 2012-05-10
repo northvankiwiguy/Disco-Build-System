@@ -10,6 +10,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
+import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.types.FileSet;
@@ -28,7 +29,22 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-				
+		
+		/* 
+		 * Determine whether the user wants to show all derived files, or just directly
+		 * derived files.
+		 */
+		boolean optAll = false;
+		String cmdName = "com.arapiki.disco.eclipse.commandParameters.derivedType";
+		String opType = event.getParameter(cmdName);
+		if (opType.equals("direct")) {
+			optAll = false;
+		} else if (opType.equals("all")) {
+			optAll = true;
+		} else {
+			throw new FatalDiscoError("Unable to handle command: " + cmdName);
+		}
+		
 		/* fetch the FileRecord nodes that are selected in the currently active editor. */
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		
@@ -43,7 +59,7 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 
 		/* get the set of all derived files */
 		Reports reports = buildStore.getReports();
-		FileSet derivedFiles = reports.reportDerivedFiles(selectedFiles, false);
+		FileSet derivedFiles = reports.reportDerivedFiles(selectedFiles, optAll);
 		derivedFiles.populateWithParents();
 		
 		/* create a new editor that will display the resulting set */
