@@ -11,6 +11,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
@@ -28,10 +29,7 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
-	
-	/* package */ DiscoFilesEditor filesEditor = null;
-	/* package */ DiscoTasksEditor tasksEditor = null;
-	
+
 	/** the BuildStore we've opened for editing */
 	private BuildStore buildStore = null;
 	
@@ -100,35 +98,49 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Add the specified Editor to the DiscoMainEditor, as a new tab. The text of the tab
+	 * will be set to be the same as the title of the window.
+	 * 
+	 * @param editor The new editor instance to add within the tab. This would usually be
+	 * 			a DiscoFilesEditor, DiscoTasksEditor, or similar.
+	 * @return The tab index of the newly added tab.
+	 */
+	public int newTab(EditorPart editor) {
+		IEditorInput editorInput = getEditorInput();
+		int index = -1;
+		
+		try {
+			index = addPage(editor, editorInput);
+			setPageText(index, editor.getTitle());
+			
+		} catch (PartInitException e) {
+			ErrorDialog.openError(getSite().getShell(),
+        		"Error creating nested editor", null, e.getStatus());
+		}
+		
+		return index;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
 	 */
 	@Override
 	protected void createPages() {
-		try {
-			
-			IEditorInput editorInput = getEditorInput();
+		IEditorInput editorInput = getEditorInput();
 
-			/* create the file editor tab */
-			filesEditor = new DiscoFilesEditor(buildStore);
-			int index = addPage(filesEditor, editorInput);
-			setPageText(index, filesEditor.getTitle());
-			
-			/* create the task editor tab */
-			tasksEditor = new DiscoTasksEditor(buildStore);
-			index = addPage(tasksEditor, editorInput);
-			setPageText(index, tasksEditor.getTitle());
+
+		/* create the file editor tab */
+		newTab(new DiscoFilesEditor(buildStore, "Files"));
+
+		/* create the task editor tab */
+		newTab(new DiscoTasksEditor(buildStore, "Tasks"));
 			
 			/* update the editor title with the name of the input file */
-			setPartName(editorInput.getName());
-			setTitleToolTip(editorInput.getToolTipText());
-			
-		
-		} catch (PartInitException e) {
-			// TODO: how should errors be handled?
-            ErrorDialog.openError(getSite().getShell(),
-            		"Error creating nested editor", null, e.getStatus());
-		}		
+		setPartName(editorInput.getName());
+		setTitleToolTip(editorInput.getToolTipText());
 	}
 
 	/*-------------------------------------------------------------------------------------*/

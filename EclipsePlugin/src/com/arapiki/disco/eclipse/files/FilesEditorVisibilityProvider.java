@@ -32,7 +32,7 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	 * The FileSet containing the visible/non-visible state of each path. If the path
 	 * is in this set, it's visible, else it's non-visible.
 	 */
-	private FileSet filterSet;
+	private FileSet primaryFilterSet;
 	
 	/**
 	 * A secondary filterSet which can be applied in conjunction with the first. Note that
@@ -55,7 +55,7 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	public FilesEditorVisibilityProvider(FileSet filterSet)
 	{
-		this.filterSet = filterSet;
+		this.primaryFilterSet = filterSet;
 	}
 
 	/*=====================================================================================*
@@ -71,8 +71,8 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 			FileRecord fr = (FileRecord)element;
 			int fileId = fr.getId();
 			
-			/* is this file a member of both filterSet and secondaryFilterSet. */
-			return (filterSet.isMember(fileId) && 
+			/* is this file a member of both primaryFilterSet and secondaryFilterSet. */
+			return (primaryFilterSet.isMember(fileId) && 
 					((secondaryFilterSet == null) || secondaryFilterSet.isMember(fileId)));
 		}
 		return false;
@@ -88,9 +88,9 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 		if (element instanceof FileRecord) {
 			FileRecord fr = (FileRecord)element;
 			if (visible) {
-				filterSet.addSubTree(fr.getId());
+				primaryFilterSet.addSubTree(fr.getId());
 			} else {
-				filterSet.removeSubTree(fr.getId());
+				primaryFilterSet.removeSubTree(fr.getId());
 			}
 		}
 	}
@@ -98,12 +98,41 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Set the primary FilterSet that determines which components/scopes we want to
+	 * display.
+	 * @param filter The new primary filter set.
+	 */
+	public void setPrimaryFilterSet(FileSet filter) {
+		primaryFilterSet = filter;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The primary filter set.
+	 */
+	public FileSet getPrimaryFilterSet() {
+		return primaryFilterSet;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Set the secondary FileSet that determine which components/scopes we want to
 	 * display.
 	 * @param filter The new secondary filter set.
 	 */
-	public void setSecondaryFileSet(FileSet filter) {
+	public void setSecondaryFilterSet(FileSet filter) {
 		secondaryFilterSet = filter;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The secondary filter set.
+	 */
+	public FileSet getSecondaryFilterSet() {
+		return secondaryFilterSet;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

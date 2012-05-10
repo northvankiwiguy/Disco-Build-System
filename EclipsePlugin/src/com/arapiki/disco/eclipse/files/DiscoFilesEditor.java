@@ -139,6 +139,11 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 * Option to reveal hidden files in the viewer, displaying them in a greyed-out style.
 	 */
 	public static final int OPT_SHOW_HIDDEN			= 8;
+	
+	/**
+	 * How many options currently exist?
+	 */
+	private static final int NUM_OPTIONS			= 4;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -147,12 +152,13 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	/**
 	 * Create a new DiscoFilesEditor instance, using the specified BuildStore as input
 	 * @param buildStore The BuildStore to display/edit.
+	 * @param tabTitle The text to appear on the editor's tab.
 	 */
-	public DiscoFilesEditor(BuildStore buildStore) {
+	public DiscoFilesEditor(BuildStore buildStore, String tabTitle) {
 		super();
 		
 		/* set the name of the tab that this editor appears in */
-		setPartName("Build Files");
+		setPartName(tabTitle);
 		
 		/* Save away our BuildStore information, for later use */
 		this.buildStore = buildStore;
@@ -161,6 +167,9 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		/* create a new component set so we can selectively filter out components */
 		filterComponentSet = new ComponentSet(buildStore);
 		filterComponentSet.setDefault(true);
+		
+		/* initially, all paths are visible */
+		visiblePaths = buildStore.getReports().reportAllFiles();
 	}
 	
 	/*=====================================================================================*
@@ -283,9 +292,8 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		 * Set up a visibility provider so we know which paths should be visible (at
 		 * least to start with).
 		 */
-		visiblePaths = buildStore.getReports().reportAllFiles();
 		visibilityProvider = new FilesEditorVisibilityProvider(visiblePaths);
-		visibilityProvider.setSecondaryFileSet(null);
+		visibilityProvider.setSecondaryFilterSet(null);
 		filesTreeViewer.setVisibilityProvider(visibilityProvider);
 		
 		/* 
@@ -351,6 +359,15 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 
 		/* start by displaying from the root (which changes, depending on our options). */
 		filesTreeViewer.setInput(contentProvider.getRootElements());
+		
+		/* 
+		 * Now that we've created all the widgets, force options to take effect. Note
+		 * that these setters have side effects that wouldn't have taken effect if
+		 * there were no widgets.
+		 */
+		setOptions(getOptions());
+		setFilterComponentSet(getFilterComponentSet());
+		setVisibilityFilterSet(getVisibilityFilterSet());
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -392,11 +409,29 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		}
 		
 		/* pass some of the options onto onto parts of the system */
-		if ((optionBits & OPT_SHOW_HIDDEN) != 0) {
+		if ((filesTreeViewer != null) && (optionBits & OPT_SHOW_HIDDEN) != 0) {
 			filesTreeViewer.setGreyVisibilityMode(enable);
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set the editor options (e.g. OPT_COALESCE_ROOTS) for this DiscoFilesEditor.
+	 * @param optionBits The option bits setting (a 1-bit enables a feature, whereas a 0-bit
+	 * 		disables that feature).
+	 */
+	public void setOptions(int optionBits)
+	{
+		/* we call setOptions for each option, to ensure that side-effects are triggered */ 
+		for (int bitNum = 0; bitNum != NUM_OPTIONS; bitNum++) {
+			int thisBitMap = (1 << bitNum);
+			
+			/* explicitly enable or disable this option */
+			setOption(thisBitMap, (optionBits & thisBitMap) != 0);
+		}
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -462,6 +497,30 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set the complete set of paths that this editor's tree viewer will show. After
+	 * calling this method, it will be necessary to also call refreshView() to actually
+	 * update the view.
+	 * @param visiblePaths The subset of paths that should be visible in the editor.
+	 */
+	public void setVisibilityFilterSet(FileSet visiblePaths) {
+		this.visiblePaths = visiblePaths;
+		if (visibilityProvider != null) {
+			visibilityProvider.setPrimaryFilterSet(visiblePaths);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The set of files that are currently visible in this editor's tree viewer.
+	 */
+	public FileSet getVisibilityFilterSet() {
+		return visibilityProvider.getPrimaryFilterSet();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Fetch this editor's component filter set. This set is used by the viewer when 
@@ -481,12 +540,16 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 */
 	public void setFilterComponentSet(ComponentSet newSet) {
 		filterComponentSet = newSet;
-		FileSet compFileSet = 
-			buildStore.getReports().reportFilesFromComponentSet(newSet);
-		compFileSet.populateWithParents();
 		
-		visibilityProvider.setSecondaryFileSet(compFileSet);
-		refreshView(true);
+		/* if the editor is already display, we can fresh the filters */
+		if (visibilityProvider != null) {
+			FileSet compFileSet = 
+				buildStore.getReports().reportFilesFromComponentSet(newSet);
+			compFileSet.populateWithParents();
+		
+			visibilityProvider.setSecondaryFilterSet(compFileSet);
+			refreshView(true);
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/

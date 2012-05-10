@@ -44,12 +44,12 @@ public class DiscoTasksEditor extends EditorPart {
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
-	public DiscoTasksEditor(BuildStore buildStore) {
+	public DiscoTasksEditor(BuildStore buildStore, String tabTitle) {
 		
 		super();
 		
 		/* Set the name that appears on the editor's window tab */
-		setPartName("Build Tasks");
+		setPartName(tabTitle);
 
 		/* save away the BuildStore, so we can query it later */
 		this.buildStore = buildStore;	

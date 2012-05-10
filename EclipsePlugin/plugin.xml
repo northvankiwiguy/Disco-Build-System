@@ -66,11 +66,13 @@
       </command>
       <command
             categoryId="com.arapiki.disco.eclipse.commands.category"
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
             description="Fully expand this directory and all its children"
             id="com.arapiki.disco.eclipse.commands.expandFileSubTree"
             name="Expand subtree">
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
             id="com.arapiki.disco.eclipse.commands.showPathRoots"
             name="Show path roots">
          <commandParameter
@@ -84,6 +86,7 @@
          </state>
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
             id="com.arapiki.disco.eclipse.commands.showComponents"
             name="Show components">
          <commandParameter
@@ -97,6 +100,7 @@
          </state>
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
             id="com.arapiki.disco.eclipse.commands.showHiddenPaths"
             name="Show hidden paths">
          <commandParameter
@@ -110,6 +114,7 @@
          </state>
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerHideRevealPath"
             id="com.arapiki.disco.eclipse.commands.hideRevealPath"
             name="Hide / Reveal Paths">
          <commandParameter
@@ -119,16 +124,29 @@
          </commandParameter>
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerFilterComponents"
             id="com.arapiki.disco.eclipse.commands.filterComponents"
             name="Filter Components">
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerFilterByName"
             id="com.arapiki.disco.eclipse.commands.filterByName"
             name="Filter by Name">
       </command>
       <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerSearchByName"
             id="com.arapiki.disco.eclipse.commands.searchByName"
             name="Search by Name">
+      </command>
+      <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerNewEditorTab"
+            id="com.arapiki.disco.eclipse.commands.newEditorTab"
+            name="Duplicate Current Editor Tab">
+      </command>
+      <command
+            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerRemoveEditorTab"
+            id="com.arapiki.disco.eclipse.commands.removeEditorTab"
+            name="Remove Editor Tab">
       </command>
    </extension>
    <extension
@@ -325,6 +343,22 @@
          <toolbar
                id="com.arapiki.disco.eclipse.toolbars.main">
             <command
+                  commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+                  icon="images/add_tab_icon.gif"
+                  label="Duplicate Current Editor Tab"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
+                  icon="images/remove_tab_icon.gif"
+                  label="Remove Editor Tab"
+                  style="push">
+            </command>
+            <separator
+                  name="com.arapiki.disco.eclipse.commands.separator1"
+                  visible="true">
+            </separator>
+            <command
                   commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
                   icon="images/show_roots_icon.gif"
                   label="Show Path Roots"
@@ -457,38 +491,6 @@
                   value="+">
             </count>
          </enabledWhen>
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
-            commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
-            commandId="com.arapiki.disco.eclipse.commands.showPathRoots">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
-            commandId="com.arapiki.disco.eclipse.commands.showComponents">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
-            commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerHideRevealPath"
-            commandId="com.arapiki.disco.eclipse.commands.hideRevealPath">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerFilterComponents"
-            commandId="com.arapiki.disco.eclipse.commands.filterComponents">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerFilterByName"
-            commandId="com.arapiki.disco.eclipse.commands.filterByName">
-      </handler>
-      <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerSearchByName"
-            commandId="com.arapiki.disco.eclipse.commands.searchByName">
       </handler>
    </extension>
    <extension
