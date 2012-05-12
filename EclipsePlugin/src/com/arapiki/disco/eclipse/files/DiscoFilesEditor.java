@@ -41,6 +41,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.EditorPart;
 
@@ -401,7 +402,28 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		/* if we focus on this editor, we actually focus on the TreeViewer control */
 		if (filesTreeViewer != null){
 			filesTreeViewer.getControl().setFocus();
-		}
+		}		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Our parent (multi-part editor) has just switched to our tab. We should update the UI
+	 * state in response.
+	 */
+	public void pageChange()
+	{
+		ICommandService service =
+			(ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+		
+		/* 
+		 * Make sure that each of these toolbar buttons (and menu items) are updated
+		 * appropriately to match the settings of *this* editor, instead of the previous
+		 * editor.
+		 */
+		service.refreshElements("com.arapiki.disco.eclipse.commands.showComponents", null);
+		service.refreshElements("com.arapiki.disco.eclipse.commands.showHiddenPaths", null);
+		service.refreshElements("com.arapiki.disco.eclipse.commands.showPathRoots", null);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

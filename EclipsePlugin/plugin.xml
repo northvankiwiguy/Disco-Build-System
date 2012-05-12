@@ -78,10 +78,6 @@
                name="showDetail"
                optional="false">
          </commandParameter>
-         <state
-               class="org.eclipse.jface.commands.ToggleState"
-               id="com.arapiki.disco.eclipse.commands.showPathRoots.state">
-         </state>
       </command>
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
@@ -92,10 +88,6 @@
                name="showDetail"
                optional="true">
          </commandParameter>
-         <state
-               class="org.eclipse.jface.commands.ToggleState"
-               id="com.arapiki.disco.eclipse.commands.showComponents.state">
-         </state>
       </command>
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
@@ -106,10 +98,6 @@
                name="showDetail"
                optional="true">
          </commandParameter>
-         <state
-               class="org.eclipse.jface.commands.ToggleState"
-               id="com.arapiki.disco.eclipse.commands.showHiddenPaths.state">
-         </state>
       </command>
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerHideRevealPath"

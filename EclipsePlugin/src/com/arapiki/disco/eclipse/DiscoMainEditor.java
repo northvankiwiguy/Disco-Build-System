@@ -153,6 +153,22 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#pageChange(int)
+	 */
+	@Override
+	protected void pageChange(int newPageIndex) {
+		super.pageChange(newPageIndex);
+		
+		/* trigger the pageChange() method on the sub-editor, so it can update the UI */
+		IEditorPart subEditor = getActiveEditor();
+		if (subEditor instanceof DiscoFilesEditor) {
+			((DiscoFilesEditor)subEditor).pageChange();			
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
 	 */
 	@Override

@@ -7,7 +7,6 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IParameter;
-import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -31,8 +30,12 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
-	/** records the current state of the most recently executed command */
-	private boolean isSelected = false;
+	/**
+	 * Given that each instance of this handler is for a specific type of options
+	 * (e.g. components, show-roots, etc). We can save time on each invocation of
+	 * the handler by caching the option value that the editor expects to see.
+	 */
+	private int savedHandlerOptionBit = -1;
 	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -72,37 +75,32 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 		if (paramValue == null) {
 			throw new FatalDiscoError("Unable to find command parameters for: " + cmd.getId());
 		}
-		
-		/* toggle the state of the command */
-		State state = cmd.getState(cmd.getId() + ".state");
-		if (state == null) {
-			throw new FatalDiscoError("Unable to find command state: " + cmd.getId() + ".state");
-		}
-		isSelected = !(Boolean)state.getValue();
-		state.setValue((Boolean)isSelected);
-		
-		/* ensure that all menu items and toolbar icons are toggled */
-		service.refreshElements(event.getCommand().getId(), null);
-		
+
 		/* 
 		 * Now update the editor itself so that the content of the editor reflects
 		 * the new state of the command.
 		 */
 		DiscoMainEditor editor = (DiscoMainEditor)HandlerUtil.getActiveEditor(event);
 		final DiscoFilesEditor subEditor = (DiscoFilesEditor)editor.getActiveSubEditor();
-				
-		if (paramValue.equals("path-roots")) {
-			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_ROOTS, isSelected);
-		} else if (paramValue.equals("components")) {
-			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_COMPONENTS, isSelected);
-		} else if (paramValue.equals("show-hidden")) {
-			subEditor.setOption(DiscoFilesEditor.OPT_SHOW_HIDDEN, isSelected);
-		} else {
-			throw new FatalDiscoError("Unable to handle command: " + cmd.getId());
+		
+		if (savedHandlerOptionBit == -1) {
+			savedHandlerOptionBit = computeOptionBits(paramValue);
 		}
+		boolean isSelected = subEditor.isOptionSet(savedHandlerOptionBit);
+		isSelected = !isSelected;
+		subEditor.setOption(savedHandlerOptionBit, isSelected);
 		
 		/*
-		 * Refresh the DiscoFilesEditor content as a background task.
+		 * Ensure that all menu items and toolbar icons are toggled. This implicitly calls
+		 * the updateElement() method (see below) on each of the widgets that needs to
+		 * reflect the new state of the option.
+		 */
+		service.refreshElements(event.getCommand().getId(), null);
+		
+		/*
+		 * Refresh the DiscoFilesEditor content as a background task. This is necessary
+		 * for the option's effect to be invoked (e.g. redrawing the tree viewer with
+		 * the new option set).
 		 */
 		subEditor.refreshView();						
 		return null;
@@ -118,8 +116,44 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 	@SuppressWarnings("unchecked")
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
-		element.setChecked(isSelected);
+		
+		/* 
+		 * We need to query the current editor page to see what the settings for the 
+		 * editor are.
+		 */
+		DiscoMainEditor editor = (DiscoMainEditor)
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		DiscoFilesEditor subEditor = (DiscoFilesEditor)editor.getActiveSubEditor();
+		
+		/* 
+		 * Note: this handler instance is specific to the option we're setting/querying, so
+		 * savedHandlerOptionBit won't change from one invocation to the next.
+		 */
+		if (savedHandlerOptionBit != -1) {
+			element.setChecked(subEditor.isOptionSet(savedHandlerOptionBit));
+		}
 	}
 
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Translate an option name (as passed in via a Command's parameter) into a option value,
+	 * as understood by the DiscoFilesEditor class.
+	 * @param param The option's name.
+	 * @return The corresponding option value (DiscoFilesEditor.OPT_SHOW_*).
+	 */
+	private int computeOptionBits(String param) {		
+		if (param.equals("path-roots")) {
+			return DiscoFilesEditor.OPT_SHOW_ROOTS;
+		} else if (param.equals("components")) {
+			return DiscoFilesEditor.OPT_SHOW_COMPONENTS;
+		} else if (param.equals("show-hidden")) {
+			return DiscoFilesEditor.OPT_SHOW_HIDDEN;
+		} else {
+			throw new FatalDiscoError("Unable to handle command parameter: " + param);
+		}
+	}
 	/*-------------------------------------------------------------------------------------*/
 }
