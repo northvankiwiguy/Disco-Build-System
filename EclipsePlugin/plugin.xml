@@ -139,7 +139,7 @@
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerNewEditorTab"
             id="com.arapiki.disco.eclipse.commands.newEditorTab"
-            name="Duplicate Current Editor Tab">
+            name="Duplicate Editor Tab">
       </command>
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerRemoveEditorTab"
@@ -361,6 +361,20 @@
                </parameter>
             </command>
          </menu>
+         <separator
+               name="com.arapiki.disco.eclipse.commands.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="Duplicate Editor Tab"
+               style="push">
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
+               label="Remove Editor Tab"
+               style="push">
+         </command>
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
@@ -369,7 +383,7 @@
             <command
                   commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
                   icon="images/add_tab_icon.gif"
-                  label="Duplicate Current Editor Tab"
+                  label="Duplicate Editor Tab"
                   style="push">
             </command>
             <command
@@ -614,6 +628,18 @@
                id="com.arapiki.disco.eclipse.commandParameters.derivedType"
                value="allInput">
          </parameter>
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+N">
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+X">
       </key>
    </extension>
    <extension

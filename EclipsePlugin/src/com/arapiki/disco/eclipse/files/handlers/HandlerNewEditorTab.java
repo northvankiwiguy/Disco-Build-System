@@ -57,7 +57,7 @@ public class HandlerNewEditorTab extends AbstractHandler {
 			}
 			
 			/* add the new editor as a new tab */
-			mainEditor.newTab(newEditor);
+			mainEditor.newPage(newEditor);
 			mainEditor.setActiveEditor(newEditor);
 		}
 		

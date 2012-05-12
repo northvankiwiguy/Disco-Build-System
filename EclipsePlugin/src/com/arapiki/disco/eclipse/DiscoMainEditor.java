@@ -106,7 +106,7 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 	 * 			a DiscoFilesEditor, DiscoTasksEditor, or similar.
 	 * @return The tab index of the newly added tab.
 	 */
-	public int newTab(EditorPart editor) {
+	public int newPage(EditorPart editor) {
 		IEditorInput editorInput = getEditorInput();
 		int index = -1;
 		
@@ -121,7 +121,35 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 		
 		return index;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Determine whether the sub-editor at the specified tab can be removed, or whether
+	 * it's permanently part of the editor.
+	 * @param tabIndex The tab index of the sub-editor.
+	 * @return true if the sub-editor can be removed, else false. 
+	 */
+	public boolean isPageRemovable(int tabIndex) {
+		
+		/* The initial "Files" and "Tasks" tabs are fixed. */
+		return (tabIndex >= 2);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove the specified sub-editor, if removal is permitted.
+	 * @param tabIndex The tab index of the sub-editor
+	 */
+	@Override
+	public void removePage(int tabIndex) {
+		
+		if (isPageRemovable(tabIndex)) {
+			super.removePage(tabIndex);
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -133,10 +161,10 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 
 
 		/* create the file editor tab */
-		newTab(new DiscoFilesEditor(buildStore, "Files"));
+		newPage(new DiscoFilesEditor(buildStore, "Files"));
 
 		/* create the task editor tab */
-		newTab(new DiscoTasksEditor(buildStore, "Tasks"));
+		newPage(new DiscoTasksEditor(buildStore, "Tasks"));
 			
 			/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());

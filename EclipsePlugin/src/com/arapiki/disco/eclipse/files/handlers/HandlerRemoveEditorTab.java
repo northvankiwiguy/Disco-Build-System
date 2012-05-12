@@ -3,6 +3,9 @@ package com.arapiki.disco.eclipse.files.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.handlers.HandlerUtil;
+
+import com.arapiki.disco.eclipse.DiscoMainEditor;
 
 /**
  * A Command Handler for removing an existing editor tab.
@@ -17,8 +20,27 @@ public class HandlerRemoveEditorTab extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		// TODO Auto-generated method stub
+		
+		/* fetch the active editor, and its BuildStore, and the active sub-editor. */
+		DiscoMainEditor mainEditor = (DiscoMainEditor)HandlerUtil.getActiveEditor(event);
+
+		/* if allowed, remove the current page */
+		int activeTab = mainEditor.getActivePage();
+		if (mainEditor.isPageRemovable(activeTab)) {
+			mainEditor.removePage(activeTab);
+		}
+
 		return null;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -91,7 +91,7 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		newEditor.setVisibilityFilterSet(resultFiles);
 		
 		/* add the new editor as a new tab */
-		mainEditor.newTab(newEditor);
+		mainEditor.newPage(newEditor);
 		mainEditor.setActiveEditor(newEditor);
 		
 		return null;
