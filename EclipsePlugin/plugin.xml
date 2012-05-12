@@ -575,6 +575,46 @@
                value="reveal">
          </parameter>
       </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+ARROW_RIGHT">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               value="directDerived">
+         </parameter>
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Shift+Ctrl+ARROW_RIGHT">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               value="allDerived">
+         </parameter>
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+ARROW_LEFT">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               value="directInput">
+         </parameter>
+      </key>
+      <key
+            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Shift+Ctrl+ARROW_LEFT">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               value="allInput">
+         </parameter>
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
