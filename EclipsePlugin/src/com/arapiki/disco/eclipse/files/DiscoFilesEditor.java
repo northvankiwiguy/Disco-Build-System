@@ -145,6 +145,13 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 	 * How many options currently exist?
 	 */
 	private static final int NUM_OPTIONS			= 4;
+	
+	/**
+	 * If a new editor tab is created with fewer than this many visible tree entries,
+	 * we should auto-expand the entire tree so that all elements are visible. If there
+	 * are more than this many elements, only expand the first couple of levels.
+	 */
+	private static final int AUTO_EXPAND_THRESHOLD 	= 200;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -366,6 +373,13 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 			(IContextService) getSite().getService(IContextService.class);
 		contextService.activateContext("com.arapiki.disco.eclipse.contexts.discoeditor");
 	
+		/* based on the size of the set to be displayed, auto-size the tree output */
+		int outputSize = getVisibilityFilterSet().size();
+		if (outputSize < AUTO_EXPAND_THRESHOLD) {
+			filesTreeViewer.expandAll();
+		} else {
+			filesTreeViewer.expandToLevel(2);
+		}
 		/* 
 		 * Now that we've created all the widgets, force options to take effect. Note
 		 * that these setters have side effects that wouldn't have taken effect if
