@@ -373,12 +373,30 @@
                   icon="images/add_tab_icon.gif"
                   label="Duplicate Editor Tab"
                   style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <with
+                        variable="activeEditorId">
+                     <equals
+                           value="com.arapiki.disco.eclipse.editors.main">
+                     </equals>
+                  </with>
+               </visibleWhen>
             </command>
             <command
                   commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
                   icon="images/remove_tab_icon.gif"
                   label="Remove Editor Tab"
                   style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <with
+                        variable="activeEditorId">
+                     <equals
+                           value="com.arapiki.disco.eclipse.editors.main">
+                     </equals>
+                  </with>
+               </visibleWhen>
             </command>
             <separator
                   name="com.arapiki.disco.eclipse.commands.separator1"

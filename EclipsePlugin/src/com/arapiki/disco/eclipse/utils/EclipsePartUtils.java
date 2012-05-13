@@ -19,8 +19,13 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import com.arapiki.disco.eclipse.Activator;
+import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.types.FileRecord;
@@ -58,6 +63,33 @@ public class EclipsePartUtils {
 		return fs;
 	}
 
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns the currently active DiscoMainEditor. If the current editor is not a
+	 * DiscoMainEditor, return null;
+	 * @return The currently active DiscoMainEditor instance, or null;
+	 */
+	public static DiscoMainEditor getActiveDiscoMainEditor() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null) {
+			return null;
+		}
+		IWorkbenchPage page = window.getActivePage();
+		if (page == null) {
+			return null;
+		}
+		IEditorPart part = page.getActiveEditor();
+		if (part == null) {
+			return null;
+		}
+		if (!(part instanceof DiscoMainEditor)) {
+			return null;
+		}
+		return (DiscoMainEditor)part;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

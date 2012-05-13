@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
+import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 
 /**
  * A Command Handler for removing an existing editor tab.
@@ -29,19 +30,14 @@ public class HandlerRemoveEditorTab extends AbstractHandler {
 		if (mainEditor.isPageRemovable(activeTab)) {
 			mainEditor.removePage(activeTab);
 		}
+		
+		else {
+			EclipsePartUtils.displayInfoDialog("Tab can't be deleted.", 
+					"The default editor tabs can't be removed.");
+		}
 
 		return null;
 	}
 
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-	 */
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-	
 	/*-------------------------------------------------------------------------------------*/
 }
