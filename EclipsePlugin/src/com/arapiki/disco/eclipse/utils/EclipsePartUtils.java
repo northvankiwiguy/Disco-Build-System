@@ -26,6 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.arapiki.disco.eclipse.Activator;
 import com.arapiki.disco.eclipse.DiscoMainEditor;
+import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.types.FileRecord;
@@ -88,6 +89,39 @@ public class EclipsePartUtils {
 			return null;
 		}
 		return (DiscoMainEditor)part;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns the currently active DiscoFilesEditor. If the current editor is not a
+	 * DiscoFilesEditor, return null;
+	 * @return The currently active DiscoFilesEditor instance, or null;
+	 */
+	public static DiscoFilesEditor getActiveDiscoFilesEditor() {
+		DiscoMainEditor mainEditor = getActiveDiscoMainEditor();
+		if (mainEditor == null) {
+			return null;
+		}
+		IEditorPart subEditor = mainEditor.getActiveSubEditor();
+		if (subEditor instanceof DiscoFilesEditor) {
+			return (DiscoFilesEditor)subEditor;
+		}
+		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns the BuildStore for the currently active editor.
+	 * @return The currently active BuildStore instance, or null;
+	 */
+	public static BuildStore getActiveBuildStore() {
+		DiscoMainEditor mainEditor = getActiveDiscoMainEditor();
+		if (mainEditor == null) {
+			return null;
+		}
+		return mainEditor.getBuildStore();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
