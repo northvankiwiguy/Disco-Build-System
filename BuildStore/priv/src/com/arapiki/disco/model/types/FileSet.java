@@ -146,11 +146,8 @@ public class FileSet extends IntegerTreeSet  {
 			 */
 			else if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('@') == -1)){
 				
-				/* map any occurrences of * into %, since that's what SQL requires */
-				String regExp = thisPath.replace('*', '%');
-				
 				/* run a report to get all files that match this regexp */
-				FileSet results = reports.reportFilesThatMatchName(regExp);
+				FileSet results = reports.reportFilesThatMatchName(thisPath);
 				
 				/* 
 				 * Merge these results into this FileSet (we update the same file set

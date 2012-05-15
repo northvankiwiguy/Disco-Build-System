@@ -238,10 +238,16 @@ public class Reports {
 	/**
 	 * Return the set of files (not directories) that match the user-specified file name.
 	 * 
-	 * @param fileArg The name of the file(s) to match.
+	 * @param fileArg The name of the file(s) to match (null is a valid value that matches
+	 * 			nothing).
 	 * @return The FileSet of matching file names.
 	 */
 	public FileSet reportFilesThatMatchName(String fileArg) {
+		
+		/* map any occurrences of * into %, since that's what SQL requires */
+		if (fileArg != null) {
+			fileArg = fileArg.replace('*', '%');
+		}
 		
 		FileSet results = new FileSet(fns);
 		try {
