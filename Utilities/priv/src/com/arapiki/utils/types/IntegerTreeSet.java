@@ -518,6 +518,26 @@ public abstract class IntegerTreeSet implements Iterable<Integer>, Cloneable {
 	public void maskSet(IntegerTreeSet mask) {
 		// TODO: implement this if ever needed
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a second set, remove any files from this set that appear in the second set.
+	 * 
+	 * @param second The second set containing the values to be removed.
+	 */
+	public void extractSet(IntegerTreeSet second) {
+		
+		/* for each element in the second IntegerTreeSet */
+		for (Iterator<Integer> iterator = second.iterator(); iterator.hasNext();) {
+			Integer elementId = (Integer) iterator.next();
+			
+			/* if it's currently in "this" IntegerTreeSet, remove it */
+			if (isMember(elementId) && second.isMember(elementId)) {
+				remove(elementId);
+			}
+		}
+	}
 
 	/*-------------------------------------------------------------------------------------*/
 

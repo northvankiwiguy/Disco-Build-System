@@ -323,6 +323,66 @@ public class TestFileSet {
 		assertTrue(mainFileSet.isMember(file6));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link 
+	 * com.arapiki.disco.model.types.FileSet#extractSet(com.arapiki.utils.types.IntegerTreeSet)}.
+	 * @throws Exception Something bad happened
+	 */
+	@Test
+	public void testExtractFileSet() throws Exception {
+		FileSet mainFileSet = new FileSet(fns);
+		
+		int file1 = fns.addFile("/apple/banana/carrot/donkey.h");
+		int file2 = fns.addFile("/apple/banana/carrot/elephant.h");
+		int file3 = fns.addFile("/apple/banana/chilly/fish.h");
+		int file4 = fns.addFile("/apple/banana/dragonfruit/goat.h");
+		int file5 = fns.addFile("/apple/banana/dragonfruit/hamster.h");
+		int file6 = fns.addFile("/apple/banana/dragonfruit/iguana.h");
+
+		/* seed mainFileSet with all files */
+		mainFileSet.add(file1);
+		mainFileSet.add(file2);
+		mainFileSet.add(file3);
+		mainFileSet.add(file4);
+		mainFileSet.add(file5);
+		mainFileSet.add(file6);
+		assertEquals(6, mainFileSet.size());
+
+		/* remove the empty FileSet, and make sure mainFileSet is unchanged */
+		FileSet fs2 = new FileSet(fns);
+		mainFileSet.extractSet(fs2);
+		assertEquals(6, mainFileSet.size());
+		
+		/* remove a single file */
+		FileSet fs3 = new FileSet(fns);
+		fs3.add(file2);
+		mainFileSet.extractSet(fs3);
+		assertEquals(5, mainFileSet.size());
+		assertFalse(mainFileSet.isMember(file2));
+		
+		/* remove a file that was already removed - this shouldn't change anything */
+		FileSet fs4 = new FileSet(fns);
+		fs4.add(file2);
+		mainFileSet.extractSet(fs4);
+		assertEquals(5, mainFileSet.size());
+		assertFalse(mainFileSet.isMember(file2));
+		
+		/* remove three additional files */
+		FileSet fs5 = new FileSet(fns);
+		fs5.add(file4);
+		fs5.add(file5);
+		fs5.add(file6);
+		mainFileSet.extractSet(fs5);
+		assertEquals(2, mainFileSet.size());
+		assertTrue(mainFileSet.isMember(file1));
+		assertFalse(mainFileSet.isMember(file2));
+		assertTrue(mainFileSet.isMember(file3));
+		assertFalse(mainFileSet.isMember(file4));
+		assertFalse(mainFileSet.isMember(file5));
+		assertFalse(mainFileSet.isMember(file6));
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
