@@ -127,7 +127,12 @@
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerNewEditorTab"
             id="com.arapiki.disco.eclipse.commands.newEditorTab"
-            name="Duplicate Editor Tab">
+            name="New Editor Tab">
+         <commandParameter
+               id="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+               name="newEditorTab"
+               optional="false">
+         </commandParameter>
       </command>
       <command
             defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerRemoveEditorTab"
@@ -372,7 +377,7 @@
                   commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
                   icon="images/add_tab_icon.gif"
                   label="Duplicate Editor Tab"
-                  style="push">
+                  style="pulldown">
                <visibleWhen
                      checkEnabled="true">
                   <with
@@ -488,6 +493,69 @@
                   </visibleWhen>
             </command>
          </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.arapiki.disco.eclipse.commands.newEditorTab">
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="1. Duplicate the Current Editor Tab"
+               mnemonic="1"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  value="duplicate">
+            </parameter>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="2. New Editor Showing All Files"
+               mnemonic="2"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  value="allFiles">
+            </parameter>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="3. New Empty Files Editor"
+               mnemonic="3"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  value="emptyFiles">
+            </parameter>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="4. New Editor Showing Unused Files"
+               mnemonic="4"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  value="unusedFiles">
+            </parameter>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="5. New Editor Showing Write-only Files"
+               mnemonic="5"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  value="writeOnlyFiles">
+            </parameter>
+         </command>
+         <command
+               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               label="6. New Editor Showing Most Popular Files"
+               mnemonic="6"
+               style="push">
+            <parameter
+                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  value="mostPopularFiles">
+            </parameter>
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -640,6 +708,10 @@
             contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+N">
+         <parameter
+               id="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+               value="duplicate">
+         </parameter>
       </key>
       <key
             commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
