@@ -16,7 +16,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.tasks.DiscoTasksEditor;
-import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
+import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.errors.BuildStoreVersionException;
 
@@ -88,10 +88,10 @@ public class DiscoMainEditor extends MultiPageEditorPart {
 			
 		} catch (BuildStoreVersionException e) {
 			
-			EclipsePartUtils.displayErrorDialog(site.getShell(), e.getMessage());
+			AlertDialog.displayErrorDialog("Disco database has the wrong version.", e.getMessage());
 			throw new PartInitException("Disco database has the wrong version.");
 		} catch (FileNotFoundException e) {
-			EclipsePartUtils.displayErrorDialog(site.getShell(), e.getMessage());
+			AlertDialog.displayErrorDialog("Can't open the Disco database.", e.getMessage());
 			throw new PartInitException("Can't open the Disco database.");
 		}
 	}

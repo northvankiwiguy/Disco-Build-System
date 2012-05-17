@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
-import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
+import com.arapiki.disco.eclipse.utils.AlertDialog;
 
 /**
  * A Command Handler for removing an existing editor tab.
@@ -32,7 +32,7 @@ public class HandlerRemoveEditorTab extends AbstractHandler {
 		}
 		
 		else {
-			EclipsePartUtils.displayInfoDialog("Tab can't be deleted.", 
+			AlertDialog.displayErrorDialog("Unable to delete this editor tab.", 
 					"The default editor tabs can't be removed.");
 		}
 

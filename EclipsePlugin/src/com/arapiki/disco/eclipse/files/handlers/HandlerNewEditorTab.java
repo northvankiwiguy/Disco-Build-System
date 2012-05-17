@@ -11,7 +11,7 @@ import org.eclipse.ui.part.EditorPart;
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.tasks.DiscoTasksEditor;
-import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
+import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Reports;
@@ -117,7 +117,7 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		 * Option 6: Most popular files.
 		 */
 		else if (subCmd.equals("mostPopularFiles")) {
-			EclipsePartUtils.displayErrorDialog(Display.getDefault().getActiveShell(), "Not Implemented");
+			AlertDialog.displayErrorDialog("Not Implemented", "This feature is not yet implemented.");
 		}
 		
 		/*

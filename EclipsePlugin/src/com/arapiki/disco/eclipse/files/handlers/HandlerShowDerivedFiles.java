@@ -9,6 +9,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
+import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
 import com.arapiki.disco.model.BuildStore;
@@ -77,8 +78,8 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		
 		/* if the result set is empty, don't open an editor, but instead open a dialog */
 		if (resultFiles.size() == 0) {
-			EclipsePartUtils.displayInfoDialog("No results", 
-					"There were no " + (optDerived ? "derived" : "input") + " files to be displayed.");
+			AlertDialog.displayInfoDialog("No results", 
+					"There are no " + (optDerived ? "derived" : "input") + " files to display.");
 			return null;
 		}
 		

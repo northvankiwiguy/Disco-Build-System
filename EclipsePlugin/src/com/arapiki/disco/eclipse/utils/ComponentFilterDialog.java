@@ -12,8 +12,8 @@
 
 package com.arapiki.disco.eclipse.utils;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -39,7 +39,7 @@ import com.arapiki.disco.model.types.ComponentSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class ComponentFilterDialog extends Dialog {
+public class ComponentFilterDialog extends TitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -213,13 +213,11 @@ public class ComponentFilterDialog extends Dialog {
 		
 		final Components compMgr = compSet.getBuildStore().getComponents();
 
+		setTitle("Select the components you wish to view:");
+		setHelpAvailable(false);
+
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
-		
-		/* Add an introductory label */
-		Label headerLabel = new Label(composite, 0);
-		headerLabel.setText("Select the components you wish to view:");
-		headerLabel.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 		
 		/* Add a box containing all the components, and their selectable state */ 
 		Composite listComposite = new Composite(composite, SWT.BORDER | SWT.V_SCROLL);

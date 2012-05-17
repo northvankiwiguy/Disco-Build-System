@@ -99,6 +99,7 @@ public class NameFilterDialog extends TitleAreaDialog {
 	protected Control createDialogArea(Composite parent) {
 		
 		setTitle("Enter a Regular Expression to Match Items in the View:");
+		setHelpAvailable(false);
 		
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
