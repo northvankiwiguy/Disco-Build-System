@@ -12,14 +12,14 @@
 
 package com.arapiki.disco.eclipse.files;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -43,10 +43,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.progress.IProgressService;
 
 import com.arapiki.disco.eclipse.Activator;
 import com.arapiki.disco.eclipse.preferences.PreferenceConstants;
+import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.eclipse.utils.VisibilityTreeViewer;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
@@ -655,9 +658,10 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 		 * UI should be run as the UI thread. Otherwise the job appears to block the
 		 * whole UI.
 		 */
-		Job redrawJob = new Job("Redraw") {
+		IRunnableWithProgress redrawJob = new IRunnableWithProgress() {
+			
 			@Override
-			public IStatus run(IProgressMonitor monitor) {
+			public void run(IProgressMonitor monitor) {
 				monitor.beginTask("Redrawing editor content...", 2);
 				monitor.worked(1);
 				Display.getDefault().syncExec(new Runnable() {
@@ -679,14 +683,18 @@ public class DiscoFilesEditor extends EditorPart implements IElementComparer {
 				});
 				monitor.worked(1);
 				monitor.done();
-				return Status.OK_STATUS;
 			}
 		};
 		
 		/* start up the progress monitor service so that it monitors the job */
-		PlatformUI.getWorkbench().getProgressService().showInDialog(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), redrawJob);
-		redrawJob.schedule();
+		IProgressService service = PlatformUI.getWorkbench().getProgressService();
+		try {
+			service.busyCursorWhile(redrawJob);
+		} catch (InvocationTargetException e) {
+			// TODO: what to do here?
+		} catch (InterruptedException e) {
+			// TODO: what to do here?
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
