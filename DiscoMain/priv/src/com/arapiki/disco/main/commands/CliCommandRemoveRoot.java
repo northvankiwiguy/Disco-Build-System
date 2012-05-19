@@ -19,7 +19,7 @@ import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Disco CLI Command class that implements the "rm-root" command.

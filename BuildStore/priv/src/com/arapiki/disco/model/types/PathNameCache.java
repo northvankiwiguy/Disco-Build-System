@@ -12,7 +12,7 @@
 
 package com.arapiki.disco.model.types;
 
-import com.arapiki.utils.types.LRULinkedHashMap;
+import com.buildml.utils.types.LRULinkedHashMap;
 
 /**
  * A PathNameCache is used as means of caching the most commonly used content

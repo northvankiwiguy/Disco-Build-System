@@ -173,10 +173,10 @@
 			
 			<formatter type="brief" usefile="false" />
 			
-			<!-- set DISCO_HOME so we can find native libraries. Normally the
+			<!-- set BUILDML_HOME so we can find native libraries. Normally the
 			   - "disco" shell script will do this for us.
 			  -->
-			<env key="DISCO_HOME" value="${pkg-dir}"/>
+			<env key="BUILDML_HOME" value="${pkg-dir}"/>
 			
 			<!--
 			   - Attempt to run all classes that start with "Test", although

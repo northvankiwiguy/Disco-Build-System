@@ -34,7 +34,7 @@
 	<target name="extra-comp-1">
 		<!-- generate JNI header files -->
 		<mkdir dir="${gen-src}" />
-		<javah class="com.arapiki.utils.os.SystemUtils" classpath="bin" destdir="${gen-src}" />	
+		<javah class="com.buildml.utils.os.SystemUtils" classpath="bin" destdir="${gen-src}" />	
 		
 		<!-- 
 		   - Generate and compile the Version.java file, containing version number and copyright year
@@ -45,8 +45,8 @@
 		<tstamp>
 		    <format property="YEAR" pattern="yyyy" />
 		</tstamp>
-		<copy file="src/com/arapiki/utils/version/Version.java" 
-			tofile="${gen-src}/com/arapiki/utils/version/Version.java" overwrite="true">
+		<copy file="src/com/buildml/utils/version/Version.java" 
+			tofile="${gen-src}/com/buildml/utils/version/Version.java" overwrite="true">
 			<filterset>
 				<filter token="YEAR" value="${YEAR}"/>
 				<filter token="VERSION" value="${version}"/>
@@ -73,7 +73,7 @@
 			<arg line="-I${gen-src}" />
 			<arg line="-I${java.home}/../include" />
 			<arg line="-I${java.home}/../include/linux" />
-			<arg line="${native-src}/com_arapiki_utils_os_SystemUtils.c" />
+			<arg line="${native-src}/com_buildml_utils_os_SystemUtils.c" />
 			<arg line="-static" />
 			<arg line="-lc" />
 		</exec>

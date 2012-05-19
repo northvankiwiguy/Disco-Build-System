@@ -20,8 +20,8 @@ import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
-import com.arapiki.utils.os.ShellResult;
-import com.arapiki.utils.os.SystemUtils;
+import com.buildml.utils.os.ShellResult;
+import com.buildml.utils.os.SystemUtils;
 
 /**
  * This class is the main entry point for scanning a legacy shell-command-based
@@ -222,10 +222,10 @@ public class LegacyBuildScanner {
 	 */
 	public void traceShellCommand(String args[]) throws IOException, InterruptedException {
 		
-		/* locate the "cfs" executable program (in $DISCO_HOME/bin) */
-		String discoHome = System.getenv("DISCO_HOME");
+		/* locate the "cfs" executable program (in $BUILDML_HOME/bin) */
+		String discoHome = System.getenv("BUILDML_HOME");
 		if (discoHome == null) {
-			throw new IOException("Unable to locate cfs tool. DISCO_HOME environment variable not set.");
+			throw new IOException("Unable to locate cfs tool. BUILDML_HOME environment variable not set.");
 		}
 		
 		/* 

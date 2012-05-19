@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

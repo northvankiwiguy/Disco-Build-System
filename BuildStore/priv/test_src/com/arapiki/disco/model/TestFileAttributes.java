@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Unit tests for the FileAttributes class.

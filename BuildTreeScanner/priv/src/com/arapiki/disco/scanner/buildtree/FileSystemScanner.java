@@ -16,9 +16,9 @@ import java.io.File;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.os.FileSystemTraverseCallback;
-import com.arapiki.utils.os.SystemUtils;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.os.FileSystemTraverseCallback;
+import com.buildml.utils.os.SystemUtils;
 
 /**
  * A class for scanning the content of a local file system, and inserting the file

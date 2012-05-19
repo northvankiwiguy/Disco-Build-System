@@ -196,7 +196,7 @@ if (-d "../cli-tests" && -d "../../test-src") {
 }
 
 #
-# Expand the release package and set the DISCO_HOME environment variable to point to it
+# Expand the release package and set the BUILDML_HOME environment variable to point to it
 #
 my $packageName = $ARGV[0];
 shift @ARGV;
@@ -208,8 +208,8 @@ if (system("mkdir -p $expandDir && tar -C $expandDir -zxf $packageName") != 0){
 	fatalError("Failed to extract Disco release package.");
 }
 my @subDir = glob("$expandDir/disco-*");
-$ENV{"DISCO_HOME"} = $subDir[0];
-$ENV{'PATH'} = $ENV{"DISCO_HOME"} . "/bin:" . $ENV{'PATH'};
+$ENV{"BUILDML_HOME"} = $subDir[0];
+$ENV{'PATH'} = $ENV{"BUILDML_HOME"} . "/bin:" . $ENV{'PATH'};
 
 #
 # Look for the list of test suites to execute. If none are specified, select them all.

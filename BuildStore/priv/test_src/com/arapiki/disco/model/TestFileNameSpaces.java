@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

@@ -12,7 +12,7 @@
 
 package com.arapiki.disco.model.types;
 
-import com.arapiki.utils.types.IntegerTreeRecord;
+import com.buildml.utils.types.IntegerTreeRecord;
 
 /**
  * This class contains a summary of a single build task. TaskRecord is used as the element

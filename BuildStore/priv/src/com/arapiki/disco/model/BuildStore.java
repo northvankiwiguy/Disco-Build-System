@@ -15,7 +15,7 @@ package com.arapiki.disco.model;
 import java.io.FileNotFoundException;
 
 import com.arapiki.disco.model.errors.BuildStoreVersionException;
-import com.arapiki.utils.version.Version;
+import com.buildml.utils.version.Version;
 
 
 /**

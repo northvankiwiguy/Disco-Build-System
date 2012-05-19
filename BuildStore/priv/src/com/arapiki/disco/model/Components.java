@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.disco.model.types.TaskSet;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore

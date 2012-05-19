@@ -26,9 +26,9 @@ import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.os.SystemUtils;
-import com.arapiki.utils.string.PathUtils;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.os.SystemUtils;
+import com.buildml.utils.string.PathUtils;
 
 /**
  * Basic testing that the LegacyBuildScanner can produce a valid

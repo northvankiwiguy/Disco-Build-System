@@ -16,8 +16,8 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.Reports;
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.types.IntegerTreeSet;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.types.IntegerTreeSet;
 
 /**
  * Implements an unordered set of file IDs. This is used in numerous places

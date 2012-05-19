@@ -24,7 +24,7 @@ import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Test methods for validating the FileSet class.
@@ -327,7 +327,7 @@ public class TestFileSet {
 
 	/**
 	 * Test method for {@link 
-	 * com.arapiki.disco.model.types.FileSet#extractSet(com.arapiki.utils.types.IntegerTreeSet)}.
+	 * com.arapiki.disco.model.types.FileSet#extractSet(com.buildml.utils.types.IntegerTreeSet)}.
 	 * @throws Exception Something bad happened
 	 */
 	@Test

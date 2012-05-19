@@ -25,8 +25,8 @@ import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.model.types.FileSet;
 import com.arapiki.disco.model.types.TaskSet;
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.print.PrintUtils;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.print.PrintUtils;
 
 /**
  * A collection of utility methods that can be used by any CLI Command code. This

@@ -18,8 +18,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.string.ShellCommandUtils;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.string.ShellCommandUtils;
 
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore

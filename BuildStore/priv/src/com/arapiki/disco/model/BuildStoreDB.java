@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.arapiki.utils.version.Version;
+import com.buildml.utils.version.Version;
 
 /**
  * A helper class to manage and simplify all the database access performed

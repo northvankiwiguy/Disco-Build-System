@@ -13,7 +13,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.arapiki.disco.eclipse.Activator;
-import com.arapiki.utils.version.Version;
+import com.buildml.utils.version.Version;
 
 /**
  * This class represents a preference page that is contributed to the Preferences 

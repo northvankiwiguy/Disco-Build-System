@@ -24,7 +24,7 @@ import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.Components;
 import com.arapiki.disco.model.types.TaskSet;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Test methods for validating the TaskSet class. These test are

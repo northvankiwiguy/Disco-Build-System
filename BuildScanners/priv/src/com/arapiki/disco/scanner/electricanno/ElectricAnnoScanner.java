@@ -25,8 +25,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.utils.files.ProgressFileInputStream;
-import com.arapiki.utils.files.ProgressFileInputStreamListener;
+import com.buildml.utils.files.ProgressFileInputStream;
+import com.buildml.utils.files.ProgressFileInputStreamListener;
 
 /**
  * Class for reading an Electric Accelerator annotation file, and populating a 

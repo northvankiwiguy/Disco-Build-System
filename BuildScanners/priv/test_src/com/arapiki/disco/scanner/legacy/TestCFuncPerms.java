@@ -24,7 +24,7 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.utils.os.SystemUtils;
+import com.buildml.utils.os.SystemUtils;
 
 /**
  * Basic testing that the LegacyBuildScanner can produce a valid

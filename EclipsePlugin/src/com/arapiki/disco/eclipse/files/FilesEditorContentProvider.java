@@ -19,7 +19,7 @@ import com.arapiki.disco.eclipse.utils.ConversionUtils;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.model.types.FileRecord;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

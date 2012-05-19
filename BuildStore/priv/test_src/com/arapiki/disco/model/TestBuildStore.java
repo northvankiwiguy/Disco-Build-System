@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.arapiki.utils.version.Version;
+import com.buildml.utils.version.Version;
 
 
 /**

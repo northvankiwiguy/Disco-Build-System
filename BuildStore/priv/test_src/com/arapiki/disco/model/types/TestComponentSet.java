@@ -20,7 +20,7 @@ import org.junit.Test;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.Components;
-import com.arapiki.utils.errors.ErrorCode;
+import com.buildml.utils.errors.ErrorCode;
 
 
 /**

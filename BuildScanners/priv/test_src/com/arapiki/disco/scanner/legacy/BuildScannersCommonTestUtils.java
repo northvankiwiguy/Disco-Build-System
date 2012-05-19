@@ -21,8 +21,8 @@ import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.CommonTestUtils;
-import com.arapiki.utils.os.ShellResult;
-import com.arapiki.utils.os.SystemUtils;
+import com.buildml.utils.os.ShellResult;
+import com.buildml.utils.os.SystemUtils;
 
 /**
  * Reusable test method for validating code in com.arapiki.disco.scanner.legacy.

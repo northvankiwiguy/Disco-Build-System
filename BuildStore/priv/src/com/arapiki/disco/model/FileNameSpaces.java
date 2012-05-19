@@ -19,8 +19,8 @@ import java.sql.SQLException;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.types.PathNameCache;
 import com.arapiki.disco.model.types.PathNameCache.PathNameCacheValue;
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.string.PathUtils;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.string.PathUtils;
 
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore

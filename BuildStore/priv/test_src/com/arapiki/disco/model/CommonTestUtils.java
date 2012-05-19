@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.arapiki.disco.model.errors.BuildStoreVersionException;
-import com.arapiki.utils.types.IntegerTreeSet;
+import com.buildml.utils.types.IntegerTreeSet;
 
 /**
  * Common methods for testing BuildStore and related classes.

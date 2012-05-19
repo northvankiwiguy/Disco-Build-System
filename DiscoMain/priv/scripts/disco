@@ -48,15 +48,15 @@ then
 	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-io-2.1.jar:$WORK/DiscoMain/priv:$CLASSPATH"
-	export DISCO_HOME=$WORK/Admin/priv/pkg/disco-0.0.0/
+	export BUILDML_HOME=$WORK/Admin/priv/pkg/disco-0.0.0/
 	
 #
 # Case 2 for a fully installed disco release - everything is in a single jar file.
 #
 elif [ -e "$SCRIPT_DIR/../lib/disco.jar" ];
 then
-    export DISCO_HOME=$SCRIPT_DIR/..
-	export CLASSPATH="$DISCO_HOME/lib/disco.jar"
+    export BUILDML_HOME=$SCRIPT_DIR/..
+	export CLASSPATH="$BUILDML_HOME/lib/disco.jar"
 
 #
 # Else, it's an error
@@ -69,9 +69,9 @@ fi
 #
 # Sanity check
 #
-if [ ! -d $DISCO_HOME ];
+if [ ! -d $BUILDML_HOME ];
 then
-	echo "Internal error: The $DISCO_HOME directory is missing."
+	echo "Internal error: The $BUILDML_HOME directory is missing."
 	exit 1
 fi
 

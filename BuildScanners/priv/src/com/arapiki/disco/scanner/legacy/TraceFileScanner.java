@@ -25,8 +25,8 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
 import com.arapiki.disco.model.FileNameSpaces.PathType;
 import com.arapiki.disco.scanner.FatalBuildScannerError;
-import com.arapiki.utils.errors.ErrorCode;
-import com.arapiki.utils.string.ShellCommandUtils;
+import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.string.ShellCommandUtils;
 
 /**
  * This class parses the output from a CFS (component file system)

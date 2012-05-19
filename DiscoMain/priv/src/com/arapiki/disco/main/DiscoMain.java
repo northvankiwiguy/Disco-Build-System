@@ -22,9 +22,9 @@ import org.apache.commons.cli.*;
 import com.arapiki.disco.main.commands.*;
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.errors.BuildStoreVersionException;
-import com.arapiki.utils.print.PrintUtils;
-import com.arapiki.utils.string.StringArray;
-import com.arapiki.utils.version.Version;
+import com.buildml.utils.print.PrintUtils;
+import com.buildml.utils.string.StringArray;
+import com.buildml.utils.version.Version;
 
 /**
  * This is the main entry point for the "disco" command line program. All other parts
