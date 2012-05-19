@@ -975,7 +975,7 @@ fork(void)
  *
  * long fpathconf(int fd, int name);
  *
- * This function doesn't do anything interesting, from a disco
+ * This function doesn't do anything interesting, from a BuildML
  * perspective.
  *======================================================================*/
 
@@ -1161,7 +1161,7 @@ ftok(const char *pathname, int proj_id)
  *
  * It's not clear if timestamp changes are interesting. This would
  * probably be used by a touch command, but that's not interesting
- * from Disco's perspective.
+ * from BuildML's perspective.
  *======================================================================*/
 
 /*======================================================================
@@ -1171,7 +1171,7 @@ ftok(const char *pathname, int proj_id)
  *
  * It's not clear if timestamp changes are interesting. This would
  * probably be used by a touch command, but that's not interesting
- * from Disco's perspective.
+ * from BuildML's perspective.
  *======================================================================*/
 
 /*======================================================================
@@ -1197,7 +1197,7 @@ ftok(const char *pathname, int proj_id)
  *
  * char *get_current_dir_name (void)
  *
- * Doesn't provide any useful information for Disco.
+ * Doesn't provide any useful information for BuildML.
  *======================================================================*/
 
 /*======================================================================
@@ -1205,7 +1205,7 @@ ftok(const char *pathname, int proj_id)
  *
  * char *getcwd(char *buffer, size_t size)
  *
- * Doesn't provide any useful information for Disco.
+ * Doesn't provide any useful information for BuildML.
  *======================================================================*/
 
 /*======================================================================
@@ -1239,7 +1239,7 @@ ftok(const char *pathname, int proj_id)
  *
  * char *getwd(char *buf);
  *
- * Doesn't provide any useful information for Disco.
+ * Doesn't provide any useful information for BuildML.
  *======================================================================*/
 
 /*======================================================================
@@ -1278,7 +1278,7 @@ lchown(const char *path, uid_t owner, gid_t group)
 
 	/*
 	 * TODO: consider how to handle this case, once symlinks are
-	 * properly handled by disco.
+	 * properly handled by BuildML.
 	 */
 	return real_lchown(path, owner, group);
 }
@@ -1411,7 +1411,7 @@ linkat(int olddirfd, const char *oldpath,
  *
  * It's not clear if timestamp changes are interesting. This would
  * probably be used by a touch command, but that's not interesting
- * from Disco's perspective.
+ * from BuildML's perspective.
  *======================================================================*/
 
 /*======================================================================
@@ -1684,7 +1684,7 @@ openat64(int dirfd, const char *pathname, int flags, ...)
  *
  * long pathconf(char *path, int name);
  *
- * This function doesn't do anything interesting, from a disco
+ * This function doesn't do anything interesting, from a BuildML
  * perspective.
  *======================================================================*/
 
@@ -2371,7 +2371,7 @@ unlinkat(int dirfd, const char *pathname, int flags)
  *
  * It's not clear if timestamp changes are interesting. This would
  * probably be used by a touch command, but that's not interesting
- * from Disco's perspective.
+ * from BuildML's perspective.
  *======================================================================*/
 
 /*======================================================================
@@ -2381,7 +2381,7 @@ unlinkat(int dirfd, const char *pathname, int flags)
  *
  * It's not clear if timestamp changes are interesting. This would
  * probably be used by a touch command, but that's not interesting
- * from Disco's perspective.
+ * from BuildML's perspective.
  *======================================================================*/
 
 /*======================================================================
@@ -2392,7 +2392,7 @@ unlinkat(int dirfd, const char *pathname, int flags)
  *
  * It's not clear if timestamp changes are interesting. This would
  * probably be used by a touch command, but that's not interesting
- * from Disco's perspective.
+ * from BuildML's perspective.
  *======================================================================*/
 
 /*======================================================================

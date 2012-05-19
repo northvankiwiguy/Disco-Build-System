@@ -44,7 +44,7 @@ extern char **environ;
  * Name of our temporary working directory - used by any test cases
  * that need file storage.
  */
-static char tmp_dir[] = "/tmp/disco-cunitXXXXXX";
+static char tmp_dir[] = "/tmp/buildml-cunitXXXXXX";
 
 /*======================================================================
  * setup - Set-up function for this suite
@@ -837,7 +837,7 @@ test_fopen64(void)
  * stream. I believe this is due to their being multiple versions of
  * the fopen/fclose function in the glibc library, and I'm picking up
  * the wrong version. However, it does appear that fopen/freopen/fclose
- * works correctly when running "disco scan-build", so we may just need
+ * works correctly when running "bml scan-build", so we may just need
  * to live without a unit test.
  */
 
