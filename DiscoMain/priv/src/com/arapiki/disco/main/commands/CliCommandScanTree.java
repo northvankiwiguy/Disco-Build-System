@@ -21,8 +21,8 @@ import org.apache.commons.cli.Options;
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.scanner.buildtree.FatalBuildTreeScannerError;
-import com.arapiki.disco.scanner.buildtree.FileSystemScanner;
+import com.buildml.scanner.buildtree.FatalBuildTreeScannerError;
+import com.buildml.scanner.buildtree.FileSystemScanner;
 
 /**
  * Disco CLI Command class that implements the "scan-tree" command.

@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.buildtree;
+package com.buildml.scanner.buildtree;
 
 import java.io.File;
 

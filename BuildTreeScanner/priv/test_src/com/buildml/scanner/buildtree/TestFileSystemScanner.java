@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.buildtree;
+package com.buildml.scanner.buildtree;
 
 
 import org.junit.After;
@@ -22,6 +22,7 @@ import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.Reports;
 import com.arapiki.disco.model.CommonTestUtils;
 import com.arapiki.disco.model.types.FileSet;
+import com.buildml.scanner.buildtree.FileSystemScanner;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
