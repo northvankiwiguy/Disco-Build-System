@@ -22,7 +22,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.Activator;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.FileNameSpaces.PathType;
 import com.buildml.model.types.FileRecord;
@@ -43,8 +43,8 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	/** The FileNameSpaces object we'll use for querying file information from the BuildStore */
 	private FileNameSpaces fns;
 	
-	/** The Components object we'll use for querying path component information */
-	private Components comps;
+	/** The Packages object we'll use for querying path package information */
+	private Packages pkgMgr;
 	
 	/** The ID of the top-root for our FileNameSpaces object */
 	private int topRootId;
@@ -63,14 +63,14 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 * labels for the FilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
 	 * @param fns The FileNameSpaces object we're graphically representing.
-	 * @param comps The Components object containing path component information.
+	 * @param pkgMgr The Packages object containing path component information.
 	 */
 	public FilesEditorLabelProvider(FilesEditor editor, FileNameSpaces fns,
-					Components comps) {
+					Packages pkgMgr) {
 
 		this.editor = editor;
 		this.fns = fns;
-		this.comps = comps;
+		this.pkgMgr = pkgMgr;
 	
 		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
 		folderImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
@@ -129,7 +129,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				}
 			}
 
-		/* there is no image for the component column or the visibility column. */
+		/* there is no image for the package column or the scope column. */
 		case 1:
 		case 2:
 			return null;
@@ -183,35 +183,35 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 					return pathName;
 				}
 
-			/* select text for the component column */
+			/* select text for the package column */
 			case 1:
-				Integer compInfo[] = comps.getFileComponent(pathId);
-				if (compInfo == null) {
+				Integer pkgInfo[] = pkgMgr.getFilePackage(pathId);
+				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
-				if (compInfo[0] == 0) {
+				if (pkgInfo[0] == 0) {
 					return "";
 				}
-				String compName = comps.getComponentName(compInfo[0]);
-				if (compName == null) {
+				String pkgName = pkgMgr.getPackageName(pkgInfo[0]);
+				if (pkgName == null) {
 					break; /* return "invalid" */
 				}
-				return compName;
+				return pkgName;
 				
 			/* select text for the visibility column */
 			case 2:
-				compInfo = comps.getFileComponent(pathId);
-				if (compInfo == null) {
+				pkgInfo = pkgMgr.getFilePackage(pathId);
+				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
-				if (compInfo[1] == 0) {
+				if (pkgInfo[1] == 0) {
 					return "";
 				}
-				String sectName = comps.getScopeName(compInfo[1]);
-				if (sectName == null) {
+				String scopeName = pkgMgr.getScopeName(pkgInfo[1]);
+				if (scopeName == null) {
 					break; /* return "invalid" */
 				}
-				return sectName;
+				return scopeName;
 				
 			}
 		}

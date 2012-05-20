@@ -81,8 +81,8 @@
       </command>
       <command
             defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
-            id="com.buildml.eclipse.commands.showComponents"
-            name="Show components">
+            id="com.buildml.eclipse.commands.showPackages"
+            name="Show Packages">
          <commandParameter
                id="com.buildml.eclipse.commandParameters.showDetail"
                name="showDetail"
@@ -110,9 +110,9 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterComponents"
-            id="com.buildml.eclipse.commands.filterComponents"
-            name="Filter Components">
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterPackages"
+            id="com.buildml.eclipse.commands.filterPackages"
+            name="Filter Packages">
       </command>
       <command
             defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterByName"
@@ -254,12 +254,12 @@
                </parameter>
             </command>
             <command
-                  commandId="com.buildml.eclipse.commands.showComponents"
-                  label="Components"
+                  commandId="com.buildml.eclipse.commands.showPackages"
+                  label="Packages"
                   style="toggle">
                <parameter
                      name="com.buildml.eclipse.commandParameters.showDetail"
-                     value="components">
+                     value="packages">
                </parameter>
             </command>
             <command
@@ -424,14 +424,14 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="com.buildml.eclipse.commands.showComponents"
-                  icon="images/show_components_icon.gif"
-                  label="Show Components"
+                  commandId="com.buildml.eclipse.commands.showPackages"
+                  icon="images/show_packages_icon.gif"
+                  label="Show Packages"
                   style="toggle"
-                  tooltip="Show component names in the file editor.">
+                  tooltip="Show package names in the file editor.">
                <parameter
                      name="com.buildml.eclipse.commandParameters.showDetail"
-                     value="components">
+                     value="packages">
                </parameter>
                <visibleWhen checkEnabled="true">
                   <with variable="activeEditorId">
@@ -460,9 +460,9 @@
                   visible="true">
             </separator>
             <command
-                  commandId="com.buildml.eclipse.commands.filterComponents"
-                  icon="images/filter_components_icon.gif"
-                  label="Filter output by selecting components to display."
+                  commandId="com.buildml.eclipse.commands.filterPackages"
+                  icon="images/filter_packages_icon.gif"
+                  label="Filter output by selecting packages to display."
                   style="push">
                   <visibleWhen checkEnabled="true">
                      <with variable="activeEditorId">

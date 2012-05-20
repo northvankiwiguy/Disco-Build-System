@@ -98,7 +98,7 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set the primary FilterSet that determines which components/scopes we want to
+	 * Set the primary FilterSet that determines which packages/scopes we want to
 	 * display.
 	 * @param filter The new primary filter set.
 	 */
@@ -118,7 +118,7 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set the secondary FileSet that determine which components/scopes we want to
+	 * Set the secondary FileSet that determine which packages/scopes we want to
 	 * display.
 	 * @param filter The new secondary filter set.
 	 */

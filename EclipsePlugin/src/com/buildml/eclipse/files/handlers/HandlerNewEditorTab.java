@@ -15,7 +15,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.BuildStore;
 import com.buildml.model.Reports;
-import com.buildml.model.types.ComponentSet;
+import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -59,8 +59,8 @@ public class HandlerNewEditorTab extends AbstractHandler {
 					new FilesEditor(buildStore, existingEditor.getTitle() + " (copy)");
 				newFilesEditor.setOptions(existingEditor.getOptions());
 				try {
-					newFilesEditor.setFilterComponentSet(
-							(ComponentSet)(existingEditor.getFilterComponentSet().clone()));
+					newFilesEditor.setFilterPackageSet(
+							(PackageSet)(existingEditor.getFilterPackageSet().clone()));
 					newFilesEditor.setVisibilityFilterSet(
 							(FileSet)(existingEditor.getVisibilityFilterSet().clone()));
 				} catch (CloneNotSupportedException e) {

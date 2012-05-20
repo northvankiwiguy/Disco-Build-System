@@ -3,32 +3,30 @@ package com.buildml.eclipse.files.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.utils.ComponentFilterDialog;
-import com.buildml.model.types.ComponentSet;
+import com.buildml.eclipse.utils.PackageFilterDialog;
+import com.buildml.model.types.PackageSet;
 
 /**
- * Handler for when the user selects the "filterComponent" command, which triggers
+ * Handler for when the user selects the "filterPackage" command, which triggers
  * a pop-up dialog to be shown. This dialog permits the user to select the subset
- * of components they wish to view in the editor.
+ * of packages they wish to view in the editor.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerFilterComponents extends AbstractHandler {
+public class HandlerFilterPackages extends AbstractHandler {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
 	/**
-	 * Handle execution of the filterComponents command. 
+	 * Handle execution of the filterPackages command. 
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -38,21 +36,21 @@ public class HandlerFilterComponents extends AbstractHandler {
 		IEditorPart editorPart = editor.getActiveSubEditor();
 		
 		/* 
-		 * For the file editor, start a "ComponentFilterDialog" and if the user
-		 * presses "OK", update the editor's filter ComponentSet with the 
+		 * For the file editor, start a "PackageFilterDialog" and if the user
+		 * presses "OK", update the editor's filter PackageSet with the 
 		 * newly selected set.
 		 */
 		if (editorPart instanceof FilesEditor) {
 			FilesEditor filesEditor = (FilesEditor)editorPart;
-			ComponentSet compFilterSet = filesEditor.getFilterComponentSet();
+			PackageSet pkgFilterSet = filesEditor.getFilterPackageSet();
 			
-			ComponentFilterDialog compSelDialog = 
-				new ComponentFilterDialog(compFilterSet);
-			compSelDialog.open();
+			PackageFilterDialog pkgSelDialog = 
+				new PackageFilterDialog(pkgFilterSet);
+			pkgSelDialog.open();
 			
-			int retCode = compSelDialog.getReturnCode();
+			int retCode = pkgSelDialog.getReturnCode();
 			if (retCode == Dialog.OK) {
-				filesEditor.setFilterComponentSet(compSelDialog.getComponentSet());
+				filesEditor.setFilterPackageSet(pkgSelDialog.getPackageSet());
 
 			} else if (retCode == Dialog.CANCEL) {
 				/* do nothing - the Dialog was canceled */

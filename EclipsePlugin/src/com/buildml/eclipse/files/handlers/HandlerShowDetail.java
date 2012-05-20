@@ -32,7 +32,7 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 
 	/**
 	 * Given that each instance of this handler is for a specific type of options
-	 * (e.g. components, show-roots, etc). We can save time on each invocation of
+	 * (e.g. packages, show-roots, etc). We can save time on each invocation of
 	 * the handler by caching the option value that the editor expects to see.
 	 */
 	private int savedHandlerOptionBit = -1;
@@ -147,8 +147,8 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 	private int computeOptionBits(String param) {		
 		if (param.equals("path-roots")) {
 			return FilesEditor.OPT_SHOW_ROOTS;
-		} else if (param.equals("components")) {
-			return FilesEditor.OPT_SHOW_COMPONENTS;
+		} else if (param.equals("packages")) {
+			return FilesEditor.OPT_SHOW_PACKAGES;
 		} else if (param.equals("show-hidden")) {
 			return FilesEditor.OPT_SHOW_HIDDEN;
 		} else {

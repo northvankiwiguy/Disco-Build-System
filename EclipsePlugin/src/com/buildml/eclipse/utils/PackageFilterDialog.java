@@ -29,91 +29,91 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
-import com.buildml.model.types.ComponentSet;
+import com.buildml.model.Packages;
+import com.buildml.model.types.PackageSet;
 
 /**
  * A Dialog allowing the user to select (with checkboxes) a subset of all the
- * BuildStore's components. This class is used in the Eclipse plugin, wherever
- * it's necessary to select a combination of components.
+ * BuildStore's packages. This class is used in the Eclipse plugin, wherever
+ * it's necessary to select a combination of packages.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class ComponentFilterDialog extends TitleAreaDialog {
+public class PackageFilterDialog extends TitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
 	/**
-	 * The input ComponentSet that this Dialog will display. This remains unmodified since
+	 * The input PackageSet that this Dialog will display. This remains unmodified since
 	 * we create a clone of this object before modifying it.
 	 */
-	private ComponentSet compSet;
+	private PackageSet pkgSet;
 	
 	/**
 	 * We need one widget for each line of the table.
 	 */
-	private CompSelectWidget lineWidgets[];
+	private PkgSelectWidget lineWidgets[];
 	
 	
 	/*=====================================================================================*
-	 * NESTED CLASS - CompSelectWidget
+	 * NESTED CLASS - PkgSelectWidget
 	 *=====================================================================================*/
 	
 	/**
-	 * A nested class representing a single line in the ComponentFilterDialog window.
-	 * Each CompSelectWidget contains the components name, and a checkbox for each of
+	 * A nested class representing a single line in the PackageFilterDialog window.
+	 * Each PkgSelectWidget contains the package's name, and a checkbox for each of
 	 * the scopes.
 	 * 
 	 * @author "Peter Smith <psmith@arapiki.com>"
 	 */
-	private class CompSelectWidget extends Composite {
+	private class PkgSelectWidget extends Composite {
 
 		/*---------------------------------------------------------------------------------*/
 
 		/** Each scope name (except for None) has its own checkbox widget. */
 		private Button checkBoxes[] = null;
 		
-		/** This ID of the component that this widget represents. */
-		int compId;
+		/** This ID of the package that this widget represents. */
+		int pkgId;
 		
 		/*---------------------------------------------------------------------------------*/
 
 		/**
-		 * Create a new instance of the CompSelectWidth class.
-		 * @param parent The ComponentFilterDialog composite that this widget is pat of.
-		 * @param compName The name of the component to be displayed.
+		 * Create a new instance of the PkgSelectWidget class.
+		 * @param parent The PackageFilterDialog composite that this widget is pat of.
+		 * @param pkgName The name of the package to be displayed.
 		 */
-		public CompSelectWidget(
+		public PkgSelectWidget(
 				Composite parent, 
-				String compName)
+				String pkgName)
 		{	
 			super(parent, 0);
 			
-			final Components compMgr = compSet.getBuildStore().getComponents();
+			final Packages pkgMgr = pkgSet.getBuildStore().getPackages();
 			
 			/* get the scope name, and prepare for a checkbox for each */
-			checkBoxes = new Button[Components.SCOPE_MAX];
+			checkBoxes = new Button[Packages.SCOPE_MAX];
 			
-			/* we'll use the component's internal ID when accessing the component Set */
-			compId = compMgr.getComponentId(compName);
+			/* we'll use the package's internal ID when accessing the package Set */
+			pkgId = pkgMgr.getPackageId(pkgName);
 			
 			/* make sure this widget is stretched to the full width of the shell */
 			this.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
 			
 			/* 
-			 * Each line will contain a section for the component name,
+			 * Each line will contain a section for the package name,
 			 * and a section for each of the scopes (excluding the None scope).
 			 */
 			GridLayout layout = new GridLayout();
-			layout.numColumns = 1 + Components.SCOPE_MAX;
+			layout.numColumns = 1 + Packages.SCOPE_MAX;
 			layout.marginHeight = 0;
 			setLayout(layout);
 			
-			/* The component name takes as much of the left side as possible */
+			/* The package name takes as much of the left side as possible */
 			Label label1 = new Label(this, 0);
-			label1.setText(compName);
+			label1.setText(pkgName);
 			label1.setLayoutData(new GridData(SWT.LEFT, SWT.NONE, true, false));
 
 			/*
@@ -121,26 +121,26 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 			 * (except for "None"). We take note of each widget (in the checkBoxes)
 			 * array so we can set/refresh it later.
 			 */
-			for (int i = 0; i < Components.SCOPE_MAX; i++) {
+			for (int i = 0; i < Packages.SCOPE_MAX; i++) {
 				
 				/* the scope check boxes are on the right side */
 				final Button newButton = new Button(this, SWT.CHECK);
-				newButton.setText(compMgr.getScopeName(i + 1));
+				newButton.setText(pkgMgr.getScopeName(i + 1));
 				newButton.setLayoutData(new GridData());
 
 				/*
 				 * An an event listener that updates the current state of
-				 * the ComponentSet whenever a checkbox is selected.
+				 * the PackageSet whenever a checkbox is selected.
 				 */
 				newButton.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						Button button = (Button)(e.getSource());
 						String buttonText = button.getText();
-						int scopeId = compMgr.getScopeId(buttonText);
+						int scopeId = pkgMgr.getScopeId(buttonText);
 						if (button.getSelection()) {
-							compSet.add(compId, scopeId);
+							pkgSet.add(pkgId, scopeId);
 						} else {
-							compSet.remove(compId, scopeId);	
+							pkgSet.remove(pkgId, scopeId);	
 						}
 					}
 				});
@@ -154,13 +154,13 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 		/*---------------------------------------------------------------------------------*/
 
 		/**
-		 * Refresh this widget with update content from the compSet.
+		 * Refresh this widget with update content from the pkgSet.
 		 */
 		public void refresh()
 		{
-			for (int i = 0; i != Components.SCOPE_MAX; i++) {
+			for (int i = 0; i != Packages.SCOPE_MAX; i++) {
 				Button thisCheck = checkBoxes[i];
-				thisCheck.setSelection(compSet.isMember(compId, i + 1));
+				thisCheck.setSelection(pkgSet.isMember(pkgId, i + 1));
 			}
 		}
 		
@@ -172,22 +172,22 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 	 *=====================================================================================*/
 	
 	/**
-	 * Create a new ComponentFilterDialog object, with the specified set of components
+	 * Create a new PackageFilterDialog object, with the specified set of packages
 	 * shown as being selected.
-	 * @param initialComponents The components that will initially be selected. 
+	 * @param initialPkgs The packages that will initially be selected. 
 	 */
-	public ComponentFilterDialog(ComponentSet initialComponents) {
+	public PackageFilterDialog(PackageSet initialPkgs) {
 		super(new Shell());
 		
 		/* 
-		 * Make a copy of the ComponentSet, so we can mess with it as much as we like
+		 * Make a copy of the PackageSet, so we can mess with it as much as we like
 		 * without disturbing the original copy (if the user hits "Cancel", we want the
 		 * original to be untouched).
 		 */
 		try {
-			compSet = (ComponentSet)initialComponents.clone();
+			pkgSet = (PackageSet)initialPkgs.clone();
 		} catch (CloneNotSupportedException e) {
-			throw new FatalError("Cloning not supported on ComponentSet objects");
+			throw new FatalError("Cloning not supported on PackageSet objects");
 		}
 	}
 	
@@ -196,11 +196,11 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 	 *=====================================================================================*/
 	
 	/**
-	 * @return The ComponentSet representing the current combination
+	 * @return The PackageSet representing the current combination
 	 * of components/scopes that are selected in the dialog.
 	 */
-	public ComponentSet getComponentSet() {
-		return compSet;
+	public PackageSet getPackageSet() {
+		return pkgSet;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -211,26 +211,26 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		
-		final Components compMgr = compSet.getBuildStore().getComponents();
+		final Packages pkgMgr = pkgSet.getBuildStore().getPackages();
 
-		setTitle("Select the components you wish to view:");
+		setTitle("Select the packages you wish to view:");
 		setHelpAvailable(false);
 
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
 		
-		/* Add a box containing all the components, and their selectable state */ 
+		/* Add a box containing all the packages, and their selectable state */ 
 		Composite listComposite = new Composite(composite, SWT.BORDER | SWT.V_SCROLL);
 		listComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		listComposite.setLayout(layout);
 		
-		String componentNames[] = compMgr.getComponents();
-		lineWidgets = new CompSelectWidget[componentNames.length];
-		for (int i = 0; i != componentNames.length; i++) {
-			String compName = componentNames[i];
-			lineWidgets[i] = new CompSelectWidget(listComposite, compName);
+		String packageNames[] = pkgMgr.getPackages();
+		lineWidgets = new PkgSelectWidget[packageNames.length];
+		for (int i = 0; i != packageNames.length; i++) {
+			String pkgName = packageNames[i];
+			lineWidgets[i] = new PkgSelectWidget(listComposite, pkgName);
 		}
 		return composite;
 	}
@@ -267,7 +267,7 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 		Rectangle parentBounds = Display.getCurrent().getBounds();
 		newShell.setBounds(
 				parentBounds.width / 2 - 250, parentBounds.height / 2 - 200, 500, 400);
-		newShell.setText("Select Components to View");
+		newShell.setText("Select Packages to View");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -288,17 +288,17 @@ public class ComponentFilterDialog extends TitleAreaDialog {
 				(buttonId == IDialogConstants.DESELECT_ALL_ID)) {
 			
 			/* 
-			 * Create a new (replacement) ComponentSet with no content, but
+			 * Create a new (replacement) PackageSet with no content, but
 			 * a default of false (deselect all) or true (select all).
 			 */
-			BuildStore bs = compSet.getBuildStore();
-			compSet = new ComponentSet(bs);
+			BuildStore bs = pkgSet.getBuildStore();
+			pkgSet = new PackageSet(bs);
 			if (buttonId == IDialogConstants.SELECT_ALL_ID) {
-				compSet.setDefault(true);
+				pkgSet.setDefault(true);
 			}
 			
 			/*
-			 * Refresh all the widgets, using this new ComponentSet.
+			 * Refresh all the widgets, using this new PackageSet.
 			 */
 			for (int i = 0; i < lineWidgets.length; i++) {
 				lineWidgets[i].refresh();

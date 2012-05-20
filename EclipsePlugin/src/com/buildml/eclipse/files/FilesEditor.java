@@ -43,17 +43,15 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
-import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.preferences.PreferenceConstants;
-import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.BuildStore;
 import com.buildml.model.FileNameSpaces;
-import com.buildml.model.types.ComponentSet;
+import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 
@@ -73,8 +71,8 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 	/** The column that displays the path tree */
 	private TreeColumn treeColumn;
 	
-	/** The column that displays the component name */
-	private TreeColumn compColumn;
+	/** The column that displays the package name */
+	private TreeColumn pkgColumn;
 	
 	/** The column that displays the path's scope */
 	private TreeColumn scopeColumn;
@@ -112,10 +110,10 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 	private int previousEditorOptionBits = 0;
 
 	/**
-	 * The set of components to be displayed (that is, files will be displayed
-	 * if they belong to one of these components).
+	 * The set of packages to be displayed (that is, files will be displayed
+	 * if they belong to one of these packages).
 	 */
-	private ComponentSet filterComponentSet;
+	private PackageSet filterPackageSet;
 	
 	/**
 	 * The TreeViewer's parent control.
@@ -136,9 +134,9 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 	public static final int OPT_SHOW_ROOTS			= 2;
 	
 	/**
-	 * Option to display each path's component name, alongside the path name itself.
+	 * Option to display each path's package name, alongside the path name itself.
 	 */
-	public static final int OPT_SHOW_COMPONENTS		= 4;
+	public static final int OPT_SHOW_PACKAGES		= 4;
 	
 	/**
 	 * Option to reveal hidden files in the viewer, displaying them in a greyed-out style.
@@ -176,9 +174,9 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 		this.buildStore = buildStore;
 		fns = buildStore.getFileNameSpaces();
 		
-		/* create a new component set so we can selectively filter out components */
-		filterComponentSet = new ComponentSet(buildStore);
-		filterComponentSet.setDefault(true);
+		/* create a new package set so we can selectively filter out packages */
+		filterPackageSet = new PackageSet(buildStore);
+		filterPackageSet.setDefault(true);
 		
 		/* initially, all paths are visible */
 		visiblePaths = buildStore.getReports().reportAllFiles();
@@ -265,16 +263,16 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 		 * The main control in this editor is a TreeViewer that allows the user to
 		 * browse the structure of the BuildStore's file system. It has three columns:
 		 *    1) The file system path (shown as a tree).
-		 *    2) The path's component (shown as a fixed-width column);
+		 *    2) The path's package (shown as a fixed-width column);
 		 *    3) The path's scope (private, public etc).
 		 */
 		filesTreeViewer = new VisibilityTreeViewer(fileEditorTree);
 		treeColumn = new TreeColumn(fileEditorTree, SWT.LEFT);
 	    treeColumn.setAlignment(SWT.LEFT);
 	    treeColumn.setText("Path");
-	    compColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
-	    compColumn.setAlignment(SWT.LEFT);
-	    compColumn.setText("Component");
+	    pkgColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
+	    pkgColumn.setAlignment(SWT.LEFT);
+	    pkgColumn.setText("Package");
 	    scopeColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
 	    scopeColumn.setAlignment(SWT.LEFT);
 	    scopeColumn.setText("Scope");
@@ -282,11 +280,11 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 	    
 	    /*
 	     * Set the initial column widths so that the path column covers the full editor
-	     * window, and the component/section columns are empty. Setting the path column
+	     * window, and the package/scope columns are empty. Setting the path column
 	     * to a non-zero pixel width causes it to be expanded to the editor's full width. 
 	     */
 	    treeColumn.setWidth(1);
-	    compColumn.setWidth(0);
+	    pkgColumn.setWidth(0);
 	    scopeColumn.setWidth(0);
 		
 	    /*
@@ -294,7 +292,7 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 		 */
 		contentProvider = new FilesEditorContentProvider(this, fns);
 		FilesEditorLabelProvider labelProvider = 
-				new FilesEditorLabelProvider(this, fns, buildStore.getComponents());
+				new FilesEditorLabelProvider(this, fns, buildStore.getPackages());
 		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);
@@ -390,7 +388,7 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 		 * there were no widgets.
 		 */
 		setOptions(getOptions());
-		setFilterComponentSet(getFilterComponentSet());
+		setFilterPackageSet(getFilterPackageSet());
 		setVisibilityFilterSet(getVisibilityFilterSet());
 	}
 
@@ -424,7 +422,7 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 		 * appropriately to match the settings of *this* editor, instead of the previous
 		 * editor.
 		 */
-		service.refreshElements("com.buildml.eclipse.commands.showComponents", null);
+		service.refreshElements("com.buildml.eclipse.commands.showPackages", null);
 		service.refreshElements("com.buildml.eclipse.commands.showHiddenPaths", null);
 		service.refreshElements("com.buildml.eclipse.commands.showPathRoots", null);
 	}
@@ -568,31 +566,31 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch this editor's component filter set. This set is used by the viewer when 
+	 * Fetch this editor's package filter set. This set is used by the viewer when 
 	 * deciding which files should be displayed (versus being filtered out).
-	 * @return This editor's component filter set.
+	 * @return This editor's package filter set.
 	 */
-	public ComponentSet getFilterComponentSet() {
-		return filterComponentSet;
+	public PackageSet getFilterPackageSet() {
+		return filterPackageSet;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set this editor's component filter set. This set is used by the viewer when 
+	 * Set this editor's package filter set. This set is used by the viewer when 
 	 * deciding which files should be displayed (versus being filtered out).
-	 * @param newSet This editor's new component filter set.
+	 * @param newSet This editor's new package filter set.
 	 */
-	public void setFilterComponentSet(ComponentSet newSet) {
-		filterComponentSet = newSet;
+	public void setFilterPackageSet(PackageSet newSet) {
+		filterPackageSet = newSet;
 		
 		/* if the editor is already display, we can fresh the filters */
 		if (visibilityProvider != null) {
-			FileSet compFileSet = 
-				buildStore.getReports().reportFilesFromComponentSet(newSet);
-			compFileSet.populateWithParents();
+			FileSet pkgFileSet = 
+				buildStore.getReports().reportFilesFromPackageSet(newSet);
+			pkgFileSet.populateWithParents();
 		
-			visibilityProvider.setSecondaryFilterSet(compFileSet);
+			visibilityProvider.setSecondaryFilterSet(pkgFileSet);
 			refreshView(true);
 		}
 	}
@@ -601,7 +599,7 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 
 	/**
 	 * Refresh the editor's content. This is typically called when some type of display
-	 * option changes (e.g. roots or components have been added), and the content is now
+	 * option changes (e.g. roots or packages have been added), and the content is now
 	 * different, or if the user resizes the main Eclipse shell. We use a progress monitor,
 	 * since a redraw operation might take a while.
 	 */
@@ -613,7 +611,7 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 
 	/**
 	 * Refresh the editor's content. This is typically called when some type of display
-	 * option changes (e.g. roots or components have been added), and the content is now
+	 * option changes (e.g. roots or packages have been added), and the content is now
 	 * different, or if the user resizes the main Eclipse shell. We use a progress monitor,
 	 * since a redraw operation might take a while.
 	 * @param forceRedraw true if we want to force a complete redraw of the viewer.
@@ -626,7 +624,7 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 		previousEditorOptionBits = currentOptions;
 		
 		/*
-		 * Determine whether the components/scope columns should be shown. Setting the
+		 * Determine whether the packages/scope columns should be shown. Setting the
 		 * width appropriately is important, especially if the shell was recently resized.
 		 * TODO: figure out why subtracting 20 pixels is important for matching the column
 		 * size with the size of the parent composite.
@@ -635,10 +633,10 @@ public class FilesEditor extends EditorPart implements IElementComparer {
 			@Override
 			public void run() {
 			    int editorWidth = filesEditorComposite.getClientArea().width - 20;
-			    int compWidth = isOptionSet(OPT_SHOW_COMPONENTS) ? 100 : 0;
-			    treeColumn.setWidth(editorWidth - 2 * compWidth);
-			    compColumn.setWidth(compWidth);
-			    scopeColumn.setWidth(compWidth);		
+			    int pkgWidth = isOptionSet(OPT_SHOW_PACKAGES) ? 100 : 0;
+			    treeColumn.setWidth(editorWidth - 2 * pkgWidth);
+			    pkgColumn.setWidth(pkgWidth);
+			    scopeColumn.setWidth(pkgWidth);		
 			}
 		});
 
