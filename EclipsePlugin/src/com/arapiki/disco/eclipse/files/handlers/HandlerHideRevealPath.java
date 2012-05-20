@@ -13,8 +13,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.types.FileRecord;
+import com.buildml.model.BuildStore;
+import com.buildml.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

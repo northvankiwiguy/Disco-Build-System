@@ -17,11 +17,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.CommonTestUtils;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.CommonTestUtils;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.Reports;
+import com.buildml.model.types.FileSet;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 
 /**

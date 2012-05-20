@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.types.ComponentSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Components;
+import com.buildml.model.types.ComponentSet;
 
 /**
  * A Dialog allowing the user to select (with checkboxes) a subset of all the

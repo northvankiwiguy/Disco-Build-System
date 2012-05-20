@@ -13,10 +13,10 @@ import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.tasks.DiscoTasksEditor;
 import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.types.ComponentSet;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Reports;
+import com.buildml.model.types.ComponentSet;
+import com.buildml.model.types.FileSet;
 
 /**
  * Command handler for adding a new tab in the current editor by duplicating the

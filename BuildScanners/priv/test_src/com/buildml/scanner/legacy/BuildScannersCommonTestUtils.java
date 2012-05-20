@@ -19,8 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.CommonTestUtils;
+import com.buildml.model.BuildStore;
+import com.buildml.model.CommonTestUtils;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 import com.buildml.utils.os.ShellResult;
 import com.buildml.utils.os.SystemUtils;

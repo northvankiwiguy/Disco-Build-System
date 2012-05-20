@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
-import com.arapiki.disco.model.BuildStore;
+import com.buildml.model.BuildStore;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.scanner.electricanno.ElectricAnnoScanner;
 import com.buildml.utils.files.ProgressFileInputStreamListener;
@@ -98,7 +98,7 @@ public class CliCommandScanEaAnno implements ICliCommand {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.arapiki.disco.main.ICliCommand#invoke(com.arapiki.disco.model.BuildStore, java.lang.String[])
+	 * @see com.arapiki.disco.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {

@@ -14,8 +14,8 @@ package com.arapiki.disco.eclipse.utils;
 
 import com.arapiki.disco.eclipse.files.FileRecordDir;
 import com.arapiki.disco.eclipse.files.FileRecordFile;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.types.FileRecord;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.types.FileRecord;
 
 /**
  * A collection of static methods implementing type conversions, as required

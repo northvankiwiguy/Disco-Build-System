@@ -12,7 +12,7 @@
 
 package com.arapiki.disco.eclipse.files;
 
-import com.arapiki.disco.model.types.FileRecord;
+import com.buildml.model.types.FileRecord;
 
 /**
  * A subclass of FileRecord used by the UI to distinguish FileRecords that represent

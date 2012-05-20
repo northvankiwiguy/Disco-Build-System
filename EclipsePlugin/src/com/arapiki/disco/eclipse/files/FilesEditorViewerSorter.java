@@ -15,9 +15,9 @@ package com.arapiki.disco.eclipse.files;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileNameSpaces.PathType;
-import com.arapiki.disco.model.types.FileRecord;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

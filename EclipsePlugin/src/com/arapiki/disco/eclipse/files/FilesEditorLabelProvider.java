@@ -22,10 +22,10 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.arapiki.disco.eclipse.Activator;
-import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.types.FileRecord;
-import com.arapiki.disco.model.FileNameSpaces.PathType;
+import com.buildml.model.Components;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

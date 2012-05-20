@@ -17,10 +17,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.BuildTasks;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.BuildTasks.OperationType;
+import com.buildml.model.BuildStore;
+import com.buildml.model.BuildTasks;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.BuildTasks.OperationType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.PathUtils;

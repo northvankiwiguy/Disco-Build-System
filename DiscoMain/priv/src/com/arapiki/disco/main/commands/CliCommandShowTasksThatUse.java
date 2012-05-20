@@ -17,14 +17,14 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.arapiki.disco.main.CliUtils;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.BuildTasks;
-import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.disco.model.types.TaskSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.BuildTasks;
+import com.buildml.model.Components;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.Reports;
+import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.types.FileSet;
+import com.buildml.model.types.TaskSet;
 
 /**
  * Disco CLI Command class that implements the "show-tasks-that-use" command.
@@ -142,7 +142,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.arapiki.disco.main.commands.CliCommandShowTasks#invoke(com.arapiki.disco.model.BuildStore, java.lang.String[])
+	 * @see com.arapiki.disco.main.commands.CliCommandShowTasks#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {

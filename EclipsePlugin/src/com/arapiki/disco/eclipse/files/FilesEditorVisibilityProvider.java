@@ -13,8 +13,8 @@
 package com.arapiki.disco.eclipse.files;
 
 import com.arapiki.disco.eclipse.utils.IVisibilityProvider;
-import com.arapiki.disco.model.types.FileRecord;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.types.FileRecord;
+import com.buildml.model.types.FileSet;
 
 /**
  * An adapter class to allow a FileSet to be used as the visibility provider for

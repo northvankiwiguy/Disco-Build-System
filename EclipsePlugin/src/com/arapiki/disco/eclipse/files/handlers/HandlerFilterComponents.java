@@ -12,7 +12,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.utils.ComponentFilterDialog;
-import com.arapiki.disco.model.types.ComponentSet;
+import com.buildml.model.types.ComponentSet;
 
 /**
  * Handler for when the user selects the "filterComponent" command, which triggers

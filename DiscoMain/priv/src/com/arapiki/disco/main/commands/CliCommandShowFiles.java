@@ -18,10 +18,10 @@ import org.apache.commons.cli.Options;
 
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Components;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.types.FileSet;
 
 /**
  * Disco CLI Command class that implements the "show-files" command.

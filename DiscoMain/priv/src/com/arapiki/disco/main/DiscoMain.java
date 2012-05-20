@@ -20,8 +20,8 @@ import java.util.Iterator;
 import org.apache.commons.cli.*;
 
 import com.arapiki.disco.main.commands.*;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.errors.BuildStoreVersionException;
+import com.buildml.model.BuildStore;
+import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.print.PrintUtils;
 import com.buildml.utils.string.StringArray;
 import com.buildml.utils.version.Version;

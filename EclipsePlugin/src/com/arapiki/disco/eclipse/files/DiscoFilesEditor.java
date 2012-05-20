@@ -51,11 +51,11 @@ import com.arapiki.disco.eclipse.Activator;
 import com.arapiki.disco.eclipse.preferences.PreferenceConstants;
 import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.eclipse.utils.VisibilityTreeViewer;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.types.ComponentSet;
-import com.arapiki.disco.model.types.FileRecord;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.types.ComponentSet;
+import com.buildml.model.types.FileRecord;
+import com.buildml.model.types.FileSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

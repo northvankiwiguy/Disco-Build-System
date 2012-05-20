@@ -18,13 +18,13 @@ import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
 
-import com.arapiki.disco.model.BuildTasks;
-import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.disco.model.FileNameSpaces.PathType;
-import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.disco.model.types.TaskSet;
+import com.buildml.model.BuildTasks;
+import com.buildml.model.Components;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.types.FileSet;
+import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.print.PrintUtils;
 

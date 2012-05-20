@@ -12,9 +12,9 @@ import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.utils.AlertDialog;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 import com.arapiki.disco.eclipse.utils.errors.FatalDiscoError;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Reports;
+import com.buildml.model.types.FileSet;
 
 /**
  * Command Handler for opening a new editor tab and showing the list of files that

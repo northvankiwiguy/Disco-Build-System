@@ -6,10 +6,10 @@
       <editor
             class="com.arapiki.disco.eclipse.DiscoMainEditor"
             default="true"
-            extensions="disco"
+            extensions="bml"
             icon="images/disco_editor_img.gif"
             id="com.arapiki.disco.eclipse.editors.main"
-            name="Disco Build Editor">
+            name="BuildML Editor">
       </editor>
    </extension>
    <extension

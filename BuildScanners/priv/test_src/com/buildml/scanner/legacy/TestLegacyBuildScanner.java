@@ -18,8 +18,8 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.CommonTestUtils;
+import com.buildml.model.BuildStore;
+import com.buildml.model.CommonTestUtils;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**

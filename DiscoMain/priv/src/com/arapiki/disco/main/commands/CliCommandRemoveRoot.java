@@ -17,8 +17,8 @@ import org.apache.commons.cli.Options;
 
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.FileNameSpaces;
+import com.buildml.model.BuildStore;
+import com.buildml.model.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -93,7 +93,7 @@ public class CliCommandRemoveRoot implements ICliCommand {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.arapiki.disco.main.ICliCommand#invoke(com.arapiki.disco.model.BuildStore, java.lang.String[])
+	 * @see com.arapiki.disco.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {

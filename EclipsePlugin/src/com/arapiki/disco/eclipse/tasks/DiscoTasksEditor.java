@@ -22,7 +22,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import com.arapiki.disco.model.BuildStore;
+import com.buildml.model.BuildStore;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

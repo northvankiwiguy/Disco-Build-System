@@ -8,9 +8,9 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
 import com.arapiki.disco.eclipse.utils.NameFilterDialog;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Reports;
+import com.buildml.model.types.FileSet;
 
 /**
  * Command Handler for the "filter by name" command.

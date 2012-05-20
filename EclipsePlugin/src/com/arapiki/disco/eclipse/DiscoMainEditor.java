@@ -17,8 +17,8 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
 import com.arapiki.disco.eclipse.tasks.DiscoTasksEditor;
 import com.arapiki.disco.eclipse.utils.AlertDialog;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.errors.BuildStoreVersionException;
+import com.buildml.model.BuildStore;
+import com.buildml.model.errors.BuildStoreVersionException;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

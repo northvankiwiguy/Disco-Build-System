@@ -15,7 +15,7 @@ package com.arapiki.disco.main;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
-import com.arapiki.disco.model.BuildStore;
+import com.buildml.model.BuildStore;
 
 /**
  * This interface must be implemented by any class that provides a disco CLI

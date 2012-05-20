@@ -22,10 +22,10 @@ import org.eclipse.ui.PlatformUI;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.files.DiscoFilesEditor;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.types.FileRecord;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.types.FileRecord;
+import com.buildml.model.types.FileSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"

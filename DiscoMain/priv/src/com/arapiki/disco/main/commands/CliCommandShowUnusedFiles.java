@@ -14,11 +14,11 @@ package com.arapiki.disco.main.commands;
 
 
 import com.arapiki.disco.main.CliUtils;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Components;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.types.FileSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Components;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.Reports;
+import com.buildml.model.types.FileSet;
 
 /**
  * Disco CLI Command class that implements the "show-unused-files" command.
@@ -72,7 +72,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.arapiki.disco.main.commands.CliCommandShowFiles#invoke(com.arapiki.disco.model.BuildStore, java.lang.String[])
+	 * @see com.arapiki.disco.main.commands.CliCommandShowFiles#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {

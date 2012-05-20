@@ -16,9 +16,9 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.arapiki.disco.eclipse.utils.ConversionUtils;
-import com.arapiki.disco.model.FileNameSpaces;
-import com.arapiki.disco.model.FileNameSpaces.PathType;
-import com.arapiki.disco.model.types.FileRecord;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.types.FileRecord;
 import com.buildml.utils.errors.ErrorCode;
 
 /**

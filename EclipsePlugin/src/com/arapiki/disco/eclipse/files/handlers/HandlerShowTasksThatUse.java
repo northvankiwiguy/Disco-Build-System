@@ -8,11 +8,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.arapiki.disco.eclipse.DiscoMainEditor;
 import com.arapiki.disco.eclipse.utils.EclipsePartUtils;
-import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.model.Reports;
-import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.disco.model.types.FileSet;
-import com.arapiki.disco.model.types.TaskSet;
+import com.buildml.model.BuildStore;
+import com.buildml.model.Reports;
+import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.types.FileSet;
+import com.buildml.model.types.TaskSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
