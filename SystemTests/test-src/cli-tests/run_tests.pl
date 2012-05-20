@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 #
-# This Perl script is the main entry point for running Disco's command-line-based
+# This Perl script is the main entry point for running BuildML's command-line-based
 # regression tests. Use this script in one of two ways:
 #
 #  1) To run all regression test suites, use:
-#       ./run_tests.pl disco-<version>.tar.gz
+#       ./run_tests.pl buildml-<version>.tar.gz
 #  2) To run selected regression test suites, use:
-#       ./run_tests.pl disco-<version>.tar.gz suite-<suite1> suite-<suite2> ...
+#       ./run_tests.pl buildml-<version>.tar.gz suite-<suite1> suite-<suite2> ...
 #
 
 use Cwd 'abs_path';
@@ -175,7 +175,7 @@ sub executeSuite {
 # Validate command line arguments
 #
 if ($#ARGV < 0) {
-	fatalError("Usage: run_tests.pl disco-<version>.tar.gz { suite-<name>, ...}");
+	fatalError("Usage: run_tests.pl buildml-<version>.tar.gz { suite-<name>, ...}");
 }
 
 #
@@ -200,14 +200,14 @@ if (-d "../cli-tests" && -d "../../test-src") {
 #
 my $packageName = $ARGV[0];
 shift @ARGV;
-my $expandDir = "$outputDir/discoHome";
+my $expandDir = "$outputDir/buildMlHome";
 if (! -e "$packageName") {
 	fatalError("Release package $packageName doesn't exist.");
 }
 if (system("mkdir -p $expandDir && tar -C $expandDir -zxf $packageName") != 0){
-	fatalError("Failed to extract Disco release package.");
+	fatalError("Failed to extract BuildML release package.");
 }
-my @subDir = glob("$expandDir/disco-*");
+my @subDir = glob("$expandDir/buildml-*");
 $ENV{"BUILDML_HOME"} = $subDir[0];
 $ENV{'PATH'} = $ENV{"BUILDML_HOME"} . "/bin:" . $ENV{'PATH'};
 

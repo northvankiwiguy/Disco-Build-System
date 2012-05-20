@@ -18,7 +18,7 @@
 		</or>
 	</condition>
 	<fail unless="java-ok">
-		A Java Development Kit (JDK) of version 1.5 or greater is required. Please make sure this is installed before trying to build Disco.
+		A Java Development Kit (JDK) of version 1.5 or greater is required. Please make sure this is installed before trying to build BuildML.
 	</fail>
 	
 	<!--
@@ -28,7 +28,7 @@
 		<contains string="${ant.version}" substring="version 1.8" />
 	</condition>
 	<fail unless="ant-ok">
-		Ant version 1.8 or greater is required. Please make sure this is installed before trying to build Disco.
+		Ant version 1.8 or greater is required. Please make sure this is installed before trying to build BuildML.
 	</fail>
 
 	<!--
@@ -39,7 +39,7 @@
 		<arg value="-v" />
 	</exec>
 	<fail unless="latex-ok">
-		The LaTeX documentation tool is required. Please make sure this is installed before trying to build Disco.
+		The LaTeX documentation tool is required. Please make sure this is installed before trying to build BuildML.
 	</fail>
 	
 	<!--
@@ -51,7 +51,7 @@
 		<arg value="-v" />
 	</exec>
 	<fail unless="dvipdf-ok">
-		The dvipdf documentation tool is required. Please make sure this is installed before trying to build Disco.
+		The dvipdf documentation tool is required. Please make sure this is installed before trying to build BuildML.
 	</fail>
 	
 </project>

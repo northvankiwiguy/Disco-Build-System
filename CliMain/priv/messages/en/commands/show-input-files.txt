@@ -1,0 +1,65 @@
+Show the files that were somehow used when generating the specified output files.
+That is, given a set of generated files, display the list of all other files
+that were read by the build tasks that created the output files.
+
+For example, an input file to myfile.o is myfile.c, assuming there's a
+build task (C compilation) that reads myfile.c and writes myfile.o.
+
+This command is the logical opposite of show-derived-files.
+
+The generated files are specified using the same style of colon-separated list
+that is used with the -f | --filter option (see below), although without
+specifying the -f or --filter. For example:
+
+    bml show-input-files file1.o:file2.o
+    
+will show all files used as input while creating file1.o and file2.o (such 
+as file1.c, file2.c, and a number of header files). Whereas,
+
+    bml show-input-files "*.a"
+    
+will show all the files used as input to any of the build tree's .a files
+(typically these will be .o files). Next,
+
+    bml show-input-files /home/psmith/myobj/libsrc/graphics/
+    
+will show all the files used as input when generating the graphics directory
+and its contents. Also,
+
+    bml show-input-files %c/obj_files
+    
+will show all the files used when creating the obj_files component.
+
+Note that in all these cases, the derivation only goes a single step. 
+That is, file.o is an input to library.a. However, in some cases you might be 
+interested in all files that are used as input, no matter how many build 
+tasks are used. For example:
+
+    bml show-derived-files -a library.a
+    
+will show all files used as input to library.a, which will include .o files,
+and the .c and .h files used to create those .o files.
+
+NOTE: the show-input-files command takes a set of files as input, and
+can also take a set of files (via -f | --filter) to filter the result set.
+The two sets of files have different purposes, and should not be confused.
+For example:
+  
+    bml show-input-files -f "*.h" "*.o"
+  
+will return the list of .h files that are used as input when generating any
+of the .o files in the build tree.  
+
+  
+Command-specific options are:
+
+-a | --all
+  
+  Display all files that are used as input, regardless of how many build
+  tasks are involved in the derivation.
+
+#include options/file-show-comps.txt
+
+#include options/show-roots.txt
+
+#include options/file-filter.txt

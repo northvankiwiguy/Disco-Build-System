@@ -1,0 +1,12 @@
+Remove an existing component from the BuildML build system. The component must
+no longer contain any files or tasks, otherwise the removal will fail.
+For example:
+
+    bml rm-comp src_code
+    
+will remove the "src_code" component, assuming it is no longer in use. It is
+not possible to remove the "None" component, even if it's empty.
+
+The command arguments are:
+
+#include options/comp-name.txt

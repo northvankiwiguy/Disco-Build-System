@@ -7,5 +7,5 @@
 # examine the files.
 #
 
-rm -f buildstore.disco
+rm -f buildstore.bml
 

@@ -1,0 +1,83 @@
+#!/bin/bash -e
+#
+# Simple launcher script for the "bml" command.
+#
+
+# make sure that wildcards (* and ?) aren't expanded. If the user passes in "*.h", we want to
+# pass "*.h" onto the Java code.
+set -f
+
+# Figure out what this script was executed as - 
+export SCRIPT_DIR=`dirname $0`
+
+# Figure out our current working directory (this may fail, so disable bash's -e for a while)
+set +e
+CUR_DIR=`pwd 2>/dev/null`
+set -e
+if [ -z "$CUR_DIR" ];
+then
+	echo "Can't locate current working directory. Aborting."
+	exit 1
+fi
+
+#
+# If SCRIPT_DIR is relative, that means the user executed the bml script as a relative
+# path (e.g. ./buildml-0.0.0/bin/bml) rather than as an absolute path or via $PATH. In this
+# case, we need to prepend our current directory to SCRIPT_DIR.
+#
+if [ ${SCRIPT_DIR:0:1} != "/" ];
+then
+	SCRIPT_DIR=$CUR_DIR/$SCRIPT_DIR
+fi
+
+#
+# Now we have two cases for setting up the classpath, depending on where the files are installed.
+#
+#   1) A development installation inside a Eclipse project
+#   2) A fully installed BuildML release.
+#
+
+#
+# Case 1 for a development installation - all .class and .jar files are in the Eclipse project layout.
+#
+if [ -e "$SCRIPT_DIR/../../../CliMain" ];
+then
+    WORK="$SCRIPT_DIR/../../../"
+    
+	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/CliMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
+	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
+	export CLASSPATH="$WORK/Utilities/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
+	export CLASSPATH="$WORK/Utilities/priv/lib/commons-io-2.1.jar:$WORK/CliMain/priv:$CLASSPATH"
+	export BUILDML_HOME=$WORK/Admin/priv/pkg/buildml-0.0.0/
+	
+#
+# Case 2 for a fully installed BuildML release - everything is in a single jar file.
+#
+elif [ -e "$SCRIPT_DIR/../lib/buildml.jar" ];
+then
+    export BUILDML_HOME=$SCRIPT_DIR/..
+	export CLASSPATH="$BUILDML_HOME/lib/buildml.jar"
+
+#
+# Else, it's an error
+#
+else
+    echo Unable to locate buildml.jar file.
+    exit 1
+fi
+
+#
+# Sanity check
+#
+if [ ! -d $BUILDML_HOME ];
+then
+	echo "Internal error: The $BUILDML_HOME directory is missing."
+	exit 1
+fi
+
+#
+# Now, invoke the bml command line tool, with all the command line arguments.
+#
+java com.buildml.main.BuildMlMain $*
+
+# Note: the return code from java is the return code for our whole script.

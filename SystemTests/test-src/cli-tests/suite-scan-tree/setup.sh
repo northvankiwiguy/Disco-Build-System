@@ -5,6 +5,6 @@
 # sub-directories. It is executed once per test-* directory.
 #
 
-rm -f buildstore.disco
-disco scan-tree $TEST_SRC/../build-tree
+rm -f buildstore.bml
+bml scan-tree $TEST_SRC/../build-tree
 

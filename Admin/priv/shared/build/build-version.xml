@@ -1,7 +1,7 @@
 <project name="version">
 
 	<!-- 
-	   - This is the default version number of Disco. Be sure to
+	   - This is the default version number of BuildML. Be sure to
 	   - update this after every major release.
 	  -->
 	<property name="version" value="0.2.0" />

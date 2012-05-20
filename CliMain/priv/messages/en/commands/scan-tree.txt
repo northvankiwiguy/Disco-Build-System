@@ -1,0 +1,25 @@
+Scan through the specified directories on the local file system, and add all
+files and directories to the BuildML database. This is used for importing
+an existing source or object tree, purely by looking at which files exist
+on the disk, rather than only learning about the files if a build task were to
+access them.
+
+One or more directories may be provided to this command, with each of them
+being traversed and their information added to the BuildML database. For
+example:
+
+    bml scan-tree /home/psmith/myappsrc /usr/include /usr/lib
+    
+will locate all files and directories in the "myappsrc" directory, as a means
+of importing the complete set of files in the source tree. Also, we import
+the standard include and library directories, to make sure we have a complete
+record of which files could potentially be used in the build process.
+    
+The command arguments are:
+
+<path>
+
+  A path on the local file system (as distinct from a path within the BuildML
+  database). When the directory and its contents are added to the database,
+  the full absolute path of the directory will be used (even if you specify
+  a relative pathname on the command line).

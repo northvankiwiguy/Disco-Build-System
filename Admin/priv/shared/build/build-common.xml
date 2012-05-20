@@ -22,7 +22,7 @@
 	   - Path/Property definitions
 	   =================================================================================-->
 
-	<!-- get the current Disco version number -->
+	<!-- get the current BuildML version number -->
 	<import file="build-version.xml" />
 	
 	<!-- these properties must be defined by the build.xml that imports build-common.xml -->
@@ -42,7 +42,7 @@
 	   - This is where the full release package can be found in its expanded form. We
 	   - need these files for unit tests when we need to load native libraries.
 	  -->
-	<property name="pkg-dir" location="${project-root}/../Admin/priv/pkg/disco-${version}" />
+	<property name="pkg-dir" location="${project-root}/../Admin/priv/pkg/buildml-${version}" />
 	
 	<!-- The classpath to use when unit testing -->
 	<path id="test-classpath">
@@ -174,7 +174,7 @@
 			<formatter type="brief" usefile="false" />
 			
 			<!-- set BUILDML_HOME so we can find native libraries. Normally the
-			   - "disco" shell script will do this for us.
+			   - "bml" shell script will do this for us.
 			  -->
 			<env key="BUILDML_HOME" value="${pkg-dir}"/>
 			

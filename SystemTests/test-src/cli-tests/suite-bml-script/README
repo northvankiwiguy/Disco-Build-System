@@ -1,0 +1,4 @@
+This test suite validates the functionality of the basic "bml" script,
+as opposed to any of the Java code that's invoked by this script.
+
+

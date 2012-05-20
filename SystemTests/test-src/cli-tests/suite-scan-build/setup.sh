@@ -5,6 +5,6 @@
 # sub-directories. It is executed once per test-* directory.
 #
 
-rm -f buildstore.disco
+rm -f buildstore.bml
 
 

@@ -1,0 +1,22 @@
+Scan through an Electric Accelerator annotation file (typically with the
+name "emake.xml"), and import the build task and file access information
+into the BuildML database. For example:
+
+    bml scan-ea-anno emake.xml
+    
+will import the content of the emake.xml annotation file and construct a
+BuildML database with the equivalent content. This does not create a fully
+functional BuildML build system, but the database can be used for querying
+the legacy build system.
+    
+The command arguments are:
+
+<emake-annotation-file>
+
+  An annotation file, as produced by Electric Accelerator. To generate this
+  file, be sure to use the following emake options:
+ 
+    --emake-annodetail=basic,file,history,waiting
+    
+  Note that this command has only had limited testing with a single version
+  of annotation files.

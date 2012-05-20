@@ -2,8 +2,8 @@ Release 0.1.0 - November 15th, 2011
 -----------------------------------
 
 - CLI support for:
-   - Scanning an Electric Accelerator annotation file into a Disco build system.
-   - Very limited support for scanning a shell-command build into a Disco build
+   - Scanning an Electric Accelerator annotation file into a BuildML build system.
+   - Very limited support for scanning a shell-command build into a BuildML build
      system.
    - Ability to show files and tasks, with filters for narrowing-down the output.
    - Support for assigning tasks and files into components.
@@ -20,7 +20,7 @@ Release 0.2.0 - February 6th, 2012
 -----------------------------------
 
 - Full support for scan-build command that can trace a GNU Make-based
-  build system and store the file/task information in the Disco
+  build system and store the file/task information in the BuildML
   database.
 
 - Numerous bug fixes, performance improvements and refactoring of

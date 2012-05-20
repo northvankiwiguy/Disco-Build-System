@@ -20,7 +20,7 @@
 	<!-- root of the entire workspace -->
 	<property name="workspace-root" location=".." />
 	
-	<!-- find out the Disco version number -->
+	<!-- find out the BuildML version number -->
 	<import file="${workspace-root}/Admin/priv/shared/build/build-version.xml" />
 	
 	<!--================================================================================
@@ -39,7 +39,7 @@
 		<exec executable="./run_tests.pl"
 			dir="test-src/cli-tests"
 			failonerror="true">
-			<arg value="${workspace-root}/Admin/pub/disco-${version}.tar.gz" />
+			<arg value="${workspace-root}/Admin/pub/buildml-${version}.tar.gz" />
 		</exec>
 	</target>
 

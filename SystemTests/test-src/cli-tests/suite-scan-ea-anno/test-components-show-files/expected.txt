@@ -1097,7 +1097,7 @@ Now show all the files in zlib
 
 Try to remove zlib (should fail)
 Error: Component zlib can't be deleted while it still contains files or tasks.
-       Use disco -h for more help.
+       Use bml -h for more help.
 Status is 1
 
 Add a new component, and set all .o files to that component
@@ -1471,12 +1471,12 @@ New component source added.
 
 Try to remove zlib (should fail)
 Error: Component zlib can't be deleted while it still contains files or tasks.
-       Use disco -h for more help.
+       Use bml -h for more help.
 Status is 1
 
 Remove the final file from the zlib component, then try to delete the component
 Error: Component zlib can't be deleted while it still contains files or tasks.
-       Use disco -h for more help.
+       Use bml -h for more help.
 Status is 1
 
 Remove the zlib directory from the component too, then try to delete the component
