@@ -11,11 +11,11 @@
  *******************************************************************************/
 
 /*
- * cfs.c - This is the main entry point for the cfs (Component File System). The
+ * cfs.c - This is the main entry point for the cfs (Capture File System). The
  * cfs implements two main features:
  *
  *   1) Allows monitoring of all file system access, by all sub-processes.
- *   2) Provides a virtual file system where files are located within components,
+ *   2) Provides a virtual file system where files are located within packages,
  *      regardless of how they're physically stored on the underlying file system.
  *
  * If cfs is invoked without any arguments, a new shell is started (based on the
@@ -196,7 +196,7 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 	if (is_interactive_shell) {
-		printf("Starting ComponentFS shell. Writing trace output to %s and debug output to %s.\n",
+		printf("Starting CaptureFS shell. Writing trace output to %s and debug output to %s.\n",
 				trace_file_name, log_file_name);
 	}
 
@@ -337,7 +337,7 @@ int main(int argc, char *argv[], char *envp[])
 
 	/* we're done - the child has terminated, and the resources should be deallocated. */
 	if (is_interactive_shell) {
-		printf("ComponentFS terminated\n");
+		printf("CaptureFS terminated\n");
 	}
 	gzclose(trace_file_h);
 

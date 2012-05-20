@@ -10,8 +10,8 @@
  -        implementation and/or initial documentation
  -->
 
-<!-- Build the ComponentFS project -->
-<project name="component-fs" default="build">
+<!-- Build the CaptureFS project -->
+<project name="capture-fs" default="build">
 
 	<!-- root of this component's build tree -->
 	<property name="project-root" location=".." />

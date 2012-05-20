@@ -11,7 +11,7 @@
 #*******************************************************************************/ 
 
 #
-# Top-level build description for the ComponentFS component.
+# Top-level build description for the CaptureFS project.
 #
 
 # what's the default location for installing cfs (and libraries)

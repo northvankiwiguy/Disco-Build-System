@@ -18,7 +18,7 @@
  * loads this file (as part of the libcfs.so library) ahead of the real libc.so file.
  * Therefore, any user-level program that calls a library function (e.g. read, write, open, etc)
  * will end up executing in this file. This allows us to perform additional tracing and/or
- * manipulation of parameters and return values to implement the CFS (Component File System).
+ * manipulation of parameters and return values to implement the CFS (Capture File System).
  * After performing this extra work, each function proceeds to invoke the "real" library
  * function from the glibc library.
  */
@@ -276,7 +276,7 @@ void _cfs_init_interposer()
 /*
  * TODO: many of these interposed functions only exist since we will one
  * day want to validate the pathname argument to ensure that the program
- * is not violating component boundaries. For now, we just silently
+ * is not violating package boundaries. For now, we just silently
  * pass through the arguments and return value.
  */
 

@@ -13,7 +13,7 @@
 /*
  * trace_file_format.h
  *
- * Contains a full description of the content of a trace file. The cfs (Component File
+ * Contains a full description of the content of a trace file. The cfs (Capture File
  * System) generates a trace file in this format. Other programs can read and interpret
  * the trace file using this format information.
  */

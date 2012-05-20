@@ -115,9 +115,9 @@ system. Otherwise use the targets in the individual project directories.
 		<copy file="${workspace-root}/Utilities/pub/libnativeLib.so" todir="${pkg-dir}/lib" />
 		
 		<!-- copy the CFS binary/library -->
-		<copy file="${workspace-root}/ComponentFS/pub/bin/cfs" todir="${pkg-dir}/bin" />
+		<copy file="${workspace-root}/CaptureFS/pub/bin/cfs" todir="${pkg-dir}/bin" />
 		<chmod file="${pkg-dir}/bin/cfs" perm="755" />
-		<copy file="${workspace-root}/ComponentFS/pub/lib/libcfs.so" todir="${pkg-dir}/lib" />
+		<copy file="${workspace-root}/CaptureFS/pub/lib/libcfs.so" todir="${pkg-dir}/lib" />
 		
 		<!-- finally, tar up the whole release package -->
 		<delete file="${pub-dir}/buildml-${version}.tar.gz" />
@@ -202,7 +202,7 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/CliMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="clean" inheritall="false" />
-		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/CaptureFS/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/SystemTests/build.xml" target="clean" inheritall="false" />
 		<antcall target="clean-javadoc" />
 		<antcall target="clean-userdoc" />
@@ -226,7 +226,7 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/CliMain/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="unit-test" inheritall="false" />
-		<ant antfile="${workspace-root}/ComponentFS/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/CaptureFS/priv/build.xml" target="unit-test" inheritall="false" />
 	</target>
 
 	<!--================================================================================-->

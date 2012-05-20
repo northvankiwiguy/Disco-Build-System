@@ -49,7 +49,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 	
 	/* 
 	 * Each entry in the trace buffer has a corresponding tag to state what
-	 * operation is being traced. See trace_file_format.h (in ComponentFS)
+	 * operation is being traced. See trace_file_format.h (in CaptureFS)
 	 * for details.
 	 */
 	
