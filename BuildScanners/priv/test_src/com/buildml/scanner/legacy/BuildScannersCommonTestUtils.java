@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.legacy;
+package com.buildml.scanner.legacy;
 
 import static org.junit.Assert.fail;
 
@@ -21,11 +21,12 @@ import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.CommonTestUtils;
+import com.buildml.scanner.legacy.LegacyBuildScanner;
 import com.buildml.utils.os.ShellResult;
 import com.buildml.utils.os.SystemUtils;
 
 /**
- * Reusable test method for validating code in com.arapiki.disco.scanner.legacy.
+ * Reusable test method for validating code in com.buildml.scanner.legacy.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  *

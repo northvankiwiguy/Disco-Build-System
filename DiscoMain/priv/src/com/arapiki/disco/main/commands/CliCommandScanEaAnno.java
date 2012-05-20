@@ -22,8 +22,8 @@ import org.xml.sax.SAXException;
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.scanner.FatalBuildScannerError;
-import com.arapiki.disco.scanner.electricanno.ElectricAnnoScanner;
+import com.buildml.scanner.FatalBuildScannerError;
+import com.buildml.scanner.electricanno.ElectricAnnoScanner;
 import com.buildml.utils.files.ProgressFileInputStreamListener;
 
 /**

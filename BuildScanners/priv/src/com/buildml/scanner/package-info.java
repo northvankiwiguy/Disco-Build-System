@@ -1,6 +1,6 @@
 
 /**
  * Code related to scanning other types of build system and importing the content into
- * a Disco BuildStore.
+ * a BuildML BuildStore.
  */
-package com.arapiki.disco.scanner;
+package com.buildml.scanner;

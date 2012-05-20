@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.electricanno;
+package com.buildml.scanner.electricanno;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;

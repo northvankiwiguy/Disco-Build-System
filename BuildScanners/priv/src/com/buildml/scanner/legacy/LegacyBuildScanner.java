@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.legacy;
+package com.buildml.scanner.legacy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.scanner.FatalBuildScannerError;
+import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.os.ShellResult;
 import com.buildml.utils.os.SystemUtils;
 
@@ -223,8 +223,8 @@ public class LegacyBuildScanner {
 	public void traceShellCommand(String args[]) throws IOException, InterruptedException {
 		
 		/* locate the "cfs" executable program (in $BUILDML_HOME/bin) */
-		String discoHome = System.getenv("BUILDML_HOME");
-		if (discoHome == null) {
+		String buildMlHome = System.getenv("BUILDML_HOME");
+		if (buildMlHome == null) {
 			throw new IOException("Unable to locate cfs tool. BUILDML_HOME environment variable not set.");
 		}
 		
@@ -233,7 +233,7 @@ public class LegacyBuildScanner {
 		 * the user specified --trace-file, we also pass that to the cfs command.
 		 */
 		StringBuffer sb = new StringBuffer();
-		sb.append(discoHome);
+		sb.append(buildMlHome);
 		sb.append("/bin/cfs ");
 		
 		/* pass the trace file name (which will default to "cfs.trace" otherwise) */

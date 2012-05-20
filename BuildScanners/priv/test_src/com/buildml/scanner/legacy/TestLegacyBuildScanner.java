@@ -10,18 +10,17 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.legacy;
+package com.buildml.scanner.legacy;
 
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.io.FileNotFoundException;
-
 import org.junit.Test;
 
 import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.CommonTestUtils;
+import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**
  * Test methods for validating the LegacyBuildScanner class. Note that

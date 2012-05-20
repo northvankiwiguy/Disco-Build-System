@@ -1,6 +1,6 @@
 
 /**
  * Code related to scanning an Electric Accelerator annotation file and inserting 
- * the content into a Disco BuildStore.
+ * the content into a BuildML BuildStore.
  */
-package com.arapiki.disco.scanner.electricanno;
+package com.buildml.scanner.electricanno;

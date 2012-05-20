@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.legacy;
+package com.buildml.scanner.legacy;
 
 
 import static org.junit.Assert.assertEquals;

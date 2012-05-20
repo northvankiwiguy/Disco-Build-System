@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.legacy;
+package com.buildml.scanner.legacy;
 
 import static org.junit.Assert.*;
 
@@ -378,7 +378,7 @@ public class TestCFuncPerms {
 	@Test
 	public void testLchown() throws Exception {
 		/*
-		 * Not implemented for now, since symlinks aren't handled very well in Disco.
+		 * Not implemented for now, since symlinks aren't handled very well in BuildML.
 		 */
 	}
 

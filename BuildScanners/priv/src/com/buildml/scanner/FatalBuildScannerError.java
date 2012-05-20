@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner;
+package com.buildml.scanner;
 
 /**
  * An Exception indicating that an error occurred while scanning a

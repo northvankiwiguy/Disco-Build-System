@@ -19,7 +19,7 @@ import org.apache.commons.cli.Options;
 import com.arapiki.disco.main.CliUtils;
 import com.arapiki.disco.main.ICliCommand;
 import com.arapiki.disco.model.BuildStore;
-import com.arapiki.disco.scanner.legacy.LegacyBuildScanner;
+import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**
  * Disco CLI Command class that implements the "scan-build" command.

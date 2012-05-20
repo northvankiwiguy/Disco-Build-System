@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.arapiki.disco.scanner.electricanno;
+package com.buildml.scanner.electricanno;
 
 import java.util.ArrayList;
 import org.xml.sax.Attributes;
@@ -21,7 +21,7 @@ import com.arapiki.disco.model.BuildStore;
 import com.arapiki.disco.model.BuildTasks;
 import com.arapiki.disco.model.FileNameSpaces;
 import com.arapiki.disco.model.BuildTasks.OperationType;
-import com.arapiki.disco.scanner.FatalBuildScannerError;
+import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.PathUtils;
 
