@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: com.arapiki.disco
-Bundle-SymbolicName: com.arapiki.disco;singleton:=true
+Bundle-Name: com.buildml
+Bundle-SymbolicName: com.buildml;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.arapiki.disco.eclipse.Activator
+Bundle-Activator: com.buildml.eclipse.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui,

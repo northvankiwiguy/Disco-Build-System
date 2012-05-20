@@ -4,157 +4,157 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.arapiki.disco.eclipse.DiscoMainEditor"
+            class="com.buildml.eclipse.MainEditor"
             default="true"
             extensions="bml"
-            icon="images/disco_editor_img.gif"
-            id="com.arapiki.disco.eclipse.editors.main"
+            icon="images/buildml_editor_img.gif"
+            id="com.buildml.eclipse.editors.main"
             name="BuildML Editor">
       </editor>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <category
-            description="Commands related to the Disco Build System"
-            id="com.arapiki.disco.eclipse.commands.category"
-            name="Disco Build System">
+            description="Commands related to the BuildML Build System"
+            id="com.buildml.eclipse.commands.category"
+            name="BuildML Build System">
       </category>
       <command
-            categoryId="com.arapiki.disco.eclipse.commands.category"
+            categoryId="com.buildml.eclipse.commands.category"
             description="Show the build tasks that either read or write these files"
-            id="com.arapiki.disco.eclipse.commands.showTasksThatUse"
+            id="com.buildml.eclipse.commands.showTasksThatUse"
             name="Show Tasks that Use these Files">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.accessType"
+               id="com.buildml.eclipse.commandParameters.accessType"
                name="accessType"
                optional="false">
          </commandParameter>
       </command>
       <command
-            categoryId="com.arapiki.disco.eclipse.commands.category"
+            categoryId="com.buildml.eclipse.commands.category"
             description="Show the build tasks that read from these files"
-            id="com.arapiki.disco.eclipse.commands.showTasksThatRead"
+            id="com.buildml.eclipse.commands.showTasksThatRead"
             name="Show Tasks that Read these Files">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.accessType"
+               id="com.buildml.eclipse.commandParameters.accessType"
                name="accessType"
                optional="false">
          </commandParameter>
       </command>
       <command
-            categoryId="com.arapiki.disco.eclipse.commands.category"
+            categoryId="com.buildml.eclipse.commands.category"
             description="Show the build tasks that write to these files"
-            id="com.arapiki.disco.eclipse.commands.showTasksThatWrite"
+            id="com.buildml.eclipse.commands.showTasksThatWrite"
             name="Show Tasks that Write these Files">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.accessType"
+               id="com.buildml.eclipse.commandParameters.accessType"
                name="accessType"
                optional="false">
          </commandParameter>
       </command>
       <command
-            categoryId="com.arapiki.disco.eclipse.commands.category"
+            categoryId="com.buildml.eclipse.commands.category"
             description="Show the files that are derived from or input to these files."
-            id="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+            id="com.buildml.eclipse.commands.showDerivedInputFiles"
             name="Show Derived/Input Files">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               id="com.buildml.eclipse.commandParameters.derivedType"
                name="derivedType"
                optional="false">
          </commandParameter>
       </command>
       <command
-            categoryId="com.arapiki.disco.eclipse.commands.category"
+            categoryId="com.buildml.eclipse.commands.category"
             description="Fully expand this directory and all its children"
-            id="com.arapiki.disco.eclipse.commands.expandFileSubTree"
+            id="com.buildml.eclipse.commands.expandFileSubTree"
             name="Expand subtree">
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
-            id="com.arapiki.disco.eclipse.commands.showPathRoots"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
+            id="com.buildml.eclipse.commands.showPathRoots"
             name="Show path roots">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.showDetail"
+               id="com.buildml.eclipse.commandParameters.showDetail"
                name="showDetail"
                optional="false">
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
-            id="com.arapiki.disco.eclipse.commands.showComponents"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
+            id="com.buildml.eclipse.commands.showComponents"
             name="Show components">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.showDetail"
+               id="com.buildml.eclipse.commandParameters.showDetail"
                name="showDetail"
                optional="true">
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerShowDetail"
-            id="com.arapiki.disco.eclipse.commands.showHiddenPaths"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
+            id="com.buildml.eclipse.commands.showHiddenPaths"
             name="Show hidden paths">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.showDetail"
+               id="com.buildml.eclipse.commandParameters.showDetail"
                name="showDetail"
                optional="true">
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerHideRevealPath"
-            id="com.arapiki.disco.eclipse.commands.hideRevealPath"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerHideRevealPath"
+            id="com.buildml.eclipse.commands.hideRevealPath"
             name="Hide / Reveal Paths">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+               id="com.buildml.eclipse.commandParameters.hideRevealType"
                name="Hide / Reveal Type"
                optional="true">
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerFilterComponents"
-            id="com.arapiki.disco.eclipse.commands.filterComponents"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterComponents"
+            id="com.buildml.eclipse.commands.filterComponents"
             name="Filter Components">
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerFilterByName"
-            id="com.arapiki.disco.eclipse.commands.filterByName"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterByName"
+            id="com.buildml.eclipse.commands.filterByName"
             name="Filter by Name">
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerSearchByName"
-            id="com.arapiki.disco.eclipse.commands.searchByName"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerSearchByName"
+            id="com.buildml.eclipse.commands.searchByName"
             name="Search by Name">
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerNewEditorTab"
-            id="com.arapiki.disco.eclipse.commands.newEditorTab"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerNewEditorTab"
+            id="com.buildml.eclipse.commands.newEditorTab"
             name="New Editor Tab">
          <commandParameter
-               id="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+               id="com.buildml.eclipse.commandParameters.newEditorTab"
                name="newEditorTab"
                optional="false">
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.arapiki.disco.eclipse.files.handlers.HandlerRemoveEditorTab"
-            id="com.arapiki.disco.eclipse.commands.removeEditorTab"
+            defaultHandler="com.buildml.eclipse.files.handlers.HandlerRemoveEditorTab"
+            id="com.buildml.eclipse.commands.removeEditorTab"
             name="Remove Editor Tab">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?after=discoactions">
+            locationURI="popup:org.eclipse.ui.popup.any?after=buildmlactions">
          <command
-               commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree"
+               commandId="com.buildml.eclipse.commands.expandFileSubTree"
                label="Expand sub-tree"
                style="push">
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               commandId="com.buildml.eclipse.commands.hideRevealPath"
                label="Hide Sub-Tree"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  name="com.buildml.eclipse.commandParameters.hideRevealType"
                   value="hide">
             </parameter>
             <visibleWhen
@@ -165,18 +165,18 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                           value="com.buildml.eclipse.files.FileRecordDir">
                      </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               commandId="com.buildml.eclipse.commands.hideRevealPath"
                label="Hide Path"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  name="com.buildml.eclipse.commandParameters.hideRevealType"
                   value="hide">
             </parameter>
             <visibleWhen
@@ -187,18 +187,18 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="com.arapiki.disco.eclipse.files.FileRecordFile">
+                           value="com.buildml.eclipse.files.FileRecordFile">
                      </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               commandId="com.buildml.eclipse.commands.hideRevealPath"
                label="Reveal Sub-Tree"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  name="com.buildml.eclipse.commandParameters.hideRevealType"
                   value="reveal">
             </parameter>
             <visibleWhen
@@ -209,18 +209,18 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                           value="com.buildml.eclipse.files.FileRecordDir">
                      </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
+               commandId="com.buildml.eclipse.commands.hideRevealPath"
                label="Reveal Path"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+                  name="com.buildml.eclipse.commandParameters.hideRevealType"
                   value="reveal">
             </parameter>
             <visibleWhen
@@ -231,43 +231,43 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="com.arapiki.disco.eclipse.files.FileRecordFile">
+                           value="com.buildml.eclipse.files.FileRecordFile">
                      </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
          </command>
          <separator
-               name="com.arapiki.disco.eclipse.commands.separator1"
+               name="com.buildml.eclipse.commands.separator1"
                visible="true">
          </separator>
          <menu
                label="Show Detail...">
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
+                  commandId="com.buildml.eclipse.commands.showPathRoots"
                   icon="images/show_roots_icon.gif"
                   label="Path Roots"
                   style="toggle">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     name="com.buildml.eclipse.commandParameters.showDetail"
                      value="path-roots">
                </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showComponents"
+                  commandId="com.buildml.eclipse.commands.showComponents"
                   label="Components"
                   style="toggle">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     name="com.buildml.eclipse.commandParameters.showDetail"
                      value="components">
                </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths"
+                  commandId="com.buildml.eclipse.commands.showHiddenPaths"
                   label="Hidden Paths"
                   style="toggle">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     name="com.buildml.eclipse.commandParameters.showDetail"
                      value="show-hidden">
                </parameter>
             </command>
@@ -276,32 +276,32 @@
                label="Show Tasks That..."
                mnemonic="T">
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showTasksThatUse"
+                  commandId="com.buildml.eclipse.commands.showTasksThatUse"
                   label="Use (Read or Write) These Files"
                   mnemonic="U"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.accessType"
+                     name="com.buildml.eclipse.commandParameters.accessType"
                      value="use">
                </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showTasksThatRead"
+                  commandId="com.buildml.eclipse.commands.showTasksThatRead"
                   label="Read From These Files"
                   mnemonic="R"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.accessType"
+                     name="com.buildml.eclipse.commandParameters.accessType"
                      value="read">
                </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showTasksThatWrite"
+                  commandId="com.buildml.eclipse.commands.showTasksThatWrite"
                   label="Write To These Files"
                   mnemonic="W"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.accessType"
+                     name="com.buildml.eclipse.commandParameters.accessType"
                      value="write">
                </parameter>
             </command>
@@ -310,22 +310,22 @@
                label="Show Derived Files..."
                mnemonic="D">
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+                  commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
                   label="Directly Derived Files"
                   mnemonic="D"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.derivedType"
+                     name="com.buildml.eclipse.commandParameters.derivedType"
                      value="directDerived">
                </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+                  commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
                   label="All Derived Files"
                   mnemonic="A"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.derivedType"
+                     name="com.buildml.eclipse.commandParameters.derivedType"
                      value="allDerived">
                </parameter>
             </command>
@@ -334,37 +334,37 @@
                label="Show Input Files..."
                mnemonic="I">
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+                  commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
                   label="Directly Input Files"
                   mnemonic="D"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.derivedType"
+                     name="com.buildml.eclipse.commandParameters.derivedType"
                      value="directInput">
                </parameter>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+                  commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
                   label="All Input Files"
                   mnemonic="A"
                   style="push">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.derivedType"
+                     name="com.buildml.eclipse.commandParameters.derivedType"
                      value="allInput">
                </parameter>
             </command>
          </menu>
          <separator
-               name="com.arapiki.disco.eclipse.commands.separator2"
+               name="com.buildml.eclipse.commands.separator2"
                visible="true">
          </separator>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="Duplicate Editor Tab"
                style="push">
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
+               commandId="com.buildml.eclipse.commands.removeEditorTab"
                label="Remove Editor Tab"
                style="push">
          </command>
@@ -372,9 +372,9 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="com.arapiki.disco.eclipse.toolbars.main">
+               id="com.buildml.eclipse.toolbars.main">
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+                  commandId="com.buildml.eclipse.commands.newEditorTab"
                   icon="images/add_tab_icon.gif"
                   label="Duplicate Editor Tab"
                   style="pulldown">
@@ -383,13 +383,13 @@
                   <with
                         variable="activeEditorId">
                      <equals
-                           value="com.arapiki.disco.eclipse.editors.main">
+                           value="com.buildml.eclipse.editors.main">
                      </equals>
                   </with>
                </visibleWhen>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
+                  commandId="com.buildml.eclipse.commands.removeEditorTab"
                   icon="images/remove_tab_icon.gif"
                   label="Remove Editor Tab"
                   style="push">
@@ -398,161 +398,161 @@
                   <with
                         variable="activeEditorId">
                      <equals
-                           value="com.arapiki.disco.eclipse.editors.main">
+                           value="com.buildml.eclipse.editors.main">
                      </equals>
                   </with>
                </visibleWhen>
             </command>
             <separator
-                  name="com.arapiki.disco.eclipse.commands.separator1"
+                  name="com.buildml.eclipse.commands.separator1"
                   visible="true">
             </separator>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showPathRoots"
+                  commandId="com.buildml.eclipse.commands.showPathRoots"
                   icon="images/show_roots_icon.gif"
                   label="Show Path Roots"
                   style="toggle"
                   tooltip="Show path roots in the file editor.">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     name="com.buildml.eclipse.commandParameters.showDetail"
                      value="path-roots">
                </parameter>
                <visibleWhen checkEnabled="true">
                   <with variable="activeEditorId">
-                     <equals value="com.arapiki.disco.eclipse.editors.main" />
+                     <equals value="com.buildml.eclipse.editors.main" />
                   </with>
                </visibleWhen>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showComponents"
+                  commandId="com.buildml.eclipse.commands.showComponents"
                   icon="images/show_components_icon.gif"
                   label="Show Components"
                   style="toggle"
                   tooltip="Show component names in the file editor.">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     name="com.buildml.eclipse.commandParameters.showDetail"
                      value="components">
                </parameter>
                <visibleWhen checkEnabled="true">
                   <with variable="activeEditorId">
-                     <equals value="com.arapiki.disco.eclipse.editors.main" />
+                     <equals value="com.buildml.eclipse.editors.main" />
                   </with>
                </visibleWhen>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.showHiddenPaths"
+                  commandId="com.buildml.eclipse.commands.showHiddenPaths"
                   icon="images/show_hidden_files.gif"
                   label="Show Hidden Paths"
                   style="toggle"
                   tooltip="Reveal paths that were hidden.">
                <parameter
-                     name="com.arapiki.disco.eclipse.commandParameters.showDetail"
+                     name="com.buildml.eclipse.commandParameters.showDetail"
                      value="show-hidden">
                </parameter>
                <visibleWhen checkEnabled="true">
                   <with variable="activeEditorId">
-                     <equals value="com.arapiki.disco.eclipse.editors.main" />
+                     <equals value="com.buildml.eclipse.editors.main" />
                   </with>
                </visibleWhen>
             </command>
             <separator
-                  name="com.arapiki.disco.eclipse.commands.separator2"
+                  name="com.buildml.eclipse.commands.separator2"
                   visible="true">
             </separator>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.filterComponents"
+                  commandId="com.buildml.eclipse.commands.filterComponents"
                   icon="images/filter_components_icon.gif"
                   label="Filter output by selecting components to display."
                   style="push">
                   <visibleWhen checkEnabled="true">
                      <with variable="activeEditorId">
-                        <equals value="com.arapiki.disco.eclipse.editors.main" />
+                        <equals value="com.buildml.eclipse.editors.main" />
                      </with>
                   </visibleWhen>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.filterByName"
+                  commandId="com.buildml.eclipse.commands.filterByName"
                   icon="images/filter_by_name_icon.gif"
                   label="Filter output by name."
                   style="push">
                   <visibleWhen checkEnabled="true">
                      <with variable="activeEditorId">
-                        <equals value="com.arapiki.disco.eclipse.editors.main" />
+                        <equals value="com.buildml.eclipse.editors.main" />
                      </with>
                   </visibleWhen>
             </command>
             <command
-                  commandId="com.arapiki.disco.eclipse.commands.searchByName"
+                  commandId="com.buildml.eclipse.commands.searchByName"
                   icon="images/search_by_name_icon.gif"
                   label="Search by name."
                   style="push">
                   <visibleWhen checkEnabled="true">
                      <with variable="activeEditorId">
-                        <equals value="com.arapiki.disco.eclipse.editors.main" />
+                        <equals value="com.buildml.eclipse.editors.main" />
                      </with>
                   </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>
       <menuContribution
-            locationURI="menu:com.arapiki.disco.eclipse.commands.newEditorTab">
+            locationURI="menu:com.buildml.eclipse.commands.newEditorTab">
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="1. Duplicate the Current Editor Tab"
                mnemonic="1"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="duplicate">
             </parameter>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="2. New Editor Showing All Files"
                mnemonic="2"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="allFiles">
             </parameter>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="3. New Empty Files Editor"
                mnemonic="3"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="emptyFiles">
             </parameter>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="4. New Editor Showing Unused Files"
                mnemonic="4"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="unusedFiles">
             </parameter>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="5. New Editor Showing Write-only Files"
                mnemonic="5"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="writeOnlyFiles">
             </parameter>
          </command>
          <command
-               commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
+               commandId="com.buildml.eclipse.commands.newEditorTab"
                label="6. New Editor Showing Most Popular Files"
                mnemonic="6"
                style="push">
             <parameter
-                  name="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+                  name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="mostPopularFiles">
             </parameter>
          </command>
@@ -561,16 +561,16 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowTasksThatUse"
-            commandId="com.arapiki.disco.eclipse.commands.showTasksThatUse">
+            class="com.buildml.eclipse.files.handlers.HandlerShowTasksThatUse"
+            commandId="com.buildml.eclipse.commands.showTasksThatUse">
          <enabledWhen>
             <count
                   value="+">
             </count></enabledWhen>
       </handler>
       <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowTasksThatUse"
-            commandId="com.arapiki.disco.eclipse.commands.showTasksThatRead">
+            class="com.buildml.eclipse.files.handlers.HandlerShowTasksThatUse"
+            commandId="com.buildml.eclipse.commands.showTasksThatRead">
          <enabledWhen>
             <count
                   value="+">
@@ -578,8 +578,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowTasksThatUse"
-            commandId="com.arapiki.disco.eclipse.commands.showTasksThatWrite">
+            class="com.buildml.eclipse.files.handlers.HandlerShowTasksThatUse"
+            commandId="com.buildml.eclipse.commands.showTasksThatWrite">
          <enabledWhen>
             <count
                   value="+">
@@ -587,8 +587,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerShowDerivedFiles"
-            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles">
+            class="com.buildml.eclipse.files.handlers.HandlerShowDerivedFiles"
+            commandId="com.buildml.eclipse.commands.showDerivedInputFiles">
          <enabledWhen>
             <count
                   value="+">
@@ -596,8 +596,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="com.arapiki.disco.eclipse.files.handlers.HandlerExpandFileSubTree"
-            commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree">
+            class="com.buildml.eclipse.files.handlers.HandlerExpandFileSubTree"
+            commandId="com.buildml.eclipse.commands.expandFileSubTree">
          <enabledWhen>
             <with
                   variable="selection">
@@ -605,7 +605,7 @@
                      ifEmpty="false"
                      operator="or">
                   <instanceof
-                        value="com.arapiki.disco.eclipse.files.FileRecordDir">
+                        value="com.buildml.eclipse.files.FileRecordDir">
                   </instanceof>
                </iterate>
             </with>
@@ -615,107 +615,107 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.arapiki.disco.eclipse.preferences.DiscoTopLevelPreferencePage"
-            id="com.arapiki.disco.eclipse.preferences.DiscoPreferencePage"
-            name="Disco">
+            class="com.buildml.eclipse.preferences.TopLevelPreferencePage"
+            id="com.buildml.eclipse.preferences.BuildMlPreferencePage"
+            name="BuildML">
       </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.arapiki.disco.eclipse.preferences.PreferenceInitializer">
+            class="com.buildml.eclipse.preferences.PreferenceInitializer">
       </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.arapiki.disco.eclipse.preferences.DiscoAppearancePreferencePage"
-            id="com.arapiki.disco.eclipse.preferences.DiscoAppearancePreferencePage"
-            category="com.arapiki.disco.eclipse.preferences.DiscoPreferencePage"
+            class="com.buildml.eclipse.preferences.AppearancePreferencePage"
+            id="com.buildml.eclipse.preferences.BuildMlAppearancePreferencePage"
+            category="com.buildml.eclipse.preferences.BuildMlPreferencePage"
             name="Appearance">
       </page>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="com.arapiki.disco.eclipse.commands.expandFileSubTree"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.expandFileSubTree"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+E">
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.hideRevealPath"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="DEL">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+               id="com.buildml.eclipse.commandParameters.hideRevealType"
                value="hide">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.hideRevealPath"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.hideRevealPath"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="INSERT">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.hideRevealType"
+               id="com.buildml.eclipse.commandParameters.hideRevealType"
                value="reveal">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+ARROW_RIGHT">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               id="com.buildml.eclipse.commandParameters.derivedType"
                value="directDerived">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
+            commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Shift+Ctrl+ARROW_RIGHT">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               id="com.buildml.eclipse.commandParameters.derivedType"
                value="allDerived">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+ARROW_LEFT">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               id="com.buildml.eclipse.commandParameters.derivedType"
                value="directInput">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.showDerivedInputFiles"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Shift+Ctrl+ARROW_LEFT">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.derivedType"
+               id="com.buildml.eclipse.commandParameters.derivedType"
                value="allInput">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.newEditorTab"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.newEditorTab"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+N">
          <parameter
-               id="com.arapiki.disco.eclipse.commandParameters.newEditorTab"
+               id="com.buildml.eclipse.commandParameters.newEditorTab"
                value="duplicate">
          </parameter>
       </key>
       <key
-            commandId="com.arapiki.disco.eclipse.commands.removeEditorTab"
-            contextId="com.arapiki.disco.eclipse.contexts.discoeditor"
+            commandId="com.buildml.eclipse.commands.removeEditorTab"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+X">
       </key>
@@ -723,9 +723,9 @@
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            description="Disco Editor"
-            id="com.arapiki.disco.eclipse.contexts.discoeditor"
-            name="Disco Editor"
+            description="BuildML Editor"
+            id="com.buildml.eclipse.contexts.buildmleditor"
+            name="BuildML Editor"
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
