@@ -78,6 +78,6 @@ fi
 #
 # Now, invoke the bml command line tool, with all the command line arguments.
 #
-java com.buildml.main.BuildMlMain $*
+java com.buildml.main.CliMain $*
 
 # Note: the return code from java is the return code for our whole script.

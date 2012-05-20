@@ -19,7 +19,7 @@ import com.buildml.model.BuildStore;
 
 /**
  * This interface must be implemented by any class that provides a BuildML CLI
- * command. The BuildMlMain class uses these classes to identify each CLI command's
+ * command. The CliMain class uses these classes to identify each CLI command's
  * name, options, arguments, and human-readable descriptions. It also processes
  * command line options and invokes the command via this interface.
  * 

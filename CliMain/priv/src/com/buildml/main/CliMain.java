@@ -32,7 +32,7 @@ import com.buildml.utils.version.Version;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public final class BuildMlMain {	
+public final class CliMain {	
 	
 	/*=====================================================================================*
 	 * TYPES/FIELDS
@@ -51,7 +51,7 @@ public final class BuildMlMain {
 	private Options globalOpts = null;
 	
 	/**
-	 * All CLI command are "plugged into" the BuildMlMain class, from where they can then
+	 * All CLI command are "plugged into" the CliMain class, from where they can then
 	 * be invoked. The CommandGroup class is used to encapsulate logical groups of commands.
 	 * For example, one group could be all the commands that display FileSet listings.
 	 */
@@ -64,7 +64,7 @@ public final class BuildMlMain {
 		ICliCommand commands[];
 	}
 	
-	/** The list of command groups that are registered with BuildMlMain. */
+	/** The list of command groups that are registered with CliMain. */
 	private ArrayList<CommandGroup> commandGroups = null;
 	
 	/*=====================================================================================*
@@ -72,10 +72,10 @@ public final class BuildMlMain {
 	 *=====================================================================================*/
 	
 	/**
-	 * Create a new BuildMlMain instance. This should only be done once, from the standard
+	 * Create a new CliMain instance. This should only be done once, from the standard
 	 * Java main() function.
 	 */
-	private BuildMlMain() {
+	private CliMain() {
 		/* empty */
 	}
 	
@@ -508,7 +508,7 @@ public final class BuildMlMain {
 		 * display a meaningful error message.
 		 */
 		try {
-			new BuildMlMain().invokeCommand(args);
+			new CliMain().invokeCommand(args);
 			
 		} catch (Throwable e) {
 			System.err.println("\n============================================================\n");
