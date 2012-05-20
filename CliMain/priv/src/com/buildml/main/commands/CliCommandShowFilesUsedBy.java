@@ -19,7 +19,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.Reports;
 import com.buildml.model.BuildTasks.OperationType;
@@ -153,7 +153,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		BuildTasks bts = buildStore.getBuildTasks();
 		Reports reports = buildStore.getReports();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
 		/* fetch the list of tasks we're querying */
 		String taskSpecs = args[0];
@@ -167,7 +167,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		accessedFiles.populateWithParents();
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, cmpts, accessedFiles, filterFileSet, optionShowRoots, optionShowComps);
+		CliUtils.printFileSet(System.out, fns, pkgMgr, accessedFiles, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

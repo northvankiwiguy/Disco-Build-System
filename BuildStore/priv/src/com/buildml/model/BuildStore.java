@@ -57,8 +57,8 @@ public class BuildStore {
 	/** The FileAttributes object we'll delegate work to. */
 	private FileAttributes fileAttributes;
 	
-	/** The Components manager object we'll delegate work to. */
-	private Components components;
+	/** The Packages manager object we'll delegate work to. */
+	private Packages packages;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -115,8 +115,8 @@ public class BuildStore {
 		/* create a new FileAttributes object to manage the attributes on files */
 		fileAttributes = new FileAttributes(this, fileSpaces);
 		
-		/* create a new Components object */
-		components = new Components(this);		
+		/* create a new Packages object */
+		packages = new Packages(this);		
 	}
 	
 	/*=====================================================================================*
@@ -197,13 +197,13 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the Components manager associated with this BuildStore. This object
-	 * encapsulates knowledge of the component names used in the BuildStore.
+	 * Fetch the Packages manager associated with this BuildStore. This object
+	 * encapsulates knowledge of the package names used in the BuildStore.
 	 * 
-	 * @return A Components manager object.
+	 * @return A Packages manager object.
 	 */
-	public Components getComponents() {
-		return components;
+	public Packages getPackages() {
+		return packages;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

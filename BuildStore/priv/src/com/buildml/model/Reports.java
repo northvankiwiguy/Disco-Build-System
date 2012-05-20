@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 import com.buildml.model.BuildTasks.OperationType;
 import com.buildml.model.FileNameSpaces.PathType;
-import com.buildml.model.types.ComponentSet;
+import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -489,31 +489,31 @@ public class Reports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a ComponentSet, return the complete FileSet of all files that belong to components
+	 * Given a PackageSet, return the complete FileSet of all files that belong to packages
 	 * that are members of the set.
 	 * 
-	 * @param compSet The ComponentSet that selects the components to be included.
-	 * @return The FileSet of files that are within the selected components.
+	 * @param pkgSet The PackageSet that selects the packages to be included.
+	 * @return The FileSet of files that are within the selected packages.
 	 */
-	public FileSet reportFilesFromComponentSet(ComponentSet compSet) {
+	public FileSet reportFilesFromPackageSet(PackageSet pkgSet) {
 		FileSet results = new FileSet(fns);
-		Components compMgr = compSet.getBuildStore().getComponents();
+		Packages pkgMgr = pkgSet.getBuildStore().getPackages();
 		
 		/*
-		 * Form the (complex) query string, which considers each component/scope individually.
+		 * Form the (complex) query string, which considers each package/scope individually.
 		 */
 		StringBuffer sb = new StringBuffer(256);
 		sb.append("select id from files where ");
 		int memberCount = 0;
 		
-		String compList[] = compMgr.getComponents();
-		for (String compName : compList) {
-			int compId = compMgr.getComponentId(compName);
-			if (compId != ErrorCode.NOT_FOUND) {
+		String pkgList[] = pkgMgr.getPackages();
+		for (String pkgName : pkgList) {
+			int pkgId = pkgMgr.getPackageId(pkgName);
+			if (pkgId != ErrorCode.NOT_FOUND) {
 				
-				/* is this component in the set? */
-				boolean hasPrivate = compSet.isMember(compId, Components.SCOPE_PRIVATE);
-				boolean hasPublic = compSet.isMember(compId, Components.SCOPE_PUBLIC);
+				/* is this package in the set? */
+				boolean hasPrivate = pkgSet.isMember(pkgId, Packages.SCOPE_PRIVATE);
+				boolean hasPublic = pkgSet.isMember(pkgId, Packages.SCOPE_PUBLIC);
 		
 				/* do we need a "or" between neighboring tests? */
 				if (hasPrivate || hasPublic) {
@@ -523,21 +523,21 @@ public class Reports {
 					}
 				}
 				
-				/* form the condition for comparing the file's components/scope */
+				/* form the condition for comparing the file's packages/scope */
 				if (hasPrivate && hasPublic) {
-					sb.append("(compId == " + compId + ")");
+					sb.append("(pkgId == " + pkgId + ")");
 				} else if (hasPrivate) {
-					sb.append("((compId == " + compId + 
-								") and (compScopeId == " + Components.SCOPE_PRIVATE + "))");
+					sb.append("((pkgId == " + pkgId + 
+								") and (pkgScopeId == " + Packages.SCOPE_PRIVATE + "))");
 				} else if (hasPublic) {
-					sb.append("((compId == " + compId + 
-								") and (compScopeId == " + Components.SCOPE_PUBLIC + "))");
+					sb.append("((pkgId == " + pkgId + 
+								") and (pkgScopeId == " + Packages.SCOPE_PUBLIC + "))");
 				}
 				
 			}
 		}
 		
-		/* if the component set was empty, so to is the result set */
+		/* if the package set was empty, so to is the result set */
 		if (memberCount == 0) {
 			return results;
 		}

@@ -1,4 +1,4 @@
-Show all tasks, with only default components
+Show all tasks, with only default packages
 - Task 1 (/home/psmith/t/cvs-1.11.23 - None)
     if test ! -f config.h; then \
     	  rm -f stamp-h1; \
@@ -588,12 +588,12 @@ Show all tasks, with only default components
       	else :; fi
 
 
-Create a new component
-New component zlib added.
+Create a new package
+New package zlib added.
 
-Add tasks 18-32 to the component
+Add tasks 18-32 to the package
 
-Show all tasks, with their components
+Show all tasks, with their packages
 - Task 1 (/home/psmith/t/cvs-1.11.23 - None)
     if test ! -f config.h; then \
     	  rm -f stamp-h1; \
@@ -1183,7 +1183,7 @@ Show all tasks, with their components
       	else :; fi
 
 
-Show only those tasks in the zlib component
+Show only those tasks in the zlib package
 - Task 2 (/home/psmith/t/cvs-1.11.23 - None)
     emake  all-recursive
 
@@ -1262,7 +1262,7 @@ Show only those tasks in the zlib component
       (ranlib libz.a || true) >/dev/null 2>&1
 
 
-Show only those tasks outside the zlib component
+Show only those tasks outside the zlib package
 - Task 1 (/home/psmith/t/cvs-1.11.23 - None)
     if test ! -f config.h; then \
     	  rm -f stamp-h1; \
@@ -1804,14 +1804,14 @@ Show only those tasks outside the zlib component
       	else :; fi
 
 
-Try to delete the zlib component (should fail)
-Error: Component zlib can't be deleted while it still contains files or tasks.
+Try to delete the zlib package (should fail)
+Error: Package zlib can't be deleted while it still contains files or tasks.
        Use bml -h for more help.
 Status is 1
 
-Set the component of all files (under task 2) to be None
+Set the package of all files (under task 2) to be None
 
-Show only those tasks in the zlib component (empty)
+Show only those tasks in the zlib package (empty)
 
-Try again to delete the zlib component (should succeed)
-Component zlib removed.
+Try again to delete the zlib package (should succeed)
+Package zlib removed.

@@ -19,7 +19,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.Reports;
 import com.buildml.model.BuildTasks.OperationType;
@@ -152,7 +152,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		BuildTasks bts = buildStore.getBuildTasks();
 		Reports reports = buildStore.getReports();
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
 		/* are we searching for reads, writes, or both? */
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);		
@@ -166,7 +166,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		taskSet.populateWithParents();
 
 		/* display the resulting set of tasks */
-		CliUtils.printTaskSet(System.out, bts, fns, cmpts, taskSet, filterTaskSet, outputFormat, optionShowComps);
+		CliUtils.printTaskSet(System.out, bts, fns, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

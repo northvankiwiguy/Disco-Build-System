@@ -182,8 +182,8 @@ public final class CliMain {
 		
 		/* 
 		 * Else, we have options to display. Show them in a nicely tabulated
-		 * format, with the short option name (e.g. -c) and the long option name
-		 * (--show-comps) first, followed by a text description of the option.
+		 * format, with the short option name (e.g. -p) and the long option name
+		 * (--show-pkgs) first, followed by a text description of the option.
 		 */
 		else {
 			for (Iterator<Option> iterator = optList.iterator(); iterator.hasNext();) {
@@ -351,13 +351,13 @@ public final class CliMain {
 				new CliCommandRemoveRoot()
 			});
 
-		registerCommandGroup("Commands for managing components",
+		registerCommandGroup("Commands for managing packages",
 			new ICliCommand[] {
-				new CliCommandShowComp(),
-				new CliCommandAddComp(),
-				new CliCommandRemoveComp(),
-				new CliCommandSetFileComp(),
-				new CliCommandSetTaskComp()
+				new CliCommandShowPkg(),
+				new CliCommandAddPkg(),
+				new CliCommandRemovePkg(),
+				new CliCommandSetFilePkg(),
+				new CliCommandSetTaskPkg()
 			});
 	}
 

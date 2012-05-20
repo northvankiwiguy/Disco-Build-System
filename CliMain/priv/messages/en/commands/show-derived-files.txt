@@ -29,9 +29,9 @@ executable files that link any of those .o files. Next,
 will show all the files derived from files in the graphics/ subdirectory
 and it's contents. Also,
 
-    bml show-derived-files %c/src_files
+    bml show-derived-files %p/src_files
     
-will show all the files derived from files in the "src_files" component.
+will show all the files derived from files in the "src_files" package.
 
 Note that in all these cases, the derivation only goes a single step.
 That is, file.o is derived from file.c. However, in some cases you might
@@ -61,7 +61,7 @@ Command-specific options are:
   Display all files that are derived from the input files, regardless of
   how many build tasks are involved in the derivation.
 
-#include options/file-show-comps.txt
+#include options/file-show-pkgs.txt
 
 #include options/show-roots.txt
 

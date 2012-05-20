@@ -28,6 +28,6 @@ The show-files-used-by command has further options for controlling the output:
   Only show files that are deleted by the specified tasks. By default, all 
   files that are accessed (read, written, modified, or deleted) will be shown.
   
-#include options/file-show-comps.txt
+#include options/file-show-pkgs.txt
 
 #include options/file-filter.txt

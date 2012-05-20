@@ -18,16 +18,14 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.types.FileSet;
+import com.buildml.model.Packages;
 
 /**
- * BuildML CLI Command class that implements the "set-file-comp" command.
+ * BuildML CLI Command class that implements the "show-pkg" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandSetFileComp implements ICliCommand {
+public class CliCommandShowPkg implements ICliCommand {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -38,7 +36,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/set-file-comp.txt");
+		return CliUtils.genLocalizedMessage("#include commands/show-pkg.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -48,7 +46,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "set-file-comp";
+		return "show-pkg";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -68,7 +66,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<comp-name> <path-spec>:...";
+		return "";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -78,7 +76,7 @@ public class CliCommandSetFileComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Add a set of files into a component.";
+		return "Show the packages defined in the build system.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -99,30 +97,14 @@ public class CliCommandSetFileComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a component name and a path-spec.");
-
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Components cmpts = buildStore.getComponents();
-
-		/* 
-		 * The component can be of the form: "comp" or "comp/section". If section
-		 * isn't specified, "private" will be used.
-		 */
-		String compName = args[0];
-		int compAndSectionIds[] = CliUtils.parseComponentAndScope(cmpts, compName, true);
-		int compId = compAndSectionIds[0];
-		int sectId = compAndSectionIds[1];
-
-		/* find out which files the user wants to set */
-		String fileSpec = args[1];
-		FileSet filesToSet = CliUtils.getCmdLineFileSet(fns, fileSpec);
-
-		/* now visit each file in the FileSet and set it's component/section */
-		buildStore.setFastAccessMode(true);
-		for (int file : filesToSet) {
-			cmpts.setFileComponent(file, compId, sectId);
+		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
+	
+		Packages pkgMgr = buildStore.getPackages();
+		
+		String pkgNames[] = pkgMgr.getPackages();
+		for (int i = 0; i < pkgNames.length; i++) {
+			System.out.println(pkgNames[i]);
 		}
-		buildStore.setFastAccessMode(false);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

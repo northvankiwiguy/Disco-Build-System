@@ -19,7 +19,7 @@ import java.io.PrintStream;
 import org.apache.commons.io.IOUtils;
 
 import com.buildml.model.BuildTasks;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.BuildTasks.OperationType;
 import com.buildml.model.FileNameSpaces.PathType;
@@ -94,8 +94,8 @@ public class CliUtils {
 	 *    <li>A path name starting with a "root:" - the same rules apply as for #1.</li>
 	 *    <li>A single file name, with one or more wildcard (*) characters. All files that match
      *       the name are added, no matter what their directory.</li>
-     *    <li>A component spec, starting with %comp, or the complement of a component, starting 
-     *       with %not-comp.</li>
+     *    <li>A package spec, starting with %pkg, or the complement of a package, starting 
+     *       with %not-pkg.</li>
      *    </ol>
      *    
 	 * @param fns The FileNameSpaces object that manages the files.
@@ -130,8 +130,8 @@ public class CliUtils {
 	 *      (regardless of their depth).</li>
 	 *   <li>If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
 	 *      than being added. The "/depth" and "/" suffix can be used to remove subtasks as well.
-	 *   <li>The special syntax "%comp/foo" means all tasks in the component "foo".</li>
-	 *   <li>The special syntax "%not-comp/foo" means all tasks outside the component "foo".</li>
+	 *   <li>The special syntax "%pkg/foo" means all tasks in the package "foo".</li>
+	 *   <li>The special syntax "%not-pkg/foo" means all tasks outside the package "foo".</li>
 	 * </ol>
 	 * @param bts The BuildTasks manager object to query.
 	 * @param taskSpecs The command line argument providing the task specification string.
@@ -158,17 +158,17 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
 	 * @param fns The FileNameSpaces manager object containing the files to be listed.
-	 * @param cmpts The Components manager object containing the component information.
+	 * @param pkgMgr The Packages manager object containing the package information.
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
 	 *         displayed (set to null to display everything).
 	 * @param showRoots Indicates whether path roots should be displayed (true), or whether 
 	 *         absolute paths should be used (false).
-	 * @param showComps Indicates whether the component names should be displayed.S
+	 * @param showPkgs Indicates whether the package names should be displayed.S
 	 */
 	public static void printFileSet(
-			PrintStream outStream, FileNameSpaces fns, Components cmpts, FileSet resultFileSet,
-			FileSet filterFileSet, boolean showRoots, boolean showComps) {
+			PrintStream outStream, FileNameSpaces fns, Packages pkgMgr, FileSet resultFileSet,
+			FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 		
 		/*
 		 * This method uses recursion to traverse the FileNameSpaces
@@ -209,8 +209,8 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = fns.getChildPaths(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printFileSetHelper(outStream, sb, fns, cmpts, children[i], 
-					resultFileSet, filterFileSet, showRoots, showComps);
+			printFileSetHelper(outStream, sb, fns, pkgMgr, children[i], 
+					resultFileSet, filterFileSet, showRoots, showPkgs);
 		}
 	}
 
@@ -223,16 +223,16 @@ public class CliUtils {
 	 * @param outStream The PrintStream on which to display the output.
 	 * @param bts The BuildTasks manager object containing the task information.
 	 * @param fns The FileNameSpaces manager object containing file name information.
-	 * @param cmpts The Components manager object containing component information.
+	 * @param pkgMgr The Packages manager object containing package information.
 	 * @param resultTaskSet The set of tasks to be displayed (the results of some previous query).
 	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
 	 * @param outputFormat Mode for formatting the command strings.
-	 * @param showComps Set to true if the component names should be shown.
+	 * @param showPkgs Set to true if the package names should be shown.
 	 */
 	public static void printTaskSet(
-			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, Components cmpts,
+			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, Packages pkgMgr,
 			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
-			boolean showComps) {
+			boolean showPkgs) {
 		
 		/* 
 		 * We always start at the top root, even though we may only display a subset
@@ -243,8 +243,8 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = bts.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fns, cmpts, children[i], 
-					resultTaskSet, filterTaskSet, outputFormat, showComps, 1);
+			printTaskSetHelper(outStream, bts, fns, pkgMgr, children[i], 
+					resultTaskSet, filterTaskSet, outputFormat, showPkgs, 1);
 		}
 	}
 
@@ -275,34 +275,34 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Parse the user-supplied component/scope string, and return the corresponding
-	 * component ID and scope ID. The string should be in the format "component" or 
-	 * "component/scope". If "scope" is not provided (and scopeAllowed is true),
+	 * Parse the user-supplied package/scope string, and return the corresponding
+	 * package ID and scope ID. The string should be in the format "package" or 
+	 * "package/scope". If "scope" is not provided (and scopeAllowed is true),
 	 * "private" is assumed. If the input is invalid, display a meaningful error message
 	 * and exit the program.
 	 * 
 	 * This method may abort the whole program (never returning) if the input string
 	 * is invalid.
 	 * 
-	 * @param cmpts The Components manager object containing the component information.
-	 * @param compString The user-supplied input string (could be anything).
+	 * @param pkgMgr The Packages manager object containing the package information.
+	 * @param pkgString The user-supplied input string (could be anything).
 	 * @param scopeAllowed True if the input string is allowed to provide a scope name. 
-	 * @return An array of two integers. The first is the component's ID number,
+	 * @return An array of two integers. The first is the package's ID number,
 	 * and the second is the scope's ID number.
 	 */
-	public static int[] parseComponentAndScope(
-			Components cmpts,
-			String compString, 
+	public static int[] parsePackageAndScope(
+			Packages pkgMgr,
+			String pkgString, 
 			boolean scopeAllowed) {
 	
-		String cmptName = null;
+		String pkgName = null;
 		String scopeName = null;
 		
-		/* check if there's a '/' in the string, to separate "component" from "scope" */
-		int slashIndex = compString.indexOf('/');
+		/* check if there's a '/' in the string, to separate "package" from "scope" */
+		int slashIndex = pkgString.indexOf('/');
 		if (slashIndex != -1) {
-			cmptName = compString.substring(0, slashIndex);
-			scopeName = compString.substring(slashIndex + 1);
+			pkgName = pkgString.substring(0, slashIndex);
+			scopeName = pkgString.substring(slashIndex + 1);
 			if (!scopeAllowed) {
 				CliUtils.reportErrorAndExit("Invalid syntax - '/" + scopeName + "' not allowed.");
 			}	
@@ -310,22 +310,22 @@ public class CliUtils {
 		
 		/* else, there's no /, assume 'private' for the scope */
 		else {
-			cmptName = compString;
+			pkgName = pkgString;
 			scopeName = "private";
 		}
 
 		/* compute the IDs */
-		int cmptId = cmpts.getComponentId(cmptName);
-		int scopeId = cmpts.getScopeId(scopeName);
+		int pkgId = pkgMgr.getPackageId(pkgName);
+		int scopeId = pkgMgr.getScopeId(scopeName);
 		
-		if (cmptId == ErrorCode.NOT_FOUND) {
-			CliUtils.reportErrorAndExit("Unknown component: " + cmptName);
+		if (pkgId == ErrorCode.NOT_FOUND) {
+			CliUtils.reportErrorAndExit("Unknown package: " + pkgName);
 		}
 		if (scopeId == ErrorCode.NOT_FOUND) {
 			CliUtils.reportErrorAndExit("Unknown scope name: " + scopeName);
 		}
 		
-		return new int[]{ cmptId, scopeId };
+		return new int[]{ pkgId, scopeId };
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -464,20 +464,20 @@ public class CliUtils {
 	 * @param outStream The PrintStream on which to display paths.
 	 * @param pathSoFar This path's parent path as a string, complete with trailing "/".
 	 * @param fns The FileNameSpaces manager object in which these paths belong.
-	 * @param cmpts The Components manager object that contains the component information.
+	 * @param pkgMgr The Packages manager object that contains the package information.
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
 	 * 		   should be displayed (set to null to display everything).
 	 * @param showRoots Whether to show path roots (true) or absolute paths (false).
-	 * @param showComps Whether to show the component names.
+	 * @param showPkgs Whether to show the package names.
 	 */
 	private static void printFileSetHelper(
-			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, Components cmpts, int thisPathId,
-			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, boolean showComps) {
+			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, Packages pkgMgr, int thisPathId,
+			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 
-		/* a StringBuffer for forming the component name */
-		StringBuffer compString = new StringBuffer();
+		/* a StringBuffer for forming the package name */
+		StringBuffer pkgString = new StringBuffer();
 		
 		/* should this path be displayed? */
 		if (!shouldBeDisplayed(thisPathId, resultFileSet, filterFileSet)){
@@ -505,39 +505,39 @@ public class CliUtils {
 		boolean isNonEmptyDirectory = isDirectory && (children.length != 0);
 		
 		/* 
-		 * If we've been asked to display file components, prepare the string to be printed.
+		 * If we've been asked to display file packages, prepare the string to be printed.
 		 */
-		if (showComps) {
+		if (showPkgs) {
 
 			/* to start, empty the StringBuffer */
-			compString.delete(0, compString.length());
+			pkgString.delete(0, pkgString.length());
 			
-			/* fetch the file's component and scope */
-			Integer compAndScopeId[] = cmpts.getFileComponent(thisPathId);
-			if (compAndScopeId == null) {
-				compString.append("Invalid file");
+			/* fetch the file's package and scope */
+			Integer pkgAndScopeId[] = pkgMgr.getFilePackage(thisPathId);
+			if (pkgAndScopeId == null) {
+				pkgString.append("Invalid file");
 			} 
 			
 			/* if valid, fetch the human-readable names */
 			else {
-				int compId = compAndScopeId[0];
-				int scopeId = compAndScopeId[1];
+				int pkgId = pkgAndScopeId[0];
+				int scopeId = pkgAndScopeId[1];
 
-				String compName = cmpts.getComponentName(compId);
-				String scopeName = cmpts.getScopeName(scopeId);
+				String pkgName = pkgMgr.getPackageName(pkgId);
+				String scopeName = pkgMgr.getScopeName(scopeId);
 			
-				/* if we can't fetch the text name of the component or scope... */
-				if (compName == null || scopeName == null) {
-					compString.append("Invalid component");
+				/* if we can't fetch the text name of the package or scope... */
+				if (pkgName == null || scopeName == null) {
+					pkgString.append("Invalid package");
 				}
 			
 				/* else, both names are valid, append them to the string */
 				else {
-					compString.append("  (");
-					compString.append(compName);
-					compString.append('/');
-					compString.append(scopeName);
-					compString.append(")");
+					pkgString.append("  (");
+					pkgString.append(pkgName);
+					pkgString.append('/');
+					pkgString.append(scopeName);
+					pkgString.append(")");
 				}
 			}
 		}
@@ -558,9 +558,9 @@ public class CliUtils {
 				outStream.print(pathSoFar);		
 				outStream.print(baseName);
 				
-				/* show components, if requested */
-				if (showComps) {
-					outStream.println(compString);
+				/* show packages, if requested */
+				if (showPkgs) {
+					outStream.println(pkgString);
 				} else {
 					outStream.println();
 				}
@@ -582,9 +582,9 @@ public class CliUtils {
 			/* display information about this root. */
 			outStream.print(pathSoFar + " (" + fns.getPathName(thisPathId) + ") ");
 			
-			/* show components, if requested */
-			if (showComps) {
-				outStream.println(compString);
+			/* show packages, if requested */
+			if (showPkgs) {
+				outStream.println(pkgString);
 			} else {
 				outStream.println();
 			}
@@ -603,8 +603,8 @@ public class CliUtils {
 		
 			/* display each of the children */
 			for (int i = 0; i < children.length; i++) {
-				printFileSetHelper(outStream, pathSoFar, fns, cmpts, children[i], 
-						resultFileSet, filterFileSet, showRoots, showComps);
+				printFileSetHelper(outStream, pathSoFar, fns, pkgMgr, children[i], 
+						resultFileSet, filterFileSet, showRoots, showPkgs);
 			}
 			
 			/* remove our base name from the pathSoFar, so our caller sees the correct value again */
@@ -621,18 +621,18 @@ public class CliUtils {
 	 * @param outStream The PrintStream on which to display the output.
 	 * @param bts The BuildTasks manager object containing the task information.
 	 * @param fns The FileNameSpaces manager object containing file name information.
-	 * @param cmpts The Components manager object containing the component information.
+	 * @param pkgMgr The Packages manager object containing the package information.
 	 * @param taskId The ID of the task we're currently displaying (at this level of recursion).
 	 * @param resultTaskSet The full set of tasks to be displayed (the result of some previous query).
 	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
 	 * @param outputFormat The way in which the tasks should be formatted.
-	 * @param showComps Set to true if we should display component names.
+	 * @param showPkgs Set to true if we should display package names.
 	 * @param indentLevel The number of spaces to indent this task by (at this recursion level).
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
-			BuildTasks bts, FileNameSpaces fns, Components cmpts, 
+			BuildTasks bts, FileNameSpaces fns, Packages pkgMgr, 
 			int taskId, TaskSet resultTaskSet,
-			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showComps,
+			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showPkgs,
 			int indentLevel) {
 	
 		/* 
@@ -677,17 +677,17 @@ public class CliUtils {
 		}
 		outStream.print(" Task " + taskId + " (" + taskDirName);
 		
-		/* if requested, display the task's component name */
-		if (showComps) {
-			int compId = cmpts.getTaskComponent(taskId);
-			if (compId == ErrorCode.NOT_FOUND) {
+		/* if requested, display the task's package name */
+		if (showPkgs) {
+			int pkgId = pkgMgr.getTaskPackage(taskId);
+			if (pkgId == ErrorCode.NOT_FOUND) {
 				outStream.print(" - Invalid task");
 			} else {
-				String compName = cmpts.getComponentName(compId);
-				if (compName == null) {
-					outStream.print(" - Invalid component");
+				String pkgName = pkgMgr.getPackageName(pkgId);
+				if (pkgName == null) {
+					outStream.print(" - Invalid package");
 				} else {
-					outStream.print(" - " + compName);					
+					outStream.print(" - " + pkgName);					
 				}
 			}
 		}
@@ -704,8 +704,8 @@ public class CliUtils {
 		/* recursively call ourselves to display each of our children */
 		Integer children[] = bts.getChildren(taskId);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fns, cmpts, children[i], 
-					resultTaskSet, filterTaskSet, outputFormat, showComps, indentLevel + 1);
+			printTaskSetHelper(outStream, bts, fns, pkgMgr, children[i], 
+					resultTaskSet, filterTaskSet, outputFormat, showPkgs, indentLevel + 1);
 		}
 		
 	}

@@ -67,14 +67,14 @@ public class TestFileAttributes {
 		/* add some attribute names, and make sure the returned IDs are unique */
 		int sizeId = fattrs.newAttrName("size");
 		int blockId = fattrs.newAttrName("blocks");
-		int componentId = fattrs.newAttrName("component");
+		int pkgId = fattrs.newAttrName("package");
 		int executableId = fattrs.newAttrName("executable");
 		assertNotSame(sizeId, blockId);
-		assertNotSame(sizeId, componentId);
+		assertNotSame(sizeId, pkgId);
 		assertNotSame(sizeId, executableId);
-		assertNotSame(blockId, componentId);
+		assertNotSame(blockId, pkgId);
 		assertNotSame(blockId, executableId);
-		assertNotSame(componentId, executableId);
+		assertNotSame(pkgId, executableId);
 
 		/* try to add a pre-existing attribute name, it should fail */
 		int blockId2 = fattrs.newAttrName("blocks");
@@ -102,13 +102,13 @@ public class TestFileAttributes {
 		/* now add some names */
 		int sizeId = fattrs.newAttrName("size");
 		int blockId = fattrs.newAttrName("blocks");
-		int componentId = fattrs.newAttrName("component");
+		int pkgId = fattrs.newAttrName("package");
 		int executableId = fattrs.newAttrName("executable");
 		
 		/* now the names should exist */
 		assertEquals(executableId, fattrs.getAttrIdFromName("executable"));
 		assertEquals(blockId, fattrs.getAttrIdFromName("blocks"));
-		assertEquals(componentId, fattrs.getAttrIdFromName("component"));
+		assertEquals(pkgId, fattrs.getAttrIdFromName("package"));
 		assertEquals(sizeId, fattrs.getAttrIdFromName("size"));
 		
 		/* but these other names shouldn't */
@@ -131,13 +131,13 @@ public class TestFileAttributes {
 		/* now add some names */
 		int sizeId = fattrs.newAttrName("size");
 		int blockId = fattrs.newAttrName("blocks");
-		int componentId = fattrs.newAttrName("component");
+		int pkgId = fattrs.newAttrName("package");
 		int executableId = fattrs.newAttrName("executable");
 		
 		/* now the names should exist */
 		assertEquals("executable", fattrs.getAttrNameFromId(executableId));
 		assertEquals("blocks", fattrs.getAttrNameFromId(blockId));
-		assertEquals("component", fattrs.getAttrNameFromId(componentId));
+		assertEquals("package", fattrs.getAttrNameFromId(pkgId));
 		assertEquals("size", fattrs.getAttrNameFromId(sizeId));
 		
 		/* but these other names shouldn't */
@@ -163,10 +163,10 @@ public class TestFileAttributes {
 		CommonTestUtils.sortedArraysEqual(names, new String[] {"size"});
 		fattrs.newAttrName("blocks");
 		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "size"});
-		fattrs.newAttrName("component");
-		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "component", "size"});
+		fattrs.newAttrName("package");
+		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "package", "size"});
 		fattrs.newAttrName("executable");
-		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "component", "executable", "size"});
+		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "package", "executable", "size"});
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -180,13 +180,13 @@ public class TestFileAttributes {
 		/* add a bunch of records */
 		fattrs.newAttrName("size");
 		fattrs.newAttrName("blocks");
-		fattrs.newAttrName("component");
+		fattrs.newAttrName("package");
 		fattrs.newAttrName("executable");
 		String names [] = fattrs.getAttrNames();
-		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "component", "executable", "size"});
+		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "package", "executable", "size"});
 
 		/* delete them, one by one */
-		assertEquals(ErrorCode.OK, fattrs.deleteAttrName("component"));
+		assertEquals(ErrorCode.OK, fattrs.deleteAttrName("package"));
 		names = fattrs.getAttrNames();
 		CommonTestUtils.sortedArraysEqual(names, new String[] {"blocks", "executable", "size"});
 		assertEquals(ErrorCode.OK, fattrs.deleteAttrName("size"));
@@ -232,40 +232,40 @@ public class TestFileAttributes {
 		int path1 = fns.addFile("/a/b/c/d");
 		int path2 = fns.addFile("/a/b/c/e");
 		int path3 = fns.addFile("/a/b/c/f");
-		int attrComponent = fattrs.newAttrName("component");
+		int attrPackage = fattrs.newAttrName("package");
 		int attrCountry = fattrs.newAttrName("country");
 		
 		/* get the value of an attribute that's not set on the specified path - returns null */
-		assertNull(fattrs.getAttrAsString(path1, attrComponent));
+		assertNull(fattrs.getAttrAsString(path1, attrPackage));
 		assertNull(fattrs.getAttrAsString(path1, attrCountry));
-		assertNull(fattrs.getAttrAsString(path2, attrComponent));
+		assertNull(fattrs.getAttrAsString(path2, attrPackage));
 		assertNull(fattrs.getAttrAsString(path2, attrCountry));
 		
 		/* set some attributes and check their values */
-		fattrs.setAttr(path1, attrComponent, "top");
+		fattrs.setAttr(path1, attrPackage, "top");
 		fattrs.setAttr(path1, attrCountry, "canada");
-		fattrs.setAttr(path2, attrComponent, "bottom");
+		fattrs.setAttr(path2, attrPackage, "bottom");
 		fattrs.setAttr(path2, attrCountry, "england");
-		assertEquals("top", fattrs.getAttrAsString(path1, attrComponent));
+		assertEquals("top", fattrs.getAttrAsString(path1, attrPackage));
 		assertEquals("canada", fattrs.getAttrAsString(path1, attrCountry));
-		assertEquals("bottom", fattrs.getAttrAsString(path2, attrComponent));
+		assertEquals("bottom", fattrs.getAttrAsString(path2, attrPackage));
 		assertEquals("england", fattrs.getAttrAsString(path2, attrCountry));
 
 		/* check that the other path wasn't impacted */
-		assertNull(fattrs.getAttrAsString(path3, attrComponent));
+		assertNull(fattrs.getAttrAsString(path3, attrPackage));
 		assertNull(fattrs.getAttrAsString(path3, attrCountry));
 		
 		/* change the value of some attributes */
-		fattrs.setAttr(path1, attrComponent, "left");
-		fattrs.setAttr(path2, attrComponent, "right");
-		assertEquals("left", fattrs.getAttrAsString(path1, attrComponent));
+		fattrs.setAttr(path1, attrPackage, "left");
+		fattrs.setAttr(path2, attrPackage, "right");
+		assertEquals("left", fattrs.getAttrAsString(path1, attrPackage));
 		assertEquals("canada", fattrs.getAttrAsString(path1, attrCountry));
-		assertEquals("right", fattrs.getAttrAsString(path2, attrComponent));
+		assertEquals("right", fattrs.getAttrAsString(path2, attrPackage));
 		assertEquals("england", fattrs.getAttrAsString(path2, attrCountry));
 		
 		/* set an attribute with a null string value - this should delete the attribute */
-		fattrs.setAttr(path1, attrComponent, null);
-		assertNull(fattrs.getAttrAsString(path1, attrComponent));
+		fattrs.setAttr(path1, attrPackage, null);
+		assertNull(fattrs.getAttrAsString(path1, attrPackage));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -18,15 +18,15 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
- * BuildML CLI Command class that implements the "add-comp" command.
+ * BuildML CLI Command class that implements the "add-pkg" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandAddComp implements ICliCommand {
+public class CliCommandAddPkg implements ICliCommand {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -37,7 +37,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/add-comp.txt");
+		return CliUtils.genLocalizedMessage("#include commands/add-pkg.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -47,7 +47,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "add-comp";
+		return "add-pkg";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -67,7 +67,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<comp-name>";
+		return "<pkg-name>";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -77,7 +77,7 @@ public class CliCommandAddComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Add a new (empty) component.";
+		return "Add a new (empty) package.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,25 +98,25 @@ public class CliCommandAddComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a component name.");
+		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a package name.");
 
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
-		String compName = args[0];
-		int compId = cmpts.addComponent(compName);
+		String pkgName = args[0];
+		int pkgId = pkgMgr.addPackage(pkgName);
 
 		/* was the syntax of the name valid? */
-		if (compId == ErrorCode.INVALID_NAME){
-			CliUtils.reportErrorAndExit("Invalid component name " + compName + ".");
+		if (pkgId == ErrorCode.INVALID_NAME){
+			CliUtils.reportErrorAndExit("Invalid package name " + pkgName + ".");
 		}
 
 		/* was the name already defined in the buildstore? */
-		if (compId == ErrorCode.ALREADY_USED){
-			CliUtils.reportErrorAndExit("Component " + compName + " is already defined.");
+		if (pkgId == ErrorCode.ALREADY_USED){
+			CliUtils.reportErrorAndExit("Package " + pkgName + " is already defined.");
 		}
 
 		/* all is good */
-		System.out.println("New component " + compName + " added.");		
+		System.out.println("New package " + pkgName + " added.");		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

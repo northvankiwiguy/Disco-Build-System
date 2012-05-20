@@ -942,7 +942,7 @@ Show .o files read by task 102
 /home/psmith/t/cvs-1.11.23/src/wrapper.o
 /home/psmith/t/cvs-1.11.23/src/zlib.o
 
-Show .o files read by task 102, with components
+Show .o files read by task 102, with packages
 /home/psmith/t/cvs-1.11.23/src/add.o  (None/None)
 /home/psmith/t/cvs-1.11.23/src/admin.o  (None/None)
 /home/psmith/t/cvs-1.11.23/src/annotate.o  (None/None)

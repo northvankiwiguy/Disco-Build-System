@@ -13,7 +13,7 @@
 package com.buildml.model.types;
 
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.Reports;
 import com.buildml.utils.errors.ErrorCode;
@@ -85,8 +85,8 @@ public class FileSet extends IntegerTreeSet  {
 	 *    <li>A path name starting with a root: - the same rules apply as for #1.</li>
 	 *    <li>A single file name, with one or more wildcard (*) characters. All files that match
      *       the name are added, no matter what their directory.</li>
-     *    <li>A component spec, starting with %comp, or the complement of a component, starting 
-     *       with %not-comp.</li>
+     *    <li>A package spec, starting with %pkg, or the complement of a package, starting 
+     *       with %not-pkg.</li>
      *  </ol>
 	 * @return ErrorCode.OK on success, or ErrorCode.BAD_PATH if an invalid path name was
 	 * provided.
@@ -94,7 +94,7 @@ public class FileSet extends IntegerTreeSet  {
 	public int populateWithPaths(String [] pathArgs) {
 		
 		BuildStore bs = fns.getBuildStore();
-		Components cmpts = bs.getComponents();
+		Packages pkgMgr = bs.getPackages();
 		Reports reports = bs.getReports();
 
 		/* for each path provided as input... */
@@ -118,15 +118,15 @@ public class FileSet extends IntegerTreeSet  {
 				String commandName = thisPath.substring(1, slashIndex);
 				String commandArgs = thisPath.substring(slashIndex + 1);
 				
-				if (commandName.equals("c") || commandName.equals("comp")){
-					FileSet results = cmpts.getFilesInComponent(commandArgs);
+				if (commandName.equals("p") || commandName.equals("pkg")){
+					FileSet results = pkgMgr.getFilesInPackage(commandArgs);
 					if (results == null) {
 						return ErrorCode.BAD_PATH;
 					}
 					mergeSet(results);
 				}
-				else if (commandName.equals("nc") || (commandName.equals("not-comp"))){
-					FileSet results = cmpts.getFilesOutsideComponent(commandArgs);
+				else if (commandName.equals("np") || (commandName.equals("not-pkg"))){
+					FileSet results = pkgMgr.getFilesOutsidePackage(commandArgs);
 					if (results == null) {
 						return ErrorCode.BAD_PATH;
 					}

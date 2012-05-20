@@ -1,0 +1,12 @@
+Remove an existing package from the BuildML build system. The package must
+no longer contain any files or tasks, otherwise the removal will fail.
+For example:
+
+    bml rm-pkg src_code
+    
+will remove the "src_code" package, assuming it is no longer in use. It is
+not possible to remove the "None" package, even if it's empty.
+
+The command arguments are:
+
+#include options/pkg-name.txt

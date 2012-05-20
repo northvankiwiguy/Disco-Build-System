@@ -26,9 +26,9 @@ will show all the files used as input to any of the build tree's .a files
 will show all the files used as input when generating the graphics directory
 and its contents. Also,
 
-    bml show-input-files %c/obj_files
+    bml show-input-files %p/obj_files
     
-will show all the files used when creating the obj_files component.
+will show all the files used when creating the obj_files package.
 
 Note that in all these cases, the derivation only goes a single step. 
 That is, file.o is an input to library.a. However, in some cases you might be 
@@ -58,7 +58,7 @@ Command-specific options are:
   Display all files that are used as input, regardless of how many build
   tasks are involved in the derivation.
 
-#include options/file-show-comps.txt
+#include options/file-show-pkgs.txt
 
 #include options/show-roots.txt
 

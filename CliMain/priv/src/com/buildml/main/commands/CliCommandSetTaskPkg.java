@@ -18,16 +18,17 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
-import com.buildml.utils.errors.ErrorCode;
+import com.buildml.model.BuildTasks;
+import com.buildml.model.Packages;
+import com.buildml.model.types.TaskSet;
 
 /**
- * BuildML CLI Command class that implements the "rm-comp" command.
+ * BuildML CLI Command class that implements the "set-task-pkg" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandRemoveComp implements ICliCommand {
-	
+public class CliCommandSetTaskPkg implements ICliCommand {
+
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -37,7 +38,7 @@ public class CliCommandRemoveComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/rm-comp.txt");
+		return CliUtils.genLocalizedMessage("#include commands/set-task-pkg.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -47,7 +48,7 @@ public class CliCommandRemoveComp implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "rm-comp";
+		return "set-task-pkg";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -67,7 +68,7 @@ public class CliCommandRemoveComp implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<comp-name>";
+		return "<pkg-name> <task-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -77,7 +78,7 @@ public class CliCommandRemoveComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Remove an existing (but unused) component.";
+		return "Add a set of tasks into a package.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,21 +99,29 @@ public class CliCommandRemoveComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a component name.");
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a package name and a colon-separated list of task-specs.");
+		
+		Packages pkgMgr = buildStore.getPackages();
+		BuildTasks bts = buildStore.getBuildTasks();
 
-		Components cmpts = buildStore.getComponents();
-
-		String compName = args[0];
-		int result = cmpts.removeComponent(compName);
-		if (result == ErrorCode.CANT_REMOVE) {
-			CliUtils.reportErrorAndExit("Component " + compName + " can't be deleted while it still contains files or tasks.");
+		/* 
+		 * The package can be of the form: "pkg". There is no section allowed
+		 * for tasks.
+		 */
+		String pkgName = args[0];
+		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, false);
+		int pkgId = pkgAndScopeIds[0];
+		
+		/* compute the TaskSet from the user-supplied list of task-specs */
+		String taskSpecs = args[1];
+		TaskSet tasksToSet = CliUtils.getCmdLineTaskSet(bts, taskSpecs);
+		
+		/* now visit each task in the TaskSet and set its package */
+		buildStore.setFastAccessMode(true);
+		for (int task : tasksToSet) {
+			pkgMgr.setTaskPackage(task, pkgId);
 		}
-		if (result == ErrorCode.NOT_FOUND) {
-			CliUtils.reportErrorAndExit("Component " + compName + " is not defined.");
-		}
-
-		/* else, all is good */
-		System.out.println("Component " + compName + " removed.");		
+		buildStore.setFastAccessMode(false);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

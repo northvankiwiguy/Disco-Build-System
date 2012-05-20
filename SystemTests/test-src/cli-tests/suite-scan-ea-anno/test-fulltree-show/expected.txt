@@ -546,8 +546,8 @@ Show .h files by their popularity
 1	/home/psmith/t/cvs-1.11.23/lib/xselect.h
 1	/home/psmith/t/cvs-1.11.23/vms/config.h
 
-Show .h files by their popularity, with components
-New component src_files added.
+Show .h files by their popularity, with packages
+New package src_files added.
 81	/home/psmith/t/cvs-1.11.23/config.h  (src_files/Public)
 72	/home/psmith/t/cvs-1.11.23/lib/getopt.h  (src_files/Public)
 66	/home/psmith/t/cvs-1.11.23/lib/regex.h  (src_files/Public)
@@ -592,7 +592,7 @@ New component src_files added.
 1	/home/psmith/t/cvs-1.11.23/lib/xselect.h  (src_files/Public)
 1	/home/psmith/t/cvs-1.11.23/vms/config.h  (src_files/Public)
 
-Show all files by popularity, with components
+Show all files by popularity, with packages
 81	/home/psmith/t/cvs-1.11.23/config.h  (src_files/Public)
 72	/home/psmith/t/cvs-1.11.23/lib/getopt.h  (src_files/Public)
 66	/home/psmith/t/cvs-1.11.23/lib/regex.h  (src_files/Public)

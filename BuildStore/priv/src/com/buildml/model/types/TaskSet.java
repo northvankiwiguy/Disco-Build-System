@@ -14,7 +14,7 @@ package com.buildml.model.types;
 
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.Reports;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -140,8 +140,8 @@ public class TaskSet extends IntegerTreeSet {
 	 *     (regardless of their depth).</li>
 	 *   <li>If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
 	 *     than being added.</li>
-	 *   <li>The special syntax "%comp/foo" means all tasks in the component "foo".</li>
-	 *   <li>The special syntax "%not-comp/foo" means all tasks outside the component "foo".</li>
+	 *   <li>The special syntax "%pkg/foo" means all tasks in the package "foo".</li>
+	 *   <li>The special syntax "%not-pkg/foo" means all tasks outside the package "foo".</li>
 	 *  </ol>
 	 *  
 	 * @param taskSpecs An array of command line arguments that specify which tasks (or sub-trees
@@ -152,7 +152,7 @@ public class TaskSet extends IntegerTreeSet {
 	public int populateWithTasks(String taskSpecs[]) {
 	
 		BuildStore bs = bts.getBuildStore();
-		Components cmpts = bs.getComponents();
+		Packages pkgMgr = bs.getPackages();
 		
 		/* 
 		 * Process each task spec in turn. They're mostly independent, although
@@ -182,19 +182,19 @@ public class TaskSet extends IntegerTreeSet {
 				String commandName = taskSpec.substring(1, slashIndex);
 				String commandArgs = taskSpec.substring(slashIndex + 1);
 				
-				if (commandName.equals("c") || commandName.equals("comp")){
-					TaskSet compTaskSet = cmpts.getTasksInComponent(commandArgs);
-					if (compTaskSet == null) {
+				if (commandName.equals("p") || commandName.equals("pkg")){
+					TaskSet pkgTaskSet = pkgMgr.getTasksInPackage(commandArgs);
+					if (pkgTaskSet == null) {
 						return ErrorCode.BAD_VALUE;
 					}
-					mergeSet(compTaskSet);
+					mergeSet(pkgTaskSet);
 				}
-				else if (commandName.equals("nc") || (commandName.equals("not-comp"))){
-					TaskSet compTaskSet = cmpts.getTasksOutsideComponent(commandArgs);
-					if (compTaskSet == null) {
+				else if (commandName.equals("np") || (commandName.equals("not-pkg"))){
+					TaskSet pkgTaskSet = pkgMgr.getTasksOutsidePackage(commandArgs);
+					if (pkgTaskSet == null) {
 						return ErrorCode.BAD_VALUE;
 					}
-					mergeSet(compTaskSet);
+					mergeSet(pkgTaskSet);
 				}
 				
 				/* try to match the task's command name */

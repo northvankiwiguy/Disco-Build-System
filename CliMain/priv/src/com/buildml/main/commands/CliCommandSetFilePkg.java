@@ -18,14 +18,16 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.model.types.FileSet;
 
 /**
- * BuildML CLI Command class that implements the "show-comp" command.
+ * BuildML CLI Command class that implements the "set-file-pkg" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandShowComp implements ICliCommand {
+public class CliCommandSetFilePkg implements ICliCommand {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -36,7 +38,7 @@ public class CliCommandShowComp implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/show-comp.txt");
+		return CliUtils.genLocalizedMessage("#include commands/set-file-pkg.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -46,7 +48,7 @@ public class CliCommandShowComp implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "show-comp";
+		return "set-file-pkg";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -66,7 +68,7 @@ public class CliCommandShowComp implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "";
+		return "<pkg-name> <path-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -76,7 +78,7 @@ public class CliCommandShowComp implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Show the components defined in the build system.";
+		return "Add a set of files into a package.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -97,14 +99,30 @@ public class CliCommandShowComp implements ICliCommand {
 	@Override
 	public void invoke(BuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
-	
-		Components cmpts = buildStore.getComponents();
-		
-		String compNames[] = cmpts.getComponents();
-		for (int i = 0; i < compNames.length; i++) {
-			System.out.println(compNames[i]);
+		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a package name and a path-spec.");
+
+		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		Packages pkgMgr = buildStore.getPackages();
+
+		/* 
+		 * The package can be of the form: "pkg" or "pkg/scope". If scope
+		 * isn't specified, "private" will be used.
+		 */
+		String pkgName = args[0];
+		int pkgAndSectionIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, true);
+		int pktId = pkgAndSectionIds[0];
+		int scopeId = pkgAndSectionIds[1];
+
+		/* find out which files the user wants to set */
+		String fileSpec = args[1];
+		FileSet filesToSet = CliUtils.getCmdLineFileSet(fns, fileSpec);
+
+		/* now visit each file in the FileSet and set it's package/scope */
+		buildStore.setFastAccessMode(true);
+		for (int file : filesToSet) {
+			pkgMgr.setFilePackage(file, pktId, scopeId);
 		}
+		buildStore.setFastAccessMode(false);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -21,15 +21,15 @@ echo "Show .h files by their popularity"
 bml show-popular-files -f "*.h"
 
 echo
-echo "Show .h files by their popularity, with components"
-bml add-comp src_files
-bml set-file-comp src_files/private "*.c"
-bml set-file-comp src_files/public "*.h"
-bml show-popular-files -f "*.h" -c
+echo "Show .h files by their popularity, with packages"
+bml add-pkg src_files
+bml set-file-pkg src_files/private "*.c"
+bml set-file-pkg src_files/public "*.h"
+bml show-popular-files -f "*.h" -p
 
 echo
-echo "Show all files by popularity, with components"
-bml show-popular-files -c
+echo "Show all files by popularity, with packages"
+bml show-popular-files -p
 
 echo
 echo "Note: with the sample emake.xml file we have, all files are used. We therefore can't test show-unused-files."

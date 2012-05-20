@@ -14,7 +14,7 @@ package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.Reports;
 import com.buildml.model.types.FileSet;
@@ -80,14 +80,14 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
 		/* get list of unused files, and add their parent paths */
 		FileSet unusedFileSet = reports.reportFilesNeverAccessed();
 		unusedFileSet.populateWithParents();
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, cmpts, unusedFileSet, filterFileSet, optionShowRoots, optionShowComps);
+		CliUtils.printFileSet(System.out, fns, pkgMgr, unusedFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

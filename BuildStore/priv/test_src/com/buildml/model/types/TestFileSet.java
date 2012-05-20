@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import com.buildml.model.BuildStore;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -483,25 +483,25 @@ public class TestFileSet {
 		assertEquals(1, fs9.size());
 		assertTrue(fs9.isMember(f4path));
 		
-		/* create a new component, named "foo", with one item in foo/public and three in foo/private */
-		Components cmpts = bs.getComponents();
-		int compFooId = cmpts.addComponent("foo");
-		int sectPublic = cmpts.getScopeId("public");
-		int sectPrivate = cmpts.getScopeId("private");
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f1path, compFooId, sectPublic));
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f2path, compFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f4path, compFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, cmpts.setFileComponent(f5path, compFooId, sectPrivate));
+		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
+		Packages pkgMgr = bs.getPackages();
+		int pkgFooId = pkgMgr.addPackage("foo");
+		int sectPublic = pkgMgr.getScopeId("public");
+		int sectPrivate = pkgMgr.getScopeId("private");
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f1path, pkgFooId, sectPublic));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f2path, pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f4path, pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f5path, pkgFooId, sectPrivate));
 		
 		/* test @foo/public membership */
 		FileSet fs10 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs10.populateWithPaths(new String[] {"%comp/foo/public"}));
+		assertEquals(ErrorCode.OK, fs10.populateWithPaths(new String[] {"%pkg/foo/public"}));
 		assertEquals(1, fs10.size());
 		assertTrue(fs10.isMember(f1path));
 
 		/* test @foo/private membership */
 		FileSet fs11 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs11.populateWithPaths(new String[] {"%c/foo/private"}));
+		assertEquals(ErrorCode.OK, fs11.populateWithPaths(new String[] {"%p/foo/private"}));
 		assertEquals(3, fs11.size());
 		assertTrue(fs11.isMember(f2path));
 		assertTrue(fs11.isMember(f4path));
@@ -509,7 +509,7 @@ public class TestFileSet {
 
 		/* test @foo membership */
 		FileSet fs12 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs12.populateWithPaths(new String[] {"%comp/foo"}));
+		assertEquals(ErrorCode.OK, fs12.populateWithPaths(new String[] {"%pkg/foo"}));
 		assertEquals(4, fs12.size());
 		assertTrue(fs12.isMember(f1path));
 		assertTrue(fs12.isMember(f2path));
@@ -518,7 +518,7 @@ public class TestFileSet {
 
 		/* test ^@foo/public membership - includes directories */
 		FileSet fs13 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs13.populateWithPaths(new String[] {"%not-comp/foo/public"}));
+		assertEquals(ErrorCode.OK, fs13.populateWithPaths(new String[] {"%not-pkg/foo/public"}));
 		assertEquals(14, fs13.size());
 		assertTrue(fs13.isMember(f2path));
 		assertTrue(fs13.isMember(f3path));
@@ -527,28 +527,28 @@ public class TestFileSet {
 		
 		/* test ^@foo/private membership - includes directories */
 		FileSet fs14 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs14.populateWithPaths(new String[] {"%nc/foo/private"}));
+		assertEquals(ErrorCode.OK, fs14.populateWithPaths(new String[] {"%np/foo/private"}));
 		assertEquals(12, fs14.size());
 		assertTrue(fs14.isMember(f1path));
 		assertTrue(fs14.isMember(f3path));
 
 		/* test ^@foo membership  - includes directories */
 		FileSet fs15 = new FileSet(fns);
-		assertEquals(ErrorCode.OK, fs15.populateWithPaths(new String[] {"%nc/foo"}));
+		assertEquals(ErrorCode.OK, fs15.populateWithPaths(new String[] {"%np/foo"}));
 		assertEquals(11, fs15.size());
 		assertTrue(fs15.isMember(f3path));
 		
 		/* test with invalid paths */
 		FileSet fs16 = new FileSet(fns);
 		assertEquals(ErrorCode.BAD_PATH, fs16.populateWithPaths(new String[] {"/a/b/x/y/z/"}));	
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%c/comp"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%c/foo/badsect"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%nc/comp"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%nc/foo/badsect"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%c"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%nc"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%c/"}));
-		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%nc/"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%p/pkg"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%p/foo/badsect"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%np/pkg"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%np/foo/badsect"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%p"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%np"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%p/"}));
+		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%np/"}));
 		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%badcommand/"}));
 	}
 	

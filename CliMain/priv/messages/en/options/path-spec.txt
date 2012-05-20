@@ -27,28 +27,28 @@
       Use the show-root, add-root and rm-root commands to manage file system
       roots.
            
-    %c/<comp-name> or %comp/<comp-name>
+    %p/<pkg-name> or %pkg/<pkg-name>
        
-      A component name, specifying the set of files to be shown. Only files
-      that reside within that component will be shown. For example:
+      A package name, specifying the set of files to be shown. Only files
+      that reside within that package will be shown. For example:
            
-          bml show-files -f %comp/kernel_src
+          bml show-files -f %pkg/kernel_src
                 
-      Use the show-comp, add-comp, rm-comp commands to define component names,
-      and the set-file-comp command to add files into a component. Component 
-      names may also include a component section name, such as 'public' or
+      Use the show-pkg, add-pkg, rm-pkg commands to define package names,
+      and the set-file-pkg command to add files into a package. Package 
+      names may also include a package section name, such as 'public' or
       'private'. For example:
            
-          bml show-files -f %comp/kernel_src/private
+          bml show-files -f %pkg/kernel_src/private
                 
       This will limit the output to only those files within the specific
-      component section.
+      package section.
            
-    %nc/<comp-name> or %not-comp/<comp-name>
+    %nc/<pkg-name> or %not-pkg/<pkg-name>
        
-      Similar to %c and %comp, but only show the files that reside outside
-      that component. For example:
+      Similar to %p and %pkg, but only show the files that reside outside
+      that package. For example:
            
-          bml show-files -f %comp/kernel_src
+          bml show-files -f %pkg/kernel_src
                 
-      Component section names (private, public) can also be used.
+      Package section names (private, public) can also be used.

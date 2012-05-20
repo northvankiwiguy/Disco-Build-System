@@ -19,7 +19,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
@@ -37,8 +37,8 @@ public class CliCommandShowFiles implements ICliCommand {
 	/** Set if we should show roots when displaying reports. */
 	protected boolean optionShowRoots = false;
 	
-	/** Set if we should show component membership when displaying reports. */
-	protected boolean optionShowComps = false;
+	/** Set if we should show package membership when displaying reports. */
+	protected boolean optionShowPkgs = false;
 	
 	/** The FileSet used to filter our results (if -f/--filter is used). */
 	protected FileSet filterFileSet = null;
@@ -79,9 +79,9 @@ public class CliCommandShowFiles implements ICliCommand {
 		Option showRootsOpt = new Option("r", "show-roots", false, "Show path roots when displaying report output.");
 		opts.addOption(showRootsOpt);
 
-		/* add the --show-comps option */
-		Option showCompsOpt = new Option("c", "show-comps", false, "Show component of each path in report output.");
-		opts.addOption(showCompsOpt);
+		/* add the --show-pkgs option */
+		Option showPkgsOpt = new Option("p", "show-pkgs", false, "Show package of each path in report output.");
+		opts.addOption(showPkgsOpt);
 
 		/* add the -f/--filter option */
 		Option filterOpt = new Option("f", "filter", true, "Path-specs used to filter the output.");
@@ -119,7 +119,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	@Override
 	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		optionShowRoots = cmdLine.hasOption("show-roots");
-		optionShowComps = cmdLine.hasOption("show-comps");
+		optionShowPkgs = cmdLine.hasOption("show-pkgs");
 		
 		/* fetch the subset of files we should filter-in */
 	
@@ -144,7 +144,7 @@ public class CliCommandShowFiles implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
 		/* 
 		 * There were no search "results", so we'll show everything (except those
@@ -153,7 +153,7 @@ public class CliCommandShowFiles implements ICliCommand {
 		FileSet resultFileSet = null;
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, cmpts, resultFileSet, filterFileSet, optionShowRoots, optionShowComps);
+		CliUtils.printFileSet(System.out, fns, pkgMgr, resultFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

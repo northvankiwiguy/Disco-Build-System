@@ -29,12 +29,12 @@
   
       Exclude the specified tasks, and <depth> levels of its child tasks.
          
-    %c/<comp-name> or %comp/<comp-name>
+    %p/<pkg-name> or %pkg/<pkg-name>
       
-      Include all the tasks that have previously been added to the <comp-name>
-      component (using the set-task-comp command).
+      Include all the tasks that have previously been added to the <pkg-name>
+      package (using the set-task-pkg command).
       
-    %nc/<comp-name> or %not-comp/<comp-name>
+    %np/<pkg-name> or %not-pkg/<pkg-name>
     
-      Include all the tasks that have NOT been added to the <comp-name>
-      component.
+      Include all the tasks that have NOT been added to the <pkg-name>
+      package.

@@ -35,7 +35,7 @@ public interface ICliCommand {
 	
 	/**
 	 * Fetch the command's parameter description, which is the syntax of the parameters that 
-	 * the command accepts. For example, "&lt;comp-name&gt; &lt;path&gt;, ...".
+	 * the command accepts. For example, "&lt;pkg-name&gt; &lt;path&gt;, ...".
 	 * @return The command's parameter description.
 	 */
 	public String getParameterDescription();

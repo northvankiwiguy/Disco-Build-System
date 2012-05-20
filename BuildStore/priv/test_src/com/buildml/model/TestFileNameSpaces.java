@@ -474,7 +474,7 @@ public class TestFileNameSpaces {
 	/**
 	 * Used by the testAddManyFiles test case.
 	 */
-	String componentNames[] = {
+	String portionNames[] = {
 			"aaaaa", "bbbbbb", "ccccccc", "dddddddd", "eeeeeeeee", "ffffffffff"
 	};
 	
@@ -493,18 +493,18 @@ public class TestFileNameSpaces {
 		Random r = new Random();
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i != 2000; i++) {
-			/* file paths can be 5-20 path components long */
-			int numPathComponents = r.nextInt(15) + 5;
+			/* file paths can be 5-20 path portions long */
+			int numPathPortions = r.nextInt(15) + 5;
 			
 			/* 
-			 * Each path component can be 5-10 characters long. To ensure
+			 * Each path portion can be 5-10 characters long. To ensure
 			 * we get some degree of consistency in path names, we'll use
-			 * the names listed in the componentNames variable.
+			 * the names listed in the portionNames variable.
 			 */
 			sb.delete(0, sb.length());
-			for (int j = 0; j != numPathComponents; j++) {
+			for (int j = 0; j != numPathPortions; j++) {
 				sb.append("/");
-				sb.append(componentNames[r.nextInt(6)]);
+				sb.append(portionNames[r.nextInt(6)]);
 			}
 			
 			//System.out.println("Adding " + sb);

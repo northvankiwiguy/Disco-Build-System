@@ -114,7 +114,7 @@ public class TestCFuncPerms {
 	public void testAccess() throws Exception {
 		/* 
 		 * Nothing to test, for now. This can be implemented when the access() function
-		 * is modified to support component-boundary checking.
+		 * is modified to support package-boundary checking.
 		 */
 	}
 
@@ -194,7 +194,7 @@ public class TestCFuncPerms {
 	public void testEaccess() throws Exception {
 		/* 
 		 * Nothing to test, for now. This can be implemented when the eaccess() function
-		 * is modified to support component-boundary checking.
+		 * is modified to support package-boundary checking.
 		 */
 	}
 
@@ -208,7 +208,7 @@ public class TestCFuncPerms {
 	public void testEuidaccess() throws Exception {
 		/* 
 		 * Nothing to test, for now. This can be implemented when the euidaccess() function
-		 * is modified to support component-boundary checking.
+		 * is modified to support package-boundary checking.
 		 */
 	}
 
@@ -222,7 +222,7 @@ public class TestCFuncPerms {
 	public void testFaccessat() throws Exception {
 		/* 
 		 * Nothing to test, for now. This can be implemented when the faccessat() function
-		 * is modified to support component-boundary checking.
+		 * is modified to support package-boundary checking.
 		 */
 	}
 

@@ -1,0 +1,4 @@
+-p | --show-pkgs
+
+  Additionally show which package the task belongs to.
+

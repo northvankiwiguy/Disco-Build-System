@@ -22,7 +22,7 @@ import org.junit.Test;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -338,20 +338,20 @@ public class TestTaskSet {
 		assertFalse(ts.isMember(taskA32));
 		assertFalse(ts.isMember(taskA321));
 		
-		/* create a component, add a couple of tasks to it, then query the component */
-		Components cmpts = bs.getComponents();
-		int fooCompId = cmpts.addComponent("foo");
-		assertEquals(ErrorCode.OK, cmpts.setTaskComponent(taskA1, fooCompId));
-		assertEquals(ErrorCode.OK, cmpts.setTaskComponent(taskA2, fooCompId));
+		/* create a package, add a couple of tasks to it, then query the package */
+		Packages pkgMgr = bs.getPackages();
+		int fooPkgId = pkgMgr.addPackage("foo");
+		assertEquals(ErrorCode.OK, pkgMgr.setTaskPackage(taskA1, fooPkgId));
+		assertEquals(ErrorCode.OK, pkgMgr.setTaskPackage(taskA2, fooPkgId));
 		
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%comp/foo" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%pkg/foo" }));
 		assertEquals(2, ts.size());
 		assertTrue(ts.isMember(taskA1));
 		assertTrue(ts.isMember(taskA2));
 
 		ts = new TaskSet(bts);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%not-comp/foo" }));
+		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%not-pkg/foo" }));
 		assertEquals(8, ts.size());
 		assertFalse(ts.isMember(taskA1));
 		assertFalse(ts.isMember(taskA2));
@@ -363,7 +363,7 @@ public class TestTaskSet {
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123/foo" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "/1" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "1//" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/comp" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/pkg" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/foo/private" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%nc" }));

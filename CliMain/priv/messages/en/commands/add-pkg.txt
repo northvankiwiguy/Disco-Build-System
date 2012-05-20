@@ -1,0 +1,12 @@
+Add a new package to the BuildML build system. The package will initially 
+not contain any files or tasks. For example:
+
+    bml add-pkg src_code
+    
+will create a new empty package named "src_code". It will now be possible
+to add files and tasks into the "src_code" package using the set-file-pkg
+and set-task-pkg commands.
+
+The command arguments are:
+
+#include options/pkg-name.txt

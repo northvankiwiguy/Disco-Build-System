@@ -122,5 +122,5 @@ echo "Show .o files read by task 102"
 bml show-files-used-by --read -f "*.o" 102
 
 echo
-echo "Show .o files read by task 102, with components"
-bml show-files-used-by --read -f "*.o" -c 102
+echo "Show .o files read by task 102, with packages"
+bml show-files-used-by --read -f "*.o" -p 102

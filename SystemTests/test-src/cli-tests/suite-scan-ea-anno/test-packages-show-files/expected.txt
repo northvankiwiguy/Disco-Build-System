@@ -1,4 +1,4 @@
-Show all files, with only default components
+Show all files, with only default packages
 /home/psmith/t/cvs-1.11.23/config.h  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (None/None)
@@ -334,8 +334,8 @@ Show all files, with only default components
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h  (None/None)
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (None/None)
 
-Add a component to the zlib files, and show all files again
-New component zlib added.
+Add a package to the zlib files, and show all files again
+New package zlib added.
 /home/psmith/t/cvs-1.11.23/config.h  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (None/None)
@@ -671,7 +671,7 @@ New component zlib added.
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
 
-Show only the files in the new component
+Show only the files in the new package
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o  (zlib/Private)
 /home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
@@ -713,7 +713,7 @@ Show only the files in the new component
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
 
-Show the files that are outside the new component
+Show the files that are outside the new package
 /home/psmith/t/cvs-1.11.23/config.h  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (None/None)
@@ -1096,12 +1096,12 @@ Now show all the files in zlib
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
 
 Try to remove zlib (should fail)
-Error: Component zlib can't be deleted while it still contains files or tasks.
+Error: Package zlib can't be deleted while it still contains files or tasks.
        Use bml -h for more help.
 Status is 1
 
-Add a new component, and set all .o files to that component
-New component objects added.
+Add a new package, and set all .o files to that package
+New package objects added.
 /home/psmith/t/cvs-1.11.23/config.h  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (None/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (None/None)
@@ -1465,19 +1465,19 @@ Show the files that are still in zlib
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
 
-Create a source component, assign it to all .c and .h files, then show what's left
-New component source added.
+Create a source package, assign it to all .c and .h files, then show what's left
+New package source added.
 /home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
 
 Try to remove zlib (should fail)
-Error: Component zlib can't be deleted while it still contains files or tasks.
+Error: Package zlib can't be deleted while it still contains files or tasks.
        Use bml -h for more help.
 Status is 1
 
-Remove the final file from the zlib component, then try to delete the component
-Error: Component zlib can't be deleted while it still contains files or tasks.
+Remove the final file from the zlib package, then try to delete the package
+Error: Package zlib can't be deleted while it still contains files or tasks.
        Use bml -h for more help.
 Status is 1
 
-Remove the zlib directory from the component too, then try to delete the component
-Component zlib removed.
+Remove the zlib directory from the package too, then try to delete the package
+Package zlib removed.

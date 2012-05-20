@@ -478,9 +478,9 @@ public class TestBuildTasks {
 			int numChars = r.nextInt(490) + 10;
 			
 			/* 
-			 * Each path component can be 5-10 characters long. To ensure
+			 * Each path "portion" can be 5-10 characters long. To ensure
 			 * we get some degree of consistency in path names, we'll use
-			 * the names listed in the componentNames variable.
+			 * the names listed in the portionNames variable.
 			 */
 			sb.delete(0, sb.length());
 			for (int j = 0; j != numChars; j++) {

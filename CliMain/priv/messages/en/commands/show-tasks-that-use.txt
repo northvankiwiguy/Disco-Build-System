@@ -53,6 +53,6 @@ Command-specific options are:
 
 #include options/task-long.txt
 
-#include options/task-show-comps.txt
+#include options/task-show-pkgs.txt
 
 #include options/task-filter.txt

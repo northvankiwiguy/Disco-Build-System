@@ -14,7 +14,7 @@ package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.BuildStore;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.Reports;
 import com.buildml.model.types.FileRecord;
@@ -80,7 +80,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Reports reports = buildStore.getReports();
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
 		/* fetch the list of most popular files */
 		FileRecord results[] = reports.reportMostCommonlyAccessedFiles();
@@ -92,15 +92,15 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 				int count = fileRecord.getCount();
 				String pathName = fns.getPathName(id, optionShowRoots);
 				
-				/* should we show component names? */
-				if (optionShowComps) {
-					Integer cmptScopeIds[] = cmpts.getFileComponent(id);
-					String cmptName = cmpts.getComponentName(cmptScopeIds[0]);
-					String sectName = cmpts.getScopeName(cmptScopeIds[1]);
+				/* should we show package names? */
+				if (optionShowPkgs) {
+					Integer cmptScopeIds[] = pkgMgr.getFilePackage(id);
+					String cmptName = pkgMgr.getPackageName(cmptScopeIds[0]);
+					String sectName = pkgMgr.getScopeName(cmptScopeIds[1]);
 					System.out.println(count + "\t" + pathName + "  (" + cmptName + "/" + sectName + ")");
 				}
 				
-				/* no, just the file names without components */
+				/* no, just the file names without packages */
 				else {
 					System.out.println(count + "\t" + pathName);
 				}

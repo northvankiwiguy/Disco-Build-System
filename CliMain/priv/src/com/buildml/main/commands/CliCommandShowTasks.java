@@ -21,7 +21,7 @@ import com.buildml.main.ICliCommand;
 import com.buildml.main.CliUtils.DisplayWidth;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.types.TaskSet;
 
@@ -36,8 +36,8 @@ public class CliCommandShowTasks implements ICliCommand {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Set if we should show component membership when displaying reports. */
-	protected static boolean optionShowComps = false;
+	/** Set if we should show package membership when displaying reports. */
+	protected static boolean optionShowPkgs = false;
 
 	/** Set if we want short output. */
 	protected static boolean optionShort = false;
@@ -83,9 +83,9 @@ public class CliCommandShowTasks implements ICliCommand {
 		
 		Options opts = new Options();
 
-		/* add the --show-comps option */
-		Option showCompsOpt = new Option("c", "show-comps", false, "Show the component of each task.");
-		opts.addOption(showCompsOpt);
+		/* add the --show-pkgs option */
+		Option showPkgsOpt = new Option("p", "show-pkgs", false, "Show the package of each task.");
+		opts.addOption(showPkgsOpt);
 		
 		/* add the -s/--short option */
 		Option shortOpt = new Option("s", "short", false, "Provide abbreviated output.");
@@ -132,7 +132,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
 		optionShort = cmdLine.hasOption("short");
 		optionLong = cmdLine.hasOption("long");
-		optionShowComps = cmdLine.hasOption("show-comps");
+		optionShowPkgs = cmdLine.hasOption("show-pkgs");
 		
 		/* do we want short or long command output? We can't have both */
 		if (optionShort && optionLong) {
@@ -165,12 +165,12 @@ public class CliCommandShowTasks implements ICliCommand {
 		
 		BuildTasks bts = buildStore.getBuildTasks();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();		
-		Components cmpts = buildStore.getComponents();
+		Packages pkgMgr = buildStore.getPackages();
 
 		/* 
 		 * Display the selected task set.
 		 */
-		CliUtils.printTaskSet(System.out, bts, fns, cmpts, null, filterTaskSet, outputFormat, optionShowComps);
+		CliUtils.printTaskSet(System.out, bts, fns, pkgMgr, null, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

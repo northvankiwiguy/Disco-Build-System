@@ -29,7 +29,7 @@ import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
 /**
- * This class parses the output from a CFS (component file system)
+ * This class parses the output from a CFS (capture file system)
  * trace file (by default, "cfs.trace") and creates a corresponding BuildStore.
  * Typically this class would only be instantiated by the LegacyBuildScanner class.
  * 

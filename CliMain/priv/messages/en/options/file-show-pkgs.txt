@@ -1,0 +1,3 @@
+-p | --show-pkgs
+
+  In addition to file names, also show which packages the file belongs to.

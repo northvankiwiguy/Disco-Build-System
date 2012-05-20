@@ -1,4 +1,0 @@
--c | --show-comps
-
-  Additionally show which component the task belongs to.
-

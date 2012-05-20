@@ -20,11 +20,11 @@ import org.junit.Test;
 
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
-import com.buildml.model.Components;
+import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.Reports;
 import com.buildml.model.BuildTasks.OperationType;
-import com.buildml.model.types.ComponentSet;
+import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -92,31 +92,31 @@ public class TestReports2 {
 		int rootTask = bts.getRootTask("");
 		
 		/* compile cat.c -> cat.o */
-		int taskCompCat = bts.addBuildTask(rootTask, dirHome, "gcc -c cat.c");
-		bts.addFileAccess(taskCompCat, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompCat, fileHousePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompCat, fileCatC, OperationType.OP_READ);
-		bts.addFileAccess(taskCompCat, fileCatO, OperationType.OP_WRITE);
+		int taskPkgCat = bts.addBuildTask(rootTask, dirHome, "gcc -c cat.c");
+		bts.addFileAccess(taskPkgCat, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgCat, fileHousePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgCat, fileCatC, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgCat, fileCatO, OperationType.OP_WRITE);
 
 		/* compile dog.c -> dog.o */
-		int taskCompDog = bts.addBuildTask(rootTask, dirHome, "gcc -c dog.c");
-		bts.addFileAccess(taskCompDog, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompDog, fileHousePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompDog, fileDogC, OperationType.OP_READ);
-		bts.addFileAccess(taskCompDog, fileDogO, OperationType.OP_WRITE);
+		int taskPkgDog = bts.addBuildTask(rootTask, dirHome, "gcc -c dog.c");
+		bts.addFileAccess(taskPkgDog, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgDog, fileHousePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgDog, fileDogC, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgDog, fileDogO, OperationType.OP_WRITE);
 		
 		/* compile bunny.c -> bunny.o */
-		int taskCompBunny = bts.addBuildTask(rootTask, dirHome, "gcc -c bunny.c");
-		bts.addFileAccess(taskCompBunny, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompBunny, fileHousePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompBunny, fileBunnyC, OperationType.OP_READ);
-		bts.addFileAccess(taskCompBunny, fileBunnyO, OperationType.OP_WRITE);
+		int taskPkgBunny = bts.addBuildTask(rootTask, dirHome, "gcc -c bunny.c");
+		bts.addFileAccess(taskPkgBunny, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgBunny, fileHousePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgBunny, fileBunnyC, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgBunny, fileBunnyO, OperationType.OP_WRITE);
 		
 		/* compile giraffe.c -> giraffe.o */
-		int taskCompGiraffe = bts.addBuildTask(rootTask, dirHome, "gcc -c giraffe.c");
-		bts.addFileAccess(taskCompGiraffe, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskCompGiraffe, fileGiraffeC, OperationType.OP_READ);
-		bts.addFileAccess(taskCompGiraffe, fileGiraffeO, OperationType.OP_WRITE);
+		int taskPkgGiraffe = bts.addBuildTask(rootTask, dirHome, "gcc -c giraffe.c");
+		bts.addFileAccess(taskPkgGiraffe, filePetH, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgGiraffe, fileGiraffeC, OperationType.OP_READ);
+		bts.addFileAccess(taskPkgGiraffe, fileGiraffeO, OperationType.OP_WRITE);
 		
 		/* archive cat.o -> cat.a */
 		int taskArchCat = bts.addBuildTask(rootTask, dirHome, "ar c cat.a cat.o");
@@ -354,24 +354,24 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportFilesFromComponentSet}.
+	 * Test method for {@link com.buildml.model.Reports#reportFilesFromPackageSet}.
 	 */
 	@Test
-	public void testReportFilesFromComponentSet() {
+	public void testReportFilesFromPackageSet() {
 		
-		/* create a new component set and add some components */
-		ComponentSet cs = new ComponentSet(bs);
-		Components comps = bs.getComponents();
-		int comp1Id = comps.addComponent("Comp1");
-		int comp2Id = comps.addComponent("Comp2");		
-		int comp3Id = comps.addComponent("Comp3");
-		int comp4Id = comps.addComponent("Comp4");
+		/* create a new package set and add some packages */
+		PackageSet cs = new PackageSet(bs);
+		Packages pkgMgr = bs.getPackages();
+		int pkg1Id = pkgMgr.addPackage("Pkg1");
+		int pkg2Id = pkgMgr.addPackage("Pkg2");		
+		int pkg3Id = pkgMgr.addPackage("Pkg3");
+		int pkg4Id = pkgMgr.addPackage("Pkg4");
 
 		/* initially, no paths should be present (not even /) */
-		FileSet fs = reports.reportFilesFromComponentSet(cs);
+		FileSet fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(0, fs.size());
 		
-		/* add a bunch of files - they should all be in the None component */
+		/* add a bunch of files - they should all be in the None package */
 		int file1 = fns.addFile("/file1");
 		int file2 = fns.addFile("/file2");
 		int file3 = fns.addFile("/file3");
@@ -381,49 +381,49 @@ public class TestReports2 {
 		int file7 = fns.addFile("/file7");
 		int file8 = fns.addFile("/file8");
 		
-		/* empty component set still gives an empty FileSet */
-		fs = reports.reportFilesFromComponentSet(cs);
+		/* empty package set still gives an empty FileSet */
+		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(0, fs.size());
 		
-		/* map the files into components */
-		comps.setFileComponent(file1, comp1Id, Components.SCOPE_PRIVATE);
-		comps.setFileComponent(file2, comp1Id, Components.SCOPE_PUBLIC);
-		comps.setFileComponent(file3, comp2Id, Components.SCOPE_PRIVATE);
-		comps.setFileComponent(file4, comp2Id, Components.SCOPE_PUBLIC);
-		comps.setFileComponent(file5, comp3Id, Components.SCOPE_PRIVATE);
-		comps.setFileComponent(file6, comp3Id, Components.SCOPE_PUBLIC);
-		comps.setFileComponent(file7, comp4Id, Components.SCOPE_PRIVATE);
-		comps.setFileComponent(file8, comp4Id, Components.SCOPE_PUBLIC);
+		/* map the files into packages */
+		pkgMgr.setFilePackage(file1, pkg1Id, Packages.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file2, pkg1Id, Packages.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file3, pkg2Id, Packages.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file4, pkg2Id, Packages.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file5, pkg3Id, Packages.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file6, pkg3Id, Packages.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file7, pkg4Id, Packages.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file8, pkg4Id, Packages.SCOPE_PUBLIC);
 	
-		/* empty component set still gives an empty FileSet */
-		fs = reports.reportFilesFromComponentSet(cs);
+		/* empty package set still gives an empty FileSet */
+		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(0, fs.size());
 		
-		/* add Comp1/Private into the component set */
-		cs.add(comp1Id, Components.SCOPE_PRIVATE);
-		fs = reports.reportFilesFromComponentSet(cs);
+		/* add Pkg1/Private into the package set */
+		cs.add(pkg1Id, Packages.SCOPE_PRIVATE);
+		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(1, fs.size());
 		assertTrue(fs.isMember(file1));
 
-		/* add Comp1/Public into the component set */
-		cs.add(comp1Id, Components.SCOPE_PUBLIC);
-		fs = reports.reportFilesFromComponentSet(cs);
+		/* add Pkg1/Public into the package set */
+		cs.add(pkg1Id, Packages.SCOPE_PUBLIC);
+		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(2, fs.size());
 		assertTrue(fs.isMember(file1));
 		assertTrue(fs.isMember(file2));
 
-		/* add Comp2 into the component set */
-		cs.add(comp2Id);
-		fs = reports.reportFilesFromComponentSet(cs);
+		/* add Pkg2 into the package set */
+		cs.add(pkg2Id);
+		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(4, fs.size());
 		assertTrue(fs.isMember(file1));
 		assertTrue(fs.isMember(file2));
 		assertTrue(fs.isMember(file3));
 		assertTrue(fs.isMember(file4));
 		
-		/* add Comp8/Public into the component set */
-		cs.add(comp4Id, Components.SCOPE_PUBLIC);
-		fs = reports.reportFilesFromComponentSet(cs);
+		/* add Pkg8/Public into the package set */
+		cs.add(pkg4Id, Packages.SCOPE_PUBLIC);
+		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(5, fs.size());
 		assertTrue(fs.isMember(file1));
 		assertTrue(fs.isMember(file2));
@@ -431,14 +431,14 @@ public class TestReports2 {
 		assertTrue(fs.isMember(file4));
 		assertTrue(fs.isMember(file8));
 		
-		/* add a few hundred components, and check scalability */
+		/* add a few hundred packages, and check scalability */
 		for (int i = 5; i != 200; i++) {
-			int id = comps.addComponent("Comp" + i);
+			int id = pkgMgr.addPackage("Pkg" + i);
 			cs.add(id, 1 + (i % 2));
 		}
 		
 		/* the simple fact that this doesn't crash is enough to pass the test */
-		fs = reports.reportFilesFromComponentSet(cs);	
+		fs = reports.reportFilesFromPackageSet(cs);	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
