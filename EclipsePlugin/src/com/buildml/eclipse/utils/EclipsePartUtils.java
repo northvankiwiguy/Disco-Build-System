@@ -21,6 +21,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.model.BuildStore;
 import com.buildml.model.FileNameSpaces;
@@ -89,16 +90,26 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Returns the currently active SubEditor.
+	 * @return The currently active SubEditor instance, or null;
+	 */
+	public static SubEditor getActiveSubEditor() {
+		MainEditor mainEditor = getActiveMainEditor();
+		if (mainEditor == null) {
+			return null;
+		}
+		return mainEditor.getActiveSubEditor();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Returns the currently active FilesEditor. If the current editor is not a
 	 * FilesEditor, return null;
 	 * @return The currently active FilesEditor instance, or null;
 	 */
 	public static FilesEditor getActiveFilesEditor() {
-		MainEditor mainEditor = getActiveMainEditor();
-		if (mainEditor == null) {
-			return null;
-		}
-		IEditorPart subEditor = mainEditor.getActiveSubEditor();
+		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor instanceof FilesEditor) {
 			return (FilesEditor)subEditor;
 		}

@@ -1,26 +1,26 @@
-package com.buildml.eclipse.files.handlers;
+package com.buildml.eclipse.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.tasks.TasksEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.BuildStore;
 import com.buildml.model.Reports;
-import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
+import com.buildml.model.types.PackageSet;
+import com.buildml.model.types.TaskSet;
 
 /**
- * Command handler for adding a new tab in the current editor by duplicating the
- * currently visible tab.
+ * Command handler for adding a new tab in the current BuildML editor. There area variety
+ * of ways that a new tab can be created, and this class handles them all.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -37,12 +37,13 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
 		BuildStore buildStore = mainEditor.getBuildStore();
 		Reports reports = buildStore.getReports();
-		IEditorPart currentEditor = mainEditor.getActiveSubEditor();
+		SubEditor currentEditor = mainEditor.getActiveSubEditor();
 		EditorPart newEditor = null;
 		
 		/* 
 		 * Determine exactly which (sub)command should be executed. If this is null, then the user
-		 * would have pressed the top-level toolbar button, which doesn't have a parameter attached.
+		 * would have pressed the top-level toolbar button, which doesn't have a parameter attached,
+		 * so we'll assume they want "duplicate".
 		 */
 		String subCmd = event.getParameter("com.buildml.eclipse.commandParameters.newEditorTab");
 		if (subCmd == null) {
@@ -50,7 +51,8 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		}
 		
 		/*
-		 * Option 1: Duplicate the current editor tab.
+		 * Option 1: Duplicate the current editor tab. This is handled differently, depending
+		 * on what type is sub-editor is currently visible.
 		 */
 		if (subCmd.equals("duplicate")) {
 			if (currentEditor instanceof FilesEditor) {
@@ -68,8 +70,20 @@ public class HandlerNewEditorTab extends AbstractHandler {
 				}
 				newEditor = newFilesEditor;
 			}		
-			else if (currentEditor instanceof TasksEditor) {
-				// TODO: support TasksEditor.
+			else if (currentEditor instanceof ActionsEditor) {
+				ActionsEditor existingEditor = (ActionsEditor)currentEditor;
+				ActionsEditor newActionsEditor = 
+					new ActionsEditor(buildStore, existingEditor.getTitle() + " (copy)");
+				newActionsEditor.setOptions(existingEditor.getOptions());
+				try {
+					newActionsEditor.setFilterPackageSet(
+							(PackageSet)(existingEditor.getFilterPackageSet().clone()));
+					newActionsEditor.setVisibilityFilterSet(
+							(TaskSet)(existingEditor.getVisibilityFilterSet().clone()));
+				} catch (CloneNotSupportedException e) {
+					throw new FatalError("Unable to duplicate a ActionEditor");
+				}
+				newEditor = newActionsEditor;	
 			}
 		}
 		

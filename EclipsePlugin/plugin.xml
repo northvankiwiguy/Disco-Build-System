@@ -65,12 +65,12 @@
       </command>
       <command
             categoryId="com.buildml.eclipse.commands.category"
-            description="Fully expand this directory and all its children"
-            id="com.buildml.eclipse.commands.expandFileSubTree"
-            name="Expand subtree">
+            description="Fully expand this item and all its children"
+            id="com.buildml.eclipse.commands.expandItemSubTree"
+            name="Expand Subtree">
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerShowDetail"
             id="com.buildml.eclipse.commands.showPathRoots"
             name="Show path roots">
          <commandParameter
@@ -80,7 +80,7 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerShowDetail"
             id="com.buildml.eclipse.commands.showPackages"
             name="Show Packages">
          <commandParameter
@@ -90,7 +90,7 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerShowDetail"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerShowDetail"
             id="com.buildml.eclipse.commands.showHiddenPaths"
             name="Show hidden paths">
          <commandParameter
@@ -100,9 +100,9 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerHideRevealPath"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerHideRevealPath"
             id="com.buildml.eclipse.commands.hideRevealPath"
-            name="Hide / Reveal Paths">
+            name="Hide / Reveal Selected Items">
          <commandParameter
                id="com.buildml.eclipse.commandParameters.hideRevealType"
                name="Hide / Reveal Type"
@@ -110,7 +110,7 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterPackages"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerFilterPackages"
             id="com.buildml.eclipse.commands.filterPackages"
             name="Filter Packages">
       </command>
@@ -125,7 +125,7 @@
             name="Search by Name">
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerNewEditorTab"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerNewEditorTab"
             id="com.buildml.eclipse.commands.newEditorTab"
             name="New Editor Tab">
          <commandParameter
@@ -135,7 +135,7 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerRemoveEditorTab"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerRemoveEditorTab"
             id="com.buildml.eclipse.commands.removeEditorTab"
             name="Remove Editor Tab">
       </command>
@@ -145,35 +145,13 @@
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=buildmlactions">
          <command
-               commandId="com.buildml.eclipse.commands.expandFileSubTree"
-               label="Expand sub-tree"
+               commandId="com.buildml.eclipse.commands.expandItemSubTree"
+               label="Expand Subtree"
                style="push">
          </command>
          <command
                commandId="com.buildml.eclipse.commands.hideRevealPath"
-               label="Hide Sub-Tree"
-               style="push">
-            <parameter
-                  name="com.buildml.eclipse.commandParameters.hideRevealType"
-                  value="hide">
-            </parameter>
-            <visibleWhen
-                  checkEnabled="true">
-               <with
-                     variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="com.buildml.eclipse.files.FileRecordDir">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.buildml.eclipse.commands.hideRevealPath"
-               label="Hide Path"
+               label="Hide Selected"
                style="push">
             <parameter
                   name="com.buildml.eclipse.commandParameters.hideRevealType"
@@ -187,7 +165,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="com.buildml.eclipse.files.FileRecordFile">
+                           value="com.buildml.utils.types.IntegerTreeRecord">
                      </instanceof>
                   </iterate>
                </with>
@@ -195,29 +173,7 @@
          </command>
          <command
                commandId="com.buildml.eclipse.commands.hideRevealPath"
-               label="Reveal Sub-Tree"
-               style="push">
-            <parameter
-                  name="com.buildml.eclipse.commandParameters.hideRevealType"
-                  value="reveal">
-            </parameter>
-            <visibleWhen
-                  checkEnabled="true">
-               <with
-                     variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="com.buildml.eclipse.files.FileRecordDir">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.buildml.eclipse.commands.hideRevealPath"
-               label="Reveal Path"
+               label="Reveal Selected"
                style="push">
             <parameter
                   name="com.buildml.eclipse.commandParameters.hideRevealType"
@@ -231,7 +187,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="com.buildml.eclipse.files.FileRecordFile">
+                           value="com.buildml.utils.types.IntegerTreeRecord">
                      </instanceof>
                   </iterate>
                </with>
@@ -305,6 +261,19 @@
                      value="write">
                </parameter>
             </command>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.buildml.model.types.FileRecord">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </menu>
          <menu
                label="Show Derived Files..."
@@ -329,6 +298,19 @@
                      value="allDerived">
                </parameter>
             </command>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.buildml.model.types.FileRecord">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </menu>
          <menu
                label="Show Input Files..."
@@ -353,6 +335,19 @@
                      value="allInput">
                </parameter>
             </command>
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.buildml.model.types.FileRecord">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </menu>
          <separator
                name="com.buildml.eclipse.commands.separator2"
@@ -412,7 +407,7 @@
                   icon="images/show_roots_icon.gif"
                   label="Show Path Roots"
                   style="toggle"
-                  tooltip="Show path roots in the file editor.">
+                  tooltip="Show path roots.">
                <parameter
                      name="com.buildml.eclipse.commandParameters.showDetail"
                      value="path-roots">
@@ -428,7 +423,7 @@
                   icon="images/show_packages_icon.gif"
                   label="Show Packages"
                   style="toggle"
-                  tooltip="Show package names in the file editor.">
+                  tooltip="Show the package that each item belongs to.">
                <parameter
                      name="com.buildml.eclipse.commandParameters.showDetail"
                      value="packages">
@@ -444,7 +439,7 @@
                   icon="images/show_hidden_files.gif"
                   label="Show Hidden Paths"
                   style="toggle"
-                  tooltip="Reveal paths that were hidden.">
+                  tooltip="Reveal items that were previously hidden.">
                <parameter
                      name="com.buildml.eclipse.commandParameters.showDetail"
                      value="show-hidden">
@@ -590,23 +585,39 @@
             class="com.buildml.eclipse.files.handlers.HandlerShowDerivedFiles"
             commandId="com.buildml.eclipse.commands.showDerivedInputFiles">
          <enabledWhen>
-            <count
-                  value="+">
-            </count>
+            <and>
+               <count
+                     value="+">
+               </count>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.buildml.model.types.FileRecord">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
-            class="com.buildml.eclipse.files.handlers.HandlerExpandFileSubTree"
-            commandId="com.buildml.eclipse.commands.expandFileSubTree">
+            class="com.buildml.eclipse.handlers.HandlerExpandItemSubTree"
+            commandId="com.buildml.eclipse.commands.expandItemSubTree">
          <enabledWhen>
             <with
                   variable="selection">
                <iterate
                      ifEmpty="false"
                      operator="or">
-                  <instanceof
-                        value="com.buildml.eclipse.files.FileRecordDir">
-                  </instanceof>
+                  <or>
+                     <instanceof
+                           value="com.buildml.eclipse.files.UIFileRecordDir">
+                     </instanceof>
+                     <instanceof
+                           value="com.buildml.eclipse.actions.UIActionRecord">
+                     </instanceof></or>
                </iterate>
             </with>
          </enabledWhen>
@@ -638,7 +649,7 @@
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="com.buildml.eclipse.commands.expandFileSubTree"
+            commandId="com.buildml.eclipse.commands.expandItemSubTree"
             contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+E">

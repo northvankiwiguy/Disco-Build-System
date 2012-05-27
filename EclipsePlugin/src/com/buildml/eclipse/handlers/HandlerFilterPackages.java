@@ -1,14 +1,13 @@
-package com.buildml.eclipse.files.handlers;
+package com.buildml.eclipse.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.PackageFilterDialog;
 import com.buildml.model.types.PackageSet;
 
@@ -33,32 +32,31 @@ public class HandlerFilterPackages extends AbstractHandler {
 		
 		/* figure out which editor is currently active */
 		MainEditor editor = (MainEditor) HandlerUtil.getActiveEditor(event);
-		IEditorPart editorPart = editor.getActiveSubEditor();
+		SubEditor subEditor = editor.getActiveSubEditor();
 		
 		/* 
-		 * For the file editor, start a "PackageFilterDialog" and if the user
-		 * presses "OK", update the editor's filter PackageSet with the 
-		 * newly selected set.
+		 * If the sub-editor supports package filtering, we should start a 
+		 * "PackageFilterDialog" and if the user presses "OK", update the 
+		 * editor's filter PackageSet with the newly selected set.
 		 */
-		if (editorPart instanceof FilesEditor) {
-			FilesEditor filesEditor = (FilesEditor)editorPart;
-			PackageSet pkgFilterSet = filesEditor.getFilterPackageSet();
-			
-			PackageFilterDialog pkgSelDialog = 
-				new PackageFilterDialog(pkgFilterSet);
-			pkgSelDialog.open();
-			
-			int retCode = pkgSelDialog.getReturnCode();
-			if (retCode == Dialog.OK) {
-				filesEditor.setFilterPackageSet(pkgSelDialog.getPackageSet());
+		PackageSet pkgFilterSet = subEditor.getFilterPackageSet();
+		if (pkgFilterSet == null) {
+			return null;
+		}
+		
+		// TODO: check whether the sub-editor supports filter via scopes.
+		PackageFilterDialog pkgSelDialog = new PackageFilterDialog(pkgFilterSet);
+		pkgSelDialog.open();
+		
+		int retCode = pkgSelDialog.getReturnCode();
+		if (retCode == Dialog.OK) {
+			subEditor.setFilterPackageSet(pkgSelDialog.getPackageSet());
 
-			} else if (retCode == Dialog.CANCEL) {
-				/* do nothing - the Dialog was canceled */
+		} else if (retCode == Dialog.CANCEL) {
+			/* do nothing - the Dialog was canceled */
 				
-			} else {
-				System.out.println("Unknown return code");
-			}
-
+		} else {
+			System.out.println("Unknown return code");
 		}
 		return null;
 	}

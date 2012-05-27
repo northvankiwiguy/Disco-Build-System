@@ -1,4 +1,4 @@
-package com.buildml.eclipse.files.handlers;
+package com.buildml.eclipse.handlers;
 
 import java.util.Iterator;
 
@@ -6,29 +6,28 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.files.FileRecordDir;
+import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 
 /**
- * 
  * A command handler for implementing the "Expand subtree" menu item. This
  * allows the user to expand an entire sub-tree of a file tree viewer.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerExpandFileSubTree extends AbstractHandler {
+public class HandlerExpandItemSubTree extends AbstractHandler {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
 	/**
-	 * The user has selected some elements on a file viewer tree, and we should proceed
-	 * to expand any of those elements that are of the FileRecordDir type.
+	 * The user has selected some elements on a TreeViewer, and we should proceed
+	 * to expand those elements (although clearly, they'll only be expanded if they
+	 * have children, and are not already expanded).
 	 * @param event The event information describing the selection. 
 	 */
 	@Override
@@ -39,20 +38,12 @@ public class HandlerExpandFileSubTree extends AbstractHandler {
 		 * selected items are part of.
 		 */
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);		
-		MainEditor editor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		IEditorPart subEditor = editor.getActiveSubEditor();
-
-		/* we only execute if the current editor is a FilesEditor */
-		if (subEditor instanceof FilesEditor) {
-			FilesEditor filesEditor = (FilesEditor)subEditor;
+		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 			
-			/* for each selected path (which is a directory), ask the editor to expand it. */
-			for (Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-				Object node = (Object) iter.next();
-				if (node instanceof FileRecordDir) {
-					filesEditor.expandSubtree((FileRecordDir)node);
-				}
-			}
+		/* for each selected item, ask the editor to expand it. */
+		for (Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+			Object node = (Object) iter.next();
+			subEditor.expandSubtree(node);
 		}
 		
 		/* for now, return code is always null */

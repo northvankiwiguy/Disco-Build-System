@@ -12,8 +12,10 @@
 
 package com.buildml.eclipse.utils;
 
-import com.buildml.eclipse.files.FileRecordDir;
-import com.buildml.eclipse.files.FileRecordFile;
+import com.buildml.eclipse.actions.UIActionRecord;
+import com.buildml.eclipse.files.UIFileRecordDir;
+import com.buildml.eclipse.files.UIFileRecordFile;
+import com.buildml.model.BuildTasks;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 
@@ -31,8 +33,8 @@ public class ConversionUtils {
 
 	/**
 	 * Given a path ID number, return a suitable subclass of FileRecord that reflects
-	 * the type of the path. For example, return a FileRecordFile() if the pathId refers
-	 * to a file, or a FileRecordDir() if it refers to a directory.
+	 * the type of the path. For example, return a UIFileRecordFile() if the pathId refers
+	 * to a file, or a UIFileRecordDir() if it refers to a directory.
 	 * @param fns The FileNameSpaces object that this path belongs to
 	 * @param pathId The ID of the path we need to create a FileRecord for.
 	 * @return The new object, whose class is a sub-class of FileRecord.
@@ -41,9 +43,9 @@ public class ConversionUtils {
 	{
 		switch (fns.getPathType(pathId)) {
 		case TYPE_DIR:
-			return new FileRecordDir(pathId);
+			return new UIFileRecordDir(pathId);
 		case TYPE_FILE:
-			return new FileRecordFile(pathId);
+			return new UIFileRecordFile(pathId);
 		case TYPE_INVALID:
 		case TYPE_SYMLINK:
 			// TODO: handle this error somehow
@@ -68,6 +70,24 @@ public class ConversionUtils {
 			result[i] = createFileRecordWithType(fns, intArr[i]);
 		}
 		return result;		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given an Integer[], return a corresponding ActionRecord[]
+	 * @param actionMgr The BuildTasks object that these actions belong to.
+	 * @param intArr The Integer[] to be converted.
+	 * @return The equivalent UIActionRecord[].
+	 */
+	public static UIActionRecord[] convertIntArrToActionRecordArr(
+			BuildTasks actionMgr, Integer[] intArr) {
+		
+		UIActionRecord result[] = new UIActionRecord[intArr.length];
+		for (int i = 0; i < intArr.length; i++) {
+			result[i] = new UIActionRecord(intArr[i]);
+		}
+		return result;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

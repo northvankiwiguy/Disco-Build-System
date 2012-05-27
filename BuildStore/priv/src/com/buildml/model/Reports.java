@@ -76,7 +76,8 @@ public class Reports {
 		selectFilesAccessedByTaskPrepStmt = null,
 		selectFilesAccessedByTaskAnyPrepStmt = null,
 		selectWriteOnlyFilesPrepStmt = null,
-		selectAllFilesPrepStmt = null;
+		selectAllFilesPrepStmt = null,
+		selectAllActionsPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -144,6 +145,7 @@ public class Reports {
 				      "where readFileId is null");
 		
 		selectAllFilesPrepStmt = db.prepareStatement("select id from files");
+		selectAllActionsPrepStmt = db.prepareStatement("select taskId from buildTasks");
 	}
 
 	/*=====================================================================================*
@@ -473,6 +475,30 @@ public class Reports {
 		FileSet results = new FileSet(fns);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectAllFilesPrepStmt);
+
+			while (rs.next()) {
+				results.add(rs.getInt(1));
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the complete set of actions in the BuildStore. The allows us to generate
+	 * an ActionSet containing all known actions.
+	 * @return The complete set of actions in the BuildStore.
+	 */
+	public TaskSet reportAllActions() {
+		TaskSet results = new TaskSet(bts);
+		try {
+			ResultSet rs = db.executePrepSelectResultSet(selectAllActionsPrepStmt);
 
 			while (rs.next()) {
 				results.add(rs.getInt(1));

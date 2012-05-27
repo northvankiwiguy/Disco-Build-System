@@ -14,8 +14,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
+import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.tasks.TasksEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.BuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
@@ -103,7 +103,7 @@ public class MainEditor extends MultiPageEditorPart {
 	 * will be set to be the same as the title of the window.
 	 * 
 	 * @param editor The new editor instance to add within the tab. This would usually be
-	 * 			a FilesEditor, TasksEditor, or similar.
+	 * 			a FilesEditor, ActionsEditor, or similar.
 	 * @return The tab index of the newly added tab.
 	 */
 	public int newPage(EditorPart editor) {
@@ -160,10 +160,8 @@ public class MainEditor extends MultiPageEditorPart {
 		super.pageChange(newPageIndex);
 		
 		/* trigger the pageChange() method on the sub-editor, so it can update the UI */
-		IEditorPart subEditor = getActiveEditor();
-		if (subEditor instanceof FilesEditor) {
-			((FilesEditor)subEditor).pageChange();			
-		}
+		SubEditor subEditor = (SubEditor)getActiveEditor();
+		subEditor.pageChange();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -177,10 +175,10 @@ public class MainEditor extends MultiPageEditorPart {
 
 
 		/* create the file editor tab */
-		newPage(new FilesEditor(buildStore, "Files"));
+		newPage(new FilesEditor(buildStore, " Files "));
 
 		/* create the task editor tab */
-		newPage(new TasksEditor(buildStore, "Tasks"));
+		newPage(new ActionsEditor(buildStore, " Actions "));
 			
 			/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());
@@ -250,8 +248,8 @@ public class MainEditor extends MultiPageEditorPart {
 	 * operations that occur.
 	 * @return The editor that's currently visible.
 	 */
-	public IEditorPart getActiveSubEditor() {
-		return this.getActiveEditor();
+	public SubEditor getActiveSubEditor() {
+		return (SubEditor) this.getActiveEditor();
 	}
 	
 	/*=====================================================================================*

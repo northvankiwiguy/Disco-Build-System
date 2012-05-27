@@ -16,21 +16,21 @@ import com.buildml.model.types.FileRecord;
 
 /**
  * A subclass of FileRecord used by the UI to distinguish FileRecords that represent
- * files, versus those that represent directories (or other types).
+ * directories, versus those that represent files (or other types).
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FileRecordFile extends FileRecord {
+public class UIFileRecordDir extends FileRecord {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new FileRecordFile
-	 * @param parentId The ID of this FileRecordFile
+	 * Create a new UIFileRecordDir
+	 * @param parentId The ID of this UIFileRecordDir
 	 */
-	public FileRecordFile(int parentId) {
+	public UIFileRecordDir(int parentId) {
 		super(parentId);
 	}
 

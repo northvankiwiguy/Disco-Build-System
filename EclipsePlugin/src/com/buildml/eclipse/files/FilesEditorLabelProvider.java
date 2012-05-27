@@ -22,6 +22,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.Activator;
+import com.buildml.eclipse.EditorOptions;
 import com.buildml.model.Packages;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.FileNameSpaces.PathType;
@@ -159,7 +160,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				/* for FileRecords, we return the path's base name */
 
 				/* case: show file path roots */
-				if (editor.isOptionSet(FilesEditor.OPT_SHOW_ROOTS)) {
+				if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS)) {
 					String rootName = fns.getRootAtPath(pathId);
 					if (rootName != null) {
 						String fullPath = fns.getPathName(pathId);
@@ -168,7 +169,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				}
 
 				/* case: show the directory, but coalesce child directories */
-				if (editor.isOptionSet(FilesEditor.OPT_COALESCE_DIRS)) {
+				if (editor.isOptionSet(EditorOptions.OPT_COALESCE_DIRS)) {
 					return getCoalescedText(pathId);
 
 					/* case: show the directory, with no coalescing */

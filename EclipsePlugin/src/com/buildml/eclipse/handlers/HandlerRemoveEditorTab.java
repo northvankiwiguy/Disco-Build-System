@@ -1,4 +1,4 @@
-package com.buildml.eclipse.files.handlers;
+package com.buildml.eclipse.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

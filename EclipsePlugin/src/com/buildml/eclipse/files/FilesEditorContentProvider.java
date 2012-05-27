@@ -15,6 +15,7 @@ package com.buildml.eclipse.files;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
+import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.FileNameSpaces.PathType;
@@ -82,7 +83,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 				 * over single-child directories where the child is itself
 				 * a directory.
 				 */
-				if (editor.isOptionSet(FilesEditor.OPT_COALESCE_DIRS)) {
+				if (editor.isOptionSet(EditorOptions.OPT_COALESCE_DIRS)) {
 					
 					/* if there isn't a single child, we don't care - exit */
 					if (childIds.length != 1) {
@@ -135,7 +136,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			}
 			
 			/* construct a new FileRecord (which must be a directory) */
-			return new FileRecordDir(parentId);
+			return new UIFileRecordDir(parentId);
 		}
 		return null;
 	}
@@ -174,7 +175,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	public FileRecord[] getRootElements() {
 		
 		int topRootId = fns.getRootPath("root");
-		if (editor.isOptionSet(FilesEditor.OPT_SHOW_ROOTS))
+		if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS))
 		{
 			String rootNames[] = fns.getRoots();
 			FileRecord fileRecords[] = new FileRecord[rootNames.length];
@@ -190,7 +191,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 					id = topRootId;
 				}
 				
-				/* create either a FileRecordFile, or a FileRecordDir object */
+				/* create either a UIFileRecordFile, or a UIFileRecordDir object */
 				fileRecords[i] = ConversionUtils.createFileRecordWithType(fns, id);
 			}
 			return fileRecords;

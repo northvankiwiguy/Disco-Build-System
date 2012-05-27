@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.files;
+package com.buildml.eclipse.actions;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -23,7 +23,10 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -36,30 +39,31 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.BuildStore;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.types.FileRecord;
-import com.buildml.model.types.FileSet;
+import com.buildml.model.BuildTasks;
 import com.buildml.model.types.PackageSet;
+import com.buildml.model.types.TaskRecord;
+import com.buildml.model.types.TaskSet;
 
 /**
- * A BuildML editor that displays the set of files within a BuildStore.
+ * Implements an sub-editor for browsing a BuildStore's actions.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FilesEditor extends SubEditor {
+public class ActionsEditor extends SubEditor {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
 	/** This editor's main control is a TreeViewer, for displaying the list of files */
-	private VisibilityTreeViewer filesTreeViewer = null;
+	VisibilityTreeViewer actionsTreeViewer = null;
 	
 	/** The column that displays the path tree */
 	private TreeColumn treeColumn;
@@ -67,23 +71,22 @@ public class FilesEditor extends SubEditor {
 	/** The column that displays the package name */
 	private TreeColumn pkgColumn;
 	
-	/** The column that displays the path's scope */
-	private TreeColumn scopeColumn;
-	
-	/** The FileNameSpaces object that contains all the file information for this BuildStore */
-	private FileNameSpaces fns = null;
+	/** The Action manager object that contains all the file information for this BuildStore */
+	private BuildTasks actionMgr = null;
 	
 	/** The ArrayContentProvider object providing this editor's content */
-	private FilesEditorContentProvider contentProvider;
-
-	/** The set of paths (within the FileNameSpaces) that are currently visible. */
-	private FileSet visiblePaths = null;
+	private ActionsEditorContentProvider contentProvider;
+	
+	/**
+	 * The set of actions (within the BuildTasks) that are currently visible. 
+	 */
+	private TaskSet visibleActions = null;
 
 	/**
 	 * The object that provides visible/non-visible information about each
-	 * element in the file tree.
+	 * element in the action tree.
 	 */
-	private FilesEditorVisibilityProvider visibilityProvider;
+	private ActionsEditorVisibilityProvider visibilityProvider;
 
 	/**
 	 * The previous set of option bits. The refreshView() method uses this value to
@@ -91,25 +94,33 @@ public class FilesEditor extends SubEditor {
 	 */
 	private int previousEditorOptionBits = 0;
 
-	/** The TreeViewer's parent control. */
+	/**
+	 * The TreeViewer's parent control.
+	 */
 	private Composite filesEditorComposite;
 
+	/**
+	 * The current tree item that has its text expanded. When a new tree item
+	 * is selected, this item's text will be contracted again.
+	 */
+	UIActionRecord previousSelection = null;
+
 	/*=====================================================================================*
-	 * CONSTRUCTORS
+	 * CONSTRUCTOR
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new FilesEditor instance, using the specified BuildStore as input
+	 * Create a new ActionsEditor instance, using the specified BuildStore as input
 	 * @param buildStore The BuildStore to display/edit.
 	 * @param tabTitle The text to appear on the editor's tab.
 	 */
-	public FilesEditor(BuildStore buildStore, String tabTitle) {
+	public ActionsEditor(BuildStore buildStore, String tabTitle) {
 		super(buildStore, tabTitle);
-
-		fns = buildStore.getFileNameSpaces();
-
+		
+		actionMgr = buildStore.getBuildTasks();
+		
 		/* initially, all paths are visible */
-		visiblePaths = buildStore.getReports().reportAllFiles();
+		visibleActions = buildStore.getReports().reportAllActions();
 	}
 	
 	/*=====================================================================================*
@@ -132,7 +143,7 @@ public class FilesEditor extends SubEditor {
 		setSite(site);
 		setInput(input);
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -145,58 +156,51 @@ public class FilesEditor extends SubEditor {
 		super.createPartControl(parent);
 		
 		/* create the main Tree control that the user will view/manipulate */
-		Tree fileEditorTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL |
+		Tree actionEditorTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL |
 															SWT.MULTI | SWT.FULL_SELECTION);
-		fileEditorTree.setHeaderVisible(true);
-	    fileEditorTree.setLinesVisible(true);
-		
+		actionEditorTree.setHeaderVisible(true);
+	    actionEditorTree.setLinesVisible(true);
+	    
 		/*
 		 * The main control in this editor is a TreeViewer that allows the user to
-		 * browse the structure of the BuildStore's file system. It has three columns:
+		 * browse the structure of the BuildStore's actions. It has two columns:
 		 *    1) The file system path (shown as a tree).
 		 *    2) The path's package (shown as a fixed-width column);
-		 *    3) The path's scope (private, public etc).
 		 */
-		filesTreeViewer = new VisibilityTreeViewer(fileEditorTree);
-		treeColumn = new TreeColumn(fileEditorTree, SWT.LEFT);
+		actionsTreeViewer = new VisibilityTreeViewer(actionEditorTree);
+		treeColumn = new TreeColumn(actionEditorTree, SWT.LEFT);
 	    treeColumn.setAlignment(SWT.LEFT);
-	    treeColumn.setText("Path");
-	    pkgColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
+	    treeColumn.setText("Action Command");
+	    pkgColumn = new TreeColumn(actionEditorTree, SWT.RIGHT);
 	    pkgColumn.setAlignment(SWT.LEFT);
 	    pkgColumn.setText("Package");
-	    scopeColumn = new TreeColumn(fileEditorTree, SWT.RIGHT);
-	    scopeColumn.setAlignment(SWT.LEFT);
-	    scopeColumn.setText("Scope");
 	    filesEditorComposite = parent;
 	    
 	    /*
 	     * Set the initial column widths so that the path column covers the full editor
-	     * window, and the package/scope columns are empty. Setting the path column
+	     * window, and the package column is empty. Setting the path column
 	     * to a non-zero pixel width causes it to be expanded to the editor's full width. 
 	     */
 	    treeColumn.setWidth(1);
 	    pkgColumn.setWidth(0);
-	    scopeColumn.setWidth(0);
 		
 	    /*
 		 * Add the tree/table content and label providers.
 		 */
-		contentProvider = new FilesEditorContentProvider(this, fns);
-		FilesEditorLabelProvider labelProvider = 
-				new FilesEditorLabelProvider(this, fns, buildStore.getPackages());
-		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
-		filesTreeViewer.setContentProvider(contentProvider);
-		filesTreeViewer.setLabelProvider(labelProvider);
-		filesTreeViewer.setSorter(viewerSorter);
+		contentProvider = new ActionsEditorContentProvider(this, actionMgr);
+		ActionsEditorLabelProvider labelProvider = 
+				new ActionsEditorLabelProvider(this, actionMgr, buildStore.getPackages());
+		actionsTreeViewer.setContentProvider(contentProvider);
+		actionsTreeViewer.setLabelProvider(labelProvider);
 		
 		/*
 		 * Set up a visibility provider so we know which paths should be visible (at
 		 * least to start with).
 		 */
-		visibilityProvider = new FilesEditorVisibilityProvider(visiblePaths);
+		visibilityProvider = new ActionsEditorVisibilityProvider(visibleActions);
 		visibilityProvider.setSecondaryFilterSet(null);
-		filesTreeViewer.setVisibilityProvider(visibilityProvider);
-		
+		actionsTreeViewer.setVisibilityProvider(visibilityProvider);
+
 		/*
 		 * Record the initial set of option bits so that we can later determine
 		 * which bits have been modified (this is used in refreshView()).
@@ -204,14 +208,40 @@ public class FilesEditor extends SubEditor {
 		previousEditorOptionBits = getOptions();
 		
 		/* double-clicking on an expandable node will expand/contract that node */
-		filesTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
+		actionsTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				FileRecord node = (FileRecord)selection.getFirstElement();
-				if (filesTreeViewer.isExpandable(node)){
-					filesTreeViewer.setExpandedState(node, 
-							!filesTreeViewer.getExpandedState(node));
+				TaskRecord node = (TaskRecord)selection.getFirstElement();
+				if (actionsTreeViewer.isExpandable(node)){
+					actionsTreeViewer.setExpandedState(node, 
+							!actionsTreeViewer.getExpandedState(node));
+				}
+			}
+		});
+		
+		/* 
+		 * Selecting a tree item will cause its text to be expanded, possible over multiple
+		 * lines.
+		 */
+		actionsTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				TreeSelection selection = (TreeSelection)event.getSelection();
+				
+				/* unselect the previously selected item */
+				if (previousSelection != null) {
+					previousSelection.setExpandedText(false);
+					actionsTreeViewer.update(previousSelection, null);
+				}
+				
+				/* only expand the current selection, if the selection size is 1 */
+				if (selection.size() == 1) {
+					Object item = (Object)selection.getFirstElement();
+					if (item instanceof UIActionRecord) {
+						UIActionRecord actionRecord = (UIActionRecord)item;
+						actionRecord.setExpandedText(true);
+						actionsTreeViewer.update(actionRecord, null);
+						previousSelection = actionRecord;
+					}
 				}
 			}
 		});
@@ -226,26 +256,26 @@ public class FilesEditor extends SubEditor {
 				manager.add(new Separator("additions"));
 			}
 		});
-		Menu menu = menuMgr.createContextMenu(filesTreeViewer.getControl());
-		filesTreeViewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, filesTreeViewer);
-		getSite().setSelectionProvider(filesTreeViewer);
+		Menu menu = menuMgr.createContextMenu(actionsTreeViewer.getControl());
+		actionsTreeViewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, actionsTreeViewer);
+		getSite().setSelectionProvider(actionsTreeViewer);
 		
 		/* 
 		 * When the tree viewer needs to compare its elements, this class
-		 * (FilesEditor) provides the equals() and hashcode() methods.
+		 * (ActionsEditor) provides the equals() and hashcode() methods.
 		 */
-		filesTreeViewer.setComparer(this);
+		actionsTreeViewer.setComparer(this);
 
 		/* start by displaying from the root (which changes, depending on our options). */
-		filesTreeViewer.setInput(contentProvider.getRootElements());
+		actionsTreeViewer.setInput(contentProvider.getRootElements());
 
 		/* based on the size of the set to be displayed, auto-size the tree output */
 		int outputSize = getVisibilityFilterSet().size();
 		if (outputSize < AUTO_EXPAND_THRESHOLD) {
-			filesTreeViewer.expandAll();
+			actionsTreeViewer.expandAll();
 		} else {
-			filesTreeViewer.expandToLevel(2);
+			actionsTreeViewer.expandToLevel(2);
 		}
 		/* 
 		 * Now that we've created all the widgets, force options to take effect. Note
@@ -266,8 +296,8 @@ public class FilesEditor extends SubEditor {
 	public void setFocus() {
 		
 		/* if we focus on this editor, we actually focus on the TreeViewer control */
-		if (filesTreeViewer != null){
-			filesTreeViewer.getControl().setFocus();
+		if (actionsTreeViewer != null){
+			actionsTreeViewer.getControl().setFocus();
 		}		
 	}
 	
@@ -282,7 +312,7 @@ public class FilesEditor extends SubEditor {
 		ICommandService service =
 			(ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
 		
-		/* 
+		/*
 		 * Make sure that each of these toolbar buttons (and menu items) are updated
 		 * appropriately to match the settings of *this* editor, instead of the previous
 		 * editor.
@@ -295,41 +325,52 @@ public class FilesEditor extends SubEditor {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Set the visibility state of the specified path. A visible path is rendered as per usual,
-	 * but a non-visible path will either be greyed out, or not rendered at all (depending
-	 * on the current setting of the grey-visibility mode). Making a previously visible path
-	 * invisible will also make all child paths invisible. Making a previously invisible
-	 * path visible will ensure that all parent paths are also made visible.
+	 * Set the visibility state of the specified action. A visible action is rendered as usual,
+	 * but a non-visible action will either be greyed out, or not rendered at all (depending
+	 * on the current setting of the grey-visibility mode). Making a previously visible action
+	 * invisible will also make all child actions invisible. Making a previously invisible
+	 * action visible will ensure that all parent actions are also made visible.
 	 * 
-	 * @param item The path to be hidden or revealed.
-	 * @param state True if the path should be made visible, else false.
+	 * @param item The action to be hidden or revealed.
+	 * @param state True if the action should be made visible, else false.
 	 */
 	public void setItemVisibilityState(Object item, boolean state) {
-		filesTreeViewer.setVisibility(item, state);
+		actionsTreeViewer.setVisibility(item, state);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Set the complete set of paths that this editor's tree viewer will show. After
+	 * Set the complete set of actions that this editor's tree viewer will show. After
 	 * calling this method, it will be necessary to also call refreshView() to actually
 	 * update the view.
-	 * @param visiblePaths The subset of paths that should be visible in the editor.
+	 * @param visibleActions The subset of actions that should be visible in the editor.
 	 */
-	public void setVisibilityFilterSet(FileSet visiblePaths) {
-		this.visiblePaths = visiblePaths;
+	public void setVisibilityFilterSet(TaskSet visibleActions) {
+		this.visibleActions = visibleActions;
 		if (visibilityProvider != null) {
-			visibilityProvider.setPrimaryFilterSet(visiblePaths);
+			visibilityProvider.setPrimaryFilterSet(visibleActions);
 		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * @return The set of files that are currently visible in this editor's tree viewer.
+	 * @return The set of actions that are currently visible in this editor's tree viewer.
 	 */
-	public FileSet getVisibilityFilterSet() {
+	public TaskSet getVisibilityFilterSet() {
 		return visibilityProvider.getPrimaryFilterSet();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given an item in the editor, expand all the descendants of that item so
+	 * that they're visible in the tree viewer.
+	 * @param node The tree node representing the item in the tree to be expanded.
+	 */
+	public void expandSubtree(Object node) {
+		actionsTreeViewer.expandToLevel(node, AbstractTreeViewer.ALL_LEVELS);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -339,18 +380,18 @@ public class FilesEditor extends SubEditor {
 	 * deciding which files should be displayed (versus being filtered out).
 	 * @param newSet This editor's new package filter set.
 	 */
-	@Override
 	public void setFilterPackageSet(PackageSet newSet) {
 		super.setFilterPackageSet(newSet);
 		
-		/* if the editor is in an initialized state, we can fresh the filters */
+		/* if the editor is already display, we can fresh the filters */
 		if (visibilityProvider != null) {
-			FileSet pkgFileSet = 
-				buildStore.getReports().reportFilesFromPackageSet(newSet);
-			pkgFileSet.populateWithParents();
-		
-			visibilityProvider.setSecondaryFilterSet(pkgFileSet);
-			refreshView(true);
+			// TODO: implement this.
+//			TaskSet pkgActionSet = 
+//				buildStore.getReports().reportActionsFromPackageSet(newSet);
+//			pkgActionSet.populateWithParents();
+//		
+//			visibilityProvider.setSecondaryFilterSet(pkgActionSet);
+//			refreshView(true);
 		}
 	}
 	
@@ -358,7 +399,7 @@ public class FilesEditor extends SubEditor {
 
 	/**
 	 * Refresh the editor's content. This is typically called when some type of display
-	 * option changes (e.g. roots or packages have been added), and the content is now
+	 * option changes (e.g. packages have been added), and the content is now
 	 * different, or if the user resizes the main Eclipse shell. We use a progress monitor,
 	 * since a redraw operation might take a while.
 	 * @param forceRedraw true if we want to force a complete redraw of the viewer.
@@ -369,9 +410,9 @@ public class FilesEditor extends SubEditor {
 		int currentOptions = getOptions();
 		int changedOptions = previousEditorOptionBits ^ currentOptions;
 		previousEditorOptionBits = currentOptions;
-
+		
 		/*
-		 * Determine whether the packages/scope columns should be shown. Setting the
+		 * Determine whether the packages columns should be shown. Setting the
 		 * width appropriately is important, especially if the shell was recently resized.
 		 * TODO: figure out why subtracting 20 pixels is important for matching the column
 		 * size with the size of the parent composite.
@@ -383,7 +424,6 @@ public class FilesEditor extends SubEditor {
 			    int pkgWidth = isOptionSet(EditorOptions.OPT_SHOW_PACKAGES) ? 100 : 0;
 			    treeColumn.setWidth(editorWidth - 2 * pkgWidth);
 			    pkgColumn.setWidth(pkgWidth);
-			    scopeColumn.setWidth(pkgWidth);		
 			}
 		});
 
@@ -392,13 +432,8 @@ public class FilesEditor extends SubEditor {
 		 * it's just the columns, then we don't need to re-query the model in order to redisplay.
 		 * Unless our caller explicitly requested a redraw.
 		 */
-		if (!forceRedraw && ((changedOptions & (EditorOptions.OPT_COALESCE_DIRS | 
-												EditorOptions.OPT_SHOW_ROOTS)) == 0)) {
+		if (!forceRedraw) {
 			return;
-		}
-		
-		if ((changedOptions & EditorOptions.OPT_COALESCE_DIRS) != 0) {
-			filesTreeViewer.setInput(contentProvider.getRootElements());
 		}
 		
 		/*
@@ -417,9 +452,9 @@ public class FilesEditor extends SubEditor {
 				Display.getDefault().syncExec(new Runnable() {
 					@Override
 					public void run() {
-						Object[] expandedElements = filesTreeViewer.getExpandedElements();
-						filesTreeViewer.setInput(contentProvider.getRootElements());
-						filesTreeViewer.refresh();
+						Object[] expandedElements = actionsTreeViewer.getExpandedElements();
+						actionsTreeViewer.setInput(contentProvider.getRootElements());
+						actionsTreeViewer.refresh();
 						
 						/* 
 						 * Ensure that all previously-expanded items are now expanded again.
@@ -427,7 +462,7 @@ public class FilesEditor extends SubEditor {
 						 * open all the parent elements as well.
 						 */
 						for (int i = 0; i < expandedElements.length; i++) {
-							filesTreeViewer.expandToLevel(expandedElements[i], 1);							
+							actionsTreeViewer.expandToLevel(expandedElements[i], 1);							
 						}
 					}
 				});
@@ -446,29 +481,19 @@ public class FilesEditor extends SubEditor {
 			// TODO: what to do here?
 		}
 	}
-
-	/*=====================================================================================*
-	 * PRIVATE/PROTECTED METHODS
-	 *=====================================================================================*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.eclipse.SubEditor#expandSubtree(java.lang.Object)
-	 */
-	@Override
-	public void expandSubtree(Object node) {
-		filesTreeViewer.expandToLevel(node, AbstractTreeViewer.ALL_LEVELS);
-	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.buildml.eclipse.SubEditor#updateEditorWithNewOptions(int, boolean)
+	/**
+	 * Invoked whenever one of this editor's options are changed. We may need to react
+	 * to the option change in some way.
+	 * @param optionBits The option(s) that were modified.
+	 * @param enable True if the options were added, else false.
 	 */
-	@Override
 	protected void updateEditorWithNewOptions(int optionBits, boolean enable) {
 		/* pass some of the options onto onto parts of the system */
-		if ((filesTreeViewer != null) && (optionBits & EditorOptions.OPT_SHOW_HIDDEN) != 0) {
-			filesTreeViewer.setGreyVisibilityMode(enable);
+		if ((actionsTreeViewer != null) && (optionBits & EditorOptions.OPT_SHOW_HIDDEN) != 0) {
+			actionsTreeViewer.setGreyVisibilityMode(enable);
 		}
 	}
 

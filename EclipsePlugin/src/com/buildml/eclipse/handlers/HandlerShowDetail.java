@@ -1,4 +1,4 @@
-package com.buildml.eclipse.files.handlers;
+package com.buildml.eclipse.handlers;
 
 import java.util.Map;
 
@@ -14,12 +14,14 @@ import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
 
+import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 
 /**
- * A handler for managing the state of various view options. These options are
+ * A command handler for managing the state of various view options. These options are
  * triggered by the pop-up menu ("Show details"), or via the editor's toolbar icons.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -81,7 +83,7 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 		 * the new state of the command.
 		 */
 		MainEditor editor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		final FilesEditor subEditor = (FilesEditor)editor.getActiveSubEditor();
+		final SubEditor subEditor = (SubEditor)editor.getActiveSubEditor();
 		
 		if (savedHandlerOptionBit == -1) {
 			savedHandlerOptionBit = computeOptionBits(paramValue);
@@ -98,11 +100,11 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 		service.refreshElements(event.getCommand().getId(), null);
 		
 		/*
-		 * Refresh the FilesEditor content as a background task. This is necessary
+		 * Refresh the SubEditor content as a background task. This is necessary
 		 * for the option's effect to be invoked (e.g. redrawing the tree viewer with
 		 * the new option set).
 		 */
-		subEditor.refreshView();						
+		subEditor.refreshView(false);
 		return null;
 	}
 
@@ -121,15 +123,13 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 		 * We need to query the current editor page to see what the settings for the 
 		 * editor are.
 		 */
-		MainEditor editor = (MainEditor)
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-		FilesEditor subEditor = (FilesEditor)editor.getActiveSubEditor();
+		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		
 		/* 
 		 * Note: this handler instance is specific to the option we're setting/querying, so
 		 * savedHandlerOptionBit won't change from one invocation to the next.
 		 */
-		if (savedHandlerOptionBit != -1) {
+		if ((subEditor != null) && (savedHandlerOptionBit != -1)) {
 			element.setChecked(subEditor.isOptionSet(savedHandlerOptionBit));
 		}
 	}
@@ -140,17 +140,17 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 
 	/**
 	 * Translate an option name (as passed in via a Command's parameter) into a option value,
-	 * as understood by the FilesEditor class.
+	 * as understood by SubEditor classes.
 	 * @param param The option's name.
-	 * @return The corresponding option value (FilesEditor.OPT_SHOW_*).
+	 * @return The corresponding option value (EditorOptions.OPT_SHOW_*).
 	 */
 	private int computeOptionBits(String param) {		
 		if (param.equals("path-roots")) {
-			return FilesEditor.OPT_SHOW_ROOTS;
+			return EditorOptions.OPT_SHOW_ROOTS;
 		} else if (param.equals("packages")) {
-			return FilesEditor.OPT_SHOW_PACKAGES;
+			return EditorOptions.OPT_SHOW_PACKAGES;
 		} else if (param.equals("show-hidden")) {
-			return FilesEditor.OPT_SHOW_HIDDEN;
+			return EditorOptions.OPT_SHOW_HIDDEN;
 		} else {
 			throw new FatalError("Unable to handle command parameter: " + param);
 		}
