@@ -137,6 +137,16 @@
             id="com.buildml.eclipse.commands.removeEditorTab"
             name="Remove Editor Tab">
       </command>
+      <command
+            defaultHandler="com.buildml.eclipse.handlers.HandlerNextEditorTab"
+            id="com.buildml.eclipse.commands.nextEditorTab"
+            name="Switch to Next Editor Tab">
+      </command>
+      <command
+            defaultHandler="com.buildml.eclipse.handlers.HandlerPreviousEditorTab"
+            id="com.buildml.eclipse.commands.previousEditorTab"
+            name="Switch to Previous Editor Tab">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -740,6 +750,18 @@
             contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+X">
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.previousEditorTab"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ARROW_LEFT">
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.nextEditorTab"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ARROW_RIGHT">
       </key>
    </extension>
    <extension

@@ -139,6 +139,31 @@ public class MainEditor extends MultiPageEditorPart {
 			}
 		}
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Switch focus to the next editor tab.
+	 */
+	public void nextPage() {
+		int currentPage = getActivePage();
+		int pageCount = getPageCount();
+		if ((currentPage != -1) && (currentPage != pageCount - 1)) {
+			setActivePage(currentPage + 1);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Switch focus to the previous editor tab.
+	 */
+	public void previousPage() {
+		int currentPage = getActivePage();
+		if (currentPage > 0) {
+			setActivePage(currentPage - 1);
+		}
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
