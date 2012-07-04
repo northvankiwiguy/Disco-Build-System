@@ -70,7 +70,6 @@
             name="Expand Subtree">
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.handlers.HandlerShowDetail"
             id="com.buildml.eclipse.commands.showPathRoots"
             name="Show path roots">
          <commandParameter
@@ -135,7 +134,6 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.handlers.HandlerRemoveEditorTab"
             id="com.buildml.eclipse.commands.removeEditorTab"
             name="Remove Editor Tab">
       </command>
@@ -157,8 +155,7 @@
                   name="com.buildml.eclipse.commandParameters.hideRevealType"
                   value="hide">
             </parameter>
-            <visibleWhen
-                  checkEnabled="true">
+            <visibleWhen>
                <with
                      variable="selection">
                   <iterate
@@ -179,8 +176,7 @@
                   name="com.buildml.eclipse.commandParameters.hideRevealType"
                   value="reveal">
             </parameter>
-            <visibleWhen
-                  checkEnabled="true">
+            <visibleWhen>
                <with
                      variable="selection">
                   <iterate
@@ -261,8 +257,7 @@
                      value="write">
                </parameter>
             </command>
-            <visibleWhen
-                  checkEnabled="true">
+            <visibleWhen>
                <with
                      variable="selection">
                   <iterate
@@ -298,8 +293,7 @@
                      value="allDerived">
                </parameter>
             </command>
-            <visibleWhen
-                  checkEnabled="true">
+            <visibleWhen>
                <with
                      variable="selection">
                   <iterate
@@ -335,8 +329,7 @@
                      value="allInput">
                </parameter>
             </command>
-            <visibleWhen
-                  checkEnabled="true">
+            <visibleWhen>
                <with
                      variable="selection">
                   <iterate
@@ -373,8 +366,7 @@
                   icon="images/add_tab_icon.gif"
                   label="Duplicate Editor Tab"
                   style="pulldown">
-               <visibleWhen
-                     checkEnabled="true">
+               <visibleWhen>
                   <with
                         variable="activeEditorId">
                      <equals
@@ -388,8 +380,7 @@
                   icon="images/remove_tab_icon.gif"
                   label="Remove Editor Tab"
                   style="push">
-               <visibleWhen
-                     checkEnabled="true">
+               <visibleWhen>
                   <with
                         variable="activeEditorId">
                      <equals
@@ -412,7 +403,7 @@
                      name="com.buildml.eclipse.commandParameters.showDetail"
                      value="path-roots">
                </parameter>
-               <visibleWhen checkEnabled="true">
+               <visibleWhen>
                   <with variable="activeEditorId">
                      <equals value="com.buildml.eclipse.editors.main" />
                   </with>
@@ -428,7 +419,7 @@
                      name="com.buildml.eclipse.commandParameters.showDetail"
                      value="packages">
                </parameter>
-               <visibleWhen checkEnabled="true">
+               <visibleWhen>
                   <with variable="activeEditorId">
                      <equals value="com.buildml.eclipse.editors.main" />
                   </with>
@@ -444,7 +435,7 @@
                      name="com.buildml.eclipse.commandParameters.showDetail"
                      value="show-hidden">
                </parameter>
-               <visibleWhen checkEnabled="true">
+               <visibleWhen>
                   <with variable="activeEditorId">
                      <equals value="com.buildml.eclipse.editors.main" />
                   </with>
@@ -459,7 +450,7 @@
                   icon="images/filter_packages_icon.gif"
                   label="Filter output by selecting packages to display."
                   style="push">
-                  <visibleWhen checkEnabled="true">
+                  <visibleWhen>
                      <with variable="activeEditorId">
                         <equals value="com.buildml.eclipse.editors.main" />
                      </with>
@@ -470,7 +461,7 @@
                   icon="images/filter_by_name_icon.gif"
                   label="Filter output by name."
                   style="push">
-                  <visibleWhen checkEnabled="true">
+                  <visibleWhen>
                      <with variable="activeEditorId">
                         <equals value="com.buildml.eclipse.editors.main" />
                      </with>
@@ -481,7 +472,7 @@
                   icon="images/search_by_name_icon.gif"
                   label="Search by name."
                   style="push">
-                  <visibleWhen checkEnabled="true">
+                  <visibleWhen>
                      <with variable="activeEditorId">
                         <equals value="com.buildml.eclipse.editors.main" />
                      </with>
@@ -622,6 +613,26 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerShowDetail"
+            commandId="com.buildml.eclipse.commands.showPathRoots">
+         <enabledWhen>
+            <test
+                  args="path-roots"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerRemoveEditorTab"
+            commandId="com.buildml.eclipse.commands.removeEditorTab">
+         <enabledWhen>
+            <test
+                  args="removable"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -739,6 +750,16 @@
             name="BuildML Editor"
             parentId="org.eclipse.ui.contexts.window">
       </context>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.buildml.eclipse.handlers.HasFeatureTester"
+            id="com.buildml.eclipse.propertyTester.subEditorHasFeature"
+            namespace="com.buildml.eclipse"
+            properties="hasFeature"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
 
 </plugin>

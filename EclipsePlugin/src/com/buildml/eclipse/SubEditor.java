@@ -65,6 +65,12 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * are more than this many elements, only expand the first couple of levels.
 	 */
 	protected static final int AUTO_EXPAND_THRESHOLD = 200;
+	
+	/**
+	 * Indicates whether this editor is "removable". That is, can the user close the
+	 * tab (the default is "true"), or is this tab permanently fixed to the editor (false)
+	 */
+	private boolean removable = true;
 
 	/*=====================================================================================*
 	 * CONSTRUCTOR
@@ -296,6 +302,26 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Set the "removable" state of this tab. 
+	 * @param removable true means that the editor tab can be closed, and false means
+	 * that it's a permanent part of the editor.
+	 */
+	public void setRemovable(boolean removable) {
+		this.removable = removable;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The removable state of this editor tab.
+	 */
+	public boolean isRemovable() {
+		return removable;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IElementComparer#equals(java.lang.Object, java.lang.Object)
 	 */
@@ -330,6 +356,7 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 		}		
 		return ((IntegerTreeRecord)element).getId();
 	}
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -378,6 +405,16 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * switched from another tab, to this tab.
 	 */
 	public abstract void pageChange();
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns true or false, to specify whether this sub editor supports the specified
+	 * feature.
+	 * @param feature A textual name for an editor feature.
+	 * @return true if the feature is supported, or false.
+	 */
+	public abstract boolean hasFeature(String feature);
 
 	/*-------------------------------------------------------------------------------------*/
 }

@@ -121,20 +121,6 @@ public class MainEditor extends MultiPageEditorPart {
 		
 		return index;
 	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Determine whether the sub-editor at the specified tab can be removed, or whether
-	 * it's permanently part of the editor.
-	 * @param tabIndex The tab index of the sub-editor.
-	 * @return true if the sub-editor can be removed, else false. 
-	 */
-	public boolean isPageRemovable(int tabIndex) {
-		
-		/* The initial "Files" and "Tasks" tabs are fixed. */
-		return (tabIndex >= 2);
-	}
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -145,8 +131,12 @@ public class MainEditor extends MultiPageEditorPart {
 	@Override
 	public void removePage(int tabIndex) {
 		
-		if (isPageRemovable(tabIndex)) {
-			super.removePage(tabIndex);
+		IEditorPart editor = getEditor(tabIndex);
+		if (editor instanceof SubEditor) {
+			SubEditor subEditor = (SubEditor)editor;
+			if (subEditor.hasFeature("removable")) {
+				super.removePage(tabIndex);
+			}
 		}
 	}
 	
@@ -173,14 +163,17 @@ public class MainEditor extends MultiPageEditorPart {
 	protected void createPages() {
 		IEditorInput editorInput = getEditorInput();
 
-
 		/* create the file editor tab */
-		newPage(new FilesEditor(buildStore, " Files "));
-
+		FilesEditor editor1 = new FilesEditor(buildStore, " Files ");
+		editor1.setRemovable(false);
+		newPage(editor1);
+		
 		/* create the task editor tab */
-		newPage(new ActionsEditor(buildStore, " Actions "));
+		ActionsEditor editor2 = new ActionsEditor(buildStore, " Actions ");
+		editor2.setRemovable(false);
+		newPage(editor2);
 			
-			/* update the editor title with the name of the input file */
+		/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());
 		setTitleToolTip(editorInput.getToolTipText());
 	}

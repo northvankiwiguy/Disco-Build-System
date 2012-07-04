@@ -12,42 +12,37 @@
 
 package com.buildml.eclipse.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.handlers.HandlerUtil;
-
-import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.utils.AlertDialog;
+import org.eclipse.core.expressions.PropertyTester;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 
 /**
- * A Command Handler for removing an existing editor tab.
- * 
+ * An Eclipse PropertyTester, for testing whether the current sub editor
+ * supports a specified feature. This class is used by adding a "test"
+ * expression in the enabledWhen or visibleWhen clauses in plugin.xml
+ *
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerRemoveEditorTab extends AbstractHandler {
-
+public class HasFeatureTester extends PropertyTester {
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
+	/**
+	 * Test the "hasFeature" property of the currently active sub editor to see if it
+	 * supports the specified argument.
+	 */
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public boolean test(Object receiver, String property, Object[] args,
+			Object expectedValue) {
 		
-		/* if allowed, remove the current page */
-		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		if (EclipsePartUtils.activeSubEditorHasFeature("removable")) {
-			int activeTab = mainEditor.getActivePage();
-			mainEditor.removePage(activeTab);
+		if (property.equals("hasFeature")) {
+			if ((args.length == 1) && (args[0] instanceof String)) {
+				String feature = (String)args[0];
+				return EclipsePartUtils.activeSubEditorHasFeature(feature);
+			}
 		}
-		
-		else {
-			AlertDialog.displayErrorDialog("Unable to delete this editor tab.", 
-					"The default editor tabs can't be removed.");
-		}
-
-		return null;
+		return false;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

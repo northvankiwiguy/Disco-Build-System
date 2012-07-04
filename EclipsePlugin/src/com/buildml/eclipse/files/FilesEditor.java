@@ -446,6 +446,21 @@ public class FilesEditor extends SubEditor {
 			// TODO: what to do here?
 		}
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.SubEditor#hasFeature(java.lang.String)
+	 */
+	@Override
+	public boolean hasFeature(String feature) {
+		if (feature.equals("removable")) {
+			return isRemovable();
+		} else if (feature.equals("path-roots")) {
+			return true;
+		}
+		return false;
+	}
 
 	/*=====================================================================================*
 	 * PRIVATE/PROTECTED METHODS

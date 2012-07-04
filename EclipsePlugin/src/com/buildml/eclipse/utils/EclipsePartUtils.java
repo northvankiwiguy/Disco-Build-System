@@ -131,4 +131,21 @@ public class EclipsePartUtils {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns true or false, to specify whether the currently active sub editor supports
+	 * the specified feature.
+	 * @param feature A textual name for an editor feature.
+	 * @return true if the feature is supported, or false. If the active editor is invalid
+	 * for some reason, also return false.
+	 */
+	public static boolean activeSubEditorHasFeature(String feature) {
+		SubEditor subEditor = getActiveSubEditor();
+		if (subEditor == null) {
+			return false;
+		}
+		return subEditor.hasFeature(feature);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }

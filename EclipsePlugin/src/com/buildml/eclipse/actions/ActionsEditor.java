@@ -484,6 +484,19 @@ public class ActionsEditor extends SubEditor {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.SubEditor#hasFeature(java.lang.String)
+	 */
+	@Override
+	public boolean hasFeature(String feature) {
+		if (feature.equals("removable")) {
+			return isRemovable();
+		}
+		return false;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Invoked whenever one of this editor's options are changed. We may need to react
 	 * to the option change in some way.
