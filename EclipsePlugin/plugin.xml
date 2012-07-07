@@ -21,31 +21,9 @@
       </category>
       <command
             categoryId="com.buildml.eclipse.commands.category"
-            description="Show the build tasks that either read or write these files"
+            description="Show the build tasks that access these files"
             id="com.buildml.eclipse.commands.showTasksThatUse"
             name="Show Tasks that Use these Files">
-         <commandParameter
-               id="com.buildml.eclipse.commandParameters.accessType"
-               name="accessType"
-               optional="false">
-         </commandParameter>
-      </command>
-      <command
-            categoryId="com.buildml.eclipse.commands.category"
-            description="Show the build tasks that read from these files"
-            id="com.buildml.eclipse.commands.showTasksThatRead"
-            name="Show Tasks that Read these Files">
-         <commandParameter
-               id="com.buildml.eclipse.commandParameters.accessType"
-               name="accessType"
-               optional="false">
-         </commandParameter>
-      </command>
-      <command
-            categoryId="com.buildml.eclipse.commands.category"
-            description="Show the build tasks that write to these files"
-            id="com.buildml.eclipse.commands.showTasksThatWrite"
-            name="Show Tasks that Write these Files">
          <commandParameter
                id="com.buildml.eclipse.commandParameters.accessType"
                name="accessType"
@@ -248,7 +226,7 @@
                </parameter>
             </command>
             <command
-                  commandId="com.buildml.eclipse.commands.showTasksThatRead"
+                  commandId="com.buildml.eclipse.commands.showTasksThatUse"
                   label="Read From These Files"
                   mnemonic="R"
                   style="push">
@@ -258,7 +236,7 @@
                </parameter>
             </command>
             <command
-                  commandId="com.buildml.eclipse.commands.showTasksThatWrite"
+                  commandId="com.buildml.eclipse.commands.showTasksThatUse"
                   label="Write To These Files"
                   mnemonic="W"
                   style="push">
@@ -565,24 +543,6 @@
             </count></enabledWhen>
       </handler>
       <handler
-            class="com.buildml.eclipse.files.handlers.HandlerShowTasksThatUse"
-            commandId="com.buildml.eclipse.commands.showTasksThatRead">
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.buildml.eclipse.files.handlers.HandlerShowTasksThatUse"
-            commandId="com.buildml.eclipse.commands.showTasksThatWrite">
-         <enabledWhen>
-            <count
-                  value="+">
-            </count>
-         </enabledWhen>
-      </handler>
-      <handler
             class="com.buildml.eclipse.files.handlers.HandlerShowDerivedFiles"
             commandId="com.buildml.eclipse.commands.showDerivedInputFiles">
          <enabledWhen>
@@ -762,6 +722,16 @@
             contextId="com.buildml.eclipse.contexts.buildmleditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ARROW_RIGHT">
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.showTasksThatUse"
+            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+ARROW_RIGHT">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.accessType"
+               value="use">
+         </parameter>
       </key>
    </extension>
    <extension

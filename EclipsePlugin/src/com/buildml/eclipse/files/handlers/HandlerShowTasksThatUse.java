@@ -7,6 +7,8 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.actions.ActionsEditor;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStore;
 import com.buildml.model.Reports;
@@ -15,8 +17,9 @@ import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 
 /**
+ * Eclipse Command Handler for the "show tasks that ..." commands.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class HandlerShowTasksThatUse extends AbstractHandler {
 
@@ -31,8 +34,8 @@ public class HandlerShowTasksThatUse extends AbstractHandler {
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		
 		/* fetch the active editor, and its BuildStore */
-		MainEditor editor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		BuildStore buildStore = editor.getBuildStore();
+		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
+		BuildStore buildStore = mainEditor.getBuildStore();
 		
 		/* build a FileSet of all the selected files */
 		FileSet selectedFiles = EclipsePartUtils.getFileSetFromSelection(buildStore, selection);
@@ -46,14 +49,26 @@ public class HandlerShowTasksThatUse extends AbstractHandler {
 			opType = OperationType.OP_WRITE;
 		}
 		
-		/* get the set of tasks that use these files */
+		/* get the set of tasks that use/read/write these files */
 		Reports reports = buildStore.getReports();
 		TaskSet userTasks = reports.reportTasksThatAccessFiles(selectedFiles, opType);
-
-		for (Integer integer : userTasks) {
-			System.out.println("Task: " + integer);
-		}
 		
+		/* if the result set is empty, don't open an editor, but instead open a dialog */
+		if (userTasks.size() == 0) {
+			AlertDialog.displayInfoDialog("No results", "There are no related tasks that " + 
+						accessType + " these files.");
+			return null;
+		}
+			
+		/* create a new editor that displays the resulting set */
+		ActionsEditor newEditor = 
+			new ActionsEditor(buildStore, "Tasks that " + accessType);
+		userTasks.populateWithParents();
+		newEditor.setVisibilityFilterSet(userTasks);
+		
+		/* add the new editor as a new tab */
+		mainEditor.newPage(newEditor);
+		mainEditor.setActiveEditor(newEditor);
 		
 		return null;
 	}
