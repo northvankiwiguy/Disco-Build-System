@@ -12,8 +12,11 @@
 
 package com.buildml.eclipse.files;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -33,13 +36,16 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.BuildStore;
 import com.buildml.model.FileNameSpaces;
@@ -203,15 +209,38 @@ public class FilesEditor extends SubEditor {
 		 */
 		previousEditorOptionBits = getOptions();
 		
-		/* double-clicking on an expandable node will expand/contract that node */
+		/* 
+		 * double-clicking on an expandable node will expand/contract that node, whereas
+		 * double-clicking on a file will open it in an editor.
+		 */
 		filesTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
 				FileRecord node = (FileRecord)selection.getFirstElement();
+			
 				if (filesTreeViewer.isExpandable(node)){
 					filesTreeViewer.setExpandedState(node, 
 							!filesTreeViewer.getExpandedState(node));
+				}
+				
+				/* else, try to open file in an appropriate editor */
+				else {
+					String filePath = fns.getPathName(node.getId());
+					File fileToOpen = new File(filePath);
+					if (fileToOpen.exists() && fileToOpen.isFile()) {
+					    IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+					    IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					    try {
+					        IDE.openEditorOnFileStore(page, fileStore);
+					    } catch (PartInitException e) {
+							AlertDialog.displayErrorDialog("File can't be opened", 
+									"For some unknown reason, the file couldn't be opened.");					    	
+					    }
+					} else {
+						AlertDialog.displayErrorDialog("File not found", 
+								"The file couldn't be opened because it's not currently on your file system.");
+					}
 				}
 			}
 		});
