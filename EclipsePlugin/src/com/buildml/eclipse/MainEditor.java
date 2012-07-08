@@ -33,6 +33,12 @@ public class MainEditor extends MultiPageEditorPart {
 	/** the BuildStore we've opened for editing */
 	private BuildStore buildStore = null;
 	
+	/** the currently active tab index */
+	private int currentPageIndex = -1;
+	
+	/** the tab that was most recently visible (before the current tab was made visible) */
+	private int previousPageIndex = -1;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -135,7 +141,15 @@ public class MainEditor extends MultiPageEditorPart {
 		if (editor instanceof SubEditor) {
 			SubEditor subEditor = (SubEditor)editor;
 			if (subEditor.hasFeature("removable")) {
+				int pageToReturnTo = previousPageIndex;
 				super.removePage(tabIndex);
+				if (pageToReturnTo != -1) {
+					/* have the index numbers changed due to removal? */
+					if (tabIndex < pageToReturnTo) {
+						pageToReturnTo--;
+					}
+					setActivePage(pageToReturnTo);
+				}
 			}
 		}
 	}
@@ -171,12 +185,16 @@ public class MainEditor extends MultiPageEditorPart {
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#pageChange(int)
 	 */
 	@Override
-	protected void pageChange(int newPageIndex) {
+	protected void pageChange(int newPageIndex) {		
 		super.pageChange(newPageIndex);
 		
 		/* trigger the pageChange() method on the sub-editor, so it can update the UI */
 		SubEditor subEditor = (SubEditor)getActiveEditor();
 		subEditor.pageChange();
+		
+		/* remember the previous actively page, so it's easier to return to */
+		previousPageIndex = currentPageIndex;
+		currentPageIndex = getActivePage();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
