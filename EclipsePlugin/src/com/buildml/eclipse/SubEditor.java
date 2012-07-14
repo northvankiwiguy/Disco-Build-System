@@ -238,12 +238,6 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 				refreshView(false);
 			}
 		});
-		
-		
-		/* enable the "buildmleditor" context, used for keyboard acceleration */
-		IContextService contextService = 
-			(IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext("com.buildml.eclipse.contexts.buildmleditor");		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

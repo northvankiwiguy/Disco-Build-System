@@ -32,6 +32,17 @@
       </command>
       <command
             categoryId="com.buildml.eclipse.commands.category"
+            description="Show files that are accessed by these actions"
+            id="com.buildml.eclipse.commands.showFilesUsedBy"
+            name="Show Files Used By These Actions">
+         <commandParameter
+               id="com.buildml.eclipse.commandParameters.accessType"
+               name="accessType"
+               optional="true">
+         </commandParameter>
+      </command>
+      <command
+            categoryId="com.buildml.eclipse.commands.category"
             description="Show the files that are derived from or input to these files."
             id="com.buildml.eclipse.commands.showDerivedInputFiles"
             name="Show Derived/Input Files">
@@ -253,6 +264,68 @@
                         operator="or">
                      <instanceof
                            value="com.buildml.model.types.FileRecord">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </menu>
+         <menu
+               label="Show Files That..."
+               mnemonic="F">
+            <command
+                  commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+                  label="Are Used By These Actions"
+                  style="push">
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.accessType"
+                     value="used">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+                  label="Are Read By These Actions"
+                  style="push">
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.accessType"
+                     value="read">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+                  label="Are Written By These Actions"
+                  style="push">
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.accessType"
+                     value="written">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+                  label="Are Modified By These Actions"
+                  style="push">
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.accessType"
+                     value="modified">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+                  label="Are Deleted By These Actions"
+                  style="push">
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.accessType"
+                     value="deleted">
+               </parameter>
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="com.buildml.model.types.TaskRecord">
                      </instanceof>
                   </iterate>
                </with>
@@ -603,6 +676,15 @@
             </test>
          </enabledWhen>
       </handler>
+      <handler
+            class="com.buildml.eclipse.actions.handlers.HandlerShowFilesUsedBy"
+            commandId="com.buildml.eclipse.commands.showFilesUsedBy">
+         <enabledWhen>
+            <count
+                  value="+">
+            </count>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -631,13 +713,13 @@
          point="org.eclipse.ui.bindings">
       <key
             commandId="com.buildml.eclipse.commands.expandItemSubTree"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+E">
       </key>
       <key
             commandId="com.buildml.eclipse.commands.hideRevealPath"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="DEL">
          <parameter
@@ -647,7 +729,7 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.hideRevealPath"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="INSERT">
          <parameter
@@ -657,7 +739,7 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+ARROW_RIGHT">
          <parameter
@@ -667,7 +749,7 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Shift+Ctrl+ARROW_RIGHT">
          <parameter
@@ -677,7 +759,7 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+ARROW_LEFT">
          <parameter
@@ -687,7 +769,7 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.showDerivedInputFiles"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Shift+Ctrl+ARROW_LEFT">
          <parameter
@@ -697,7 +779,7 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.newEditorTab"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+N">
          <parameter
@@ -707,40 +789,82 @@
       </key>
       <key
             commandId="com.buildml.eclipse.commands.removeEditorTab"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+X">
       </key>
       <key
             commandId="com.buildml.eclipse.commands.previousEditorTab"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ARROW_LEFT">
       </key>
       <key
             commandId="com.buildml.eclipse.commands.nextEditorTab"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.editor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ARROW_RIGHT">
       </key>
       <key
             commandId="com.buildml.eclipse.commands.showTasksThatUse"
-            contextId="com.buildml.eclipse.contexts.buildmleditor"
+            contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ALT+ARROW_RIGHT">
          <parameter
                id="com.buildml.eclipse.commandParameters.accessType"
-               value="use">
+               value="read">
+         </parameter>
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.showTasksThatUse"
+            contextId="com.buildml.eclipse.contexts.fileseditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+ARROW_LEFT">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.accessType"
+               value="write">
+         </parameter>
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+            contextId="com.buildml.eclipse.contexts.actionseditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+ARROW_RIGHT">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.accessType"
+               value="written">
+         </parameter>
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.showFilesUsedBy"
+            contextId="com.buildml.eclipse.contexts.actionseditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ALT+ARROW_LEFT">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.accessType"
+               value="read">
          </parameter>
       </key>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            description="BuildML Editor"
-            id="com.buildml.eclipse.contexts.buildmleditor"
+            description="BuildML Actions Editor"
+            id="com.buildml.eclipse.contexts.editor"
             name="BuildML Editor"
             parentId="org.eclipse.ui.contexts.window">
+      </context>
+      <context
+            description="BuildML Files Editor"
+            id="com.buildml.eclipse.contexts.fileseditor"
+            name="BuildML Files Editor"
+            parentId="com.buildml.eclipse.contexts.editor">
+      </context>
+      <context
+            description="BuildML Actions Editor"
+            id="com.buildml.eclipse.contexts.actionseditor"
+            name="BuildML Actions Editor"
+            parentId="com.buildml.eclipse.contexts.editor">
       </context>
    </extension>
    <extension

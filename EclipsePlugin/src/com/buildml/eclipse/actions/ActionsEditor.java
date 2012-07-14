@@ -155,6 +155,11 @@ public class ActionsEditor extends SubEditor {
 		/* initiate functionality that's common to all editors */
 		super.createPartControl(parent);
 		
+		/* enable the "actionseditor" context, used for keyboard acceleration */
+		IContextService contextService = 
+			(IContextService) getSite().getService(IContextService.class);
+		contextService.activateContext("com.buildml.eclipse.contexts.actionseditor");
+		
 		/* create the main Tree control that the user will view/manipulate */
 		Tree actionEditorTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL |
 															SWT.MULTI | SWT.FULL_SELECTION);

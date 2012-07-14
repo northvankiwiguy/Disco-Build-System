@@ -40,6 +40,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IProgressService;
 
@@ -149,6 +150,11 @@ public class FilesEditor extends SubEditor {
 		
 		/* initiate functionality that's common to all editors */
 		super.createPartControl(parent);
+		
+		/* enable the "fileseditor" context, used for keyboard acceleration */
+		IContextService contextService = 
+			(IContextService) getSite().getService(IContextService.class);
+		contextService.activateContext("com.buildml.eclipse.contexts.fileseditor");	
 		
 		/* create the main Tree control that the user will view/manipulate */
 		Tree fileEditorTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL |

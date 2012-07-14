@@ -24,9 +24,12 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.model.BuildStore;
+import com.buildml.model.BuildTasks;
 import com.buildml.model.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
+import com.buildml.model.types.TaskRecord;
+import com.buildml.model.types.TaskSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -60,6 +63,29 @@ public class EclipsePartUtils {
 		return fs;
 	}
 
+	/*-------------------------------------------------------------------------------------*/	
+
+	/**
+	 * Given an Eclipse command handler's selection, such as when a user selects a bunch of ActionRecord
+	 * nodes from a TreeViewer, convert the selection into an ActionSet. Selected items that are not of type
+	 * ActionRecord are ignored.
+	 * @param buildStore The BuildStore that stores the selected objects.
+	 * @param selection The Eclipse command handler's selection.
+	 * @return The equivalent ActionSet.
+	 */
+	public static TaskSet getActionSetFromSelection(BuildStore buildStore, TreeSelection selection) {
+		
+		BuildTasks actionMgr = buildStore.getBuildTasks();
+		TaskSet acts = new TaskSet(actionMgr);
+		Iterator<?> iter = selection.iterator();
+		while (iter.hasNext()) {
+			Object item = iter.next();
+			if (item instanceof TaskRecord) {
+				acts.add(((TaskRecord)item).getId());
+			}
+		}
+		return acts;
+	}
 
 	/*-------------------------------------------------------------------------------------*/
 
