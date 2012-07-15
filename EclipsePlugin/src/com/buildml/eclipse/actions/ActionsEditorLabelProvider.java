@@ -12,10 +12,12 @@
 
 package com.buildml.eclipse.actions;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.model.BuildTasks;
 import com.buildml.model.Packages;
@@ -45,6 +47,9 @@ public class ActionsEditorLabelProvider implements ITableLabelProvider {
 	/** The ID of the top-root for our Action Manager object */
 	private int topRootId;
 	
+	/** Image representing the "action" icon. */
+	private Image actionImage;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -62,7 +67,10 @@ public class ActionsEditorLabelProvider implements ITableLabelProvider {
 		this.editor = editor;
 		this.actionMgr = actionMgr;
 		this.pkgMgr = pkgMgr;
-			
+		
+		ImageDescriptor descr = Activator.getImageDescriptor("images/action_icon.gif");
+		actionImage = descr.createImage();
+		
 		/* determine the top-root action */
 		topRootId = actionMgr.getRootTask("root");
 	}
@@ -77,8 +85,7 @@ public class ActionsEditorLabelProvider implements ITableLabelProvider {
 	 * @return An Image for the specified column.
 	 */
 	public Image getColumnImage(Object element, int columnIndex) {
-		/* by default, show nothing */
-		return null;
+		return actionImage;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -100,10 +107,10 @@ public class ActionsEditorLabelProvider implements ITableLabelProvider {
 			/* select the text for the Action "command" column */
 			case 0:
 				if (actionRecord.isExpandedText()) {
-					return actionMgr.getCommand(actionId);
+					return " " + actionMgr.getCommand(actionId);
 				} 
 				else {
-					return actionMgr.getCommandSummary(actionId, 200);
+					return " " + actionMgr.getCommandSummary(actionId, 200);
 				}
 					
 			/* select text for the package column */
@@ -123,7 +130,7 @@ public class ActionsEditorLabelProvider implements ITableLabelProvider {
 			}
 		}
 
-		return "<invalid>";
+		return " <invalid>";
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
