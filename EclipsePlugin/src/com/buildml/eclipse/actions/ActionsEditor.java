@@ -21,18 +21,16 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
@@ -65,11 +63,11 @@ public class ActionsEditor extends SubEditor {
 	/** This editor's main control is a TreeViewer, for displaying the list of files */
 	VisibilityTreeViewer actionsTreeViewer = null;
 	
-	/** The column that displays the path tree */
-	private TreeColumn treeColumn;
+	/** The column that displays the action tree */
+	private TreeViewerColumn treeColumn;
 	
 	/** The column that displays the package name */
-	private TreeColumn pkgColumn;
+	private TreeViewerColumn pkgColumn;
 	
 	/** The Action manager object that contains all the file information for this BuildStore */
 	private BuildTasks actionMgr = null;
@@ -173,12 +171,12 @@ public class ActionsEditor extends SubEditor {
 		 *    2) The path's package (shown as a fixed-width column);
 		 */
 		actionsTreeViewer = new VisibilityTreeViewer(actionEditorTree);
-		treeColumn = new TreeColumn(actionEditorTree, SWT.LEFT);
-	    treeColumn.setAlignment(SWT.LEFT);
-	    treeColumn.setText("Action Command");
-	    pkgColumn = new TreeColumn(actionEditorTree, SWT.RIGHT);
-	    pkgColumn.setAlignment(SWT.LEFT);
-	    pkgColumn.setText("Package");
+		treeColumn = new TreeViewerColumn(actionsTreeViewer, SWT.LEFT);
+	    treeColumn.getColumn().setAlignment(SWT.LEFT);
+	    treeColumn.getColumn().setText("Action Command");
+	    pkgColumn = new TreeViewerColumn(actionsTreeViewer, SWT.RIGHT);
+	    pkgColumn.getColumn().setAlignment(SWT.LEFT);
+	    pkgColumn.getColumn().setText("Package");
 	    filesEditorComposite = parent;
 	    
 	    /*
@@ -186,17 +184,21 @@ public class ActionsEditor extends SubEditor {
 	     * window, and the package column is empty. Setting the path column
 	     * to a non-zero pixel width causes it to be expanded to the editor's full width. 
 	     */
-	    treeColumn.setWidth(1);
-	    pkgColumn.setWidth(0);
+	    treeColumn.getColumn().setWidth(1);
+	    pkgColumn.getColumn().setWidth(0);
 		
 	    /*
 		 * Add the tree/table content and label providers.
 		 */
 		contentProvider = new ActionsEditorContentProvider(this, actionMgr);
-		ActionsEditorLabelProvider labelProvider = 
-				new ActionsEditorLabelProvider(this, actionMgr, buildStore.getPackages());
+		ActionsEditorLabelCol1Provider labelProviderCol1 = 
+				new ActionsEditorLabelCol1Provider(this, actionMgr);
+		ActionsEditorLabelCol2Provider labelProviderCol2 = 
+				new ActionsEditorLabelCol2Provider(this, buildStore.getPackages());
 		actionsTreeViewer.setContentProvider(contentProvider);
-		actionsTreeViewer.setLabelProvider(labelProvider);
+		treeColumn.setLabelProvider(labelProviderCol1);
+		pkgColumn.setLabelProvider(labelProviderCol2);
+	    ColumnViewerToolTipSupport.enableFor(actionsTreeViewer);
 		
 		/*
 		 * Set up a visibility provider so we know which paths should be visible (at
@@ -220,33 +222,6 @@ public class ActionsEditor extends SubEditor {
 				if (actionsTreeViewer.isExpandable(node)){
 					actionsTreeViewer.setExpandedState(node, 
 							!actionsTreeViewer.getExpandedState(node));
-				}
-			}
-		});
-		
-		/* 
-		 * Selecting a tree item will cause its text to be expanded, possible over multiple
-		 * lines.
-		 */
-		actionsTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				TreeSelection selection = (TreeSelection)event.getSelection();
-				
-				/* unselect the previously selected item */
-				if (previousSelection != null) {
-					previousSelection.setExpandedText(false);
-					actionsTreeViewer.update(previousSelection, null);
-				}
-				
-				/* only expand the current selection, if the selection size is 1 */
-				if (selection.size() == 1) {
-					Object item = (Object)selection.getFirstElement();
-					if (item instanceof UIActionRecord) {
-						UIActionRecord actionRecord = (UIActionRecord)item;
-						actionRecord.setExpandedText(true);
-						actionsTreeViewer.update(actionRecord, null);
-						previousSelection = actionRecord;
-					}
 				}
 			}
 		});
@@ -427,8 +402,8 @@ public class ActionsEditor extends SubEditor {
 			public void run() {
 			    int editorWidth = filesEditorComposite.getClientArea().width - 20;
 			    int pkgWidth = isOptionSet(EditorOptions.OPT_SHOW_PACKAGES) ? 100 : 0;
-			    treeColumn.setWidth(editorWidth - 2 * pkgWidth);
-			    pkgColumn.setWidth(pkgWidth);
+			  treeColumn.getColumn().setWidth(editorWidth - 2 * pkgWidth);
+			  pkgColumn.getColumn().setWidth(pkgWidth);
 			}
 		});
 

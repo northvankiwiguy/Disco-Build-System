@@ -22,17 +22,6 @@ import com.buildml.model.types.TaskRecord;
 public class UIActionRecord extends TaskRecord {
 
 	/*=====================================================================================*
-	 * FIELDS/TYPES
-	 *=====================================================================================*/
-
-	/** 
-	 * Records whether this tree element is currently "expanded". That is, is the text
-	 * command for this action compressed onto one line (expandedText == false), or is
-	 * it expanded to cover multiple lines (expandedText == true).
-	 */
-	private boolean expandedText = false;
-
-	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
@@ -42,26 +31,6 @@ public class UIActionRecord extends TaskRecord {
 	 */
 	public UIActionRecord(int id) {
 		super(id);
-	}
-
-	/*=====================================================================================*
-	 * PUBLIC METHODS
-	 *=====================================================================================*/
-
-	/**
-	 * @return the expandedText
-	 */
-	public boolean isExpandedText() {
-		return expandedText;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * @param expandedText the expandedText to set
-	 */
-	public void setExpandedText(boolean expandedText) {
-		this.expandedText = expandedText;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	
