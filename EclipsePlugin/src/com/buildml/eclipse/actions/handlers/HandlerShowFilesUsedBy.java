@@ -6,7 +6,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
@@ -37,6 +39,7 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 		/* fetch the active editor, and its BuildStore */
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
 		BuildStore buildStore = mainEditor.getBuildStore();
+		SubEditor existingEditor = mainEditor.getActiveSubEditor();
 		
 		/* build an ActionSet of all the selected files */
 		TaskSet selectedActions = EclipsePartUtils.getActionSetFromSelection(buildStore, selection);
@@ -72,6 +75,7 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 		FilesEditor newEditor = 
 			new FilesEditor(buildStore, "Files that are " + accessType);
 		userFiles.populateWithParents();
+		newEditor.setOptions(existingEditor.getOptions() & ~EditorOptions.OPT_SHOW_HIDDEN);
 		newEditor.setVisibilityFilterSet(userFiles);
 		
 		/* add the new editor as a new tab */

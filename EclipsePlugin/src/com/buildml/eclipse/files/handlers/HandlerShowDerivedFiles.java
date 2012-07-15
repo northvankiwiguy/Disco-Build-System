@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.files.FilesEditor;
@@ -89,7 +90,7 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		/* create a new editor that will display the resulting set */
 		FilesEditor newEditor = 
 			new FilesEditor(buildStore, "Derived files");
-		newEditor.setOptions(existingEditor.getOptions());
+		newEditor.setOptions(existingEditor.getOptions() & ~EditorOptions.OPT_SHOW_HIDDEN);
 		newEditor.setVisibilityFilterSet(resultFiles);
 		
 		/* add the new editor as a new tab */
