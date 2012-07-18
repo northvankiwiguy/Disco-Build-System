@@ -14,6 +14,7 @@ package com.buildml.eclipse.actions;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -24,9 +25,16 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -42,9 +50,12 @@ import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
+import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.TaskRecord;
 import com.buildml.model.types.TaskSet;
@@ -475,6 +486,47 @@ public class ActionsEditor extends SubEditor {
 		return false;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.SubEditor#doCopyCommand(org.eclipse.core.commands.ExecutionEvent)
+	 */
+	public void doCopyCommand(Clipboard clipboard, ISelection selection) {
+		
+		/* Determine the set of actions that are currently selected */
+		if (selection instanceof TreeSelection) {
+			TaskSet actionSet = EclipsePartUtils.
+					getActionSetFromSelection(buildStore, (TreeSelection)selection);
+
+			/* 
+			 * All commands will be concatenated together into a single string (with an appropriate
+			 * EOL character).
+			 */
+			String eol = System.getProperty("line.separator");
+			StringBuffer sb = new StringBuffer();
+			for (int actionId : actionSet) {
+				String cmd = actionMgr.getCommand(actionId);
+				sb.append(cmd);
+				sb.append(eol);
+			}
+			
+			/*
+			 * Copy the string to the clipboard(s). There's a separate clipboard for
+			 * Eclipse versus Linux, so copy to both of them.
+			 */
+			try {
+				clipboard.setContents(
+						new Object[] { sb.toString(), },
+						new Transfer[] { TextTransfer.getInstance(), }, 
+						DND.CLIPBOARD | DND.SELECTION_CLIPBOARD);
+				
+			} catch (SWTError error) {
+				AlertDialog.displayErrorDialog("Unable to copy",
+						"The selected information could not be copied to the clipboard.");
+			}			
+		}
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

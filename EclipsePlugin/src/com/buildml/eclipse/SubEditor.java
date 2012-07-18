@@ -12,11 +12,14 @@
 
 package com.buildml.eclipse;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IElementComparer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -409,6 +412,16 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * @return true if the feature is supported, or false.
 	 */
 	public abstract boolean hasFeature(String feature);
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * The "copy" command has been invoked in the current sub editor (via the Edit menu, or 
+	 * via Ctrl-C). Process the event by copying the current selection to the clipboard.
+	 * @param clipboard The clipboard to copy onto.
+	 * @param selection The elements in the current editor that are selected.
+	 */
+	public abstract void doCopyCommand(Clipboard clipboard, ISelection selection);
 
 	/*-------------------------------------------------------------------------------------*/
 }

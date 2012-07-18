@@ -685,6 +685,18 @@
             </count>
          </enabledWhen>
       </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerCopyCommand"
+            commandId="org.eclipse.ui.edit.copy">
+         <activeWhen>
+            <with
+                  variable="activePartId">
+               <equals
+                     value="com.buildml.eclipse.editors.main">
+               </equals>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
