@@ -12,6 +12,9 @@
 
 package com.buildml.eclipse.actions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -19,7 +22,10 @@ import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.SubEditor;
+import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
+import com.buildml.model.FileNameSpaces;
+import com.buildml.utils.print.PrintUtils;
 
 /**
  * Label provider for the first column of the TreeViewer which is the main viewer for the
@@ -36,8 +42,17 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	/** The Action Manager object we'll use for querying information from the BuildStore */
 	private BuildTasks actionMgr;
 	
+	/** The BuildStore that we're viewing. */
+	private BuildStore buildStore;
+	
+	/** The FileNameSpaces associated with the BuildStore. */
+	private FileNameSpaces filesMgr;
+	
 	/** Image representing the "action" icon. */
 	private Image actionImage;
+	
+	/** The maximum number of characters wide that a tooletip should be */
+	private final int toolTipWrapWidth = 120;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -52,6 +67,8 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	public ActionsEditorLabelCol1Provider(SubEditor editor, BuildTasks actionMgr) {
 
 		this.actionMgr = actionMgr;
+		this.buildStore = actionMgr.getBuildStore();
+		this.filesMgr = this.buildStore.getFileNameSpaces();
 		
 		/* all entries in the first column have an icon - precache it now */
 		ImageDescriptor descr = Activator.getImageDescriptor("images/action_icon.gif");
@@ -105,7 +122,31 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 			UIActionRecord actionRecord = (UIActionRecord)element;
 			int actionId = actionRecord.getId();
 
-			return actionMgr.getCommand(actionId);
+			/* We'll accumulate the full text of the tooltip in a StringBuffer */
+			StringBuffer fullText = new StringBuffer();
+			
+			/* 
+			 * First, output the command's current working directory, taking care to
+			 * wrap the path if it's too long.
+			 */
+			int cmdDirId = actionMgr.getDirectory(actionId);
+			String dirString = filesMgr.getPathName(cmdDirId);
+			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+			PrintStream printStream = new PrintStream(outStream);
+			PrintUtils.indentAndWrap(printStream, dirString, 0, toolTipWrapWidth);
+			fullText.append("Directory:\n");
+			fullText.append(outStream.toString());
+			fullText.append("\n");
+			
+			/* Compute the action's command string, taking care to wrap it where necessary. */
+			String cmdText = actionMgr.getCommand(actionId);
+			outStream.reset();
+			PrintUtils.indentAndWrap(printStream, cmdText, 0, toolTipWrapWidth);
+			fullText.append("Shell command:\n");
+			fullText.append(outStream.toString());
+			
+			/* we're done - return the full string */
+			return fullText.toString();
 		}
 		return null;
 	}
