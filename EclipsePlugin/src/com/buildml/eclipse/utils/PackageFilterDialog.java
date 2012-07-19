@@ -15,6 +15,7 @@ package com.buildml.eclipse.utils;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -56,6 +57,11 @@ public class PackageFilterDialog extends TitleAreaDialog {
 	 */
 	private PkgSelectWidget lineWidgets[];
 	
+	/** Default width of the dialog box. */
+	private int dialogWidth;
+	
+	/** Default height of the dialog box. */
+	private int dialogHeight;
 	
 	/*=====================================================================================*
 	 * NESTED CLASS - PkgSelectWidget
@@ -219,19 +225,35 @@ public class PackageFilterDialog extends TitleAreaDialog {
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
 		
-		/* Add a box containing all the packages, and their selectable state */ 
-		Composite listComposite = new Composite(composite, SWT.BORDER | SWT.V_SCROLL);
+		/* 
+		 * Add a box containing all the packages, and their selectable state. We put
+		 * everything inside a ScrolledComposite, so that the scrollbar is managed for us.
+		 */
+		ScrolledComposite scrolledComposite = new ScrolledComposite(composite, SWT.BORDER | SWT.V_SCROLL);
+		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		scrolledComposite.setLayout(new GridLayout());
+		scrolledComposite.setAlwaysShowScrollBars(true);
+		
+		/* Add another composite (within the ScrolledComposite) that will contain the list of package names */
+		Composite listComposite = new Composite(scrolledComposite, SWT.NONE);
 		listComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		listComposite.setLayout(layout);
 		
+		/* Add a new line for each package name */
 		String packageNames[] = pkgMgr.getPackages();
 		lineWidgets = new PkgSelectWidget[packageNames.length];
 		for (int i = 0; i != packageNames.length; i++) {
 			String pkgName = packageNames[i];
 			lineWidgets[i] = new PkgSelectWidget(listComposite, pkgName);
 		}
+		
+		/* tell the ScrolledComposite what it's managing, and how big it should be. */
+		scrolledComposite.setContent(listComposite);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setMinWidth(0);
+		listComposite.setSize(listComposite.computeSize(dialogWidth, SWT.DEFAULT));
 		return composite;
 	}
 
@@ -265,8 +287,11 @@ public class PackageFilterDialog extends TitleAreaDialog {
 		
 		/* centre the dialog in the middle of the screen */
 		Rectangle parentBounds = Display.getCurrent().getBounds();
+		dialogHeight = parentBounds.height / 2;
+		dialogWidth = parentBounds.width / 4;
 		newShell.setBounds(
-				parentBounds.width / 2 - 250, parentBounds.height / 2 - 200, 500, 400);
+				parentBounds.width / 2 - (dialogWidth / 2), 
+				parentBounds.height / 2 - (dialogHeight / 2), dialogWidth, dialogHeight);
 		newShell.setText("Select Packages to View");
 	}
 
