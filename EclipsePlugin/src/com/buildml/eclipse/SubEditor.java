@@ -15,6 +15,8 @@ package com.buildml.eclipse;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -22,14 +24,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.model.BuildStore;
-import com.buildml.model.types.FileRecord;
-import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeRecord;
 
@@ -129,6 +129,37 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	public boolean isSaveAsAllowed() {
 		/* save-as is not permitted */
 		return false;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * @return An image to be displayed on this sub editor's tab.
+	 */
+	public Image getEditorImage() {
+		
+		/* ask the subeditor instance where its image is (if it has one) */
+		String path = getEditorImagePath();
+		if (path != null) {
+			
+			/* 
+			 * Create a descriptor, and perhaps a new image, if it's not already
+			 * available in this plugin's image registry.
+			 */
+			ImageDescriptor imageDescr = Activator.getImageDescriptor(path);
+			ImageRegistry pluginImageRegistry = Activator.getDefault().getImageRegistry();
+			Image iconImage = pluginImageRegistry.get(imageDescr.toString());
+			if (iconImage == null) {
+				iconImage = imageDescr.createImage();
+				pluginImageRegistry.put(imageDescr.toString(), iconImage);
+			}
+			return iconImage;
+		}
+
+		/* no icon for this editor */
+		else {
+			return null;
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -422,6 +453,14 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * @param selection The elements in the current editor that are selected.
 	 */
 	public abstract void doCopyCommand(Clipboard clipboard, ISelection selection);
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The plugin-relative path to the image file that represents this editor.
+	 * (for example, "images/files_icon.gif").
+	 */
+	public abstract String getEditorImagePath();
 
 	/*-------------------------------------------------------------------------------------*/
 }

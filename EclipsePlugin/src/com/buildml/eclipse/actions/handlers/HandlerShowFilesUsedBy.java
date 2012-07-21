@@ -73,7 +73,7 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 			
 		/* create a new editor that displays the resulting set */
 		FilesEditor newEditor = 
-			new FilesEditor(buildStore, "Files that are " + accessType);
+			new FilesEditor(buildStore, "Files " + accessType);
 		userFiles.populateWithParents();
 		newEditor.setOptions(existingEditor.getOptions() & ~EditorOptions.OPT_SHOW_HIDDEN);
 		newEditor.setVisibilityFilterSet(userFiles);

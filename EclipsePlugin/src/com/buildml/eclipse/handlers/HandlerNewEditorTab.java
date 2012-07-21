@@ -50,7 +50,7 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		BuildStore buildStore = mainEditor.getBuildStore();
 		Reports reports = buildStore.getReports();
 		SubEditor currentEditor = mainEditor.getActiveSubEditor();
-		EditorPart newEditor = null;
+		SubEditor newEditor = null;
 		
 		/* 
 		 * Determine exactly which (sub)command should be executed. If this is null, then the user
@@ -67,10 +67,22 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		 * on what type is sub-editor is currently visible.
 		 */
 		if (subCmd.equals("duplicate")) {
+			
+			/* determine the new name for the new tab */
+			int page = mainEditor.getActivePage();
+			String newName = "";
+			if (page != -1) {
+				newName = mainEditor.getPageName(page);
+				if (!newName.endsWith("(copy)")) {
+					newName = newName + " (copy)";
+				}
+			}
+			
+			/* is it a FilesEditor tab? */
 			if (currentEditor instanceof FilesEditor) {
 				FilesEditor existingEditor = (FilesEditor)currentEditor;
 				FilesEditor newFilesEditor = 
-					new FilesEditor(buildStore, existingEditor.getTitle() + " (copy)");
+					new FilesEditor(buildStore, newName);
 				newFilesEditor.setOptions(existingEditor.getOptions());
 				try {
 					newFilesEditor.setFilterPackageSet(
@@ -81,11 +93,13 @@ public class HandlerNewEditorTab extends AbstractHandler {
 					throw new FatalError("Unable to duplicate a FilesEditor");
 				}
 				newEditor = newFilesEditor;
-			}		
+			}
+			
+			/* or is it an ActionsEditor tab? */
 			else if (currentEditor instanceof ActionsEditor) {
 				ActionsEditor existingEditor = (ActionsEditor)currentEditor;
 				ActionsEditor newActionsEditor = 
-					new ActionsEditor(buildStore, existingEditor.getTitle() + " (copy)");
+					new ActionsEditor(buildStore, newName);
 				newActionsEditor.setOptions(existingEditor.getOptions());
 				try {
 					newActionsEditor.setFilterPackageSet(

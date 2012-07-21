@@ -48,7 +48,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IProgressService;
 
@@ -504,6 +503,16 @@ public class FilesEditor extends SubEditor {
 			return true;
 		}
 		return false;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.SubEditor#getIcon()
+	 */
+	@Override
+	public String getEditorImagePath() {
+		return "images/files_icon.gif";
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

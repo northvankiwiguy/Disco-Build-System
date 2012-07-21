@@ -5,13 +5,18 @@ import java.io.FileNotFoundException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.buildml.eclipse.actions.ActionsEditor;
@@ -112,13 +117,20 @@ public class MainEditor extends MultiPageEditorPart {
 	 * 			a FilesEditor, ActionsEditor, or similar.
 	 * @return The tab index of the newly added tab.
 	 */
-	public int newPage(EditorPart editor) {
+	public int newPage(SubEditor editor) {
 		IEditorInput editorInput = getEditorInput();
 		int index = -1;
 		
 		try {
+			/* set the new tab's text name */
 			index = addPage(editor, editorInput);
-			setPageText(index, editor.getTitle());
+			setPageText(index, " " + editor.getTitle() + " ");
+			
+			/* if it has one, set the new tab's icon */
+			Image image = editor.getEditorImage();
+			if (image != null) {
+				setPageImage(index, image);
+			}
 			
 		} catch (PartInitException e) {
 			ErrorDialog.openError(getSite().getShell(),
@@ -181,6 +193,18 @@ public class MainEditor extends MultiPageEditorPart {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Return the name that's written on the current sub editor's tab.
+	 * @param tabIndex The tab index of the sub-editor.
+	 * @return The tab's current text.
+	 */
+	public String getPageName(int tabIndex) {
+		String text = getPageText(tabIndex);
+		return text.substring(1, text.length() - 1);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#pageChange(int)
 	 */
@@ -207,18 +231,34 @@ public class MainEditor extends MultiPageEditorPart {
 		IEditorInput editorInput = getEditorInput();
 
 		/* create the file editor tab */
-		FilesEditor editor1 = new FilesEditor(buildStore, " Files ");
+		FilesEditor editor1 = new FilesEditor(buildStore, "Files");
 		editor1.setRemovable(false);
 		newPage(editor1);
 		
 		/* create the task editor tab */
-		ActionsEditor editor2 = new ActionsEditor(buildStore, " Actions ");
+		ActionsEditor editor2 = new ActionsEditor(buildStore, "Actions");
 		editor2.setRemovable(false);
 		newPage(editor2);
 			
 		/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());
 		setTitleToolTip(editorInput.getToolTipText());
+		
+		/*
+		 * Attach a double-click listener to the MultiPageEditorPart, so that if the
+		 * user double-clicks on one of the tabs at the bottom of the editor, we
+		 * can bring up a Dialog box that will allow them to change the tab name.
+		 */
+		if (getContainer() instanceof CTabFolder)
+		{
+			CTabFolder folder = (CTabFolder)getContainer();
+			folder.addListener(SWT.MouseDoubleClick, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					renameTab();
+				}
+			});
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -292,5 +332,32 @@ public class MainEditor extends MultiPageEditorPart {
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
+	/**
+	 * Invoked whenever the user double-clicks on the "tab name" at the bottom of the
+	 * editor window. This brings up a dialog box allowing the user to change the
+	 * tab's name.
+	 */
+	private void renameTab() {
+		
+		/* fetch the current tab text, being careful to remove trailing and leading " ". */
+		int pageIndex = getActivePage();
+		String currentTabName = getPageText(pageIndex);
+		currentTabName = currentTabName.substring(1, currentTabName.length() - 1);
+		
+		/* Open the dialog box, to allow the user to modify the name */
+		EditorTabNameChangeDialog dialog = new EditorTabNameChangeDialog();
+		dialog.setName(currentTabName);
+		dialog.open();
+
+		/* If the user pressed OK, set the new name */
+		if (dialog.getReturnCode() == Dialog.OK) {
+			String newTabName = dialog.getName();
+			if (pageIndex != -1) {
+				setPageText(pageIndex, " " + newTabName + " ");
+			}
+		}
+		dialog.close();
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

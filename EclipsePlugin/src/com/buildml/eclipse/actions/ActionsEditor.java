@@ -14,7 +14,6 @@ package com.buildml.eclipse.actions;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -486,6 +485,16 @@ public class ActionsEditor extends SubEditor {
 		return false;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.SubEditor#getEditorImagePath()
+	 */
+	@Override
+	public String getEditorImagePath() {
+		return "images/action_icon.gif";
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
