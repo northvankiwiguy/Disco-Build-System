@@ -581,6 +581,65 @@ public class Reports {
 		return results;		
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a PackageSet, return the complete ActionSet of all actions that belong to packages
+	 * that are members of the set.
+	 * 
+	 * @param pkgSet The PackageSet that selects the packages to be included.
+	 * @return The ActionSet of actions that are within the selected packages.
+	 */
+	public TaskSet reportActionsFromPackageSet(PackageSet pkgSet) {
+		TaskSet results = new TaskSet(bts);
+		Packages pkgMgr = pkgSet.getBuildStore().getPackages();
+		
+		/*
+		 * Form the (complex) query string.
+		 */
+		StringBuffer sb = new StringBuffer(256);
+		sb.append("select taskId from buildTasks where ");
+		int memberCount = 0;
+		
+		String pkgList[] = pkgMgr.getPackages();
+		for (String pkgName : pkgList) {
+			int pkgId = pkgMgr.getPackageId(pkgName);
+			if (pkgId != ErrorCode.NOT_FOUND) {
+				
+				/* is this package in the set? */
+				boolean isMember = pkgSet.isMember(pkgId, Packages.SCOPE_PUBLIC);
+		
+				/* do we need a "or" between neighboring tests? */
+				if (isMember) {
+					memberCount++;
+					if (memberCount > 1) {
+						sb.append(" or ");
+					}
+					
+					/* form the condition for comparing the action's package. */
+					sb.append("(pkgId == " + pkgId + ")");
+				}
+			}
+		}
+		
+		/* if the package set was empty, so too is the result set */
+		if (memberCount == 0) {
+			return results;
+		}
+		
+		ResultSet rs = db.executeSelectResultSet(sb.toString());
+		try {
+			while (rs.next()) {
+				results.add(rs.getInt(1));
+			}
+			rs.close();
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/

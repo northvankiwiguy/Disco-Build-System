@@ -63,6 +63,9 @@ public class PackageFilterDialog extends TitleAreaDialog {
 	/** Default height of the dialog box. */
 	private int dialogHeight;
 	
+	/** Should the dialog box show scope names? */
+	private boolean showScopes;
+	
 	/*=====================================================================================*
 	 * NESTED CLASS - PkgSelectWidget
 	 *=====================================================================================*/
@@ -113,7 +116,7 @@ public class PackageFilterDialog extends TitleAreaDialog {
 			 * and a section for each of the scopes (excluding the None scope).
 			 */
 			GridLayout layout = new GridLayout();
-			layout.numColumns = 1 + Packages.SCOPE_MAX;
+			layout.numColumns = 1 + getNumScopes();
 			layout.marginHeight = 0;
 			setLayout(layout);
 			
@@ -127,11 +130,16 @@ public class PackageFilterDialog extends TitleAreaDialog {
 			 * (except for "None"). We take note of each widget (in the checkBoxes)
 			 * array so we can set/refresh it later.
 			 */
-			for (int i = 0; i < Packages.SCOPE_MAX; i++) {
+			int numScopes = getNumScopes();
+			for (int i = 0; i < numScopes; i++) {
 				
 				/* the scope check boxes are on the right side */
 				final Button newButton = new Button(this, SWT.CHECK);
-				newButton.setText(pkgMgr.getScopeName(i + 1));
+				if (showScopes) {
+					newButton.setText(pkgMgr.getScopeName(i + 1));
+				} else {
+					newButton.setText("Show");					
+				}
 				newButton.setLayoutData(new GridData());
 
 				/*
@@ -142,7 +150,12 @@ public class PackageFilterDialog extends TitleAreaDialog {
 					public void widgetSelected(SelectionEvent e) {
 						Button button = (Button)(e.getSource());
 						String buttonText = button.getText();
-						int scopeId = pkgMgr.getScopeId(buttonText);
+						int scopeId;
+						if (showScopes) {
+							scopeId = pkgMgr.getScopeId(buttonText);
+						} else {
+							scopeId = Packages.SCOPE_PUBLIC;
+						}
 						if (button.getSelection()) {
 							pkgSet.add(pkgId, scopeId);
 						} else {
@@ -164,9 +177,28 @@ public class PackageFilterDialog extends TitleAreaDialog {
 		 */
 		public void refresh()
 		{
-			for (int i = 0; i != Packages.SCOPE_MAX; i++) {
+			int numScopes = getNumScopes();
+			for (int i = 0; i != numScopes; i++) {
 				Button thisCheck = checkBoxes[i];
-				thisCheck.setSelection(pkgSet.isMember(pkgId, i + 1));
+				if (showScopes) {
+					thisCheck.setSelection(pkgSet.isMember(pkgId, i + 1));
+				} else {
+					thisCheck.setSelection(pkgSet.isMember(pkgId, Packages.SCOPE_PUBLIC));
+				}
+			}
+		}
+		
+		/*---------------------------------------------------------------------------------*/
+
+		/**
+		 * @return The number of scope names that should be displayed (e.g. "Public" and 
+		 * "Private"), or just "Show".
+		 */
+		private int getNumScopes() {
+			if (showScopes) {
+				return Packages.SCOPE_MAX;
+			} else {
+				return 1;
 			}
 		}
 		
@@ -180,10 +212,14 @@ public class PackageFilterDialog extends TitleAreaDialog {
 	/**
 	 * Create a new PackageFilterDialog object, with the specified set of packages
 	 * shown as being selected.
-	 * @param initialPkgs The packages that will initially be selected. 
+	 * @param initialPkgs The packages that will initially be selected.
+	 * @param showScopes True if our dialog box should show the package scope names (public
+	 *    and private), or just allow the whole package to be selected.
 	 */
-	public PackageFilterDialog(PackageSet initialPkgs) {
+	public PackageFilterDialog(PackageSet initialPkgs, boolean showScopes) {
 		super(new Shell());
+		
+		this.showScopes = showScopes;
 		
 		/* 
 		 * Make a copy of the PackageSet, so we can mess with it as much as we like

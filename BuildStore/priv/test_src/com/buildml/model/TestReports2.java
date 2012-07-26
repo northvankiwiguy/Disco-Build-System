@@ -26,6 +26,7 @@ import com.buildml.model.Reports;
 import com.buildml.model.BuildTasks.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
+import com.buildml.model.types.TaskSet;
 
 /**
  * The class contains test cases for some of the methods in the Report class
@@ -439,6 +440,92 @@ public class TestReports2 {
 		
 		/* the simple fact that this doesn't crash is enough to pass the test */
 		fs = reports.reportFilesFromPackageSet(cs);	
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+
+	/**
+	 * Test method for {@link com.buildml.model.Reports#reportActionsFromPackageSet}.
+	 */
+	@Test
+	public void testReportActionsFromPackageSet() {
+		
+		/* create a new package set and add some packages */
+		PackageSet cs = new PackageSet(bs);
+		Packages pkgMgr = bs.getPackages();
+		int pkg1Id = pkgMgr.addPackage("Pkg1");
+		int pkg2Id = pkgMgr.addPackage("Pkg2");		
+		int pkg3Id = pkgMgr.addPackage("Pkg3");
+		int pkg4Id = pkgMgr.addPackage("Pkg4");
+
+		/* initially, no actions should be present */
+		TaskSet tset = reports.reportActionsFromPackageSet(cs);
+		assertEquals(0, tset.size());
+		
+		/* add a bunch of actions - they should all be in the None package */
+		int action1 = bts.addBuildTask(0, 0, "command 1");
+		int action2 = bts.addBuildTask(0, 0, "command 2");
+		int action3 = bts.addBuildTask(0, 0, "command 3");
+		int action4 = bts.addBuildTask(0, 0, "command 4");
+		int action5 = bts.addBuildTask(0, 0, "command 5");
+		int action6 = bts.addBuildTask(0, 0, "command 6");
+		int action7 = bts.addBuildTask(0, 0, "command 7");
+		int action8 = bts.addBuildTask(0, 0, "command 8");
+		
+		/* empty package set still gives an empty ActionSet */
+		tset = reports.reportActionsFromPackageSet(cs);
+		assertEquals(0, tset.size());
+		
+		/* map the actions into packages */
+		pkgMgr.setTaskPackage(action1, pkg1Id);
+		pkgMgr.setTaskPackage(action2, pkg2Id);
+		pkgMgr.setTaskPackage(action3, pkg3Id);
+		pkgMgr.setTaskPackage(action4, pkg4Id);
+		pkgMgr.setTaskPackage(action5, pkg1Id);
+		pkgMgr.setTaskPackage(action6, pkg2Id);
+		pkgMgr.setTaskPackage(action7, pkg3Id);
+		pkgMgr.setTaskPackage(action8, pkg4Id);
+
+		/* empty package set still gives an empty ActionSet */
+		tset = reports.reportActionsFromPackageSet(cs);
+		assertEquals(0, tset.size());
+		
+		/* add Pkg1 into the package set */
+		cs.add(pkg1Id, Packages.SCOPE_PUBLIC);
+		tset = reports.reportActionsFromPackageSet(cs);
+		assertEquals(2, tset.size());
+		assertTrue(tset.isMember(action1));
+		assertTrue(tset.isMember(action5));
+
+		/* add Pkg2 into the package set */
+		cs.add(pkg2Id);
+		tset = reports.reportActionsFromPackageSet(cs);
+		assertEquals(4, tset.size());
+		assertTrue(tset.isMember(action1));
+		assertTrue(tset.isMember(action2));
+		assertTrue(tset.isMember(action5));
+		assertTrue(tset.isMember(action6));
+
+		/* add Pkg4 into the package set */
+		cs.add(pkg4Id, Packages.SCOPE_PUBLIC);
+		tset = reports.reportActionsFromPackageSet(cs);
+		assertEquals(6, tset.size());
+		assertTrue(tset.isMember(action1));
+		assertTrue(tset.isMember(action2));
+		assertTrue(tset.isMember(action4));
+		assertTrue(tset.isMember(action5));
+		assertTrue(tset.isMember(action6));
+		assertTrue(tset.isMember(action8));
+		
+		/* add a few hundred packages, and check scalability */
+		for (int i = 5; i != 200; i++) {
+			int id = pkgMgr.addPackage("Pkg" + i);
+			cs.add(id, Packages.SCOPE_PUBLIC);
+		}
+		
+		/* the simple fact that this doesn't crash is enough to pass the test */
+		tset = reports.reportActionsFromPackageSet(cs);	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

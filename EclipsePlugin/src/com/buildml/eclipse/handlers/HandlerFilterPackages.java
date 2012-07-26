@@ -43,9 +43,9 @@ public class HandlerFilterPackages extends AbstractHandler {
 		if (pkgFilterSet == null) {
 			return null;
 		}
-		
-		// TODO: check whether the sub-editor supports filter via scopes.
-		PackageFilterDialog pkgSelDialog = new PackageFilterDialog(pkgFilterSet);
+
+		boolean showScopes = subEditor.hasFeature("filter-packages-by-scope");
+		PackageFilterDialog pkgSelDialog = new PackageFilterDialog(pkgFilterSet, showScopes);
 		pkgSelDialog.open();
 		
 		int retCode = pkgSelDialog.getReturnCode();

@@ -373,15 +373,14 @@ public class ActionsEditor extends SubEditor {
 	public void setFilterPackageSet(PackageSet newSet) {
 		super.setFilterPackageSet(newSet);
 		
-		/* if the editor is already display, we can fresh the filters */
+		/* if the editor is in an initialized state, we can refresh the filters */
 		if (visibilityProvider != null) {
-			// TODO: implement this.
-//			TaskSet pkgActionSet = 
-//				buildStore.getReports().reportActionsFromPackageSet(newSet);
-//			pkgActionSet.populateWithParents();
-//		
-//			visibilityProvider.setSecondaryFilterSet(pkgActionSet);
-//			refreshView(true);
+			TaskSet pkgActionSet = 
+					buildStore.getReports().reportActionsFromPackageSet(newSet);
+			pkgActionSet.populateWithParents();
+		
+			visibilityProvider.setSecondaryFilterSet(pkgActionSet);
+			refreshView(true);
 		}
 	}
 	

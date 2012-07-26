@@ -501,6 +501,8 @@ public class FilesEditor extends SubEditor {
 			return isRemovable();
 		} else if (feature.equals("path-roots")) {
 			return true;
+		} else if (feature.equals("filter-packages-by-scope")) {
+			return true;
 		}
 		return false;
 	}
