@@ -103,7 +103,7 @@
             name="Filter Packages">
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerFilterByName"
+            defaultHandler="com.buildml.eclipse.handlers.HandlerFilterByName"
             id="com.buildml.eclipse.commands.filterByName"
             name="Filter by Name">
       </command>

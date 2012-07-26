@@ -22,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
@@ -138,6 +139,21 @@ public class EclipsePartUtils {
 		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor instanceof FilesEditor) {
 			return (FilesEditor)subEditor;
+		}
+		return null;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns the currently active ActionsEditor. If the current editor is not an
+	 * ActionsEditor, return null;
+	 * @return The currently active ActionsEditor instance, or null;
+	 */
+	public static ActionsEditor getActiveActionsEditor() {
+		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		if (subEditor instanceof ActionsEditor) {
+			return (ActionsEditor)subEditor;
 		}
 		return null;
 	}
