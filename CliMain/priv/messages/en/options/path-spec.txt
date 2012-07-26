@@ -44,7 +44,7 @@
       This will limit the output to only those files within the specific
       package section.
            
-    %nc/<pkg-name> or %not-pkg/<pkg-name>
+    %np/<pkg-name> or %not-pkg/<pkg-name>
        
       Similar to %p and %pkg, but only show the files that reside outside
       that package. For example:
