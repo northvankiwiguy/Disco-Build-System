@@ -1,27 +1,40 @@
 package com.buildml.eclipse;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
 
@@ -29,7 +42,7 @@ import com.buildml.model.errors.BuildStoreVersionException;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class MainEditor extends MultiPageEditorPart {
+public class MainEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -43,6 +56,9 @@ public class MainEditor extends MultiPageEditorPart {
 	
 	/** the tab that was most recently visible (before the current tab was made visible) */
 	private int previousPageIndex = -1;
+
+	/** The file that this editor has open. */
+	private File fileInput;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -73,15 +89,13 @@ public class MainEditor extends MultiPageEditorPart {
 		
 		/* open the BuildStore file we're editing */
 		
-		IFileEditorInput fileInput = (IFileEditorInput)input;
-		IFile file = fileInput.getFile();
-		IPath path = file.getLocation();
+		IFileEditorInput editorInput = (IFileEditorInput)input;
+		fileInput = editorInput.getFile().getLocation().toFile();
 
 		// TODO: handle the case where multiple editors have the same BuildStore open.
 		
 		// TODO: put a top-level catch for FatalBuildStoreException() (and other
 		// exceptions) to display a meaningful error.
-
 		
 		try {
 			/*
@@ -90,12 +104,12 @@ public class MainEditor extends MultiPageEditorPart {
 			 * us to open a file that doesn't exist, so this is an extra safety
 			 * check.
 			 */
-			if (!file.exists()) {
-				throw new FileNotFoundException(path + " does not exist, or is not writable.");
+			if (!fileInput.exists()) {
+				throw new FileNotFoundException(fileInput + " does not exist, or is not writable.");
 			}
 			
 			/* open the existing BuildStore database */
-			buildStore = new BuildStore(path.toOSString());
+			buildStore = new BuildStore(fileInput.toString());
 			
 		} catch (BuildStoreVersionException e) {
 			
@@ -105,6 +119,12 @@ public class MainEditor extends MultiPageEditorPart {
 			AlertDialog.displayErrorDialog("Can't open the BuildML database.", e.getMessage());
 			throw new PartInitException("Can't open the BuildML database.");
 		}
+		
+		/* 
+		 * Register to learn about changes to resources in our workspace. We might need to
+		 * know if somebody deletes or renames the file we're editing.
+		 */
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -303,7 +323,11 @@ public class MainEditor extends MultiPageEditorPart {
 	public void dispose() {
 
 		/* close the BuildStore to release resources */
-		buildStore.close();		
+		buildStore.close();
+		
+		/* stop listening to resource changes */
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+
 		super.dispose();
 	}
 
@@ -326,6 +350,75 @@ public class MainEditor extends MultiPageEditorPart {
 	 */
 	public SubEditor getActiveSubEditor() {
 		return (SubEditor) this.getActiveEditor();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * This method is called whenever a resource in our project is modified. We only
+	 * care about this if somebody has deleted or renamed the file that we're editing. 
+	 * Otherwise this event is ignored.
+	 */
+	@Override
+	public void resourceChanged(IResourceChangeEvent event) {
+		IResourceDelta changes = event.getDelta();
+		try {
+			changes.accept(new IResourceDeltaVisitor() {
+				public boolean visit(IResourceDelta change) {
+					if (change.getResource().getType() == IResource.FILE) {
+						IResource resource = change.getResource();
+						
+						/* 
+						 * Is the changed file the file that we're editing? Also, is the
+						 * change a "remove" operation (a delete or a rename).
+						 */
+						if (resource.getLocation().toFile().equals(fileInput) &&
+								(change.getKind() == IResourceDelta.REMOVED)) {
+
+							/* was the file renamed? */
+							if (change.getFlags() == IResourceDelta.MOVED_TO) {
+								final File newFile = new File(Platform.getLocation().toOSString(), 
+														change.getMovedToPath().toOSString());
+								
+								/* 
+								 * if so, record the new name, and proceed to change the name
+								 * of the editor tab (in a UI thread) to be the basename of the
+								 * file's path.
+								 */
+								fileInput = newFile;								
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										String newPartName = newFile.toString();
+										int lastSlash = newPartName.lastIndexOf('/'); 
+										if (lastSlash == -1) {
+											MainEditor.this.setPartName(newPartName);
+										} else {
+											MainEditor.this.setPartName(newPartName.substring(lastSlash + 1));
+										}
+									}
+								});
+							}
+							
+							/* no, the file was completely deleted - close the editor */
+							else {
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										IWorkbenchPage page = MainEditor.this.getEditorSite().getPage();
+										page.closeEditor(MainEditor.this, false);
+									}
+								});
+							}							
+						}
+					};
+					return true;
+				}
+			});
+		}
+		catch (CoreException exception) {
+			/* nothing */
+		}
 	}
 	
 	/*=====================================================================================*
