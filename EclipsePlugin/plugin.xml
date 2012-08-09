@@ -903,5 +903,22 @@
             name="BuildML File">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="com.buildml.eclipse.wizards.bmlCategory"
+            name="BuildML">
+      </category>
+      <wizard
+            category="com.buildml.eclipse.wizards.bmlCategory"
+            class="com.buildml.eclipse.wizards.ImportEaAnno"
+            icon="images/buildml_editor_img.gif"
+            id="com.buildml.eclipse.wizards.ImportEaAnno"
+            name="Import ElectricAccelerator Annotation File">
+         <description>
+            Import from an ElectricAccelerator Annotation file into a BuildML file.
+         </description>
+      </wizard>
+   </extension>
 
 </plugin>

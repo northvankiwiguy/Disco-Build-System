@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,12 @@
 
 package com.buildml.eclipse.utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -189,5 +191,34 @@ public class EclipsePartUtils {
 		return subEditor.hasFeature(feature);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return An array of the currently open BuildML editors, or null if there was an
+	 * error retrieving the editor list.
+	 */
+	public static MainEditor[] getOpenBmlEditors()
+	{
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null) {
+			return null;
+		}
+		IWorkbenchPage page = window.getActivePage();
+		if (page == null) {
+			return null;
+		}
+		IEditorReference editors[] = page.getEditorReferences();
+		ArrayList<MainEditor> bmlEditors = new ArrayList<MainEditor>();
+		int foundMainEditors = 0;
+		for (int i = 0; i < editors.length; i++) {
+			IEditorPart editor = editors[i].getEditor(true);
+			if (editor instanceof MainEditor) {
+				foundMainEditors++;
+				bmlEditors.add((MainEditor)editor);
+			}
+		}
+		return bmlEditors.toArray(new MainEditor[foundMainEditors]);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

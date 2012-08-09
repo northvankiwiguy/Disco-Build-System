@@ -355,6 +355,15 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * @return The file that this editor is editing.
+	 */
+	public File getFile() {
+		return fileInput;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * This method is called whenever a resource in our project is modified. We only
 	 * care about this if somebody has deleted or renamed the file that we're editing. 
 	 * Otherwise this event is ignored.
