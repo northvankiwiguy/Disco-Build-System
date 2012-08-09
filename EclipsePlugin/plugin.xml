@@ -920,5 +920,22 @@
          </description>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="com.buildml.eclipse.wizards.bmlCategory"
+            name="BuildML">
+      </category>
+      <wizard
+            category="com.buildml.eclipse.wizards.bmlCategory"
+            class="com.buildml.eclipse.wizards.ImportFileSystem"
+            icon="images/files_icon.gif"
+            id="com.buildml.eclipse.wizards.ImportFileSystem"
+            name="Import Directory Hierarchy">
+         <description>
+            Import a hierarchy of files and directories into a BuildML file.
+         </description>
+      </wizard>
+   </extension>
 
 </plugin>
