@@ -937,5 +937,22 @@
          </description>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="com.buildml.eclipse.wizards.bmlCategory"
+            name="BuildML">
+      </category>
+      <wizard
+            category="com.buildml.eclipse.wizards.bmlCategory"
+            class="com.buildml.eclipse.wizards.ImportLegacyBuild"
+            icon="images/buildml_editor_img.gif"
+            id="com.buildml.eclipse.wizards.ImportLegacyBuild"
+            name="Import Legacy Build Process">
+         <description>
+            Execute a legacy build command and import the files and actions into a BuildML file.
+         </description>
+      </wizard>
+   </extension>
 
 </plugin>
