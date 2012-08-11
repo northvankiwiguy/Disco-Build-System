@@ -12,10 +12,23 @@
 
 package com.buildml.eclipse.wizards;
 
+import java.io.File;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.progress.UIJob;
+
+import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.BuildStore;
+import com.buildml.scanner.buildtree.FileSystemScanner;
 
 /**
  * Provides an Eclipse wizard for importing a directory hierarchy into a BuildML file.
@@ -52,11 +65,71 @@ public class ImportFileSystem extends Wizard implements IImportWizard {
 	 * @return true if the action was accepted, else false.
 	 */	
 	public boolean performFinish() {
-		// TODO: finish this.
-		String outputBmlFilePath = mainPage.getOutputPath();
-		String inputDirectoryPath = mainPage.getDirectoryPath();
+		BuildStore buildStore = null;
+		
+		/* This is the BuildStore we'll update */
+		final String outputBmlFilePath = mainPage.getOutputPath();
+		
+		/* This is the root of the directory hierarchy we'll traverse */
+		final String inputDirectoryPath = mainPage.getDirectoryPath();
 
-		System.out.println("Importing files and directories from " + inputDirectoryPath + " into " + outputBmlFilePath);
+		/* 
+		 * If the BuildStore is currently open in an editor, force it to save/close so
+		 * we don't need to worry about concurrency problems.
+		 */
+		MainEditor bmlEditor = EclipsePartUtils.getOpenBmlEditor(new File(outputBmlFilePath));
+		if (bmlEditor != null) {
+			IWorkbenchPage page = EclipsePartUtils.getActiveWorkbenchPage();
+			if (page != null) {
+				page.closeEditor(bmlEditor, true);
+			}
+		}
+		
+		/* Freshly open the BuildStore (but just not in an editor) */
+		buildStore = EclipsePartUtils.getNewBuildStore(outputBmlFilePath);
+		if (buildStore == null) {
+			return false;
+		}
+		
+		/*
+		 * Start the background job that does the import. Once it's finished,
+		 * the editor will be (re)opened so the user can see the content.
+		 */
+		final BuildStore importBuildStore = buildStore;
+		final FileSystemScanner fss = new FileSystemScanner(importBuildStore);
+		Job importJob = new Job("Import Files and Directories") {
+			@Override
+			public IStatus run(final IProgressMonitor monitor) {
+				monitor.beginTask("Importing Files and Directories...",  
+									IProgressMonitor.UNKNOWN);
+				
+				/* perform the import */
+				fss.scanForFiles("root", inputDirectoryPath);
+				
+				/* we're done - close up */
+				monitor.done();
+				importBuildStore.close();
+				
+				/* 
+				 * Open the BuildStore in an editor (this must be done
+				 * in the UI thread) so that the user can see what was just
+				 * imported.
+				 */
+				UIJob openEditorJob = new UIJob("Open Editor") {
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						EclipsePartUtils.openNewEditor(outputBmlFilePath);						
+						return Status.OK_STATUS;
+					}
+				};
+				openEditorJob.schedule();
+				return Status.OK_STATUS;
+			}
+		};
+		
+		/* start up the progress monitor service so that it monitors the job */
+		importJob.setUser(true);
+		importJob.schedule();
         return true;
 	}
 	 

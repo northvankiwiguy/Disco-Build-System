@@ -238,23 +238,14 @@ public class FilesEditor extends SubEditor {
 							!filesTreeViewer.getExpandedState(node));
 				}
 				
-				/* else, try to open file in an appropriate editor */
+				/* 
+				 * else, try to open file in an appropriate editor.
+				 * A dialog box will be displayed (by openNewEditor)
+				 * if there's a problem.
+				 */
 				else {
 					String filePath = fns.getPathName(node.getId());
-					File fileToOpen = new File(filePath);
-					if (fileToOpen.exists() && fileToOpen.isFile()) {
-					    IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
-					    IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-					    try {
-					        IDE.openEditorOnFileStore(page, fileStore);
-					    } catch (PartInitException e) {
-							AlertDialog.displayErrorDialog("File can't be opened", 
-									"For some unknown reason, the file couldn't be opened.");					    	
-					    }
-					} else {
-						AlertDialog.displayErrorDialog("File not found", 
-								"The file couldn't be opened because it's not currently on your file system.");
-					}
+					EclipsePartUtils.openNewEditor(filePath);
 				}
 			}
 		});

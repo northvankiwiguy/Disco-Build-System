@@ -12,10 +12,14 @@
 
 package com.buildml.eclipse.utils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -33,6 +37,7 @@ import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.UIJob;
 
 import com.buildml.eclipse.MainEditor;
@@ -42,6 +47,7 @@ import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
 import com.buildml.model.FileNameSpaces;
+import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskRecord;
@@ -236,6 +242,25 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Given a file (on the file system), determine whether there are any BML editors
+	 * currently editing that file. 
+	 * @param fileBeingEdited The file that an editor might be editing. 
+	 * @return The matching editor, or null if no open editor is editing this file.
+	 */
+	public static MainEditor getOpenBmlEditor(File fileBeingEdited)
+	{
+		MainEditor[] editors = getOpenBmlEditors();
+		for (int i = 0; i < editors.length; i++) {
+			if (editors[i].getFile().equals(fileBeingEdited)) {
+				return editors[i];
+			}
+		}
+		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * @return The currently active workbench page, or null if there's no active page.
 	 */
 	public static IWorkbenchPage getActiveWorkbenchPage()
@@ -304,6 +329,77 @@ public class EclipsePartUtils {
 		
 		/* return a new PrintStream, so we can use all the standard output functionality */
 		return new PrintStream(messageConsole.newMessageStream());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a new BuildStore object by opening a *.bml database file. 
+	 * @param bmlFileName Name of the .bml file to be opened. This is a UI centric method
+	 * that will display dialog boxes to explain if anything goes wrong.
+	 * @return The corresponding BuildStore object, or null if there was a problem
+	 * opening the database.
+	 */
+	public static BuildStore getNewBuildStore(String bmlFileName) {
+
+		BuildStore buildStore = null;
+		File fileInput = new File(bmlFileName);
+		try {
+			/*
+			 * Test that file exists before opening it, otherwise it'll be created
+			 * automatically, which isn't what we want. Ideally Eclipse wouldn't ask
+			 * us to open a file that doesn't exist, so this is an extra safety
+			 * check.
+			 */
+			if (!fileInput.exists()) {
+				String message = fileInput + " does not exist, or is not writable.";
+				throw new FileNotFoundException(message);
+			}
+
+			/* open the existing BuildStore database */
+			buildStore = new BuildStore(fileInput.toString());
+
+		} catch (BuildStoreVersionException e) {
+			AlertDialog.displayErrorDialog("BuildML database has the wrong version.", e.getMessage());
+		} catch (FileNotFoundException e) {
+			AlertDialog.displayErrorDialog("Can't open the BuildML database.", e.getMessage());
+		}
+		return buildStore;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Open a .bml file in a new BML editor window. This must be executed by the UI thread.
+	 * 
+	 * @param fileToOpen The file to be opened.
+	 * @return true on success, or false on failure. On failure, a suitable dialog box
+	 * will display the reason for the failure.
+	 */
+	public static boolean openNewEditor(String fileToOpen) {
+
+		File file = new File(fileToOpen);
+		if (file.isFile()) {
+			IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
+			IWorkbenchPage page = getActiveWorkbenchPage();
+			if (page == null) {
+				AlertDialog.displayErrorDialog("Editor can't be opened", 
+						"For some unknown reason, a new editor couldn't be opened.");
+				return false;
+			}
+			try {
+				IDE.openEditorOnFileStore(page, fileStore);
+			} catch (PartInitException e) {
+				AlertDialog.displayErrorDialog("File can't be opened", 
+						"For some unknown reason, the file couldn't be opened.");
+				return false;
+			}
+		} else {
+			AlertDialog.displayErrorDialog("File not found", 
+					"The file couldn't be opened because it's not currently on your file system.");
+			return false;
+		}
+		return true;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -97,26 +97,8 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 		// TODO: put a top-level catch for FatalBuildStoreException() (and other
 		// exceptions) to display a meaningful error.
 		
-		try {
-			/*
-			 * Test that file exists before opening it, otherwise it'll be created
-			 * automatically, which isn't what we want. Ideally Eclipse wouldn't ask
-			 * us to open a file that doesn't exist, so this is an extra safety
-			 * check.
-			 */
-			if (!fileInput.exists()) {
-				throw new FileNotFoundException(fileInput + " does not exist, or is not writable.");
-			}
-			
-			/* open the existing BuildStore database */
-			buildStore = new BuildStore(fileInput.toString());
-			
-		} catch (BuildStoreVersionException e) {
-			
-			AlertDialog.displayErrorDialog("BuildML database has the wrong version.", e.getMessage());
-			throw new PartInitException("BuildML database has the wrong version.");
-		} catch (FileNotFoundException e) {
-			AlertDialog.displayErrorDialog("Can't open the BuildML database.", e.getMessage());
+		buildStore = EclipsePartUtils.getNewBuildStore(fileInput.getPath());
+		if (buildStore == null) {
 			throw new PartInitException("Can't open the BuildML database.");
 		}
 		
