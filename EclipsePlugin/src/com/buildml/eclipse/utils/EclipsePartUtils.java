@@ -12,15 +12,28 @@
 
 package com.buildml.eclipse.utils;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleConstants;
+import org.eclipse.ui.console.IConsoleManager;
+import org.eclipse.ui.console.IConsoleView;
+import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.progress.UIJob;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
@@ -218,6 +231,79 @@ public class EclipsePartUtils {
 			}
 		}
 		return bmlEditors.toArray(new MainEditor[foundMainEditors]);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The currently active workbench page, or null if there's no active page.
+	 */
+	public static IWorkbenchPage getActiveWorkbenchPage()
+	{
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window == null) {
+			return null;
+		}
+		return window.getActivePage();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Open an Eclipse console view, ready for textual output to be displayed. This involves
+	 * either finding an existing console (with the specified name), or creating a new console.
+	 * In either case, ensure that the console is visible so the user can see the output.
+	 * 
+	 * @param consoleName Name of the console view to open.
+	 * @return An OutputStream, for writing to the console.
+	 */
+	public static PrintStream getConsolePrintStream(String consoleName) {
+		
+		/*
+		 * Look through the existing consoles, to see if we've already created it.
+		 */
+		ConsolePlugin plugin = ConsolePlugin.getDefault();
+		IConsoleManager conMan = plugin.getConsoleManager();
+		IConsole[] existing = conMan.getConsoles();
+		MessageConsole messageConsole = null;
+		for (int i = 0; i < existing.length; i++) {
+			if (existing[i].getName().equals(consoleName)) {
+				messageConsole = (MessageConsole)existing[i];
+			}
+		}
+
+		/* no, it didn't exist so create a new one */
+		if (messageConsole == null) {
+			messageConsole = new MessageConsole(consoleName, null);
+			conMan.addConsoles(new IConsole[]{messageConsole});
+		}
+		
+		/*
+		 * Ensure that the console is visible to the end user. This involves
+		 * starting a UI thread that's able to open the view.
+		 */
+		final MessageConsole console = messageConsole;
+		Job showConsoleJob = new UIJob("show console") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IWorkbenchPage page = EclipsePartUtils.getActiveWorkbenchPage();
+				if (page == null) {
+					return Status.CANCEL_STATUS;
+				}
+				IConsoleView view = null;
+				try {
+					view = (IConsoleView) page.showView(IConsoleConstants.ID_CONSOLE_VIEW);
+				} catch (PartInitException e1) {
+					/* nothing we can do - just don't show the console */
+				}
+				view.display(console);
+				return Status.OK_STATUS;
+			}
+		};
+		showConsoleJob.schedule();
+		
+		/* return a new PrintStream, so we can use all the standard output functionality */
+		return new PrintStream(messageConsole.newMessageStream());
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
