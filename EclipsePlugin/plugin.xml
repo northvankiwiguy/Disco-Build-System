@@ -722,6 +722,15 @@
       </page>
    </extension>
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.buildml.eclipse.preferences.PathsPreferencePage"
+            id="com.buildml.eclipse.preferences.BuildMlPathsPreferencePage"
+            category="com.buildml.eclipse.preferences.BuildMlPreferencePage"
+            name="Paths">
+      </page>
+   </extension>
+   <extension
          point="org.eclipse.ui.bindings">
       <key
             commandId="com.buildml.eclipse.commands.expandItemSubTree"

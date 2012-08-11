@@ -61,7 +61,10 @@ public class SystemUtils {
 		 */
 		String buildMlHome = System.getenv("BUILDML_HOME");
 		if (buildMlHome == null) {
-			throw new FatalError("The BUILDML_HOME environment variable is not set.");
+			buildMlHome = System.getProperty("BUILDML_HOME");
+			if (buildMlHome == null) {
+				throw new FatalError("The BUILDML_HOME environment variable is not set.");
+			}
 		}
 
 		/* load our JNI libraries */

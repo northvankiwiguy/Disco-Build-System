@@ -17,5 +17,12 @@ public class PreferenceConstants {
 	 */
 	public static final String PREF_COALESCE_DIRS = "coalesceDirectoryPreference";
 	
+	/**
+	 * Preference: the directory location where the BuildML "bin" and "lib" directories
+	 * can be found. This is necessary so that executable binary and dynamically loadable
+	 * libraries can be found.
+	 */
+	public static final String PREF_BUILDML_HOME = "buildmlHomeDirectory";
+	
 	/*-------------------------------------------------------------------------------------*/
 }

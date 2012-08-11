@@ -1,6 +1,10 @@
 package com.buildml.eclipse.preferences;
 
 import org.eclipse.jface.preference.*;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbench;
 
@@ -8,9 +12,9 @@ import com.buildml.eclipse.Activator;
 
 /**
  * This class provides the BuildML editor preference management for 
- * the BuildML/Appearance page.
+ * the BuildML/Paths page.
  */
-public class AppearancePreferencePage
+public class PathsPreferencePage
 	extends FieldEditorPreferencePage
 	implements IWorkbenchPreferencePage {
 
@@ -21,10 +25,10 @@ public class AppearancePreferencePage
 	/**
 	 * Create a new preference page.
 	 */
-	public AppearancePreferencePage() {
+	public PathsPreferencePage() {
 		super(GRID);
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("Appearance of BuildML editors and views.");
+		setDescription("Paths for BuildML editors and views.");
 	}
 
 	/*=====================================================================================*
@@ -36,11 +40,16 @@ public class AppearancePreferencePage
 	 */
 	public void createFieldEditors() {
 
-		addField(
-			new BooleanFieldEditor(
-				PreferenceConstants.PREF_COALESCE_DIRS,
-				"To save space, &coalesce directory hierarchies onto a single line.",
-				getFieldEditorParent()));
+		Composite parent = getFieldEditorParent();
+		
+		Label buildMlHomeLabel = new Label(parent, SWT.NONE);
+		buildMlHomeLabel.setText("Directory containing BuildML's bin and lib directories:");
+		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
+		gd.verticalIndent = 10;
+		buildMlHomeLabel.setLayoutData(gd);
+		
+		addField(new DirectoryFieldEditor(PreferenceConstants.PREF_BUILDML_HOME,
+				"", parent));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -12,7 +12,8 @@
 
 package com.buildml.eclipse;
 
-import org.eclipse.core.commands.ExecutionEvent;
+import java.io.File;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.preferences.PreferenceConstants;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.BuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeRecord;
@@ -243,6 +245,31 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 		
 		setOption(EditorOptions.OPT_COALESCE_DIRS, 
 				prefStore.getBoolean(PreferenceConstants.PREF_COALESCE_DIRS));
+		
+		/*
+		 * Check that the BUILDML_HOME preference is set, is a directory, and contains subdirectories
+		 * "lib" and "bin".
+		 */
+		String buildMlPath = prefStore.getString(PreferenceConstants.PREF_BUILDML_HOME);
+		if (buildMlPath.isEmpty()) {
+			AlertDialog.displayErrorDialog("Missing Preference Setting", 
+					"The preference setting: \"Directory containing BuildML's bin and lib directories\" " +
+					"is not defined. Please go into the BuildML preferences and set a suitable value.");
+		}
+		else {
+			File buildMlPathFile = new File(buildMlPath);
+			if (!(buildMlPathFile.isDirectory()) ||
+					(!new File(buildMlPathFile, "bin").isDirectory()) ||
+					(!new File(buildMlPathFile, "lib").isDirectory())) {
+				AlertDialog.displayErrorDialog("Invalid Preference Setting", 
+						"The preference setting: \"Directory containing BuildML's bin and lib directories\" " +
+						"does not refer to a valid directory.");
+			}
+			/* else, the path is good */
+			else {
+				System.setProperty("BUILDML_HOME", buildMlPath);
+			}
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
