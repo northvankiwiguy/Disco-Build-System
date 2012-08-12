@@ -262,7 +262,7 @@ public class LegacyBuildScanner {
 		 * in a buffer since we won't be looking at it.
 		 */
 		String commandLine = sb.toString();
-		ShellResult result = SystemUtils.executeShellCmd(commandLine, "", true, false);
+		ShellResult result = SystemUtils.executeShellCmd(commandLine, "", System.out, false, null);
 		if (result.getReturnCode() != 0) {
 			throw new IOException("Failed to execute shell command: " + commandLine);
 		}

@@ -119,8 +119,9 @@ public class SystemUtils {
 	 * 
 	 * @param cmd The shell command to be executed.
 	 * @param stdin The text to be passed to the command's standard input.
-	 * @param echoToOutput Set if the stdout and stderr should be echoed to our own stdout/stderr.
+	 * @param echoStream If not null, the process's stdout and stderr should be echoed to this stream.
 	 * @param saveToBuffer Set if the stdout and stderr should be saved in buffers.
+	 * @param workingDir If not null, the working directory the command should be executed in.
 	 * 
 	 * @return The command's standard output, error and return code in the form of a ShellResult object. If
 	 * saveToBuffer is false, then the output/error fields will be empty.
@@ -128,12 +129,14 @@ public class SystemUtils {
 	 * @throws IOException For some reason the shell command failed to execute.
 	 * @throws InterruptedException The command was interrupted before it completed.
 	 */
-	public static ShellResult executeShellCmd(String cmd, String stdin, boolean echoToOutput, boolean saveToBuffer) 
+	public static ShellResult executeShellCmd(
+			String cmd, String stdin, PrintStream echoStream, 
+			boolean saveToBuffer, File workingDir) 
 		throws IOException, InterruptedException {
 		
 		/* invoke the command as a sub process */
 		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd);
+		Process pr = run.exec(cmd, null, workingDir);
 		
 		/* send the child process it's stdin, followed by an EOF */
 		PrintStream childStdin = new PrintStream(pr.getOutputStream());
@@ -146,9 +149,9 @@ public class SystemUtils {
 		 * EOF is reached.
 		 */
 		StreamToStringBufferWorker stdOutWorker = new StreamToStringBufferWorker(pr.getInputStream(),
-				echoToOutput, saveToBuffer, System.out);
+				saveToBuffer, echoStream);
 		StreamToStringBufferWorker stdErrWorker = new StreamToStringBufferWorker(pr.getErrorStream(),
-				echoToOutput, saveToBuffer, System.err);
+				saveToBuffer, echoStream);
 		
 		/* Start the threads and wait for them both to terminate */
 		Thread stdOutThread = new Thread(stdOutWorker);
@@ -186,7 +189,7 @@ public class SystemUtils {
 	public static ShellResult executeShellCmd(String cmd, String stdin) 
 		throws IOException, InterruptedException {
 	
-		return executeShellCmd(cmd, stdin, false, true);
+		return executeShellCmd(cmd, stdin, null, true, null);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -187,7 +187,27 @@ public class TestSystemUtils {
 		 * Test the non-buffering variant. Even though there's output, we shouldn't get any
 		 * of it.
 		 */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", false, false);
+		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", null, false, null);
+		assertEquals(sr.getReturnCode(), 0);
+		assertEquals("", sr.getStdout());
+		assertEquals("", sr.getStderr());
+		
+		/*
+		 * Test with an invalid working directory
+		 */
+		try {
+			sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", 
+					null, false, new File("/invalid-path"));
+			fail("Failed to throw IOException when executing in invalid directory.");
+		} catch (IOException ex) {
+			/* passed */
+		}
+		
+		/*
+		 * Test with a valid working directory
+		 */
+		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", 
+				null, false, new File("/tmp"));
 		assertEquals(sr.getReturnCode(), 0);
 		assertEquals("", sr.getStdout());
 		assertEquals("", sr.getStderr());

@@ -60,16 +60,13 @@ public class StreamToStringBufferWorker extends Thread {
 	 * Create a new StreamToStringBufferWorker object.
 	 * 
 	 * @param str The InputStream to read from.
-	 * @param echoToOutput Set if the stdout and stderr should be echoed to our own 
-	 * process's stdout/stderr.
 	 * @param saveToBuffer Set if the stdout and stderr should be saved in buffers.
-	 * @param outStream if echoToOutput is true, the stream we should echo to.
+	 * @param outStream if not null, the stream we should echo to.
 	 */
 	public StreamToStringBufferWorker(InputStream str, 
-			boolean echoToOutput, boolean saveToBuffer, PrintStream outStream) {
+			boolean saveToBuffer, PrintStream outStream) {
 		reader = new BufferedReader(new InputStreamReader(str));
 		sb = new StringBuffer();
-		this.echoToOutput = echoToOutput;
 		this.saveToBuffer = saveToBuffer;
 		this.outStream = outStream;
 	}
@@ -91,7 +88,7 @@ public class StreamToStringBufferWorker extends Thread {
 					sb.append(line);
 					sb.append('\n');
 				}
-				if (echoToOutput) {
+				if (outStream != null) {
 					outStream.println(line);
 				}
 			}
