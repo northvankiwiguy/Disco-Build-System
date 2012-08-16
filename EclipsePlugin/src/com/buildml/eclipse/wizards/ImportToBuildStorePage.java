@@ -145,6 +145,7 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 			openEditorsExist = true;
 			new Label(outputGroup, SWT.NONE).setText("Choose Open BuildML file:");
 			bmlFileComboBox = new Combo(outputGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+			bmlFileComboBox.add("");
 			for (int i = 0; i < openEditors.length; i++) {
 				String option = openEditors[i].getPartName(); 
 				bmlFileComboBox.add(option);
@@ -156,8 +157,8 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 				@Override
 				public void modifyText(ModifyEvent e) {
 					int index = bmlFileComboBox.getSelectionIndex();
-					if (index != -1) {
-						outputFile.setStringValue(openEditors[index].getFile().toString());
+					if (index > 0) {
+						outputFile.setStringValue(openEditors[index - 1].getFile().toString());
 					}
 				}
 			});
