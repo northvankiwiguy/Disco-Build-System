@@ -135,6 +135,7 @@ public class TestCFuncPerms {
 				"#include <sys/stat.h>\n" +
 				"int main() {" +
 				"  chmod(\"" + tmpDir + "/chmod-file\", 0644);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
 		assertEquals(fns.getPath(tmpDir + "/chmod-file"), fileModifies[0].intValue());
@@ -146,6 +147,7 @@ public class TestCFuncPerms {
 				"#include <sys/stat.h>\n" +
 				"int main() {" +
 				"  chmod(\"" + tmpDir + "/no-file\", 0644);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileModifies.length);
 	}
@@ -169,6 +171,7 @@ public class TestCFuncPerms {
 				"#include <sys/stat.h>\n" +
 				"int main() {" +
 				"  chown(\"" + tmpDir + "/chown-file\", getuid(), getgid());" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
 		assertEquals(fns.getPath(tmpDir + "/chown-file"), fileModifies[0].intValue());
@@ -180,6 +183,7 @@ public class TestCFuncPerms {
 				"#include <sys/stat.h>\n" +
 				"int main() {" +
 				"  chown(\"" + tmpDir + "/no-file\", getuid(), getgid());" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileModifies.length);
 	}
@@ -246,6 +250,7 @@ public class TestCFuncPerms {
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = open(\"fchmod-file\", O_RDONLY);" +
 				"  fchmod(fd, 0644);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
 		assertEquals(fns.getPath(tmpDir + "/fchmod-file"), fileModifies[0].intValue());
@@ -257,6 +262,7 @@ public class TestCFuncPerms {
 				"#include <sys/stat.h>\n" +
 				"int main() {" +
 				"  fchmod(-1, 0644);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileModifies.length);
 	}
@@ -280,6 +286,7 @@ public class TestCFuncPerms {
 				"int main() {" +
 				"  int fd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  fchmodat(fd, \"fchmodat-file\", 0644, 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
 		assertEquals(fns.getPath(tmpDir + "/fchmodat-file"), fileModifies[0].intValue());
@@ -293,6 +300,7 @@ public class TestCFuncPerms {
 				"int main() {" +
 				"  int fd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  fchmodat(fd, \"bad-file\", 0644, 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileModifies.length);
 	}
@@ -318,6 +326,7 @@ public class TestCFuncPerms {
 				"int main() {" +
 				"  int fd = open(\"" + tmpDir + "/fchown-file\", O_RDONLY);" +
 				"  fchown(fd, getuid(), getgid());" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
 		assertEquals(fns.getPath(tmpDir + "/fchown-file"), fileModifies[0].intValue());
@@ -329,6 +338,7 @@ public class TestCFuncPerms {
 				"#include <sys/stat.h>\n" +
 				"int main() {" +
 				"  fchown(-1, getuid(), getgid());" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileModifies.length);
 	}
@@ -352,6 +362,7 @@ public class TestCFuncPerms {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  fchownat(dirfd, \"fchownat-file\", getuid(), getgid(), 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
 		assertEquals(fns.getPath(tmpDir + "/fchownat-file"), fileModifies[0].intValue());
@@ -365,6 +376,7 @@ public class TestCFuncPerms {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  fchownat(dirfd, \"bad-file\", getuid(), getgid(), 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileModifies.length);
 	}

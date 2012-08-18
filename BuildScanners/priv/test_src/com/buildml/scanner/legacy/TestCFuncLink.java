@@ -128,6 +128,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  link(\"oldFile1\", \"linkFile1\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
@@ -143,6 +144,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  link(\"badFile\", \"linkFile1a\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileAccesses.length);
 	}
@@ -166,6 +168,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  linkat(dirfd, \"oldFile2\", dirfd, \"linkFile2\", 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
@@ -183,6 +186,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  linkat(dirfd, \"badFile2\", dirfd, \"linkFile2a\", 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileAccesses.length);  /* only the dirfd open is read */
 	}
@@ -205,6 +209,7 @@ public class TestCFuncLink {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"    remove(\"" + tmpDir + "/fileToDelete\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -220,6 +225,7 @@ public class TestCFuncLink {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"    remove(\"" + tmpDir + "/dirToDelete\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -234,6 +240,7 @@ public class TestCFuncLink {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"    remove(\"" + tmpDir + "/invalidFile\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(0, fileAccesses.length);
 	}
@@ -255,6 +262,7 @@ public class TestCFuncLink {
 				"#include <stdio.h>\n" +
 				"int main() {" +
 				"    rename(\"" + tmpDir + "/fileToRename\", \"" + tmpDir + "/newName\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -272,6 +280,7 @@ public class TestCFuncLink {
 				"#include <stdio.h>\n" +
 				"int main() {" +
 				"    rename(\"" + tmpDir + "/dirToRename\", \"" + tmpDir + "/newDirName\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -288,6 +297,7 @@ public class TestCFuncLink {
 				"#include <stdio.h>\n" +
 				"int main() {" +
 				"    rename(\"" + tmpDir + "/badFile\", \"" + tmpDir + "/newBadFile\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(0, fileAccesses.length);
 	}
@@ -311,6 +321,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"    int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"    renameat(dirfd, \"fileToRename\", dirfd, \"newName\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);
 		assertEquals(1, fileReads.length);			 /* opening the dirfd */
@@ -331,6 +342,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"    int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"    renameat(dirfd, \"dirToRename\", dirfd, \"newDirName\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);
 		assertEquals(1, fileReads.length);			/* opening the dirfd */
@@ -350,6 +362,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"    int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"    renameat(dirfd, \"badFile\", dirfd, \"newBadName\");" +
+				"    return 0;" +
 				"}", null);
 		assertEquals(1, fileAccesses.length); /* the dirfd open */
 	}
@@ -372,6 +385,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  symlink(\"oldFile1\", \"linkFile1\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
@@ -390,6 +404,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  symlink(\"oldDir1\", \"linkDir1\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
@@ -408,6 +423,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  symlink(\"badFile\", \"linkFile1a\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
@@ -426,6 +442,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  symlink(\"../../oldFile1\", \"subdir1/subdir2/linkFile1\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
@@ -455,6 +472,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  symlinkat(\"" + tmpDir + "/oldFile2\", dirfd, \"linkFile2\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
@@ -474,6 +492,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  symlinkat(\"" + tmpDir + "/oldDir2\", dirfd, \"linkDir2\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
@@ -492,6 +511,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  symlinkat(\"" + tmpDir + "/badFile2\", dirfd, \"linkFile2a\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
@@ -512,6 +532,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  symlinkat(\"../../oldFile2\", dirfd, \"subdir1/subdir2/linkFile2\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
@@ -540,6 +561,7 @@ public class TestCFuncLink {
 				"#include <unistd.h>\n" +
 				"int main() {" +
 				"  unlink(\"" + tmpDir + "/fileToDelete\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -552,6 +574,7 @@ public class TestCFuncLink {
 				"#include <unistd.h>\n" +
 				"int main() {" +
 				"  unlink(\"" + tmpDir + "/invalidFile\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileAccesses.length);
 	}
@@ -574,6 +597,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  unlinkat(dirfd, \"fileToDelete\", 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -589,6 +613,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  unlinkat(dirfd, \"dirToDelete\", AT_REMOVEDIR);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
@@ -603,6 +628,7 @@ public class TestCFuncLink {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  unlinkat(dirfd, \"invalidFile\", 0);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileAccesses.length); /* only the dirfd open */
 	}

@@ -151,10 +151,12 @@ public class TestCFuncExec {
 				"      wait(&status);" +
 				"      if (WEXITSTATUS(status) == 123) { creat(\"/tmp/flag-file2\", 0666); }" +
 				"  }" +
+				"  return 0;" +
 		    	"}";
 		} else {
 			parentSource +=
 				"  " + extraLines +
+				"  return 0;" +
 				"};";
 		}
 
@@ -234,6 +236,7 @@ public class TestCFuncExec {
 		String source = 
 			"int main() {" +
 			"  system(\"" + extraLines + "\");" + 
+			"  return 0;" +
 			"}";
 	
 		/* trace the program's behaviour into a BuildStore */
@@ -357,6 +360,7 @@ public class TestCFuncExec {
 			"extern char **environ;" +
 			"int main() {" +
 			"   execle(\"true\", \"true\", \"arg1\", \"\", \"arg3\", \"\", 0, environ);" +
+			"   return 0;" +
 			"}";
 
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
@@ -452,6 +456,7 @@ public class TestCFuncExec {
 			"    int status;" +
 			"    wait(&status);" +
 			"  }" +
+			"  return 0;" +
 			"}";
 		
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
@@ -496,6 +501,7 @@ public class TestCFuncExec {
 			"int main() {" +
 			"  FILE *f = popen(\"echo Hello World\", \"r\");" + 
 			"  fclose(f);" +
+			"  return 0;" +
 			"}";
 	
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
@@ -675,6 +681,7 @@ public class TestCFuncExec {
 		String source = 
 			"int main() {" +
 			"	execl(\"/bad-path\", \"bad-path\", 0);" +
+			"   return 0;" +
 			"}";
 		
 		BuildStore bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);

@@ -218,6 +218,7 @@ public class TestCFuncDir {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  mkdir(\"newDir\", 0755);" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(1, fileAccesses.length);
@@ -233,6 +234,7 @@ public class TestCFuncDir {
 				"#include <unistd.h>\n" +
 				"int main() {" +
 				"  mkdir(\"/invalid/dir\", 0755);" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(0, fileAccesses.length);
@@ -257,6 +259,7 @@ public class TestCFuncDir {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  mkdirat(dirfd, \"anotherDir\", 0755);" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(2, fileAccesses.length);
@@ -275,6 +278,7 @@ public class TestCFuncDir {
 				"int main() {" +
 				"  int dirfd = open(\"" + tmpDir + "\", O_RDONLY);" +
 				"  mkdirat(dirfd, \"/invalid/dir\", 0755);" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(1, fileAccesses.length);
@@ -301,6 +305,7 @@ public class TestCFuncDir {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  rmdir(\"newDir\");" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(1, fileAccesses.length);
@@ -316,6 +321,7 @@ public class TestCFuncDir {
 				"#include <unistd.h>\n" +
 				"int main() {" +
 				"  rmdir(\"/invalid/dir\");" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(0, fileAccesses.length);

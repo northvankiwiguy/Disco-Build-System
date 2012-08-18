@@ -126,6 +126,7 @@ public class TestCFuncOpen {
 				"#include <stdio.h>\n" +
 				"int main() {" +
 				"  int fd = " + func + "(\"" + tmpDir + "/test-file1\", 0644);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -141,6 +142,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = " + func + "(\"test-file2\", 0644);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -187,6 +189,7 @@ public class TestCFuncOpen {
 				"#include <stdio.h>\n" +
 				"int main() {" +
 				"  FILE *file = " + func + "(\"/etc/passwd\", \"r\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -202,6 +205,7 @@ public class TestCFuncOpen {
 				"#include <stdio.h>\n" +
 				"int main() {" +
 				"  FILE *file = " + func + "(\"/etc/not-passwd\", \"r\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -215,6 +219,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
 				"  FILE *file = " + func + "(\"test-file1\", \"r\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -230,6 +235,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
 				"  FILE *file = " + func + "(\"test-file2\", \"w\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -263,6 +269,7 @@ public class TestCFuncOpen {
 				"  file = " + func + "(\"test-file-a+\", \"a+\");" +
 				"  file = " + func + "(\"test-file-ab+\", \"ab+\");" +
 				"  file = " + func + "(\"test-file-a+b\", \"a+b\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(2, fileReads.length);
 		assertEquals(9, fileWrites.length);
@@ -276,6 +283,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" + 
 				"  FILE *file = " + func + "(\".\", \"r\");" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -327,6 +335,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  FILE *file = fopen(\"" + fileName1 + "\", \"r\");" + 
 				"  file = " + func + "(\"" + fileName1 + "\", \"w\", file);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -345,6 +354,7 @@ public class TestCFuncOpen {
 				"  chdir(\"" + tmpDir + "\");" + 
 				"  FILE *file = fopen(\"" + fileName1 + "\", \"r\");" + 
 				"  file = " + func + "(\"file1\", \"w\", file);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -362,6 +372,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  FILE *file = fopen(\"" + fileName1 + "\", \"r\");" + 
 				"  file = " + func + "(\"" + fileName2 + "\", \"w\", file);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -385,6 +396,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  FILE *file = fopen(\"" + fileName1 + "\", \"r\");" + 
 				"  file = " + func + "(NULL, \"w\", file);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -399,6 +411,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  FILE *file = fopen(\"" + fileName1 + "\", \"w\");" + 
 				"  file = " + func + "(\"" + fileName1 + "\", \"r\", file);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -416,6 +429,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  FILE *file = fopen(\"" + fileName1 + "\", \"w\");" + 
 				"  file = " + func + "(\"missing-file\", \"r\", file);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -464,6 +478,7 @@ public class TestCFuncOpen {
 				"#include <sys/ipc.h>\n" +
 				"int main() {" +
 				"  key_t key = ftok(\"/etc/passwd\", 10);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		int fileId = fns.getPath("/etc/passwd");
@@ -478,6 +493,7 @@ public class TestCFuncOpen {
 				"#include <sys/ipc.h>\n" +
 				"int main() {" +
 				"  key_t key = ftok(\"/missing-file\", 10);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 	}
@@ -498,6 +514,7 @@ public class TestCFuncOpen {
 				"#include <fcntl.h>\n" +
 				"int main() {" +
 				"  int fd = " + func + "(\"/etc/passwd\", O_RDONLY);" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(1, fileReads.length);
@@ -516,6 +533,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = " + func + "(\"test-file1\", O_RDONLY);" +
+				"  return 0;" +
 				"}", null);
 		
 		assertEquals(1, fileReads.length);
@@ -532,6 +550,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = " + func + "(\"test-file2\", O_CREAT | O_WRONLY);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -548,6 +567,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = " + func + "(\"test-file3\", O_RDWR);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -564,6 +584,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = open(\"test-file-missing\", O_RDWR);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -577,6 +598,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int fd = open(\".\", O_RDONLY);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -627,6 +649,7 @@ public class TestCFuncOpen {
 				"  int fd = " + func + "(dirfd, \"test-file1\", O_CREAT|O_WRONLY, 0666);" +
 				"  close(dirfd);" + 
 				"  close(fd);" + 
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);		/* the sub-dir directory is read */
 		assertEquals(1, fileWrites.length);
@@ -645,6 +668,7 @@ public class TestCFuncOpen {
 				"  int dirfd = open(\"sub-dir\", O_RDONLY);" +
 				"  int fd = " + func + "(dirfd, \"" + tmpDir + "/sub-dir2/test-file2\"," +
 						"O_CREAT|O_WRONLY, 0666);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);		/* the sub-dir directory is read */
 		assertEquals(1, fileWrites.length);
@@ -661,6 +685,7 @@ public class TestCFuncOpen {
 				"  chdir(\"" + tmpDir + "\");" + 
 				"  int fd = " + func + "(AT_FDCWD, \"sub-dir/test-file3\"," +
 						"O_CREAT|O_WRONLY, 0666);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
@@ -677,6 +702,7 @@ public class TestCFuncOpen {
 				"  chdir(\"" + tmpDir + "\");" + 
 				"  int fd = " + func + "(100, \"sub-dir/test-file4\"," +
 						"O_CREAT|O_WRONLY, 0666);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -691,6 +717,7 @@ public class TestCFuncOpen {
 				"  int dirfd = open(\"sub-dir\", O_RDONLY);" +
 				"  int fd = " + func + "(dirfd, \"sub-dir/test-file-missing\"," +
 						"O_RDONLY, 0666);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);		/* the sub-dir directory is read */
 		assertEquals(0, fileWrites.length);
@@ -739,6 +766,7 @@ public class TestCFuncOpen {
 				"extern int truncate64(const char *, __off64_t);" +
 				"int main() {" +
 				"  int status = " + func + "(\"" + tmpDir + "/test-file1\", 10);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -758,6 +786,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int status = " + func + "(\"test-file2\", 10);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
@@ -776,6 +805,7 @@ public class TestCFuncOpen {
 				"int main() {" +
 				"  chdir(\"" + tmpDir + "\");" +
 				"  int status = " + func + "(\"test-file-missing\", 10);" +
+				"  return 0;" +
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
