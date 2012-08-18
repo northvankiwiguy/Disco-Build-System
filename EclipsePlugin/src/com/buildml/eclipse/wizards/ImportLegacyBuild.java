@@ -123,8 +123,12 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 				
 				monitor.beginTask("Importing Files and Actions into BuildML File...",  
 						IProgressMonitor.UNKNOWN);
-				
-				// TODO: what if this fails?
+
+				/*
+				 * Parse the trace file. This only reason this could fail is if something got lost/corrupted,
+				 * rather than due to a user error. On failure, a FatalBuildStoreError will be thrown
+				 * and then displayed by Eclipse.
+				 */
 				lbs.parseTraceFile();
 								
 				/* we're done - close up */
