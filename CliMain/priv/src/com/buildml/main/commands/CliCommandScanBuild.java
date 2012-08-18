@@ -204,7 +204,8 @@ public class CliCommandScanBuild implements ICliCommand {
 				lbs.traceShellCommand(args, null, System.out);
 
 			} catch (Exception e) {
-				CliUtils.reportErrorAndExit("Unable to invoke shell command: " + e.getMessage());
+				CliUtils.reportErrorAndExit("The shell command returned a non-zero exit code." +
+						" The legacy build process will not be scanned.");
 			}
 		}
 		

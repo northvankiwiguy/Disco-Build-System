@@ -333,7 +333,12 @@ int main(int argc, char *argv[], char *envp[])
 				/* continue until the child process dies */
 			} while (status == 0);
 		}
+		break;
 	}
+
+	/* clean up the child process, fetching its exit status */
+	int exitStatus;
+	wait(&exitStatus);
 
 	/* we're done - the child has terminated, and the resources should be deallocated. */
 	if (is_interactive_shell) {
@@ -345,7 +350,9 @@ int main(int argc, char *argv[], char *envp[])
 		perror("Fatal error removing the trace buffer");
 		exit(-1);
 	}
-	return 0;
+
+	/* we'll exit with the exact same return code our child returned */
+	return WEXITSTATUS(exitStatus);
 }
 
 /*======================================================================*/

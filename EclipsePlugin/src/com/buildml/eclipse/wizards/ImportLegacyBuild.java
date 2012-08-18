@@ -114,7 +114,11 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 					lbs.traceShellCommand(new String[] {inputCommand}, new File(inputDirectory), outStream);
 
 				} catch (Exception e) {
-					AlertDialog.displayErrorDialog("Import Failed", e.getMessage());
+					AlertDialog.displayErrorDialog("Import Failed", "For some reason, the legacy build process " +
+							"couldn't be imported. The .bml file has not be modified.");
+					monitor.done();
+					importBuildStore.close();
+					return Status.CANCEL_STATUS;
 				}
 				
 				monitor.beginTask("Importing Files and Actions into BuildML File...",  
