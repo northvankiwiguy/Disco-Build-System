@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,9 +136,34 @@ public class SystemUtils {
 			boolean saveToBuffer, File workingDir) 
 		throws IOException, InterruptedException {
 		
+		/* 
+		 * Figure out what the BUILDML_HOME environment variable must be set to. If it's already
+		 * set in the environment, that's great, but if not we should add it.
+		 */
+		String buildMlHome = System.getenv("BUILDML_HOME");
+		String newEnvironment[] = null;
+		if (buildMlHome == null) {
+			buildMlHome = System.getProperty("BUILDML_HOME");
+			
+			/* whoops - not in the environment, or in the properties */
+			if (buildMlHome == null) {
+				throw new IOException(
+						"Unable to locate cfs tool. BUILDML_HOME environment variable not set.");
+			}
+			
+			/* BUILDML_HOME is a property, but not an environment variable, so we must add it */
+			Map<String, String> envMap = System.getenv();
+			ArrayList<String> envArray = new ArrayList<String>(envMap.size() + 1);
+			for (String key : envMap.keySet()) {
+				envArray.add(key + "=" + envMap.get(key));
+			}
+			envArray.add("BUILDML_HOME=" + buildMlHome);
+			newEnvironment = envArray.toArray(new String[envArray.size()]);
+		}
+		
 		/* invoke the command as a sub process */
 		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd, null, workingDir);
+		Process pr = run.exec(cmd, newEnvironment, workingDir);
 		
 		/* send the child process it's stdin, followed by an EOF */
 		PrintStream childStdin = new PrintStream(pr.getOutputStream());

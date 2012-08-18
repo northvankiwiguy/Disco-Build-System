@@ -217,15 +217,23 @@ public class LegacyBuildScanner {
 	 * 
 	 * @param args The shell command line arguments (as would normally be passed into a main()
 	 * function).
+	 * @param workingDir If not null, the directory in which to execute the command (if null,
+	 * 			use the current directory).
+	 * @param outStream The PrintStream on which the traced command's output should be displayed.
 	 * @throws InterruptedException The scan operation was interrupted before it completed fully.
 	 * @throws IOException The build command was not found, or failed to execute for some reason.
 	 */
-	public void traceShellCommand(String args[]) throws IOException, InterruptedException {
+	public void traceShellCommand(String args[], File workingDir, PrintStream outStream) 
+			throws IOException, InterruptedException {
 		
 		/* locate the "cfs" executable program (in $BUILDML_HOME/bin) */
 		String buildMlHome = System.getenv("BUILDML_HOME");
 		if (buildMlHome == null) {
-			throw new IOException("Unable to locate cfs tool. BUILDML_HOME environment variable not set.");
+			buildMlHome = System.getProperty("BUILDML_HOME");
+			if (buildMlHome == null) {
+				throw new IOException(
+						"Unable to locate cfs tool. BUILDML_HOME environment variable not set.");
+			}
 		}
 		
 		/* 
@@ -262,7 +270,7 @@ public class LegacyBuildScanner {
 		 * in a buffer since we won't be looking at it.
 		 */
 		String commandLine = sb.toString();
-		ShellResult result = SystemUtils.executeShellCmd(commandLine, "", System.out, false, null);
+		ShellResult result = SystemUtils.executeShellCmd(commandLine, "", outStream, false, workingDir);
 		if (result.getReturnCode() != 0) {
 			throw new IOException("Failed to execute shell command: " + commandLine);
 		}

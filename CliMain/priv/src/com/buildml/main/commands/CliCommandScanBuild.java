@@ -201,7 +201,7 @@ public class CliCommandScanBuild implements ICliCommand {
 		if (!optionReadTrace) {
 			try {
 				/* invoke the shell commands, and construct the trace file */
-				lbs.traceShellCommand(args);
+				lbs.traceShellCommand(args, null, System.out);
 
 			} catch (Exception e) {
 				CliUtils.reportErrorAndExit("Unable to invoke shell command: " + e.getMessage());

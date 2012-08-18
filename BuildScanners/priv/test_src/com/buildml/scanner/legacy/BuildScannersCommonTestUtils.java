@@ -120,7 +120,8 @@ public class BuildScannersCommonTestUtils {
 					argString.append(' ');
 				}
 			}
-			lbs.traceShellCommand(new String[] { exeProgram + " " + argString.toString()});
+			lbs.traceShellCommand(new String[] { exeProgram + " " + argString.toString()}, 
+					null, System.out);
 		} catch (Exception ex) {
 			fail("Unable to trace shell command: " + ex.getMessage());
 		}

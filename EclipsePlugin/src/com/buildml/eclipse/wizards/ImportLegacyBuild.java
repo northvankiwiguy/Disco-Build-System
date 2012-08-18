@@ -12,10 +12,25 @@
 
 package com.buildml.eclipse.wizards;
 
+import java.io.File;
+import java.io.PrintStream;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.progress.UIJob;
+
+import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.BuildStore;
+import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**
  * Provides an Eclipse wizard for importing a legacy build process into a 
@@ -53,13 +68,85 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 	 * @return true if the action was accepted, else false.
 	 */	
 	public boolean performFinish() {
-		// TODO: finish this.
-		String outputBmlFilePath = mainPage.getOutputPath();
-		String inputDirectory = mainPage.getInputPath();
-		String inputCommand = mainPage.getInputCommand();
+		
+		/* This is the BuildStore we'll update */
+		final String outputBmlFilePath = mainPage.getOutputPath();
+		
+		/* This is the root of the directory hierarchy we'll traverse */
+		final String inputDirectory = mainPage.getInputPath();
+		
+		/* This is the build command we'll execute */
+		final String inputCommand = mainPage.getInputCommand();
+		
+		/* 
+		 * If the BuildStore is currently open in an editor, force it to save/close so
+		 * we don't need to worry about concurrency problems.
+		 */
+		MainEditor bmlEditor = EclipsePartUtils.getOpenBmlEditor(new File(outputBmlFilePath));
+		if (bmlEditor != null) {
+			IWorkbenchPage page = EclipsePartUtils.getActiveWorkbenchPage();
+			if (page != null) {
+				page.closeEditor(bmlEditor, true);
+			}
+		}
+		
+		/* Freshly open the BuildStore (but just not in an editor) */
+		final BuildStore importBuildStore = EclipsePartUtils.getNewBuildStore(outputBmlFilePath);
+		if (importBuildStore == null) {
+			return false;
+		}
+		
+		/* Start the import process */
+		Job importJob = new Job("Import a Legacy Build Process") {
+			@Override
+			public IStatus run(final IProgressMonitor monitor) {
+				
+				PrintStream outStream = EclipsePartUtils.getConsolePrintStream("BuildML Import");
+				
+				monitor.beginTask("Executing Legacy Build Process...",  
+									IProgressMonitor.UNKNOWN);
+				
+				LegacyBuildScanner lbs = new LegacyBuildScanner();
+				lbs.setBuildStore(importBuildStore);
+				lbs.setTraceFile(new File(inputDirectory, "cfs.trace").toString());
 
-		System.out.println("Running the command " + inputCommand + " in directory " +
-				inputDirectory + " and importing into " + outputBmlFilePath);
+				try {
+					lbs.traceShellCommand(new String[] {inputCommand}, new File(inputDirectory), outStream);
+
+				} catch (Exception e) {
+					AlertDialog.displayErrorDialog("Import Failed", e.getMessage());
+				}
+				
+				monitor.beginTask("Importing Files and Actions into BuildML File...",  
+						IProgressMonitor.UNKNOWN);
+				
+				// TODO: what if this fails?
+				lbs.parseTraceFile();
+								
+				/* we're done - close up */
+				monitor.done();
+				importBuildStore.close();
+				
+				/* 
+				 * Open the BuildStore in an editor (this must be done
+				 * in the UI thread) so that the user can see what was just
+				 * imported.
+				 */
+				UIJob openEditorJob = new UIJob("Open Editor") {
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						EclipsePartUtils.openNewEditor(outputBmlFilePath);						
+						return Status.OK_STATUS;
+					}
+				};
+				openEditorJob.schedule();
+				return Status.OK_STATUS;
+			}
+		};
+		
+		/* start up the progress monitor service so that it monitors the job */
+		importJob.setUser(true);
+		importJob.schedule();
         return true;
 	}
 	 
