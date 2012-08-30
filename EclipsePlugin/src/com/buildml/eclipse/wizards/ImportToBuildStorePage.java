@@ -14,7 +14,10 @@ package com.buildml.eclipse.wizards;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -57,6 +60,12 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 	
 	/** The combo box from which existing (open) .bml files can be selected */
 	private Combo bmlFileComboBox;
+	
+	/**
+	 * The resources that were selected in the Eclipse UI, when the "import" operation was
+	 * invoked. If valid, this is used as the .bml file to import into.
+	 */
+	private ISelection selection;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -68,11 +77,14 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 	 * @param pageName The title of this wizard page.
 	 * @param instructions The textual instructions to be displayed near the top of the
 	 * 			page. These guide the user on how to fill out the fields.
+	 * @param selection Resource(s) selected when "import" was invoked.
 	 */
-	protected ImportToBuildStorePage(String pageName, String instructions) {
+	protected ImportToBuildStorePage(String pageName, String instructions, 
+									 ISelection selection) {
 		super(pageName);
 		setTitle(pageName);
 		this.instructions = instructions;
+		this.selection = selection;
 	}
 	
 	/*=====================================================================================*
@@ -171,7 +183,27 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 				(openEditorsExist ? "or " : "") + "Browse BuildML Files: ", outputFileComposite);
 		outputFile.setFileExtensions(new String[] { "*.bml" });
 		addTextValidator(outputFile.getTextControl(outputFileComposite));
-		
+
+		/*
+		 * If there was a .bml file selected when the "import" operation was initiated, select
+		 * that file as the default .bml file.
+		 */
+		if (selection != null && !selection.isEmpty() && 
+				selection instanceof IStructuredSelection) {
+			IStructuredSelection ssel = (IStructuredSelection) selection;
+			if (ssel.size() == 1) {
+				Object obj = ssel.getFirstElement();
+				if (obj instanceof IFile) {
+					IFile file = (IFile)obj;
+					String relativePath = file.getFullPath().toString();
+					if (relativePath.endsWith(".bml")) {
+						outputFile.setStringValue(
+								EclipsePartUtils.workspaceRelativeToAbsolutePath(relativePath));
+					}
+				}
+			}
+		}
+
 		/* done */
 		setControl(composite);
 	}

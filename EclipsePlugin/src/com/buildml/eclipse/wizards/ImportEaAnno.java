@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
@@ -211,7 +212,7 @@ public class ImportEaAnno extends Wizard implements IImportWizard {
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		setWindowTitle("Import from an ElectricAccelerator Annotation File.");
 		setNeedsProgressMonitor(true);
-		mainPage = new ImportEaAnnoPage("Import ElectricAccelerator Annotation File.");
+		mainPage = new ImportEaAnnoPage("Import ElectricAccelerator Annotation File.", selection);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

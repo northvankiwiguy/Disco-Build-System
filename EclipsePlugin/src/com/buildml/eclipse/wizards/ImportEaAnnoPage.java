@@ -15,6 +15,7 @@ package com.buildml.eclipse.wizards;
 import java.io.File;
 
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -52,10 +53,11 @@ public class ImportEaAnnoPage extends ImportToBuildStorePage {
 	/**
 	 * Create a new ImportEaAnnoPage, which serves as the wizard dialog page for importing
 	 * from an ElectricAccelerator annotation file, into a BuildML .bml file.
-	 * @param pageName
+	 * @param pageName Title of the dialog box.
+	 * @param selection Resource(s) selected when "import" was invoked.
 	 */
-	public ImportEaAnnoPage(String pageName) {
-		super(pageName, instructions);
+	public ImportEaAnnoPage(String pageName, ISelection selection) {
+		super(pageName, instructions, selection);
 		setDescription("Select the source Annotation file and the destination BuildML file.");
 	}
 	

@@ -15,6 +15,7 @@ package com.buildml.eclipse.wizards;
 import java.io.File;
 
 import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -52,10 +53,11 @@ public class ImportFileSystemPage extends ImportToBuildStorePage {
 	/**
 	 * Create a new ImportFileSystemPage, which serves as the wizard dialog page for importing
 	 * a directory hierarchy into a BuildML .bml file.
-	 * @param pageName
+	 * @param pageName Title of the dialog box.
+	 * @param selection Resource(s) selected when "import" was invoked.
 	 */
-	public ImportFileSystemPage(String pageName) {
-		super(pageName, instructions);
+	public ImportFileSystemPage(String pageName, ISelection selection) {
+		super(pageName, instructions, selection);
 		setDescription("Select the source directory hierarchy and the destination BuildML file.");
 	}
 	

@@ -166,7 +166,7 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		setWindowTitle("Import a Legacy Build Process.");
 		setNeedsProgressMonitor(true);
-		mainPage = new ImportLegacyBuildPage("Import Legacy Build Process.");
+		mainPage = new ImportLegacyBuildPage("Import Legacy Build Process.", selection);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

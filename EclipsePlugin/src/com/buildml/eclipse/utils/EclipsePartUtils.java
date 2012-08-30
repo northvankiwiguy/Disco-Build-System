@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -272,6 +273,20 @@ public class EclipsePartUtils {
 		return window.getActivePage();
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a path relative to the Eclipse workspace root, return the equivalent absolute
+	 * path.
+	 * @param relativePath The workspace-relative path.
+	 * @return The equivalent absolute path.
+	 */
+	public static String workspaceRelativeToAbsolutePath(String relativePath)
+	{
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + 
+						relativePath;
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

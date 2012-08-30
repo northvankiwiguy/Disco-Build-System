@@ -15,6 +15,7 @@ package com.buildml.eclipse.wizards;
 import java.io.File;
 
 import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -60,10 +61,11 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage {
 	/**
 	 * Create a new ImportLegacyBuildPage, which serves as the wizard dialog page for importing
 	 * a legacy build process into a BuildML .bml file.
-	 * @param pageName
+	 * @param pageName Title of the dialog box.
+	 * @param selection Resource(s) selected when "import" was invoked.
 	 */
-	public ImportLegacyBuildPage(String pageName) {
-		super(pageName, instructions);
+	public ImportLegacyBuildPage(String pageName, ISelection selection) {
+		super(pageName, instructions, selection);
 		setDescription("Select the necessary shell command(s), the directory in which " +
 						"the command(s) should be executed, and the destination BuildML file.");
 	}

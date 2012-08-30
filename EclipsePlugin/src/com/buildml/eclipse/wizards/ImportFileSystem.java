@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
@@ -141,7 +142,7 @@ public class ImportFileSystem extends Wizard implements IImportWizard {
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		setWindowTitle("Import a File System Directory Hierarchy.");
 		setNeedsProgressMonitor(true);
-		mainPage = new ImportFileSystemPage("Import Directory Hierarchy.");
+		mainPage = new ImportFileSystemPage("Import Directory Hierarchy.", selection);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
