@@ -1,0 +1,10 @@
+Status is 0
+Error: The shell command returned a non-zero exit code. The legacy build process will not be scanned.
+       Use bml -h for more help.
+Status is 1
+Executing true && true 
+Error: The shell command returned a non-zero exit code. The legacy build process will not be scanned.
+       Use bml -h for more help.
+Status is 1
+Status is 0
+Status is 0

@@ -119,7 +119,7 @@ public class SystemUtils {
 	 * Execute a shell command and capture the return code, standard output and standard error
 	 * strings.
 	 * 
-	 * @param cmd The shell command to be executed.
+	 * @param args The arguments of the shell command to be executed.
 	 * @param stdin The text to be passed to the command's standard input.
 	 * @param echoStream If not null, the process's stdout and stderr should be echoed to this stream.
 	 * @param saveToBuffer Set if the stdout and stderr should be saved in buffers.
@@ -132,7 +132,7 @@ public class SystemUtils {
 	 * @throws InterruptedException The command was interrupted before it completed.
 	 */
 	public static ShellResult executeShellCmd(
-			String cmd, String stdin, PrintStream echoStream, 
+			String args[], String stdin, PrintStream echoStream, 
 			boolean saveToBuffer, File workingDir) 
 		throws IOException, InterruptedException {
 		
@@ -163,7 +163,7 @@ public class SystemUtils {
 		
 		/* invoke the command as a sub process */
 		Runtime run = Runtime.getRuntime();
-		Process pr = run.exec(cmd, newEnvironment, workingDir);
+		Process pr = run.exec(args, newEnvironment, workingDir);
 		
 		/* send the child process it's stdin, followed by an EOF */
 		PrintStream childStdin = new PrintStream(pr.getOutputStream());
@@ -205,7 +205,7 @@ public class SystemUtils {
 	/**
 	 * A variant of executeShellCmd that defaults to saving output/error to a buffer, but not echoing it
 	 * 
-	 * @param cmd The command to be executed.
+	 * @param args The arguments of the command to be executed.
 	 * @param stdin The text to be passed to the command's standard input.
 	 * 
 	 * @return The command's standard output, error and return code in the form of a ShellResult object.
@@ -213,10 +213,10 @@ public class SystemUtils {
 	 * @throws IOException For some reason the shell command failed to execute.
 	 * @throws InterruptedException The command was interrupted before it completed.
 	 */
-	public static ShellResult executeShellCmd(String cmd, String stdin) 
+	public static ShellResult executeShellCmd(String args[], String stdin) 
 		throws IOException, InterruptedException {
 	
-		return executeShellCmd(cmd, stdin, null, true, null);
+		return executeShellCmd(args, stdin, null, true, null);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

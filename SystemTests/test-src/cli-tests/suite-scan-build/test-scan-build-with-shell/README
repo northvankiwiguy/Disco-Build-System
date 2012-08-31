@@ -1,0 +1,4 @@
+This test suite validates that functionality of the "scan-build -c" command,
+which passes the single (quoted) argument through a shell. This allows
+special shell characters (<, >, |, etc) to be handled correctly.
+

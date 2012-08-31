@@ -50,7 +50,7 @@ public class TestNativeMethods {
 		}
 		
 		/* now, create it - it will become a symlink */
-		ShellResult sr = SystemUtils.executeShellCmd("ln -s " + tmpFileName + " " + symlinkName, null);
+		ShellResult sr = SystemUtils.executeShellCmd(new String[] {"ln", "-s", tmpFileName, symlinkName}, null);
 		assertEquals(0, sr.getReturnCode());
 		assertTrue(SystemUtils.isSymlink(symlinkName));
 
@@ -101,7 +101,7 @@ public class TestNativeMethods {
 		}
 
 		/* now, create it - it will become a symlink */
-		ShellResult sr = SystemUtils.executeShellCmd("ln -s " + tmpFileName + " " + symlinkName, null);
+		ShellResult sr = SystemUtils.executeShellCmd(new String[] {"ln", "-s", tmpFileName, symlinkName}, null);
 		assertEquals(0, sr.getReturnCode());
 		assertEquals(tmpFileName, SystemUtils.readSymlink(symlinkName));
 

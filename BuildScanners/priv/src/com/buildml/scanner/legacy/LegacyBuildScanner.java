@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 
 import com.buildml.model.BuildStore;
 import com.buildml.scanner.FatalBuildScannerError;
@@ -220,10 +221,11 @@ public class LegacyBuildScanner {
 	 * @param workingDir If not null, the directory in which to execute the command (if null,
 	 * 			use the current directory).
 	 * @param outStream The PrintStream on which the traced command's output should be displayed.
+	 * @param useShell If true, pass the single (quoted) command line argument through a shell.
 	 * @throws InterruptedException The scan operation was interrupted before it completed fully.
 	 * @throws IOException The build command was not found, or failed to execute for some reason.
 	 */
-	public void traceShellCommand(String args[], File workingDir, PrintStream outStream) 
+	public void traceShellCommand(String args[], File workingDir, PrintStream outStream, boolean useShell) 
 			throws IOException, InterruptedException {
 		
 		/* locate the "cfs" executable program (in $BUILDML_HOME/bin) */
@@ -237,42 +239,47 @@ public class LegacyBuildScanner {
 		}
 		
 		/* 
-		 * Create a single command line string, by joining all the arguments. If
-		 * the user specified --trace-file, we also pass that to the cfs command.
+		 * Create an array of all the command line arguments. If the user 
+		 * specified --trace-file, we also pass that to the cfs command.
 		 */
-		StringBuffer sb = new StringBuffer();
-		sb.append(buildMlHome);
-		sb.append("/bin/cfs ");
+		ArrayList<String> allArgs = new ArrayList<String>(args.length + 10);
+		allArgs.add(buildMlHome + "/bin/cfs");
 		
 		/* pass the trace file name (which will default to "cfs.trace" otherwise) */
-		sb.append("-o ");
-		sb.append(traceFilePathName);
-		sb.append(" ");
+		allArgs.add("-o");
+		allArgs.add(traceFilePathName);
 		
 		/* pass the log file name (which will default to "cfs.log" otherwise) */
-		sb.append("-l ");
-		sb.append(logFileName);
-		sb.append(" ");
+		allArgs.add("-l");
+		allArgs.add(logFileName);
 				
 		/* pass debug flags */
-		sb.append("-d ");
-		sb.append(getDebugLevel());
-		sb.append(" ");
+		allArgs.add("-d");
+		allArgs.add(String.valueOf(getDebugLevel()));
+		
+		/* should the command argument be passed through a shell? */
+		if (useShell) {
+			allArgs.add("-c");
+		}
 		
 		/* now the command's arguments */
 		for (int i = 0; i < args.length; i++) {
-			sb.append(args[i]);
-			sb.append(' ');
+			allArgs.add(args[i]);
 		}
 		
 		/* 
 		 * Execute the command, echoing the output/error to our console (but don't capture it
 		 * in a buffer since we won't be looking at it.
 		 */
-		String commandLine = sb.toString();
-		ShellResult result = SystemUtils.executeShellCmd(commandLine, "", outStream, false, workingDir);
+		String allArgsArray[] = allArgs.toArray(new String[0]);
+		ShellResult result = 
+				SystemUtils.executeShellCmd(allArgsArray, "", outStream, false, workingDir);
 		if (result.getReturnCode() != 0) {
-			throw new IOException("Failed to execute shell command: " + commandLine);
+			String errString = "";
+			for (int i = 0; i < allArgsArray.length; i++) {
+				errString += (allArgsArray[i] + " ");
+			}
+			throw new IOException("Failed to execute shell command: " + errString);
 		}
 		
 	}

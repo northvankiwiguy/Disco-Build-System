@@ -62,8 +62,9 @@ public class BuildScannersCommonTestUtils {
 		 * Compile the program, using the default C compiler
 		 */
 		try {
-			ShellResult sr = SystemUtils.executeShellCmd("cc -o " + tmpDir + "/" + 
-					programName + " " + tmpDir + "/" + programName + ".c", "");
+			ShellResult sr = SystemUtils.executeShellCmd(
+					new String[] {"cc", "-o", tmpDir + "/" + programName,
+							      tmpDir + "/" + programName + ".c"}, "");
 			if (sr.getReturnCode() != 0) {
 				throw new Exception("Compile error: " + sr.getStderr());
 			}
@@ -113,15 +114,20 @@ public class BuildScannersCommonTestUtils {
 		
 		/* invoke the newly compiled "prog" executable, and trace it with cfs */
 		try {
-			StringBuffer argString = new StringBuffer();
+			/*
+			 * Form a new String[] with the program name inserted at the start. 
+			 * If args == null, then we form an array with only the command name.
+			 */
+			int length = 1;
 			if (args != null) {
-				for (String arg : args) {
-					argString.append(arg);
-					argString.append(' ');
-				}
+				length = args.length + 1;
 			}
-			lbs.traceShellCommand(new String[] { exeProgram + " " + argString.toString()}, 
-					null, System.out);
+			String allArgs[] = new String[length];
+			allArgs[0] = exeProgram;
+			if (args != null) {
+				System.arraycopy(args, 0, allArgs, 1, args.length);
+			}
+			lbs.traceShellCommand(allArgs, null, System.out, false);
 		} catch (Exception ex) {
 			fail("Unable to trace shell command: " + ex.getMessage());
 		}

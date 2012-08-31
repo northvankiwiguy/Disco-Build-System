@@ -120,7 +120,7 @@ public class TestSystemUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.utils.os.SystemUtils#executeShellCmd(java.lang.String, java.lang.String)}.
+	 * Test method for {@link com.buildml.utils.os.SystemUtils#executeShellCmd(java.lang.String[], java.lang.String)}.
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
@@ -131,24 +131,26 @@ public class TestSystemUtils {
 		
 		/* Execute an invalid command - should return an IOException */
 		try {
-			sr = SystemUtils.executeShellCmd("/blah", "Hello World\n");
+			sr = SystemUtils.executeShellCmd(new String[] {"/blah"}, "Hello World\n");
 			fail("Failed to throw IOException when executing invalid command");
 		} catch (IOException ex) {
 			/* passed */
 		}
 		
 		/* request a specific error code - our perl script always does exit() with it's second argument */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 23", "\n");
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "0", "23"}, "\n");
 		assertEquals(sr.getReturnCode(), 23);
 		
 		/* Simply echo back our stdin - the stdout should be identical to the stdin we provided. */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n");
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "0", "0"}, 
+				                         "Hello World\n");
 		assertEquals(sr.getReturnCode(), 0);
 		assertEquals("Hello World\n", sr.getStdout());
 		assertEquals("", sr.getStderr());
 	
 		/* Same, but with multiple lines of text. */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\nHow are you?\n");
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "0", "0"}, 
+										 "Hello World\nHow are you?\n");
 		assertEquals(sr.getReturnCode(), 0);
 		assertEquals("Hello World\nHow are you?\n", sr.getStdout());
 		assertEquals("", sr.getStderr());
@@ -157,7 +159,7 @@ public class TestSystemUtils {
 		 * Now get the program to generate some of its own output - that is, 5 letters on stdout 
 		 * and 5 digits on stderr.
 		 */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 5 0", "Hi\n");
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "5", "0"}, "Hi\n");
 		assertEquals(sr.getReturnCode(), 0);
 		assertEquals("Hi\nABCDE\n", sr.getStdout());
 		assertEquals("01234\n", sr.getStderr());
@@ -166,7 +168,7 @@ public class TestSystemUtils {
 		 * Now try a really really big case, where the stdout and stderr will certainly be intermingled.
 		 */
 		int count = 250000;
-		sr = SystemUtils.executeShellCmd(ourTempExe + " " + count, "");
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), String.valueOf(count)}, "");
 		assertEquals(sr.getReturnCode(), 0);
 		
 		/* first, check the lengths */
@@ -187,7 +189,8 @@ public class TestSystemUtils {
 		 * Test the non-buffering variant. Even though there's output, we shouldn't get any
 		 * of it.
 		 */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", null, false, null);
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "0", "0"}, 
+				                         "Hello World\n", null, false, null);
 		assertEquals(sr.getReturnCode(), 0);
 		assertEquals("", sr.getStdout());
 		assertEquals("", sr.getStderr());
@@ -196,8 +199,8 @@ public class TestSystemUtils {
 		 * Test with an invalid working directory
 		 */
 		try {
-			sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", 
-					null, false, new File("/invalid-path"));
+			sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "0", "0"},
+											 "Hello World\n", null, false, new File("/invalid-path"));
 			fail("Failed to throw IOException when executing in invalid directory.");
 		} catch (IOException ex) {
 			/* passed */
@@ -206,8 +209,8 @@ public class TestSystemUtils {
 		/*
 		 * Test with a valid working directory
 		 */
-		sr = SystemUtils.executeShellCmd(ourTempExe + " 0 0", "Hello World\n", 
-				null, false, new File("/tmp"));
+		sr = SystemUtils.executeShellCmd(new String[] {ourTempExe.toString(), "0", "0"}, 
+										"Hello World\n", null, false, new File("/tmp"));
 		assertEquals(sr.getReturnCode(), 0);
 		assertEquals("", sr.getStdout());
 		assertEquals("", sr.getStderr());

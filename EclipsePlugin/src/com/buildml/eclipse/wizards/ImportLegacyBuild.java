@@ -31,6 +31,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStore;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
+import com.buildml.utils.string.ShellCommandUtils;
 
 /**
  * Provides an Eclipse wizard for importing a legacy build process into a 
@@ -76,7 +77,8 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 		final String inputDirectory = mainPage.getInputPath();
 		
 		/* This is the build command we'll execute */
-		final String inputCommand = mainPage.getInputCommand();
+		final String inputCommand = 
+				ShellCommandUtils.joinCommandLine(mainPage.getInputCommand());
 		
 		/* 
 		 * If the BuildStore is currently open in an editor, force it to save/close so
@@ -111,7 +113,8 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 				lbs.setTraceFile(new File(inputDirectory, "cfs.trace").toString());
 
 				try {
-					lbs.traceShellCommand(new String[] {inputCommand}, new File(inputDirectory), outStream);
+					lbs.traceShellCommand(new String[] {inputCommand}, new File(inputDirectory), 
+							outStream, true);
 
 				} catch (Exception e) {
 					AlertDialog.displayErrorDialog("Import Failed", "For some reason, the legacy build process " +

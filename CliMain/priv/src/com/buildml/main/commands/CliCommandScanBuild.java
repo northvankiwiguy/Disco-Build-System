@@ -36,7 +36,10 @@ public class CliCommandScanBuild implements ICliCommand {
 	
 	/** Set if the user specified --read-trace. */
 	private boolean optionReadTrace = false;
-	
+
+	/** Set if the user specified -c, to pass the single argument through a shell. */
+	private boolean optionUseShell = false;
+
 	/** Set if the user specified --trace-level=. */
 	private int optionDebugLevel = 0;
 	
@@ -91,7 +94,11 @@ public class CliCommandScanBuild implements ICliCommand {
 		Option dumpTraceOpt = new Option("d", "debug-level", true, 
 				"Debug level (0 = none, 1 = brief, 2 = detailed).");
 		opts.addOption(dumpTraceOpt);
-		
+
+		/* add the -c option */
+		Option useShellOpt = new Option("c", "command-string", false, "Execute the quoted string as the whole command line.");
+		opts.addOption(useShellOpt);
+
 		/* add the --log-file option */
 		Option logFileOpt = new Option("l", "log-file", true,  "File for capturing debug information (default: cfs.log).");
 		logFileOpt.setArgName("file-name");
@@ -131,6 +138,7 @@ public class CliCommandScanBuild implements ICliCommand {
 		/* fetch the option values */
 		optionTraceOnly = cmdLine.hasOption("trace-only");
 		optionReadTrace = cmdLine.hasOption("read-trace");
+		optionUseShell = cmdLine.hasOption("command-string");
 		traceFileName = cmdLine.getOptionValue("trace-file");
 		logFileName = cmdLine.getOptionValue("log-file");
 		
@@ -194,6 +202,11 @@ public class CliCommandScanBuild implements ICliCommand {
 			lbs.setBuildStore(buildStore);
 		}
 		
+		/* if -c is specified, only a single command argument is allowed (the quoted string) */
+		if (optionUseShell && args.length != 1) {
+			CliUtils.reportErrorAndExit("When using -c, only a single (quoted) argument is permitted.");
+		}
+		
 		/*
 		 * Invoke the shell commands via "cfs", and collect the trace output. However, skip this
 		 * step if the user selected --read-trace (which uses an existing trace file)
@@ -201,7 +214,7 @@ public class CliCommandScanBuild implements ICliCommand {
 		if (!optionReadTrace) {
 			try {
 				/* invoke the shell commands, and construct the trace file */
-				lbs.traceShellCommand(args, null, System.out);
+				lbs.traceShellCommand(args, null, System.out, optionUseShell);
 
 			} catch (Exception e) {
 				CliUtils.reportErrorAndExit("The shell command returned a non-zero exit code." +

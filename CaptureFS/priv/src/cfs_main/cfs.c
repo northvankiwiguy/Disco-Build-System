@@ -62,6 +62,13 @@ static char *log_file_name = "cfs.log";
 int traverse_source = FALSE;
 
 /*
+ * If -c is passed on the command line, the single command line argument
+ * must be a quoted string that will be passed onto the command shell
+ * (e.g. $SHELL -c "$arg")
+ */
+int command_string = FALSE;
+
+/*
  * Amount of debug output to display. Valid values are currently 0, 1 or 2.
  */
 int debug_level = 0;
@@ -81,7 +88,7 @@ int is_interactive_shell = 0;
 static char **parse_options(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "+hro:l:d:")) != -1){
+	while ((opt = getopt(argc, argv, "+hcro:l:d:")) != -1){
 		switch (opt){
 		case 'o':
 			/* -o <trace-file> */
@@ -94,6 +101,10 @@ static char **parse_options(int argc, char *argv[])
 		case 'r':
 			/* -r - traverse the directory hierarchy to locate source files */
 			traverse_source = TRUE;
+			break;
+		case 'c':
+			/* -c - pass the command line argument through a command shell */
+			command_string = TRUE;
 			break;
 		case 'd':
 			/* -d - set debugging output level. Restrict to 0, 1 or 2 */
@@ -108,7 +119,7 @@ static char **parse_options(int argc, char *argv[])
 		case '?':
 		case 'h':
 			fprintf(stderr, "Usage:\n");
-			fprintf(stderr, "    cfs [-h | -o trace-file | -d debug-level] [ command args ...]\n");
+			fprintf(stderr, "    cfs [-h | -o trace-file | -d debug-level | -c] [ command args ...]\n");
 			exit(-1);
 		default:
 			/* ignore */
@@ -116,11 +127,29 @@ static char **parse_options(int argc, char *argv[])
 		}
 	}
 
+	/* If -c was provided, there can only be a single command line argument remaining. */
+	if (command_string) {
+		if (optind != argc - 1) {
+			fprintf(stderr, "Error: The -c option requires exactly one quoted argument.\n");
+			exit(-1);
+		}
+
+		/* construct a command line of the form: "$SHELL -c arg" */
+		static char *shell_command[4] = {NULL, "-c", NULL, NULL};
+		shell_command[0] = getenv("SHELL");
+		if (shell_command[0] == NULL){
+			fprintf(stderr, "Error: cfs -c option - can't detect your default shell.\n");
+			exit(-1);
+		}
+		shell_command[2] = argv[optind];
+		return shell_command;
+	}
+
 	/*
 	 * The remainder of the arguments (if any) provide the command line
 	 * to execute in the cfs environment.
 	 */
-	if (optind < argc) {
+	else if (optind < argc) {
 		/* arguments remain, interpret them as the command to execute and it's arguments */
 		is_interactive_shell = FALSE;
 		return &argv[optind];

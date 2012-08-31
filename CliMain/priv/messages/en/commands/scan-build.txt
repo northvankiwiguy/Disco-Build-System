@@ -22,6 +22,15 @@ The command arguments are:
 
 Command-specific options are:
 
+-c | --command-string
+
+  Use the quoted string as the entire command line. This is useful when
+  scanning a command containing special shell characters (such as |, < or >)
+  that would normally be parsed and interpreted by the user's current shell,
+  rather than the scanner. For example:
+  
+      bml scan-build -c "make clean && make"
+
 -f | --trace-file <file-name>
 
   During the scanning process, a large amount of trace data is gathered. Due
