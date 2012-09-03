@@ -928,13 +928,6 @@
             Import from an ElectricAccelerator Annotation file into a BuildML file.
          </description>
       </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.importWizards">
-      <category
-            id="com.buildml.eclipse.wizards.bmlCategory"
-            name="BuildML">
-      </category>
       <wizard
             category="com.buildml.eclipse.wizards.bmlCategory"
             class="com.buildml.eclipse.wizards.ImportFileSystem"
@@ -945,13 +938,6 @@
             Import a hierarchy of files and directories into a BuildML file.
          </description>
       </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.importWizards">
-      <category
-            id="com.buildml.eclipse.wizards.bmlCategory"
-            name="BuildML">
-      </category>
       <wizard
             category="com.buildml.eclipse.wizards.bmlCategory"
             class="com.buildml.eclipse.wizards.ImportLegacyBuild"
@@ -963,5 +949,4 @@
          </description>
       </wizard>
    </extension>
-
 </plugin>
