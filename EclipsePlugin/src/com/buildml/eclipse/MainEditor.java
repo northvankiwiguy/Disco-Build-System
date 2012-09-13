@@ -1,8 +1,9 @@
 package com.buildml.eclipse;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -20,27 +21,28 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStore;
-import com.buildml.model.errors.BuildStoreVersionException;
 
 /**
+ * The main Eclipse editor for editing/viewing BuildML files. This editor is a "multi-part"
+ * editor, since most of the work is done by sub-editors.
+ * 
  * @author "Peter Smith <psmith@arapiki.com>"
- *
  */
 public class MainEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
@@ -59,6 +61,15 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 
 	/** The file that this editor has open. */
 	private File fileInput;
+	
+	/** This editor's undo/redo context - applies to all sub editors */
+	private IUndoContext undoContext;
+
+	/** This editor's "undo" action - trigger by menu or keyboard shortcut (Ctrl-Z) */
+	private UndoActionHandler undoAction;
+
+	/** This editor's "redo" action - trigger by menu or keyboard shortcut (Ctrl-Y) */
+	private RedoActionHandler redoAction;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -261,6 +272,14 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 				}
 			});
 		}
+		
+		/*
+		 * Create a new undo/redo context for this editor (and all sub-editors). Next,
+		 * create Eclipse UI actions that can be added to the global edit menu.
+		 */
+		undoContext = new ObjectUndoContext(this);
+		undoAction = new UndoActionHandler(getSite(), undoContext);
+		redoAction = new RedoActionHandler(getSite(), undoContext);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -341,6 +360,39 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 */
 	public File getFile() {
 		return fileInput;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return This editor's undo/redo context, which is the central queue for all of
+	 * this editor's operations that can be undone and redone.
+	 */
+	public IUndoContext getUndoContext()
+	{
+		return undoContext;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#setFocus()
+	 */
+	@Override
+	public void setFocus() {
+		super.setFocus();
+
+		/*
+		 * Our editor (or a sub-editor) has just become active. Ensure that the global
+		 * "redo" and "undo" menu items (and keyboard shortcuts) are registered to
+		 * use our queue of operations.
+		 */
+		if ((undoAction != null) && (redoAction != null)) {
+			IActionBars actionBars = getEditorSite().getActionBars();
+			actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
+			actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
+			actionBars.updateActionBars();
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

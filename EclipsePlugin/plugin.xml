@@ -136,6 +136,14 @@
             id="com.buildml.eclipse.commands.previousEditorTab"
             name="Switch to Previous Editor Tab">
       </command>
+      <command
+            id="com.buildml.eclipse.commands.assignRoot"
+            name="Assign Root Name">
+      </command>
+      <command
+            id="com.buildml.eclipse.commands.removeRoot"
+            name="Remove Root Name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -186,6 +194,70 @@
                      </instanceof>
                   </iterate>
                </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.assignRoot"
+               label="Assign Root Name"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+       		   <and>
+       		      <test
+                     args="path-roots"
+                     property="com.buildml.eclipse.hasFeature">
+                  </test>
+                  <not>
+                     <test
+                           property="com.buildml.eclipse.hasAttachedRoot">
+                     </test>
+                  </not>
+                  <count
+                        value="1">
+                  </count>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="com.buildml.eclipse.files.UIFileRecordDir">
+                        </instanceof>
+                     </iterate>
+                  </with>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.removeRoot"
+               label="Remove Root Name"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <with
+                        variable="selection">
+                     <count
+                           value="1">
+                     </count>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           operator="and">
+                        <instanceof
+                              value="com.buildml.eclipse.files.UIFileRecordDir">
+                        </instanceof>
+                     </iterate>
+                  </with>
+                  <test
+                        property="com.buildml.eclipse.hasAttachedRoot">
+                  </test>
+                  <test
+                     args="path-roots"
+                     property="com.buildml.eclipse.hasFeature">
+                  </test>
+               </and>
             </visibleWhen>
          </command>
          <separator
@@ -697,6 +769,14 @@
             </with>
          </activeWhen>
       </handler>
+      <handler
+            class="com.buildml.eclipse.files.handlers.HandlerAssignRootName"
+            commandId="com.buildml.eclipse.commands.assignRoot">
+      </handler>
+      <handler
+            class="com.buildml.eclipse.files.handlers.HandlerRemoveRoot"
+            commandId="com.buildml.eclipse.commands.removeRoot">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -895,6 +975,13 @@
             id="com.buildml.eclipse.propertyTester.subEditorHasFeature"
             namespace="com.buildml.eclipse"
             properties="hasFeature"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="com.buildml.eclipse.files.handlers.PathPropertyTester"
+            id="com.buildml.eclipse.propertyTester.pathTester"
+            namespace="com.buildml.eclipse"
+            properties="hasAttachedRoot"
             type="java.lang.Object">
       </propertyTester>
    </extension>

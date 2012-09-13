@@ -18,6 +18,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -38,6 +39,7 @@ import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.UIJob;
 
@@ -45,6 +47,7 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.model.BuildStore;
 import com.buildml.model.BuildTasks;
 import com.buildml.model.FileNameSpaces;
@@ -108,6 +111,28 @@ public class EclipsePartUtils {
 			}
 		}
 		return acts;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a UI event handler's selection, return the one (and only) UIFileRecordDir
+	 * object that was selected. Otherwise return null;
+	 * 
+	 * @param event The UI event, as passed into the UI handler code.
+	 * @return The selected UIFileRecordDir, or null if something else (or nothing at all)
+	 * was selected.
+	 */
+	public static UIFileRecordDir getSingleSelectedPathDir(ExecutionEvent event) {
+		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
+		if ((selection == null) || (selection.size() != 1)) {
+			return null;
+		}
+		Object nodeObject = selection.getFirstElement();
+		if (!(nodeObject instanceof UIFileRecordDir)) {
+			return null;
+		}
+		return (UIFileRecordDir)nodeObject;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
