@@ -13,6 +13,7 @@
 package com.buildml.main;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -447,6 +448,8 @@ public final class CliMain {
 		try {
 			buildStore = new BuildStore(buildStoreFileName);
 		} catch (FileNotFoundException ex) {
+			CliUtils.reportErrorAndExit(ex.getMessage());
+		} catch (IOException ex) {
 			CliUtils.reportErrorAndExit(ex.getMessage());
 		} catch (BuildStoreVersionException ex) {
 			CliUtils.reportErrorAndExit(ex.getMessage());				

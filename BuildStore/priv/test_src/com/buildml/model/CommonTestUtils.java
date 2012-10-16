@@ -14,6 +14,7 @@ package com.buildml.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,8 +36,10 @@ public class CommonTestUtils {
 	 * testing purposes only.
 	 * @return The empty BuildStore database
 	 * @throws FileNotFoundException If the database file can't be opened
+	 * @throws IOException An I/O problem occurred while opening the database.
 	 */
-	public static BuildStore getEmptyBuildStore() throws FileNotFoundException {
+	public static BuildStore getEmptyBuildStore() 
+			throws FileNotFoundException, IOException {
 		return getEmptyBuildStore(new File("/tmp"));
 	}	
 	
@@ -48,8 +51,10 @@ public class CommonTestUtils {
 	 * @param tmpDir The directory in which to place the BuildStore file.
 	 * @return The empty BuildStore database.
 	 * @throws FileNotFoundException If the database file can't be opened.
+	 * @throws IOException An I/O problem occurred while opening the database.
 	 */
-	public static BuildStore getEmptyBuildStore(File tmpDir) throws FileNotFoundException {
+	public static BuildStore getEmptyBuildStore(File tmpDir) 
+			throws FileNotFoundException, IOException {
 		BuildStore bs;
 		try {
 			File bsFile = new File(tmpDir, "testBuildStore.bml");

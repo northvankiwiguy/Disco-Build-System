@@ -12,7 +12,9 @@
 
 package com.buildml.model;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import org.apache.commons.io.FileUtils;
 
 import com.buildml.utils.version.Version;
 
@@ -49,9 +53,20 @@ class BuildStoreDB  {
 	 */
 	private static final int SCHEMA_VERSION = 1;
 
-
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
+	
+	/** The original name of this database file (user-facing) */
+	private String databaseFileName;
+	
+	/** The temporary name of this database file (for unsaved changes) */
+	private String tempDatabaseFileName;
+	
+	/** 
+	 * true if we've created a temporary working copy of the database.
+	 * That is, databaseFileName != tempDatabaseFileName.
+	 */
+	private boolean saveRequired;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -62,11 +77,14 @@ class BuildStoreDB  {
 	 * 
 	 * @param databaseName The name of the database to create. For SQLite databases,
 	 * this is the path to the database file.
+	 * @param saveRequired True if this database must be explicitly "saved" before it's
+	 *        closed (otherwise the changes will be discarded).
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
+	 * @throws IOException Problem when opening the database, or making a temporary working database.
 	 */
 	/* package private */ 
-	BuildStoreDB(String databaseName) throws FileNotFoundException {
-		
+	BuildStoreDB(String databaseName, boolean saveRequired) throws FileNotFoundException, IOException {
+				
 		/* make sure that the sqlite JDBC connector is available */
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -77,26 +95,55 @@ class BuildStoreDB  {
 		/*
 		 * Ensure that the database name ends with .bml (if it doesn't already)
 		 */
-		if (!databaseName.endsWith(".bml")) {
-			databaseName += ".bml";
+		String fileToOpen;
+		if (databaseName.endsWith(".bml")) {
+			fileToOpen = databaseName;
+		} else {
+			fileToOpen = databaseName + ".bml";
 		}
 		
+		/* save the user-facing name of the database file, for when we need to save */
+		databaseFileName = fileToOpen;
+		
+		/*
+		 * If we want save/saveAs functionality, create a temporary database file
+		 * where the live changes will be made. We start by making a copy of the
+		 * user-facing database file into this temporary file.
+		 */
+		this.saveRequired = saveRequired;
+		if (saveRequired) {
+			try {
+				tempDatabaseFileName = File.createTempFile("temp", ".tmpbml").toString();
+			} catch (IOException e) {
+				throw new IOException("Unable to open " + fileToOpen + ". " + e.getMessage());
+			}
+			
+			/*
+			 * If there's an existing database file that we're editing, make a copy of it. If
+			 * not, we simply open a new database with the temporary name.
+			 */
+			if (new File(fileToOpen).exists()) {
+				FileUtils.copyFile(new File(fileToOpen), new File(tempDatabaseFileName));
+			}
+			fileToOpen = tempDatabaseFileName;
+		}
+			
 		/* 
 		 * Open/create the database. The sqlite database will be created as
 		 * a local disk file with a .bml extension.
 		 */
 	    try {
-			dbConn = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
+			dbConn = DriverManager.getConnection("jdbc:sqlite:" + fileToOpen);
 			
 		} catch (SQLException e) {
 			/* provide a meaningful error message if the file simply can't be opened */
 			if (e.getMessage().contains("Permission denied")) {
-				throw new FileNotFoundException("Error: Unable to open database file: " + databaseName);
+				throw new FileNotFoundException("Error: Unable to open database file: " + fileToOpen);
 			}
 			
 			/* else provide a more generic message */
 			throw new FatalBuildStoreError("Unable to access to SQLite database: " + 
-					databaseName + "\n" + e.getMessage());
+					fileToOpen + "\n" + e.getMessage());
 		}
 		
 		/* prepare some statements */
@@ -543,7 +590,8 @@ class BuildStoreDB  {
 	/**
 	 * Close a database connection, releasing all resources. From this point on,
 	 * none of the methods in the class may be used (they'll simply throw an
-	 * exception).
+	 * exception). If there were any unsaved changes in the database, they'll be
+	 * discarded.
 	 */
 	/* package private */
 	void close() {
@@ -559,13 +607,56 @@ class BuildStoreDB  {
 			throw new FatalBuildStoreError("Unable to close database connection: " + e);
 		}
 		
+		/*
+		 * If this BuildStore was opened with the "saveRequired" flag set, we can now
+		 * delete the temporary file. The caller *should have* saved the database
+		 * if they actually want to keep the content.
+		 */
+		if (saveRequired) {
+			new File(tempDatabaseFileName).delete();
+		}
+		
 		/* 
 		 * Make the connection variable unusable - this will result in exceptions being
 		 * thrown if somebody try to use it.
 		 */
 		dbConn = null;
 	}
-		
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Save the content of this database to disk. This method only has an effect if
+	 * the database was created with savedRequired == true, in which case a temporary
+	 * copy of the original database was used. This method saves the temporary database
+	 * on top of the original (user-facing) file.
+	 * @throws IOException Unable to save the database.
+	 */
+	public void save() throws IOException {
+		if (saveRequired) {
+			setFastAccessMode(false);
+			FileUtils.copyFile(new File(tempDatabaseFileName), new File(databaseFileName));
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Save the content of this database to disk, using the caller-specified file name.
+	 * This method only has an effect if the database was created with savedRequired == true, 
+	 * in which case a temporary copy of the original database was used. This method saves
+	 * the temporary database on top of the caller-specified file.
+	 * @param fileToSave New name of the database file. This new name becomes the default
+	 * name for all future "save" operations.
+	 * @throws IOException Unable to save the database.
+	 */
+	public void saveAs(String fileToSave) throws IOException {
+		if (saveRequired) {
+			databaseFileName = fileToSave;
+			save();
+		}
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/

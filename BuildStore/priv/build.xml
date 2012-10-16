@@ -14,6 +14,7 @@
 	<path id="project-classpath">
 		<pathelement location="${workspace-root}/Utilities/pub/utilities.jar" />
 		<pathelement location="${project-root}/priv/lib/sqlitejdbc-v056.jar" />
+		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-io-2.1.jar" />
 	</path>
 
 	<!-- no extra classpath for unit testing -->

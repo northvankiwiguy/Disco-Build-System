@@ -13,6 +13,7 @@
 package com.buildml.model;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.version.Version;
@@ -70,14 +71,17 @@ public class BuildStore {
 	 * create a fresh database.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
+	 * @param saveRequired True if BuildStore must explicitly be "saved" before
+	 *        it's closed (otherwise the changes will be discarded).
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
+	 * @throws IOException An I/O problem occurred while opening the database file.
 	 * @throws BuildStoreVersionException The database schema of an existing database is the wrong version.
 	 */
-	public BuildStore(String buildStoreName)
-			throws FileNotFoundException, BuildStoreVersionException {
+	public BuildStore(String buildStoreName, boolean saveRequired)
+			throws FileNotFoundException, IOException, BuildStoreVersionException {
 		
 		/* create a new DB manager to handle all the SQL connection issues */
-		db = new BuildStoreDB(buildStoreName);
+		db = new BuildStoreDB(buildStoreName, saveRequired);
 		
 		/* if necessary, initialize the database with required tables */
 		int buildStoreVersion = getBuildStoreVersion();
@@ -117,6 +121,25 @@ public class BuildStore {
 		
 		/* create a new Packages object */
 		packages = new Packages(this);		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Open or create a new BuildStore database. If the database already
+	 * exists, open it for updating. If there's no database by this name,
+	 * create a fresh database. Changes to this BuildStore will automatically
+	 * be saved to the original BuildML file (no "save" operation required).
+	 * 
+	 * @param buildStoreName Name of the database to open or create.
+	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
+	 * @throws IOException An I/O problem occurred while opening the database file.
+	 * @throws BuildStoreVersionException The database schema of an existing database is the 
+	 *         wrong version.
+	 */
+	public BuildStore(String buildStoreName)
+			throws FileNotFoundException, IOException, BuildStoreVersionException {
+		this(buildStoreName, false);
 	}
 	
 	/*=====================================================================================*
@@ -237,6 +260,33 @@ public class BuildStore {
 	 */
 	public void close() {
 		db.close();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Save this BuildStore to disk, ensuring that any temporary (unsaved) changes are
+	 * persisted. This method only has an effect if the database was created with
+	 * saveRequired == true.
+	 * @throws IOException Unable to write database to disk.
+	 */
+	public void save() throws IOException
+	{
+		db.save();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Save this BuildStore to disk, using the caller-specified file name. This method only
+	 * has an effect if the database was created with saveRequired == true.
+	 * @param fileToSave The file to write the database content into. This file now becomes
+	 * the default for future save() operations.
+	 * @throws IOException Unable to write database to disk.
+	 */
+	public void saveAs(String fileToSave) throws IOException
+	{
+		db.saveAs(fileToSave);
 	}
 	
 	/*=====================================================================================*
