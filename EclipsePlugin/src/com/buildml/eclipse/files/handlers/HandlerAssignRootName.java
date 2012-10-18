@@ -118,6 +118,9 @@ public class HandlerAssignRootName extends AbstractHandler {
 			SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 			subEditor.setOptions(EditorOptions.OPT_SHOW_ROOTS);
 			subEditor.refreshView(true);
+			
+			/* mark the editor as dirty */
+			EclipsePartUtils.markEditorDirty();
 			return Status.OK_STATUS;
 		}
 

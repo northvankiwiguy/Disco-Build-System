@@ -103,6 +103,9 @@ public class HandlerRemoveRoot extends AbstractHandler {
 			
 			/* All is now good, refresh the editor so that the root disappears */
 			EclipsePartUtils.getActiveSubEditor().refreshView(true);
+			
+			/* mark the editor as dirty */
+			EclipsePartUtils.markEditorDirty();
 			return Status.OK_STATUS;
 		}
 

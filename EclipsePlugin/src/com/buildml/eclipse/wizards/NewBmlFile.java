@@ -13,6 +13,7 @@
 package com.buildml.eclipse.wizards;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -133,6 +134,9 @@ public class NewBmlFile extends Wizard implements INewWizard {
 			} catch (FileNotFoundException e) {
 				AlertDialog.displayErrorDialog("Error", 
 						"A problem occurred while creating the new file: " + fileName);
+			} catch (IOException e) {
+					AlertDialog.displayErrorDialog("Error", 
+							"A I/O error occurred while creating the new file: " + fileName);
 			} catch (BuildStoreVersionException e) {
 				AlertDialog.displayErrorDialog("Error", 
 						"BuildML file has an incompatible version: " + fileName);

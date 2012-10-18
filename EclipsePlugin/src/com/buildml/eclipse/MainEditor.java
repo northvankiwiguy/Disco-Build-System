@@ -1,9 +1,11 @@
 package com.buildml.eclipse;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -11,6 +13,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
@@ -21,6 +24,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -29,14 +33,18 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStore;
+import com.buildml.model.FatalBuildStoreError;
 
 /**
  * The main Eclipse editor for editing/viewing BuildML files. This editor is a "multi-part"
@@ -70,6 +78,9 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 
 	/** This editor's "redo" action - trigger by menu or keyboard shortcut (Ctrl-Y) */
 	private RedoActionHandler redoAction;
+	
+	/** "dirty" state of this editor - true means that it needs saving */
+	private boolean editorIsDirty = false;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -289,8 +300,26 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		
+		try {
+			/* save the database to disk */
+			buildStore.save();
+			
+			/* update Eclipse's resources, so it notices that the file has changed */
+			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+			try {
+				file.refreshLocal(IFile.DEPTH_ONE, monitor);
+			} catch (CoreException e) {
+				throw new FatalBuildStoreError("Unable to update file resource after save", e);
+			}
+
+			/* save was successful - notify other parts of Eclipse */
+			editorIsDirty = false;
+			firePropertyChange(PROP_DIRTY);
+
+		} catch (IOException e) {
+			AlertDialog.displayErrorDialog("Error Saving Database",
+					"The database could not be saved to disk. Reason: " + e.getMessage());
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -301,9 +330,52 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 */
 	@Override
 	public void doSaveAs() {
-		/* not implemented */
-	}
+		
+		/*
+		 * Open a "save as" dialog box that queries the user for the new file
+		 * name to save as.
+		 */
+		Shell shell = getSite().getWorkbenchWindow().getShell();
+		SaveAsDialog dialog = new SaveAsDialog(shell);
+		dialog.setOriginalFile(((IFileEditorInput) getEditorInput()).getFile());
+		dialog.open();
 
+		/* if the user provided a file name (as opposed to hitting cancel) */
+		final IPath newPath = dialog.getResult();   
+		if (newPath != null) {
+			try {
+				/* save the file to the newly-selected path */
+				String absPath = EclipsePartUtils.workspaceRelativeToAbsolutePath(newPath.toOSString());
+				buildStore.saveAs(absPath);
+
+				/* update Eclipse's resources to reflect the new file */
+				IFile newFile = ResourcesPlugin.getWorkspace().getRoot().getFile(newPath);
+				try {
+					newFile.refreshLocal(IFile.DEPTH_ONE, null);
+				} catch (CoreException e) {
+					throw new FatalBuildStoreError("Unable to update file resource after save", e);
+				}
+				
+				/*
+				 * Set this editor's input to refer to the new file, since
+				 * the old file is no longer "attached" to this editor. As
+				 * a result, we mark the editor as "not dirty", as well
+				 * as notifying other parts of Eclipse that our input has changed.
+				 */
+				setInput(new FileEditorInput(newFile));
+				setPartName(newFile.getName());
+				editorIsDirty = false;
+				firePropertyChange(PROP_DIRTY);
+				firePropertyChange(PROP_INPUT);
+				
+			} catch (IOException e) {
+				AlertDialog.displayErrorDialog("Error Saving Database",
+						"The database could not be saved to disk. Reason: " + e.getMessage());
+			}
+			
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -311,8 +383,30 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 */
 	@Override
 	public boolean isSaveAsAllowed() {
-		/* save-as is not supported for BuildStore-based data */
-		return false;
+		return true;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#isDirty()
+	 */
+	@Override
+	public boolean isDirty() {
+		return editorIsDirty;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * The content of the editor has changed, so mark the editor as dirty (the "save" menu
+	 * option will now be available).
+	 */
+	public void markDirty() {
+		if (!editorIsDirty) {
+			editorIsDirty = true;
+			firePropertyChange(PROP_DIRTY);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

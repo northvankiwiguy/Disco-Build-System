@@ -14,6 +14,7 @@ package com.buildml.eclipse.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -222,6 +223,19 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Mark the current MainEditor as having been modified. This means that it's now a
+	 * candidate for saving.
+	 */
+	public static void markEditorDirty() {
+		MainEditor editor = getActiveMainEditor();
+		if (editor != null) {
+			editor.markDirty();
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Returns true or false, to specify whether the currently active sub editor supports
 	 * the specified feature.
 	 * @param feature A textual name for an editor feature.
@@ -396,13 +410,19 @@ public class EclipsePartUtils {
 				throw new FileNotFoundException(message);
 			}
 
-			/* open the existing BuildStore database */
-			buildStore = new BuildStore(fileInput.toString());
+			/* 
+			 * Open the existing BuildStore database, with the requirement that changes
+			 * must be explicitly saved before they're written back to this original
+			 * file.
+			 */
+			buildStore = new BuildStore(fileInput.toString(), true);
 
 		} catch (BuildStoreVersionException e) {
 			AlertDialog.displayErrorDialog("BuildML database has the wrong version.", e.getMessage());
 		} catch (FileNotFoundException e) {
 			AlertDialog.displayErrorDialog("Can't open the BuildML database.", e.getMessage());
+		} catch (IOException e) {
+			AlertDialog.displayErrorDialog("An I/O error occurred in the BuildML database.", e.getMessage());
 		}
 		return buildStore;
 	}
