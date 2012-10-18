@@ -12,10 +12,10 @@
 
 package com.buildml.model.types;
 
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.Packages;
-import com.buildml.model.impl.Reports;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -199,7 +199,7 @@ public class TaskSet extends IntegerTreeSet {
 				
 				/* try to match the task's command name */
 				else if (commandName.equals("m") || commandName.equals("match")){
-					Reports reports = bs.getReports();
+					IReportMgr reports = bs.getReportMgr();
 					
 					/* substitute * with %, and un-escape \\: to be : */
 					commandArgs = commandArgs.replace('*', '%');

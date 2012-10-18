@@ -13,10 +13,10 @@
 package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileRecord;
 
 /**
@@ -79,11 +79,11 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Reports reports = buildStore.getReports();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 		Packages pkgMgr = buildStore.getPackages();
 
 		/* fetch the list of most popular files */
-		FileRecord results[] = reports.reportMostCommonlyAccessedFiles();
+		FileRecord results[] = reportMgr.reportMostCommonlyAccessedFiles();
 
 		/* pretty print the results - only show files if they're in the filter set */
 		for (FileRecord fileRecord : results) {

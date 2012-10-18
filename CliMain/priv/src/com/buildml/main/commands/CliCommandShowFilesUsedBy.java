@@ -17,11 +17,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -151,7 +151,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);
 
 		BuildTasks bts = buildStore.getBuildTasks();
-		Reports reports = buildStore.getReports();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		Packages pkgMgr = buildStore.getPackages();
 
@@ -163,7 +163,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		}
 
 		/* run the report */
-		FileSet accessedFiles = reports.reportFilesAccessedByTasks(ts, opType);
+		FileSet accessedFiles = reportMgr.reportFilesAccessedByTasks(ts, opType);
 		accessedFiles.populateWithParents();
 
 		/* pretty print the results */

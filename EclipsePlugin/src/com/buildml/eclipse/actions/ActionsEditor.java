@@ -128,7 +128,7 @@ public class ActionsEditor extends SubEditor {
 		actionMgr = buildStore.getBuildTasks();
 		
 		/* initially, all paths are visible */
-		visibleActions = buildStore.getReports().reportAllActions();
+		visibleActions = buildStore.getReportMgr().reportAllActions();
 	}
 	
 	/*=====================================================================================*
@@ -376,7 +376,7 @@ public class ActionsEditor extends SubEditor {
 		/* if the editor is in an initialized state, we can refresh the filters */
 		if (visibilityProvider != null) {
 			TaskSet pkgActionSet = 
-					buildStore.getReports().reportActionsFromPackageSet(newSet);
+					buildStore.getReportMgr().reportActionsFromPackageSet(newSet);
 			pkgActionSet.populateWithParents();
 		
 			visibilityProvider.setSecondaryFilterSet(pkgActionSet);

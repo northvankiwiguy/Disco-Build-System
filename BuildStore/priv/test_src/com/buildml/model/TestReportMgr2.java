@@ -18,11 +18,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.Packages;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
@@ -33,7 +33,7 @@ import com.buildml.model.types.TaskSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class TestReports2 {
+public class TestReportMgr2 {
 
 	/** Our test BuildStore object */
 	private BuildStore bs;
@@ -45,7 +45,7 @@ public class TestReports2 {
 	private BuildTasks bts;
 	
 	/** Our test Reports object */
-	private Reports reports;
+	private IReportMgr reports;
 	
 	/** various file IDs and task IDs */
 	private int filePetH, fileHousePetH;
@@ -67,7 +67,7 @@ public class TestReports2 {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		fns = bs.getFileNameSpaces();
 		bts = bs.getBuildTasks();
-		reports = bs.getReports();
+		reports = bs.getReportMgr();
 		
 		/* add a realistic-looking set of files, including .h, .c, .o, .a and .exe files */
 		filePetH = fns.addFile("/home/pets.h");
@@ -151,7 +151,7 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Reports#reportDerivedFiles(FileSet, boolean)}.
+	 * Test method for {@link com.buildml.model.IReportMgr#reportDerivedFiles(FileSet, boolean)}.
 	 */
 	@Test
 	public void testReportDerivedFiles() {
@@ -257,7 +257,7 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Reports#reportInputFiles(FileSet, boolean)}.
+	 * Test method for {@link com.buildml.model.IReportMgr#reportInputFiles(FileSet, boolean)}.
 	 */
 	@Test
 	public void testReportInputFiles() {
@@ -355,7 +355,7 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Reports#reportFilesFromPackageSet}.
+	 * Test method for {@link com.buildml.model.IReportMgr#reportFilesFromPackageSet}.
 	 */
 	@Test
 	public void testReportFilesFromPackageSet() {
@@ -446,7 +446,7 @@ public class TestReports2 {
 	
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Reports#reportActionsFromPackageSet}.
+	 * Test method for {@link com.buildml.model.IReportMgr#reportActionsFromPackageSet}.
 	 */
 	@Test
 	public void testReportActionsFromPackageSet() {

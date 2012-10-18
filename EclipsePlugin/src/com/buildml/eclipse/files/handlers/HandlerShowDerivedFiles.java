@@ -14,8 +14,8 @@ import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -70,12 +70,12 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		FileSet selectedFiles = EclipsePartUtils.getFileSetFromSelection(buildStore, selection);
 
 		/* get the set of all derived files */
-		Reports reports = buildStore.getReports();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 		FileSet resultFiles;
 		if (optDerived) {
-			resultFiles = reports.reportDerivedFiles(selectedFiles, optAll);
+			resultFiles = reportMgr.reportDerivedFiles(selectedFiles, optAll);
 		} else {
-			resultFiles = reports.reportInputFiles(selectedFiles, optAll);			
+			resultFiles = reportMgr.reportInputFiles(selectedFiles, optAll);			
 		}
 		
 		/* if the result set is empty, don't open an editor, but instead open a dialog */

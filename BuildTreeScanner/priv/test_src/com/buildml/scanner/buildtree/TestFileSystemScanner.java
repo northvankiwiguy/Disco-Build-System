@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 
@@ -68,8 +68,8 @@ public class TestFileSystemScanner {
 		fss.scanForFiles("root", "/home/psmith/work");
 		
 		/* display the list of files that were never accessed */
-		Reports reports = bs.getReports();
-		FileSet results = reports.reportFilesNeverAccessed();
+		IReportMgr reportMgr = bs.getReportMgr();
+		FileSet results = reportMgr.reportFilesNeverAccessed();
 		for (Integer pathId : results) {			
 			/*String pathName = */fns.getPathName(pathId);
 			//System.out.println(pathName);

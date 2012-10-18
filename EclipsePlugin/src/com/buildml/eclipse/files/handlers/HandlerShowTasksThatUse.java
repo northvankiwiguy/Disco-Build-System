@@ -13,8 +13,8 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -54,8 +54,8 @@ public class HandlerShowTasksThatUse extends AbstractHandler {
 		}
 		
 		/* get the set of tasks that use/read/write these files */
-		Reports reports = buildStore.getReports();
-		TaskSet userTasks = reports.reportTasksThatAccessFiles(selectedFiles, opType);
+		IReportMgr reportMgr = buildStore.getReportMgr();
+		TaskSet userTasks = reportMgr.reportTasksThatAccessFiles(selectedFiles, opType);
 		
 		/* if the result set is empty, don't open an editor, but instead open a dialog */
 		if (userTasks.size() == 0) {

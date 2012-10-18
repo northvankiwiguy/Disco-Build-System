@@ -12,10 +12,10 @@
 
 package com.buildml.model.types;
 
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.Packages;
-import com.buildml.model.impl.Reports;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -95,7 +95,7 @@ public class FileSet extends IntegerTreeSet  {
 		
 		BuildStore bs = fns.getBuildStore();
 		Packages pkgMgr = bs.getPackages();
-		Reports reports = bs.getReports();
+		IReportMgr reportMgr = bs.getReportMgr();
 
 		/* for each path provided as input... */
 		for (int i = 0; i < pathArgs.length; i++) {
@@ -147,7 +147,7 @@ public class FileSet extends IntegerTreeSet  {
 			else if ((thisPath.indexOf('/') == -1) && (thisPath.indexOf('@') == -1)){
 				
 				/* run a report to get all files that match this regexp */
-				FileSet results = reports.reportFilesThatMatchName(thisPath);
+				FileSet results = reportMgr.reportFilesThatMatchName(thisPath);
 				
 				/* 
 				 * Merge these results into this FileSet (we update the same file set

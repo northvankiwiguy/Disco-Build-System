@@ -12,11 +12,8 @@
 
 package com.buildml.eclipse.files;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -124,7 +121,7 @@ public class FilesEditor extends SubEditor {
 		fns = buildStore.getFileNameSpaces();
 
 		/* initially, all paths are visible */
-		visiblePaths = buildStore.getReports().reportAllFiles();
+		visiblePaths = buildStore.getReportMgr().reportAllFiles();
 	}
 	
 	/*=====================================================================================*
@@ -380,7 +377,7 @@ public class FilesEditor extends SubEditor {
 		/* if the editor is in an initialized state, we can fresh the filters */
 		if (visibilityProvider != null) {
 			FileSet pkgFileSet = 
-				buildStore.getReports().reportFilesFromPackageSet(newSet);
+				buildStore.getReportMgr().reportFilesFromPackageSet(newSet);
 			pkgFileSet.populateWithParents();
 		
 			visibilityProvider.setSecondaryFilterSet(pkgFileSet);

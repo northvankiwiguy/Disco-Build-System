@@ -17,10 +17,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -123,7 +123,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 		CliUtils.validateArgs(getName(), args, 1, 1, "One or more colon-separated path-specs must be provided.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Reports reports = buildStore.getReports();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 		Packages pkgMgr = buildStore.getPackages();
 
 		/* fetch the list of files that are the source of the derivation */
@@ -133,7 +133,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 		}
 
 		/* get list of derived files, and add their parent paths */
-		FileSet derivedFileSet = reports.reportDerivedFiles(sourceFileSet, optionAll);
+		FileSet derivedFileSet = reportMgr.reportDerivedFiles(sourceFileSet, optionAll);
 		derivedFileSet.populateWithParents();
 
 		/* pretty print the results - no filtering used here */

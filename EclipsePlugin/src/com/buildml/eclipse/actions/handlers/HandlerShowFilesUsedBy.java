@@ -13,8 +13,8 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -61,8 +61,8 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 		}
 		
 		/* get the set of files that are used/read/written/modified/deleted by these actions */
-		Reports reports = buildStore.getReports();
-		FileSet userFiles = reports.reportFilesAccessedByTasks(selectedActions, opType);
+		IReportMgr reportMgr = buildStore.getReportMgr();
+		FileSet userFiles = reportMgr.reportFilesAccessedByTasks(selectedActions, opType);
 		
 		/* if the result set is empty, don't open an editor, but instead open a dialog */
 		if (userFiles.size() == 0) {

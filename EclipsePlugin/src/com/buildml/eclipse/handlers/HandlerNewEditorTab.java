@@ -16,7 +16,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
@@ -24,8 +23,8 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.errors.FatalError;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.TaskSet;
@@ -48,7 +47,7 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		/* fetch the active editor, and its BuildStore, and the active sub-editor. */
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
 		BuildStore buildStore = mainEditor.getBuildStore();
-		Reports reports = buildStore.getReports();
+		IReportMgr reports = buildStore.getReportMgr();
 		SubEditor currentEditor = mainEditor.getActiveSubEditor();
 		SubEditor newEditor = null;
 		

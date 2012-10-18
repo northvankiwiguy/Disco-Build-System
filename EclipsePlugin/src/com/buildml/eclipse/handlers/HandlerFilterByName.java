@@ -10,10 +10,10 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.NameFilterDialog;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 
@@ -61,7 +61,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		}
 		BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		FileNameSpaces fileMgr = buildStore.getFileNameSpaces();
-		Reports reports = buildStore.getReports();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 		
 		/* 
 		 * Display a dialog, which asks the user to provide a regular expression string,
@@ -80,7 +80,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		int resultCode = dialog.getAddRemoveChoice();	
 		dialog.close();
 		
-		FileSet resultSet = reports.reportFilesThatMatchName(regExpr);
+		FileSet resultSet = reportMgr.reportFilesThatMatchName(regExpr);
 		FileSet newVisibilitySet = null;
 		
 		/*
@@ -109,7 +109,7 @@ public class HandlerFilterByName extends AbstractHandler {
 			break;
 			
 		case NameFilterDialog.SELECT_ALL_ITEMS:
-			newVisibilitySet = reports.reportAllFiles();
+			newVisibilitySet = reportMgr.reportAllFiles();
 			break;
 			
 		case NameFilterDialog.DESELECT_ALL_ITEMS:
@@ -149,7 +149,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		}
 		BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		BuildTasks actionsMgr = buildStore.getBuildTasks();
-		Reports reports = buildStore.getReports();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 		
 		/* 
 		 * Display a dialog, which asks the user to provide a regular expression string,
@@ -168,7 +168,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		int resultCode = dialog.getAddRemoveChoice();	
 		dialog.close();
 		
-		TaskSet resultSet = reports.reportTasksThatMatchName(regExpr);
+		TaskSet resultSet = reportMgr.reportTasksThatMatchName(regExpr);
 		TaskSet newVisibilitySet = null;
 		
 		/*
@@ -197,7 +197,7 @@ public class HandlerFilterByName extends AbstractHandler {
 			break;
 			
 		case NameFilterDialog.SELECT_ALL_ITEMS:
-			newVisibilitySet = reports.reportAllActions();
+			newVisibilitySet = reportMgr.reportAllActions();
 			break;
 			
 		case NameFilterDialog.DESELECT_ALL_ITEMS:

@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.buildml.model.IReportMgr;
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.version.Version;
 
@@ -53,7 +54,7 @@ public class BuildStore {
 	private BuildTasks buildTasks;
 	
 	/** The Reports manager object we'll delegate work to. */
-	private Reports reports;
+	private IReportMgr reportMgr;
 	
 	/** The FileAttributes object we'll delegate work to. */
 	private FileAttributes fileAttributes;
@@ -113,8 +114,8 @@ public class BuildStore {
 		/* create a new BuildTasks object to manage the relationship between files */
 		buildTasks = new BuildTasks(this);
 		
-		/* create a new Reports object to provide reporting methods */
-		reports = new Reports(this);
+		/* create a new ReportMgr object to provide reporting methods */
+		reportMgr = new ReportMgr(this);
 		
 		/* create a new FileAttributes object to manage the attributes on files */
 		fileAttributes = new FileAttributes(this, fileSpaces);
@@ -200,8 +201,8 @@ public class BuildStore {
 	 *  
 	 * @return A Reports manager object.
 	 */
-	public Reports getReports() {
-		return reports;
+	public IReportMgr getReportMgr() {
+		return reportMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

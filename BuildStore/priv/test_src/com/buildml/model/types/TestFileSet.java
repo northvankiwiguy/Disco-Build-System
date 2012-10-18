@@ -714,7 +714,7 @@ public class TestFileSet {
 		int dir7 = fns.getPath("/1/2/7");
 		int dir8 = fns.getPath("/1/2/8");
 		int dir9 = fns.getPath("/1/2/9");
-		fs = bs.getReports().reportAllFiles();
+		fs = bs.getReportMgr().reportAllFiles();
 		
 		/* all files should be present now */
 		assertEquals(21, fs.size());

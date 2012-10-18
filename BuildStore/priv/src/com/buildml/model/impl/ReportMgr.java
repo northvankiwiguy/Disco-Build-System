@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.PackageSet;
@@ -32,12 +33,12 @@ import com.buildml.utils.errors.ErrorCode;
  * information from the BuildStore. These reports are able to access the database
  * directly, rather than using the standard BuildStore APIs.
  * <p>
- * There should be exactly one Reports object per BuildStore object. Use the
- * BuildStore's getReports() method to obtain that one instance.
+ * There should be exactly one ReportMgr object per BuildStore object. Use the
+ * BuildStore's getReportMgr() method to obtain that one instance.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class Reports {
+/* package private */ class ReportMgr implements IReportMgr {
 	
 	/*=====================================================================================*
 	 * TYPES/FIELDS
@@ -90,7 +91,7 @@ public class Reports {
 	 * 
 	 * @param buildStore The BuildStore than owns this Reports object.
 	 */
-	public Reports(BuildStore buildStore) {
+	public ReportMgr(BuildStore buildStore) {
 		this.db = buildStore.getBuildStoreDB();
 		this.fns = buildStore.getFileNameSpaces();
 		this.bts = buildStore.getBuildTasks();
@@ -153,12 +154,10 @@ public class Reports {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
-	/**
-	 * Provides an ordered array of the most commonly accessed files across the whole build store.
-	 * For each record in the result set, return the number of unique tasks that access the file.
-	 * 
-	 * @return An array of FileRecord, sorted with the most commonly accessed file first.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportMostCommonlyAccessedFiles()
 	 */
+	@Override
 	public FileRecord[] reportMostCommonlyAccessedFiles() {
 		
 		ArrayList<FileRecord> results = new ArrayList<FileRecord>();
@@ -182,13 +181,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Generate a report to show which files are the most common includers of the specified
-	 * file. This provides information on where the specified file is used the most often.
-	 * 
-	 * @param includedFile ID of the file that is being included.
-	 * @return An ordered array of FileRecord objects, containing the output of the report.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportMostCommonIncludersOfFile(int)
 	 */
+	@Override
 	public FileRecord[] reportMostCommonIncludersOfFile(int includedFile) {
 		
 		ArrayList<FileRecord> results = new ArrayList<FileRecord>();
@@ -212,12 +208,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return a FileSet of all files in the BuildStore that aren't accessed by any tasks.
-	 * This helps identify which source files are never used.
-	 * 
-	 * @return The set of files that are never accessed.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportFilesNeverAccessed()
 	 */
+	@Override
 	public FileSet reportFilesNeverAccessed() {
 		
 		FileSet results = new FileSet(fns);
@@ -238,13 +232,10 @@ public class Reports {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the set of files (not directories) that match the user-specified file name.
-	 * 
-	 * @param fileArg The name of the file(s) to match (null is a valid value that matches
-	 * 			nothing).
-	 * @return The FileSet of matching file names.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportFilesThatMatchName(java.lang.String)
 	 */
+	@Override
 	public FileSet reportFilesThatMatchName(String fileArg) {
 		
 		/* map any occurrences of * into %, since that's what SQL requires */
@@ -271,12 +262,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the set of tasks whose command string matches the user-specified pattern.
-	 * 
-	 * @param pattern The user-specified pattern to match.
-	 * @return The TaskSet of matching file names.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportTasksThatMatchName(java.lang.String)
 	 */
+	@Override
 	public TaskSet reportTasksThatMatchName(String pattern) {
 		
 		Integer results[];
@@ -293,48 +282,30 @@ public class Reports {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given the input FileSet (sourceFileSet), return a new FileSet containing all the 
-	 * paths that are derived from the paths listed in sourceFileSet. A file (A) is derived 
-	 * from file (B) if there's a task (or sequence of paths) that reads B and writes to A.
-	 * 
-	 * @param sourceFileSet The FileSet of all files we should consider as input to the tasks.
-	 * @param reportIndirect Set if we should also report on indirectly derived files
-	 * (with multiple tasks between file A and file B).
-	 * @return The FileSet of derived paths.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportDerivedFiles(com.buildml.model.types.FileSet, boolean)
 	 */
+	@Override
 	public FileSet reportDerivedFiles(FileSet sourceFileSet, boolean reportIndirect) {
 		return reportDerivedFilesHelper(sourceFileSet, reportIndirect, selectDerivedFilesPrepStmt);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given the input FileSet (targetFileSet), return a new FileSet containing all the 
-	 * paths that are used as input when generating the paths listed in targetFileSet. 
-	 * A file (A) is input for file (B) if there's a task (or sequence of paths) that reads A 
-	 * and writes to B. This is the opposite of reportDerivedFiles().
-	 * 
-	 * @param targetFileSet The FileSet of all files that are the target of tasks.
-	 * @param reportIndirect Set if we should also report on indirectly derived files
-	 * (multiple tasks between file A and file B).
-	 * @return The FileSet of input paths.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportInputFiles(com.buildml.model.types.FileSet, boolean)
 	 */
+	@Override
 	public FileSet reportInputFiles(FileSet targetFileSet, boolean reportIndirect) {
 		return reportDerivedFilesHelper(targetFileSet, reportIndirect, selectInputFilesPrepStmt);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Given a FileSet, return a TaskSet containing all the build tasks that access this
-	 * collection files. The opType specifies whether we want tasks that read these files,
-	 * write to these files, or either read or write.
-	 * 
-	 * @param fileSet The set of input files.
-	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
-	 * @return a TaskSet of all tasks that access these files in the mode specified.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportTasksThatAccessFiles(com.buildml.model.types.FileSet, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
+	@Override
 	public TaskSet reportTasksThatAccessFiles(FileSet fileSet,
 			OperationType opType) {
 		
@@ -383,15 +354,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given a TaskSet, return a FileSet containing all the files that are accessed by this
-	 * collection of tasks. The opType specifies whether we want files that are read by
-	 * these tasks, written by these tasks, or either read or written. 
-	 * 
-	 * @param taskSet The set of input tasks
-	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
-	 * @return a FileSet of all files that are accessed by these tasks, in the mode specified.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportFilesAccessedByTasks(com.buildml.model.types.TaskSet, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
+	@Override
 	public FileSet reportFilesAccessedByTasks(TaskSet taskSet, OperationType opType) {
 		
 		/* create an empty result FileSet */
@@ -439,14 +405,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the set of files that are written to by a build task, but aren't ever
-	 * read by a different task. This generally implies that the file is a "final"
-	 * file (such as an executable program, or release package), rather than an intermediate
-	 * file (such as an object file).
-	 * 
-	 * @return The FileSet of write-only files.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportWriteOnlyFiles()
 	 */
+	@Override
 	public FileSet reportWriteOnlyFiles() {
 		
 		FileSet results = new FileSet(fns);
@@ -467,11 +429,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the complete set of files in the BuildStore. The allows us to generate
-	 * a FileSet containing all known files.
-	 * @return The complete set of files in the BuildStore.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportAllFiles()
 	 */
+	@Override
 	public FileSet reportAllFiles() {
 		FileSet results = new FileSet(fns);
 		try {
@@ -491,11 +452,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the complete set of actions in the BuildStore. The allows us to generate
-	 * an ActionSet containing all known actions.
-	 * @return The complete set of actions in the BuildStore.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportAllActions()
 	 */
+	@Override
 	public TaskSet reportAllActions() {
 		TaskSet results = new TaskSet(bts);
 		try {
@@ -515,13 +475,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given a PackageSet, return the complete FileSet of all files that belong to packages
-	 * that are members of the set.
-	 * 
-	 * @param pkgSet The PackageSet that selects the packages to be included.
-	 * @return The FileSet of files that are within the selected packages.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportFilesFromPackageSet(com.buildml.model.types.PackageSet)
 	 */
+	@Override
 	public FileSet reportFilesFromPackageSet(PackageSet pkgSet) {
 		FileSet results = new FileSet(fns);
 		Packages pkgMgr = pkgSet.getBuildStore().getPackages();
@@ -584,13 +541,10 @@ public class Reports {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given a PackageSet, return the complete ActionSet of all actions that belong to packages
-	 * that are members of the set.
-	 * 
-	 * @param pkgSet The PackageSet that selects the packages to be included.
-	 * @return The ActionSet of actions that are within the selected packages.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IReportMgr#reportActionsFromPackageSet(com.buildml.model.types.PackageSet)
 	 */
+	@Override
 	public TaskSet reportActionsFromPackageSet(PackageSet pkgSet) {
 		TaskSet results = new TaskSet(bts);
 		Packages pkgMgr = pkgSet.getBuildStore().getPackages();
