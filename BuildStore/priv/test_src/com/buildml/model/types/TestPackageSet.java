@@ -17,9 +17,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.Packages;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.Packages;
 import com.buildml.model.types.PackageSet;
 
 

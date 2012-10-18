@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.scanner.electricanno.ElectricAnnoScanner;
 import com.buildml.utils.files.ProgressFileInputStreamListener;

@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.ConversionUtils;
-import com.buildml.model.BuildTasks;
+import com.buildml.model.impl.BuildTasks;
 
 /**
  * Content Provider for the TreeViewer used as the main viewer in the ActionsEditor.

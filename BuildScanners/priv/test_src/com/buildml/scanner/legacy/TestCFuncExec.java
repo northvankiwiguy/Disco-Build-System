@@ -21,11 +21,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.SystemUtils;
 import com.buildml.utils.string.PathUtils;

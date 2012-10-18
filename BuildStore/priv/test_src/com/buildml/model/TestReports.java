@@ -19,12 +19,12 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.FileIncludes;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.Reports;
-import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileIncludes;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.Reports;
+import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -72,7 +72,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportMostCommonlyAccessedFiles()}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportMostCommonlyAccessedFiles()}.
 	 */
 	@Test
 	public void testReportMostCommonlyAccessedFiles() {
@@ -154,7 +154,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportMostCommonlyAccessedFiles()}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportMostCommonlyAccessedFiles()}.
 	 */
 	@Test
 	public void testScalabilityOfReportMostCommonlyAccessedFiles() {
@@ -188,7 +188,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 	
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportMostCommonIncludersOfFile(int)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportMostCommonIncludersOfFile(int)}.
 	 */
 	@Test
 	public void testreportMostCommonIncludersOfFile() {
@@ -238,7 +238,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportMostCommonlyAccessedFiles()}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportMostCommonlyAccessedFiles()}.
 	 */
 	@Test
 	public void testScalabilityOfReportMostCommonIncludesOfFile() {
@@ -267,7 +267,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportFilesNeverAccessed()}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportFilesNeverAccessed()}.
 	 */
 	@Test
 	public void testFilesNeverAccessed() {
@@ -319,7 +319,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportFilesThatMatchName(String)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportFilesThatMatchName(String)}.
 	 */
 	@Test
 	public void testReportFilesThatMatchName() {
@@ -367,7 +367,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportTasksThatMatchName(String)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportTasksThatMatchName(String)}.
 	 */
 	@Test
 	public void testReportTasksThatMatchName() {
@@ -406,7 +406,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportTasksThatAccessFiles(FileSet, OperationType)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportTasksThatAccessFiles(FileSet, OperationType)}.
 	 */
 	@Test
 	public void testReportTasksThatAccessFiles() {
@@ -524,7 +524,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportFilesAccessedByTasks(TaskSet, OperationType)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportFilesAccessedByTasks(TaskSet, OperationType)}.
 	 */
 	@Test
 	public void testFilesAccessedByTasks() {
@@ -600,7 +600,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportWriteOnlyFiles()}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportWriteOnlyFiles()}.
 	 */
 	@Test
 	public void testWriteOnlyFiles() {
@@ -671,7 +671,7 @@ public class TestReports {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportAllFiles()}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportAllFiles()}.
 	 */
 	@Test
 	public void testAllFiles() {

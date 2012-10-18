@@ -17,8 +17,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.utils.ConversionUtils;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.utils.errors.ErrorCode;
 

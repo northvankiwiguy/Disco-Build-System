@@ -15,7 +15,7 @@ package com.buildml.main;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 
 /**
  * This interface must be implemented by any class that provides a BuildML CLI

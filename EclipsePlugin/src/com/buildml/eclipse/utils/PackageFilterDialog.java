@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.buildml.eclipse.utils.errors.FatalError;
-import com.buildml.model.BuildStore;
-import com.buildml.model.Packages;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.Packages;
 import com.buildml.model.types.PackageSet;
 
 /**

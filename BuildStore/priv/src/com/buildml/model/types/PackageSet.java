@@ -14,8 +14,8 @@ package com.buildml.model.types;
 
 import java.util.HashMap;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.Packages;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.Packages;
 
 /**
  * Represents a set of packages. Each package (and it's various scopes) can

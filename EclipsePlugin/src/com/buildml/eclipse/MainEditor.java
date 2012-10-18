@@ -43,8 +43,8 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.BuildStore;
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.impl.BuildStore;
 
 /**
  * The main Eclipse editor for editing/viewing BuildML files. This editor is a "multi-part"

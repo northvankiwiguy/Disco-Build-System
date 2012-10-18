@@ -18,7 +18,7 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**

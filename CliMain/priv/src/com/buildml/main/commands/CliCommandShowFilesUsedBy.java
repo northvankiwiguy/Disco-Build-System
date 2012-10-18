@@ -17,12 +17,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.Packages;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.Reports;
-import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.Packages;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.Reports;
+import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 

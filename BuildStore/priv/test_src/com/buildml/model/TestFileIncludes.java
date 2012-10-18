@@ -19,8 +19,8 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.FileIncludes;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileIncludes;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -51,7 +51,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.FileIncludes#addFileIncludes(int, int)}.
+	 * Test method for {@link com.buildml.model.impl.FileIncludes#addFileIncludes(int, int)}.
 	 */
 	@Test
 	public void testAddFileIncludes() {
@@ -84,7 +84,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.FileIncludes#getTotalFileIncludedCount(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileIncludes#getTotalFileIncludedCount(int)}.
 	 */
 	@Test
 	public void testGetTotalFileIncludesCount() {
@@ -113,7 +113,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.FileIncludes#getFilesThatInclude(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileIncludes#getFilesThatInclude(int)}.
 	 */
 	@Test
 	public void testGetFilesThatInclude() {
@@ -142,7 +142,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.FileIncludes#getFilesIncludedBy(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileIncludes#getFilesIncludedBy(int)}.
 	 */
 	@Test
 	public void testGetFilesIncludedBy() {
@@ -174,7 +174,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileIncludes#deleteFilesIncludedBy(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileIncludes#deleteFilesIncludedBy(int)}.
 	 */
 	@Test
 	public void deleteFilesIncludedBy() {
@@ -214,7 +214,7 @@ public class TestFileIncludes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileIncludes#getTotalFileIncludedCount(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileIncludes#getTotalFileIncludedCount(int)}.
 	 */
 	@Test
 	public void testScalability() {

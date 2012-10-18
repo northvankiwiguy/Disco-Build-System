@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.SubEditor;
-import com.buildml.model.Packages;
+import com.buildml.model.impl.Packages;
 import com.buildml.utils.errors.ErrorCode;
 
 /**

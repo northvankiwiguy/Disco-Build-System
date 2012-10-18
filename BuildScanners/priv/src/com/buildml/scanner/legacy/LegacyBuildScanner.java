@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.os.ShellResult;
 import com.buildml.utils.os.SystemUtils;

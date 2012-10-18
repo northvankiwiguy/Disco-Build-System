@@ -17,10 +17,10 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.Packages;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.Packages;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -52,7 +52,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#addPackage(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#addPackage(java.lang.String)}.
 	 */
 	@Test
 	public void testAddPackage() {
@@ -103,7 +103,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#getPackageName(int)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#getPackageName(int)}.
 	 */
 	@Test
 	public void testGetPackageName() {
@@ -127,7 +127,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#getPackageId(String)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#getPackageId(String)}.
 	 */
 	@Test
 	public void testGetPackageId() {
@@ -167,7 +167,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#removePackage(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#removePackage(java.lang.String)}.
 	 */
 	@Test
 	public void testRemovePackage() {
@@ -221,7 +221,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#getPackages()}.
+	 * Test method for {@link com.buildml.model.impl.Packages#getPackages()}.
 	 */
 	@Test
 	public void testGetPackages() {
@@ -260,7 +260,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.Packages#getScopeName(int)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#getScopeName(int)}.
 	 */
 	@Test
 	public void testGetScopeName() {
@@ -279,7 +279,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#getScopeId(String)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#getScopeId(String)}.
 	 */
 	@Test
 	public void testGetScopeId() {
@@ -302,7 +302,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Packages#parsePkgSpec(String)}.
+	 * Test method for {@link com.buildml.model.impl.Packages#parsePkgSpec(String)}.
 	 * @exception Exception Something bad happened
 	 */
 	@Test

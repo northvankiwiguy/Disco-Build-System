@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -19,8 +19,8 @@ import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.RootNameDialog;
-import com.buildml.model.BuildStore;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
 /**

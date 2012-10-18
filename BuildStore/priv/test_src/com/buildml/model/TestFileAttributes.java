@@ -17,9 +17,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.FileAttributes;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileAttributes;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -59,7 +59,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#newAttrName(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#newAttrName(java.lang.String)}.
 	 */
 	@Test
 	public void testNewAttrName() {
@@ -90,7 +90,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getAttrIdFromName(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getAttrIdFromName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetAttrIdFromName() {
@@ -119,7 +119,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getAttrNameFromId(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getAttrNameFromId(int)}.
 	 */
 	@Test
 	public void testGetAttrNameFromId() {
@@ -148,7 +148,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getAttrNames()}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getAttrNames()}.
 	 */
 	@Test
 	public void testGetAttrNames() {
@@ -172,7 +172,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#deleteAttrName(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#deleteAttrName(java.lang.String)}.
 	 */
 	@Test
 	public void testDeleteAttrName() {
@@ -223,7 +223,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#setAttr(int, int, java.lang.String)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#setAttr(int, int, java.lang.String)}.
 	 */
 	@Test
 	public void testSetAttrIntIntString() {
@@ -271,7 +271,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#setAttr(int, int, int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#setAttr(int, int, int)}.
 	 */
 	@Test
 	public void testSetAttrIntIntInt() {
@@ -324,7 +324,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getAttrAsString(int, int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getAttrAsString(int, int)}.
 	 */
 	@Test
 	public void testGetAttrAsString() {
@@ -368,7 +368,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getAttrAsInteger(int, int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getAttrAsInteger(int, int)}.
 	 */
 	@Test
 	public void testGetAttrAsInteger() {
@@ -410,7 +410,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#deleteAttr(int, int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#deleteAttr(int, int)}.
 	 */
 	@Test
 	public void testDeleteAttr() {
@@ -444,7 +444,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#deleteAllAttrOnPath(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#deleteAllAttrOnPath(int)}.
 	 */
 	@Test
 	public void testDeleteAllAttrOnPath() {
@@ -486,7 +486,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getAttrsOnPath(int)}.
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getAttrsOnPath(int)}.
 	 */
 	@Test
 	public void testGetAttrsOnPath() {
@@ -539,7 +539,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getPathsWithAttr(int)}
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getPathsWithAttr(int)}
 	 */
 	@Test
 	public void testGetPathsWithAttrInt() {
@@ -580,7 +580,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getPathsWithAttr(int, String)}
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getPathsWithAttr(int, String)}
 	 */
 	@Test
 	public void testGetPathsWithAttrIntString() {
@@ -619,7 +619,7 @@ public class TestFileAttributes {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileAttributes#getPathsWithAttr(int, int)}
+	 * Test method for {@link com.buildml.model.impl.FileAttributes#getPathsWithAttr(int, int)}
 	 */
 	@Test
 	public void testGetPathsWithAttrIntInt() {

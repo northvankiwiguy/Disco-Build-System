@@ -10,11 +10,13 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import com.buildml.model.FatalBuildStoreError;
 
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore

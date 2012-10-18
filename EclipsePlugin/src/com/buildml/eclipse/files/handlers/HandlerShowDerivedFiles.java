@@ -14,8 +14,8 @@ import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
-import com.buildml.model.BuildStore;
-import com.buildml.model.Reports;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 
 /**

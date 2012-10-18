@@ -18,12 +18,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.Packages;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.Reports;
-import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.Packages;
+import com.buildml.model.impl.Reports;
+import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -151,7 +151,7 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportDerivedFiles(FileSet, boolean)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportDerivedFiles(FileSet, boolean)}.
 	 */
 	@Test
 	public void testReportDerivedFiles() {
@@ -257,7 +257,7 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportInputFiles(FileSet, boolean)}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportInputFiles(FileSet, boolean)}.
 	 */
 	@Test
 	public void testReportInputFiles() {
@@ -355,7 +355,7 @@ public class TestReports2 {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportFilesFromPackageSet}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportFilesFromPackageSet}.
 	 */
 	@Test
 	public void testReportFilesFromPackageSet() {
@@ -446,7 +446,7 @@ public class TestReports2 {
 	
 
 	/**
-	 * Test method for {@link com.buildml.model.Reports#reportActionsFromPackageSet}.
+	 * Test method for {@link com.buildml.model.impl.Reports#reportActionsFromPackageSet}.
 	 */
 	@Test
 	public void testReportActionsFromPackageSet() {

@@ -10,13 +10,14 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PathNameCache;
 import com.buildml.model.types.PathNameCache.PathNameCacheValue;
 import com.buildml.utils.errors.ErrorCode;

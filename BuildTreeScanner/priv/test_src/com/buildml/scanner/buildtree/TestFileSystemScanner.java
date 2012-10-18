@@ -17,10 +17,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.Reports;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.Reports;
 import com.buildml.model.types.FileSet;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 

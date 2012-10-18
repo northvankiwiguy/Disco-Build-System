@@ -17,8 +17,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -51,7 +51,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileNameSpaces#addNewRoot(String, int)}.
+	 * Test method for {@link com.buildml.model.impl.FileNameSpaces#addNewRoot(String, int)}.
 	 */
 	@Test
 	public void testAddNewRoot() {
@@ -146,7 +146,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileNameSpaces#getRoots()}.
+	 * Test method for {@link com.buildml.model.impl.FileNameSpaces#getRoots()}.
 	 */
 	@Test
 	public void testGetRoots() {
@@ -177,7 +177,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileNameSpaces#moveRootToPath}.
+	 * Test method for {@link com.buildml.model.impl.FileNameSpaces#moveRootToPath}.
 	 */
 	@Test
 	public void testMoveRootToPath() {
@@ -219,7 +219,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileNameSpaces#getRootAtPath}.
+	 * Test method for {@link com.buildml.model.impl.FileNameSpaces#getRootAtPath}.
 	 */
 	@Test
 	public void testGetRootAtPath() {
@@ -251,7 +251,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileNameSpaces#getEnclosingRoot}.
+	 * Test method for {@link com.buildml.model.impl.FileNameSpaces#getEnclosingRoot}.
 	 */
 	@Test
 	public void testGetEnclosingRoot() {
@@ -282,7 +282,7 @@ public class TestFileNameSpacesRoots {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.FileNameSpaces#deleteRoot(String)}.
+	 * Test method for {@link com.buildml.model.impl.FileNameSpaces#deleteRoot(String)}.
 	 */
 	@Test
 	public void testDeleteRoot() {

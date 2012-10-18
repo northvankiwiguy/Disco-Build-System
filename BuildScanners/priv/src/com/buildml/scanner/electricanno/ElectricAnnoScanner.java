@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.utils.files.ProgressFileInputStream;
 import com.buildml.utils.files.ProgressFileInputStreamListener;
 

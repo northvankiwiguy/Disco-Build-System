@@ -21,7 +21,7 @@ import java.util.Iterator;
 import org.apache.commons.cli.*;
 
 import com.buildml.main.commands.*;
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.print.PrintUtils;
 import com.buildml.utils.string.StringArray;

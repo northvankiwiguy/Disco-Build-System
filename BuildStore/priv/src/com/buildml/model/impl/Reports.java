@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,8 +18,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.buildml.model.BuildTasks.OperationType;
-import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;

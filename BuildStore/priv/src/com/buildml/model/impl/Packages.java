@@ -10,12 +10,13 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;

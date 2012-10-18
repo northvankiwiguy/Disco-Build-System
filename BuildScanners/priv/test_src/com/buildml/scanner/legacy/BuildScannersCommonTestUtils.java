@@ -19,7 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 import com.buildml.utils.os.ShellResult;

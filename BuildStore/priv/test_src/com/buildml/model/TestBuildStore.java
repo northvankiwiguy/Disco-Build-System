@@ -20,9 +20,9 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
 import com.buildml.model.FatalBuildStoreError;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.version.Version;
 
@@ -59,7 +59,7 @@ public class TestBuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildStore#getBuildStoreVersion()}.
+	 * Test method for {@link com.buildml.model.impl.BuildStore#getBuildStoreVersion()}.
 	 */
 	@Test
 	public void testGetBuildStoreVersion() {

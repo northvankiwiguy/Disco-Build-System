@@ -18,11 +18,11 @@ import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
 
-import com.buildml.model.BuildTasks;
-import com.buildml.model.Packages;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.BuildTasks.OperationType;
-import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.Packages;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;

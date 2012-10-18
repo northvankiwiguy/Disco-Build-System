@@ -15,8 +15,8 @@ package com.buildml.eclipse.utils;
 import com.buildml.eclipse.actions.UIActionRecord;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.files.UIFileRecordFile;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 
 /**

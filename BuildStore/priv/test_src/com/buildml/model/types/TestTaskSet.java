@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.Packages;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.Packages;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
 

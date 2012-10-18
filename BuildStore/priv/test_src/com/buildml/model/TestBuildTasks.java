@@ -19,11 +19,11 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
 import com.buildml.model.CommonTestUtils;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.BuildTasks.OperationType;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -67,7 +67,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#addBuildTask(int, int, String)}.
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#addBuildTask(int, int, String)}.
 	 */
 	@Test
 	public void testAddBuildTask() {
@@ -84,7 +84,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getCommand(int)}
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getCommand(int)}
 	 */
 	@Test
 	public void testGetCommand() {
@@ -102,7 +102,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getCommandSummary(int, int)}
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getCommandSummary(int, int)}
 	 */
 	@Test
 	public void testGetCommandSummary() {
@@ -125,7 +125,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getParent(int)}
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getParent(int)}
 	 * @throws Exception Something bad happened
 	 */
 	@Test
@@ -155,7 +155,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getDirectory(int)}
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getDirectory(int)}
 	 * @throws Exception Something bad happened
 	 */
 	@Test
@@ -182,7 +182,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getParent(int)}
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getParent(int)}
 	 * @throws Exception Something bad happened
 	 */
 	@Test
@@ -212,7 +212,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#addFileAccess(int, int, OperationType)}.
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#addFileAccess(int, int, OperationType)}.
 	 */
 	@Test
 	public void testAddGetFileAccess() {
@@ -349,7 +349,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getTasksThatAccess(int, OperationType)}.
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getTasksThatAccess(int, OperationType)}.
 	 */
 	@Test
 	public void testGetTasksThatAccess() {
@@ -427,7 +427,7 @@ public class TestBuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.BuildTasks#getTasksInDirectory(int)}.
+	 * Test method for {@link com.buildml.model.impl.BuildTasks#getTasksInDirectory(int)}.
 	 */
 	@Test
 	public void testGetTasksInDirectory() {

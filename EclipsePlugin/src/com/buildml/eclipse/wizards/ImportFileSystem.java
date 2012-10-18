@@ -30,7 +30,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 
 /**

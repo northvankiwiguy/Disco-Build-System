@@ -19,10 +19,10 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.main.CliUtils.DisplayWidth;
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.Packages;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.Packages;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.TaskSet;
 
 /**

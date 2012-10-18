@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 

@@ -14,8 +14,8 @@ package com.buildml.scanner.buildtree;
 
 import java.io.File;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.FileSystemTraverseCallback;
 import com.buildml.utils.os.SystemUtils;

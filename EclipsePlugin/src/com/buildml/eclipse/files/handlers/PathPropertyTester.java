@@ -6,8 +6,8 @@ import org.eclipse.core.expressions.PropertyTester;
 
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.BuildStore;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.FileNameSpaces;
 
 /**
  * A Eclipse plugin "PropertyTester" class for determining whether

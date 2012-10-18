@@ -19,11 +19,11 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.BuildTasks.OperationType;
-import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;

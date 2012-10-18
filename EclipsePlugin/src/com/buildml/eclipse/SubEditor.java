@@ -31,7 +31,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.model.BuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeRecord;
 

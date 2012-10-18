@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.buildml.model.FatalBuildStoreError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 

@@ -15,8 +15,8 @@ package com.buildml.eclipse.files;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.FileRecord;
 
 /**

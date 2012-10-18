@@ -23,9 +23,9 @@ import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
-import com.buildml.model.Packages;
-import com.buildml.model.FileNameSpaces;
-import com.buildml.model.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.impl.Packages;
+import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.FileRecord;
 
 /**

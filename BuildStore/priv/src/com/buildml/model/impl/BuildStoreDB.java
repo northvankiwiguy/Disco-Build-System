@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model;
+package com.buildml.model.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 
+import com.buildml.model.FatalBuildStoreError;
 import com.buildml.utils.version.Version;
 
 /**

@@ -22,9 +22,9 @@ import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.SubEditor;
-import com.buildml.model.BuildStore;
-import com.buildml.model.BuildTasks;
-import com.buildml.model.FileNameSpaces;
+import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.print.PrintUtils;
 
 /**
