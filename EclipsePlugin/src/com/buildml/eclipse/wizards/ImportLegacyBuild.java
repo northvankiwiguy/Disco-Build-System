@@ -13,6 +13,7 @@
 package com.buildml.eclipse.wizards;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -136,6 +137,12 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 								
 				/* we're done - close up */
 				monitor.done();
+				try {
+					importBuildStore.save();
+				} catch (IOException e) {
+					AlertDialog.displayErrorDialog("Import Failed", 
+							"The build database could not be closed. " + e.getMessage());
+				}
 				importBuildStore.close();
 				
 				/* 

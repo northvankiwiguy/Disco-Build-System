@@ -179,6 +179,12 @@ public class ImportEaAnno extends Wizard implements IImportWizard {
 				
 				/* we're done - close the BuildStore */
 				monitor.done();
+				try {
+					importBuildStore.save();
+				} catch (IOException e) {
+					AlertDialog.displayErrorDialog("Import Failed", 
+							"The build database could not be closed. " + e.getMessage());
+				}
 				importBuildStore.close();
 								
 				/* 

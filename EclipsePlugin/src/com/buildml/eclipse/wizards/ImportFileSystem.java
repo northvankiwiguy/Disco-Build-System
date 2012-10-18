@@ -13,6 +13,7 @@
 package com.buildml.eclipse.wizards;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,6 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.progress.UIJob;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStore;
 import com.buildml.scanner.buildtree.FileSystemScanner;
@@ -109,6 +111,12 @@ public class ImportFileSystem extends Wizard implements IImportWizard {
 				
 				/* we're done - close up */
 				monitor.done();
+				try {
+					importBuildStore.save();
+				} catch (IOException e) {
+					AlertDialog.displayErrorDialog("Import Failed", 
+							"The build database could not be closed. " + e.getMessage());
+				}
 				importBuildStore.close();
 				
 				/* 
