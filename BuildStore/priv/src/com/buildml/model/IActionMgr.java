@@ -12,8 +12,6 @@
 
 package com.buildml.model;
 
-import com.buildml.model.impl.ActionMgr.OperationType;
-
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore
  * information pertaining to build actions.
@@ -26,10 +24,28 @@ import com.buildml.model.impl.ActionMgr.OperationType;
 public interface IActionMgr {
 
 	/**
-	 * The maximum number of tasks that this ActionMgr object can handle.
+	 * The maximum number of actions that this ActionMgr object can handle.
 	 */
 	public static final int MAX_TASKS = 16777216;
 
+	/** Data type for specifying the type of a file access that an action performs. */
+	public enum OperationType {
+		/** An unspecified operation for when we don't care which operation is performed. */
+		OP_UNSPECIFIED,		
+		
+		/** The file was read by the action. */
+		OP_READ,
+		
+		/** The file was written by the action. */
+		OP_WRITE,
+		
+		/** The file was read and written by the same action. */
+		OP_MODIFIED,
+		
+		/** The file was deleted by the action. */
+		OP_DELETE
+	};
+	
 	/**
 	 * Add a new build action, and return the action ID number.
 	 * 

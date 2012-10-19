@@ -18,11 +18,11 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 

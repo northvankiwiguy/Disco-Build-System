@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;

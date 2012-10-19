@@ -23,10 +23,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.utils.os.SystemUtils;
 
 /**

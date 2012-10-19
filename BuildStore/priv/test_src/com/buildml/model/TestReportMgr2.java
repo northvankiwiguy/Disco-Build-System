@@ -18,8 +18,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;

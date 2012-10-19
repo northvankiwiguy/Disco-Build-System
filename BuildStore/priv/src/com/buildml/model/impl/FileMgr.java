@@ -18,11 +18,11 @@ import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.PathNameCache;
 import com.buildml.model.types.PathNameCache.PathNameCacheValue;
 import com.buildml.utils.errors.ErrorCode;

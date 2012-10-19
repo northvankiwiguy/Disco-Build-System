@@ -38,7 +38,6 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.BuildStore;
 
 /**
  * This class provides Eclipse wizard functionality for creating a new empty BuildML

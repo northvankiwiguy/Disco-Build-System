@@ -39,24 +39,6 @@ public class ActionMgr implements IActionMgr {
 	/*=====================================================================================*
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
-
-	/** Data type for specifying the type of a file access that a task performs. */
-	public enum OperationType {
-		/** An unspecified operation for when we don't care which operation is performed. */
-		OP_UNSPECIFIED,		
-		
-		/** The file was read by the task. */
-		OP_READ,
-		
-		/** The file was written by the task. */
-		OP_WRITE,
-		
-		/** The file was read and written by the same task. */
-		OP_MODIFIED,
-		
-		/** The file was deleted by the task. */
-		OP_DELETE
-	}
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
