@@ -15,7 +15,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * Command Handler for the "filter by name" command.
@@ -168,14 +168,14 @@ public class HandlerFilterByName extends AbstractHandler {
 		int resultCode = dialog.getAddRemoveChoice();	
 		dialog.close();
 		
-		TaskSet resultSet = reportMgr.reportTasksThatMatchName(regExpr);
-		TaskSet newVisibilitySet = null;
+		ActionSet resultSet = reportMgr.reportActionsThatMatchName(regExpr);
+		ActionSet newVisibilitySet = null;
 		
 		/*
 		 * Depending on the selected mode, either merge or filter these actions from the
 		 * current tab's action set. 
 		 */
-		TaskSet currentActionSet = editor.getVisibilityFilterSet();
+		ActionSet currentActionSet = editor.getVisibilityFilterSet();
 		switch (resultCode) {
 		
 		case NameFilterDialog.SELECT_ONLY_MATCHING_ITEMS:
@@ -189,7 +189,7 @@ public class HandlerFilterByName extends AbstractHandler {
 			
 		case NameFilterDialog.REMOVE_MATCHING_ITEMS:
 			try {
-				newVisibilitySet = (TaskSet)currentActionSet.clone();
+				newVisibilitySet = (ActionSet)currentActionSet.clone();
 				newVisibilitySet.extractSet(resultSet);
 			} catch (CloneNotSupportedException e) {
 				/* won't happen */
@@ -201,7 +201,7 @@ public class HandlerFilterByName extends AbstractHandler {
 			break;
 			
 		case NameFilterDialog.DESELECT_ALL_ITEMS:
-			newVisibilitySet = new TaskSet(actionsMgr);
+			newVisibilitySet = new ActionSet(actionsMgr);
 			break;
 			
 		default:

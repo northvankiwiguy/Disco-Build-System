@@ -427,7 +427,7 @@ public class TestFileMgr {
 
 		/* test that we can't remove a directory that a task was executed in */
 		int path4 = fileMgr.addFile("/april/may/september");
-		int myBuildTask = actionMgr.addBuildTask(actionMgr.getRootTask("root"), path4, "/bin/true");
+		int myBuildTask = actionMgr.addAction(actionMgr.getRootAction("root"), path4, "/bin/true");
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path4));
 		
 		/* test that we can't remove a path that's referenced by a task */

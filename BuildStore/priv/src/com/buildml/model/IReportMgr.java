@@ -16,7 +16,7 @@ import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * An IReportMgr object is the part of a BuildStore that handles reporting of data.
@@ -63,12 +63,12 @@ public interface IReportMgr {
 	public abstract FileSet reportFilesThatMatchName(String fileArg);
 
 	/**
-	 * Return the set of tasks whose command string matches the user-specified pattern.
+	 * Return the set of actions whose command string matches the user-specified pattern.
 	 * 
 	 * @param pattern The user-specified pattern to match.
 	 * @return The TaskSet of matching file names.
 	 */
-	public abstract TaskSet reportTasksThatMatchName(String pattern);
+	public abstract ActionSet reportActionsThatMatchName(String pattern);
 
 	/**
 	 * Given the input FileSet (sourceFileSet), return a new FileSet containing all the 
@@ -98,27 +98,27 @@ public interface IReportMgr {
 			boolean reportIndirect);
 
 	/**
-	 * Given a FileSet, return a TaskSet containing all the build tasks that access this
-	 * collection files. The opType specifies whether we want tasks that read these files,
+	 * Given a FileSet, return a TaskSet containing all the actions that access this
+	 * collection files. The opType specifies whether we want actions that read these files,
 	 * write to these files, or either read or write.
 	 * 
 	 * @param fileSet The set of input files.
 	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
 	 * @return a TaskSet of all tasks that access these files in the mode specified.
 	 */
-	public abstract TaskSet reportTasksThatAccessFiles(FileSet fileSet,
+	public abstract ActionSet reportActionsThatAccessFiles(FileSet fileSet,
 			OperationType opType);
 
 	/**
-	 * Given a TaskSet, return a FileSet containing all the files that are accessed by this
-	 * collection of tasks. The opType specifies whether we want files that are read by
-	 * these tasks, written by these tasks, or either read or written. 
+	 * Given an ActionSet, return a FileSet containing all the files that are accessed by this
+	 * collection of actions. The opType specifies whether we want files that are read by
+	 * these actions, written by these actions, or either read or written. 
 	 * 
-	 * @param taskSet The set of input tasks
+	 * @param actionSet The set of input actions.
 	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
-	 * @return a FileSet of all files that are accessed by these tasks, in the mode specified.
+	 * @return a FileSet of all files that are accessed by these actions, in the mode specified.
 	 */
-	public abstract FileSet reportFilesAccessedByTasks(TaskSet taskSet,
+	public abstract FileSet reportFilesAccessedByActions(ActionSet actionSet,
 			OperationType opType);
 
 	/**
@@ -143,7 +143,7 @@ public interface IReportMgr {
 	 * an ActionSet containing all known actions.
 	 * @return The complete set of actions in the BuildStore.
 	 */
-	public abstract TaskSet reportAllActions();
+	public abstract ActionSet reportAllActions();
 
 	/**
 	 * Given a PackageSet, return the complete FileSet of all files that belong to packages
@@ -161,6 +161,6 @@ public interface IReportMgr {
 	 * @param pkgSet The PackageSet that selects the packages to be included.
 	 * @return The ActionSet of actions that are within the selected packages.
 	 */
-	public abstract TaskSet reportActionsFromPackageSet(PackageSet pkgSet);
+	public abstract ActionSet reportActionsFromPackageSet(PackageSet pkgSet);
 
 }

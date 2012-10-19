@@ -45,7 +45,7 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	 * Create a new ActionsEditorContentProvider that translates the information
 	 * in the BuildStore into something that a TreeViewer can understand.
 	 * @param editor The editor that this content provider is associated with.
-	 * @param actionMgr The BuildTasks object that we're displaying information from.
+	 * @param actionMgr The ActionMgr object that we're displaying information from.
 	 */
 	public ActionsEditorContentProvider(SubEditor editor, IActionMgr actionMgr) {
 
@@ -141,7 +141,7 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	 */
 	public UIActionRecord[] getRootElements() {
 		
-		int topRootId = actionMgr.getRootTask("root");
+		int topRootId = actionMgr.getRootAction("root");
 		Integer childIds[] = actionMgr.getChildren(topRootId);
 		return ConversionUtils.convertIntArrToActionRecordArr(actionMgr, childIds);
 	}

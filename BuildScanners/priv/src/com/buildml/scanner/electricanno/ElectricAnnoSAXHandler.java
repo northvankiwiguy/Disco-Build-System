@@ -110,7 +110,7 @@ import com.buildml.utils.string.PathUtils;
 		taskStack = new ArrayList<Integer>();
 		
 		/* To start with, all tasks we encounter are children of the root task */
-		mostRecentTask = currentParentTask = actionMgr.getRootTask("");
+		mostRecentTask = currentParentTask = actionMgr.getRootAction("");
 		taskStack.add(currentParentTask);
 		
 		/* we'll also need to track our current directory */
@@ -246,7 +246,7 @@ import com.buildml.utils.string.PathUtils;
 				String argvString = commandArgv.toString();
 				commandArgv = null;	
 				
-				int newTaskId = actionMgr.addBuildTask(currentParentTask, currentDirId, argvString);
+				int newTaskId = actionMgr.addAction(currentParentTask, currentDirId, argvString);
 				
 				/* record the ID of this task, since it might be the new parent task soon */
 				mostRecentTask = newTaskId;

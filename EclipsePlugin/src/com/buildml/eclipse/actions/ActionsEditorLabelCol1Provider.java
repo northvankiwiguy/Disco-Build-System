@@ -74,7 +74,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 		ImageDescriptor descr = Activator.getImageDescriptor("images/action_icon.gif");
 		actionImage = descr.createImage();
 		
-		actionMgr.getRootTask("root");
+		actionMgr.getRootAction("root");
 	}
 
 	/*=====================================================================================*

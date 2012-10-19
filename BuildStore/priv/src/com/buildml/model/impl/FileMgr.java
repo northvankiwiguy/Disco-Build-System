@@ -547,13 +547,13 @@ public class FileMgr implements IFileMgr {
 			return ErrorCode.CANT_REMOVE;
 		}
 
-		/* check that it's not used as the directory for any tasks */
-		if (actionMgr.getTasksInDirectory(pathId).length != 0) {
+		/* check that it's not used as the directory for any actions */
+		if (actionMgr.getActionsInDirectory(pathId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
-		/* check that it's not accessed by any tasks */
-		if (actionMgr.getTasksThatAccess(pathId, 
+		/* check that it's not accessed by any actions */
+		if (actionMgr.getActionsThatAccess(pathId, 
 					OperationType.OP_UNSPECIFIED).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}

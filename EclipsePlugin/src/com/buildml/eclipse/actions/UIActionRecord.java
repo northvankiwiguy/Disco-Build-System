@@ -12,14 +12,14 @@
 
 package com.buildml.eclipse.actions;
 
-import com.buildml.model.types.TaskRecord;
+import com.buildml.model.types.ActionRecord;
 
 /**
  * A type of ActionRecord that's specifically used for displaying in the UI.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class UIActionRecord extends TaskRecord {
+public class UIActionRecord extends ActionRecord {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS

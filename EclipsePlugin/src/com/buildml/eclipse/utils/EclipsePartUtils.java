@@ -56,8 +56,8 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskRecord;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionRecord;
+import com.buildml.model.types.ActionSet;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -101,15 +101,15 @@ public class EclipsePartUtils {
 	 * @param selection The Eclipse command handler's selection.
 	 * @return The equivalent ActionSet.
 	 */
-	public static TaskSet getActionSetFromSelection(IBuildStore buildStore, TreeSelection selection) {
+	public static ActionSet getActionSetFromSelection(IBuildStore buildStore, TreeSelection selection) {
 		
 		IActionMgr actionMgr = buildStore.getActionMgr();
-		TaskSet acts = new TaskSet(actionMgr);
+		ActionSet acts = new ActionSet(actionMgr);
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object item = iter.next();
-			if (item instanceof TaskRecord) {
-				acts.add(((TaskRecord)item).getId());
+			if (item instanceof ActionRecord) {
+				acts.add(((ActionRecord)item).getId());
 			}
 		}
 		return acts;

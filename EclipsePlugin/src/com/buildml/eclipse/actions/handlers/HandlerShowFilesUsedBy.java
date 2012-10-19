@@ -17,7 +17,7 @@ import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * Eclipse Command Handler for the "show files used by..." commands.
@@ -42,7 +42,7 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 		SubEditor existingEditor = mainEditor.getActiveSubEditor();
 		
 		/* build an ActionSet of all the selected files */
-		TaskSet selectedActions = EclipsePartUtils.getActionSetFromSelection(buildStore, selection);
+		ActionSet selectedActions = EclipsePartUtils.getActionSetFromSelection(buildStore, selection);
 
 		/* 
 		 * what operation is the user asking for? "used", "read", "written", "modified" or "deleted"? 
@@ -62,7 +62,7 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 		
 		/* get the set of files that are used/read/written/modified/deleted by these actions */
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		FileSet userFiles = reportMgr.reportFilesAccessedByTasks(selectedActions, opType);
+		FileSet userFiles = reportMgr.reportFilesAccessedByActions(selectedActions, opType);
 		
 		/* if the result set is empty, don't open an editor, but instead open a dialog */
 		if (userFiles.size() == 0) {

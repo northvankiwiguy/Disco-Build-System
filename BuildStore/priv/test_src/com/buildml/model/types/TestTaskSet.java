@@ -23,7 +23,7 @@ import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -36,7 +36,7 @@ import com.buildml.utils.errors.ErrorCode;
 public class TestTaskSet {
 	
 	/** Our test TaskSet object */
-	private TaskSet ts;
+	private ActionSet ts;
 	
 	/** Our test BuildStore object */
 	private IBuildStore bs;
@@ -55,13 +55,13 @@ public class TestTaskSet {
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		actionMgr = bs.getActionMgr();
-		ts = new TaskSet(actionMgr);
+		ts = new ActionSet(actionMgr);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#isMember(int)}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#isMember(int)}.
 	 */
 	@Test
 	public void testIsMember() {
@@ -85,7 +85,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#remove(int)}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#remove(int)}.
 	 */
 	@Test
 	public void testRemove() {
@@ -122,7 +122,7 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#iterator()}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#iterator()}.
 	 */
 	@Test
 	public void testIterator() {
@@ -148,18 +148,18 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#populateWithParents()}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#populateWithParents()}.
 	 */
 	@Test
 	public void testPopulateWithParents() {
 		
 		/* create a bunch of tasks in a tree structure */
-		int task1 = actionMgr.addBuildTask(actionMgr.getRootTask(""), 0, "top command");
-		int task2 = actionMgr.addBuildTask(task1, 0, "second command");
-		int task3 = actionMgr.addBuildTask(task1, 0, "second command as well");
-		int task4 = actionMgr.addBuildTask(task3, 0, "third command");
-		actionMgr.addBuildTask(task4, 0, "fourth command");
-		int task6 = actionMgr.addBuildTask(task2, 0, "second command's child");
+		int task1 = actionMgr.addAction(actionMgr.getRootAction(""), 0, "top command");
+		int task2 = actionMgr.addAction(task1, 0, "second command");
+		int task3 = actionMgr.addAction(task1, 0, "second command as well");
+		int task4 = actionMgr.addAction(task3, 0, "third command");
+		actionMgr.addAction(task4, 0, "fourth command");
+		int task6 = actionMgr.addAction(task2, 0, "second command's child");
 
 		/* add only one of them to the TaskSet */
 		ts.add(task6);		
@@ -190,13 +190,13 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#mergeSet(TaskSet)}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#mergeSet(ActionSet)}.
 	 */
 	@Test
 	public void testMergeSet() {
 
 		/* create and populate a new TaskSet to merge in */
-		TaskSet mainTaskSet = new TaskSet(actionMgr);
+		ActionSet mainTaskSet = new ActionSet(actionMgr);
 		mainTaskSet.add(1);
 		mainTaskSet.add(10);
 		mainTaskSet.add(100);
@@ -211,7 +211,7 @@ public class TestTaskSet {
 		assertTrue(ts.isMember(100));
 
 		/* create a new set, with new content to merge in */
-		mainTaskSet = new TaskSet(actionMgr);
+		mainTaskSet = new ActionSet(actionMgr);
 		mainTaskSet.add(23);
 		mainTaskSet.add(56);
 		mainTaskSet.add(100);
@@ -231,16 +231,16 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#size()}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#size()}.
 	 */
 	@Test
 	public void testSize() {
 		
 		/* create a bunch of tasks */
-		int root = actionMgr.getRootTask("");
-		int task1 = actionMgr.addBuildTask(root, 0, "");
-		int task2 = actionMgr.addBuildTask(root, 0, "");
-		int task3 = actionMgr.addBuildTask(root, 0, "");
+		int root = actionMgr.getRootAction("");
+		int task1 = actionMgr.addAction(root, 0, "");
+		int task2 = actionMgr.addAction(root, 0, "");
+		int task3 = actionMgr.addAction(root, 0, "");
 		
 		/* add them to the TaskSet, testing the size as we go along */ 
 		assertEquals(0, ts.size());
@@ -263,36 +263,36 @@ public class TestTaskSet {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#populateWithTasks(String[])}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#populateWithActions(String[])}.
 	 */
 	@Test
 	public void testPopulateWithTasks() {
 		
 		/* add some tasks in a tree hierarchy */
-		int root = actionMgr.getRootTask("");
-		int taskA = actionMgr.addBuildTask(root, 0, "top-level-task-A");
-		int taskA1 = actionMgr.addBuildTask(taskA, 0, "second-level-task-under-A");
-		int taskA2 = actionMgr.addBuildTask(taskA, 0, "second-level-task-under-A");
-		int taskA3 = actionMgr.addBuildTask(taskA, 0, "second-level-task-under-A");
-		int taskA31 = actionMgr.addBuildTask(taskA3, 0, "third-level-task-under-A3");
-		int taskA32 = actionMgr.addBuildTask(taskA3, 0, "third-level-task-under-A3");
-		int taskA321 = actionMgr.addBuildTask(taskA32, 0, "fourth-level-task-under-A32");
-		actionMgr.addBuildTask(taskA, 0, "second-level-task-under-A");
-		int taskB = actionMgr.addBuildTask(root, 0, "top-level-task-B");
-		actionMgr.addBuildTask(root, 0, "top-level-task-C");
+		int root = actionMgr.getRootAction("");
+		int taskA = actionMgr.addAction(root, 0, "top-level-task-A");
+		int taskA1 = actionMgr.addAction(taskA, 0, "second-level-task-under-A");
+		int taskA2 = actionMgr.addAction(taskA, 0, "second-level-task-under-A");
+		int taskA3 = actionMgr.addAction(taskA, 0, "second-level-task-under-A");
+		int taskA31 = actionMgr.addAction(taskA3, 0, "third-level-task-under-A3");
+		int taskA32 = actionMgr.addAction(taskA3, 0, "third-level-task-under-A3");
+		int taskA321 = actionMgr.addAction(taskA32, 0, "fourth-level-task-under-A32");
+		actionMgr.addAction(taskA, 0, "second-level-task-under-A");
+		int taskB = actionMgr.addAction(root, 0, "top-level-task-B");
+		actionMgr.addAction(root, 0, "top-level-task-C");
 	
 		/* populate with an empty specification string array*/
-		ts.populateWithTasks(new String[0]);
+		ts.populateWithActions(new String[0]);
 		assertEquals(0, ts.size());
 		
 		/* populate with a single task, without any of its descendants. Format is "<taskA3>" */
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString()}));
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(taskA3).toString()}));
 		assertEquals(1, ts.size());
 		assertTrue(ts.isMember(taskA3));
 
 		/* populate with a complete subtree. Format is "<taskA3>/" */
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + "/" }));
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(taskA3).toString() + "/" }));
 		assertEquals(4, ts.size());
 		assertTrue(ts.isMember(taskA3));
 		assertTrue(ts.isMember(taskA31));
@@ -300,16 +300,16 @@ public class TestTaskSet {
 		assertTrue(ts.isMember(taskA321));
 		
 		/* populate with a complete subtree, of depth 2. Format is "<taskA3>/2" */
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA3).toString() + "/2" }));
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(taskA3).toString() + "/2" }));
 		assertEquals(3, ts.size());
 		assertTrue(ts.isMember(taskA3));
 		assertTrue(ts.isMember(taskA31));
 		assertTrue(ts.isMember(taskA32));
 		
 		/* similar complete subtree of depth 2, but with different tasks. Format is "<taskA>/2" */
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA).toString() + "/2" }));
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(taskA).toString() + "/2" }));
 		assertEquals(5, ts.size());
 		assertTrue(ts.isMember(taskA));
 		assertTrue(ts.isMember(taskA1));
@@ -317,22 +317,22 @@ public class TestTaskSet {
 		assertTrue(ts.isMember(taskA3));
 	
 		/* populate the full tree, down four levels (this excludes only one task) */
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + "/4" }));
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(root).toString() + "/4" }));
 		assertEquals(10, ts.size());
 		assertFalse(ts.isMember(taskA321));
 		
 		/* populate with two different tasks */
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(taskA1).toString(),
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(taskA1).toString(),
 					Integer.valueOf(taskB).toString()}));
 		assertEquals(2, ts.size());
 		assertTrue(ts.isMember(taskA1));
 		assertTrue(ts.isMember(taskB));
 		
 		/* populate the full tree (all levels), then remove a subtree (taskA32 and below) */
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { Integer.valueOf(root).toString() + "/",
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { Integer.valueOf(root).toString() + "/",
 				"-" + Integer.valueOf(taskA32).toString() + "/" }));
 		assertEquals(9, ts.size());
 		assertFalse(ts.isMember(taskA32));
@@ -341,79 +341,79 @@ public class TestTaskSet {
 		/* create a package, add a couple of tasks to it, then query the package */
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int fooPkgId = pkgMgr.addPackage("foo");
-		assertEquals(ErrorCode.OK, pkgMgr.setTaskPackage(taskA1, fooPkgId));
-		assertEquals(ErrorCode.OK, pkgMgr.setTaskPackage(taskA2, fooPkgId));
+		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(taskA1, fooPkgId));
+		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(taskA2, fooPkgId));
 		
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%pkg/foo" }));
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { "%pkg/foo" }));
 		assertEquals(2, ts.size());
 		assertTrue(ts.isMember(taskA1));
 		assertTrue(ts.isMember(taskA2));
 
-		ts = new TaskSet(actionMgr);
-		assertEquals(ErrorCode.OK, ts.populateWithTasks(new String[] { "%not-pkg/foo" }));
+		ts = new ActionSet(actionMgr);
+		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { "%not-pkg/foo" }));
 		assertEquals(8, ts.size());
 		assertFalse(ts.isMember(taskA1));
 		assertFalse(ts.isMember(taskA2));
 
 		/* test invalid syntax */
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "+123" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "X" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123-" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "123/foo" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "/1" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "1//" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/pkg" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/foo/private" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%nc" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%c/" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%nc/" }));
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithTasks(new String[] { "%badvalue/" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "+123" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "X" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "123-" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "123/foo" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "/1" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "1//" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%c/pkg" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%c/foo/private" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%c" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%nc" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%c/" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%nc/" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "%badvalue/" }));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.types.TaskSet#populateWithTasks(String[])}.
+	 * Test method for {@link com.buildml.model.types.ActionSet#populateWithActions(String[])}.
 	 */
 	@Test
 	public void testMatchingCommandNames() {
 
-		int task1 = actionMgr.addBuildTask(0, 0, "a task is a task, of : course, of course");
-		int task2 = actionMgr.addBuildTask(0, 0, "another task");
-		int task3 = actionMgr.addBuildTask(0, 0, "gcc -c -o foo.o foo.c");
-		int task4 = actionMgr.addBuildTask(0, 0, "gcc -c -o bah.o bah.c");
-		int task5 = actionMgr.addBuildTask(0, 0, "gcc -c -o bling.o bling.c");
+		int task1 = actionMgr.addAction(0, 0, "a task is a task, of : course, of course");
+		int task2 = actionMgr.addAction(0, 0, "another task");
+		int task3 = actionMgr.addAction(0, 0, "gcc -c -o foo.o foo.c");
+		int task4 = actionMgr.addAction(0, 0, "gcc -c -o bah.o bah.c");
+		int task5 = actionMgr.addAction(0, 0, "gcc -c -o bling.o bling.c");
 
 		/* look for gcc commands */
-		TaskSet results = new TaskSet(actionMgr);
-		results.populateWithTasks(new String[] {"%match/gcc *"});
+		ActionSet results = new ActionSet(actionMgr);
+		results.populateWithActions(new String[] {"%match/gcc *"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task3, task4, task5}));
 		
 		/* same, but use %m instead of %match */
-		results = new TaskSet(actionMgr);
-		results.populateWithTasks(new String[] {"%m/gcc *"});
+		results = new ActionSet(actionMgr);
+		results.populateWithActions(new String[] {"%m/gcc *"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task3, task4, task5}));
 		
 		/* look for the word "task" */
-		results = new TaskSet(actionMgr);
-		results.populateWithTasks(new String[] {"%match/task"});
+		results = new ActionSet(actionMgr);
+		results.populateWithActions(new String[] {"%match/task"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2}));
 		
 		/* try with an empty pattern */
-		results = new TaskSet(actionMgr);
-		results.populateWithTasks(new String[] {"%m/"});
+		results = new ActionSet(actionMgr);
+		results.populateWithActions(new String[] {"%m/"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3, task4, task5}));
 	
 		/* try with a single * */
-		results = new TaskSet(actionMgr);
-		results.populateWithTasks(new String[] {"%m/*"});
+		results = new ActionSet(actionMgr);
+		results.populateWithActions(new String[] {"%m/*"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3, task4, task5}));
 		
 		/* try to match an embedded : */
-		results = new TaskSet(actionMgr);
-		results.populateWithTasks(new String[] {"%match/*of \\: course*"});
+		results = new ActionSet(actionMgr);
+		results.populateWithActions(new String[] {"%match/*of \\: course*"});
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
 	}
 	

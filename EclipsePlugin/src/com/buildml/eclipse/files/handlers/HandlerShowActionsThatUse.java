@@ -10,21 +10,20 @@ import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
-import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
- * Eclipse Command Handler for the "show tasks that ..." commands.
+ * Eclipse Command Handler for the "show actions that ..." commands.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class HandlerShowTasksThatUse extends AbstractHandler {
+public class HandlerShowActionsThatUse extends AbstractHandler {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -53,23 +52,23 @@ public class HandlerShowTasksThatUse extends AbstractHandler {
 			opType = OperationType.OP_WRITE;
 		}
 		
-		/* get the set of tasks that use/read/write these files */
+		/* get the set of actions that use/read/write these files */
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		TaskSet userTasks = reportMgr.reportTasksThatAccessFiles(selectedFiles, opType);
+		ActionSet userActions = reportMgr.reportActionsThatAccessFiles(selectedFiles, opType);
 		
 		/* if the result set is empty, don't open an editor, but instead open a dialog */
-		if (userTasks.size() == 0) {
-			AlertDialog.displayInfoDialog("No results", "There are no related tasks that " + 
+		if (userActions.size() == 0) {
+			AlertDialog.displayInfoDialog("No results", "There are no related actions that " + 
 						accessType + " these files.");
 			return null;
 		}
 			
 		/* create a new editor that displays the resulting set */
 		ActionsEditor newEditor = 
-			new ActionsEditor(buildStore, "Tasks that " + accessType);
-		userTasks.populateWithParents();
+			new ActionsEditor(buildStore, "Actions that " + accessType);
+		userActions.populateWithParents();
 		newEditor.setOptions(existingEditor.getOptions() & ~EditorOptions.OPT_SHOW_HIDDEN);
-		newEditor.setVisibilityFilterSet(userTasks);
+		newEditor.setVisibilityFilterSet(userActions);
 		
 		/* add the new editor as a new tab */
 		mainEditor.newPage(newEditor);

@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * A Dialog allowing the user to select a regular expression to match a file/task name.
- * The user may also determine whether the matching files/tasks should be added to,
+ * A Dialog allowing the user to select a regular expression to match a file/action name.
+ * The user may also determine whether the matching files/actions should be added to,
  * or extracted from the current set of items displayed.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"

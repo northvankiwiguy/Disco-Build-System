@@ -20,7 +20,7 @@ import com.buildml.main.ICliCommand;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * BuildML CLI Command class that implements the "set-task-pkg" command.
@@ -114,12 +114,12 @@ public class CliCommandSetTaskPkg implements ICliCommand {
 		
 		/* compute the TaskSet from the user-supplied list of task-specs */
 		String taskSpecs = args[1];
-		TaskSet tasksToSet = CliUtils.getCmdLineTaskSet(actionMgr, taskSpecs);
+		ActionSet tasksToSet = CliUtils.getCmdLineActionSet(actionMgr, taskSpecs);
 		
 		/* now visit each task in the TaskSet and set its package */
 		buildStore.setFastAccessMode(true);
 		for (int task : tasksToSet) {
-			pkgMgr.setTaskPackage(task, pkgId);
+			pkgMgr.setActionPackage(task, pkgId);
 		}
 		buildStore.setFastAccessMode(false);	
 	}

@@ -94,7 +94,7 @@ public class TestCFuncOpen {
 		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
-		rootTask = actionMgr.getRootTask("root");
+		rootTask = actionMgr.getRootAction("root");
 		
 		/* there should only be one child task */
 		Integer childTasks[] = actionMgr.getChildren(rootTask);

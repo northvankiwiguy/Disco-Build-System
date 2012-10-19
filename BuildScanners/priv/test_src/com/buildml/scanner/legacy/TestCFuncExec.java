@@ -170,7 +170,7 @@ public class TestCFuncExec {
 		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
-		int rootTask = actionMgr.getRootTask("root");
+		int rootTask = actionMgr.getRootAction("root");
 		
 		/* 
 		 * There should only be one top-level task (parent), and it should contain a 
@@ -245,7 +245,7 @@ public class TestCFuncExec {
 		actionMgr = bs.getActionMgr();
 		
 		/* validate the top-level task (the process that invokes "system"). */
-		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootTask("root"));
+		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootAction("root"));
 		assertEquals(1, tasks.length);
 		int systemTaskId = tasks[0].intValue();
 		
@@ -465,7 +465,7 @@ public class TestCFuncExec {
 		actionMgr = bs.getActionMgr();
 		
 		/* validate the top-level task (the process that invokes fork()). */
-		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootTask("root"));
+		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootAction("root"));
 		assertEquals(1, tasks.length);
 		int forkTaskId = tasks[0].intValue();
 		
@@ -509,7 +509,7 @@ public class TestCFuncExec {
 		actionMgr = bs.getActionMgr();
 		
 		/* validate the top-level task (the process that invokes "popen"). */
-		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootTask("root"));
+		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootAction("root"));
 		assertEquals(1, tasks.length);
 		int popenTaskId = tasks[0].intValue();
 		
@@ -688,7 +688,7 @@ public class TestCFuncExec {
 		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* there should be one top-level task (the one we just ran). */
-		int rootTask = actionMgr.getRootTask("root");
+		int rootTask = actionMgr.getRootAction("root");
 		Integer children[] = actionMgr.getChildren(rootTask);
 		assertEquals(1, children.length);
 		

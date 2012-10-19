@@ -28,7 +28,7 @@ import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -266,10 +266,10 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IReportMgr#reportTasksThatMatchName(java.lang.String)
+	 * @see com.buildml.model.impl.IReportMgr#reportActionsThatMatchName(java.lang.String)
 	 */
 	@Override
-	public TaskSet reportTasksThatMatchName(String pattern) {
+	public ActionSet reportActionsThatMatchName(String pattern) {
 		
 		Integer results[];
 		try {
@@ -280,7 +280,7 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
-		return new TaskSet(actionMgr, results);
+		return new ActionSet(actionMgr, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -306,14 +306,14 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IReportMgr#reportTasksThatAccessFiles(com.buildml.model.types.FileSet, com.buildml.model.impl.BuildTasks.OperationType)
+	 * @see com.buildml.model.impl.IReportMgr#reportActionsThatAccessFiles(com.buildml.model.types.FileSet, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
 	@Override
-	public TaskSet reportTasksThatAccessFiles(FileSet fileSet,
+	public ActionSet reportActionsThatAccessFiles(FileSet fileSet,
 			OperationType opType) {
 		
-		/* create an empty result TaskSet */
-		TaskSet results = new TaskSet(actionMgr);
+		/* create an empty result ActionSet */
+		ActionSet results = new ActionSet(actionMgr);
 		
 		/* for each file in the FileSet */
 		for (Iterator<Integer> iterator = fileSet.iterator(); iterator.hasNext();) {		
@@ -358,10 +358,10 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IReportMgr#reportFilesAccessedByTasks(com.buildml.model.types.TaskSet, com.buildml.model.impl.BuildTasks.OperationType)
+	 * @see com.buildml.model.impl.IReportMgr#reportFilesAccessedByActions(com.buildml.model.types.TaskSet, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
 	@Override
-	public FileSet reportFilesAccessedByTasks(TaskSet taskSet, OperationType opType) {
+	public FileSet reportFilesAccessedByActions(ActionSet taskSet, OperationType opType) {
 		
 		/* create an empty result FileSet */
 		FileSet results = new FileSet(fileMgr);
@@ -459,8 +459,8 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @see com.buildml.model.impl.IReportMgr#reportAllActions()
 	 */
 	@Override
-	public TaskSet reportAllActions() {
-		TaskSet results = new TaskSet(actionMgr);
+	public ActionSet reportAllActions() {
+		ActionSet results = new ActionSet(actionMgr);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectAllActionsPrepStmt);
 
@@ -548,8 +548,8 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @see com.buildml.model.impl.IReportMgr#reportActionsFromPackageSet(com.buildml.model.types.PackageSet)
 	 */
 	@Override
-	public TaskSet reportActionsFromPackageSet(PackageSet pkgSet) {
-		TaskSet results = new TaskSet(actionMgr);
+	public ActionSet reportActionsFromPackageSet(PackageSet pkgSet) {
+		ActionSet results = new ActionSet(actionMgr);
 		IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 		
 		/*

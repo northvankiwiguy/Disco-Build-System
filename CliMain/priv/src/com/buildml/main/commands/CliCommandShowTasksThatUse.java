@@ -24,7 +24,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * BuildML CLI Command class that implements the "show-tasks-that-use" command.
@@ -162,11 +162,11 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		FileSet fileSet = CliUtils.getCmdLineFileSet(fileMgr, fileSpecs);
 
 		/* find all tasks that access (read, write or both) these files */
-		TaskSet taskSet = reportMgr.reportTasksThatAccessFiles(fileSet, opType);
+		ActionSet taskSet = reportMgr.reportActionsThatAccessFiles(fileSet, opType);
 		taskSet.populateWithParents();
 
 		/* display the resulting set of tasks */
-		CliUtils.printTaskSet(System.out, actionMgr, fileMgr, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
+		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

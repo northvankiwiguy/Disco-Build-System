@@ -15,24 +15,24 @@ package com.buildml.model.types;
 import com.buildml.utils.types.IntegerTreeRecord;
 
 /**
- * This class contains a summary of a single build task. TaskRecord is used as the element
- * type in a TaskSet, as well as other methods that return information about a collection
+ * This class contains a summary of a single action. ActionRecord is used as the element
+ * type in a ActionSet, as well as other methods that return information about a collection
  * of tasks.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class TaskRecord extends IntegerTreeRecord {
+public class ActionRecord extends IntegerTreeRecord {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 	
 	/**
-	 * Create a new instance of TaskRecord, with the id field set.
+	 * Create a new instance of ActionRecord, with the id field set.
 	 * 
-	 * @param id The ID number of this TaskRecord.
+	 * @param id The ID number of this ActionRecord.
 	 */
-	public TaskRecord(int id) {
+	public ActionRecord(int id) {
 		super();
 		this.id = id;
 	}

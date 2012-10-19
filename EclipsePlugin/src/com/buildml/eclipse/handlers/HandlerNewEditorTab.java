@@ -27,7 +27,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * Command handler for adding a new tab in the current BuildML editor. There area variety
@@ -104,7 +104,7 @@ public class HandlerNewEditorTab extends AbstractHandler {
 					newActionsEditor.setFilterPackageSet(
 							(PackageSet)(existingEditor.getFilterPackageSet().clone()));
 					newActionsEditor.setVisibilityFilterSet(
-							(TaskSet)(existingEditor.getVisibilityFilterSet().clone()));
+							(ActionSet)(existingEditor.getVisibilityFilterSet().clone()));
 				} catch (CloneNotSupportedException e) {
 					throw new FatalError("Unable to duplicate a ActionEditor");
 				}

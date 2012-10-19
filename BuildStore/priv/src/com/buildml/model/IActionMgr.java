@@ -26,7 +26,7 @@ public interface IActionMgr {
 	/**
 	 * The maximum number of actions that this ActionMgr object can handle.
 	 */
-	public static final int MAX_TASKS = 16777216;
+	public static final int MAX_ACTIONS = 16777216;
 
 	/** Data type for specifying the type of a file access that an action performs. */
 	public enum OperationType {
@@ -49,12 +49,12 @@ public interface IActionMgr {
 	/**
 	 * Add a new build action, and return the action ID number.
 	 * 
-	 * @param parentActionId The task ID of the new action's parent.
+	 * @param parentActionId The ID of the new action's parent.
 	 * @param actionDirId The ID of the path (a directory) in which this action was executed.
 	 * @param command The shell command associated with this action.
 	 * @return The new action's ID.
 	 */
-	public abstract int addBuildTask(int parentActionId, int actionDirId,
+	public abstract int addAction(int parentActionId, int actionDirId,
 			String command);
 
 	/**
@@ -87,7 +87,7 @@ public interface IActionMgr {
 	 *    OP_WRITE, or OP_UNSPECIFIED if you don't care).
 	 * @return An array of IDs of actions that access this file.
 	 */
-	public abstract Integer[] getTasksThatAccess(int fileId,
+	public abstract Integer[] getActionsThatAccess(int fileId,
 			OperationType operation);
 
 	/**
@@ -95,7 +95,7 @@ public interface IActionMgr {
 	 * @param pathId The directory in which the actions must be executed.
 	 * @return The list of actions.
 	 */
-	public abstract Integer[] getTasksInDirectory(int pathId);
+	public abstract Integer[] getActionsInDirectory(int pathId);
 
 	/**
 	 * Fetch the build action's command line string.
@@ -149,7 +149,7 @@ public interface IActionMgr {
 	 * @param rootName The name of the root, which is attached to an action.
 	 * @return The root action's ID.
 	 */
-	public abstract int getRootTask(String rootName);
+	public abstract int getRootAction(String rootName);
 
 	/**
 	 * Return the BuildStore object that owns this IActionMgr object.

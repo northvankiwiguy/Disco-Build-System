@@ -21,9 +21,9 @@
       </category>
       <command
             categoryId="com.buildml.eclipse.commands.category"
-            description="Show the build tasks that access these files"
-            id="com.buildml.eclipse.commands.showTasksThatUse"
-            name="Show Tasks that Use these Files">
+            description="Show the actions that access these files"
+            id="com.buildml.eclipse.commands.showActionsThatUse"
+            name="Show Actions that Use these Files">
          <commandParameter
                id="com.buildml.eclipse.commandParameters.accessType"
                name="accessType"
@@ -296,10 +296,10 @@
             </command>
          </menu>
          <menu
-               label="Show Tasks That..."
+               label="Show Actions That..."
                mnemonic="T">
             <command
-                  commandId="com.buildml.eclipse.commands.showTasksThatUse"
+                  commandId="com.buildml.eclipse.commands.showActionsThatUse"
                   label="Use (Read or Write) These Files"
                   mnemonic="U"
                   style="push">
@@ -309,7 +309,7 @@
                </parameter>
             </command>
             <command
-                  commandId="com.buildml.eclipse.commands.showTasksThatUse"
+                  commandId="com.buildml.eclipse.commands.showActionsThatUse"
                   label="Read From These Files"
                   mnemonic="R"
                   style="push">
@@ -319,7 +319,7 @@
                </parameter>
             </command>
             <command
-                  commandId="com.buildml.eclipse.commands.showTasksThatUse"
+                  commandId="com.buildml.eclipse.commands.showActionsThatUse"
                   label="Write To These Files"
                   mnemonic="W"
                   style="push">
@@ -397,7 +397,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="com.buildml.model.types.TaskRecord">
+                           value="com.buildml.model.types.ActionRecord">
                      </instanceof>
                   </iterate>
                </with>
@@ -680,8 +680,8 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.buildml.eclipse.files.handlers.HandlerShowTasksThatUse"
-            commandId="com.buildml.eclipse.commands.showTasksThatUse">
+            class="com.buildml.eclipse.files.handlers.HandlerShowActionsThatUse"
+            commandId="com.buildml.eclipse.commands.showActionsThatUse">
          <enabledWhen>
             <count
                   value="+">
@@ -907,7 +907,7 @@
             sequence="ARROW_RIGHT">
       </key>
       <key
-            commandId="com.buildml.eclipse.commands.showTasksThatUse"
+            commandId="com.buildml.eclipse.commands.showActionsThatUse"
             contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ALT+ARROW_RIGHT">
@@ -917,7 +917,7 @@
          </parameter>
       </key>
       <key
-            commandId="com.buildml.eclipse.commands.showTasksThatUse"
+            commandId="com.buildml.eclipse.commands.showActionsThatUse"
             contextId="com.buildml.eclipse.contexts.fileseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ALT+ARROW_LEFT">

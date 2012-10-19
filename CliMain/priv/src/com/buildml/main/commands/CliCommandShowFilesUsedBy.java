@@ -24,7 +24,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * BuildML CLI Command class that implements the "show-files-used-by" command.
@@ -157,13 +157,13 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 
 		/* fetch the list of tasks we're querying */
 		String taskSpecs = args[0];
-		TaskSet ts = CliUtils.getCmdLineTaskSet(actionMgr, taskSpecs);
+		ActionSet ts = CliUtils.getCmdLineActionSet(actionMgr, taskSpecs);
 		if (ts == null) {
 			CliUtils.reportErrorAndExit("no tasks were selected.");
 		}
 
 		/* run the report */
-		FileSet accessedFiles = reportMgr.reportFilesAccessedByTasks(ts, opType);
+		FileSet accessedFiles = reportMgr.reportFilesAccessedByActions(ts, opType);
 		accessedFiles.populateWithParents();
 
 		/* pretty print the results */

@@ -23,7 +23,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * BuildML CLI Command class that implements the "show-tasks" command.
@@ -49,7 +49,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	protected DisplayWidth outputFormat = DisplayWidth.WRAPPED;
 	
 	/** The TaskSet used to filter our results (if -f/--filter is used). */
-	protected TaskSet filterTaskSet = null;
+	protected ActionSet filterTaskSet = null;
 	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -146,7 +146,7 @@ public class CliCommandShowTasks implements ICliCommand {
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		String filterInString = cmdLine.getOptionValue("f");
 		if (filterInString != null) {
-			filterTaskSet = CliUtils.getCmdLineTaskSet(actionMgr, filterInString);
+			filterTaskSet = CliUtils.getCmdLineActionSet(actionMgr, filterInString);
 			if (filterTaskSet != null) {
 				filterTaskSet.populateWithParents();
 			}
@@ -170,7 +170,7 @@ public class CliCommandShowTasks implements ICliCommand {
 		/* 
 		 * Display the selected task set.
 		 */
-		CliUtils.printTaskSet(System.out, actionMgr, fileMgr, pkgMgr, null, filterTaskSet, outputFormat, optionShowPkgs);
+		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, null, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

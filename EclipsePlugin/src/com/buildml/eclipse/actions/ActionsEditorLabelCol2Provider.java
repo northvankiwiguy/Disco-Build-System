@@ -77,7 +77,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 		if (element instanceof UIActionRecord) {
 			UIActionRecord actionRecord = (UIActionRecord)element;
 			int actionId = actionRecord.getId();
-			int pkgId = pkgMgr.getTaskPackage(actionId);
+			int pkgId = pkgMgr.getActionPackage(actionId);
 			if (pkgId == ErrorCode.NOT_FOUND) {
 				return "<invalid>";
 			}

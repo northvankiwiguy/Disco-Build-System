@@ -22,7 +22,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -70,17 +70,17 @@ import com.buildml.utils.errors.ErrorCode;
 		findFilesInPackage2PrepStmt = null,
 		findFilesOutsidePackage1PrepStmt = null,
 		findFilesOutsidePackage2PrepStmt = null,		
-		updateTaskPackagePrepStmt = null,
-		findTaskPackagePrepStmt = null,
-		findTasksInPackagePrepStmt = null,
-		findTasksOutsidePackagePrepStmt = null;
+		updateActionPackagePrepStmt = null,
+		findActionPackagePrepStmt = null,
+		findActionsInPackagePrepStmt = null,
+		findActionsOutsidePackagePrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 	
 	/**
-	 * Create a new Packages object, which represents the file/task packages that
+	 * Create a new Packages object, which represents the file/action packages that
 	 * are part of the BuildStore.
 	 * 
 	 * @param buildStore The BuildStore that this Packages object belongs to.
@@ -108,11 +108,11 @@ import com.buildml.utils.errors.ErrorCode;
 		findFilesOutsidePackage1PrepStmt = db.prepareStatement("select id from files where pkgId != ?");
 		findFilesOutsidePackage2PrepStmt = db.prepareStatement("select id from files where " +
 				"not (pkgId = ? and pkgScopeId = ?)");
-		updateTaskPackagePrepStmt = db.prepareStatement("update buildTasks set pkgId = ? " +
+		updateActionPackagePrepStmt = db.prepareStatement("update buildTasks set pkgId = ? " +
 				"where taskId = ?");
-		findTaskPackagePrepStmt = db.prepareStatement("select pkgId from buildTasks where taskId = ?");
-		findTasksInPackagePrepStmt = db.prepareStatement("select taskId from buildTasks where pkgId = ?");
-		findTasksOutsidePackagePrepStmt = db.prepareStatement("select taskId from buildTasks " +
+		findActionPackagePrepStmt = db.prepareStatement("select pkgId from buildTasks where taskId = ?");
+		findActionsInPackagePrepStmt = db.prepareStatement("select taskId from buildTasks where pkgId = ?");
+		findActionsOutsidePackagePrepStmt = db.prepareStatement("select taskId from buildTasks " +
 				"where pkgId != ? and taskId != 0");
 	}
 
@@ -121,7 +121,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 *=====================================================================================*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#addPackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#addPackage(java.lang.String)
 	 */
 	@Override
 	public int addPackage(String packageName) {
@@ -151,7 +151,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getPackageName(int)
+	 * @see com.buildml.model.IPackageMgr#getPackageName(int)
 	 */
 	@Override
 	public String getPackageName(int packageId) {
@@ -185,7 +185,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getPackageId(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getPackageId(java.lang.String)
 	 */
 	@Override
 	public int getPackageId(String packageName) {
@@ -219,7 +219,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#removePackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#removePackage(java.lang.String)
 	 */
 	@Override
 	public int removePackage(String packageName) {
@@ -241,9 +241,9 @@ import com.buildml.utils.errors.ErrorCode;
 			return ErrorCode.CANT_REMOVE;
 		}
 		
-		/* determine if this package is used by any tasks */
-		TaskSet tasksInPackage = getTasksInPackage(pkgId);
-		if (tasksInPackage.size() != 0) {
+		/* determine if this package is used by any actions */
+		ActionSet actionsInPackage = getActionsInPackage(pkgId);
+		if (actionsInPackage.size() != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -261,7 +261,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getPackages()
+	 * @see com.buildml.model.IPackageMgr#getPackages()
 	 */
 	@Override
 	public String[] getPackages() {
@@ -273,7 +273,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getScopeName(int)
+	 * @see com.buildml.model.IPackageMgr#getScopeName(int)
 	 */
 	@Override
 	public String getScopeName(int id) {
@@ -294,7 +294,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getScopeId(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getScopeId(java.lang.String)
 	 */
 	@Override
 	public int getScopeId(String name) {
@@ -315,7 +315,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#parsePkgSpec(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#parsePkgSpec(java.lang.String)
 	 */
 	@Override
 	public Integer[] parsePkgSpec(String pkgSpec) {
@@ -349,7 +349,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#setFilePackage(int, int, int)
+	 * @see com.buildml.model.IPackageMgr#setFilePackage(int, int, int)
 	 */
 	@Override
 	public int setFilePackage(int fileId, int pkgId, int pkgScopeId) {
@@ -372,7 +372,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilePackage(int)
+	 * @see com.buildml.model.IPackageMgr#getFilePackage(int)
 	 */
 	@Override
 	public Integer[] getFilePackage(int fileId) {
@@ -401,7 +401,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilesInPackage(int)
+	 * @see com.buildml.model.IPackageMgr#getFilesInPackage(int)
 	 */
 	@Override
 	public FileSet getFilesInPackage(int pkgId) {
@@ -420,7 +420,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilesInPackage(int, int)
+	 * @see com.buildml.model.IPackageMgr#getFilesInPackage(int, int)
 	 */
 	@Override
 	public FileSet getFilesInPackage(int pkgId, int pkgScopeId) {
@@ -441,7 +441,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilesInPackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getFilesInPackage(java.lang.String)
 	 */
 	@Override
 	public FileSet getFilesInPackage(String pkgSpec) {
@@ -471,7 +471,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilesOutsidePackage(int)
+	 * @see com.buildml.model.IPackageMgr#getFilesOutsidePackage(int)
 	 */
 	@Override
 	public FileSet getFilesOutsidePackage(int pkgId) {
@@ -490,7 +490,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilesOutsidePackage(int, int)
+	 * @see com.buildml.model.IPackageMgr#getFilesOutsidePackage(int, int)
 	 */
 	@Override
 	public FileSet getFilesOutsidePackage(int pkgId, int pkgScopeId) {
@@ -510,7 +510,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getFilesOutsidePackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getFilesOutsidePackage(java.lang.String)
 	 */
 	@Override
 	public FileSet getFilesOutsidePackage(String pkgSpec) {
@@ -539,15 +539,15 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#setTaskPackage(int, int)
+	 * @see com.buildml.model.IPackageMgr#setTaskPackage(int, int)
 	 */
 	@Override
-	public int setTaskPackage(int taskId, int pkgId) {
+	public int setActionPackage(int actionId, int pkgId) {
 		
 		try {
-			updateTaskPackagePrepStmt.setInt(1, pkgId);
-			updateTaskPackagePrepStmt.setInt(2, taskId);
-			int rowCount = db.executePrepUpdate(updateTaskPackagePrepStmt);
+			updateActionPackagePrepStmt.setInt(1, pkgId);
+			updateActionPackagePrepStmt.setInt(2, actionId);
+			int rowCount = db.executePrepUpdate(updateActionPackagePrepStmt);
 			if (rowCount == 0) {
 				return ErrorCode.NOT_FOUND;
 			}
@@ -561,15 +561,15 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getTaskPackage(int)
+	 * @see com.buildml.model.IPackageMgr#getTaskPackage(int)
 	 */
 	@Override
-	public int getTaskPackage(int taskId) {
+	public int getActionPackage(int actionId) {
 		
 		Integer results[];
 		try {
-			findTaskPackagePrepStmt.setInt(1, taskId);
-			results = db.executePrepSelectIntegerColumn(findTaskPackagePrepStmt);
+			findActionPackagePrepStmt.setInt(1, actionId);
+			results = db.executePrepSelectIntegerColumn(findActionPackagePrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
@@ -581,7 +581,7 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/* 
 		 * One result == we have the correct ID (note: it's not possible to have
-		 * multiple results, since taskId is a unique key
+		 * multiple results, since actionId is a unique key
 		 */
 		return results[0];
 	}
@@ -589,27 +589,27 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getTasksInPackage(int)
+	 * @see com.buildml.model.IPackageMgr#getTasksInPackage(int)
 	 */
 	@Override
-	public TaskSet getTasksInPackage(int pkgId) {
+	public ActionSet getActionsInPackage(int pkgId) {
 		Integer results[] = null;
 		try {
-			findTasksInPackagePrepStmt.setInt(1, pkgId);
-			results = db.executePrepSelectIntegerColumn(findTasksInPackagePrepStmt);
+			findActionsInPackagePrepStmt.setInt(1, pkgId);
+			results = db.executePrepSelectIntegerColumn(findActionsInPackagePrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return new TaskSet(actionMgr, results);
+		return new ActionSet(actionMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getTasksInPackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getTasksInPackage(java.lang.String)
 	 */
 	@Override
-	public TaskSet getTasksInPackage(String pkgSpec) {
+	public ActionSet getActionsInPackage(String pkgSpec) {
 		
 		/* translate the package's name to its ID */
 		int pkgId = getPackageId(pkgSpec);
@@ -617,33 +617,33 @@ import com.buildml.utils.errors.ErrorCode;
 			return null;
 		}
 		
-		return getTasksInPackage(pkgId);
+		return getActionsInPackage(pkgId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getTasksOutsidePackage(int)
+	 * @see com.buildml.model.IPackageMgr#getTasksOutsidePackage(int)
 	 */
 	@Override
-	public TaskSet getTasksOutsidePackage(int pkgId) {
+	public ActionSet getActionsOutsidePackage(int pkgId) {
 		Integer results[] = null;
 		try {
-			findTasksOutsidePackagePrepStmt.setInt(1, pkgId);
-			results = db.executePrepSelectIntegerColumn(findTasksOutsidePackagePrepStmt);
+			findActionsOutsidePackagePrepStmt.setInt(1, pkgId);
+			results = db.executePrepSelectIntegerColumn(findActionsOutsidePackagePrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return new TaskSet(actionMgr, results);
+		return new ActionSet(actionMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IPackageMgr#getTasksOutsidePackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getTasksOutsidePackage(java.lang.String)
 	 */
 	@Override
-	public TaskSet getTasksOutsidePackage(String pkgSpec) {
+	public ActionSet getActionsOutsidePackage(String pkgSpec) {
 		
 		/* translate the package's name to its ID */
 		int pkgId = getPackageId(pkgSpec);
@@ -651,7 +651,7 @@ import com.buildml.utils.errors.ErrorCode;
 			return null;
 		}
 		
-		return getTasksOutsidePackage(pkgId);
+		return getActionsOutsidePackage(pkgId);
 	}
 	
 	/*=====================================================================================*

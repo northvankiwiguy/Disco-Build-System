@@ -76,7 +76,7 @@ public class ConversionUtils {
 
 	/**
 	 * Given an Integer[], return a corresponding ActionRecord[]
-	 * @param actionMgr The BuildTasks object that these actions belong to.
+	 * @param actionMgr The ActionMgr object that these actions belong to.
 	 * @param intArr The Integer[] to be converted.
 	 * @return The equivalent UIActionRecord[].
 	 */

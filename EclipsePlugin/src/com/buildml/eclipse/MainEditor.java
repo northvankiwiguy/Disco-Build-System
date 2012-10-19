@@ -259,7 +259,7 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 		editor1.setRemovable(false);
 		newPage(editor1);
 		
-		/* create the task editor tab */
+		/* create the action editor tab */
 		ActionsEditor editor2 = new ActionsEditor(buildStore, "Actions");
 		editor2.setRemovable(false);
 		newPage(editor2);

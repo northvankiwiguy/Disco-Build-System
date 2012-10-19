@@ -24,14 +24,14 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.print.PrintUtils;
 
 /**
  * A collection of utility methods that can be used by any CLI Command code. This
  * includes error reporting, command argument parsing, printing a FileSet and printing
- * a TaskSet. These methods are all static, so no object is required for them to be
+ * a ActionSetSet. These methods are all static, so no object is required for them to be
  * invoked.
  * 
  * Note: A number of these methods are used for command-line validation, and could 
@@ -46,11 +46,11 @@ public class CliUtils {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
-	/** Enumeration for specifying how a task's command string should be displayed. */
+	/** Enumeration for specifying how a action's command string should be displayed. */
 	public enum DisplayWidth { 
 		
 		/** 
-		 * As much as possible of the task's command line should be displayed on one line 
+		 * As much as possible of the action's command line should be displayed on one line 
 		 * (truncate the remainder of the line if it's too long).
 		 */
 		ONE_LINE, 
@@ -119,31 +119,31 @@ public class CliUtils {
 
 	/**
 	 * Given a user-supplied set of command line arguments, parse those arguments and create
-	 * a suitable TaskSet containing all the relevant tasks that match the specification. The
+	 * a suitable ActionSet containing all the relevant actions that match the specification. The
 	 * specification string is a colon-separated list of:
 	 * <ol>
-	 * 	 <li>A specific task number, which will be added to the TaskSet.</li>
-	 *   <li>The task number followed by [/depth] to indicate that all tasks in the sub tree,
-	 *      starting at the specified task and moving down the task tree "depth" level, should
+	 * 	 <li>A specific action number, which will be added to the ActionSet.</li>
+	 *   <li>The action number followed by [/depth] to indicate that all actions in the sub tree,
+	 *      starting at the specified action and moving down the action tree "depth" level, should
 	 *      be added.</li>
-	 *   <li>If 'depth' is omitted (only the '/' is provided), all tasks is the subtree are added
+	 *   <li>If 'depth' is omitted (only the '/' is provided), all actions is the subtree are added
 	 *      (regardless of their depth).</li>
-	 *   <li>If the task number is prefixed by '-', the tasks are removed from the TaskSet, rather
-	 *      than being added. The "/depth" and "/" suffix can be used to remove subtasks as well.
-	 *   <li>The special syntax "%pkg/foo" means all tasks in the package "foo".</li>
-	 *   <li>The special syntax "%not-pkg/foo" means all tasks outside the package "foo".</li>
+	 *   <li>If the action number is prefixed by '-', the actions are removed from the ActionSet, rather
+	 *      than being added. The "/depth" and "/" suffix can be used to remove subactions as well.
+	 *   <li>The special syntax "%pkg/foo" means all actions in the package "foo".</li>
+	 *   <li>The special syntax "%not-pkg/foo" means all actions outside the package "foo".</li>
 	 * </ol>
-	 * @param actionMgr The BuildTasks manager object to query.
-	 * @param taskSpecs The command line argument providing the task specification string.
-	 * @return The TaskSet, as described by the input task specification.
+	 * @param actionMgr The ActionMgr manager object to query.
+	 * @param actionSpecs The command line argument providing the action specification string.
+	 * @return The ActionSet, as described by the input action specification.
 	 */
-	public static TaskSet getCmdLineTaskSet(IActionMgr actionMgr, String taskSpecs) {
+	public static ActionSet getCmdLineActionSet(IActionMgr actionMgr, String actionSpecs) {
 		
-		String taskSpecList[] = taskSpecs.split(":");
+		String actionSpecList[] = actionSpecs.split(":");
 
-		TaskSet result = new TaskSet(actionMgr);
-		if (result.populateWithTasks(taskSpecList) != ErrorCode.OK) {
-			System.err.println("Error: Invalid task filter provided.");
+		ActionSet result = new ActionSet(actionMgr);
+		if (result.populateWithActions(actionSpecList) != ErrorCode.OK) {
+			System.err.println("Error: Invalid action filter provided.");
 			System.exit(1);
 		}
 		
@@ -217,34 +217,34 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a TaskSet, display the tasks in that set in a pretty-printed format. To ensure
-	 * that all tasks are displayed, you should first call TaskSet.populateWithParents().
+	 * Given a ActionSet, display the actions in that set in a pretty-printed format. To ensure
+	 * that all actions are displayed, you should first call ActionSet.populateWithParents().
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param actionMgr The BuildTasks manager object containing the task information.
+	 * @param actionMgr The BuildTasks manager object containing the action information.
 	 * @param fileMgr The FileNameSpaces manager object containing file name information.
 	 * @param pkgMgr The Packages manager object containing package information.
-	 * @param resultTaskSet The set of tasks to be displayed (the results of some previous query).
-	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
+	 * @param resultActionSet The set of actions to be displayed (the results of some previous query).
+	 * @param filterActionSet The set of actions to actually be displayed (for post-filtering the query results).
 	 * @param outputFormat Mode for formatting the command strings.
 	 * @param showPkgs Set to true if the package names should be shown.
 	 */
-	public static void printTaskSet(
+	public static void printActionSet(
 			PrintStream outStream, IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr,
-			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
+			ActionSet resultActionSet, ActionSet filterActionSet, DisplayWidth outputFormat,
 			boolean showPkgs) {
 		
 		/* 
 		 * We always start at the top root, even though we may only display a subset
 		 * of the paths underneath that root.
 		 */
-		int topRoot = actionMgr.getRootTask("");
+		int topRoot = actionMgr.getRootAction("");
 	
 		/* call the helper function to display each of our children */
 		Integer children[] = actionMgr.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
-					resultTaskSet, filterTaskSet, outputFormat, showPkgs, 1);
+			printActionSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
+					resultActionSet, filterActionSet, outputFormat, showPkgs, 1);
 		}
 	}
 
@@ -615,28 +615,28 @@ public class CliUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A helper method, called exclusively by printTaskSet(). This method calls itself recursively
-	 * as it traverses the TaskSet's tree structure.
+	 * A helper method, called exclusively by printActionSet(). This method calls itself recursively
+	 * as it traverses the ActionSet's tree structure.
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param actionMgr The BuildTasks manager object containing the task information.
+	 * @param actionMgr The BuildTasks manager object containing the action information.
 	 * @param fileMgr The FileNameSpaces manager object containing file name information.
 	 * @param pkgMgr The Packages manager object containing the package information.
-	 * @param taskId The ID of the task we're currently displaying (at this level of recursion).
-	 * @param resultTaskSet The full set of tasks to be displayed (the result of some previous query).
-	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
-	 * @param outputFormat The way in which the tasks should be formatted.
+	 * @param actionId The ID of the action we're currently displaying (at this level of recursion).
+	 * @param resultActionSet The full set of actions to be displayed (the result of some previous query).
+	 * @param filterActionSet The set of actions to actually be displayed (for post-filtering the query results).
+	 * @param outputFormat The way in which the actions should be formatted.
 	 * @param showPkgs Set to true if we should display package names.
-	 * @param indentLevel The number of spaces to indent this task by (at this recursion level).
+	 * @param indentLevel The number of spaces to indent this action by (at this recursion level).
 	 */
-	private static void printTaskSetHelper(PrintStream outStream,
+	private static void printActionSetHelper(PrintStream outStream,
 			IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr, 
-			int taskId, TaskSet resultTaskSet,
-			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showPkgs,
+			int actionId, ActionSet resultActionSet,
+			ActionSet filterActionSet, DisplayWidth outputFormat, boolean showPkgs,
 			int indentLevel) {
 	
 		/* 
-		 * Display the current task, at the appropriate indentation level. The format is:
+		 * Display the current action, at the appropriate indentation level. The format is:
 		 * 
 		 * - Task 1 (/home/psmith/t/cvs-1.11.23)
 	     *     if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :;
@@ -647,41 +647,41 @@ public class CliUtils {
 	     * Where Task 1 is the parent of Task 2.
 	     */
 		
-		/* is this task in the TaskSet to be printed? If not, terminate recursion */
-		if (! (((resultTaskSet == null) || (resultTaskSet.isMember(taskId))) &&
-			((filterTaskSet == null) || (filterTaskSet.isMember(taskId))))) {
+		/* is this action in the ActionSet to be printed? If not, terminate recursion */
+		if (! (((resultActionSet == null) || (resultActionSet.isMember(actionId))) &&
+			((filterActionSet == null) || (filterActionSet.isMember(actionId))))) {
 			return;
 		}	
 	
 		/* 
-		 * Fetch the task's command string (if there is one). It can either be
+		 * Fetch the action's command string (if there is one). It can either be
 		 * in short format (on a single line), or a full string (possibly multiple lines)
 		 */
 		String command;
 		if (outputFormat == DisplayWidth.ONE_LINE) {
-			command = actionMgr.getCommandSummary(taskId, getColumnWidth() - indentLevel - 3);
+			command = actionMgr.getCommandSummary(actionId, getColumnWidth() - indentLevel - 3);
 		} else {
-			command = actionMgr.getCommand(taskId);
+			command = actionMgr.getCommand(actionId);
 		}
 		if (command == null) {
 			command = "<unknown command>";
 		}
 		
-		/* fetch the name of the directory the task was executed in */
-		int taskDirId = actionMgr.getDirectory(taskId);
-		String taskDirName = fileMgr.getPathName(taskDirId);
+		/* fetch the name of the directory the action was executed in */
+		int actionDirId = actionMgr.getDirectory(actionId);
+		String actionDirName = fileMgr.getPathName(actionDirId);
 		
 		/* display the correct number of "-" characters */
 		for (int i = 0; i != indentLevel; i++) {
 			outStream.append('-');
 		}
-		outStream.print(" Task " + taskId + " (" + taskDirName);
+		outStream.print(" Task " + actionId + " (" + actionDirName);
 		
-		/* if requested, display the task's package name */
+		/* if requested, display the action's package name */
 		if (showPkgs) {
-			int pkgId = pkgMgr.getTaskPackage(taskId);
+			int pkgId = pkgMgr.getActionPackage(actionId);
 			if (pkgId == ErrorCode.NOT_FOUND) {
-				outStream.print(" - Invalid task");
+				outStream.print(" - Invalid action");
 			} else {
 				String pkgName = pkgMgr.getPackageName(pkgId);
 				if (pkgName == null) {
@@ -693,7 +693,7 @@ public class CliUtils {
 		}
 		outStream.println(")");
 		
-		/* display the task's command string. Each line must be indented appropriately */
+		/* display the action's command string. Each line must be indented appropriately */
 		if (outputFormat != DisplayWidth.NOT_WRAPPED) {
 			PrintUtils.indentAndWrap(outStream, command, indentLevel + 3, getColumnWidth());
 			outStream.println();
@@ -702,10 +702,10 @@ public class CliUtils {
 		}
 		
 		/* recursively call ourselves to display each of our children */
-		Integer children[] = actionMgr.getChildren(taskId);
+		Integer children[] = actionMgr.getChildren(actionId);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
-					resultTaskSet, filterTaskSet, outputFormat, showPkgs, indentLevel + 1);
+			printActionSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
+					resultActionSet, filterActionSet, outputFormat, showPkgs, indentLevel + 1);
 		}
 		
 	}

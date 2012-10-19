@@ -13,7 +13,7 @@
 package com.buildml.model;
 
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionSet;
 
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore
@@ -202,44 +202,44 @@ public interface IPackageMgr {
 	/**
 	 * Set the package associated with this task.
 	 * 
-	 * @param taskId The ID of the task whose package will be set.
-	 * @param pkgId The ID of the package to be associated with this task.
-	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this task doesn't exist
+	 * @param actionId The ID of the action whose package will be set.
+	 * @param pkgId The ID of the package to be associated with this action.
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this action doesn't exist
 	 */
-	public abstract int setTaskPackage(int taskId, int pkgId);
+	public abstract int setActionPackage(int actionId, int pkgId);
 
 	/**
 	 * Get the package associated with this task.
 	 * 
-	 * @param taskId The ID of the task whose package we're interested in.
-	 * @return The task's package, or ErrorCode.NOT_FOUND if the task doesn't exist.
+	 * @param actionId The ID of the task whose package we're interested in.
+	 * @return The action's package, or ErrorCode.NOT_FOUND if the action doesn't exist.
 	 */
-	public abstract int getTaskPackage(int taskId);
+	public abstract int getActionPackage(int actionId);
 
 	/**
-	 * Return the set of tasks that are within the specified package.
+	 * Return the set of actions that are within the specified package.
 	 * 
 	 * @param pkgId The package we're examining.
-	 * @return The set of tasks that reside inside that package.
+	 * @return The set of actions that reside inside that package.
 	 */
-	public abstract TaskSet getTasksInPackage(int pkgId);
+	public abstract ActionSet getActionsInPackage(int pkgId);
 
 	/**
 	 * Return the set of tasks that are within the specified package.
 	 * 
 	 * @param pkgSpec The name of the package to query.
-	 * @return The set of tasks that reside inside that package, null if the
+	 * @return The set of actions that reside inside that package, null if the
 	 * package name is invalid.
 	 */
-	public abstract TaskSet getTasksInPackage(String pkgSpec);
+	public abstract ActionSet getActionsInPackage(String pkgSpec);
 
 	/**
-	 * Return the set of tasks that are outside the specified package.
+	 * Return the set of actions that are outside the specified package.
 	 * 
 	 * @param pkgId The package we're examining.
-	 * @return The set of tasks that reside outside that package.
+	 * @return The set of actions that reside outside that package.
 	 */
-	public abstract TaskSet getTasksOutsidePackage(int pkgId);
+	public abstract ActionSet getActionsOutsidePackage(int pkgId);
 
 	/**
 	 * Return the set of tasks that are outside the specified package.
@@ -248,6 +248,6 @@ public interface IPackageMgr {
 	 * @return An array of tasks that reside outside that package, null if the
 	 * package name is invalid.
 	 */
-	public abstract TaskSet getTasksOutsidePackage(String pkgSpec);
+	public abstract ActionSet getActionsOutsidePackage(String pkgSpec);
 
 }

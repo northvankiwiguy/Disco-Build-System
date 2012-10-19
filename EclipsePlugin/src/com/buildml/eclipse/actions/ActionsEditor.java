@@ -56,8 +56,8 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
-import com.buildml.model.types.TaskRecord;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionRecord;
+import com.buildml.model.types.ActionSet;
 
 /**
  * Implements an sub-editor for browsing a BuildStore's actions.
@@ -86,9 +86,9 @@ public class ActionsEditor extends SubEditor {
 	private ActionsEditorContentProvider contentProvider;
 	
 	/**
-	 * The set of actions (within the BuildTasks) that are currently visible. 
+	 * The set of actions (within the ActionMgr) that are currently visible. 
 	 */
-	private TaskSet visibleActions = null;
+	private ActionSet visibleActions = null;
 
 	/**
 	 * The object that provides visible/non-visible information about each
@@ -228,7 +228,7 @@ public class ActionsEditor extends SubEditor {
 		actionsTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				TaskRecord node = (TaskRecord)selection.getFirstElement();
+				ActionRecord node = (ActionRecord)selection.getFirstElement();
 				if (actionsTreeViewer.isExpandable(node)){
 					actionsTreeViewer.setExpandedState(node, 
 							!actionsTreeViewer.getExpandedState(node));
@@ -336,7 +336,7 @@ public class ActionsEditor extends SubEditor {
 	 * update the view.
 	 * @param visibleActions The subset of actions that should be visible in the editor.
 	 */
-	public void setVisibilityFilterSet(TaskSet visibleActions) {
+	public void setVisibilityFilterSet(ActionSet visibleActions) {
 		this.visibleActions = visibleActions;
 		if (visibilityProvider != null) {
 			visibilityProvider.setPrimaryFilterSet(visibleActions);
@@ -348,7 +348,7 @@ public class ActionsEditor extends SubEditor {
 	/**
 	 * @return The set of actions that are currently visible in this editor's tree viewer.
 	 */
-	public TaskSet getVisibilityFilterSet() {
+	public ActionSet getVisibilityFilterSet() {
 		return visibilityProvider.getPrimaryFilterSet();
 	}
 
@@ -375,7 +375,7 @@ public class ActionsEditor extends SubEditor {
 		
 		/* if the editor is in an initialized state, we can refresh the filters */
 		if (visibilityProvider != null) {
-			TaskSet pkgActionSet = 
+			ActionSet pkgActionSet = 
 					buildStore.getReportMgr().reportActionsFromPackageSet(newSet);
 			pkgActionSet.populateWithParents();
 		
@@ -503,7 +503,7 @@ public class ActionsEditor extends SubEditor {
 		
 		/* Determine the set of actions that are currently selected */
 		if (selection instanceof TreeSelection) {
-			TaskSet actionSet = EclipsePartUtils.
+			ActionSet actionSet = EclipsePartUtils.
 					getActionSetFromSelection(buildStore, (TreeSelection)selection);
 
 			/* 

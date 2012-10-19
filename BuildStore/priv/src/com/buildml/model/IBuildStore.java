@@ -21,7 +21,7 @@ import java.io.IOException;
  * to store an entire BuildML build.
  * 
  * Note that although BuildStore is the main entry point, most of the work is done by
- * its delegate classes, such as FileNameSpaces, BuildTasks etc. These "Managers" each deal
+ * its delegate classes, such as FileMgr, ActionMgr etc. These "Managers" each deal
  * with a specific part of the build system, providing business logic and database access
  * to implement features.
  * 

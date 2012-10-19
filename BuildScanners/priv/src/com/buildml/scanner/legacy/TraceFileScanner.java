@@ -173,7 +173,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 		 * Insert the parent/root ID numbers to signify the first process/task 
 		 */
 		processToTaskMap = new HashMap<Integer, Integer>();
-		processToTaskMap.put(Integer.valueOf(0), actionMgr.getRootTask("root"));
+		processToTaskMap.put(Integer.valueOf(0), actionMgr.getRootAction("root"));
 		
 		/* set up input stream, and variables for reading it */
 		inputStream = new GZIPInputStream(new FileInputStream(fileName));
@@ -336,7 +336,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 			}
 			
 			/* add the new task to the build store */
-			int newTaskId = actionMgr.addBuildTask(parentTaskId, taskDirId, command);
+			int newTaskId = actionMgr.addAction(parentTaskId, taskDirId, command);
 			
 			/* associate CFS's process number with BuildStore's taskID */
 			setTaskId(processNum, newTaskId);

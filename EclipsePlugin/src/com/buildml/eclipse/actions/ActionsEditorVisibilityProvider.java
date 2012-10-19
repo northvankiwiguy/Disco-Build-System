@@ -13,8 +13,8 @@
 package com.buildml.eclipse.actions;
 
 import com.buildml.eclipse.utils.IVisibilityProvider;
-import com.buildml.model.types.TaskRecord;
-import com.buildml.model.types.TaskSet;
+import com.buildml.model.types.ActionRecord;
+import com.buildml.model.types.ActionSet;
 
 /**
  * An adapter class to allow a ActionSet to be used as the visibility provider for
@@ -32,7 +32,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 * The ActionSet containing the visible/non-visible state of each path. If the path
 	 * is in this set, it's visible, else it's non-visible.
 	 */
-	private TaskSet primaryFilterSet;
+	private ActionSet primaryFilterSet;
 	
 	/**
 	 * A secondary filterSet which can be applied in conjunction with the first. Note that
@@ -40,7 +40,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 * It's use is to further filter out elements after the primary filter set (filterSet)
 	 * has been applied.
 	 */
-	private TaskSet secondaryFilterSet;
+	private ActionSet secondaryFilterSet;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -53,7 +53,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 * 
 	 * @param filterSet The ActionSet specifying the visibility state of each path.
 	 */
-	public ActionsEditorVisibilityProvider(TaskSet filterSet)
+	public ActionsEditorVisibilityProvider(ActionSet filterSet)
 	{
 		this.primaryFilterSet = filterSet;
 	}
@@ -67,8 +67,8 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	@Override
 	public boolean isVisible(Object element) {
-		if (element instanceof TaskRecord) {
-			TaskRecord actionRecord = (TaskRecord)element;
+		if (element instanceof ActionRecord) {
+			ActionRecord actionRecord = (ActionRecord)element;
 			int actionId = actionRecord.getId();
 			
 			/* is this file a member of both primaryFilterSet and secondaryFilterSet. */
@@ -85,8 +85,8 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	@Override
 	public void setVisibility(Object element, boolean visible) {
-		if (element instanceof TaskRecord) {
-			TaskRecord actionRecord = (TaskRecord)element;
+		if (element instanceof ActionRecord) {
+			ActionRecord actionRecord = (ActionRecord)element;
 			if (visible) {
 				primaryFilterSet.addSubTree(actionRecord.getId());
 			} else {
@@ -102,7 +102,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 * display.
 	 * @param filter The new primary filter set.
 	 */
-	public void setPrimaryFilterSet(TaskSet filter) {
+	public void setPrimaryFilterSet(ActionSet filter) {
 		primaryFilterSet = filter;
 	}
 	
@@ -111,7 +111,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	/**
 	 * @return The primary filter set.
 	 */
-	public TaskSet getPrimaryFilterSet() {
+	public ActionSet getPrimaryFilterSet() {
 		return primaryFilterSet;
 	}
 	
@@ -122,7 +122,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 * display.
 	 * @param filter The new secondary filter set.
 	 */
-	public void setSecondaryFilterSet(TaskSet filter) {
+	public void setSecondaryFilterSet(ActionSet filter) {
 		secondaryFilterSet = filter;
 	}
 	
@@ -131,7 +131,7 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	/**
 	 * @return The secondary filter set.
 	 */
-	public TaskSet getSecondaryFilterSet() {
+	public ActionSet getSecondaryFilterSet() {
 		return secondaryFilterSet;
 	}
 	
