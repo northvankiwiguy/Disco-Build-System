@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.FatalBuildStoreError;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.version.Version;
@@ -86,7 +85,7 @@ public class TestBuildStore {
 		bsFile.delete();
 		try {
 			/* new BuildStore with "savedRequired" turned off */
-			bs = new BuildStore(bsFile.toString(), false);
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), false);
 		} catch (Exception e) {
 			fail();
 		}
@@ -97,7 +96,7 @@ public class TestBuildStore {
 		
 		/* reopen the BuildStore and see if the modification is intact */
 		try {
-			bs = new BuildStore(bsFile.toString());
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString());
 		} catch (Exception e) {
 			fail();
 		}
@@ -119,7 +118,7 @@ public class TestBuildStore {
 		bsFile.delete();
 		try {
 			/* new BuildStore with "savedRequired" turned on */
-			bs = new BuildStore(bsFile.toString(), true);
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), true);
 		} catch (Exception e) {
 			fail();
 		}
@@ -132,7 +131,7 @@ public class TestBuildStore {
 		
 		/* reopen the BuildStore and see if the modification is intact */
 		try {
-			bs = new BuildStore(bsFile.toString());
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString());
 		} catch (Exception e) {
 			fail();
 		}
@@ -154,7 +153,7 @@ public class TestBuildStore {
 		bsFile.delete();
 		try {
 			/* new BuildStore with "savedRequired" turned on */
-			bs = new BuildStore(bsFile.toString(), true);
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), true);
 		} catch (Exception e) {
 			fail();
 		}
@@ -172,7 +171,7 @@ public class TestBuildStore {
 		
 		/* reopen the BuildStore and see if the modification is intact */
 		try {
-			bs = new BuildStore(bsFile.toString());
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString());
 		} catch (Exception e) {
 			fail();
 		}
@@ -197,7 +196,7 @@ public class TestBuildStore {
 		
 		try {
 			/* new BuildStore with "savedRequired" turned on */
-			bs = new BuildStore(bsFile.toString(), true);
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), true);
 		} catch (Exception e) {
 			fail();
 		}
@@ -226,7 +225,7 @@ public class TestBuildStore {
 		
 		/* reopen the BuildStore and see if the modification is intact */
 		try {
-			bs = new BuildStore(bsFileSaveAs.toString());
+			bs = BuildStoreFactory.openBuildStore(bsFileSaveAs.toString());
 		} catch (Exception e) {
 			fail();
 		}
@@ -253,7 +252,7 @@ public class TestBuildStore {
 		
 		try {
 			/* new BuildStore with "savedRequired" turned on */
-			bs = new BuildStore(bsFile.toString(), true);
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), true);
 		} catch (Exception e) {
 			fail();
 		}

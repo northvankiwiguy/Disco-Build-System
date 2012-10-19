@@ -49,9 +49,9 @@ import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
+import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
@@ -416,7 +416,7 @@ public class EclipsePartUtils {
 			 * must be explicitly saved before they're written back to this original
 			 * file.
 			 */
-			buildStore = new BuildStore(fileInput.toString(), true);
+			buildStore = BuildStoreFactory.openBuildStore(fileInput.toString(), true);
 
 		} catch (BuildStoreVersionException e) {
 			AlertDialog.displayErrorDialog("BuildML database has the wrong version.", e.getMessage());

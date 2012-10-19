@@ -21,8 +21,8 @@ import java.util.Iterator;
 import org.apache.commons.cli.*;
 
 import com.buildml.main.commands.*;
+import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.print.PrintUtils;
 import com.buildml.utils.string.StringArray;
@@ -447,7 +447,7 @@ public final class CliMain {
 		 */
 		IBuildStore buildStore = null;
 		try {
-			buildStore = new BuildStore(buildStoreFileName);
+			buildStore = BuildStoreFactory.openBuildStore(buildStoreFileName);
 		} catch (FileNotFoundException ex) {
 			CliUtils.reportErrorAndExit(ex.getMessage());
 		} catch (IOException ex) {

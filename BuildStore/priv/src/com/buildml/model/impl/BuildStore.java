@@ -71,9 +71,8 @@ public class BuildStore implements IBuildStore {
 	 *=====================================================================================*/
 	
 	/**
-	 * Open or create a new BuildStore database. If the database already
-	 * exists, open it for updating. If there's no database by this name,
-	 * create a fresh database.
+	 * Open or create a new BuildStore database. Clients should not invoke this
+	 * constructor directly. Instead, use BuildStoreFactory instead.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
 	 * @param saveRequired True if BuildStore must explicitly be "saved" before
@@ -131,10 +130,8 @@ public class BuildStore implements IBuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Open or create a new BuildStore database. If the database already
-	 * exists, open it for updating. If there's no database by this name,
-	 * create a fresh database. Changes to this BuildStore will automatically
-	 * be saved to the original BuildML file (no "save" operation required).
+	 * Open or create a new BuildStore database. Clients should not invoke this
+	 * constructor directly. Instead, use BuildStoreFactory instead.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.

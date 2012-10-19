@@ -20,7 +20,6 @@ import java.util.Arrays;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.errors.BuildStoreVersionException;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**
@@ -59,7 +58,7 @@ public class CommonTestUtils {
 		try {
 			File bsFile = new File(tmpDir, "testBuildStore.bml");
 			bsFile.delete();
-			bs = new BuildStore(bsFile.toString());
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString());
 		} catch (BuildStoreVersionException e) {
 			/* we can't handle schema version problems - make it a fatal error */
 			throw new FatalBuildStoreError(e.getMessage());

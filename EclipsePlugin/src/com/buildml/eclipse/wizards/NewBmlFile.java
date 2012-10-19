@@ -35,6 +35,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.model.BuildStoreFactory;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.model.impl.BuildStore;
 
@@ -130,7 +132,8 @@ public class NewBmlFile extends Wizard implements INewWizard {
 		IPath location = file.getLocation();
 		if (location != null) {
 			try {
-				new BuildStore(location.toOSString());
+				IBuildStore bs = BuildStoreFactory.openBuildStore(location.toOSString());
+				bs.close();
 			} catch (FileNotFoundException e) {
 				AlertDialog.displayErrorDialog("Error", 
 						"A problem occurred while creating the new file: " + fileName);
