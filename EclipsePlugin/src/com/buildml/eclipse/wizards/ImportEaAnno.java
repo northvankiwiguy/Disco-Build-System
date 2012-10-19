@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.scanner.electricanno.ElectricAnnoScanner;
 import com.buildml.utils.files.ProgressFileInputStreamListener;
@@ -92,7 +92,7 @@ public class ImportEaAnno extends Wizard implements IImportWizard {
 		}
 		
 		/* Freshly open the BuildStore (but just not in an editor) */
-		BuildStore buildStore = EclipsePartUtils.getNewBuildStore(outputBmlFilePath);
+		IBuildStore buildStore = EclipsePartUtils.getNewBuildStore(outputBmlFilePath);
 		if (buildStore == null) {
 			return false;
 		}
@@ -101,7 +101,7 @@ public class ImportEaAnno extends Wizard implements IImportWizard {
 		 * Start the background job that does the import. Once it's finished,
 		 * the editor will be (re)opened so the user can see the content.
 		 */
-		final BuildStore importBuildStore = buildStore;
+		final IBuildStore importBuildStore = buildStore;
 		Job importJob = new Job("Import ElectricAccelerator Annotation File") {
 			
 			/* the background job starts here... */

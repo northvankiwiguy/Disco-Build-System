@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.os.ShellResult;
 import com.buildml.utils.os.SystemUtils;
@@ -48,7 +48,7 @@ public class LegacyBuildScanner {
 	 * The BuildStore we should generate, or null if we should parse the trace file without
 	 * creating a BuildStore.
 	 */
-	private BuildStore buildStore = null;
+	private IBuildStore buildStore = null;
 	
 	/**
 	 * The debug verbosity level for showing the progress of a trace. 0 = none, 1 = some,
@@ -162,7 +162,7 @@ public class LegacyBuildScanner {
 	 * @param buildStore The BuildStore to collect information in, or null to not collect
 	 * information.
 	 */
-	public void setBuildStore(BuildStore buildStore) {
+	public void setBuildStore(IBuildStore buildStore) {
 		this.buildStore = buildStore;
 	}
 
@@ -173,7 +173,7 @@ public class LegacyBuildScanner {
 	 * 
 	 * @return The BuildStore we'll write the trace file's data into.
 	 */
-	public BuildStore getBuildStore() {
+	public IBuildStore getBuildStore() {
 		return buildStore;
 	}
 

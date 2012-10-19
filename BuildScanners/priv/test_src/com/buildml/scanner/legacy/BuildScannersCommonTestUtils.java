@@ -19,8 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 import com.buildml.utils.os.ShellResult;
 import com.buildml.utils.os.SystemUtils;
@@ -87,10 +87,10 @@ public class BuildScannersCommonTestUtils {
 	 * @return The BuildStore created by scanning the program
 	 * @throws Exception Something bad happened
 	 */
-	public static BuildStore parseLegacyProgram(File tmpDir, String program, String args[]) throws Exception {
+	public static IBuildStore parseLegacyProgram(File tmpDir, String program, String args[]) throws Exception {
 		
 		/* our return value */
-		BuildStore bs = null;
+		IBuildStore bs = null;
 
 		String exeProgram = compileProgram(tmpDir, "prog", program);
 

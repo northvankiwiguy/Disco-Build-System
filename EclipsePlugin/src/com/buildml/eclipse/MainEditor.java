@@ -44,7 +44,7 @@ import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.FatalBuildStoreError;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 
 /**
  * The main Eclipse editor for editing/viewing BuildML files. This editor is a "multi-part"
@@ -59,7 +59,7 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 *=====================================================================================*/
 
 	/** the BuildStore we've opened for editing */
-	private BuildStore buildStore = null;
+	private IBuildStore buildStore = null;
 	
 	/** the currently active tab index */
 	private int currentPageIndex = -1;
@@ -431,7 +431,7 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	/**
 	 * @return The BuildStore associated with this instance of the editor
 	 */
-	public BuildStore getBuildStore() {
+	public IBuildStore getBuildStore() {
 		return buildStore;
 	}
 

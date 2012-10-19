@@ -14,7 +14,7 @@ package com.buildml.scanner.buildtree;
 
 import java.io.File;
 
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.FileSystemTraverseCallback;
@@ -35,7 +35,7 @@ public class FileSystemScanner {
 	/**
 	 * The BuildStore associated with this FileSystemScanner.
 	 */
-	private BuildStore buildStore;
+	private IBuildStore buildStore;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -46,7 +46,7 @@ public class FileSystemScanner {
 	 * 
 	 * @param buildStore The BuildStore into which the scanned information should be added.
 	 */
-	public FileSystemScanner(BuildStore buildStore) {
+	public FileSystemScanner(IBuildStore buildStore) {
 		this.buildStore = buildStore;
 	}
 	

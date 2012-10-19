@@ -20,8 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -36,7 +36,7 @@ public class TestFileSet {
 	private FileSet fs;
 	
 	/** Our test BuildStore object */
-	private BuildStore bs;
+	private IBuildStore bs;
 	
 	/** Our test FileNameSpaces object */
 	private FileNameSpaces fns;

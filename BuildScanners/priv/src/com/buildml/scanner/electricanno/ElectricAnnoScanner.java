@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.utils.files.ProgressFileInputStream;
 import com.buildml.utils.files.ProgressFileInputStreamListener;
 
@@ -41,7 +41,7 @@ public class ElectricAnnoScanner {
 	 *=====================================================================================*/
 
 	/** The BuildStore object to which the annotation data will be added. */
-	private BuildStore buildStore;
+	private IBuildStore buildStore;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -52,7 +52,7 @@ public class ElectricAnnoScanner {
 	 * 
 	 * @param buildStore The BuildStore to add the EC Annotation data into.
 	 */
-	public ElectricAnnoScanner(BuildStore buildStore) {
+	public ElectricAnnoScanner(IBuildStore buildStore) {
 		this.buildStore = buildStore;
 	}
 	

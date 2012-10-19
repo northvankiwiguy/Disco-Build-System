@@ -15,7 +15,7 @@ package com.buildml.main;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 
 /**
  * This interface must be implemented by any class that provides a BuildML CLI
@@ -66,7 +66,7 @@ public interface ICliCommand {
 	 * @param buildStore The BuildStore we'll operate on.
 	 * @param cmdLine The pre-parsed command line, which contains the command's options.
 	 */
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine);
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine);
 	
 	/**
 	 * Invoke this command, using the provided command line arguments. If an error occurs,
@@ -76,6 +76,6 @@ public interface ICliCommand {
 	 * @param buildStore The BuildStore to perform the command on.
 	 * @param args The command line arguments (normal "non-option" arguments only).
 	 */
-	public void invoke(BuildStore buildStore, String [] args);
+	public void invoke(IBuildStore buildStore, String [] args);
 	
 }

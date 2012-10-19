@@ -19,8 +19,8 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.main.CliUtils.DisplayWidth;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.TaskSet;
@@ -129,7 +129,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		optionShort = cmdLine.hasOption("short");
 		optionLong = cmdLine.hasOption("long");
 		optionShowPkgs = cmdLine.hasOption("show-pkgs");
@@ -159,7 +159,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 		

@@ -18,8 +18,8 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
@@ -117,7 +117,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#processOptions(java.lang.String[])
 	 */
 	@Override
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		optionShowRoots = cmdLine.hasOption("show-roots");
 		optionShowPkgs = cmdLine.hasOption("show-pkgs");
 		
@@ -139,7 +139,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String [] args) {
+	public void invoke(IBuildStore buildStore, String [] args) {
 		
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 

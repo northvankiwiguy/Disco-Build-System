@@ -30,7 +30,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 
 /**
@@ -68,7 +68,7 @@ public class ImportFileSystem extends Wizard implements IImportWizard {
 	 * @return true if the action was accepted, else false.
 	 */	
 	public boolean performFinish() {
-		BuildStore buildStore = null;
+		IBuildStore buildStore = null;
 		
 		/* This is the BuildStore we'll update */
 		final String outputBmlFilePath = mainPage.getOutputPath();
@@ -98,7 +98,7 @@ public class ImportFileSystem extends Wizard implements IImportWizard {
 		 * Start the background job that does the import. Once it's finished,
 		 * the editor will be (re)opened so the user can see the content.
 		 */
-		final BuildStore importBuildStore = buildStore;
+		final IBuildStore importBuildStore = buildStore;
 		final FileSystemScanner fss = new FileSystemScanner(importBuildStore);
 		Job importJob = new Job("Import Files and Directories") {
 			@Override

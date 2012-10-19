@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
@@ -63,7 +64,7 @@ public class FileNameSpaces {
 	};
 	
 	/** The BuildStore object that "owns" this FileNameSpaces object. */
-	private BuildStore buildStore;
+	private IBuildStore buildStore;
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
@@ -715,7 +716,7 @@ public class FileNameSpaces {
 	 * Returns a reference to this FileNameSpace's BuildStore object. 
 	 * @return A reference to this FileNameSpace's BuildStore object.
 	 */
-	public BuildStore getBuildStore() {
+	public IBuildStore getBuildStore() {
 		return buildStore;
 	}
 	

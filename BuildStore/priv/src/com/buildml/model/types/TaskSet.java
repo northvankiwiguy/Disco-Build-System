@@ -12,9 +12,9 @@
 
 package com.buildml.model.types;
 
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -151,7 +151,7 @@ public class TaskSet extends IntegerTreeSet {
 	 */
 	public int populateWithTasks(String taskSpecs[]) {
 	
-		BuildStore bs = bts.getBuildStore();
+		IBuildStore bs = bts.getBuildStore();
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		
 		/* 

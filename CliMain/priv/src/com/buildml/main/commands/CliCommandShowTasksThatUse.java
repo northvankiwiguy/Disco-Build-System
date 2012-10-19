@@ -17,9 +17,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
@@ -127,7 +127,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 * @see com.buildml.main.commands.CliCommandShowTasks#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		
 		/* process the standard show-tasks options */
 		super.processOptions(buildStore, cmdLine);
@@ -145,7 +145,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 * @see com.buildml.main.commands.CliCommandShowTasks#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided.");
 

@@ -18,7 +18,7 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -74,7 +74,7 @@ public class HandlerRemoveRoot extends AbstractHandler {
 				throws ExecutionException {
 
 			/* identify the PathMgr object containing the path */
-			BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
+			IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 			if (buildStore == null) {
 				return errorStatus;
 			}
@@ -120,7 +120,7 @@ public class HandlerRemoveRoot extends AbstractHandler {
 		public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 				throws ExecutionException {
 
-			BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
+			IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 			if (buildStore == null) {
 				return errorStatus;
 			}

@@ -13,9 +13,9 @@
 package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
@@ -74,7 +74,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	 * @see com.buildml.main.commands.CliCommandShowFiles#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 

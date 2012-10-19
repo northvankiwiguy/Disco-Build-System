@@ -13,8 +13,8 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -38,7 +38,7 @@ public class HandlerShowFilesUsedBy extends AbstractHandler {
 		
 		/* fetch the active editor, and its BuildStore */
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		BuildStore buildStore = mainEditor.getBuildStore();
+		IBuildStore buildStore = mainEditor.getBuildStore();
 		SubEditor existingEditor = mainEditor.getActiveSubEditor();
 		
 		/* build an ActionSet of all the selected files */

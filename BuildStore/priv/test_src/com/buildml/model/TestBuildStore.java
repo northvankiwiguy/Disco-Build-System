@@ -35,7 +35,7 @@ import com.buildml.utils.version.Version;
 public class TestBuildStore {
 
 	/** Our BuildStore object, used in many test cases */
-	private BuildStore bs;
+	private IBuildStore bs;
 
 	/** The BuildStoreFileSpace associated with this BuildStore */
 	FileNameSpaces bsfs;

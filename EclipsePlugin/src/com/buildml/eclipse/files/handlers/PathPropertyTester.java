@@ -6,7 +6,7 @@ import org.eclipse.core.expressions.PropertyTester;
 
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 
 /**
@@ -44,7 +44,7 @@ public class PathPropertyTester extends PropertyTester {
 						int pathId = node.getId();
 						
 						/* finally, test if the path has an attached root */
-						BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
+						IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 						if (buildStore != null) {
 							FileNameSpaces pathMgr = buildStore.getFileNameSpaces();
 							return pathMgr.getRootAtPath(pathId) != null;

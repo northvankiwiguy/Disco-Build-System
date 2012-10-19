@@ -49,6 +49,7 @@ import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
@@ -76,7 +77,7 @@ public class EclipsePartUtils {
 	 * @param selection The Eclipse command handler's selection.
 	 * @return The equivalent FileSet.
 	 */
-	public static FileSet getFileSetFromSelection(BuildStore buildStore, TreeSelection selection) {
+	public static FileSet getFileSetFromSelection(IBuildStore buildStore, TreeSelection selection) {
 		
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		FileSet fs = new FileSet(fns);
@@ -100,7 +101,7 @@ public class EclipsePartUtils {
 	 * @param selection The Eclipse command handler's selection.
 	 * @return The equivalent ActionSet.
 	 */
-	public static TaskSet getActionSetFromSelection(BuildStore buildStore, TreeSelection selection) {
+	public static TaskSet getActionSetFromSelection(IBuildStore buildStore, TreeSelection selection) {
 		
 		BuildTasks actionMgr = buildStore.getBuildTasks();
 		TaskSet acts = new TaskSet(actionMgr);
@@ -212,7 +213,7 @@ public class EclipsePartUtils {
 	 * Returns the BuildStore for the currently active editor.
 	 * @return The currently active BuildStore instance, or null;
 	 */
-	public static BuildStore getActiveBuildStore() {
+	public static IBuildStore getActiveBuildStore() {
 		MainEditor mainEditor = getActiveMainEditor();
 		if (mainEditor == null) {
 			return null;
@@ -394,9 +395,9 @@ public class EclipsePartUtils {
 	 * @return The corresponding BuildStore object, or null if there was a problem
 	 * opening the database.
 	 */
-	public static BuildStore getNewBuildStore(String bmlFileName) {
+	public static IBuildStore getNewBuildStore(String bmlFileName) {
 
-		BuildStore buildStore = null;
+		IBuildStore buildStore = null;
 		File fileInput = new File(bmlFileName);
 		try {
 			/*

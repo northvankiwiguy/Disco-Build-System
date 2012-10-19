@@ -21,9 +21,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.utils.errors.ErrorCode;
@@ -41,7 +41,7 @@ import com.buildml.utils.string.PathUtils;
 public class TestCFuncExec {
 
 	/* variables used in many test cases */
-	private BuildStore bs = null;
+	private IBuildStore bs = null;
 	private BuildTasks bts = null;
 	private FileNameSpaces fns = null;
 	private int shellTaskId;
@@ -684,7 +684,7 @@ public class TestCFuncExec {
 			"   return 0;" +
 			"}";
 		
-		BuildStore bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
+		IBuildStore bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
 		BuildTasks bts = bs.getBuildTasks();
 		
 		/* there should be one top-level task (the one we just ran). */

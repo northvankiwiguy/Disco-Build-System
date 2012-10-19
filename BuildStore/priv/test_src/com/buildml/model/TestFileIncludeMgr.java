@@ -19,7 +19,6 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildStore;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -30,7 +29,7 @@ public class TestFileIncludeMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/** our BuildStore, used for testing */
-	private BuildStore bs;
+	private IBuildStore bs;
 	
 	/** our FileDependencies object, used for testing */
 	private IFileIncludeMgr fileIncludeMgr;

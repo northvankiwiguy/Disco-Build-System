@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IBuildStore;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -67,7 +68,7 @@ public class BuildTasks {
 	private BuildStoreDB db = null;
 	
 	/** The BuildStore object that owns this BuildTasks object. */
-	private BuildStore buildStore = null;
+	private IBuildStore buildStore = null;
 	
 	/** The FileNameSpaces object associated with these BuildTasks */
 	private FileNameSpaces fns = null;
@@ -616,7 +617,7 @@ public class BuildTasks {
 	 *
 	 * @return The BuildStore object that owns this BuildTasks object.
 	 */
-	public BuildStore getBuildStore() {
+	public IBuildStore getBuildStore() {
 		return buildStore;
 	}
 	

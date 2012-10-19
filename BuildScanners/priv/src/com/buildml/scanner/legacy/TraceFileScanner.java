@@ -19,7 +19,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
@@ -104,7 +104,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 	private int traceFilePos;
 	
 	/** The BuildStore we should add trace file information to (null = don't add to BuildStore). */
-	private BuildStore buildStore;
+	private IBuildStore buildStore;
 	
 	/** The BuildTasks object contained within our BuildStore (null = don't add to BuildStore). */
 	private BuildTasks buildTasks;
@@ -153,7 +153,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 	 */
 	/* package */ TraceFileScanner(
 			String fileName, 
-			BuildStore buildStore, 
+			IBuildStore buildStore, 
 			PrintStream debugStream,
 			int debugLevel) throws IOException {
 		

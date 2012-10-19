@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -32,7 +33,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 *=====================================================================================*/
 	
 	/** The BuildStore object that "owns" this Packages object. */
-	private BuildStore buildStore;
+	private IBuildStore buildStore;
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 

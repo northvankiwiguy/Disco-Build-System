@@ -19,7 +19,7 @@ import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.RootNameDialog;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -83,7 +83,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 				throws ExecutionException {
 			
 			/* identify the PathMgr to be used */
-			BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
+			IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 			if (buildStore == null) {
 				return errorStatus;
 			}

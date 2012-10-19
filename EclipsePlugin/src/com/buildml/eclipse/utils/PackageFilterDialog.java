@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.buildml.eclipse.utils.errors.FatalError;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.types.PackageSet;
 
 /**
@@ -352,7 +352,7 @@ public class PackageFilterDialog extends TitleAreaDialog {
 			 * Create a new (replacement) PackageSet with no content, but
 			 * a default of false (deselect all) or true (select all).
 			 */
-			BuildStore bs = pkgSet.getBuildStore();
+			IBuildStore bs = pkgSet.getBuildStore();
 			pkgSet = new PackageSet(bs);
 			if (buttonId == IDialogConstants.SELECT_ALL_ID) {
 				pkgSet.setDefault(true);

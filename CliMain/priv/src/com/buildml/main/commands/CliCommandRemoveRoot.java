@@ -17,7 +17,7 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -86,7 +86,7 @@ public class CliCommandRemoveRoot implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		/* no options */
 	}
 
@@ -96,7 +96,7 @@ public class CliCommandRemoveRoot implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "You must specify a root name.");
 		

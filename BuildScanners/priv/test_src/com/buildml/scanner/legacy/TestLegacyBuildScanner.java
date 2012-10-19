@@ -18,8 +18,8 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**
@@ -71,7 +71,7 @@ public class TestLegacyBuildScanner {
 		LegacyBuildScanner buildScanner = new LegacyBuildScanner();
 	
 		/* create an empty build store */
-		BuildStore buildStore = CommonTestUtils.getEmptyBuildStore();
+		IBuildStore buildStore = CommonTestUtils.getEmptyBuildStore();
 		
 		/* by default, there's no BuildStore */
 		assertNull(buildScanner.getBuildStore());

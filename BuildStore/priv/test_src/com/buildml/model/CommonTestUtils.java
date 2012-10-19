@@ -38,7 +38,7 @@ public class CommonTestUtils {
 	 * @throws FileNotFoundException If the database file can't be opened
 	 * @throws IOException An I/O problem occurred while opening the database.
 	 */
-	public static BuildStore getEmptyBuildStore() 
+	public static IBuildStore getEmptyBuildStore() 
 			throws FileNotFoundException, IOException {
 		return getEmptyBuildStore(new File("/tmp"));
 	}	
@@ -53,9 +53,9 @@ public class CommonTestUtils {
 	 * @throws FileNotFoundException If the database file can't be opened.
 	 * @throws IOException An I/O problem occurred while opening the database.
 	 */
-	public static BuildStore getEmptyBuildStore(File tmpDir) 
+	public static IBuildStore getEmptyBuildStore(File tmpDir) 
 			throws FileNotFoundException, IOException {
-		BuildStore bs;
+		IBuildStore bs;
 		try {
 			File bsFile = new File(tmpDir, "testBuildStore.bml");
 			bsFile.delete();

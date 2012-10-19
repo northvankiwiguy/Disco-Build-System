@@ -30,7 +30,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -94,7 +94,7 @@ public class ImportLegacyBuild extends Wizard implements IImportWizard {
 		}
 		
 		/* Freshly open the BuildStore (but just not in an editor) */
-		final BuildStore importBuildStore = EclipsePartUtils.getNewBuildStore(outputBmlFilePath);
+		final IBuildStore importBuildStore = EclipsePartUtils.getNewBuildStore(outputBmlFilePath);
 		if (importBuildStore == null) {
 			return false;
 		}

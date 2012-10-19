@@ -52,7 +52,7 @@ import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
@@ -122,7 +122,7 @@ public class ActionsEditor extends SubEditor {
 	 * @param buildStore The BuildStore to display/edit.
 	 * @param tabTitle The text to appear on the editor's tab.
 	 */
-	public ActionsEditor(BuildStore buildStore, String tabTitle) {
+	public ActionsEditor(IBuildStore buildStore, String tabTitle) {
 		super(buildStore, tabTitle);
 		
 		actionMgr = buildStore.getBuildTasks();

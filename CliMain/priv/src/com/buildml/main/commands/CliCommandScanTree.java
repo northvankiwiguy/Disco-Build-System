@@ -20,7 +20,7 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.buildtree.FatalBuildTreeScannerError;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 
@@ -89,7 +89,7 @@ public class CliCommandScanTree implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		/* nothing to do */
 	}
 
@@ -99,7 +99,7 @@ public class CliCommandScanTree implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "one or more directory names required.");
 

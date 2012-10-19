@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -32,7 +31,7 @@ public class TestFileAttributeMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/** our BuildStore, used for testing */
-	private BuildStore bs;
+	private IBuildStore bs;
 	
 	/** our FileAttributes object, used for testing */
 	private IFileAttributeMgr fileAttrMgr;

@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
@@ -36,7 +35,7 @@ public class TestReportMgr {
 
 	
 	/** our test BuildStore object */
-	private BuildStore bs;
+	private IBuildStore bs;
 
 	/** our test FileNameSpaces object */
 	private FileNameSpaces fns;

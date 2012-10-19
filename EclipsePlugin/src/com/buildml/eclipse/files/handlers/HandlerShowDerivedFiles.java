@@ -14,8 +14,8 @@ import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -62,7 +62,7 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		
 		/* fetch the active editor, its BuildStore, and the active sub-editor */
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		BuildStore buildStore = mainEditor.getBuildStore();
+		IBuildStore buildStore = mainEditor.getBuildStore();
 		SubEditor subEditor = mainEditor.getActiveSubEditor();
 		FilesEditor existingEditor = (FilesEditor)subEditor;
 		

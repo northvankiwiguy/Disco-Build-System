@@ -20,8 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -39,7 +39,7 @@ public class TestTaskSet {
 	private TaskSet ts;
 	
 	/** Our test BuildStore object */
-	private BuildStore bs;
+	private IBuildStore bs;
 
 	/** Our test BuildTasks object */
 	private BuildTasks bts;

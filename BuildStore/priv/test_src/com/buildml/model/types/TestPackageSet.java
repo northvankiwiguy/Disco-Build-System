@@ -18,8 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.types.PackageSet;
 
 
@@ -30,7 +30,7 @@ import com.buildml.model.types.PackageSet;
 public class TestPackageSet {
 
 	/** The BuildStore that contains the packages */
-	private BuildStore bs;
+	private IBuildStore bs;
 	
 	/** The corresponding Packages class */
 	private IPackageMgr pkgMgr;

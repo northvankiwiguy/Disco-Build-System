@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -29,7 +28,7 @@ public class TestFileNameSpacesRoots {
 
 
 	/** Our BuildStore object, used in many test cases */
-	private BuildStore bs;
+	private IBuildStore bs;
 
 	/** The BuildStoreFileSpace associated with this BuildStore */
 	FileNameSpaces bsfs;

@@ -10,8 +10,8 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.NameFilterDialog;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
@@ -59,7 +59,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		if (editor == null) {
 			return null;
 		}
-		BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
+		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		FileNameSpaces fileMgr = buildStore.getFileNameSpaces();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		
@@ -147,7 +147,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		if (editor == null) {
 			return null;
 		}
-		BuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
+		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		BuildTasks actionsMgr = buildStore.getBuildTasks();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		

@@ -17,7 +17,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
@@ -102,7 +102,7 @@ import com.buildml.utils.string.PathUtils;
 	 * 
 	 * @param buildStore The BuildStore object to be populated.
 	 */
-	public ElectricAnnoSAXHandler(BuildStore buildStore) {
+	public ElectricAnnoSAXHandler(IBuildStore buildStore) {
 		buildTasks = buildStore.getBuildTasks();
 		fns = buildStore.getFileNameSpaces();
 		

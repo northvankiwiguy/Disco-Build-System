@@ -20,9 +20,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.impl.FileNameSpaces.PathType;
@@ -39,7 +39,7 @@ import com.buildml.utils.os.SystemUtils;
 public class TestCFuncLink {
 
 	/* variables used in many test cases */
-	private BuildStore bs = null;
+	private IBuildStore bs = null;
 	private BuildTasks bts = null;
 	private FileNameSpaces fns = null;
 	private int rootTask;

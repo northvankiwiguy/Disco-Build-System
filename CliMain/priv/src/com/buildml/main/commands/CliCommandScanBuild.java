@@ -18,7 +18,7 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**
@@ -133,7 +133,7 @@ public class CliCommandScanBuild implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void processOptions(BuildStore buildStore, CommandLine cmdLine) {
+	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		
 		/* fetch the option values */
 		optionTraceOnly = cmdLine.hasOption("trace-only");
@@ -170,7 +170,7 @@ public class CliCommandScanBuild implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(BuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String[] args) {
 		
 		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "A shell command and arguments must be specified.");
 

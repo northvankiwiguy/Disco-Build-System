@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IPackageMgr;
@@ -35,7 +36,7 @@ import com.buildml.utils.version.Version;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class BuildStore {
+public class BuildStore implements IBuildStore {
 	
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -150,121 +151,100 @@ public class BuildStore {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 	
-	/**
-	 * Return the BuildML database's schema version.
-	 * 
-	 * @return The schema version as an integer, or -1 if there's no schema in place.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getBuildStoreVersion()
 	 */
+	@Override
 	public int getBuildStoreVersion() {
 		return db.getBuildStoreVersion();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the FileNamesSpaces manager associated with this BuildStore. This object
-	 * encapsulates all knowledge about files/directories within the build system.
-	 * 
-	 * @return A FileNameSpaces manager object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getFileNameSpaces()
 	 */
+	@Override
 	public FileNameSpaces getFileNameSpaces() {
 		return fileSpaces;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the FileIncludeMgr associated with this BuildStore. This object
-	 * encapsulates knowledge of which source files textually include which other
-	 * source files.
-	 * 
-	 * @return A FileIncludeMgr object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getFileIncludeMgr()
 	 */
+	@Override
 	public IFileIncludeMgr getFileIncludeMgr() {
 		return fileIncludeMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the BuildTasks manager associated with this BuildStore. This object
-	 * contains information about all build tasks.
-	 * 
-	 * @return A BuildTasks manager object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getBuildTasks()
 	 */
+	@Override
 	public BuildTasks getBuildTasks() {
 		return buildTasks;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the Reports manager associated with this BuildStore. This object
-	 * contains methods for generating summary reports from the BuildML database.
-	 *  
-	 * @return A Reports manager object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getReportMgr()
 	 */
+	@Override
 	public IReportMgr getReportMgr() {
 		return reportMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the FileAttributeMgr manager associated with this BuildStore. This object
-	 * encapsulates knowledge of which attributes are attached to the paths in
-	 * our FileNameSpaces object.
-	 * 
-	 * @return This BuildStore's FileAttributeMgr object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getFileAttributeMgr()
 	 */
+	@Override
 	public IFileAttributeMgr getFileAttributeMgr() {
 		return fileAttrMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the Packages manager associated with this BuildStore. This object
-	 * encapsulates knowledge of the package names used in the BuildStore.
-	 * 
-	 * @return A Packages manager object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getPackageMgr()
 	 */
+	@Override
 	public IPackageMgr getPackageMgr() {
 		return packages;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Specify whether database access should be fast (true) or safe (false). Fast
-	 * access is considerably faster than safe access, but won't ensure that
-	 * changes are written to the disk. Only use fast access for "large write" operations.
-	 * 
-	 * @param fast Set to true to enable fast access, or false for safe access.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#setFastAccessMode(boolean)
 	 */
+	@Override
 	public void setFastAccessMode(boolean fast) {
 		db.setFastAccessMode(fast);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Close the BuildStore, and release any resources associated with it. Attempting to
-	 * access the BuildStore's content after it's closed will likely cause a
-	 * FatalBuildStoreError.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#close()
 	 */
+	@Override
 	public void close() {
 		db.close();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Save this BuildStore to disk, ensuring that any temporary (unsaved) changes are
-	 * persisted. This method only has an effect if the database was created with
-	 * saveRequired == true.
-	 * @throws IOException Unable to write database to disk.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#save()
 	 */
+	@Override
 	public void save() throws IOException
 	{
 		db.save();
@@ -272,13 +252,10 @@ public class BuildStore {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Save this BuildStore to disk, using the caller-specified file name. This method only
-	 * has an effect if the database was created with saveRequired == true.
-	 * @param fileToSave The file to write the database content into. This file now becomes
-	 * the default for future save() operations.
-	 * @throws IOException Unable to write database to disk.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#saveAs(java.lang.String)
 	 */
+	@Override
 	public void saveAs(String fileToSave) throws IOException
 	{
 		db.saveAs(fileToSave);

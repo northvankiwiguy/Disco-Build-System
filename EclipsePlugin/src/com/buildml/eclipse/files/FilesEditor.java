@@ -53,7 +53,7 @@ import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
@@ -115,7 +115,7 @@ public class FilesEditor extends SubEditor {
 	 * @param buildStore The BuildStore to display/edit.
 	 * @param tabTitle The text to appear on the editor's tab.
 	 */
-	public FilesEditor(BuildStore buildStore, String tabTitle) {
+	public FilesEditor(IBuildStore buildStore, String tabTitle) {
 		super(buildStore, tabTitle);
 
 		fns = buildStore.getFileNameSpaces();

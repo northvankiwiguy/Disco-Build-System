@@ -31,7 +31,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.model.impl.BuildStore;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeRecord;
 
@@ -50,7 +50,7 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 *=====================================================================================*/
 
 	/** The BuildStore we're editing */
-	protected BuildStore buildStore = null;
+	protected IBuildStore buildStore = null;
 	
 	/**
 	 * The set of packages to be displayed (that is, files will be displayed
@@ -86,7 +86,7 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * @param buildStore The BuildStore to display/edit.
 	 * @param tabTitle The text to appear on the editor's tab.
 	 */
-	public SubEditor(BuildStore buildStore, String tabTitle) {
+	public SubEditor(IBuildStore buildStore, String tabTitle) {
 		super();
 	
 		/* set the name of the tab that this editor appears in */
