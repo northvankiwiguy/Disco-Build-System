@@ -15,8 +15,8 @@ package com.buildml.eclipse.utils;
 import com.buildml.eclipse.actions.UIActionRecord;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.files.UIFileRecordFile;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.FileRecord;
 
 /**
@@ -81,7 +81,7 @@ public class ConversionUtils {
 	 * @return The equivalent UIActionRecord[].
 	 */
 	public static UIActionRecord[] convertIntArrToActionRecordArr(
-			BuildTasks actionMgr, Integer[] intArr) {
+			IActionMgr actionMgr, Integer[] intArr) {
 		
 		UIActionRecord result[] = new UIActionRecord[intArr.length];
 		for (int i = 0; i < intArr.length; i++) {

@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.buildml.model.BuildStoreVersionException;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
@@ -31,7 +32,7 @@ import com.buildml.utils.version.Version;
  * to store an entire BuildML build.
  * 
  * Note that although BuildStore is the main entry point, most of the work is done by
- * its delegate classes, such as FileNameSpaces, BuildTasks etc. These "Managers" each deal
+ * its delegate classes, such as FileMgr, ActionMgr etc. These "Managers" each deal
  * with a specific part of the build system, providing business logic and database access
  * to implement features.
  * 
@@ -55,8 +56,8 @@ public class BuildStore implements IBuildStore {
 	/** The FileIncludeMgr object we'll delegate work to. */
 	private IFileIncludeMgr fileIncludeMgr;
 
-	/** The BuildTasks manager object we'll delegate work to. */
-	private BuildTasks buildTasks;
+	/** The ActionMgr manager object we'll delegate work to. */
+	private IActionMgr actionMgr;
 	
 	/** The Reports manager object we'll delegate work to. */
 	private IReportMgr reportMgr;
@@ -115,8 +116,8 @@ public class BuildStore implements IBuildStore {
 		/* create a new FileIncludeMgr object to manage the relationship between files */
 		fileIncludeMgr = new FileIncludeMgr(this);
 
-		/* create a new BuildTasks object to manage the relationship between files */
-		buildTasks = new BuildTasks(this);
+		/* create a new ActionMgr object to manage the relationship between files */
+		actionMgr = new ActionMgr(this);
 		
 		/* create a new ReportMgr object to provide reporting methods */
 		reportMgr = new ReportMgr(this);
@@ -180,11 +181,11 @@ public class BuildStore implements IBuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IBuildStore#getBuildTasks()
+	 * @see com.buildml.model.IBuildStore#getActionMgr()
 	 */
 	@Override
-	public BuildTasks getBuildTasks() {
-		return buildTasks;
+	public IActionMgr getActionMgr() {
+		return actionMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

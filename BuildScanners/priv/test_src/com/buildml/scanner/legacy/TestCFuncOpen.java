@@ -21,11 +21,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.SystemUtils;
 
@@ -41,7 +41,7 @@ public class TestCFuncOpen {
 
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
-	private BuildTasks bts = null;
+	private IActionMgr actionMgr = null;
 	private IFileMgr fileMgr = null;
 	private int rootTask;
 	private int task;
@@ -90,24 +90,24 @@ public class TestCFuncOpen {
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, programCode, args);
 		
 		/* fetch references to sub objects */
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
-		rootTask = bts.getRootTask("root");
+		rootTask = actionMgr.getRootTask("root");
 		
 		/* there should only be one child task */
-		Integer childTasks[] = bts.getChildren(rootTask);
+		Integer childTasks[] = actionMgr.getChildren(rootTask);
 		assertEquals(1, childTasks.length);
 		
 		/* this is the task ID of the one task */
 		task = childTasks[0];
 
 		/* fetch the file access arrays */
-		fileAccesses = bts.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
-		fileReads = bts.getFilesAccessed(task, OperationType.OP_READ);
-		fileWrites = bts.getFilesAccessed(task, OperationType.OP_WRITE);
-		fileModifies = bts.getFilesAccessed(task, OperationType.OP_MODIFIED);
+		fileAccesses = actionMgr.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
+		fileReads = actionMgr.getFilesAccessed(task, OperationType.OP_READ);
+		fileWrites = actionMgr.getFilesAccessed(task, OperationType.OP_WRITE);
+		fileModifies = actionMgr.getFilesAccessed(task, OperationType.OP_MODIFIED);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

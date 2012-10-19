@@ -10,10 +10,10 @@ import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.NameFilterDialog;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 
@@ -148,7 +148,7 @@ public class HandlerFilterByName extends AbstractHandler {
 			return null;
 		}
 		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
-		BuildTasks actionsMgr = buildStore.getBuildTasks();
+		IActionMgr actionsMgr = buildStore.getActionMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		
 		/* 

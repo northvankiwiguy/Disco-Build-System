@@ -21,11 +21,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.SystemUtils;
 import com.buildml.utils.string.PathUtils;
@@ -42,7 +42,7 @@ public class TestCFuncExec {
 
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
-	private BuildTasks bts = null;
+	private IActionMgr actionMgr = null;
 	private IFileMgr fileMgr = null;
 	private int shellTaskId;
 	
@@ -166,30 +166,30 @@ public class TestCFuncExec {
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, parentSource, null);
 
 		/* fetch references to sub objects */
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
-		int rootTask = bts.getRootTask("root");
+		int rootTask = actionMgr.getRootTask("root");
 		
 		/* 
 		 * There should only be one top-level task (parent), and it should contain a 
 		 * single second-level task (child). The second-level task has no children.
 		 */
-		Integer tasks[] = bts.getChildren(rootTask);
+		Integer tasks[] = actionMgr.getChildren(rootTask);
 		assertEquals(1, tasks.length);
 		int parentTaskId = tasks[0].intValue();
-		tasks = bts.getChildren(parentTaskId);
+		tasks = actionMgr.getChildren(parentTaskId);
 		assertEquals(1, tasks.length);
 		int childTaskId = tasks[0].intValue();
-		tasks = bts.getChildren(childTaskId);
+		tasks = actionMgr.getChildren(childTaskId);
 		assertEquals(0, tasks.length);
 
 		/* 
 		 * Now validate the file access patterns. The parent task wrote to /tmp/flag-file1
 		 * and /tmp/flag-file2. 
 		 */		
-		Integer[] fileWrites = bts.getFilesAccessed(parentTaskId, OperationType.OP_WRITE);
+		Integer[] fileWrites = actionMgr.getFilesAccessed(parentTaskId, OperationType.OP_WRITE);
 		assertEquals(2, fileWrites.length);
 		int flag1Id = fileMgr.getPath("/tmp/flag-file1");
 		int flag2Id = fileMgr.getPath("/tmp/flag-file2");
@@ -198,7 +198,7 @@ public class TestCFuncExec {
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {flag1Id, flag2Id}, fileWrites));
 		
 		/* And the child task wrote to /tmp/flag-file3 */
-		fileWrites = bts.getFilesAccessed(childTaskId, OperationType.OP_WRITE);
+		fileWrites = actionMgr.getFilesAccessed(childTaskId, OperationType.OP_WRITE);
 		assertEquals(1, fileWrites.length);
 		int flag3Id = fileMgr.getPath("/tmp/flag-file3");
 		assertNotSame(ErrorCode.BAD_PATH, flag3Id);
@@ -209,16 +209,16 @@ public class TestCFuncExec {
 		 */
 		int currentDirId = 
 			fileMgr.getPath(PathUtils.normalizeAbsolutePath(new File(".").getAbsolutePath()));
-		int parentDirId = bts.getDirectory(parentTaskId);
+		int parentDirId = actionMgr.getDirectory(parentTaskId);
 		assertEquals(currentDirId, parentDirId);
-		int childDirId = bts.getDirectory(childTaskId);
+		int childDirId = actionMgr.getDirectory(childTaskId);
 		assertEquals(currentDirId, childDirId);
 		
 		/*
 		 * Validate that the child command's arguments are correct. That is, the absolute
 		 * path name to the child, followed by the expected arguments. 
 		 */
-		String cmdLine = bts.getCommand(childTaskId);
+		String cmdLine = actionMgr.getCommand(childTaskId);
 		assertEquals(childPath + " arg1 arg2 arg3", cmdLine);
 	}
 	
@@ -242,15 +242,15 @@ public class TestCFuncExec {
 		/* trace the program's behaviour into a BuildStore */
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
 		fileMgr = bs.getFileMgr();
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		
 		/* validate the top-level task (the process that invokes "system"). */
-		Integer [] tasks = bts.getChildren(bts.getRootTask("root"));
+		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootTask("root"));
 		assertEquals(1, tasks.length);
 		int systemTaskId = tasks[0].intValue();
 		
 		/* the system task has a single child (the shell task). */
-		tasks = bts.getChildren(systemTaskId);
+		tasks = actionMgr.getChildren(systemTaskId);
 		assertEquals(1, tasks.length);
 		shellTaskId = tasks[0].intValue();
 	}
@@ -462,17 +462,17 @@ public class TestCFuncExec {
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
 
 		fileMgr = bs.getFileMgr();
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		
 		/* validate the top-level task (the process that invokes fork()). */
-		Integer [] tasks = bts.getChildren(bts.getRootTask("root"));
+		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootTask("root"));
 		assertEquals(1, tasks.length);
 		int forkTaskId = tasks[0].intValue();
 		
 		/* check that this task accessed both flag-file1 and flag-file2 */
 		int file1Id = fileMgr.getPath("/tmp/flag-file1");
 		int file2Id = fileMgr.getPath("/tmp/flag-file2");
-		Integer fileWrites[] = bts.getFilesAccessed(forkTaskId, OperationType.OP_WRITE);
+		Integer fileWrites[] = actionMgr.getFilesAccessed(forkTaskId, OperationType.OP_WRITE);
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileWrites, new Integer[] {file1Id, file2Id}));
 	}
 
@@ -506,20 +506,20 @@ public class TestCFuncExec {
 	
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
 		fileMgr = bs.getFileMgr();
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		
 		/* validate the top-level task (the process that invokes "popen"). */
-		Integer [] tasks = bts.getChildren(bts.getRootTask("root"));
+		Integer [] tasks = actionMgr.getChildren(actionMgr.getRootTask("root"));
 		assertEquals(1, tasks.length);
 		int popenTaskId = tasks[0].intValue();
 		
 		/* the popen task has a single child (the shell task). */
-		tasks = bts.getChildren(popenTaskId);
+		tasks = actionMgr.getChildren(popenTaskId);
 		assertEquals(1, tasks.length);
 		shellTaskId = tasks[0].intValue();
 		
 		/* the shell task has no child ("echo" is built-in to the shell */
-		tasks = bts.getChildren(shellTaskId);
+		tasks = actionMgr.getChildren(shellTaskId);
 		assertEquals(0, tasks.length);
 	}
 	
@@ -574,12 +574,12 @@ public class TestCFuncExec {
 		traceSystemProgram("cp /etc/passwd /tmp/flag-file4");
 	
 		/* the shell task has a single child (the underlying command). */
-		Integer tasks[] = bts.getChildren(shellTaskId);
+		Integer tasks[] = actionMgr.getChildren(shellTaskId);
 		assertEquals(1, tasks.length);
 		int cmdTaskId = tasks[0].intValue();
 		
 		/* the command task has no children */
-		tasks = bts.getChildren(cmdTaskId);
+		tasks = actionMgr.getChildren(cmdTaskId);
 		assertEquals(0, tasks.length);
 		
 		/* check that /etc/passwd and /tmp/flag-file4 have been accessed. */
@@ -600,12 +600,12 @@ public class TestCFuncExec {
 		traceSystemProgram("cat /etc/passwd >/tmp/flag-file4");
 
 		/* the shell task has a single child (the underlying command). */
-		Integer tasks[] = bts.getChildren(shellTaskId);
+		Integer tasks[] = actionMgr.getChildren(shellTaskId);
 		assertEquals(1, tasks.length);
 		int cmdTaskId = tasks[0].intValue();
 		
 		/* the command task has no children */
-		tasks = bts.getChildren(cmdTaskId);
+		tasks = actionMgr.getChildren(cmdTaskId);
 		assertEquals(0, tasks.length);
 		
 		/* check that /etc/passwd and /tmp/flag-file4 have been accessed. */
@@ -626,12 +626,12 @@ public class TestCFuncExec {
 		traceSystemProgram("cat /etc/passwd | wc -l > /dev/null");
 
 		/* the shell task has two children (cat and wc). */
-		Integer tasks[] = bts.getChildren(shellTaskId);
+		Integer tasks[] = actionMgr.getChildren(shellTaskId);
 		assertEquals(2, tasks.length);
 		
 		/* neither of these tasks have children */
-		assertEquals(0, bts.getChildren(tasks[0].intValue()).length);
-		assertEquals(0, bts.getChildren(tasks[1].intValue()).length);
+		assertEquals(0, actionMgr.getChildren(tasks[0].intValue()).length);
+		assertEquals(0, actionMgr.getChildren(tasks[1].intValue()).length);
 
 		/* check that /etc/passwd has been accessed. */
 		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/etc/passwd"));
@@ -650,12 +650,12 @@ public class TestCFuncExec {
 		traceSystemProgram("cat /etc/passwd > /dev/null && cat /etc/group >/dev/null");
 
 		/* the shell task has two children (cat and cat). */
-		Integer tasks[] = bts.getChildren(shellTaskId);
+		Integer tasks[] = actionMgr.getChildren(shellTaskId);
 		assertEquals(2, tasks.length);
 		
 		/* neither of these tasks have children */
-		assertEquals(0, bts.getChildren(tasks[0].intValue()).length);
-		assertEquals(0, bts.getChildren(tasks[1].intValue()).length);
+		assertEquals(0, actionMgr.getChildren(tasks[0].intValue()).length);
+		assertEquals(0, actionMgr.getChildren(tasks[1].intValue()).length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -685,16 +685,16 @@ public class TestCFuncExec {
 			"}";
 		
 		IBuildStore bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
-		BuildTasks bts = bs.getBuildTasks();
+		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* there should be one top-level task (the one we just ran). */
-		int rootTask = bts.getRootTask("root");
-		Integer children[] = bts.getChildren(rootTask);
+		int rootTask = actionMgr.getRootTask("root");
+		Integer children[] = actionMgr.getChildren(rootTask);
 		assertEquals(1, children.length);
 		
 		/* there should be no second level tasks */
 		int parentTask = children[0].intValue();
-		children = bts.getChildren(parentTask);
+		children = actionMgr.getChildren(parentTask);
 		assertEquals(0, children.length);
 	}
 	

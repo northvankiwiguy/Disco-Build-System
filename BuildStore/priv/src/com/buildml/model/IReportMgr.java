@@ -12,7 +12,7 @@
 
 package com.buildml.model;
 
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;

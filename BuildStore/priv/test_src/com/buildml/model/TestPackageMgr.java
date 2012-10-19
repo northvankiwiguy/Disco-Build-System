@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -170,7 +169,7 @@ public class TestPackageMgr {
 	public void testRemovePackage() {
 		
 		IFileMgr fileMgr = bs.getFileMgr();
-		BuildTasks bts = bs.getBuildTasks();
+		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* try to remove package names that haven't been added */
 		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.removePackage("PkgA"));
@@ -206,7 +205,7 @@ public class TestPackageMgr {
 		
 		/* assign them to tasks, then try to remove the name */
 		int my_pkg = pkgMgr.getPackageId("my_package");
-		int task1 = bts.addBuildTask(0, 0, "task1");
+		int task1 = actionMgr.addBuildTask(0, 0, "task1");
 		pkgMgr.setTaskPackage(task1, my_pkg);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("my_package"));
 		
@@ -613,12 +612,12 @@ public class TestPackageMgr {
 	public void testTaskPackages() throws Exception {
 		
 		IPackageMgr pkgMgr = bs.getPackageMgr();
-		BuildTasks bts = bs.getBuildTasks();
+		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* create a few tasks */
-		int task1 = bts.addBuildTask(0, 0, "task1");
-		int task2 = bts.addBuildTask(0, 0, "task2");
-		int task3 = bts.addBuildTask(0, 0, "task3");
+		int task1 = actionMgr.addBuildTask(0, 0, "task1");
+		int task2 = actionMgr.addBuildTask(0, 0, "task2");
+		int task3 = actionMgr.addBuildTask(0, 0, "task3");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
@@ -661,7 +660,7 @@ public class TestPackageMgr {
 	@Test
 	public void testGetTasksInPackage() throws Exception {
 		IPackageMgr pkgMgr = bs.getPackageMgr();
-		BuildTasks bts = bs.getBuildTasks();
+		IActionMgr bts = bs.getActionMgr();
 		
 		/* create a few tasks */
 		int task1 = bts.addBuildTask(0, 0, "task1");

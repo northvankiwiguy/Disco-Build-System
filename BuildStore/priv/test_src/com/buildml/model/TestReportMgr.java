@@ -20,8 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -39,8 +38,8 @@ public class TestReportMgr {
 	/** our test FileMgr object */
 	private IFileMgr fileMgr;
 	
-	/** our test BuildTasks object */
-	private BuildTasks bts;
+	/** our test ActionMgr object */
+	private IActionMgr actionMgr;
 	
 	/** our test FileIncludes object */
 	private IFileIncludeMgr fileIncludeMgr;
@@ -60,10 +59,10 @@ public class TestReportMgr {
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		fileMgr = bs.getFileMgr();
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		fileIncludeMgr = bs.getFileIncludeMgr();
 		reports = bs.getReportMgr();
-		rootTaskId = bts.getRootTask("root");
+		rootTaskId = actionMgr.getRootTask("root");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -82,22 +81,22 @@ public class TestReportMgr {
 		int dir = fileMgr.addDirectory("myEmptydir");
 
 		/* create three different tasks */
-		int task1 = bts.addBuildTask(rootTaskId, 0, "command");
-		int task2 = bts.addBuildTask(rootTaskId, 0, "command");		
-		int task3 = bts.addBuildTask(rootTaskId, 0, "command");
-		int task4 = bts.addBuildTask(rootTaskId, 0, "command");
+		int task1 = actionMgr.addBuildTask(rootTaskId, 0, "command");
+		int task2 = actionMgr.addBuildTask(rootTaskId, 0, "command");		
+		int task3 = actionMgr.addBuildTask(rootTaskId, 0, "command");
+		int task4 = actionMgr.addBuildTask(rootTaskId, 0, "command");
 		
 		/* add references from the tasks to the files - task1 uses three of them */
-		bts.addFileAccess(task1, foxFile, OperationType.OP_READ);
-		bts.addFileAccess(task1, boxFile, OperationType.OP_READ);
-		bts.addFileAccess(task1, soxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, foxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, boxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, soxFile, OperationType.OP_READ);
 		
 		/* task2 only uses 2 files */
-		bts.addFileAccess(task2, foxFile, OperationType.OP_READ);
-		bts.addFileAccess(task2, boxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2, foxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2, boxFile, OperationType.OP_READ);
 		
 		/* task3 uses 1 file - note that task4 uses none */
-		bts.addFileAccess(task3, foxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task3, foxFile, OperationType.OP_READ);
 
 		/*
 		 * The results of the search should be:
@@ -119,10 +118,10 @@ public class TestReportMgr {
 		assertEquals(1, results[2].getCount());
 		
 		/* now add roxFile into the mix - access it lots */
-		bts.addFileAccess(task1, roxFile, OperationType.OP_READ);
-		bts.addFileAccess(task2, roxFile, OperationType.OP_READ);
-		bts.addFileAccess(task3, roxFile, OperationType.OP_READ);
-		bts.addFileAccess(task4, roxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, roxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2, roxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task3, roxFile, OperationType.OP_READ);
+		actionMgr.addFileAccess(task4, roxFile, OperationType.OP_READ);
 		
 		/*
 		 * Check again, roxFile should now be the most popular.
@@ -143,7 +142,7 @@ public class TestReportMgr {
 		/*
 		 * Access a directory, this shouldn't be in the results.
 		 */
-		bts.addFileAccess(task1, dir, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, dir, OperationType.OP_READ);
 		results = reports.reportMostCommonlyAccessedFiles();
 		assertEquals(4, results.length);		
 	}
@@ -170,10 +169,10 @@ public class TestReportMgr {
 		
 		/* add a (small) bunch of tasks, and associate files with them. */
 		for (int i = 0; i != numTasks; i++) {
-			int taskId = bts.addBuildTask(rootTaskId, 0, "command");
+			int taskId = actionMgr.addBuildTask(rootTaskId, 0, "command");
 			
 			for (int j = 0; j != filesPerTask; j++) {
-				bts.addFileAccess(taskId, r.nextInt(numFiles), OperationType.OP_READ);
+				actionMgr.addFileAccess(taskId, r.nextInt(numFiles), OperationType.OP_READ);
 			}
 		}
 		bs.setFastAccessMode(false);
@@ -279,12 +278,12 @@ public class TestReportMgr {
 		int file3 = fileMgr.addFile("/home/psmith/myfile3");
 		int file4 = fileMgr.addFile("/home/psmith/myfile4");
 		
-		int task1 = bts.addBuildTask(rootTaskId, 0, "task1");
-		int task2 = bts.addBuildTask(rootTaskId, 0, "task2");
+		int task1 = actionMgr.addBuildTask(rootTaskId, 0, "task1");
+		int task2 = actionMgr.addBuildTask(rootTaskId, 0, "task2");
 
 		/* access some */
-		bts.addFileAccess(task1, file1, OperationType.OP_READ);
-		bts.addFileAccess(task1, file2, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(task1, file1, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, file2, OperationType.OP_WRITE);
 		
 		/* file3 and file4 should both be in the results, but we don't know the order */
 		results = reports.reportFilesNeverAccessed();
@@ -293,22 +292,22 @@ public class TestReportMgr {
 		assertTrue(results.isMember(file4));
 				
 		/* another task should access those same files, and the results will be the same */
-		bts.addFileAccess(task2, file2, OperationType.OP_READ);
-		bts.addFileAccess(task2, file1, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(task2, file2, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2, file1, OperationType.OP_WRITE);
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(2, results.size());
 		assertTrue(results.isMember(file3));
 		assertTrue(results.isMember(file4));
 				
 		/* now access file 3 */
-		bts.addFileAccess(task1, file3, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1, file3, OperationType.OP_READ);
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(1, results.size());
 		assertTrue(results.isMember(file4));
 		assertFalse(results.isMember(file3));
 		
 		/* finally access file 3 */
-		bts.addFileAccess(task2, file4, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2, file4, OperationType.OP_READ);
 		results = reports.reportFilesNeverAccessed();
 		assertEquals(0, results.size());
 	}
@@ -369,11 +368,11 @@ public class TestReportMgr {
 	@Test
 	public void testReportTasksThatMatchName() {
 	
-		int task1 = bts.addBuildTask(0, 0, "My command number 1");
-		int task2 = bts.addBuildTask(0, 0, "My command number 2");
-		int task3 = bts.addBuildTask(0, 0, "Another with number 1 in it");
-		int task4 = bts.addBuildTask(0, 0, "A completely different task");
-		int task5 = bts.addBuildTask(0, 0, "A final command with 1 in it");
+		int task1 = actionMgr.addBuildTask(0, 0, "My command number 1");
+		int task2 = actionMgr.addBuildTask(0, 0, "My command number 2");
+		int task3 = actionMgr.addBuildTask(0, 0, "Another with number 1 in it");
+		int task4 = actionMgr.addBuildTask(0, 0, "A completely different task");
+		int task5 = actionMgr.addBuildTask(0, 0, "A final command with 1 in it");
 	
 		/* match commands that contain "command" */
 		TaskSet results = reports.reportTasksThatMatchName("%command%");
@@ -416,25 +415,25 @@ public class TestReportMgr {
 		int file3a = fileMgr.addFile("/file3a");
 		int file3b = fileMgr.addFile("/file3b");
 
-		int rootTask = bts.getRootTask("");
+		int rootTask = actionMgr.getRootTask("");
 		
 		/* task 1 reads/writes file1a and file1b */
-		int task1a = bts.addBuildTask(rootTask, 0, "task1 command reads file1a");
-		int task1b = bts.addBuildTask(rootTask, 0, "task1 command writes file1b");
-		bts.addFileAccess(task1a, file1a, OperationType.OP_READ);
-		bts.addFileAccess(task1b, file1b, OperationType.OP_WRITE);
+		int task1a = actionMgr.addBuildTask(rootTask, 0, "task1 command reads file1a");
+		int task1b = actionMgr.addBuildTask(rootTask, 0, "task1 command writes file1b");
+		actionMgr.addFileAccess(task1a, file1a, OperationType.OP_READ);
+		actionMgr.addFileAccess(task1b, file1b, OperationType.OP_WRITE);
 
 		/* task 2 reads/writes file2a and file2b */
-		int task2a = bts.addBuildTask(rootTask, 0, "task2 command reads file2a");
-		int task2b = bts.addBuildTask(rootTask, 0, "task2 command writes file2b");
-		bts.addFileAccess(task2a, file2a, OperationType.OP_READ);
-		bts.addFileAccess(task2b, file2b, OperationType.OP_WRITE);
+		int task2a = actionMgr.addBuildTask(rootTask, 0, "task2 command reads file2a");
+		int task2b = actionMgr.addBuildTask(rootTask, 0, "task2 command writes file2b");
+		actionMgr.addFileAccess(task2a, file2a, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2b, file2b, OperationType.OP_WRITE);
 
 		/* task 3 reads/writes file3a and file3b */
-		int task3a = bts.addBuildTask(rootTask, 0, "task3 command reads file3a");
-		int task3b = bts.addBuildTask(rootTask, 0, "task3 command writes file3b");
-		bts.addFileAccess(task3a, file3a, OperationType.OP_READ);
-		bts.addFileAccess(task3b, file3b, OperationType.OP_WRITE);
+		int task3a = actionMgr.addBuildTask(rootTask, 0, "task3 command reads file3a");
+		int task3b = actionMgr.addBuildTask(rootTask, 0, "task3 command writes file3b");
+		actionMgr.addFileAccess(task3a, file3a, OperationType.OP_READ);
+		actionMgr.addFileAccess(task3b, file3b, OperationType.OP_WRITE);
 
 		/* test the report for an empty FileSet */
 		FileSet source = new FileSet(fileMgr);
@@ -531,21 +530,21 @@ public class TestReportMgr {
 		int file2 = fileMgr.addFile("/a/b/d.java");
 		int file3 = fileMgr.addFile("/a/b/e.java");
 
-		int root = bts.getRootTask("");
-		int task1 = bts.addBuildTask(root, 0, "");
-		bts.addFileAccess(task1, file1, OperationType.OP_WRITE);
-		bts.addFileAccess(task1, file2, OperationType.OP_READ);
+		int root = actionMgr.getRootTask("");
+		int task1 = actionMgr.addBuildTask(root, 0, "");
+		actionMgr.addFileAccess(task1, file1, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(task1, file2, OperationType.OP_READ);
 
-		int task2 = bts.addBuildTask(root, 0, "");
-		bts.addFileAccess(task2, file1, OperationType.OP_READ);
-		bts.addFileAccess(task2, file3, OperationType.OP_READ);
+		int task2 = actionMgr.addBuildTask(root, 0, "");
+		actionMgr.addFileAccess(task2, file1, OperationType.OP_READ);
+		actionMgr.addFileAccess(task2, file3, OperationType.OP_READ);
 
-		int task3 = bts.addBuildTask(root, 0, "");
-		bts.addFileAccess(task3, file3, OperationType.OP_WRITE);
-		bts.addFileAccess(task3, file3, OperationType.OP_WRITE);
+		int task3 = actionMgr.addBuildTask(root, 0, "");
+		actionMgr.addFileAccess(task3, file3, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(task3, file3, OperationType.OP_WRITE);
 
 		/* test with the empty TaskSet - should be no files returned */
-		TaskSet ts = new TaskSet(bts);
+		TaskSet ts = new TaskSet(actionMgr);
 		FileSet result = reports.reportFilesAccessedByTasks(ts, OperationType.OP_UNSPECIFIED);
 		assertEquals(0, result.size());
 		
@@ -612,9 +611,9 @@ public class TestReportMgr {
 		/* a.java will be compiled into a.class, which goes into prog.jar (see later) */
 		int fileAJava = fileMgr.addFile("/a.java");
 		int fileAClass = fileMgr.addFile("/a.class");
-		int taskA = bts.addBuildTask(0, 0, "javac a.java");
-		bts.addFileAccess(taskA, fileAJava, OperationType.OP_READ);
-		bts.addFileAccess(taskA, fileAClass, OperationType.OP_WRITE);
+		int taskA = actionMgr.addBuildTask(0, 0, "javac a.java");
+		actionMgr.addFileAccess(taskA, fileAJava, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskA, fileAClass, OperationType.OP_WRITE);
 
 		/* run the report - should show a.class */
 		result = reports.reportWriteOnlyFiles();
@@ -624,9 +623,9 @@ public class TestReportMgr {
 		/* b.java will be compiled into b.class, which goes into prog.jar (see later) */		
 		int fileBJava = fileMgr.addFile("/b.java");
 		int fileBClass = fileMgr.addFile("/b.class");
-		int taskB = bts.addBuildTask(0, 0, "javac b.java");
-		bts.addFileAccess(taskB, fileBJava, OperationType.OP_READ);
-		bts.addFileAccess(taskB, fileBClass, OperationType.OP_WRITE);
+		int taskB = actionMgr.addBuildTask(0, 0, "javac b.java");
+		actionMgr.addFileAccess(taskB, fileBJava, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskB, fileBClass, OperationType.OP_WRITE);
 		
 		/* Run the report - a.class and b.class should be listed */
 		result = reports.reportWriteOnlyFiles();
@@ -637,9 +636,9 @@ public class TestReportMgr {
 		/* c.java will be compiled into c.class, but no further */
 		int fileCJava = fileMgr.addFile("/c.java");
 		int fileCClass = fileMgr.addFile("/c.class");
-		int taskC = bts.addBuildTask(0, 0, "javac c.java");
-		bts.addFileAccess(taskC, fileCJava, OperationType.OP_READ);
-		bts.addFileAccess(taskC, fileCClass, OperationType.OP_WRITE);
+		int taskC = actionMgr.addBuildTask(0, 0, "javac c.java");
+		actionMgr.addFileAccess(taskC, fileCJava, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskC, fileCClass, OperationType.OP_WRITE);
 		
 		/* d.java is not read at all */
 		fileMgr.addFile("/d.java");		
@@ -653,10 +652,10 @@ public class TestReportMgr {
 		
 		/* now put A.class and B.class into prog.jar */
 		int fileProgJar = fileMgr.addFile("/prog.jar");
-		int taskProg = bts.addBuildTask(0, 0, "jar cf prog.jar a.class b.class");
-		bts.addFileAccess(taskProg, fileAClass, OperationType.OP_READ);
-		bts.addFileAccess(taskProg, fileBClass, OperationType.OP_READ);
-		bts.addFileAccess(taskProg, fileProgJar, OperationType.OP_WRITE);
+		int taskProg = actionMgr.addBuildTask(0, 0, "jar cf prog.jar a.class b.class");
+		actionMgr.addFileAccess(taskProg, fileAClass, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskProg, fileBClass, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskProg, fileProgJar, OperationType.OP_WRITE);
 	
 		/* Run the report - only c.class and prog.jar should be listed */
 		result = reports.reportWriteOnlyFiles();

@@ -22,11 +22,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.utils.os.SystemUtils;
 
 /**
@@ -41,7 +41,7 @@ public class TestCFuncDir {
 	
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
-	private BuildTasks bts = null;
+	private IActionMgr actionMgr = null;
 	private IFileMgr fileMgr = null;
 	private int rootTask;
 	private int task;
@@ -90,25 +90,25 @@ public class TestCFuncDir {
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, programCode, args);
 		
 		/* fetch references to sub objects */
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
-		rootTask = bts.getRootTask("root");
+		rootTask = actionMgr.getRootTask("root");
 		
 		/* there should only be one child task */
-		Integer childTasks[] = bts.getChildren(rootTask);
+		Integer childTasks[] = actionMgr.getChildren(rootTask);
 		assertEquals(1, childTasks.length);
 		
 		/* this is the task ID of the one task */
 		task = childTasks[0];
 
 		/* fetch the file access arrays */
-		fileAccesses = bts.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
-		fileReads = bts.getFilesAccessed(task, OperationType.OP_READ);
-		fileWrites = bts.getFilesAccessed(task, OperationType.OP_WRITE);
-		fileModifies = bts.getFilesAccessed(task, OperationType.OP_MODIFIED);
-		fileDeletes = bts.getFilesAccessed(task, OperationType.OP_DELETE);
+		fileAccesses = actionMgr.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
+		fileReads = actionMgr.getFilesAccessed(task, OperationType.OP_READ);
+		fileWrites = actionMgr.getFilesAccessed(task, OperationType.OP_WRITE);
+		fileModifies = actionMgr.getFilesAccessed(task, OperationType.OP_MODIFIED);
+		fileDeletes = actionMgr.getFilesAccessed(task, OperationType.OP_DELETE);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -131,9 +131,9 @@ public class TestCFuncDir {
 				"}", null);
 		
 		/* test that the child task ("true") executed in tmpDir */
-		Integer childTasks[] = bts.getChildren(task);
+		Integer childTasks[] = actionMgr.getChildren(task);
 		assertEquals(1, childTasks.length);
-		int dirId = bts.getDirectory(childTasks[0]);
+		int dirId = actionMgr.getDirectory(childTasks[0]);
 		assertEquals(tmpDir.toString(), fileMgr.getPathName(dirId));
 		
 		/*
@@ -148,9 +148,9 @@ public class TestCFuncDir {
 				"}", null);
 		
 		/* test that the child task ("true") executes in /, rather than tmpdir/invalid */
-		childTasks = bts.getChildren(task);
+		childTasks = actionMgr.getChildren(task);
 		assertEquals(1, childTasks.length);
-		dirId = bts.getDirectory(childTasks[0]);
+		dirId = actionMgr.getDirectory(childTasks[0]);
 		assertEquals("/", fileMgr.getPathName(dirId));
 	}
 
@@ -176,9 +176,9 @@ public class TestCFuncDir {
 				"}", null);
 		
 		/* test that the child task ("true") executed in tmpDir */
-		Integer childTasks[] = bts.getChildren(task);
+		Integer childTasks[] = actionMgr.getChildren(task);
 		assertEquals(1, childTasks.length);
-		int dirId = bts.getDirectory(childTasks[0]);
+		int dirId = actionMgr.getDirectory(childTasks[0]);
 		assertEquals(tmpDir.toString(), fileMgr.getPathName(dirId));
 		
 		/*
@@ -194,9 +194,9 @@ public class TestCFuncDir {
 				"}", null);
 		
 		/* test that the child task ("true") executes in / */
-		childTasks = bts.getChildren(task);
+		childTasks = actionMgr.getChildren(task);
 		assertEquals(1, childTasks.length);
-		dirId = bts.getDirectory(childTasks[0]);
+		dirId = actionMgr.getDirectory(childTasks[0]);
 		assertEquals("/", fileMgr.getPathName(dirId));
 	}
 

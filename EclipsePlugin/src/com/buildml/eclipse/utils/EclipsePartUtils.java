@@ -51,9 +51,9 @@ import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.BuildStoreVersionException;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskRecord;
@@ -103,7 +103,7 @@ public class EclipsePartUtils {
 	 */
 	public static TaskSet getActionSetFromSelection(IBuildStore buildStore, TreeSelection selection) {
 		
-		BuildTasks actionMgr = buildStore.getBuildTasks();
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		TaskSet acts = new TaskSet(actionMgr);
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {

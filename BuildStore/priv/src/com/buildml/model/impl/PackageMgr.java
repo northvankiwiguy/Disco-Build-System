@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
@@ -45,8 +46,8 @@ import com.buildml.utils.errors.ErrorCode;
 	/** The FileMgr object that manages the files in our packages. */
 	private IFileMgr fileMgr = null;
 	
-	/** The BuildTasks object that manages the tasks in our packages. */
-	private BuildTasks bts = null;
+	/** The ActionMgr object that manages the actions in our packages. */
+	private IActionMgr actionMgr = null;
 	
 	/**
 	 * The names of the scopes within a package. These are statically defined and
@@ -88,7 +89,7 @@ import com.buildml.utils.errors.ErrorCode;
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
-		this.bts = buildStore.getBuildTasks();
+		this.actionMgr = buildStore.getActionMgr();
 		
 		/* initialize prepared database statements */
 		addPackagePrepStmt = db.prepareStatement("insert into packages values (null, ?)");
@@ -599,7 +600,7 @@ import com.buildml.utils.errors.ErrorCode;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return new TaskSet(bts, results);
+		return new TaskSet(actionMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -633,7 +634,7 @@ import com.buildml.utils.errors.ErrorCode;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		return new TaskSet(bts, results);
+		return new TaskSet(actionMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

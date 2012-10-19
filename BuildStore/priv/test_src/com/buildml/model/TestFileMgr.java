@@ -17,8 +17,7 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -34,8 +33,8 @@ public class TestFileMgr {
 	/** The FileMgr associated with this BuildStore */
 	IFileMgr fileMgr;
 	
-	/** The BuildTasks associated with this BuildStore */
-	BuildTasks bts;
+	/** The ActionMgr associated with this BuildStore */
+	IActionMgr actionMgr;
 	
 	/** The FileAttributeMgr associated with this BuildStore */
 	IFileAttributeMgr fileAttrMgr;
@@ -53,7 +52,7 @@ public class TestFileMgr {
 		
 		/* fetch the associated FileNameSpaces, BuildTasks, etc. */
 		fileMgr = bs.getFileMgr();
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		fileAttrMgr = bs.getFileAttributeMgr();
 		fileIncludeMgr = bs.getFileIncludeMgr();
 	}
@@ -428,12 +427,12 @@ public class TestFileMgr {
 
 		/* test that we can't remove a directory that a task was executed in */
 		int path4 = fileMgr.addFile("/april/may/september");
-		int myBuildTask = bts.addBuildTask(bts.getRootTask("root"), path4, "/bin/true");
+		int myBuildTask = actionMgr.addBuildTask(actionMgr.getRootTask("root"), path4, "/bin/true");
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path4));
 		
 		/* test that we can't remove a path that's referenced by a task */
 		int path5 = fileMgr.addFile("/april/may/october");
-		bts.addFileAccess(myBuildTask, path5, OperationType.OP_READ);
+		actionMgr.addFileAccess(myBuildTask, path5, OperationType.OP_READ);
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path5));
 		
 		/* test that we can't remove a path that's attached to root */

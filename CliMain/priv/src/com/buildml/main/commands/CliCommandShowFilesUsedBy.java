@@ -17,12 +17,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 
@@ -150,14 +150,14 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		/* are we searching for reads, writes, or both? */
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);
 
-		BuildTasks bts = buildStore.getBuildTasks();
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* fetch the list of tasks we're querying */
 		String taskSpecs = args[0];
-		TaskSet ts = CliUtils.getCmdLineTaskSet(bts, taskSpecs);
+		TaskSet ts = CliUtils.getCmdLineTaskSet(actionMgr, taskSpecs);
 		if (ts == null) {
 			CliUtils.reportErrorAndExit("no tasks were selected.");
 		}

@@ -14,7 +14,6 @@ package com.buildml.model;
 
 import java.io.IOException;
 
-import com.buildml.model.impl.BuildTasks;
 
 /**
  * A BuildStore object is the main class that implements a BuildML build system. By creating
@@ -55,12 +54,12 @@ public interface IBuildStore {
 	public abstract IFileIncludeMgr getFileIncludeMgr();
 
 	/**
-	 * Fetch the BuildTasks manager associated with this BuildStore. This object
-	 * contains information about all build tasks.
+	 * Fetch the ActionMgr manager associated with this BuildStore. This object
+	 * contains information about all build actions.
 	 * 
-	 * @return A BuildTasks manager object.
+	 * @return An ActionMgr manager object.
 	 */
-	public abstract BuildTasks getBuildTasks();
+	public abstract IActionMgr getActionMgr();
 
 	/**
 	 * Fetch the Reports manager associated with this BuildStore. This object

@@ -19,11 +19,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
@@ -59,10 +60,10 @@ import com.buildml.utils.errors.ErrorCode;
 	private IFileMgr fileMgr = null;
 	
 	/**
-	 * The BuildTasks object we're reporting on. This is provided to us when the
+	 * The ActionMgr object we're reporting on. This is provided to us when the
 	 * Reports object is first instantiated.
 	 */
-	private BuildTasks bts = null;
+	private IActionMgr actionMgr = null;
 	
 	/**
 	 * Various prepared statement for database access.
@@ -96,7 +97,7 @@ import com.buildml.utils.errors.ErrorCode;
 	public ReportMgr(BuildStore buildStore) {
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
-		this.bts = buildStore.getBuildTasks();
+		this.actionMgr = buildStore.getActionMgr();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from buildTaskFiles, files " +
@@ -279,7 +280,7 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
-		return new TaskSet(bts, results);
+		return new TaskSet(actionMgr, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -312,7 +313,7 @@ import com.buildml.utils.errors.ErrorCode;
 			OperationType opType) {
 		
 		/* create an empty result TaskSet */
-		TaskSet results = new TaskSet(bts);
+		TaskSet results = new TaskSet(actionMgr);
 		
 		/* for each file in the FileSet */
 		for (Iterator<Integer> iterator = fileSet.iterator(); iterator.hasNext();) {		
@@ -459,7 +460,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public TaskSet reportAllActions() {
-		TaskSet results = new TaskSet(bts);
+		TaskSet results = new TaskSet(actionMgr);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectAllActionsPrepStmt);
 
@@ -548,7 +549,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public TaskSet reportActionsFromPackageSet(PackageSet pkgSet) {
-		TaskSet results = new TaskSet(bts);
+		TaskSet results = new TaskSet(actionMgr);
 		IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 		
 		/*

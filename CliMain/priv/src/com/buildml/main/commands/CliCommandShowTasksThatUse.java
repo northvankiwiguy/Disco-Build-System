@@ -17,12 +17,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 
@@ -150,7 +150,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
-		BuildTasks bts = buildStore.getBuildTasks();
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
@@ -166,7 +166,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		taskSet.populateWithParents();
 
 		/* display the resulting set of tasks */
-		CliUtils.printTaskSet(System.out, bts, fileMgr, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
+		CliUtils.printTaskSet(System.out, actionMgr, fileMgr, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

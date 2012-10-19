@@ -22,9 +22,9 @@ import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.SubEditor;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.utils.print.PrintUtils;
 
 /**
@@ -40,7 +40,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	 *=====================================================================================*/
 
 	/** The Action Manager object we'll use for querying information from the BuildStore */
-	private BuildTasks actionMgr;
+	private IActionMgr actionMgr;
 	
 	/** The BuildStore that we're viewing. */
 	private IBuildStore buildStore;
@@ -64,7 +64,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	 * @param editor The editor that we're providing text/images for.
 	 * @param actionMgr The FileNameSpaces object we're graphically representing.
 	 */
-	public ActionsEditorLabelCol1Provider(SubEditor editor, BuildTasks actionMgr) {
+	public ActionsEditorLabelCol1Provider(SubEditor editor, IActionMgr actionMgr) {
 
 		this.actionMgr = actionMgr;
 		this.buildStore = actionMgr.getBuildStore();

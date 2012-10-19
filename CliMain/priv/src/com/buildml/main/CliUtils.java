@@ -18,10 +18,10 @@ import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
 
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.TaskSet;
@@ -133,15 +133,15 @@ public class CliUtils {
 	 *   <li>The special syntax "%pkg/foo" means all tasks in the package "foo".</li>
 	 *   <li>The special syntax "%not-pkg/foo" means all tasks outside the package "foo".</li>
 	 * </ol>
-	 * @param bts The BuildTasks manager object to query.
+	 * @param actionMgr The BuildTasks manager object to query.
 	 * @param taskSpecs The command line argument providing the task specification string.
 	 * @return The TaskSet, as described by the input task specification.
 	 */
-	public static TaskSet getCmdLineTaskSet(BuildTasks bts, String taskSpecs) {
+	public static TaskSet getCmdLineTaskSet(IActionMgr actionMgr, String taskSpecs) {
 		
 		String taskSpecList[] = taskSpecs.split(":");
 
-		TaskSet result = new TaskSet(bts);
+		TaskSet result = new TaskSet(actionMgr);
 		if (result.populateWithTasks(taskSpecList) != ErrorCode.OK) {
 			System.err.println("Error: Invalid task filter provided.");
 			System.exit(1);
@@ -221,7 +221,7 @@ public class CliUtils {
 	 * that all tasks are displayed, you should first call TaskSet.populateWithParents().
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param bts The BuildTasks manager object containing the task information.
+	 * @param actionMgr The BuildTasks manager object containing the task information.
 	 * @param fileMgr The FileNameSpaces manager object containing file name information.
 	 * @param pkgMgr The Packages manager object containing package information.
 	 * @param resultTaskSet The set of tasks to be displayed (the results of some previous query).
@@ -230,7 +230,7 @@ public class CliUtils {
 	 * @param showPkgs Set to true if the package names should be shown.
 	 */
 	public static void printTaskSet(
-			PrintStream outStream, BuildTasks bts, IFileMgr fileMgr, IPackageMgr pkgMgr,
+			PrintStream outStream, IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr,
 			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
 			boolean showPkgs) {
 		
@@ -238,12 +238,12 @@ public class CliUtils {
 		 * We always start at the top root, even though we may only display a subset
 		 * of the paths underneath that root.
 		 */
-		int topRoot = bts.getRootTask("");
+		int topRoot = actionMgr.getRootTask("");
 	
 		/* call the helper function to display each of our children */
-		Integer children[] = bts.getChildren(topRoot);
+		Integer children[] = actionMgr.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fileMgr, pkgMgr, children[i], 
+			printTaskSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
 					resultTaskSet, filterTaskSet, outputFormat, showPkgs, 1);
 		}
 	}
@@ -619,7 +619,7 @@ public class CliUtils {
 	 * as it traverses the TaskSet's tree structure.
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param bts The BuildTasks manager object containing the task information.
+	 * @param actionMgr The BuildTasks manager object containing the task information.
 	 * @param fileMgr The FileNameSpaces manager object containing file name information.
 	 * @param pkgMgr The Packages manager object containing the package information.
 	 * @param taskId The ID of the task we're currently displaying (at this level of recursion).
@@ -630,7 +630,7 @@ public class CliUtils {
 	 * @param indentLevel The number of spaces to indent this task by (at this recursion level).
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
-			BuildTasks bts, IFileMgr fileMgr, IPackageMgr pkgMgr, 
+			IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr, 
 			int taskId, TaskSet resultTaskSet,
 			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showPkgs,
 			int indentLevel) {
@@ -659,16 +659,16 @@ public class CliUtils {
 		 */
 		String command;
 		if (outputFormat == DisplayWidth.ONE_LINE) {
-			command = bts.getCommandSummary(taskId, getColumnWidth() - indentLevel - 3);
+			command = actionMgr.getCommandSummary(taskId, getColumnWidth() - indentLevel - 3);
 		} else {
-			command = bts.getCommand(taskId);
+			command = actionMgr.getCommand(taskId);
 		}
 		if (command == null) {
 			command = "<unknown command>";
 		}
 		
 		/* fetch the name of the directory the task was executed in */
-		int taskDirId = bts.getDirectory(taskId);
+		int taskDirId = actionMgr.getDirectory(taskId);
 		String taskDirName = fileMgr.getPathName(taskDirId);
 		
 		/* display the correct number of "-" characters */
@@ -702,9 +702,9 @@ public class CliUtils {
 		}
 		
 		/* recursively call ourselves to display each of our children */
-		Integer children[] = bts.getChildren(taskId);
+		Integer children[] = actionMgr.getChildren(taskId);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fileMgr, pkgMgr, children[i], 
+			printTaskSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
 					resultTaskSet, filterTaskSet, outputFormat, showPkgs, indentLevel + 1);
 		}
 		

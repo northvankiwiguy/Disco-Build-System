@@ -19,8 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -38,8 +37,8 @@ public class TestReportMgr2 {
 	/** Our test FileMgr object */
 	private IFileMgr fileMgr;
 	
-	/** Our test BuildTasks object */
-	private BuildTasks bts;
+	/** Our test ActionMgr object */
+	private IActionMgr actionMgr;
 	
 	/** Our test Reports object */
 	private IReportMgr reports;
@@ -63,7 +62,7 @@ public class TestReportMgr2 {
 		/* get all the objects we need to set up the test scenario */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		fileMgr = bs.getFileMgr();
-		bts = bs.getBuildTasks();
+		actionMgr = bs.getActionMgr();
 		reports = bs.getReportMgr();
 		
 		/* add a realistic-looking set of files, including .h, .c, .o, .a and .exe files */
@@ -87,62 +86,62 @@ public class TestReportMgr2 {
 		int dirHome = fileMgr.getPath("/home");
 		
 		/* add all tasks underneath the root */
-		int rootTask = bts.getRootTask("");
+		int rootTask = actionMgr.getRootTask("");
 		
 		/* compile cat.c -> cat.o */
-		int taskPkgCat = bts.addBuildTask(rootTask, dirHome, "gcc -c cat.c");
-		bts.addFileAccess(taskPkgCat, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgCat, fileHousePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgCat, fileCatC, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgCat, fileCatO, OperationType.OP_WRITE);
+		int taskPkgCat = actionMgr.addBuildTask(rootTask, dirHome, "gcc -c cat.c");
+		actionMgr.addFileAccess(taskPkgCat, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgCat, fileHousePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgCat, fileCatC, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgCat, fileCatO, OperationType.OP_WRITE);
 
 		/* compile dog.c -> dog.o */
-		int taskPkgDog = bts.addBuildTask(rootTask, dirHome, "gcc -c dog.c");
-		bts.addFileAccess(taskPkgDog, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgDog, fileHousePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgDog, fileDogC, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgDog, fileDogO, OperationType.OP_WRITE);
+		int taskPkgDog = actionMgr.addBuildTask(rootTask, dirHome, "gcc -c dog.c");
+		actionMgr.addFileAccess(taskPkgDog, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgDog, fileHousePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgDog, fileDogC, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgDog, fileDogO, OperationType.OP_WRITE);
 		
 		/* compile bunny.c -> bunny.o */
-		int taskPkgBunny = bts.addBuildTask(rootTask, dirHome, "gcc -c bunny.c");
-		bts.addFileAccess(taskPkgBunny, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgBunny, fileHousePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgBunny, fileBunnyC, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgBunny, fileBunnyO, OperationType.OP_WRITE);
+		int taskPkgBunny = actionMgr.addBuildTask(rootTask, dirHome, "gcc -c bunny.c");
+		actionMgr.addFileAccess(taskPkgBunny, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgBunny, fileHousePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgBunny, fileBunnyC, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgBunny, fileBunnyO, OperationType.OP_WRITE);
 		
 		/* compile giraffe.c -> giraffe.o */
-		int taskPkgGiraffe = bts.addBuildTask(rootTask, dirHome, "gcc -c giraffe.c");
-		bts.addFileAccess(taskPkgGiraffe, filePetH, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgGiraffe, fileGiraffeC, OperationType.OP_READ);
-		bts.addFileAccess(taskPkgGiraffe, fileGiraffeO, OperationType.OP_WRITE);
+		int taskPkgGiraffe = actionMgr.addBuildTask(rootTask, dirHome, "gcc -c giraffe.c");
+		actionMgr.addFileAccess(taskPkgGiraffe, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgGiraffe, fileGiraffeC, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskPkgGiraffe, fileGiraffeO, OperationType.OP_WRITE);
 		
 		/* archive cat.o -> cat.a */
-		int taskArchCat = bts.addBuildTask(rootTask, dirHome, "ar c cat.a cat.o");
-		bts.addFileAccess(taskArchCat, fileCatO, OperationType.OP_READ);
-		bts.addFileAccess(taskArchCat, fileCatA, OperationType.OP_WRITE);
+		int taskArchCat = actionMgr.addBuildTask(rootTask, dirHome, "ar c cat.a cat.o");
+		actionMgr.addFileAccess(taskArchCat, fileCatO, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskArchCat, fileCatA, OperationType.OP_WRITE);
 
 		/* archive dog.o -> dog.a */
-		int taskArchDog = bts.addBuildTask(rootTask, dirHome, "ar c dog.a dog.o");
-		bts.addFileAccess(taskArchDog, fileDogO, OperationType.OP_READ);
-		bts.addFileAccess(taskArchDog, fileDogA, OperationType.OP_WRITE);
+		int taskArchDog = actionMgr.addBuildTask(rootTask, dirHome, "ar c dog.a dog.o");
+		actionMgr.addFileAccess(taskArchDog, fileDogO, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskArchDog, fileDogA, OperationType.OP_WRITE);
 		
 		/* archive bunny.o -> bunny.a */
-		int taskArchBunny = bts.addBuildTask(rootTask, dirHome, "ar c bunny.a bunny.o");
-		bts.addFileAccess(taskArchBunny, fileBunnyO, OperationType.OP_READ);
-		bts.addFileAccess(taskArchBunny, fileBunnyA, OperationType.OP_WRITE);
+		int taskArchBunny = actionMgr.addBuildTask(rootTask, dirHome, "ar c bunny.a bunny.o");
+		actionMgr.addFileAccess(taskArchBunny, fileBunnyO, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskArchBunny, fileBunnyA, OperationType.OP_WRITE);
 		
 		/* archive giraffe.o -> giraffe.a */
-		int taskArchGiraffe = bts.addBuildTask(rootTask, dirHome, "ar c giraffe.a giraffe.o");
-		bts.addFileAccess(taskArchGiraffe, fileGiraffeO, OperationType.OP_READ);
-		bts.addFileAccess(taskArchGiraffe, fileGiraffeA, OperationType.OP_WRITE);
+		int taskArchGiraffe = actionMgr.addBuildTask(rootTask, dirHome, "ar c giraffe.a giraffe.o");
+		actionMgr.addFileAccess(taskArchGiraffe, fileGiraffeO, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskArchGiraffe, fileGiraffeA, OperationType.OP_WRITE);
 
 		/* link cat.a, dog.a, giraffe.a and bunny.a -> animals.exe */
-		int taskLinkAnimals = bts.addBuildTask(rootTask, dirHome, "ln -o animals.exe cat.a dog.a bunny.a giraffe.a");
-		bts.addFileAccess(taskLinkAnimals, fileCatA, OperationType.OP_READ);
-		bts.addFileAccess(taskLinkAnimals, fileDogA, OperationType.OP_READ);
-		bts.addFileAccess(taskLinkAnimals, fileBunnyA, OperationType.OP_READ);
-		bts.addFileAccess(taskLinkAnimals, fileGiraffeA, OperationType.OP_READ);
-		bts.addFileAccess(taskLinkAnimals, fileAnimalsExe, OperationType.OP_WRITE);
+		int taskLinkAnimals = actionMgr.addBuildTask(rootTask, dirHome, "ln -o animals.exe cat.a dog.a bunny.a giraffe.a");
+		actionMgr.addFileAccess(taskLinkAnimals, fileCatA, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskLinkAnimals, fileDogA, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskLinkAnimals, fileBunnyA, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskLinkAnimals, fileGiraffeA, OperationType.OP_READ);
+		actionMgr.addFileAccess(taskLinkAnimals, fileAnimalsExe, OperationType.OP_WRITE);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -461,14 +460,14 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* add a bunch of actions - they should all be in the None package */
-		int action1 = bts.addBuildTask(0, 0, "command 1");
-		int action2 = bts.addBuildTask(0, 0, "command 2");
-		int action3 = bts.addBuildTask(0, 0, "command 3");
-		int action4 = bts.addBuildTask(0, 0, "command 4");
-		int action5 = bts.addBuildTask(0, 0, "command 5");
-		int action6 = bts.addBuildTask(0, 0, "command 6");
-		int action7 = bts.addBuildTask(0, 0, "command 7");
-		int action8 = bts.addBuildTask(0, 0, "command 8");
+		int action1 = actionMgr.addBuildTask(0, 0, "command 1");
+		int action2 = actionMgr.addBuildTask(0, 0, "command 2");
+		int action3 = actionMgr.addBuildTask(0, 0, "command 3");
+		int action4 = actionMgr.addBuildTask(0, 0, "command 4");
+		int action5 = actionMgr.addBuildTask(0, 0, "command 5");
+		int action6 = actionMgr.addBuildTask(0, 0, "command 6");
+		int action7 = actionMgr.addBuildTask(0, 0, "command 7");
+		int action8 = actionMgr.addBuildTask(0, 0, "command 8");
 		
 		/* empty package set still gives an empty ActionSet */
 		tset = reports.reportActionsFromPackageSet(cs);

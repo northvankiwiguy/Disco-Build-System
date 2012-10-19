@@ -19,11 +19,11 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
@@ -106,8 +106,8 @@ import com.buildml.utils.string.ShellCommandUtils;
 	/** The BuildStore we should add trace file information to (null = don't add to BuildStore). */
 	private IBuildStore buildStore;
 	
-	/** The BuildTasks object contained within our BuildStore (null = don't add to BuildStore). */
-	private BuildTasks buildTasks;
+	/** The ActionMgr object contained within our BuildStore (null = don't add to BuildStore). */
+	private IActionMgr actionMgr;
 	
 	/** The FileMgr object contained within our BuildStore (null = don't add to BuildStore). */
 	private IFileMgr fileMgr;
@@ -164,7 +164,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 		
 		/* these objects are part of our BuildStore object */
 		if (buildStore != null) {
-			this.buildTasks = buildStore.getBuildTasks();
+			this.actionMgr = buildStore.getActionMgr();
 			this.fileMgr = buildStore.getFileMgr();
 		}
 		
@@ -173,7 +173,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 		 * Insert the parent/root ID numbers to signify the first process/task 
 		 */
 		processToTaskMap = new HashMap<Integer, Integer>();
-		processToTaskMap.put(Integer.valueOf(0), buildTasks.getRootTask("root"));
+		processToTaskMap.put(Integer.valueOf(0), actionMgr.getRootTask("root"));
 		
 		/* set up input stream, and variables for reading it */
 		inputStream = new GZIPInputStream(new FileInputStream(fileName));
@@ -336,7 +336,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 			}
 			
 			/* add the new task to the build store */
-			int newTaskId = buildTasks.addBuildTask(parentTaskId, taskDirId, command);
+			int newTaskId = actionMgr.addBuildTask(parentTaskId, taskDirId, command);
 			
 			/* associate CFS's process number with BuildStore's taskID */
 			setTaskId(processNum, newTaskId);
@@ -433,7 +433,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 		}
 		
 		/* add the file access information to the build store */
-		buildTasks.addFileAccess(taskId, fileId, direction);
+		actionMgr.addFileAccess(taskId, fileId, direction);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.ConversionUtils;
-import com.buildml.model.impl.BuildTasks;
+import com.buildml.model.IActionMgr;
 
 /**
  * Content Provider for the TreeViewer used as the main viewer in the ActionsEditor.
@@ -35,7 +35,7 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	private SubEditor editor = null;
 	
 	/** The Action Manager object we should query for file information */
-	private BuildTasks actionMgr = null;
+	private IActionMgr actionMgr = null;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -47,7 +47,7 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	 * @param editor The editor that this content provider is associated with.
 	 * @param actionMgr The BuildTasks object that we're displaying information from.
 	 */
-	public ActionsEditorContentProvider(SubEditor editor, BuildTasks actionMgr) {
+	public ActionsEditorContentProvider(SubEditor editor, IActionMgr actionMgr) {
 
 		this.editor = editor;
 		this.actionMgr = actionMgr;

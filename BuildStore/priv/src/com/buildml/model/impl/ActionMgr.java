@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
@@ -33,16 +34,11 @@ import com.buildml.utils.string.ShellCommandUtils;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class BuildTasks {
+public class ActionMgr implements IActionMgr {
 
 	/*=====================================================================================*
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
-
-	/**
-	 * The maximum number of tasks that this BuildTasks object can handle.
-	 */
-	public static final int MAX_TASKS = 16777216;
 
 	/** Data type for specifying the type of a file access that a task performs. */
 	public enum OperationType {
@@ -101,7 +97,7 @@ public class BuildTasks {
 	 * 
 	 * @param buildStore The BuildStore object that "owns" this BuildTasks manager
 	 */
-	public BuildTasks(BuildStore buildStore) {
+	public ActionMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
@@ -137,14 +133,10 @@ public class BuildTasks {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 	
-	/**
-	 * Add a new build task, and return the task ID number.
-	 * 
-	 * @param parentTaskId The task ID of the new task's parent.
-	 * @param taskDirId The ID of the path (a directory) in which this task was executed.
-	 * @param command The shell command associated with this task.
-	 * @return The new task's ID.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#addBuildTask(int, int, java.lang.String)
 	 */
+	@Override
 	public int addBuildTask(int parentTaskId, int taskDirId, String command) {
 		
 		try {
@@ -212,14 +204,10 @@ public class BuildTasks {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Record the fact that the specific build task accessed the specified file. Adding
-	 * the same relationship a second or successive time has no effect.
-	 * 
-	 * @param buildTaskId The ID of the build task that accessed the file.
-	 * @param fileNumber The file's ID number.
-	 * @param newOperation How the task accessed the file (read, write, delete, etc).
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#addFileAccess(int, int, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
+	@Override
 	public void addFileAccess(int buildTaskId, int fileNumber, OperationType newOperation) {
 		
 		/* 
@@ -318,14 +306,10 @@ public class BuildTasks {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return an array of files that were accessed by this build task.
-	 * 
-	 * @param taskId The build task that accessed the files.
-	 * @param operation The type of operation we're interested in (such as OP_READ,
-	 *    OP_WRITE, or OP_UNSPECIFIED if you don't care).
-	 * @return An array of file IDs.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getFilesAccessed(int, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
+	@Override
 	public Integer [] getFilesAccessed(int taskId, OperationType operation) {
 				
 		List<Integer> results;
@@ -361,14 +345,10 @@ public class BuildTasks {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return an array of tasks that accessed a specific file.
-	 * 
-	 * @param fileId The file we're interested in querying for.
-	 * @param operation The operation that the tasks perform on this file (such as OP_READ,
-	 *    OP_WRITE, or OP_UNSPECIFIED if you don't care).
-	 * @return An array of task IDs that access this file.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getTasksThatAccess(int, com.buildml.model.impl.BuildTasks.OperationType)
 	 */
+	@Override
 	public Integer [] getTasksThatAccess(int fileId, OperationType operation) {
 		
 		List<Integer> results;
@@ -405,11 +385,10 @@ public class BuildTasks {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the list of all tasks that execute within the directory specified by pathId.
-	 * @param pathId The directory in which the tasks must be executed.
-	 * @return The list of tasks.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getTasksInDirectory(int)
 	 */
+	@Override
 	public Integer[] getTasksInDirectory(int pathId) {
 		
 		Integer intResults[] = null;
@@ -425,12 +404,10 @@ public class BuildTasks {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the build task's command line string.
-	 * 
-	 * @param taskId The build task we're querying.
-	 * @return The build task's command line string.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getCommand(int)
 	 */
+	@Override
 	public String getCommand(int taskId) {
 		String [] stringResults = null;
 		try {
@@ -459,16 +436,10 @@ public class BuildTasks {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch a summary of this task's command. The summary string is designed to give a
-	 * high-level overview of what the command does. The summary string for certain commands
-	 * may contain the command name and most important parameters, whereas for other commands
-	 * it may just be the first 'width' characters of the shell command.
-	 * 
-	 * @param taskId The ID of the task.
-	 * @param width The maximum number of characters in the summary string.
-	 * @return The summary string for this task's command.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getCommandSummary(int, int)
 	 */
+	@Override
 	public String getCommandSummary(int taskId, int width) {
 		
 		/* 
@@ -498,13 +469,10 @@ public class BuildTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 
-	/**
-	 * Given the ID of a task, return the task's parent task.
-	 * 
-	 * @param taskId The task to return the parent of.
-	 * @return The ID of the task's parent, or NOT_FOUND if the task is at the root, or
-	 * BAD_VALUE if the task ID is invalid.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getParent(int)
 	 */
+	@Override
 	public int getParent(int taskId) {
 		
 		/* query the database, based on the task Id */
@@ -542,12 +510,10 @@ public class BuildTasks {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the path ID of the directory in which this task was executed.
-	 * 
-	 * @param taskId The ID of the task.
-	 * @return The path ID of the directory in which this task was executed.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getDirectory(int)
 	 */
+	@Override
 	public int getDirectory(int taskId) {
 		Integer [] intResults = null;
 		try {
@@ -576,13 +542,10 @@ public class BuildTasks {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given the ID of task, return an array of the task's children (possibly empty).
-	 * 
-	 * @param taskId The task that is the parent of the children to be returned.
-	 * @return An array of child task IDs (in no particular order). Or the empty array if there
-	 * are no children.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getChildren(int)
 	 */
+	@Override
 	public Integer [] getChildren(int taskId) {
 		
 		Integer [] intResults = null;
@@ -598,12 +561,10 @@ public class BuildTasks {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the build task ID of the task with the associated root name.
-	 * 
-	 * @param rootName The name of the root, which is attached to a task.
-	 * @return The root task's ID.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getRootTask(java.lang.String)
 	 */
+	@Override
 	public int getRootTask(String rootName) {
 		
 		// TODO: return something other than 0. Currently the default task is created
@@ -613,11 +574,10 @@ public class BuildTasks {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the BuildStore object that owns this BuildTasks object.
-	 *
-	 * @return The BuildStore object that owns this BuildTasks object.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IActionMgr#getBuildStore()
 	 */
+	@Override
 	public IBuildStore getBuildStore() {
 		return buildStore;
 	}

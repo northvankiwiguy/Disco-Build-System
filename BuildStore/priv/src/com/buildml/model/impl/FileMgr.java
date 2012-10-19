@@ -17,11 +17,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.model.types.PathNameCache;
 import com.buildml.model.types.PathNameCache.PathNameCacheValue;
 import com.buildml.utils.errors.ErrorCode;
@@ -537,7 +538,7 @@ public class FileMgr implements IFileMgr {
 		 * We need to refer to all these helper objects, to see if they
 		 * use the path we're trying to delete.
 		 */
-		BuildTasks buildTasks = buildStore.getBuildTasks();
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		IFileAttributeMgr fileAttrMgr = buildStore.getFileAttributeMgr();
 		IFileIncludeMgr fileIncludeMgr = buildStore.getFileIncludeMgr();
 		
@@ -547,12 +548,12 @@ public class FileMgr implements IFileMgr {
 		}
 
 		/* check that it's not used as the directory for any tasks */
-		if (buildTasks.getTasksInDirectory(pathId).length != 0) {
+		if (actionMgr.getTasksInDirectory(pathId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
 		/* check that it's not accessed by any tasks */
-		if (buildTasks.getTasksThatAccess(pathId, 
+		if (actionMgr.getTasksThatAccess(pathId, 
 					OperationType.OP_UNSPECIFIED).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}

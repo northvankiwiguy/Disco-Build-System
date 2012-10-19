@@ -52,8 +52,8 @@ import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.TaskRecord;
@@ -80,7 +80,7 @@ public class ActionsEditor extends SubEditor {
 	private TreeViewerColumn pkgColumn;
 	
 	/** The Action manager object that contains all the file information for this BuildStore */
-	private BuildTasks actionMgr = null;
+	private IActionMgr actionMgr = null;
 	
 	/** The ArrayContentProvider object providing this editor's content */
 	private ActionsEditorContentProvider contentProvider;
@@ -125,7 +125,7 @@ public class ActionsEditor extends SubEditor {
 	public ActionsEditor(IBuildStore buildStore, String tabTitle) {
 		super(buildStore, tabTitle);
 		
-		actionMgr = buildStore.getBuildTasks();
+		actionMgr = buildStore.getActionMgr();
 		
 		/* initially, all paths are visible */
 		visibleActions = buildStore.getReportMgr().reportAllActions();

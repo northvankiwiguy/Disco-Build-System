@@ -17,10 +17,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.BuildTasks.OperationType;
+import com.buildml.model.impl.ActionMgr.OperationType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.PathUtils;
@@ -65,8 +65,8 @@ import com.buildml.utils.string.PathUtils;
 	 */
 	StringBuffer commandArgv;
 	
-	/** The BuildTasks object associated with this BuildStore. */
-	private BuildTasks buildTasks;
+	/** The ActionMgr object associated with this BuildStore. */
+	private IActionMgr actionMgr;
 	
 	/** The FileMgr object associated with this BuildStore. */
 	private IFileMgr fileMgr;
@@ -103,14 +103,14 @@ import com.buildml.utils.string.PathUtils;
 	 * @param buildStore The BuildStore object to be populated.
 	 */
 	public ElectricAnnoSAXHandler(IBuildStore buildStore) {
-		buildTasks = buildStore.getBuildTasks();
+		actionMgr = buildStore.getActionMgr();
 		fileMgr = buildStore.getFileMgr();
 		
 		/* create a stack to remember the hierarchy of tasks */
 		taskStack = new ArrayList<Integer>();
 		
 		/* To start with, all tasks we encounter are children of the root task */
-		mostRecentTask = currentParentTask = buildTasks.getRootTask("");
+		mostRecentTask = currentParentTask = actionMgr.getRootTask("");
 		taskStack.add(currentParentTask);
 		
 		/* we'll also need to track our current directory */
@@ -246,7 +246,7 @@ import com.buildml.utils.string.PathUtils;
 				String argvString = commandArgv.toString();
 				commandArgv = null;	
 				
-				int newTaskId = buildTasks.addBuildTask(currentParentTask, currentDirId, argvString);
+				int newTaskId = actionMgr.addBuildTask(currentParentTask, currentDirId, argvString);
 				
 				/* record the ID of this task, since it might be the new parent task soon */
 				mostRecentTask = newTaskId;
@@ -255,7 +255,7 @@ import com.buildml.utils.string.PathUtils;
 				for (String file : filesRead) {
 					int newFileId = fileMgr.addFile(file);
 					if (newFileId != ErrorCode.BAD_PATH) {
-						buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
+						actionMgr.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
 					} else {
 						throw new FatalBuildScannerError("Unable to register new file in database: " + file);
 					}
@@ -265,7 +265,7 @@ import com.buildml.utils.string.PathUtils;
 				for (String file : filesWritten) {
 					int newFileId = fileMgr.addFile(file);
 					if (newFileId != ErrorCode.BAD_PATH) {
-						buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
+						actionMgr.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
 					} else {
 						throw new FatalBuildScannerError("Unable to register new file in database: " + file);
 					}

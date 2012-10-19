@@ -12,10 +12,10 @@
 
 package com.buildml.model.types;
 
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.BuildTasks;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -35,9 +35,9 @@ public class TaskSet extends IntegerTreeSet {
 	 *=====================================================================================*/
 
 	/**
-	 * The BuildTasks manager object that contains the tasks referenced in this TaskSet.
+	 * The ActionMgr object that contains the actions referenced in this TaskSet.
 	 */
-	private BuildTasks bts;
+	private IActionMgr actionMgr;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -46,15 +46,15 @@ public class TaskSet extends IntegerTreeSet {
 	/**
 	 * Creates a new TaskSet and initializes it to being empty.
 	 * 
-	 * @param bts The BuildTasks manager object that owns the tasks in this set.
+	 * @param actionMgr The ActionMgr object that owns the actions in this set.
 	 */	
-	public TaskSet(BuildTasks bts) {
+	public TaskSet(IActionMgr actionMgr) {
 		
 		/* most of the functionality is provided by the IntegerTreeSet class */
 		super();
 		
-		/* except we also need to record our BuildTasks object */
-		this.bts = bts;
+		/* except we also need to record our ActionMgr object */
+		this.actionMgr = actionMgr;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -62,16 +62,16 @@ public class TaskSet extends IntegerTreeSet {
 	/**
 	 * Creates a new TaskSet and initializes it from an array of integer values.
 	 * 
-	 * @param bts The BuildTasks manager object that owns the tasks in this set.
-	 * @param initValues The initial values to be added to the task set.
+	 * @param actionMgr The ActionMgr object that owns the actions in this set.
+	 * @param initValues The initial values to be added to the ActionSet.
 	 */
-	public TaskSet(BuildTasks bts, Integer[] initValues) {
+	public TaskSet(IActionMgr actionMgr, Integer[] initValues) {
 
 		/* most of the functionality is provided by the IntegerTreeSet class */
 		super(initValues);
 		
-		/* except we also need to record our BuildTasks object */
-		this.bts = bts;
+		/* except we also need to record our ActionMgr object */
+		this.actionMgr = actionMgr;
 	}
 
 	/*=====================================================================================*
@@ -86,7 +86,7 @@ public class TaskSet extends IntegerTreeSet {
 	 */
 	@Override
 	public int getParent(int id) {
-		int parent = bts.getParent(id);
+		int parent = actionMgr.getParent(id);
 		
 		/* if we've reached the root, our parent is ourselves */
 		if (parent == ErrorCode.NOT_FOUND) {
@@ -104,7 +104,7 @@ public class TaskSet extends IntegerTreeSet {
 	 */
 	@Override
 	public Integer[] getChildren(int id) {
-		return bts.getChildren(id);
+		return actionMgr.getChildren(id);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -116,8 +116,8 @@ public class TaskSet extends IntegerTreeSet {
 	 */
 	public void mergeSet(TaskSet second) {
 		
-		/* ensure the BuildTasks are the same for both TaskSets */
-		if (bts != second.bts) {
+		/* ensure the ActionMgr is the same for both TaskSets */
+		if (actionMgr != second.actionMgr) {
 			return;
 		}
 		super.mergeSet(second);
@@ -151,7 +151,7 @@ public class TaskSet extends IntegerTreeSet {
 	 */
 	public int populateWithTasks(String taskSpecs[]) {
 	
-		IBuildStore bs = bts.getBuildStore();
+		IBuildStore bs = actionMgr.getBuildStore();
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		
 		/* 
@@ -276,7 +276,7 @@ public class TaskSet extends IntegerTreeSet {
 	 */
 	protected int getMaxIdNumber()
 	{
-		return BuildTasks.MAX_TASKS;
+		return IActionMgr.MAX_TASKS;
 	}
 	
 	/*=====================================================================================*
@@ -307,7 +307,7 @@ public class TaskSet extends IntegerTreeSet {
 		 * or if there's no depth range specified (defaults to -1) 
 		 */
 		if ((depth > 1) || (depth == -1)) {
-			Integer children [] = bts.getChildren(taskNum);
+			Integer children [] = actionMgr.getChildren(taskNum);
 			for (int i = 0; i < children.length; i++) {
 				populateWithTasksHelper(children[i], (depth == -1) ? -1 : depth - 1, toBeAdded);
 			}
