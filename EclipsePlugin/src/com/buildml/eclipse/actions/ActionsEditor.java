@@ -204,7 +204,7 @@ public class ActionsEditor extends SubEditor {
 		ActionsEditorLabelCol1Provider labelProviderCol1 = 
 				new ActionsEditorLabelCol1Provider(this, actionMgr);
 		ActionsEditorLabelCol2Provider labelProviderCol2 = 
-				new ActionsEditorLabelCol2Provider(this, buildStore.getPackages());
+				new ActionsEditorLabelCol2Provider(this, buildStore.getPackageMgr());
 		actionsTreeViewer.setContentProvider(contentProvider);
 		treeColumn.setLabelProvider(labelProviderCol1);
 		pkgColumn.setLabelProvider(labelProviderCol2);

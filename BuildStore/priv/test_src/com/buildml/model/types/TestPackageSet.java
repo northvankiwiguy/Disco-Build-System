@@ -18,8 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.types.PackageSet;
 
 
@@ -33,7 +33,7 @@ public class TestPackageSet {
 	private BuildStore bs;
 	
 	/** The corresponding Packages class */
-	private Packages packages;
+	private IPackageMgr pkgMgr;
 	
 	/** The PackageSet under test */
 	private PackageSet pkgSet;
@@ -56,16 +56,16 @@ public class TestPackageSet {
 	@Before
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
-		packages = bs.getPackages();
+		pkgMgr = bs.getPackageMgr();
 		pkgSet = new PackageSet(bs);
 		
 		/* add a bunch of packages to the BuildStore */
-		idPkg1 = packages.addPackage("Pkg1");
-		idPkg2 = packages.addPackage("Pkg2");
-		idGreenPkg = packages.addPackage("GreenPkg");
-		idBluePkg = packages.addPackage("BluePkg");
-		idYellowPkg = packages.addPackage("YellowPkg");
-		idMauvePkg = packages.addPackage("MauvePkg");
+		idPkg1 = pkgMgr.addPackage("Pkg1");
+		idPkg2 = pkgMgr.addPackage("Pkg2");
+		idGreenPkg = pkgMgr.addPackage("GreenPkg");
+		idBluePkg = pkgMgr.addPackage("BluePkg");
+		idYellowPkg = pkgMgr.addPackage("YellowPkg");
+		idMauvePkg = pkgMgr.addPackage("MauvePkg");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -18,8 +18,8 @@ import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
 
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.impl.FileNameSpaces.PathType;
@@ -167,7 +167,7 @@ public class CliUtils {
 	 * @param showPkgs Indicates whether the package names should be displayed.S
 	 */
 	public static void printFileSet(
-			PrintStream outStream, FileNameSpaces fns, Packages pkgMgr, FileSet resultFileSet,
+			PrintStream outStream, FileNameSpaces fns, IPackageMgr pkgMgr, FileSet resultFileSet,
 			FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 		
 		/*
@@ -230,7 +230,7 @@ public class CliUtils {
 	 * @param showPkgs Set to true if the package names should be shown.
 	 */
 	public static void printTaskSet(
-			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, Packages pkgMgr,
+			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, IPackageMgr pkgMgr,
 			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
 			boolean showPkgs) {
 		
@@ -291,7 +291,7 @@ public class CliUtils {
 	 * and the second is the scope's ID number.
 	 */
 	public static int[] parsePackageAndScope(
-			Packages pkgMgr,
+			IPackageMgr pkgMgr,
 			String pkgString, 
 			boolean scopeAllowed) {
 	
@@ -473,7 +473,7 @@ public class CliUtils {
 	 * @param showPkgs Whether to show the package names.
 	 */
 	private static void printFileSetHelper(
-			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, Packages pkgMgr, int thisPathId,
+			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, IPackageMgr pkgMgr, int thisPathId,
 			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 
 		/* a StringBuffer for forming the package name */
@@ -630,7 +630,7 @@ public class CliUtils {
 	 * @param indentLevel The number of spaces to indent this task by (at this recursion level).
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
-			BuildTasks bts, FileNameSpaces fns, Packages pkgMgr, 
+			BuildTasks bts, FileNameSpaces fns, IPackageMgr pkgMgr, 
 			int taskId, TaskSet resultTaskSet,
 			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showPkgs,
 			int indentLevel) {

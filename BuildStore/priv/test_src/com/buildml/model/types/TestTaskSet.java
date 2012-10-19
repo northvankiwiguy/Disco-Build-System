@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -339,7 +339,7 @@ public class TestTaskSet {
 		assertFalse(ts.isMember(taskA321));
 		
 		/* create a package, add a couple of tasks to it, then query the package */
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int fooPkgId = pkgMgr.addPackage("foo");
 		assertEquals(ErrorCode.OK, pkgMgr.setTaskPackage(taskA1, fooPkgId));
 		assertEquals(ErrorCode.OK, pkgMgr.setTaskPackage(taskA2, fooPkgId));

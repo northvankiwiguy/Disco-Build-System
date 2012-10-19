@@ -13,9 +13,9 @@
 package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
@@ -80,7 +80,7 @@ public class CliCommandShowWriteOnlyFiles extends CliCommandShowFiles {
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* get list of write-only files, and add their parent paths */
 		FileSet writeOnlyFileSet = reportMgr.reportWriteOnlyFiles();

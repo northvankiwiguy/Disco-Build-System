@@ -17,8 +17,8 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -100,7 +100,7 @@ public class CliCommandRemovePkg implements ICliCommand {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a package name.");
 
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		String pkgName = args[0];
 		int result = pkgMgr.removePackage(pkgName);

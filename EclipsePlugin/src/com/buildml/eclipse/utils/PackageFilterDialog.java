@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.buildml.eclipse.utils.errors.FatalError;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.types.PackageSet;
 
 /**
@@ -100,10 +100,10 @@ public class PackageFilterDialog extends TitleAreaDialog {
 		{	
 			super(parent, 0);
 			
-			final Packages pkgMgr = pkgSet.getBuildStore().getPackages();
+			final IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 			
 			/* get the scope name, and prepare for a checkbox for each */
-			checkBoxes = new Button[Packages.SCOPE_MAX];
+			checkBoxes = new Button[IPackageMgr.SCOPE_MAX];
 			
 			/* we'll use the package's internal ID when accessing the package Set */
 			pkgId = pkgMgr.getPackageId(pkgName);
@@ -154,7 +154,7 @@ public class PackageFilterDialog extends TitleAreaDialog {
 						if (showScopes) {
 							scopeId = pkgMgr.getScopeId(buttonText);
 						} else {
-							scopeId = Packages.SCOPE_PUBLIC;
+							scopeId = IPackageMgr.SCOPE_PUBLIC;
 						}
 						if (button.getSelection()) {
 							pkgSet.add(pkgId, scopeId);
@@ -183,7 +183,7 @@ public class PackageFilterDialog extends TitleAreaDialog {
 				if (showScopes) {
 					thisCheck.setSelection(pkgSet.isMember(pkgId, i + 1));
 				} else {
-					thisCheck.setSelection(pkgSet.isMember(pkgId, Packages.SCOPE_PUBLIC));
+					thisCheck.setSelection(pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PUBLIC));
 				}
 			}
 		}
@@ -196,7 +196,7 @@ public class PackageFilterDialog extends TitleAreaDialog {
 		 */
 		private int getNumScopes() {
 			if (showScopes) {
-				return Packages.SCOPE_MAX;
+				return IPackageMgr.SCOPE_MAX;
 			} else {
 				return 1;
 			}
@@ -253,7 +253,7 @@ public class PackageFilterDialog extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		
-		final Packages pkgMgr = pkgSet.getBuildStore().getPackages();
+		final IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 
 		setTitle("Select the packages you wish to view:");
 		setHelpAvailable(false);

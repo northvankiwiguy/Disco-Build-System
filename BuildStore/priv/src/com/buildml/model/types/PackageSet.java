@@ -14,8 +14,8 @@ package com.buildml.model.types;
 
 import java.util.HashMap;
 
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 
 /**
  * Represents a set of packages. Each package (and it's various scopes) can
@@ -39,7 +39,7 @@ public class PackageSet implements Cloneable {
 	 * The Packages object containing the packages/scopes that this set can have as
 	 * members.
 	 */
-	private Packages pkgMgr = null;
+	private IPackageMgr pkgMgr = null;
 	
 	/**
 	 * The default membership state for packages/scopes that have not explicitly been
@@ -69,7 +69,7 @@ public class PackageSet implements Cloneable {
 	public PackageSet(BuildStore buildStore) {
 		
 		this.buildStore = buildStore;
-		pkgMgr = buildStore.getPackages();
+		pkgMgr = buildStore.getPackageMgr();
 		
 		/* Create a mapping of package IDs to a scope-ID bitmap */
 		membershipMap = new HashMap<Integer, Integer>();

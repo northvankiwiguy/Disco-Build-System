@@ -1,0 +1,253 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Arapiki Solutions Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    psmith - initial API and 
+ *        implementation and/or initial documentation
+ *******************************************************************************/
+
+package com.buildml.model;
+
+import com.buildml.model.types.FileSet;
+import com.buildml.model.types.TaskSet;
+
+/**
+ * A manager class (that supports the BuildStore class) that manages all BuildStore
+ * information relating to package definitions. That is, it keeps information on
+ * which files and tasks belong in each package.
+ * <p>
+ * A package's name is simply a text identifier that maps to underlying numeric ID.
+ * These IDs are then associated with files and tasks as a means of grouping them
+ * together into logical units.
+ * <p>
+ * In the case of files, a package is also associated with a scope within that
+ * package, such as "private" and "public". That is, if a file is associated
+ * with package "foo", the file will either belong to the foo/private scope, or the
+ * foo/public scope.
+ * <p>
+ * Note: tasks can only belong to the package as a whole, rather than belonging to
+ * an individual scope within that package.
+ * 
+ * @author Peter Smith <psmith@arapiki.com>
+ */
+public interface IPackageMgr {
+
+	/**
+	 * Numeric constants for each of the scopes.
+	 */
+	public static final int SCOPE_NONE = 0;
+	public static final int SCOPE_PRIVATE = 1;
+	public static final int SCOPE_PUBLIC = 2;
+	public static final int SCOPE_MAX = 2;
+
+	/**
+	 * Add a new package to the BuildStore.
+	 * 
+	 * @param packageName The name of the new package to be added.
+	 * @return The package's ID if the addition was successful, ErrorCode.INVALID_NAME
+	 * if the package's name isn't valid, or ErrorCode.ALREADY_USED if the package 
+	 * name is already in the BuildStore.
+	 */
+	public abstract int addPackage(String packageName);
+
+	/**
+	 * Given a package's ID number, return the package's name.
+	 * 
+	 * @param packageId The package's ID number.
+	 * @return The package's name, or null if the package ID is invalid.
+	 */
+	public abstract String getPackageName(int packageId);
+
+	/**
+	 * Given a package's name, return its ID number.
+	 * 
+	 * @param packageName The package's name.
+	 * @return The package's ID number, ErrorCode.NOT_FOUND if there's no package
+	 * with this name.
+	 */
+	public abstract int getPackageId(String packageName);
+
+	/**
+	 * Remove the specified package from the BuildStore. The package can only be removed
+	 * if there are no files or tasks associated with the package.
+	 * 
+	 * @param packageName The name of the package to be removed.
+	 * @return ErrorCode.OK if the packate was successfully removed, ErrorCode.CANT_REMOVE
+	 * if the package is still in use, and ErrorCode.NOT_FOUND if there's no package
+	 * with this name.
+	 */
+	public abstract int removePackage(String packageName);
+
+	/**
+	 * Return an alphabetically sorted array of all the packages. The case (upper versus
+	 * lower) is ignored when sorting the results.
+	 * 
+	 * @return A non-empty array of package names (will always contain the "None" package).
+	 */
+	public abstract String[] getPackages();
+
+	/**
+	 * Given a scope's ID number, return the corresponding scope name.
+	 * 
+	 * @param id The scope's ID number.
+	 * @return The scope's name, or null if the ID number is invalid.
+	 */
+	public abstract String getScopeName(int id);
+
+	/**
+	 * Given a scope's name, return its ID number. There can be many names for the same
+	 * scope, so there isn't a 1:1 mapping of names to IDs. For example, both "private" and
+	 * "priv" will return the same ID number.
+	 * 
+	 * @param name The scope's name.
+	 * @return The scope's ID number, or ErrorCode.NOT_FOUND if the scope name isn't valid.
+	 */
+	public abstract int getScopeId(String name);
+
+	/**
+	 * Parse a package specification string, and return the ID of the package and
+	 * (optionally) the ID of the scope within that package. The syntax of the package
+	 * spec must be of the form:
+	 *  <ol>
+	 * 	  <li>&lt;pkg-name&gt;</li>
+	 * 	  <li>&lt;pkg-name&gt;/&lt;scope-name&gt;</li>
+	 *  </ol>
+	 * That is, the scope name is optional.
+	 * 
+	 * @param pkgSpec The package specification string.
+	 * @return An Integer[2] array, where [0] is the package's ID and [1] is the scope
+	 * ID. If either portion of the pkgSpec was invalid (not a registered package or scope),
+	 * the ID for that portion will be ErrorCode.NOT_FOUND. If there was no scope name
+	 * specified, the scope ID will be 0, which represents the "None" scope.
+	 */
+	public abstract Integer[] parsePkgSpec(String pkgSpec);
+
+	/**
+	 * Set the package/scope associated with this path.
+	 * 
+	 * @param fileId The ID of the file whose package will be set.
+	 * @param pkgId The ID of the package to be associated with this file.
+	 * @param pkgScopeId The ID of the package's scope.
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this file doesn't exist
+	 */
+	public abstract int setFilePackage(int fileId, int pkgId, int pkgScopeId);
+
+	/**
+	 * Get the package/scope associated with this path.
+	 * 
+	 * @param fileId The ID of the path whose package we're interested in
+	 * @return A Integer[2] array where [0] is the package ID, and [1] is the scope ID,
+	 * or null if the file doesn't exist.
+	 */
+	public abstract Integer[] getFilePackage(int fileId);
+
+	/**
+	 * Return the set of files that are within the specified package (any scope).
+	 * 
+	 * @param pkgId The ID of the package we're examining.
+	 * @return The set of files that reside inside that package.
+	 */
+	public abstract FileSet getFilesInPackage(int pkgId);
+
+	/**
+	 * Return the set of files that are within the specified package/scope.
+	 * 
+	 * @param pkgId The ID of the package we're examining.
+	 * @param pkgScopeId The scope within the package we're interested in.
+	 * @return The set of files that reside inside that package/scope.
+	 */
+	public abstract FileSet getFilesInPackage(int pkgId, int pkgScopeId);
+
+	/**
+	 * Return the set of files that are within the specified package/scope, given a
+	 * string specification of the package/scope.
+	 * 
+	 * @param pkgSpec The package name, or the package/scope name.
+	 * @return The FileSet of all files in this package or package/scope, or null if
+	 * there's a an error in parsing the pkg/spec name.
+	 */
+	public abstract FileSet getFilesInPackage(String pkgSpec);
+
+	/**
+	 * Return the set of files that are outside the specified package.
+	 * 
+	 * @param pkgId The ID of the package we're examining.
+	 * @return The set of files that reside outside that package.
+	 */
+	public abstract FileSet getFilesOutsidePackage(int pkgId);
+
+	/**
+	 * Return the set of files that are outside the specified package/scope.
+	 * 
+	 * @param pkgId The ID of the package we're examining.
+	 * @param pkgScopeId The ID of the scope within the package we're interested in.
+	 * @return The set of files that reside outside that package/scope.
+	 */
+	public abstract FileSet getFilesOutsidePackage(int pkgId, int pkgScopeId);
+
+	/**
+	 * Returns the set of files that fall outside of the package boundaries, using a string
+	 * to specify the package/scope.
+	 * 
+	 * @param pkgSpec The package name, or the package/scope name.
+	 * @return The FileSet of all files outside of this package or package/scope, or null if
+	 * there's a an error in parsing the pkg/spec name.
+	 */
+	public abstract FileSet getFilesOutsidePackage(String pkgSpec);
+
+	/**
+	 * Set the package associated with this task.
+	 * 
+	 * @param taskId The ID of the task whose package will be set.
+	 * @param pkgId The ID of the package to be associated with this task.
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this task doesn't exist
+	 */
+	public abstract int setTaskPackage(int taskId, int pkgId);
+
+	/**
+	 * Get the package associated with this task.
+	 * 
+	 * @param taskId The ID of the task whose package we're interested in.
+	 * @return The task's package, or ErrorCode.NOT_FOUND if the task doesn't exist.
+	 */
+	public abstract int getTaskPackage(int taskId);
+
+	/**
+	 * Return the set of tasks that are within the specified package.
+	 * 
+	 * @param pkgId The package we're examining.
+	 * @return The set of tasks that reside inside that package.
+	 */
+	public abstract TaskSet getTasksInPackage(int pkgId);
+
+	/**
+	 * Return the set of tasks that are within the specified package.
+	 * 
+	 * @param pkgSpec The name of the package to query.
+	 * @return The set of tasks that reside inside that package, null if the
+	 * package name is invalid.
+	 */
+	public abstract TaskSet getTasksInPackage(String pkgSpec);
+
+	/**
+	 * Return the set of tasks that are outside the specified package.
+	 * 
+	 * @param pkgId The package we're examining.
+	 * @return The set of tasks that reside outside that package.
+	 */
+	public abstract TaskSet getTasksOutsidePackage(int pkgId);
+
+	/**
+	 * Return the set of tasks that are outside the specified package.
+	 * 
+	 * @param pkgSpec The name of the package to query.
+	 * @return An array of tasks that reside outside that package, null if the
+	 * package name is invalid.
+	 */
+	public abstract TaskSet getTasksOutsidePackage(String pkgSpec);
+
+}

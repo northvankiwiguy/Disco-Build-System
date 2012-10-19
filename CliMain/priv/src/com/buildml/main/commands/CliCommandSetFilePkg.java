@@ -17,8 +17,8 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
@@ -102,7 +102,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a package name and a path-spec.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
 		 * The package can be of the form: "pkg" or "pkg/scope". If scope

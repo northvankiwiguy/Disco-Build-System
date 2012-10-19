@@ -22,7 +22,6 @@ import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
@@ -362,7 +361,7 @@ public class TestReportMgr2 {
 		
 		/* create a new package set and add some packages */
 		PackageSet cs = new PackageSet(bs);
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkg1Id = pkgMgr.addPackage("Pkg1");
 		int pkg2Id = pkgMgr.addPackage("Pkg2");		
 		int pkg3Id = pkgMgr.addPackage("Pkg3");
@@ -387,27 +386,27 @@ public class TestReportMgr2 {
 		assertEquals(0, fs.size());
 		
 		/* map the files into packages */
-		pkgMgr.setFilePackage(file1, pkg1Id, Packages.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file2, pkg1Id, Packages.SCOPE_PUBLIC);
-		pkgMgr.setFilePackage(file3, pkg2Id, Packages.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file4, pkg2Id, Packages.SCOPE_PUBLIC);
-		pkgMgr.setFilePackage(file5, pkg3Id, Packages.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file6, pkg3Id, Packages.SCOPE_PUBLIC);
-		pkgMgr.setFilePackage(file7, pkg4Id, Packages.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file8, pkg4Id, Packages.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file1, pkg1Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file2, pkg1Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file3, pkg2Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file4, pkg2Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file5, pkg3Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file6, pkg3Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMgr.setFilePackage(file7, pkg4Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file8, pkg4Id, IPackageMgr.SCOPE_PUBLIC);
 	
 		/* empty package set still gives an empty FileSet */
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(0, fs.size());
 		
 		/* add Pkg1/Private into the package set */
-		cs.add(pkg1Id, Packages.SCOPE_PRIVATE);
+		cs.add(pkg1Id, IPackageMgr.SCOPE_PRIVATE);
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(1, fs.size());
 		assertTrue(fs.isMember(file1));
 
 		/* add Pkg1/Public into the package set */
-		cs.add(pkg1Id, Packages.SCOPE_PUBLIC);
+		cs.add(pkg1Id, IPackageMgr.SCOPE_PUBLIC);
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(2, fs.size());
 		assertTrue(fs.isMember(file1));
@@ -423,7 +422,7 @@ public class TestReportMgr2 {
 		assertTrue(fs.isMember(file4));
 		
 		/* add Pkg8/Public into the package set */
-		cs.add(pkg4Id, Packages.SCOPE_PUBLIC);
+		cs.add(pkg4Id, IPackageMgr.SCOPE_PUBLIC);
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(5, fs.size());
 		assertTrue(fs.isMember(file1));
@@ -453,7 +452,7 @@ public class TestReportMgr2 {
 		
 		/* create a new package set and add some packages */
 		PackageSet cs = new PackageSet(bs);
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkg1Id = pkgMgr.addPackage("Pkg1");
 		int pkg2Id = pkgMgr.addPackage("Pkg2");		
 		int pkg3Id = pkgMgr.addPackage("Pkg3");
@@ -492,7 +491,7 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* add Pkg1 into the package set */
-		cs.add(pkg1Id, Packages.SCOPE_PUBLIC);
+		cs.add(pkg1Id, IPackageMgr.SCOPE_PUBLIC);
 		tset = reports.reportActionsFromPackageSet(cs);
 		assertEquals(2, tset.size());
 		assertTrue(tset.isMember(action1));
@@ -508,7 +507,7 @@ public class TestReportMgr2 {
 		assertTrue(tset.isMember(action6));
 
 		/* add Pkg4 into the package set */
-		cs.add(pkg4Id, Packages.SCOPE_PUBLIC);
+		cs.add(pkg4Id, IPackageMgr.SCOPE_PUBLIC);
 		tset = reports.reportActionsFromPackageSet(cs);
 		assertEquals(6, tset.size());
 		assertTrue(tset.isMember(action1));
@@ -521,7 +520,7 @@ public class TestReportMgr2 {
 		/* add a few hundred packages, and check scalability */
 		for (int i = 5; i != 200; i++) {
 			int id = pkgMgr.addPackage("Pkg" + i);
-			cs.add(id, Packages.SCOPE_PUBLIC);
+			cs.add(id, IPackageMgr.SCOPE_PUBLIC);
 		}
 		
 		/* the simple fact that this doesn't crash is enough to pass the test */

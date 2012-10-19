@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.impl.FileNameSpaces.PathType;
@@ -481,7 +482,7 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public FileSet reportFilesFromPackageSet(PackageSet pkgSet) {
 		FileSet results = new FileSet(fns);
-		Packages pkgMgr = pkgSet.getBuildStore().getPackages();
+		IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 		
 		/*
 		 * Form the (complex) query string, which considers each package/scope individually.
@@ -496,8 +497,8 @@ import com.buildml.utils.errors.ErrorCode;
 			if (pkgId != ErrorCode.NOT_FOUND) {
 				
 				/* is this package in the set? */
-				boolean hasPrivate = pkgSet.isMember(pkgId, Packages.SCOPE_PRIVATE);
-				boolean hasPublic = pkgSet.isMember(pkgId, Packages.SCOPE_PUBLIC);
+				boolean hasPrivate = pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PRIVATE);
+				boolean hasPublic = pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PUBLIC);
 		
 				/* do we need a "or" between neighboring tests? */
 				if (hasPrivate || hasPublic) {
@@ -512,10 +513,10 @@ import com.buildml.utils.errors.ErrorCode;
 					sb.append("(pkgId == " + pkgId + ")");
 				} else if (hasPrivate) {
 					sb.append("((pkgId == " + pkgId + 
-								") and (pkgScopeId == " + Packages.SCOPE_PRIVATE + "))");
+								") and (pkgScopeId == " + IPackageMgr.SCOPE_PRIVATE + "))");
 				} else if (hasPublic) {
 					sb.append("((pkgId == " + pkgId + 
-								") and (pkgScopeId == " + Packages.SCOPE_PUBLIC + "))");
+								") and (pkgScopeId == " + IPackageMgr.SCOPE_PUBLIC + "))");
 				}
 				
 			}
@@ -547,7 +548,7 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public TaskSet reportActionsFromPackageSet(PackageSet pkgSet) {
 		TaskSet results = new TaskSet(bts);
-		Packages pkgMgr = pkgSet.getBuildStore().getPackages();
+		IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 		
 		/*
 		 * Form the (complex) query string.
@@ -562,7 +563,7 @@ import com.buildml.utils.errors.ErrorCode;
 			if (pkgId != ErrorCode.NOT_FOUND) {
 				
 				/* is this package in the set? */
-				boolean isMember = pkgSet.isMember(pkgId, Packages.SCOPE_PUBLIC);
+				boolean isMember = pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PUBLIC);
 		
 				/* do we need a "or" between neighboring tests? */
 				if (isMember) {

@@ -17,9 +17,9 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.types.TaskSet;
 
 /**
@@ -101,7 +101,7 @@ public class CliCommandSetTaskPkg implements ICliCommand {
 
 		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a package name and a colon-separated list of task-specs.");
 		
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 		BuildTasks bts = buildStore.getBuildTasks();
 
 		/* 

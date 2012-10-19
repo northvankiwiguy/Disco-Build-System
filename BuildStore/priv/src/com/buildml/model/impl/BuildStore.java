@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.version.Version;
@@ -60,7 +61,7 @@ public class BuildStore {
 	private FileAttributes fileAttributes;
 	
 	/** The Packages manager object we'll delegate work to. */
-	private Packages packages;
+	private IPackageMgr packages;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -121,7 +122,7 @@ public class BuildStore {
 		fileAttributes = new FileAttributes(this, fileSpaces);
 		
 		/* create a new Packages object */
-		packages = new Packages(this);		
+		packages = new PackageMgr(this);		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -226,7 +227,7 @@ public class BuildStore {
 	 * 
 	 * @return A Packages manager object.
 	 */
-	public Packages getPackages() {
+	public IPackageMgr getPackageMgr() {
 		return packages;
 	}
 

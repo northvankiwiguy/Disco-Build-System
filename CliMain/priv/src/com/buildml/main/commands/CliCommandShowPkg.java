@@ -17,8 +17,8 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 
 /**
  * BuildML CLI Command class that implements the "show-pkg" command.
@@ -99,7 +99,7 @@ public class CliCommandShowPkg implements ICliCommand {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 	
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 		
 		String pkgNames[] = pkgMgr.getPackages();
 		for (int i = 0; i < pkgNames.length; i++) {

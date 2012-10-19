@@ -23,8 +23,8 @@ import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces.PathType;
 import com.buildml.model.types.FileRecord;
 
@@ -45,7 +45,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	private FileNameSpaces fns;
 	
 	/** The Packages object we'll use for querying path package information */
-	private Packages pkgMgr;
+	private IPackageMgr pkgMgr;
 	
 	/** The ID of the top-root for our FileNameSpaces object */
 	private int topRootId;
@@ -67,7 +67,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 * @param pkgMgr The Packages object containing path component information.
 	 */
 	public FilesEditorLabelProvider(FilesEditor editor, FileNameSpaces fns,
-					Packages pkgMgr) {
+					IPackageMgr pkgMgr) {
 
 		this.editor = editor;
 		this.fns = fns;

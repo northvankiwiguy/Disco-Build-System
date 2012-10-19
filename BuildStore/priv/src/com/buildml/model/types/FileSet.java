@@ -12,10 +12,10 @@
 
 package com.buildml.model.types;
 
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Packages;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -94,7 +94,7 @@ public class FileSet extends IntegerTreeSet  {
 	public int populateWithPaths(String [] pathArgs) {
 		
 		BuildStore bs = fns.getBuildStore();
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		IReportMgr reportMgr = bs.getReportMgr();
 
 		/* for each path provided as input... */

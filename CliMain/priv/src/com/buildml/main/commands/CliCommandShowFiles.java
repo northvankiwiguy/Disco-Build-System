@@ -18,8 +18,8 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
@@ -144,7 +144,7 @@ public class CliCommandShowFiles implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
 		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
 		 * There were no search "results", so we'll show everything (except those

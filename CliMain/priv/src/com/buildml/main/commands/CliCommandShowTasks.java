@@ -19,9 +19,9 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.main.CliUtils.DisplayWidth;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.TaskSet;
 
@@ -165,7 +165,7 @@ public class CliCommandShowTasks implements ICliCommand {
 		
 		BuildTasks bts = buildStore.getBuildTasks();
 		FileNameSpaces fns = buildStore.getFileNameSpaces();		
-		Packages pkgMgr = buildStore.getPackages();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
 		 * Display the selected task set.

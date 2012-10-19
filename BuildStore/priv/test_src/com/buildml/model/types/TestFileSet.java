@@ -20,9 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -484,7 +484,7 @@ public class TestFileSet {
 		assertTrue(fs9.isMember(f4path));
 		
 		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkgFooId = pkgMgr.addPackage("foo");
 		int sectPublic = pkgMgr.getScopeId("public");
 		int sectPrivate = pkgMgr.getScopeId("private");

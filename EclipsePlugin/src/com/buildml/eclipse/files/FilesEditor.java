@@ -200,7 +200,7 @@ public class FilesEditor extends SubEditor {
 		 */
 		contentProvider = new FilesEditorContentProvider(this, fns);
 		FilesEditorLabelProvider labelProvider = 
-				new FilesEditorLabelProvider(this, fns, buildStore.getPackages());
+				new FilesEditorLabelProvider(this, fns, buildStore.getPackageMgr());
 		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);

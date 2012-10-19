@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.SubEditor;
-import com.buildml.model.impl.Packages;
+import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -36,7 +36,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 	 * The Packages Manager object we'll use for querying file information from 
 	 * the BuildStore.
 	 */
-	private Packages pkgMgr;
+	private IPackageMgr pkgMgr;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -48,7 +48,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 	 * @param editor The editor that we're providing text/images for.
 	 * @param pkgMgr The Packages object containing path component information.
 	 */
-	public ActionsEditorLabelCol2Provider(SubEditor editor, Packages pkgMgr) {
+	public ActionsEditorLabelCol2Provider(SubEditor editor, IPackageMgr pkgMgr) {
 		this.pkgMgr = pkgMgr;
 	}
 

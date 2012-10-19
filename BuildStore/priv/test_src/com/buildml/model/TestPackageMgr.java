@@ -20,7 +20,6 @@ import org.junit.Test;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.Packages;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -29,13 +28,13 @@ import com.buildml.utils.errors.ErrorCode;
  * Unit tests for the Packages class.
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class TestPackages {
+public class TestPackageMgr {
 
 	/** Our BuildStore object, used in many test cases */
 	private BuildStore bs;
 
 	/** The Packages object associated with this BuildStore */
-	private Packages pkgMgr;
+	private IPackageMgr pkgMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -46,13 +45,13 @@ public class TestPackages {
 	public void setUp() throws Exception {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
-		pkgMgr = bs.getPackages();
+		pkgMgr = bs.getPackageMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#addPackage(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#addPackage(java.lang.String)}.
 	 */
 	@Test
 	public void testAddPackage() {
@@ -103,7 +102,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#getPackageName(int)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#getPackageName(int)}.
 	 */
 	@Test
 	public void testGetPackageName() {
@@ -127,7 +126,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#getPackageId(String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#getPackageId(String)}.
 	 */
 	@Test
 	public void testGetPackageId() {
@@ -167,7 +166,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#removePackage(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#removePackage(java.lang.String)}.
 	 */
 	@Test
 	public void testRemovePackage() {
@@ -199,12 +198,12 @@ public class TestPackages {
 		/* assign a package to files, then try to remove the name */
 		int pkgA = pkgMgr.getPackageId("PkgA");
 		int file1 = fns.addFile("/aardvark/bunny");
-		pkgMgr.setFilePackage(file1, pkgA, Packages.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file1, pkgA, IPackageMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("PkgA"));
 		
 		/* remove the package from the file, then try again to remove the package name */
 		int pkgNone = pkgMgr.getPackageId("None");
-		pkgMgr.setFilePackage(file1, pkgNone, Packages.SCOPE_PRIVATE);
+		pkgMgr.setFilePackage(file1, pkgNone, IPackageMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.OK, pkgMgr.removePackage("PkgA"));
 		
 		/* assign them to tasks, then try to remove the name */
@@ -221,7 +220,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#getPackages()}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#getPackages()}.
 	 */
 	@Test
 	public void testGetPackages() {
@@ -260,7 +259,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#getScopeName(int)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#getScopeName(int)}.
 	 */
 	@Test
 	public void testGetScopeName() {
@@ -279,7 +278,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#getScopeId(String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#getScopeId(String)}.
 	 */
 	@Test
 	public void testGetScopeId() {
@@ -302,7 +301,7 @@ public class TestPackages {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.Packages#parsePkgSpec(String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#parsePkgSpec(String)}.
 	 * @exception Exception Something bad happened
 	 */
 	@Test
@@ -324,11 +323,11 @@ public class TestPackages {
 		/* test pkgSpecs with both package and scope names */
 		results = pkgMgr.parsePkgSpec("pkg1/private");
 		assertEquals(pkg1, results[0].intValue());
-		assertEquals(Packages.SCOPE_PRIVATE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
 		
 		results = pkgMgr.parsePkgSpec("pkg2/public");
 		assertEquals(pkg2, results[0].intValue());
-		assertEquals(Packages.SCOPE_PUBLIC, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 		
 		/* test invalid pkgSpecs */
 		results = pkgMgr.parsePkgSpec("badname");
@@ -345,7 +344,7 @@ public class TestPackages {
 		
 		results = pkgMgr.parsePkgSpec("badname/public");
 		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
-		assertEquals(Packages.SCOPE_PUBLIC, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -358,7 +357,7 @@ public class TestPackages {
 	@Test
 	public void testFilePackages() throws Exception {
 		
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		FileNameSpaces bsfs = bs.getFileNameSpaces();
 		
 		/* create a few files */
@@ -374,46 +373,46 @@ public class TestPackages {
 		/* by default, all files are in None/None */
 		Integer results[] = pkgMgr.getFilePackage(path1);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path2);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path3);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 
 		/* set one of the files into PkgA/public */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgA, Packages.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgA, IPackageMgr.SCOPE_PUBLIC));
 		results = pkgMgr.getFilePackage(path1);
 		assertEquals(pkgA, results[0].intValue());
-		assertEquals(Packages.SCOPE_PUBLIC, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 		results = pkgMgr.getFilePackage(path2);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path3);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		
 		/* set another file to another package */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path3, pkgB, Packages.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path3, pkgB, IPackageMgr.SCOPE_PRIVATE));
 		results = pkgMgr.getFilePackage(path1);
 		assertEquals(pkgA, results[0].intValue());
-		assertEquals(Packages.SCOPE_PUBLIC, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 		results = pkgMgr.getFilePackage(path2);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path3);
 		assertEquals(pkgB, results[0].intValue());
-		assertEquals(Packages.SCOPE_PRIVATE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
 		
 		/* set a file's package back to None/None */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgNone, Packages.SCOPE_NONE));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgNone, IPackageMgr.SCOPE_NONE));
 		results = pkgMgr.getFilePackage(path1);
 		assertEquals(pkgNone, results[0].intValue());
-		assertEquals(Packages.SCOPE_NONE, results[1].intValue());
+		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		
 		/* try to set a non-existent file */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.setFilePackage(1000, pkgA, Packages.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.setFilePackage(1000, pkgA, IPackageMgr.SCOPE_PUBLIC));
 		
 		/* try to get a non-existent file */
 		assertNull(pkgMgr.getFilePackage(2000));
@@ -550,12 +549,12 @@ public class TestPackages {
 		int f5path = fns.addFile("/b/c/d/f5.c");
 
 		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkgFooId = pkgMgr.addPackage("foo");
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f1path, pkgFooId, Packages.SCOPE_PUBLIC));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f2path, pkgFooId, Packages.SCOPE_PRIVATE));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f4path, pkgFooId, Packages.SCOPE_PRIVATE));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f5path, pkgFooId, Packages.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f1path, pkgFooId, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f2path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f4path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f5path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
 
 		/* test @foo/public membership */
 		FileSet fs = pkgMgr.getFilesInPackage("foo/public");
@@ -615,7 +614,7 @@ public class TestPackages {
 	@Test
 	public void testTaskPackages() throws Exception {
 		
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		BuildTasks bts = bs.getBuildTasks();
 		
 		/* create a few tasks */
@@ -663,7 +662,7 @@ public class TestPackages {
 	 */
 	@Test
 	public void testGetTasksInPackage() throws Exception {
-		Packages pkgMgr = bs.getPackages();
+		IPackageMgr pkgMgr = bs.getPackageMgr();
 		BuildTasks bts = bs.getBuildTasks();
 		
 		/* create a few tasks */
