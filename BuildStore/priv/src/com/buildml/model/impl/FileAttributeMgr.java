@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -31,7 +32,7 @@ import com.buildml.utils.errors.ErrorCode;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FileAttributes {
+/* package private */ class FileAttributeMgr implements IFileAttributeMgr {
 
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
@@ -71,7 +72,7 @@ public class FileAttributes {
 	 * @param buildStore The BuildStore object that owns this FileAttributes object.
 	 * @param fns The FileNameSpaces object that these attributes are attached to
 	 */
-	public FileAttributes(BuildStore buildStore, FileNameSpaces fns) {
+	public FileAttributeMgr(BuildStore buildStore, FileNameSpaces fns) {
 		this.db = buildStore.getBuildStoreDB();
 		this.fileNameSpaces = fns;
 		
@@ -98,14 +99,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Add a new attribute name to the list of attributes that can be associated
-	 * with a path.
-	 * 
-	 * @param attrName The name of the new attribute.
-	 * @return The new attribute's ID number, or ALREADY_USED if this attribute name is
-	 * already in use.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#newAttrName(java.lang.String)
 	 */
+	@Override
 	public int newAttrName(String attrName) {
 		
 		/* if this name is already used, return an error */
@@ -127,12 +124,10 @@ public class FileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * For a given attribute name, return the corresponding ID number.
-	 * 
-	 * @param attrName The attribute's name.
-	 * @return The attribute's ID number, or NOT_FOUND if the attribute name isn't defined.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getAttrIdFromName(java.lang.String)
 	 */
+	@Override
 	public int getAttrIdFromName(String attrName) {
 		
 		Integer results[];
@@ -159,12 +154,10 @@ public class FileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * For a given attribute ID, return the corresponding attribute name.
-	 * 
-	 * @param attrId The attribute's ID number.
-	 * @return The attributes name, or null if the attribute name isn't defined.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getAttrNameFromId(int)
 	 */
+	@Override
 	public String getAttrNameFromId(int attrId) {
 		
 		String results[];
@@ -191,12 +184,10 @@ public class FileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return an array of all attribute names.
-	 * 
-	 * @return A String array of attribute names. The names will be returned in 
-	 * alphabetical order.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getAttrNames()
 	 */
+	@Override
 	public String[] getAttrNames() {
 		
 		return db.executePrepSelectStringColumn(selectOrderedNamePrepStmt);
@@ -204,14 +195,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Remove the attribute's name from the list of attributes that can be associated
-	 * with a path. An attribute can only be removed if it's no longer in use.
-	 * 
-	 * @param attrName The name of the attribute to be removed.
-	 * @return OK on successful deletion, NOT_FOUND if the attribute name doesn't exist, or
-	 * CANT_REMOVE if there are files still making use of this attribute.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#deleteAttrName(java.lang.String)
 	 */
+	@Override
 	public int deleteAttrName(String attrName) {
 		
 		/* attribute names can't be deleted if they're in use - check this first */
@@ -250,16 +237,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * For the specific path (pathId), set the attribute (attrId) to the specified String
-	 * value (attrValue). Note that for performance reasons, there's no error checking on
-	 * the pathId and attrId values - Any integer values are acceptable, and could potentially
-	 * overwrite the existing value of this attribute for this path.
-	 * 
-	 * @param pathId The path to attach the attribute to.
-	 * @param attrId The attribute to be set
-	 * @param attrValue The String value to set the attribute to.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#setAttr(int, int, java.lang.String)
 	 */
+	@Override
 	public void setAttr(int pathId, int attrId, String attrValue) {
 
 		/* if attrValue is null, that's equivalent to deleting the record */
@@ -292,18 +273,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * For the specific path (pathId), set the attribute (attrId) to the specified integer
-	 * value (attrValue). Note that for performance reasons, there's no error checking on
-	 * the pathId and attrId values - Any integer values are acceptable, and could potentially
-	 * overwrite the existing value of this attribute for this path.
-	 * 
-	 * @param pathId The path to attach the attribute to.
-	 * @param attrId The attribute to be set.
-	 * @param attrValue The integer value to set the attribute to.
-	 * @return OK if the attribute was added successfully, or BAD_VALUE if the integer
-	 * is not valid (i.e. not >= 0).
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#setAttr(int, int, int)
 	 */
+	@Override
 	public int setAttr(int pathId, int attrId, int attrValue) {
 		
 		if (attrValue < 0) {
@@ -315,13 +288,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the specified attribute value from the specified path, returning it as a String.
-	 * 
-	 * @param pathId The path on which the attribute is attached.
-	 * @param attrId The attribute whose value we want to fetch.
-	 * @return The attributes String value, or null if the attribute isn't set on this path.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getAttrAsString(int, int)
 	 */
+	@Override
 	public String getAttrAsString(int pathId, int attrId) {
 		String results[];
 		try {
@@ -349,14 +319,10 @@ public class FileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch the specified attribute value from the specified path, returning it as an int.
-	 * 
-	 * @param pathId The path on which the attribute is attached.
-	 * @param attrId The attribute whose value we want to fetch.
-	 * @return The attributes positive integer value, BAD_VALUE if the attribute's
-	 * value isn't a positive integer, or NOT_FOUND if the attribute wasn't set.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getAttrAsInteger(int, int)
 	 */
+	@Override
 	public int getAttrAsInteger(int pathId, int attrId) {
 		
 		/* fetch the attribute's value as a String */
@@ -386,15 +352,10 @@ public class FileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Remove the attribute (attrId) that's currently associated with the specified 
-	 * path (pathId). For performance reasons, no error checking is done to validate
-	 * the path or attribute values. This method succeeds regardless of whether the
-	 * attribute is set or not.
-	 * 
-	 * @param pathId The path on which the attribute is attached.
-	 * @param attrId The attribute to be removed.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#deleteAttr(int, int)
 	 */
+	@Override
 	public void deleteAttr(int pathId, int attrId) {
 		
 		/* delete the record, whether it exists in the database or not */
@@ -410,10 +371,10 @@ public class FileAttributes {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Remove all the attributes that are associated with the specified path.
-	 * @param pathId The path to which the attributes are currently attached.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#deleteAllAttrOnPath(int)
 	 */
+	@Override
 	public void deleteAllAttrOnPath(int pathId) {
 		
 		/* delete all records for this pathId (there are possibly none) */
@@ -428,12 +389,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given a path ID, return an array of attributes that are attached to that path.
-	 * 
-	 * @param pathId The ID of the path the attributes are attached to.
-	 * @return An Integer [] array of all attributes attached to this path.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getAttrsOnPath(int)
 	 */
+	@Override
 	public Integer[] getAttrsOnPath(int pathId) {
 
 		Integer results[];
@@ -449,12 +408,10 @@ public class FileAttributes {
 		
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the FileSet containing all paths that have the attribute set (to any value).
-	 * 
-	 * @param attrId The attribute to test for.
-	 * @return The FileSet of all files that have this attribute set.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getPathsWithAttr(int)
 	 */
+	@Override
 	public FileSet getPathsWithAttr(int attrId) {
 
 		Integer results[] = null;
@@ -470,14 +427,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the FileSet of all paths that have the specified attribute set to the
-	 * specified String value.
-	 * 
-	 * @param attrId The attribute to test for.
-	 * @param value The value to compare against.
-	 * @return The FileSet of all files that have this attribute set to the specified value.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getPathsWithAttr(int, java.lang.String)
 	 */
+	@Override
 	public FileSet getPathsWithAttr(int attrId, String value) {
 
 		Integer results[] = null;
@@ -494,14 +447,10 @@ public class FileAttributes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the FileSet of all paths that have the specified attribute set to the
-	 * specified Integer value.
-	 * 
-	 * @param attrId The attribute to test for.
-	 * @param value The value to compare against.
-	 * @return The FileSet of all files that have this attribute set to the specified value.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileAttributeMgr#getPathsWithAttr(int, int)
 	 */
+	@Override
 	public FileSet getPathsWithAttr(int attrId, int value) {
 		return getPathsWithAttr(attrId, String.valueOf(value));
 	}

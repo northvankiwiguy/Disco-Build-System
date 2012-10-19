@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
@@ -58,8 +59,8 @@ public class BuildStore {
 	/** The Reports manager object we'll delegate work to. */
 	private IReportMgr reportMgr;
 	
-	/** The FileAttributes object we'll delegate work to. */
-	private FileAttributes fileAttributes;
+	/** The FileAttributeMgr object we'll delegate work to. */
+	private IFileAttributeMgr fileAttrMgr;
 	
 	/** The Packages manager object we'll delegate work to. */
 	private IPackageMgr packages;
@@ -119,8 +120,8 @@ public class BuildStore {
 		/* create a new ReportMgr object to provide reporting methods */
 		reportMgr = new ReportMgr(this);
 		
-		/* create a new FileAttributes object to manage the attributes on files */
-		fileAttributes = new FileAttributes(this, fileSpaces);
+		/* create a new FileAttributeMgr object to manage the attributes on files */
+		fileAttrMgr = new FileAttributeMgr(this, fileSpaces);
 		
 		/* create a new Packages object */
 		packages = new PackageMgr(this);		
@@ -210,14 +211,14 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the FileAttributes manager associated with this BuildStore. This object
+	 * Fetch the FileAttributeMgr manager associated with this BuildStore. This object
 	 * encapsulates knowledge of which attributes are attached to the paths in
 	 * our FileNameSpaces object.
 	 * 
-	 * @return A FileAttributes manager object.
+	 * @return This BuildStore's FileAttributeMgr object.
 	 */
-	public FileAttributes getFileAttributes() {
-		return fileAttributes;
+	public IFileAttributeMgr getFileAttributeMgr() {
+		return fileAttrMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

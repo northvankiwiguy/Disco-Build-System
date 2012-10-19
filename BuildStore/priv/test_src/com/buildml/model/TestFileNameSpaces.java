@@ -19,7 +19,6 @@ import org.junit.Test;
 
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileAttributes;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.impl.FileNameSpaces.PathType;
@@ -40,8 +39,8 @@ public class TestFileNameSpaces {
 	/** The BuildTasks associated with this BuildStore */
 	BuildTasks bts;
 	
-	/** The FileAttributes associated with this BuildStore */
-	FileAttributes fattrs;
+	/** The FileAttributeMgr associated with this BuildStore */
+	IFileAttributeMgr fileAttrMgr;
 
 	/** The FileIncludes associated with this BuildStore */
 	IFileIncludeMgr fileIncludeMgr;
@@ -57,7 +56,7 @@ public class TestFileNameSpaces {
 		/* fetch the associated FileNameSpaces, BuildTasks, etc. */
 		bsfs = bs.getFileNameSpaces();
 		bts = bs.getBuildTasks();
-		fattrs = bs.getFileAttributes();
+		fileAttrMgr = bs.getFileAttributeMgr();
 		fileIncludeMgr = bs.getFileIncludeMgr();
 	}
 
@@ -446,11 +445,11 @@ public class TestFileNameSpaces {
 		
 		/* test that any attributes on that path have been removed. */
 		int path7 = bsfs.addFile("/april/may/december");
-		int myAttrId = fattrs.newAttrName("myattr");
-		fattrs.setAttr(path7, myAttrId, 1);
-		assertEquals(1, fattrs.getAttrsOnPath(path7).length);
+		int myAttrId = fileAttrMgr.newAttrName("myattr");
+		fileAttrMgr.setAttr(path7, myAttrId, 1);
+		assertEquals(1, fileAttrMgr.getAttrsOnPath(path7).length);
 		assertEquals(ErrorCode.OK, bsfs.removePath(path7));
-		assertEquals(0, fattrs.getAttrsOnPath(path7).length);
+		assertEquals(0, fileAttrMgr.getAttrsOnPath(path7).length);
 		
 		/* test that we can't remove a path that is included by another path */
 		int path8 = bsfs.addFile("/april/may/january");

@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PathNameCache;
@@ -654,7 +655,7 @@ public class FileNameSpaces {
 		 * use the path we're trying to delete.
 		 */
 		BuildTasks buildTasks = buildStore.getBuildTasks();
-		FileAttributes fileAttrs = buildStore.getFileAttributes();
+		IFileAttributeMgr fileAttrMgr = buildStore.getFileAttributeMgr();
 		IFileIncludeMgr fileIncludeMgr = buildStore.getFileIncludeMgr();
 		
 		/* check that this path doesn't have children */
@@ -699,7 +700,7 @@ public class FileNameSpaces {
 		}	
 		
 		/* remove any attributes that are associated with this file */
-		fileAttrs.deleteAllAttrOnPath(pathId);
+		fileAttrMgr.deleteAllAttrOnPath(pathId);
 		
 		/* remove any file-includes where this file does the including */
 		fileIncludeMgr.deleteFilesIncludedBy(pathId);
