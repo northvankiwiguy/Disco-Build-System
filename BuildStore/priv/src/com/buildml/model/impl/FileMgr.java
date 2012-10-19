@@ -41,23 +41,6 @@ public class FileMgr implements IFileMgr {
 	/*=====================================================================================*
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
-
-	/**
-	 * Path types - paths can be directories, plain files, or symlinks.
-	 */
-	public enum PathType { 
-		/** The path has an invalid type. */
-		TYPE_INVALID, 
-		
-		/** The path refers to a directory. */
-		TYPE_DIR, 
-		
-		/** The path refers to a file. */
-		TYPE_FILE, 
-		
-		/** The path refers to a symlink. */
-		TYPE_SYMLINK
-	};
 	
 	/** The BuildStore object that "owns" this FileNameSpaces object. */
 	private IBuildStore buildStore;

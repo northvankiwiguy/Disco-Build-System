@@ -18,7 +18,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.FileMgr.PathType;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.utils.errors.ErrorCode;
 

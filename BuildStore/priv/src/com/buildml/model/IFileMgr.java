@@ -12,8 +12,6 @@
 
 package com.buildml.model;
 
-import com.buildml.model.impl.FileMgr.PathType;
-
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore
  * information about paths (files, directories, etc), as well as path roots.
@@ -24,7 +22,24 @@ import com.buildml.model.impl.FileMgr.PathType;
  * @author Peter Smith <psmith@arapiki.com>
  */
 public interface IFileMgr {
-
+	
+	/**
+	 * Path types - paths can be directories, plain files, or symlinks.
+	 */
+	public enum PathType { 
+		/** The path has an invalid type. */
+		TYPE_INVALID, 
+		
+		/** The path refers to a directory. */
+		TYPE_DIR, 
+		
+		/** The path refers to a file. */
+		TYPE_FILE, 
+		
+		/** The path refers to a symlink. */
+		TYPE_SYMLINK
+	};
+	
 	/**
 	 * The maximum number of files that this FileNamesSpaces object can handle.
 	 */

@@ -21,9 +21,9 @@ import java.util.zip.GZIPInputStream;
 
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;

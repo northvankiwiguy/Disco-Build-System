@@ -20,10 +20,10 @@ import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;

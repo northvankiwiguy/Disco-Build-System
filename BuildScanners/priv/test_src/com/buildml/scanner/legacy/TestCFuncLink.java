@@ -24,8 +24,8 @@ import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.utils.os.SystemUtils;
 
 /**

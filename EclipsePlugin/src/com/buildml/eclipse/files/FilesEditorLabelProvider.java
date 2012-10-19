@@ -24,8 +24,8 @@ import org.eclipse.ui.PlatformUI;
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.FileRecord;
 
 /**

@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileMgr.PathType;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.utils.errors.ErrorCode;
 
 /**

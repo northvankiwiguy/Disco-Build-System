@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
 import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.FileMgr.PathType;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.FileRecord;
 
 /**
