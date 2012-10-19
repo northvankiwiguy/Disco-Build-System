@@ -249,15 +249,6 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Force the database to be empty. This is primarily for testing purposes.
-	 */
-	public void forceInitialize() {
-		db.initDatabase();
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Close the BuildStore, and release any resources associated with it. Attempting to
 	 * access the BuildStore's content after it's closed will likely cause a
 	 * FatalBuildStoreError.
