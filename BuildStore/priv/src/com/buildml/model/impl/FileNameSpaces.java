@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PathNameCache;
 import com.buildml.model.types.PathNameCache.PathNameCacheValue;
@@ -654,7 +655,7 @@ public class FileNameSpaces {
 		 */
 		BuildTasks buildTasks = buildStore.getBuildTasks();
 		FileAttributes fileAttrs = buildStore.getFileAttributes();
-		FileIncludes fileIncludes = buildStore.getFileIncludes();
+		IFileIncludeMgr fileIncludeMgr = buildStore.getFileIncludeMgr();
 		
 		/* check that this path doesn't have children */
 		if (getChildPaths(pathId).length != 0) {
@@ -678,7 +679,7 @@ public class FileNameSpaces {
 		}
 		
 		/* check that it's not included by another file */
-		if (fileIncludes.getFilesThatInclude(pathId).length != 0) {
+		if (fileIncludeMgr.getFilesThatInclude(pathId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -701,7 +702,7 @@ public class FileNameSpaces {
 		fileAttrs.deleteAllAttrOnPath(pathId);
 		
 		/* remove any file-includes where this file does the including */
-		fileIncludes.deleteFilesIncludedBy(pathId);
+		fileIncludeMgr.deleteFilesIncludedBy(pathId);
 		
 		/* success, the path has been removed */
 		return ErrorCode.OK;

@@ -20,7 +20,6 @@ import org.junit.Test;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.impl.FileAttributes;
-import com.buildml.model.impl.FileIncludes;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.impl.FileNameSpaces.PathType;
@@ -45,7 +44,7 @@ public class TestFileNameSpaces {
 	FileAttributes fattrs;
 
 	/** The FileIncludes associated with this BuildStore */
-	FileIncludes fincludes;
+	IFileIncludeMgr fileIncludeMgr;
 
 	/**
 	 * @throws java.lang.Exception
@@ -59,7 +58,7 @@ public class TestFileNameSpaces {
 		bsfs = bs.getFileNameSpaces();
 		bts = bs.getBuildTasks();
 		fattrs = bs.getFileAttributes();
-		fincludes = bs.getFileIncludes();
+		fileIncludeMgr = bs.getFileIncludeMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -456,17 +455,17 @@ public class TestFileNameSpaces {
 		/* test that we can't remove a path that is included by another path */
 		int path8 = bsfs.addFile("/april/may/january");
 		int path9 = bsfs.addFile("/april/may/february");
-		fincludes.addFileIncludes(path8, path9);
+		fileIncludeMgr.addFileIncludes(path8, path9);
 		assertEquals(ErrorCode.CANT_REMOVE, bsfs.removePath(path9));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
-				fincludes.getFilesIncludedBy(path8), new Integer[] { path9 }));
+				fileIncludeMgr.getFilesIncludedBy(path8), new Integer[] { path9 }));
 		
 		/* but, we can remove a path that does the including */
 		assertTrue(CommonTestUtils.sortedArraysEqual(
-				fincludes.getFilesThatInclude(path9), new Integer[] { path8 }));
+				fileIncludeMgr.getFilesThatInclude(path9), new Integer[] { path8 }));
 		assertEquals(ErrorCode.OK, bsfs.removePath(path8));
-		assertEquals(0, fincludes.getFilesThatInclude(path9).length);
-		assertEquals(0, fincludes.getFilesIncludedBy(path8).length);
+		assertEquals(0, fileIncludeMgr.getFilesThatInclude(path9).length);
+		assertEquals(0, fileIncludeMgr.getFilesIncludedBy(path8).length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

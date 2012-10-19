@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.errors.BuildStoreVersionException;
@@ -48,8 +49,8 @@ public class BuildStore {
 	/** The FileNameSpaces manager object we'll delegate work to. */
 	private FileNameSpaces fileSpaces;
 
-	/** The FileIncludes manager object we'll delegate work to. */
-	private FileIncludes fileIncludes;
+	/** The FileIncludeMgr object we'll delegate work to. */
+	private IFileIncludeMgr fileIncludeMgr;
 
 	/** The BuildTasks manager object we'll delegate work to. */
 	private BuildTasks buildTasks;
@@ -109,8 +110,8 @@ public class BuildStore {
 		/* create a new FileNameSpaces object to manage our list of files */
 		fileSpaces = new FileNameSpaces(this);
 		
-		/* create a new FileIncludes object to manage the relationship between files */
-		fileIncludes = new FileIncludes(this);
+		/* create a new FileIncludeMgr object to manage the relationship between files */
+		fileIncludeMgr = new FileIncludeMgr(this);
 
 		/* create a new BuildTasks object to manage the relationship between files */
 		buildTasks = new BuildTasks(this);
@@ -172,14 +173,14 @@ public class BuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Fetch the FileIncludes manager associated with this BuildStore. This object
+	 * Fetch the FileIncludeMgr associated with this BuildStore. This object
 	 * encapsulates knowledge of which source files textually include which other
 	 * source files.
 	 * 
-	 * @return A FileIncludes manager object.
+	 * @return A FileIncludeMgr object.
 	 */
-	public FileIncludes getFileIncludes() {
-		return fileIncludes;
+	public IFileIncludeMgr getFileIncludeMgr() {
+		return fileIncludeMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

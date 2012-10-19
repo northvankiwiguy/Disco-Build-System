@@ -22,7 +22,6 @@ import org.junit.Test;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildStore;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileIncludes;
 import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileRecord;
@@ -46,7 +45,7 @@ public class TestReportMgr {
 	private BuildTasks bts;
 	
 	/** our test FileIncludes object */
-	private FileIncludes fis;
+	private IFileIncludeMgr fileIncludeMgr;
 	
 	/** our test Reports object */
 	private IReportMgr reports;
@@ -64,7 +63,7 @@ public class TestReportMgr {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		fns = bs.getFileNameSpaces();
 		bts = bs.getBuildTasks();
-		fis = bs.getFileIncludes();
+		fileIncludeMgr = bs.getFileIncludeMgr();
 		reports = bs.getReportMgr();
 		rootTaskId = bts.getRootTask("root");
 	}
@@ -201,15 +200,15 @@ public class TestReportMgr {
 		fns.addFile("/mydir/files/fileE.h");
 	
 		/* register the include relationships, all for file2 */
-		fis.addFileIncludes(file1, file2);
-		fis.addFileIncludes(file3, file2);
-		fis.addFileIncludes(file1, file4);
-		fis.addFileIncludes(file1, file2);
-		fis.addFileIncludes(file3, file2);
-		fis.addFileIncludes(file4, file2);
-		fis.addFileIncludes(file2, file4);
-		fis.addFileIncludes(file1, file2);
-		fis.addFileIncludes(file1, file2);
+		fileIncludeMgr.addFileIncludes(file1, file2);
+		fileIncludeMgr.addFileIncludes(file3, file2);
+		fileIncludeMgr.addFileIncludes(file1, file4);
+		fileIncludeMgr.addFileIncludes(file1, file2);
+		fileIncludeMgr.addFileIncludes(file3, file2);
+		fileIncludeMgr.addFileIncludes(file4, file2);
+		fileIncludeMgr.addFileIncludes(file2, file4);
+		fileIncludeMgr.addFileIncludes(file1, file2);
+		fileIncludeMgr.addFileIncludes(file1, file2);
 
 		/* 
 		 * Results should be:
@@ -254,8 +253,8 @@ public class TestReportMgr {
 		
 		/* add a bunch of files - some include file*/
 		for (int i = 0; i != numIncludes; i++) {
-			fis.addFileIncludes(r.nextInt(numFiles), file1);
-			fis.addFileIncludes(r.nextInt(numFiles), file2);
+			fileIncludeMgr.addFileIncludes(r.nextInt(numFiles), file1);
+			fileIncludeMgr.addFileIncludes(r.nextInt(numFiles), file2);
 		}
 		
 		bs.setFastAccessMode(false);

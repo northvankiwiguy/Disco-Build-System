@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IFileIncludeMgr;
 
 /**
  * A manager class (that supports the BuildStore class) that manages all BuildStore
@@ -28,7 +29,7 @@ import com.buildml.model.FatalBuildStoreError;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FileIncludes {
+/* package private */ class FileIncludeMgr implements IFileIncludeMgr {
 
 	/*=====================================================================================*
 	 * TYPES/FIELDS
@@ -61,7 +62,7 @@ public class FileIncludes {
 	 * 
 	 * @param buildStore The BuildStore object that owns this FileIncludes object.
 	 */
-	public FileIncludes(BuildStore buildStore) {
+	public FileIncludeMgr(BuildStore buildStore) {
 		this.db = buildStore.getBuildStoreDB();
 		
 		/* create prepared database statements */
@@ -83,11 +84,10 @@ public class FileIncludes {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
-	/**
-	 * Record the fact that file1 somehow includes file2.
-	 * @param file1 The file that does the including.
-	 * @param file2 The file that is included.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileIncludeMgr#addFileIncludes(int, int)
 	 */
+	@Override
 	public void addFileIncludes(int file1, int file2) {
 		
 		try {
@@ -107,15 +107,10 @@ public class FileIncludes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Given a pair of files, where file1 depends on file2 in some way, return the count of
-	 * how many times this dependency relationship has been noted. That is, how many times
-	 * was addFileIncludes() called with this pair of files.
-	 * 
-	 * @param file1 The file that does the including.
-	 * @param file2 The file that is included.
-	 * @return The number of times the dependency was noted.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileIncludeMgr#getFileIncludesCount(int, int)
 	 */
+	@Override
 	public int getFileIncludesCount(int file1, int file2) {
 	
 		Integer results[];
@@ -143,13 +138,10 @@ public class FileIncludes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return the total number of times that a specific file is included, regardless of who
-	 * includes it.
-	 * 
-	 * @param file The file in which we're interested.
-	 * @return The total number of times the file is accessed by one or more other files.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileIncludeMgr#getTotalFileIncludedCount(int)
 	 */
+	@Override
 	public int getTotalFileIncludedCount(int file) {
 		ResultSet rs;
 		int usageCount = 0;
@@ -171,12 +163,10 @@ public class FileIncludes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return an Integer array of all files that include the specified file.
-	 * 
-	 * @param fileId ID of the file that is being included
-	 * @return An Integer array of all files that include the specified file.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileIncludeMgr#getFilesThatInclude(int)
 	 */
+	@Override
 	public Integer[] getFilesThatInclude(int fileId) {
 		
 		Integer results[];
@@ -193,12 +183,10 @@ public class FileIncludes {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Return an Integer array of all files that are included by the specified file.
-	 * 
-	 * @param fileId ID of the file that does the including.
-	 * @return An Integer array of all files that are included by the specified file
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileIncludeMgr#getFilesIncludedBy(int)
 	 */
+	@Override
 	public Integer[] getFilesIncludedBy(int fileId) {
 		
 		Integer results[];
@@ -215,10 +203,10 @@ public class FileIncludes {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Delete any file-includes relationship where the specified file does the including.
-	 * @param pathId The file that does the include.
+	/* (non-Javadoc)
+	 * @see com.buildml.model.impl.IFileIncludeMgr#deleteFilesIncludedBy(int)
 	 */
+	@Override
 	public void deleteFilesIncludedBy(int pathId) {
 		
 		try {
