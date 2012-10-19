@@ -54,7 +54,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
@@ -82,8 +82,8 @@ public class FilesEditor extends SubEditor {
 	/** The column that displays the path's scope */
 	private TreeColumn scopeColumn;
 	
-	/** The FileNameSpaces object that contains all the file information for this BuildStore */
-	private FileNameSpaces fns = null;
+	/** The FileMgr object that contains all the file information for this BuildStore */
+	private IFileMgr fileMgr = null;
 	
 	/** The ArrayContentProvider object providing this editor's content */
 	private FilesEditorContentProvider contentProvider;
@@ -118,7 +118,7 @@ public class FilesEditor extends SubEditor {
 	public FilesEditor(IBuildStore buildStore, String tabTitle) {
 		super(buildStore, tabTitle);
 
-		fns = buildStore.getFileNameSpaces();
+		fileMgr = buildStore.getFileMgr();
 
 		/* initially, all paths are visible */
 		visiblePaths = buildStore.getReportMgr().reportAllFiles();
@@ -198,10 +198,10 @@ public class FilesEditor extends SubEditor {
 	    /*
 		 * Add the tree/table content and label providers.
 		 */
-		contentProvider = new FilesEditorContentProvider(this, fns);
+		contentProvider = new FilesEditorContentProvider(this, fileMgr);
 		FilesEditorLabelProvider labelProvider = 
-				new FilesEditorLabelProvider(this, fns, buildStore.getPackageMgr());
-		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fns);
+				new FilesEditorLabelProvider(this, fileMgr, buildStore.getPackageMgr());
+		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fileMgr);
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);
 		filesTreeViewer.setSorter(viewerSorter);
@@ -241,7 +241,7 @@ public class FilesEditor extends SubEditor {
 				 * if there's a problem.
 				 */
 				else {
-					String filePath = fns.getPathName(node.getId());
+					String filePath = fileMgr.getPathName(node.getId());
 					EclipsePartUtils.openNewEditor(filePath);
 				}
 			}
@@ -525,7 +525,7 @@ public class FilesEditor extends SubEditor {
 			String eol = System.getProperty("line.separator");
 			StringBuffer sb = new StringBuffer();
 			for (int pathId : fileSet) {
-				String path = fns.getPathName(pathId);
+				String path = fileMgr.getPathName(pathId);
 				sb.append(path);
 				sb.append(eol);
 			}

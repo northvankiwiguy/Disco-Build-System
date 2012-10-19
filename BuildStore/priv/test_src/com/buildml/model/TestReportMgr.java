@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
@@ -37,8 +36,8 @@ public class TestReportMgr {
 	/** our test BuildStore object */
 	private IBuildStore bs;
 
-	/** our test FileNameSpaces object */
-	private FileNameSpaces fns;
+	/** our test FileMgr object */
+	private IFileMgr fileMgr;
 	
 	/** our test BuildTasks object */
 	private BuildTasks bts;
@@ -60,7 +59,7 @@ public class TestReportMgr {
 	@Before
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		bts = bs.getBuildTasks();
 		fileIncludeMgr = bs.getFileIncludeMgr();
 		reports = bs.getReportMgr();
@@ -76,11 +75,11 @@ public class TestReportMgr {
 	public void testReportMostCommonlyAccessedFiles() {
 		
 		/* add some files */
-		int foxFile = fns.addFile("/mydir/fox");
-		int boxFile = fns.addFile("/mydir/box");
-		int soxFile = fns.addFile("/mydir/sox");
-		int roxFile = fns.addFile("/mydir/rox");
-		int dir = fns.addDirectory("myEmptydir");
+		int foxFile = fileMgr.addFile("/mydir/fox");
+		int boxFile = fileMgr.addFile("/mydir/box");
+		int soxFile = fileMgr.addFile("/mydir/sox");
+		int roxFile = fileMgr.addFile("/mydir/rox");
+		int dir = fileMgr.addDirectory("myEmptydir");
 
 		/* create three different tasks */
 		int task1 = bts.addBuildTask(rootTaskId, 0, "command");
@@ -166,7 +165,7 @@ public class TestReportMgr {
 		
 		/* add a bunch of files */
 		for (int i = 0; i != numFiles; i++) {
-			fns.addFile(String.valueOf(r.nextInt()));
+			fileMgr.addFile(String.valueOf(r.nextInt()));
 		}
 		
 		/* add a (small) bunch of tasks, and associate files with them. */
@@ -192,11 +191,11 @@ public class TestReportMgr {
 	public void testreportMostCommonIncludersOfFile() {
 	
 		/* create some files */
-		int file1 = fns.addFile("/mydir/files/fileA.h");
-		int file2 = fns.addFile("/mydir/files/fileB.h");
-		int file3 = fns.addFile("/mydir/files/fileC.h");
-		int file4 = fns.addFile("/mydir/files/fileD.h");
-		fns.addFile("/mydir/files/fileE.h");
+		int file1 = fileMgr.addFile("/mydir/files/fileA.h");
+		int file2 = fileMgr.addFile("/mydir/files/fileB.h");
+		int file3 = fileMgr.addFile("/mydir/files/fileC.h");
+		int file4 = fileMgr.addFile("/mydir/files/fileD.h");
+		fileMgr.addFile("/mydir/files/fileE.h");
 	
 		/* register the include relationships, all for file2 */
 		fileIncludeMgr.addFileIncludes(file1, file2);
@@ -247,8 +246,8 @@ public class TestReportMgr {
 		bs.setFastAccessMode(true);
 		Random r = new Random();
 		
-		int file1 = fns.addFile("/file1");
-		int file2 = fns.addFile("/file2");
+		int file1 = fileMgr.addFile("/file1");
+		int file2 = fileMgr.addFile("/file2");
 		
 		/* add a bunch of files - some include file*/
 		for (int i = 0; i != numIncludes; i++) {
@@ -275,10 +274,10 @@ public class TestReportMgr {
 		assertEquals(0, results.size());
 		
 		/* add some files and a couple of tasks */
-		int file1 = fns.addFile("/home/psmith/myfile1");
-		int file2 = fns.addFile("/home/psmith/myfile2");
-		int file3 = fns.addFile("/home/psmith/myfile3");
-		int file4 = fns.addFile("/home/psmith/myfile4");
+		int file1 = fileMgr.addFile("/home/psmith/myfile1");
+		int file2 = fileMgr.addFile("/home/psmith/myfile2");
+		int file3 = fileMgr.addFile("/home/psmith/myfile3");
+		int file4 = fileMgr.addFile("/home/psmith/myfile4");
 		
 		int task1 = bts.addBuildTask(rootTaskId, 0, "task1");
 		int task2 = bts.addBuildTask(rootTaskId, 0, "task2");
@@ -333,11 +332,11 @@ public class TestReportMgr {
 		assertEquals(0, results.size());
 
 		/* add some files */		
-		int file1 = fns.addFile("/home/psmith/myfile");
-		int file2 = fns.addFile("/home/psmith/src/myfile");
-		int file3 = fns.addFile("/home/psmith/src/myfile2");
-		int file4 = fns.addFile("/home/psmith/src/lib/myfile");
-		int file5 = fns.addFile("/home/psmith/src/lib/myfile2");
+		int file1 = fileMgr.addFile("/home/psmith/myfile");
+		int file2 = fileMgr.addFile("/home/psmith/src/myfile");
+		int file3 = fileMgr.addFile("/home/psmith/src/myfile2");
+		int file4 = fileMgr.addFile("/home/psmith/src/lib/myfile");
+		int file5 = fileMgr.addFile("/home/psmith/src/lib/myfile2");
 		
 		/* search for something that doesn't exist at all */
 		results = reports.reportFilesThatMatchName("Makefile");
@@ -410,12 +409,12 @@ public class TestReportMgr {
 	public void testReportTasksThatAccessFiles() {
 
 		/* Create a bunch of files */
-		int file1a = fns.addFile("/file1a");
-		int file1b = fns.addFile("/file1b");
-		int file2a = fns.addFile("/file2a");
-		int file2b = fns.addFile("/file2b");
-		int file3a = fns.addFile("/file3a");
-		int file3b = fns.addFile("/file3b");
+		int file1a = fileMgr.addFile("/file1a");
+		int file1b = fileMgr.addFile("/file1b");
+		int file2a = fileMgr.addFile("/file2a");
+		int file2b = fileMgr.addFile("/file2b");
+		int file3a = fileMgr.addFile("/file3a");
+		int file3b = fileMgr.addFile("/file3b");
 
 		int rootTask = bts.getRootTask("");
 		
@@ -438,7 +437,7 @@ public class TestReportMgr {
 		bts.addFileAccess(task3b, file3b, OperationType.OP_WRITE);
 
 		/* test the report for an empty FileSet */
-		FileSet source = new FileSet(fns);
+		FileSet source = new FileSet(fileMgr);
 		TaskSet resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		TaskSet resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
 		TaskSet resultUses = reports.reportTasksThatAccessFiles(source, OperationType.OP_UNSPECIFIED);
@@ -447,7 +446,7 @@ public class TestReportMgr {
 		assertEquals(0, resultUses.size());
 		
 		/* test with only file1a */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(file1a);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
@@ -459,7 +458,7 @@ public class TestReportMgr {
 		assertTrue(resultUses.isMember(task1a));
 
 		/* test with only file1b */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(file1b);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
 		resultWrites = reports.reportTasksThatAccessFiles(source, OperationType.OP_WRITE);
@@ -471,7 +470,7 @@ public class TestReportMgr {
 		assertTrue(resultUses.isMember(task1b));
 		
 		/* test with both file1a and file1b */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(file1a);
 		source.add(file1b);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
@@ -486,7 +485,7 @@ public class TestReportMgr {
 		assertTrue(resultUses.isMember(task1b));
 		
 		/* test with file1a and file2a */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(file1a);
 		source.add(file2a);
 		resultReads = reports.reportTasksThatAccessFiles(source, OperationType.OP_READ);
@@ -501,7 +500,7 @@ public class TestReportMgr {
 		assertTrue(resultUses.isMember(task2a));
 
 		/* test with file1a, file2a and file3b */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(file1a);
 		source.add(file2a);
 		source.add(file3b);
@@ -528,9 +527,9 @@ public class TestReportMgr {
 	public void testFilesAccessedByTasks() {
 		
 		/* create some tasks, and some file accesses for each */
-		int file1 = fns.addFile("/a/b/c.java");
-		int file2 = fns.addFile("/a/b/d.java");
-		int file3 = fns.addFile("/a/b/e.java");
+		int file1 = fileMgr.addFile("/a/b/c.java");
+		int file2 = fileMgr.addFile("/a/b/d.java");
+		int file3 = fileMgr.addFile("/a/b/e.java");
 
 		int root = bts.getRootTask("");
 		int task1 = bts.addBuildTask(root, 0, "");
@@ -611,8 +610,8 @@ public class TestReportMgr {
 		assertEquals(0, result.size());
 		
 		/* a.java will be compiled into a.class, which goes into prog.jar (see later) */
-		int fileAJava = fns.addFile("/a.java");
-		int fileAClass = fns.addFile("/a.class");
+		int fileAJava = fileMgr.addFile("/a.java");
+		int fileAClass = fileMgr.addFile("/a.class");
 		int taskA = bts.addBuildTask(0, 0, "javac a.java");
 		bts.addFileAccess(taskA, fileAJava, OperationType.OP_READ);
 		bts.addFileAccess(taskA, fileAClass, OperationType.OP_WRITE);
@@ -623,8 +622,8 @@ public class TestReportMgr {
 		assertTrue(result.isMember(fileAClass));		
 		
 		/* b.java will be compiled into b.class, which goes into prog.jar (see later) */		
-		int fileBJava = fns.addFile("/b.java");
-		int fileBClass = fns.addFile("/b.class");
+		int fileBJava = fileMgr.addFile("/b.java");
+		int fileBClass = fileMgr.addFile("/b.class");
 		int taskB = bts.addBuildTask(0, 0, "javac b.java");
 		bts.addFileAccess(taskB, fileBJava, OperationType.OP_READ);
 		bts.addFileAccess(taskB, fileBClass, OperationType.OP_WRITE);
@@ -636,14 +635,14 @@ public class TestReportMgr {
 		assertTrue(result.isMember(fileBClass));
 		
 		/* c.java will be compiled into c.class, but no further */
-		int fileCJava = fns.addFile("/c.java");
-		int fileCClass = fns.addFile("/c.class");
+		int fileCJava = fileMgr.addFile("/c.java");
+		int fileCClass = fileMgr.addFile("/c.class");
 		int taskC = bts.addBuildTask(0, 0, "javac c.java");
 		bts.addFileAccess(taskC, fileCJava, OperationType.OP_READ);
 		bts.addFileAccess(taskC, fileCClass, OperationType.OP_WRITE);
 		
 		/* d.java is not read at all */
-		fns.addFile("/d.java");		
+		fileMgr.addFile("/d.java");		
 
 		/* Run the report - a.class, b.class and c.class should be listed */
 		result = reports.reportWriteOnlyFiles();
@@ -653,7 +652,7 @@ public class TestReportMgr {
 		assertTrue(result.isMember(fileCClass));
 		
 		/* now put A.class and B.class into prog.jar */
-		int fileProgJar = fns.addFile("/prog.jar");
+		int fileProgJar = fileMgr.addFile("/prog.jar");
 		int taskProg = bts.addBuildTask(0, 0, "jar cf prog.jar a.class b.class");
 		bts.addFileAccess(taskProg, fileAClass, OperationType.OP_READ);
 		bts.addFileAccess(taskProg, fileBClass, OperationType.OP_READ);
@@ -674,7 +673,7 @@ public class TestReportMgr {
 	@Test
 	public void testAllFiles() {
 
-		int dirRoot = fns.getPath("/");
+		int dirRoot = fileMgr.getPath("/");
 
 		/* an empty file store still has the "/" path in it */
 		FileSet result = reports.reportAllFiles();
@@ -682,15 +681,15 @@ public class TestReportMgr {
 		assertTrue(result.isMember(dirRoot));
 		
 		/* add a bunch of paths and test that their in the set */
-		int fileAJava = fns.addFile("/a.java");
-		int fileBJava = fns.addFile("/b.java");
-		int fileCJava = fns.addFile("/c.java");
-		int fileAC = fns.addFile("/a/A.c");
-		int fileBC = fns.addFile("/a/b/B.c");
-		int fileCC = fns.addFile("/a/b/c/C.c");
-		int dirA = fns.getPath("/a");
-		int dirB = fns.getPath("/a/b");
-		int dirC = fns.getPath("/a/b/c");
+		int fileAJava = fileMgr.addFile("/a.java");
+		int fileBJava = fileMgr.addFile("/b.java");
+		int fileCJava = fileMgr.addFile("/c.java");
+		int fileAC = fileMgr.addFile("/a/A.c");
+		int fileBC = fileMgr.addFile("/a/b/B.c");
+		int fileCC = fileMgr.addFile("/a/b/c/C.c");
+		int dirA = fileMgr.getPath("/a");
+		int dirB = fileMgr.getPath("/a/b");
+		int dirC = fileMgr.getPath("/a/b/c");
 		
 		result = reports.reportAllFiles();
 		assertEquals(10, result.size());
@@ -705,17 +704,17 @@ public class TestReportMgr {
 		assertTrue(result.isMember(dirC));
 		
 		/* delete a few paths and try again */
-		fns.removePath(fileAC);
+		fileMgr.removePath(fileAC);
 		result = reports.reportAllFiles();
 		assertEquals(9, result.size());
 		assertFalse(result.isMember(fileAC));
 
-		fns.removePath(fileCC);
+		fileMgr.removePath(fileCC);
 		result = reports.reportAllFiles();
 		assertEquals(8, result.size());
 		assertFalse(result.isMember(fileCC));
 
-		fns.removePath(dirC);
+		fileMgr.removePath(dirC);
 		result = reports.reportAllFiles();
 		assertEquals(7, result.size());
 		assertFalse(result.isMember(dirC));

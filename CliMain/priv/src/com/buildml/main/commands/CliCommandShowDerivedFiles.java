@@ -18,9 +18,9 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -122,12 +122,12 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "One or more colon-separated path-specs must be provided.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* fetch the list of files that are the source of the derivation */
-		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fns, args[0]);
+		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fileMgr, args[0]);
 		if (sourceFileSet != null) {
 			sourceFileSet.populateWithParents();
 		}
@@ -137,7 +137,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 		derivedFileSet.populateWithParents();
 
 		/* pretty print the results - no filtering used here */
-		CliUtils.printFileSet(System.out, fns, pkgMgr, derivedFileSet, filterFileSet, optionShowRoots, optionShowPkgs);	
+		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, derivedFileSet, filterFileSet, optionShowRoots, optionShowPkgs);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -18,6 +18,7 @@ import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -41,8 +42,8 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	private BuildStoreDB db = null;
 	
-	/** The FileNameSpaces object that manages the files in our packages. */
-	private FileNameSpaces fns = null;
+	/** The FileMgr object that manages the files in our packages. */
+	private IFileMgr fileMgr = null;
 	
 	/** The BuildTasks object that manages the tasks in our packages. */
 	private BuildTasks bts = null;
@@ -86,7 +87,7 @@ import com.buildml.utils.errors.ErrorCode;
 	public PackageMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
-		this.fns = buildStore.getFileNameSpaces();
+		this.fileMgr = buildStore.getFileMgr();
 		this.bts = buildStore.getBuildTasks();
 		
 		/* initialize prepared database statements */
@@ -412,7 +413,7 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* convert to a FileSet */
-		return new FileSet(fns, results);
+		return new FileSet(fileMgr, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -433,7 +434,7 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* convert to a FileSet */
-		return new FileSet(fns, results);
+		return new FileSet(fileMgr, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -482,7 +483,7 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* convert to a FileSet */
-		return new FileSet(fns, results);
+		return new FileSet(fileMgr, results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -502,7 +503,7 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* convert to a FileSet */
-		return new FileSet(fns, results);
+		return new FileSet(fileMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

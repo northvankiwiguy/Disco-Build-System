@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.scanner.buildtree.FileSystemScanner;
 
@@ -33,8 +33,8 @@ public class TestFileSystemScanner {
 	/** Our test BuildStore object */
 	private IBuildStore bs;
 
-	/** Our test FileNameSpaces object */
-	private FileNameSpaces fns;
+	/** Our test FileMgr object */
+	private IFileMgr fileMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -44,7 +44,7 @@ public class TestFileSystemScanner {
 	@Before
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -71,7 +71,7 @@ public class TestFileSystemScanner {
 		IReportMgr reportMgr = bs.getReportMgr();
 		FileSet results = reportMgr.reportFilesNeverAccessed();
 		for (Integer pathId : results) {			
-			/*String pathName = */fns.getPathName(pathId);
+			/*String pathName = */fileMgr.getPathName(pathId);
 			//System.out.println(pathName);
 		}
 		//System.out.println("Found " + results.size() + " files");

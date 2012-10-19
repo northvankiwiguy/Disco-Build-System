@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -70,8 +71,8 @@ public class BuildTasks {
 	/** The BuildStore object that owns this BuildTasks object. */
 	private IBuildStore buildStore = null;
 	
-	/** The FileNameSpaces object associated with these BuildTasks */
-	private FileNameSpaces fns = null;
+	/** The FileMgr object associated with these BuildTasks */
+	private IFileMgr fileMgr = null;
 	
 	/** Various prepared statement for database access. */
 	private PreparedStatement 
@@ -103,7 +104,7 @@ public class BuildTasks {
 	public BuildTasks(BuildStore buildStore) {
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
-		this.fns = buildStore.getFileNameSpaces();
+		this.fileMgr = buildStore.getFileMgr();
 
 		/* create prepared database statements */
 		insertBuildTaskPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, 0, ?)");
@@ -290,7 +291,7 @@ public class BuildTasks {
 				 * same path is already used by some other task, but that's acceptable. We
 				 * only want to remove paths that were used exclusively by this task.
 				 */
-				fns.removePath(fileNumber);
+				fileMgr.removePath(fileNumber);
 			}
 			
 			/*

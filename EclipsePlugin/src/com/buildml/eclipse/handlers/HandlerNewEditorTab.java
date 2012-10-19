@@ -126,7 +126,7 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		 */
 		else if (subCmd.equals("emptyFiles")) {
 			FilesEditor newFilesEditor = new FilesEditor(buildStore, "Empty");
-			newFilesEditor.setVisibilityFilterSet(new FileSet(buildStore.getFileNameSpaces()));
+			newFilesEditor.setVisibilityFilterSet(new FileSet(buildStore.getFileMgr()));
 			newEditor = newFilesEditor;
 		}
 

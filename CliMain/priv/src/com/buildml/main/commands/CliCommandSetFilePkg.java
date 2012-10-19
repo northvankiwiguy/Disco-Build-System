@@ -18,8 +18,8 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -101,7 +101,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 
 		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a package name and a path-spec.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
@@ -115,7 +115,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 
 		/* find out which files the user wants to set */
 		String fileSpec = args[1];
-		FileSet filesToSet = CliUtils.getCmdLineFileSet(fns, fileSpec);
+		FileSet filesToSet = CliUtils.getCmdLineFileSet(fileMgr, fileSpec);
 
 		/* now visit each file in the FileSet and set it's package/scope */
 		buildStore.setFastAccessMode(true);

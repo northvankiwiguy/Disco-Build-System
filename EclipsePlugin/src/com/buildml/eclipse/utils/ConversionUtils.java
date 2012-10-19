@@ -15,8 +15,8 @@ package com.buildml.eclipse.utils;
 import com.buildml.eclipse.actions.UIActionRecord;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.files.UIFileRecordFile;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 
 /**
@@ -35,13 +35,13 @@ public class ConversionUtils {
 	 * Given a path ID number, return a suitable subclass of FileRecord that reflects
 	 * the type of the path. For example, return a UIFileRecordFile() if the pathId refers
 	 * to a file, or a UIFileRecordDir() if it refers to a directory.
-	 * @param fns The FileNameSpaces object that this path belongs to
+	 * @param fileMgr The FileMgr object that this path belongs to
 	 * @param pathId The ID of the path we need to create a FileRecord for.
 	 * @return The new object, whose class is a sub-class of FileRecord.
 	 */
-	public static FileRecord createFileRecordWithType(FileNameSpaces fns, int pathId)
+	public static FileRecord createFileRecordWithType(IFileMgr fileMgr, int pathId)
 	{
-		switch (fns.getPathType(pathId)) {
+		switch (fileMgr.getPathType(pathId)) {
 		case TYPE_DIR:
 			return new UIFileRecordDir(pathId);
 		case TYPE_FILE:
@@ -57,17 +57,17 @@ public class ConversionUtils {
 
 	/**
 	 * Given an Integer[], return a corresponding FileRecord[]
-	 * @param fns The FileNameSpaces object that this path belongs to.
+	 * @param fileMgr The FileMgr object that this path belongs to.
 	 * @param intArr The Integer[] to be converted.
 	 * @return The equivalent FileRecord[].
 	 */
 	public static FileRecord[] convertIntArrToFileRecordArr(
-			FileNameSpaces fns,
+			IFileMgr fileMgr,
 			Integer[] intArr)
 	{
 		FileRecord result[] = new FileRecord[intArr.length];
 		for (int i = 0; i < intArr.length; i++) {
-			result[i] = createFileRecordWithType(fns, intArr[i]);
+			result[i] = createFileRecordWithType(fileMgr, intArr[i]);
 		}
 		return result;		
 	}

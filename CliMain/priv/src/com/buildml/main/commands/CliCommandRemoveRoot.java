@@ -18,7 +18,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -100,10 +100,10 @@ public class CliCommandRemoveRoot implements ICliCommand {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "You must specify a root name.");
 		
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		String rootName = args[0];
 		
-		int rc = fns.deleteRoot(rootName);
+		int rc = fileMgr.deleteRoot(rootName);
 		
 		if (rc != ErrorCode.OK) {
 			String msg = null;

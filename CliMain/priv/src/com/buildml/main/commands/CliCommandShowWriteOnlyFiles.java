@@ -14,9 +14,9 @@ package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -78,7 +78,7 @@ public class CliCommandShowWriteOnlyFiles extends CliCommandShowFiles {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
@@ -87,7 +87,7 @@ public class CliCommandShowWriteOnlyFiles extends CliCommandShowFiles {
 		writeOnlyFileSet.populateWithParents();
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, pkgMgr, writeOnlyFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
+		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, writeOnlyFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

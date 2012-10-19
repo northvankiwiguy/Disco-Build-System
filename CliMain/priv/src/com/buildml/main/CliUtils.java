@@ -18,11 +18,11 @@ import java.io.PrintStream;
 
 import org.apache.commons.io.IOUtils;
 
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -98,16 +98,16 @@ public class CliUtils {
      *       with %not-pkg.</li>
      *    </ol>
      *    
-	 * @param fns The FileNameSpaces object that manages the files.
+	 * @param fileMgr The FileNameSpaces object that manages the files.
 	 * @param pathSpecs A String of ":"-separated path specs (files, directories, or regular expressions).
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
-	public static FileSet getCmdLineFileSet(FileNameSpaces fns, String pathSpecs) {
+	public static FileSet getCmdLineFileSet(IFileMgr fileMgr, String pathSpecs) {
 	
 		String pathSpecList[] = pathSpecs.split(":");
 		
 		/* else populate a new FileSet */
-		FileSet result = new FileSet(fns);
+		FileSet result = new FileSet(fileMgr);
 		if (result.populateWithPaths(pathSpecList) != ErrorCode.OK) {
 			CliUtils.reportErrorAndExit("Invalid path filter provided");
 		}
@@ -157,7 +157,7 @@ public class CliUtils {
 	 * used primarily for displaying the result of reports.
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
-	 * @param fns The FileNameSpaces manager object containing the files to be listed.
+	 * @param fileMgr The FileNameSpaces manager object containing the files to be listed.
 	 * @param pkgMgr The Packages manager object containing the package information.
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
@@ -167,7 +167,7 @@ public class CliUtils {
 	 * @param showPkgs Indicates whether the package names should be displayed.S
 	 */
 	public static void printFileSet(
-			PrintStream outStream, FileNameSpaces fns, IPackageMgr pkgMgr, FileSet resultFileSet,
+			PrintStream outStream, IFileMgr fileMgr, IPackageMgr pkgMgr, FileSet resultFileSet,
 			FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 		
 		/*
@@ -191,8 +191,8 @@ public class CliUtils {
 		 * of the paths underneath that root. Also, figure out the root's name
 		 * (it's '/' or '@root').
 		 */
-		int topRoot = fns.getRootPath("root");
-		String rootPathName = fns.getPathName(topRoot, showRoots);
+		int topRoot = fileMgr.getRootPath("root");
+		String rootPathName = fileMgr.getPathName(topRoot, showRoots);
 	
 		/*
 		 * Create a StringBuffer that'll be used for tracking the path name. We'll
@@ -207,9 +207,9 @@ public class CliUtils {
 		}
 		
 		/* call the helper function to display each of our children */
-		Integer children[] = fns.getChildPaths(topRoot);
+		Integer children[] = fileMgr.getChildPaths(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printFileSetHelper(outStream, sb, fns, pkgMgr, children[i], 
+			printFileSetHelper(outStream, sb, fileMgr, pkgMgr, children[i], 
 					resultFileSet, filterFileSet, showRoots, showPkgs);
 		}
 	}
@@ -222,7 +222,7 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
 	 * @param bts The BuildTasks manager object containing the task information.
-	 * @param fns The FileNameSpaces manager object containing file name information.
+	 * @param fileMgr The FileNameSpaces manager object containing file name information.
 	 * @param pkgMgr The Packages manager object containing package information.
 	 * @param resultTaskSet The set of tasks to be displayed (the results of some previous query).
 	 * @param filterTaskSet The set of tasks to actually be displayed (for post-filtering the query results).
@@ -230,7 +230,7 @@ public class CliUtils {
 	 * @param showPkgs Set to true if the package names should be shown.
 	 */
 	public static void printTaskSet(
-			PrintStream outStream, BuildTasks bts, FileNameSpaces fns, IPackageMgr pkgMgr,
+			PrintStream outStream, BuildTasks bts, IFileMgr fileMgr, IPackageMgr pkgMgr,
 			TaskSet resultTaskSet, TaskSet filterTaskSet, DisplayWidth outputFormat,
 			boolean showPkgs) {
 		
@@ -243,7 +243,7 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = bts.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fns, pkgMgr, children[i], 
+			printTaskSetHelper(outStream, bts, fileMgr, pkgMgr, children[i], 
 					resultTaskSet, filterTaskSet, outputFormat, showPkgs, 1);
 		}
 	}
@@ -463,7 +463,7 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream on which to display paths.
 	 * @param pathSoFar This path's parent path as a string, complete with trailing "/".
-	 * @param fns The FileNameSpaces manager object in which these paths belong.
+	 * @param fileMgr The FileNameSpaces manager object in which these paths belong.
 	 * @param pkgMgr The Packages manager object that contains the package information.
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
@@ -473,7 +473,7 @@ public class CliUtils {
 	 * @param showPkgs Whether to show the package names.
 	 */
 	private static void printFileSetHelper(
-			PrintStream outStream, StringBuffer pathSoFar, FileNameSpaces fns, IPackageMgr pkgMgr, int thisPathId,
+			PrintStream outStream, StringBuffer pathSoFar, IFileMgr fileMgr, IPackageMgr pkgMgr, int thisPathId,
 			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 
 		/* a StringBuffer for forming the package name */
@@ -485,7 +485,7 @@ public class CliUtils {
 		}	
 		
 		/* get this path's list of children */
-		Integer children[] = fns.getChildPaths(thisPathId);
+		Integer children[] = fileMgr.getChildPaths(thisPathId);
 	
 		/* we'll use this to record the current path's name */
 		String baseName;
@@ -497,11 +497,11 @@ public class CliUtils {
 		 */
 		String rootName = null;
 		if (showRoots) {
-			rootName = fns.getRootAtPath(thisPathId);
+			rootName = fileMgr.getRootAtPath(thisPathId);
 		}
 		
 		/* what is this path? A directory or something else? */
-		boolean isDirectory = (fns.getPathType(thisPathId) == PathType.TYPE_DIR);
+		boolean isDirectory = (fileMgr.getPathType(thisPathId) == PathType.TYPE_DIR);
 		boolean isNonEmptyDirectory = isDirectory && (children.length != 0);
 		
 		/* 
@@ -546,7 +546,7 @@ public class CliUtils {
 		if (rootName == null) {
 			
 			/* get the name of this path */
-			baseName = fns.getBaseName(thisPathId);
+			baseName = fileMgr.getBaseName(thisPathId);
 		
 			/* 
 			 * Display this path, prefixed by the absolute pathSoFar. Don't show non-empty
@@ -580,7 +580,7 @@ public class CliUtils {
 			pathSoFar.append(rootName);
 			
 			/* display information about this root. */
-			outStream.print(pathSoFar + " (" + fns.getPathName(thisPathId) + ") ");
+			outStream.print(pathSoFar + " (" + fileMgr.getPathName(thisPathId) + ") ");
 			
 			/* show packages, if requested */
 			if (showPkgs) {
@@ -603,7 +603,7 @@ public class CliUtils {
 		
 			/* display each of the children */
 			for (int i = 0; i < children.length; i++) {
-				printFileSetHelper(outStream, pathSoFar, fns, pkgMgr, children[i], 
+				printFileSetHelper(outStream, pathSoFar, fileMgr, pkgMgr, children[i], 
 						resultFileSet, filterFileSet, showRoots, showPkgs);
 			}
 			
@@ -620,7 +620,7 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
 	 * @param bts The BuildTasks manager object containing the task information.
-	 * @param fns The FileNameSpaces manager object containing file name information.
+	 * @param fileMgr The FileNameSpaces manager object containing file name information.
 	 * @param pkgMgr The Packages manager object containing the package information.
 	 * @param taskId The ID of the task we're currently displaying (at this level of recursion).
 	 * @param resultTaskSet The full set of tasks to be displayed (the result of some previous query).
@@ -630,7 +630,7 @@ public class CliUtils {
 	 * @param indentLevel The number of spaces to indent this task by (at this recursion level).
 	 */
 	private static void printTaskSetHelper(PrintStream outStream,
-			BuildTasks bts, FileNameSpaces fns, IPackageMgr pkgMgr, 
+			BuildTasks bts, IFileMgr fileMgr, IPackageMgr pkgMgr, 
 			int taskId, TaskSet resultTaskSet,
 			TaskSet filterTaskSet, DisplayWidth outputFormat, boolean showPkgs,
 			int indentLevel) {
@@ -669,7 +669,7 @@ public class CliUtils {
 		
 		/* fetch the name of the directory the task was executed in */
 		int taskDirId = bts.getDirectory(taskId);
-		String taskDirName = fns.getPathName(taskDirId);
+		String taskDirName = fileMgr.getPathName(taskDirId);
 		
 		/* display the correct number of "-" characters */
 		for (int i = 0; i != indentLevel; i++) {
@@ -704,7 +704,7 @@ public class CliUtils {
 		/* recursively call ourselves to display each of our children */
 		Integer children[] = bts.getChildren(taskId);
 		for (int i = 0; i < children.length; i++) {
-			printTaskSetHelper(outStream, bts, fns, pkgMgr, children[i], 
+			printTaskSetHelper(outStream, bts, fileMgr, pkgMgr, children[i], 
 					resultTaskSet, filterTaskSet, outputFormat, showPkgs, indentLevel + 1);
 		}
 		

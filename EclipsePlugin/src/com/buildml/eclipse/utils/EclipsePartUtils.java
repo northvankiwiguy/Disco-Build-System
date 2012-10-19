@@ -52,8 +52,8 @@ import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskRecord;
@@ -79,8 +79,8 @@ public class EclipsePartUtils {
 	 */
 	public static FileSet getFileSetFromSelection(IBuildStore buildStore, TreeSelection selection) {
 		
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
-		FileSet fs = new FileSet(fns);
+		IFileMgr fileMgr = buildStore.getFileMgr();
+		FileSet fs = new FileSet(fileMgr);
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object item = iter.next();

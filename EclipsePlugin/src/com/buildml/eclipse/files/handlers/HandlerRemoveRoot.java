@@ -19,7 +19,7 @@ import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -78,16 +78,16 @@ public class HandlerRemoveRoot extends AbstractHandler {
 			if (buildStore == null) {
 				return errorStatus;
 			}
-			FileNameSpaces pathMgr = buildStore.getFileNameSpaces();
+			IFileMgr fileMgr = buildStore.getFileMgr();
 			
 			/* fetch the root's name (error if it doesn't exist) */
-			rootName = pathMgr.getRootAtPath(pathId);
+			rootName = fileMgr.getRootAtPath(pathId);
 			if (rootName == null) {
 				return errorStatus;
 			}
 			
 			/* attempt the removal, possibly displaying an error dialog */
-			int errCode = pathMgr.deleteRoot(rootName);
+			int errCode = fileMgr.deleteRoot(rootName);
 			if (errCode != 0) {
 				String errMsg = "An unknown error occurred.";
 				switch(errCode) {
@@ -124,8 +124,8 @@ public class HandlerRemoveRoot extends AbstractHandler {
 			if (buildStore == null) {
 				return errorStatus;
 			}
-			FileNameSpaces pathMgr = buildStore.getFileNameSpaces();
-			int errCode = pathMgr.addNewRoot(rootName, pathId);
+			IFileMgr fileMgr = buildStore.getFileMgr();
+			int errCode = fileMgr.addNewRoot(rootName, pathId);
 			if (errCode != 0) {
 				/* this is an "undo", so it shouldn't fail (if it does, fail silently) */
 				return errorStatus;

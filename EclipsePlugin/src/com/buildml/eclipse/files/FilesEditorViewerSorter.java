@@ -15,8 +15,8 @@ package com.buildml.eclipse.files;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
-import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.IFileMgr;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.FileRecord;
 
 /**
@@ -28,8 +28,8 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 	/** The FilesEditor that we provide content for */
 	private FilesEditor editor = null;
 	
-	/** The FileNameSpaces object we should query for file information */
-	private FileNameSpaces fns = null;
+	/** The FileMgr object we should query for file information */
+	private IFileMgr fileMgr = null;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -37,12 +37,12 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 	 * Create a new FilesEditorViewerSorter, which is designed for sorting elements
 	 * within the FilesEditor page.
 	 * @param editor The FilesEditor we're sorting information for.
-	 * @param fns The FileNameSpaces object the information is derived from.
+	 * @param fileMgr The FileNameSpaces object the information is derived from.
 	 */
-	public FilesEditorViewerSorter(FilesEditor editor, FileNameSpaces fns) {
+	public FilesEditorViewerSorter(FilesEditor editor, IFileMgr fileMgr) {
 		
 		this.editor = editor;
-		this.fns = fns;
+		this.fileMgr = fileMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -57,8 +57,8 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 		/* Sort first by type (directories before files/symlinks), and then by name */
 		FileRecord fr1 = (FileRecord)r1;
 		FileRecord fr2 = (FileRecord)r2;
-		PathType pt1 = fns.getPathType(fr1.getId());
-		PathType pt2 = fns.getPathType(fr2.getId());
+		PathType pt1 = fileMgr.getPathType(fr1.getId());
+		PathType pt2 = fileMgr.getPathType(fr2.getId());
 		
 		/* if r1 is a directory, and r2 isn't, then r1 comes first */
 		if ((pt1 == PathType.TYPE_DIR) && (pt2 != PathType.TYPE_DIR)) {
@@ -71,8 +71,8 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 		}
 		
 		/* else, compare their names */
-		String name1 = fns.getBaseName(fr1.getId());
-		String name2 = fns.getBaseName(fr2.getId());
+		String name1 = fileMgr.getBaseName(fr1.getId());
+		String name2 = fileMgr.getBaseName(fr2.getId());
 		return name1.compareToIgnoreCase(name2);
 	}
 	

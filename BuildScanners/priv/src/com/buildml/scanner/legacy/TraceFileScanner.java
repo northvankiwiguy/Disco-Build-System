@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
@@ -109,8 +109,8 @@ import com.buildml.utils.string.ShellCommandUtils;
 	/** The BuildTasks object contained within our BuildStore (null = don't add to BuildStore). */
 	private BuildTasks buildTasks;
 	
-	/** The FileNameSpace object contained within our BuildStore (null = don't add to BuildStore). */
-	private FileNameSpaces fileNameSpaces;
+	/** The FileMgr object contained within our BuildStore (null = don't add to BuildStore). */
+	private IFileMgr fileMgr;
 	
 	/** The PrintStream to write debug information to (null = don't write debug information). */
 	private PrintStream debugStream;
@@ -165,7 +165,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 		/* these objects are part of our BuildStore object */
 		if (buildStore != null) {
 			this.buildTasks = buildStore.getBuildTasks();
-			this.fileNameSpaces = buildStore.getFileNameSpaces();
+			this.fileMgr = buildStore.getFileMgr();
 		}
 		
 		/* 
@@ -330,7 +330,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 			Integer parentTaskId = getTaskId(parentProcessNum);
 		
 			/* fetch the current working directory ID */
-			int taskDirId = fileNameSpaces.addDirectory(cwd);
+			int taskDirId = fileMgr.addDirectory(cwd);
 			if (taskDirId == ErrorCode.BAD_PATH){
 				throw new FatalBuildScannerError("Invalid current working directory: " + cwd);
 			}
@@ -422,11 +422,11 @@ import com.buildml.utils.string.ShellCommandUtils;
 		/* get the BuildStore fileId */
 		int fileId;
 		if (type == PathType.TYPE_FILE) {
-			fileId = fileNameSpaces.addFile(fileName);
+			fileId = fileMgr.addFile(fileName);
 		} else if (type == PathType.TYPE_DIR) {
-			fileId = fileNameSpaces.addDirectory(fileName);
+			fileId = fileMgr.addDirectory(fileName);
 		} else {
-			fileId = fileNameSpaces.addSymlink(fileName);
+			fileId = fileMgr.addSymlink(fileName);
 		}
 		if (fileId < 0){
 			throw new FatalBuildScannerError("Failed to add file: " + fileName + " to the BuildStore");

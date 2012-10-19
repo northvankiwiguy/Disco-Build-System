@@ -20,7 +20,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.RootNameDialog;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -54,8 +54,8 @@ public class HandlerAssignRootName extends AbstractHandler {
 		private IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 
 											"Unable to add or remove path root.");
 
-		/** The PathMgr that contains the path and the root */
-		private FileNameSpaces pathMgr;
+		/** The FileMgr that contains the path and the root */
+		private IFileMgr fileMgr;
 		
 		/*---------------------------------------------------------------------------*/
 
@@ -87,10 +87,10 @@ public class HandlerAssignRootName extends AbstractHandler {
 			if (buildStore == null) {
 				return errorStatus;
 			}
-			pathMgr = buildStore.getFileNameSpaces();
+			fileMgr = buildStore.getFileMgr();
 			
 			/* try to add the root to the selected path. On error, give a message */
-			int errCode = pathMgr.addNewRoot(rootName, pathId);
+			int errCode = fileMgr.addNewRoot(rootName, pathId);
 			if (errCode != 0) {
 				String errMsg = "An unknown error occurred.";
 				switch(errCode) {
@@ -136,7 +136,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 				throws ExecutionException {
 
 			/* reverse the operation, using saved state */
-			int errCode = pathMgr.deleteRoot(rootName);
+			int errCode = fileMgr.deleteRoot(rootName);
 			if (errCode != 0) {
 				/* this is an "undo", so fail silently */
 				return errorStatus;

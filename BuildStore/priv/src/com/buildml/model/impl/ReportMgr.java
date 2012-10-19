@@ -19,10 +19,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
@@ -52,10 +53,10 @@ import com.buildml.utils.errors.ErrorCode;
 	private BuildStoreDB db = null;
 	
 	/**
-	 * The FileNameSpaces object we're reporting on. This is provided to us when the
+	 * The FileMgr object we're reporting on. This is provided to us when the
 	 * Reports object is first instantiated.
 	 */
-	private FileNameSpaces fns = null;
+	private IFileMgr fileMgr = null;
 	
 	/**
 	 * The BuildTasks object we're reporting on. This is provided to us when the
@@ -94,7 +95,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	public ReportMgr(BuildStore buildStore) {
 		this.db = buildStore.getBuildStoreDB();
-		this.fns = buildStore.getFileNameSpaces();
+		this.fileMgr = buildStore.getFileMgr();
 		this.bts = buildStore.getBuildTasks();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
@@ -215,7 +216,7 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public FileSet reportFilesNeverAccessed() {
 		
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesNotUsedPrepStmt);
 
@@ -244,7 +245,7 @@ import com.buildml.utils.errors.ErrorCode;
 			fileArg = fileArg.replace('*', '%');
 		}
 		
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		try {
 			selectFilesWithMatchingNamePrepStmt.setString(1, fileArg);
 			ResultSet rs = db.executePrepSelectResultSet(selectFilesWithMatchingNamePrepStmt);
@@ -362,7 +363,7 @@ import com.buildml.utils.errors.ErrorCode;
 	public FileSet reportFilesAccessedByTasks(TaskSet taskSet, OperationType opType) {
 		
 		/* create an empty result FileSet */
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		
 		/* for each task in the TaskSet */
 		for (Iterator<Integer> iterator = taskSet.iterator(); iterator.hasNext();) {		
@@ -412,7 +413,7 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public FileSet reportWriteOnlyFiles() {
 		
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectWriteOnlyFilesPrepStmt);
 
@@ -435,7 +436,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public FileSet reportAllFiles() {
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		try {
 			ResultSet rs = db.executePrepSelectResultSet(selectAllFilesPrepStmt);
 
@@ -481,7 +482,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public FileSet reportFilesFromPackageSet(PackageSet pkgSet) {
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
 		
 		/*
@@ -617,7 +618,7 @@ import com.buildml.utils.errors.ErrorCode;
 		 * Create a new empty FileSet for tracking all the results. Each time we
 		 * iterate through the loop, we merge the results into this FileSet
 		 */
-		FileSet results = new FileSet(fns);
+		FileSet results = new FileSet(fileMgr);
 		
 		/* the first set of files to analyze */
 		FileSet nextFileSet = startFileSet;
@@ -637,7 +638,7 @@ import com.buildml.utils.errors.ErrorCode;
 		do {
 			
 			/* empty FileSet to collect this round's set of results */
-			FileSet thisRoundOfResults = new FileSet(fns);
+			FileSet thisRoundOfResults = new FileSet(fileMgr);
 
 			/* iterate through each of the files in this round's FileSet */
 			for (int fileId : nextFileSet) {

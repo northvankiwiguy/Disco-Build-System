@@ -18,10 +18,10 @@ import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
@@ -149,7 +149,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		BuildTasks bts = buildStore.getBuildTasks();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
@@ -159,14 +159,14 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 
 		/* fetch the FileSet of paths from the user's command line */
 		String fileSpecs = args[0];
-		FileSet fileSet = CliUtils.getCmdLineFileSet(fns, fileSpecs);
+		FileSet fileSet = CliUtils.getCmdLineFileSet(fileMgr, fileSpecs);
 
 		/* find all tasks that access (read, write or both) these files */
 		TaskSet taskSet = reportMgr.reportTasksThatAccessFiles(fileSet, opType);
 		taskSet.populateWithParents();
 
 		/* display the resulting set of tasks */
-		CliUtils.printTaskSet(System.out, bts, fns, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
+		CliUtils.printTaskSet(System.out, bts, fileMgr, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

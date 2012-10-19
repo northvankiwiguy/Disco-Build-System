@@ -18,8 +18,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
@@ -68,8 +68,8 @@ import com.buildml.utils.string.PathUtils;
 	/** The BuildTasks object associated with this BuildStore. */
 	private BuildTasks buildTasks;
 	
-	/** The FileNameSpaces object associated with this BuildStore. */
-	private FileNameSpaces fns;
+	/** The FileMgr object associated with this BuildStore. */
+	private IFileMgr fileMgr;
 	
 	/** The set of files that have been read in the current &lt;job&gt;. */
 	private ArrayList<String> filesRead;
@@ -104,7 +104,7 @@ import com.buildml.utils.string.PathUtils;
 	 */
 	public ElectricAnnoSAXHandler(IBuildStore buildStore) {
 		buildTasks = buildStore.getBuildTasks();
-		fns = buildStore.getFileNameSpaces();
+		fileMgr = buildStore.getFileMgr();
 		
 		/* create a stack to remember the hierarchy of tasks */
 		taskStack = new ArrayList<Integer>();
@@ -115,7 +115,7 @@ import com.buildml.utils.string.PathUtils;
 		
 		/* we'll also need to track our current directory */
 		directoryStack = new ArrayList<Integer>();
-		directoryStack.add(fns.getRootPath("root"));
+		directoryStack.add(fileMgr.getRootPath("root"));
 	}
 	
 	/*=====================================================================================*
@@ -158,7 +158,7 @@ import com.buildml.utils.string.PathUtils;
 			String cwd = atts.getValue("cwd");
 			
 			/* record the <make>'s current directory */
-			currentDirId = fns.addDirectory(cwd);
+			currentDirId = fileMgr.addDirectory(cwd);
 			if (currentDirId == ErrorCode.BAD_PATH) {
 				throw new FatalBuildScannerError("Unable to register new directory in database: " + cwd);
 			}
@@ -253,7 +253,7 @@ import com.buildml.utils.string.PathUtils;
 
 				/* add all the file reads to the build task */
 				for (String file : filesRead) {
-					int newFileId = fns.addFile(file);
+					int newFileId = fileMgr.addFile(file);
 					if (newFileId != ErrorCode.BAD_PATH) {
 						buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
 					} else {
@@ -263,7 +263,7 @@ import com.buildml.utils.string.PathUtils;
 
 				/* add all the file writes to the build task */
 				for (String file : filesWritten) {
-					int newFileId = fns.addFile(file);
+					int newFileId = fileMgr.addFile(file);
 					if (newFileId != ErrorCode.BAD_PATH) {
 						buildTasks.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
 					} else {

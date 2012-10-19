@@ -22,10 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.SystemUtils;
 
@@ -42,7 +42,7 @@ public class TestCFuncOpen {
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
 	private BuildTasks bts = null;
-	private FileNameSpaces fns = null;
+	private IFileMgr fileMgr = null;
 	private int rootTask;
 	private int task;
 	private Integer fileAccesses[], fileReads[], fileWrites[], fileModifies[];
@@ -91,7 +91,7 @@ public class TestCFuncOpen {
 		
 		/* fetch references to sub objects */
 		bts = bs.getBuildTasks();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
 		rootTask = bts.getRootTask("root");
@@ -130,7 +130,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		int fileId = fns.getPath(tmpDir + "/test-file1");
+		int fileId = fileMgr.getPath(tmpDir + "/test-file1");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 	
@@ -146,7 +146,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/test-file2");
+		fileId = fileMgr.getPath(tmpDir + "/test-file2");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());		
 	}
@@ -193,10 +193,10 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
-		int fileId = fns.getPath("/etc/passwd");
+		int fileId = fileMgr.getPath("/etc/passwd");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileReads[0].intValue());
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileReads[0].intValue()));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileReads[0].intValue()));
 		
 		/*
 		 * Open a missing file, in read mode - no read should be logged.
@@ -223,7 +223,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/test-file1");
+		fileId = fileMgr.getPath(tmpDir + "/test-file1");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileReads[0].intValue());
 		
@@ -239,7 +239,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/test-file2");
+		fileId = fileMgr.getPath(tmpDir + "/test-file2");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 		
@@ -287,7 +287,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileReads[0].intValue()));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileReads[0].intValue()));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -340,7 +340,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
 		assertEquals(1, fileModifies.length);
-		int fileId = fns.getPath(fileName1);
+		int fileId = fileMgr.getPath(fileName1);
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileModifies[0].intValue());
 
@@ -359,7 +359,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
 		assertEquals(1, fileModifies.length);
-		fileId = fns.getPath(fileName1);
+		fileId = fileMgr.getPath(fileName1);
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileModifies[0].intValue());
 		
@@ -377,10 +377,10 @@ public class TestCFuncOpen {
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
 		assertEquals(0, fileModifies.length);
-		fileId = fns.getPath(fileName1);
+		fileId = fileMgr.getPath(fileName1);
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileReads[0].intValue());
-		fileId = fns.getPath(fileName2);
+		fileId = fileMgr.getPath(fileName2);
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 
@@ -416,7 +416,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
 		assertEquals(0, fileModifies.length);
-		fileId = fns.getPath(fileName1);
+		fileId = fileMgr.getPath(fileName1);
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 
@@ -434,7 +434,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
 		assertEquals(0, fileModifies.length);
-		fileId = fns.getPath(fileName1);
+		fileId = fileMgr.getPath(fileName1);
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 	}
@@ -481,10 +481,10 @@ public class TestCFuncOpen {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileReads.length);
-		int fileId = fns.getPath("/etc/passwd");
+		int fileId = fileMgr.getPath("/etc/passwd");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileReads[0].intValue());
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileReads[0].intValue()));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileReads[0].intValue()));
 
 		/*
 		 * Execute ftok() on a missing file.
@@ -519,10 +519,10 @@ public class TestCFuncOpen {
 		
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
-		int fileId = fns.getPath("/etc/passwd");
+		int fileId = fileMgr.getPath("/etc/passwd");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileReads[0].intValue());
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileReads[0].intValue()));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileReads[0].intValue()));
 		
 		/*
 		 * Open a file with a relative path, in read-mode.
@@ -538,7 +538,7 @@ public class TestCFuncOpen {
 		
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/test-file1");
+		fileId = fileMgr.getPath(tmpDir + "/test-file1");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileReads[0].intValue());	
 		
@@ -554,7 +554,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/test-file2");
+		fileId = fileMgr.getPath(tmpDir + "/test-file2");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());	
 		
@@ -572,7 +572,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
 		assertEquals(1, fileModifies.length);
-		fileId = fns.getPath(tmpDir + "/test-file3");
+		fileId = fileMgr.getPath(tmpDir + "/test-file3");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileModifies[0].intValue());	
 
@@ -603,7 +603,7 @@ public class TestCFuncOpen {
 		assertEquals(1, fileReads.length);
 		assertEquals(0, fileWrites.length);
 		assertEquals(0, fileModifies.length);
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileReads[0].intValue()));		
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileReads[0].intValue()));		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -653,7 +653,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(1, fileReads.length);		/* the sub-dir directory is read */
 		assertEquals(1, fileWrites.length);
-		int fileId = fns.getPath(tmpDir + "/sub-dir/test-file1");
+		int fileId = fileMgr.getPath(tmpDir + "/sub-dir/test-file1");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 		
@@ -672,7 +672,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(1, fileReads.length);		/* the sub-dir directory is read */
 		assertEquals(1, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/sub-dir2/test-file2");
+		fileId = fileMgr.getPath(tmpDir + "/sub-dir2/test-file2");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 		
@@ -689,7 +689,7 @@ public class TestCFuncOpen {
 				"}", null);
 		assertEquals(0, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		fileId = fns.getPath(tmpDir + "/sub-dir/test-file3");
+		fileId = fileMgr.getPath(tmpDir + "/sub-dir/test-file3");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileWrites[0].intValue());
 		
@@ -771,7 +771,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
 		assertEquals(1, fileModifies.length);
-		int fileId = fns.getPath(tmpDir + "/test-file1");
+		int fileId = fileMgr.getPath(tmpDir + "/test-file1");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileModifies[0].intValue());
 	
@@ -791,7 +791,7 @@ public class TestCFuncOpen {
 		assertEquals(0, fileReads.length);
 		assertEquals(0, fileWrites.length);
 		assertEquals(1, fileModifies.length);
-		fileId = fns.getPath(tmpDir + "/test-file2");
+		fileId = fileMgr.getPath(tmpDir + "/test-file2");
 		assertNotSame(ErrorCode.NOT_FOUND, fileId);
 		assertEquals(fileId, fileModifies[0].intValue());
 		

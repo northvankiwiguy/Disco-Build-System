@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -33,11 +32,11 @@ public class TestFileAttributeMgr {
 	/** our BuildStore, used for testing */
 	private IBuildStore bs;
 	
-	/** our FileAttributes object, used for testing */
+	/** our FileAttributeMgr object, used for testing */
 	private IFileAttributeMgr fileAttrMgr;
 	
-	/** our FileNameSpaces object, used for testing */
-	private FileNameSpaces fns;
+	/** our FileMgr object, used for testing */
+	private IFileMgr fileMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -51,7 +50,7 @@ public class TestFileAttributeMgr {
 		
 		/* fetch the associated FileAttributes and FileNameSpaces */
 		fileAttrMgr = bs.getFileAttributeMgr();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -206,8 +205,8 @@ public class TestFileAttributeMgr {
 		assertEquals(ErrorCode.NOT_FOUND, fileAttrMgr.deleteAttrName("notexistatall"));
 
 		/* add attributes to a path, and ensure that the attribute name can't be deleted */
-		int path1 = fns.addFile("/z/y/x");
-		int path2 = fns.addFile("/m/n/o");
+		int path1 = fileMgr.addFile("/z/y/x");
+		int path2 = fileMgr.addFile("/m/n/o");
 		int usedAttr = fileAttrMgr.newAttrName("used");
 		fileAttrMgr.setAttr(path1, usedAttr, 100);
 		fileAttrMgr.setAttr(path2, usedAttr, 1234);
@@ -227,9 +226,9 @@ public class TestFileAttributeMgr {
 	public void testSetAttrIntIntString() {
 		
 		/* add some paths and a couple of attribute names */
-		int path1 = fns.addFile("/a/b/c/d");
-		int path2 = fns.addFile("/a/b/c/e");
-		int path3 = fns.addFile("/a/b/c/f");
+		int path1 = fileMgr.addFile("/a/b/c/d");
+		int path2 = fileMgr.addFile("/a/b/c/e");
+		int path3 = fileMgr.addFile("/a/b/c/f");
 		int attrPackage = fileAttrMgr.newAttrName("package");
 		int attrCountry = fileAttrMgr.newAttrName("country");
 		
@@ -275,9 +274,9 @@ public class TestFileAttributeMgr {
 	public void testSetAttrIntIntInt() {
 		
 		/* add some paths and a couple of attribute names */
-		int path1 = fns.addFile("/a/b/c/d");
-		int path2 = fns.addFile("/a/b/c/e");
-		int path3 = fns.addFile("/a/b/c/f");
+		int path1 = fileMgr.addFile("/a/b/c/d");
+		int path2 = fileMgr.addFile("/a/b/c/e");
+		int path3 = fileMgr.addFile("/a/b/c/f");
 		int attrSize = fileAttrMgr.newAttrName("size");
 		int attrBlocks = fileAttrMgr.newAttrName("blocks");
 		
@@ -327,7 +326,7 @@ public class TestFileAttributeMgr {
 	@Test
 	public void testGetAttrAsString() {
 		
-		int path1 = fns.addFile("/p1/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
 		int attr1 = fileAttrMgr.newAttrName("attr1");
 		int attr2 = fileAttrMgr.newAttrName("attr2");
 		
@@ -372,7 +371,7 @@ public class TestFileAttributeMgr {
 	public void testGetAttrAsInteger() {
 		
 		/* create a path and two attributes */
-		int path1 = fns.addFile("/p1/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
 		int attr1 = fileAttrMgr.newAttrName("attr1");
 		int attr2 = fileAttrMgr.newAttrName("attr2");
 		
@@ -414,7 +413,7 @@ public class TestFileAttributeMgr {
 	public void testDeleteAttr() {
 		
 		/* create a path and three attributes */
-		int path1 = fns.addFile("/p1/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
 		int attr1 = fileAttrMgr.newAttrName("attr1");
 		int attr2 = fileAttrMgr.newAttrName("attr2");
 		
@@ -448,8 +447,8 @@ public class TestFileAttributeMgr {
 	public void testDeleteAllAttrOnPath() {
 		
 		/* create two paths */
-		int path1 = fns.addFile("/path1");
-		int path2 = fns.addFile("/path2");
+		int path1 = fileMgr.addFile("/path1");
+		int path2 = fileMgr.addFile("/path2");
 
 		/* create a number of attributes */
 		int attr1 = fileAttrMgr.newAttrName("attr1");
@@ -496,9 +495,9 @@ public class TestFileAttributeMgr {
 		int attrAge = fileAttrMgr.newAttrName("age");
 
 		/* and a bunch of paths */
-		int path1 = fns.addFile("/p1/p2/p3");
-		int path2 = fns.addFile("/p1/p4/p5");
-		int path3 = fns.addFile("/p2/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
+		int path2 = fileMgr.addFile("/p1/p4/p5");
+		int path3 = fileMgr.addFile("/p2/p2/p3");
 
 		/* to start with, none of the paths have attributes */
 		assertEquals(0, fileAttrMgr.getAttrsOnPath(path1).length);
@@ -548,9 +547,9 @@ public class TestFileAttributeMgr {
 		int attrUnused = fileAttrMgr.newAttrName("unused");
 
 		/* and a bunch of paths */
-		int path1 = fns.addFile("/p1/p2/p3");
-		int path2 = fns.addFile("/p1/p4/p5");
-		int path3 = fns.addFile("/p2/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
+		int path2 = fileMgr.addFile("/p1/p4/p5");
+		int path3 = fileMgr.addFile("/p2/p2/p3");
 
 		/* assign the attributes to the paths */
 		fileAttrMgr.setAttr(path1, attrWidth, 200);
@@ -589,9 +588,9 @@ public class TestFileAttributeMgr {
 		int attrUnused = fileAttrMgr.newAttrName("unused");
 
 		/* and a bunch of paths */
-		int path1 = fns.addFile("/p1/p2/p3");
-		int path2 = fns.addFile("/p1/p4/p5");
-		int path3 = fns.addFile("/p2/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
+		int path2 = fileMgr.addFile("/p1/p4/p5");
+		int path3 = fileMgr.addFile("/p2/p2/p3");
 
 		/* assign the attributes to the paths */
 		fileAttrMgr.setAttr(path1, attrWord, "Hello");
@@ -628,9 +627,9 @@ public class TestFileAttributeMgr {
 		int attrUnused = fileAttrMgr.newAttrName("unused");
 
 		/* and a bunch of paths */
-		int path1 = fns.addFile("/p1/p2/p3");
-		int path2 = fns.addFile("/p1/p4/p5");
-		int path3 = fns.addFile("/p2/p2/p3");
+		int path1 = fileMgr.addFile("/p1/p2/p3");
+		int path2 = fileMgr.addFile("/p1/p4/p5");
+		int path3 = fileMgr.addFile("/p2/p2/p3");
 
 		/* assign the attributes to the paths */
 		fileAttrMgr.setAttr(path1, attrShoeSize, 13);

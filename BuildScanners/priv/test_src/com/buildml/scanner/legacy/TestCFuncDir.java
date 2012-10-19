@@ -23,10 +23,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.utils.os.SystemUtils;
 
 /**
@@ -42,7 +42,7 @@ public class TestCFuncDir {
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
 	private BuildTasks bts = null;
-	private FileNameSpaces fns = null;
+	private IFileMgr fileMgr = null;
 	private int rootTask;
 	private int task;
 	private Integer fileAccesses[], fileReads[], fileWrites[], fileModifies[], fileDeletes[];
@@ -91,7 +91,7 @@ public class TestCFuncDir {
 		
 		/* fetch references to sub objects */
 		bts = bs.getBuildTasks();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
 		rootTask = bts.getRootTask("root");
@@ -134,7 +134,7 @@ public class TestCFuncDir {
 		Integer childTasks[] = bts.getChildren(task);
 		assertEquals(1, childTasks.length);
 		int dirId = bts.getDirectory(childTasks[0]);
-		assertEquals(tmpDir.toString(), fns.getPathName(dirId));
+		assertEquals(tmpDir.toString(), fileMgr.getPathName(dirId));
 		
 		/*
 		 * Chdir to a path that doesn't exist.
@@ -151,7 +151,7 @@ public class TestCFuncDir {
 		childTasks = bts.getChildren(task);
 		assertEquals(1, childTasks.length);
 		dirId = bts.getDirectory(childTasks[0]);
-		assertEquals("/", fns.getPathName(dirId));
+		assertEquals("/", fileMgr.getPathName(dirId));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -179,7 +179,7 @@ public class TestCFuncDir {
 		Integer childTasks[] = bts.getChildren(task);
 		assertEquals(1, childTasks.length);
 		int dirId = bts.getDirectory(childTasks[0]);
-		assertEquals(tmpDir.toString(), fns.getPathName(dirId));
+		assertEquals(tmpDir.toString(), fileMgr.getPathName(dirId));
 		
 		/*
 		 * fchdir to a bad file descriptor
@@ -197,7 +197,7 @@ public class TestCFuncDir {
 		childTasks = bts.getChildren(task);
 		assertEquals(1, childTasks.length);
 		dirId = bts.getDirectory(childTasks[0]);
-		assertEquals("/", fns.getPathName(dirId));
+		assertEquals("/", fileMgr.getPathName(dirId));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -223,9 +223,9 @@ public class TestCFuncDir {
 		
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileWrites.length);
-		String dirName = fns.getPathName(fileAccesses[0]);
+		String dirName = fileMgr.getPathName(fileAccesses[0]);
 		assertEquals(tmpDir + "/newDir", dirName);
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileAccesses[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileAccesses[0]));
 		
 		/*
 		 * Fail to make a directory - should not be logged.
@@ -265,9 +265,9 @@ public class TestCFuncDir {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		String dirName = fns.getPathName(fileWrites[0]);
+		String dirName = fileMgr.getPathName(fileWrites[0]);
 		assertEquals(tmpDir + "/anotherDir", dirName);
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileWrites[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileWrites[0]));
 
 		/*
 		 * Failing to make a directory will result in no accesses.
@@ -310,9 +310,9 @@ public class TestCFuncDir {
 		
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
-		String dirName = fns.getPathName(fileDeletes[0]);
+		String dirName = fileMgr.getPathName(fileDeletes[0]);
 		assertEquals(tmpDir + "/newDir", dirName);
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileDeletes[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileDeletes[0]));
 		
 		/*
 		 * Fail to make a directory - should not be logged.

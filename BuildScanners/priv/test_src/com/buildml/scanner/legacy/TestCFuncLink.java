@@ -23,9 +23,9 @@ import org.junit.Test;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.utils.os.SystemUtils;
 
 /**
@@ -41,7 +41,7 @@ public class TestCFuncLink {
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
 	private BuildTasks bts = null;
-	private FileNameSpaces fns = null;
+	private IFileMgr fileMgr = null;
 	private int rootTask;
 	private int task;
 	private Integer fileAccesses[], fileReads[], fileWrites[], fileModifies[], fileDeletes[];
@@ -90,7 +90,7 @@ public class TestCFuncLink {
 		
 		/* fetch references to sub objects */
 		bts = bs.getBuildTasks();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
 		rootTask = bts.getRootTask("root");
@@ -133,8 +133,8 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/oldFile1", fns.getPathName(fileReads[0]));
-		assertEquals(tmpDir + "/linkFile1", fns.getPathName(fileWrites[0]));
+		assertEquals(tmpDir + "/oldFile1", fileMgr.getPathName(fileReads[0]));
+		assertEquals(tmpDir + "/linkFile1", fileMgr.getPathName(fileWrites[0]));
 		
 		/*
 		 * Creation of a hard link to a non-existent file should not be logged.
@@ -172,10 +172,10 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/linkFile2", fns.getPathName(fileWrites[0]));
+		assertEquals(tmpDir + "/linkFile2", fileMgr.getPathName(fileWrites[0]));
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
-				new Integer[] { fns.getPath(tmpDir + "/oldFile2"),
-								fns.getPath(tmpDir.toString()) }));
+				new Integer[] { fileMgr.getPath(tmpDir + "/oldFile2"),
+								fileMgr.getPath(tmpDir.toString()) }));
 		
 		/*
 		 * Creation of a hard link to a non-existent file should not be logged.
@@ -213,8 +213,8 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
-		assertEquals(tmpDir + "/fileToDelete", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/fileToDelete", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileDeletes[0]));
 
 		/*
 		 * Remove a directory that exists
@@ -229,8 +229,8 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
-		assertEquals(tmpDir + "/dirToDelete", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/dirToDelete", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileDeletes[0]));
 
 		/*
 		 * Remove a file that doesn't exist
@@ -267,10 +267,10 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
 		assertEquals(1, fileWrites.length);		
-		assertEquals(tmpDir + "/fileToRename", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileDeletes[0]));
-		assertEquals(tmpDir + "/newName", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/fileToRename", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/newName", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileWrites[0]));
 
 		/*
 		 * Rename a directory that exists
@@ -285,10 +285,10 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
 		assertEquals(1, fileWrites.length);	
-		assertEquals(tmpDir + "/dirToRename", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileDeletes[0]));
-		assertEquals(tmpDir + "/newDirName", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/dirToRename", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/newDirName", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileWrites[0]));
 		
 		/*
 		 * Rename a file that doesn't exist
@@ -327,10 +327,10 @@ public class TestCFuncLink {
 		assertEquals(1, fileReads.length);			 /* opening the dirfd */
 		assertEquals(1, fileDeletes.length);
 		assertEquals(1, fileWrites.length);		
-		assertEquals(tmpDir + "/fileToRename", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileDeletes[0]));
-		assertEquals(tmpDir + "/newName", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/fileToRename", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/newName", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileWrites[0]));
 
 		/*
 		 * Rename a directory that exists
@@ -348,10 +348,10 @@ public class TestCFuncLink {
 		assertEquals(1, fileReads.length);			/* opening the dirfd */
 		assertEquals(1, fileDeletes.length);
 		assertEquals(1, fileWrites.length);	
-		assertEquals(tmpDir + "/dirToRename", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileDeletes[0]));
-		assertEquals(tmpDir + "/newDirName", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/dirToRename", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/newDirName", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileWrites[0]));
 		
 		/*
 		 * Rename a file that doesn't exist
@@ -390,10 +390,10 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/oldFile1", fns.getPathName(fileReads[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileReads[0]));
-		assertEquals(tmpDir + "/linkFile1", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/oldFile1", fileMgr.getPathName(fileReads[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileReads[0]));
+		assertEquals(tmpDir + "/linkFile1", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileWrites[0]));
 
 		/*
 		 * create a symbolic link to a valid directory.
@@ -409,10 +409,10 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/oldDir1", fns.getPathName(fileReads[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileReads[0]));
-		assertEquals(tmpDir + "/linkDir1", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/oldDir1", fileMgr.getPathName(fileReads[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileReads[0]));
+		assertEquals(tmpDir + "/linkDir1", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileWrites[0]));
 		
 		/*
 		 * Creation of a symlink to a non-existent file should still work
@@ -428,8 +428,8 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/badFile", fns.getPathName(fileReads[0]));
-		assertEquals(tmpDir + "/linkFile1a", fns.getPathName(fileWrites[0]));
+		assertEquals(tmpDir + "/badFile", fileMgr.getPathName(fileReads[0]));
+		assertEquals(tmpDir + "/linkFile1a", fileMgr.getPathName(fileWrites[0]));
 		
 		/*
 		 * create a symbolic link to a valid file, using a relative path. Make
@@ -447,10 +447,10 @@ public class TestCFuncLink {
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileReads.length);
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/oldFile1", fns.getPathName(fileReads[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileReads[0]));
-		assertEquals(tmpDir + "/subdir1/subdir2/linkFile1", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/oldFile1", fileMgr.getPathName(fileReads[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileReads[0]));
+		assertEquals(tmpDir + "/subdir1/subdir2/linkFile1", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileWrites[0]));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -476,11 +476,11 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/linkFile2", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/linkFile2", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileWrites[0]));
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
-				new Integer[] { fns.getPath(tmpDir + "/oldFile2"),
-								fns.getPath(tmpDir.toString()) }));
+				new Integer[] { fileMgr.getPath(tmpDir + "/oldFile2"),
+								fileMgr.getPath(tmpDir.toString()) }));
 
 		/*
 		 * create a symbolic link to a valid directory
@@ -496,11 +496,11 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/linkDir2", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/linkDir2", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileWrites[0]));
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
-				new Integer[] { fns.getPath(tmpDir + "/oldDir2"),
-								fns.getPath(tmpDir.toString()) }));
+				new Integer[] { fileMgr.getPath(tmpDir + "/oldDir2"),
+								fileMgr.getPath(tmpDir.toString()) }));
 
 		/*
 		 * Creation of a symbolic link to a non-existent file should still work.
@@ -515,10 +515,10 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/linkFile2a", fns.getPathName(fileWrites[0]));
+		assertEquals(tmpDir + "/linkFile2a", fileMgr.getPathName(fileWrites[0]));
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
-				new Integer[] { fns.getPath(tmpDir + "/badFile2"),
-								fns.getPath(tmpDir.toString()) }));
+				new Integer[] { fileMgr.getPath(tmpDir + "/badFile2"),
+								fileMgr.getPath(tmpDir.toString()) }));
 		
 		/*
 		 * create a symbolic link to a valid file where the target file is
@@ -536,11 +536,11 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(3, fileAccesses.length);		/* include the dirfd open */
 		assertEquals(1, fileWrites.length);
-		assertEquals(tmpDir + "/subdir1/subdir2/linkFile2", fns.getPathName(fileWrites[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileWrites[0]));
+		assertEquals(tmpDir + "/subdir1/subdir2/linkFile2", fileMgr.getPathName(fileWrites[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileWrites[0]));
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileReads, 
-				new Integer[] { fns.getPath(tmpDir + "/oldFile2"),
-								fns.getPath(tmpDir.toString()) }));
+				new Integer[] { fileMgr.getPath(tmpDir + "/oldFile2"),
+								fileMgr.getPath(tmpDir.toString()) }));
 
 	}
 
@@ -565,7 +565,7 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(1, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
-		assertEquals(tmpDir + "/fileToDelete", fns.getPathName(fileDeletes[0]));
+		assertEquals(tmpDir + "/fileToDelete", fileMgr.getPathName(fileDeletes[0]));
 		
 		/*
 		 * Unlink a file that doesn't exist.
@@ -601,8 +601,8 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
-		assertEquals(tmpDir + "/fileToDelete", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_FILE, fns.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/fileToDelete", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(fileDeletes[0]));
 		
 		/*
 		 * Unlinkat a valid directory (using the AT_REMOVEDIR flag).
@@ -617,8 +617,8 @@ public class TestCFuncLink {
 				"}", null);
 		assertEquals(2, fileAccesses.length);
 		assertEquals(1, fileDeletes.length);
-		assertEquals(tmpDir + "/dirToDelete", fns.getPathName(fileDeletes[0]));
-		assertEquals(PathType.TYPE_DIR, fns.getPathType(fileDeletes[0]));
+		assertEquals(tmpDir + "/dirToDelete", fileMgr.getPathName(fileDeletes[0]));
+		assertEquals(PathType.TYPE_DIR, fileMgr.getPathType(fileDeletes[0]));
 		
 		/*
 		 * Unlink a file that doesn't exist.

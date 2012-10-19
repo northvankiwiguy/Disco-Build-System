@@ -20,7 +20,6 @@ import org.junit.Test;
 
 import com.buildml.model.IReportMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.FileSet;
@@ -36,8 +35,8 @@ public class TestReportMgr2 {
 	/** Our test BuildStore object */
 	private IBuildStore bs;
 
-	/** Our test FileNameSpaces object */
-	private FileNameSpaces fns;
+	/** Our test FileMgr object */
+	private IFileMgr fileMgr;
 	
 	/** Our test BuildTasks object */
 	private BuildTasks bts;
@@ -63,29 +62,29 @@ public class TestReportMgr2 {
 		
 		/* get all the objects we need to set up the test scenario */
 		bs = CommonTestUtils.getEmptyBuildStore();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		bts = bs.getBuildTasks();
 		reports = bs.getReportMgr();
 		
 		/* add a realistic-looking set of files, including .h, .c, .o, .a and .exe files */
-		filePetH = fns.addFile("/home/pets.h");
-		fileHousePetH = fns.addFile("/home/house-pets.h");
-		fileCatC = fns.addFile("/home/cat.c");
-		fileDogC = fns.addFile("/home/dog.c");
-		fileBunnyC = fns.addFile("/home/bunny.c");
-		fileGiraffeC = fns.addFile("/home/giraffe.c");
-		fileCatO = fns.addFile("/home/cat.o");
-		fileDogO = fns.addFile("/home/dog.o");
-		fileBunnyO = fns.addFile("/home/bunny.o");
-		fileGiraffeO = fns.addFile("/home/giraffe.o");
-		fileCatA = fns.addFile("/home/cat.a");
-		fileDogA = fns.addFile("/home/dog.a");
-		fileBunnyA = fns.addFile("/home/bunny.a");
-		fileGiraffeA = fns.addFile("/home/giraffe.a");
-		fileAnimalsExe = fns.addFile("/home/animals.exe");
+		filePetH = fileMgr.addFile("/home/pets.h");
+		fileHousePetH = fileMgr.addFile("/home/house-pets.h");
+		fileCatC = fileMgr.addFile("/home/cat.c");
+		fileDogC = fileMgr.addFile("/home/dog.c");
+		fileBunnyC = fileMgr.addFile("/home/bunny.c");
+		fileGiraffeC = fileMgr.addFile("/home/giraffe.c");
+		fileCatO = fileMgr.addFile("/home/cat.o");
+		fileDogO = fileMgr.addFile("/home/dog.o");
+		fileBunnyO = fileMgr.addFile("/home/bunny.o");
+		fileGiraffeO = fileMgr.addFile("/home/giraffe.o");
+		fileCatA = fileMgr.addFile("/home/cat.a");
+		fileDogA = fileMgr.addFile("/home/dog.a");
+		fileBunnyA = fileMgr.addFile("/home/bunny.a");
+		fileGiraffeA = fileMgr.addFile("/home/giraffe.a");
+		fileAnimalsExe = fileMgr.addFile("/home/animals.exe");
 		
 		/* what directory were these tasks executed in? */
-		int dirHome = fns.getPath("/home");
+		int dirHome = fileMgr.getPath("/home");
 		
 		/* add all tasks underneath the root */
 		int rootTask = bts.getRootTask("");
@@ -159,26 +158,26 @@ public class TestReportMgr2 {
 		 */
 
 		/* test empty FileSet -> empty FileSet */		
-		FileSet source = new FileSet(fns);
+		FileSet source = new FileSet(fileMgr);
 		FileSet result = reports.reportDerivedFiles(source, false);
 		assertEquals(0, result.size());
 		
 		/* test cat.c -> cat.o */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileCatC);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileCatO));
 				
 		/* test dog.c -> dog.o */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileDogC);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileDogO));
 
 		/* test pets.h -> cat.o, dog.o, bunny.o, giraffe.o */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(filePetH);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(4, result.size());
@@ -188,21 +187,21 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileGiraffeO));
 		
 		/* test dog.o -> dog.a */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileDogO);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileDogA));
 				
 		/* test dog.a -> animals.exe */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileDogA);
 		result = reports.reportDerivedFiles(source, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileAnimalsExe));
 		
 		/* test cat.c, dog.c -> cat.o, dog.o */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileCatC);
 		source.add(fileDogC);
 		result = reports.reportDerivedFiles(source, false);
@@ -215,7 +214,7 @@ public class TestReportMgr2 {
 		 */
 		
 		/* test cat.c -> cat.o, cat.a, animals.exe */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileCatC);
 		result = reports.reportDerivedFiles(source, true);
 		assertEquals(3, result.size());
@@ -224,7 +223,7 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileAnimalsExe));
 		
 		/* test dog.c -> dog.o, dog.a, animals.exe */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileDogC);
 		result = reports.reportDerivedFiles(source, true);
 		assertEquals(3, result.size());
@@ -233,7 +232,7 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileAnimalsExe));
 		
 		/* test bunny.o -> bunny.a, animals.exe */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(fileBunnyO);
 		result = reports.reportDerivedFiles(source, true);
 		assertEquals(2, result.size());
@@ -244,7 +243,7 @@ public class TestReportMgr2 {
 		 * Test pets.h -> cat.o, dog.o, bunny.o, giraffe.o, cat.a, 
 		 * dog.a, bunny.a, giraffe.a, animals.exe
 		 */
-		source = new FileSet(fns);
+		source = new FileSet(fileMgr);
 		source.add(filePetH);
 		result = reports.reportDerivedFiles(source, true);
 		assertTrue(CommonTestUtils.treeSetEqual(result, 
@@ -265,12 +264,12 @@ public class TestReportMgr2 {
 		 */
 
 		/* test empty FileSet -> empty FileSet */
-		FileSet dest = new FileSet(fns);
+		FileSet dest = new FileSet(fileMgr);
 		FileSet result = reports.reportInputFiles(dest, false);
 		assertEquals(0, result.size());
 		
 		/* test {house-pet.h, pet.h, cat.c} <- cat.o */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileCatO);
 		result = reports.reportInputFiles(dest, false);
 		assertEquals(3, result.size());
@@ -279,7 +278,7 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileHousePetH));
 		
 		/* test {house-pet.h, pet.h, dog.c} <- dog.o */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileDogO);
 		result = reports.reportInputFiles(dest, false);
 		assertEquals(3, result.size());
@@ -288,7 +287,7 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileHousePetH));
 		
 		/* test {pet.h, giraffe.c} <- giraffe.o */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileGiraffeO);
 		result = reports.reportInputFiles(dest, false);
 		assertEquals(2, result.size());
@@ -296,20 +295,20 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(filePetH));
 
 		/* test {} <- pets.h */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(filePetH);
 		result = reports.reportInputFiles(dest, false);
 		assertEquals(0, result.size());
 
 		/* test dog.o <- dog.a */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileDogA);
 		result = reports.reportInputFiles(dest, false);
 		assertEquals(1, result.size());
 		assertTrue(result.isMember(fileDogO));
 		
 		/* test dog.a, cat.a, bunny.a, giraffe.a <- animals.exe */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileAnimalsExe);
 		result = reports.reportInputFiles(dest, false);
 		assertEquals(4, result.size());
@@ -319,7 +318,7 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileGiraffeA));
 
 		/* test cat.c, dog.c, pets.h, house-pets.h <- cat.o, dog.o */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileCatO);
 		dest.add(fileDogO);
 		result = reports.reportInputFiles(dest, false);
@@ -334,7 +333,7 @@ public class TestReportMgr2 {
 		 */
 				
 		/* test house-pets.h, pets.h, bunny.c, bunny.o <- bunny.a */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileBunnyA);
 		result = reports.reportInputFiles(dest, true);
 		assertEquals(4, result.size());
@@ -344,7 +343,7 @@ public class TestReportMgr2 {
 		assertTrue(result.isMember(fileHousePetH));
 		
 		/* test pets.h, house-pets.h, *.c, *.o, *.a <- animals.exe */
-		dest = new FileSet(fns);
+		dest = new FileSet(fileMgr);
 		dest.add(fileAnimalsExe);
 		result = reports.reportInputFiles(dest, true);
 		assertEquals(14, result.size());
@@ -371,14 +370,14 @@ public class TestReportMgr2 {
 		assertEquals(0, fs.size());
 		
 		/* add a bunch of files - they should all be in the None package */
-		int file1 = fns.addFile("/file1");
-		int file2 = fns.addFile("/file2");
-		int file3 = fns.addFile("/file3");
-		int file4 = fns.addFile("/file4");
-		int file5 = fns.addFile("/file5");
-		int file6 = fns.addFile("/file6");
-		int file7 = fns.addFile("/file7");
-		int file8 = fns.addFile("/file8");
+		int file1 = fileMgr.addFile("/file1");
+		int file2 = fileMgr.addFile("/file2");
+		int file3 = fileMgr.addFile("/file3");
+		int file4 = fileMgr.addFile("/file4");
+		int file5 = fileMgr.addFile("/file5");
+		int file6 = fileMgr.addFile("/file6");
+		int file7 = fileMgr.addFile("/file7");
+		int file8 = fileMgr.addFile("/file8");
 		
 		/* empty package set still gives an empty FileSet */
 		fs = reports.reportFilesFromPackageSet(cs);

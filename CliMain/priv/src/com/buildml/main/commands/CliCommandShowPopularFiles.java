@@ -14,9 +14,9 @@ package com.buildml.main.commands;
 
 import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileRecord;
 
 /**
@@ -78,7 +78,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
@@ -90,7 +90,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 			int id = fileRecord.getId();
 			if ((filterFileSet == null) || (filterFileSet.isMember(id))){
 				int count = fileRecord.getCount();
-				String pathName = fns.getPathName(id, optionShowRoots);
+				String pathName = fileMgr.getPathName(id, optionShowRoots);
 				
 				/* should we show package names? */
 				if (optionShowPkgs) {

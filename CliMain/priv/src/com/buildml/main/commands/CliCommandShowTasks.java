@@ -20,9 +20,9 @@ import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.main.CliUtils.DisplayWidth;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.TaskSet;
 
 /**
@@ -164,13 +164,13 @@ public class CliCommandShowTasks implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 		
 		BuildTasks bts = buildStore.getBuildTasks();
-		FileNameSpaces fns = buildStore.getFileNameSpaces();		
+		IFileMgr fileMgr = buildStore.getFileMgr();		
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
 		 * Display the selected task set.
 		 */
-		CliUtils.printTaskSet(System.out, bts, fns, pkgMgr, null, filterTaskSet, outputFormat, optionShowPkgs);
+		CliUtils.printTaskSet(System.out, bts, fileMgr, pkgMgr, null, filterTaskSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

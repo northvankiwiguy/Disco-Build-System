@@ -15,7 +15,6 @@ package com.buildml.model;
 import java.io.IOException;
 
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 
 /**
  * A BuildStore object is the main class that implements a BuildML build system. By creating
@@ -39,12 +38,12 @@ public interface IBuildStore {
 	public abstract int getBuildStoreVersion();
 
 	/**
-	 * Fetch the FileNamesSpaces manager associated with this BuildStore. This object
+	 * Fetch the FileMgr manager associated with this BuildStore. This object
 	 * encapsulates all knowledge about files/directories within the build system.
 	 * 
-	 * @return A FileNameSpaces manager object.
+	 * @return A FileMgr manager object.
 	 */
-	public abstract FileNameSpaces getFileNameSpaces();
+	public abstract IFileMgr getFileMgr();
 
 	/**
 	 * Fetch the FileIncludeMgr associated with this BuildStore. This object

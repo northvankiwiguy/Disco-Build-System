@@ -18,7 +18,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -100,14 +100,14 @@ public class CliCommandShowRoot implements ICliCommand {
 		
 		CliUtils.validateArgs(getName(), args, 0, 1, "Only one root name can be specified.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 
 		/* no arguments == display all roots */
 		if (args.length == 0) {
-			String [] roots = fns.getRoots();
+			String [] roots = fileMgr.getRoots();
 			for (int i = 0; i < roots.length; i++) {
 				String rootName = roots[i];
-				String associatedPath = fns.getPathName(fns.getRootPath(rootName));
+				String associatedPath = fileMgr.getPathName(fileMgr.getRootPath(rootName));
 				System.out.println(rootName + " " + associatedPath);
 			}
 		}
@@ -115,11 +115,11 @@ public class CliCommandShowRoot implements ICliCommand {
 		/* else, one arg == show the path for this specific root */
 		else {
 			String rootName = args[0];
-			int rootId = fns.getRootPath(rootName);
+			int rootId = fileMgr.getRootPath(rootName);
 			if (rootId == ErrorCode.NOT_FOUND) {
 				CliUtils.reportErrorAndExit("Root name not found - " + rootName + ".");
 			}
-			String associatedPath = fns.getPathName(rootId);
+			String associatedPath = fileMgr.getPathName(rootId);
 			System.out.println(associatedPath);
 		}
 	}

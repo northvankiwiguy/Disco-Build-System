@@ -13,9 +13,9 @@
 package com.buildml.model.types;
 
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -35,9 +35,9 @@ public class FileSet extends IntegerTreeSet  {
 	 *=====================================================================================*/
 
 	/**
-	 * The FileNameSpaces manager object containing the files referenced in this FileSet.
+	 * The FileMgr manager object containing the files referenced in this FileSet.
 	 */
-	private FileNameSpaces fns;
+	private IFileMgr fileMgr;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -48,13 +48,13 @@ public class FileSet extends IntegerTreeSet  {
 	 * 
 	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet.
 	 */	
-	public FileSet(FileNameSpaces fns) {
+	public FileSet(IFileMgr fns) {
 		
 		/* most of the functionality is provided by the IntegerTreeSet class */
 		super();
 		
 		/* except we also need to record our FileNameSpaces object */
-		this.fns = fns;
+		this.fileMgr = fns;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -65,9 +65,9 @@ public class FileSet extends IntegerTreeSet  {
 	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet.
 	 * @param paths The IDs of the paths to be added to the FileSet.
 	 */
-	public FileSet(FileNameSpaces fns, Integer paths[]) {
+	public FileSet(IFileMgr fns, Integer paths[]) {
 		super(paths);
-		this.fns = fns;
+		this.fileMgr = fns;
 	}
 	
 	/*=====================================================================================*
@@ -93,7 +93,7 @@ public class FileSet extends IntegerTreeSet  {
 	 */
 	public int populateWithPaths(String [] pathArgs) {
 		
-		IBuildStore bs = fns.getBuildStore();
+		IBuildStore bs = fileMgr.getBuildStore();
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		IReportMgr reportMgr = bs.getReportMgr();
 
@@ -158,7 +158,7 @@ public class FileSet extends IntegerTreeSet  {
 
 			/* else add files/directories by name. Look up the path and add its children recursively */
 			else {
-				int pathId = fns.getPath(thisPath);
+				int pathId = fileMgr.getPath(thisPath);
 				if (pathId == ErrorCode.BAD_PATH) {
 					return ErrorCode.BAD_PATH;
 				}
@@ -181,7 +181,7 @@ public class FileSet extends IntegerTreeSet  {
 	public void mergeSet(FileSet second) {
 		
 		/* ensure the FileNameSpaces are the same for both FileSets */
-		if (fns != second.fns) {
+		if (fileMgr != second.fileMgr) {
 			return;
 		}
 		super.mergeSet(second);
@@ -197,7 +197,7 @@ public class FileSet extends IntegerTreeSet  {
 	 */
 	@Override
 	public int getParent(int id) {
-		return fns.getParentPath(id);
+		return fileMgr.getParentPath(id);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -208,7 +208,7 @@ public class FileSet extends IntegerTreeSet  {
 	 */
 	@Override
 	public Integer[] getChildren(int id) {
-		return fns.getChildPaths(id);
+		return fileMgr.getChildPaths(id);
 	}
 	
 	/*=====================================================================================*
@@ -226,7 +226,7 @@ public class FileSet extends IntegerTreeSet  {
 		add(pathId);
 		
 		/* now add all the children of this path */
-		Integer children [] = fns.getChildPaths(pathId);
+		Integer children [] = fileMgr.getChildPaths(pathId);
 		for (int i = 0; i < children.length; i++) {
 			populateWithPathsHelper(children[i]);
 		}
@@ -240,7 +240,7 @@ public class FileSet extends IntegerTreeSet  {
 	 */
 	protected int getMaxIdNumber()
 	{
-		return FileNameSpaces.MAX_FILES;
+		return IFileMgr.MAX_FILES;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

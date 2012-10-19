@@ -15,7 +15,7 @@ package com.buildml.scanner.buildtree;
 import java.io.File;
 
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.FileSystemTraverseCallback;
 import com.buildml.utils.os.SystemUtils;
@@ -70,7 +70,7 @@ public class FileSystemScanner {
 	public void scanForFiles(final String rootName, String fileSystemPath) {
 		
 		/* these need to be final so the callback class (see later) can access them */
-		final FileNameSpaces fns = buildStore.getFileNameSpaces();
+		final IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* make the database really fast (turn off auto-commit ). */
 		buildStore.setFastAccessMode(true);
@@ -88,7 +88,7 @@ public class FileSystemScanner {
 					@Override
 					public void callback(File thisPath) {
 						String pathName = thisPath.toString();
-						if (fns.addFile("@" + rootName + "/" + pathName) == ErrorCode.BAD_PATH){
+						if (fileMgr.addFile("@" + rootName + "/" + pathName) == ErrorCode.BAD_PATH){
 							throw new FatalBuildTreeScannerError("Adding file name /" + pathName +
 									" to BuildStore returned an error."); 
 						}

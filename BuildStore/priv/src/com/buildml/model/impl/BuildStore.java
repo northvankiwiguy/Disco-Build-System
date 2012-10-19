@@ -19,6 +19,7 @@ import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.utils.version.Version;
@@ -48,8 +49,8 @@ public class BuildStore implements IBuildStore {
 	 */
 	private BuildStoreDB db;
 	
-	/** The FileNameSpaces manager object we'll delegate work to. */
-	private FileNameSpaces fileSpaces;
+	/** The FileMgr manager object we'll delegate work to. */
+	private IFileMgr fileMgr;
 
 	/** The FileIncludeMgr object we'll delegate work to. */
 	private IFileIncludeMgr fileIncludeMgr;
@@ -108,8 +109,8 @@ public class BuildStore implements IBuildStore {
 			}
 		}
 		
-		/* create a new FileNameSpaces object to manage our list of files */
-		fileSpaces = new FileNameSpaces(this);
+		/* create a new FileMgr object to manage our list of files */
+		fileMgr = new FileMgr(this);
 		
 		/* create a new FileIncludeMgr object to manage the relationship between files */
 		fileIncludeMgr = new FileIncludeMgr(this);
@@ -121,7 +122,7 @@ public class BuildStore implements IBuildStore {
 		reportMgr = new ReportMgr(this);
 		
 		/* create a new FileAttributeMgr object to manage the attributes on files */
-		fileAttrMgr = new FileAttributeMgr(this, fileSpaces);
+		fileAttrMgr = new FileAttributeMgr(this, fileMgr);
 		
 		/* create a new Packages object */
 		packages = new PackageMgr(this);		
@@ -162,8 +163,8 @@ public class BuildStore implements IBuildStore {
 	 * @see com.buildml.model.IBuildStore#getFileNameSpaces()
 	 */
 	@Override
-	public FileNameSpaces getFileNameSpaces() {
-		return fileSpaces;
+	public IFileMgr getFileMgr() {
+		return fileMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -17,6 +17,7 @@ import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IFileAttributeMgr;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -41,9 +42,9 @@ import com.buildml.utils.errors.ErrorCode;
 	private BuildStoreDB db;
 	
 	/**
-	 * The FileNameSpaces object that these file attributes are associated with.
+	 * The FileMgr object that these file attributes are associated with.
 	 */
-	private FileNameSpaces fileNameSpaces;
+	private IFileMgr fileMgr;
 	
 	/**
 	 * Various prepared statements for database access.
@@ -72,9 +73,9 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @param buildStore The BuildStore object that owns this FileAttributes object.
 	 * @param fns The FileNameSpaces object that these attributes are attached to
 	 */
-	public FileAttributeMgr(BuildStore buildStore, FileNameSpaces fns) {
+	public FileAttributeMgr(BuildStore buildStore, IFileMgr fns) {
 		this.db = buildStore.getBuildStoreDB();
-		this.fileNameSpaces = fns;
+		this.fileMgr = fns;
 		
 		/* Prepare our database statements */
 		selectIdFromNamePrepStmt = db.prepareStatement("select id from fileAttrsName where name = ?");
@@ -422,7 +423,7 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 				
-		return new FileSet(fileNameSpaces, results);
+		return new FileSet(fileMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -442,7 +443,7 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
-		return new FileSet(fileNameSpaces, results);
+		return new FileSet(fileMgr, results);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -17,8 +17,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.utils.ConversionUtils;
-import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.IFileMgr;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.FileRecord;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -36,8 +36,8 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	/** The FilesEditor that we provide content for */
 	private FilesEditor editor = null;
 	
-	/** The FileNameSpaces object we should query for file information */
-	private FileNameSpaces fns = null;
+	/** The FileMgr object we should query for file information */
+	private IFileMgr fileMgr = null;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -47,12 +47,12 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 * Create a new {@link FilesEditorContentProvider} that translates the information
 	 * in the BuildStore into something that a TreeViewer can understand.
 	 * @param editor The editor that this content provider is associated with.
-	 * @param fns The FileNameSpaces object that we're displaying information from.
+	 * @param fileMgr The FileNameSpaces object that we're displaying information from.
 	 */
-	public FilesEditorContentProvider(FilesEditor editor, FileNameSpaces fns) {
+	public FilesEditorContentProvider(FilesEditor editor, IFileMgr fileMgr) {
 
 		this.editor = editor;
-		this.fns = fns;
+		this.fileMgr = fileMgr;
 	}
 	
 	/*=====================================================================================*
@@ -76,7 +76,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			while (true) {
 				
 				/* Fetch the children IDs from the BuildStore */
-				childIds = fns.getChildPaths(pathId);
+				childIds = fileMgr.getChildPaths(pathId);
 			
 				/*
 				 * If directory coalescing is enabled, we want to skip
@@ -92,7 +92,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 					
 					/* if the single child isn't a directory - exit */
 					pathId = childIds[0];
-					if (fns.getPathType(pathId) != PathType.TYPE_DIR) {
+					if (fileMgr.getPathType(pathId) != PathType.TYPE_DIR) {
 						break;
 					}
 					
@@ -106,7 +106,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			}
 			
 			/* Convert our child list from an Integer[] to a FileRecord[] */
-			return ConversionUtils.convertIntArrToFileRecordArr(fns, childIds);
+			return ConversionUtils.convertIntArrToFileRecordArr(fileMgr, childIds);
 		}
 		return null;
 	}
@@ -123,7 +123,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			
 			/* query the BuildStore for this element's parent */
 			FileRecord frElement = (FileRecord)element;
-			int parentId = fns.getParentPath(frElement.getId());
+			int parentId = fileMgr.getParentPath(frElement.getId());
 
 			/* base case - parent of / is null */
 			if (parentId == frElement.getId()) {
@@ -154,7 +154,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 			FileRecord fr = (FileRecord)element;
 			
 			/* query the BuildStore to see if there are any children */
-			Integer childIds[] = fns.getChildPaths(fr.getId());
+			Integer childIds[] = fileMgr.getChildPaths(fr.getId());
 			if (childIds.length > 0) {
 				return true;
 			}
@@ -174,13 +174,13 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 */
 	public FileRecord[] getRootElements() {
 		
-		int topRootId = fns.getRootPath("root");
+		int topRootId = fileMgr.getRootPath("root");
 		if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS))
 		{
-			String rootNames[] = fns.getRoots();
+			String rootNames[] = fileMgr.getRoots();
 			FileRecord fileRecords[] = new FileRecord[rootNames.length];
 			for (int i = 0; i < rootNames.length; i++) {
-				int id = fns.getRootPath(rootNames[i]);
+				int id = fileMgr.getRootPath(rootNames[i]);
 				
 				/* 
 				 * if the name is missing, it's an internal error, but just
@@ -192,15 +192,15 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 				}
 				
 				/* create either a UIFileRecordFile, or a UIFileRecordDir object */
-				fileRecords[i] = ConversionUtils.createFileRecordWithType(fns, id);
+				fileRecords[i] = ConversionUtils.createFileRecordWithType(fileMgr, id);
 			}
 			return fileRecords;
 		}
 		
 		/* else, the directories at the / level are the top-level elements */
 		else {
-			Integer childIds[] = fns.getChildPaths(topRootId);
-			return ConversionUtils.convertIntArrToFileRecordArr(fns, childIds);
+			Integer childIds[] = fileMgr.getChildPaths(topRootId);
+			return ConversionUtils.convertIntArrToFileRecordArr(fileMgr, childIds);
 		}
 	}
 

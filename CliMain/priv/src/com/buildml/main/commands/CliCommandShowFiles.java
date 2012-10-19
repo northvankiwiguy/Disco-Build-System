@@ -19,8 +19,8 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -123,10 +123,10 @@ public class CliCommandShowFiles implements ICliCommand {
 		
 		/* fetch the subset of files we should filter-in */
 	
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		String filterInString = cmdLine.getOptionValue("f");
 		if (filterInString != null) {
-			filterFileSet = CliUtils.getCmdLineFileSet(fns, filterInString);
+			filterFileSet = CliUtils.getCmdLineFileSet(fileMgr, filterInString);
 			if (filterFileSet != null) {
 				filterFileSet.populateWithParents();
 			}
@@ -143,7 +143,7 @@ public class CliCommandShowFiles implements ICliCommand {
 		
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
@@ -153,7 +153,7 @@ public class CliCommandShowFiles implements ICliCommand {
 		FileSet resultFileSet = null;
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fns, pkgMgr, resultFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
+		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, resultFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

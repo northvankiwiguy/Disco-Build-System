@@ -23,8 +23,8 @@ import org.eclipse.swt.graphics.Image;
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.print.PrintUtils;
 
 /**
@@ -45,8 +45,8 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	/** The BuildStore that we're viewing. */
 	private IBuildStore buildStore;
 	
-	/** The FileNameSpaces associated with the BuildStore. */
-	private FileNameSpaces filesMgr;
+	/** The FileMgr associated with the BuildStore. */
+	private IFileMgr fileMgr;
 	
 	/** Image representing the "action" icon. */
 	private Image actionImage;
@@ -68,7 +68,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 
 		this.actionMgr = actionMgr;
 		this.buildStore = actionMgr.getBuildStore();
-		this.filesMgr = this.buildStore.getFileNameSpaces();
+		this.fileMgr = this.buildStore.getFileMgr();
 		
 		/* all entries in the first column have an icon - precache it now */
 		ImageDescriptor descr = Activator.getImageDescriptor("images/action_icon.gif");
@@ -130,7 +130,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 			 * wrap the path if it's too long.
 			 */
 			int cmdDirId = actionMgr.getDirectory(actionId);
-			String dirString = filesMgr.getPathName(cmdDirId);
+			String dirString = fileMgr.getPathName(cmdDirId);
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 			PrintStream printStream = new PrintStream(outStream);
 			PrintUtils.indentAndWrap(printStream, dirString, 0, toolTipWrapWidth);

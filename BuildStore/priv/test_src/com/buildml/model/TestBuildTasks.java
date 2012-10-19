@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -34,8 +33,8 @@ public class TestBuildTasks {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The FileNameSpace object associated with this BuildStore */
-	FileNameSpaces bsfs;
+	/** The FileMgr object associated with this BuildStore */
+	IFileMgr fileMgr;
 	
 	/** The BuildTasks object associated with this BuildStore */
 	BuildTasks bts;
@@ -54,7 +53,7 @@ public class TestBuildTasks {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
 		/* fetch the associated FileNameSpace object */
-		bsfs = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		
 		/* fetch the associated BuildTasks object */
 		bts = bs.getBuildTasks();
@@ -219,10 +218,10 @@ public class TestBuildTasks {
 		int task = bts.addBuildTask(rootTaskId, 0, "gcc -o foo foo.c");
 		
 		/* create a number of new files */
-		int fileFooC = bsfs.addFile("/a/b/c/foo.c");
-		int fileFooH = bsfs.addFile("/a/b/c/foo.h");
-		int fileFooO = bsfs.addFile("/a/b/c/foo.o");
-		int fileFoo = bsfs.addFile("/a/b/c/foo");
+		int fileFooC = fileMgr.addFile("/a/b/c/foo.c");
+		int fileFooH = fileMgr.addFile("/a/b/c/foo.h");
+		int fileFooO = fileMgr.addFile("/a/b/c/foo.o");
+		int fileFoo = fileMgr.addFile("/a/b/c/foo");
 		
 		/* record that these files are accessed by the task */
 		bts.addFileAccess(task, fileFooC, OperationType.OP_READ);
@@ -265,15 +264,15 @@ public class TestBuildTasks {
 		int task = bts.addBuildTask(rootTaskId, 0, "my mystery task");
 		
 		/* create a number of new files */
-		int file1 = bsfs.addFile("/file1");
-		int file2 = bsfs.addFile("/file2");
-		int file3 = bsfs.addFile("/file3");
-		int file4 = bsfs.addFile("/file4");
-		int file5 = bsfs.addFile("/file5");
-		int file6 = bsfs.addFile("/file6");
-		int file7 = bsfs.addFile("/file7");
-		int file8 = bsfs.addFile("/file8");
-		int file9 = bsfs.addFile("/file9");
+		int file1 = fileMgr.addFile("/file1");
+		int file2 = fileMgr.addFile("/file2");
+		int file3 = fileMgr.addFile("/file3");
+		int file4 = fileMgr.addFile("/file4");
+		int file5 = fileMgr.addFile("/file5");
+		int file6 = fileMgr.addFile("/file6");
+		int file7 = fileMgr.addFile("/file7");
+		int file8 = fileMgr.addFile("/file8");
+		int file9 = fileMgr.addFile("/file9");
 				
 		/* test read, read => read */
 		bts.addFileAccess(task, file1, OperationType.OP_READ);
@@ -334,7 +333,7 @@ public class TestBuildTasks {
 		assertEquals(0, bts.getTasksThatAccess(file8, OperationType.OP_DELETE).length);
 		
 		/* test write, read, delete => temporary - and the file is deleted */
-		assertEquals(file9, bsfs.getPath("/file9"));
+		assertEquals(file9, fileMgr.getPath("/file9"));
 		bts.addFileAccess(task, file9, OperationType.OP_WRITE);
 		bts.addFileAccess(task, file9, OperationType.OP_READ);
 		bts.addFileAccess(task, file9, OperationType.OP_DELETE);
@@ -342,7 +341,7 @@ public class TestBuildTasks {
 		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_READ).length);
 		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_WRITE).length);
 		assertEquals(0, bts.getTasksThatAccess(file9, OperationType.OP_DELETE).length);
-		assertEquals(ErrorCode.BAD_PATH, bsfs.getPath("/file9"));
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.getPath("/file9"));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -359,13 +358,13 @@ public class TestBuildTasks {
 		int task3 = bts.addBuildTask(rootTaskId, 0, "gcc -o mult.o mult.c");
 
 		/* and a bunch of files that access those tasks */
-		int file1 = bsfs.addFile("/clock.o");
-		int file2 = bsfs.addFile("/clock.c");
-		int file3 = bsfs.addFile("/banner.o");
-		int file4 = bsfs.addFile("/banner.c");
-		int file5 = bsfs.addFile("/mult.o");
-		int file6 = bsfs.addFile("/mult.c");
-		int file7 = bsfs.addFile("/stdio.h");
+		int file1 = fileMgr.addFile("/clock.o");
+		int file2 = fileMgr.addFile("/clock.c");
+		int file3 = fileMgr.addFile("/banner.o");
+		int file4 = fileMgr.addFile("/banner.c");
+		int file5 = fileMgr.addFile("/mult.o");
+		int file6 = fileMgr.addFile("/mult.c");
+		int file7 = fileMgr.addFile("/stdio.h");
 		
 		/* now register each task's file accesses */
 		bts.addFileAccess(task1, file1, OperationType.OP_WRITE);
@@ -432,9 +431,9 @@ public class TestBuildTasks {
 	public void testGetTasksInDirectory() {
 
 		/* create a couple of directories */
-		int dir1 = bsfs.addDirectory("/dir1");
-		int dir2 = bsfs.addDirectory("/dir2");
-		int dir3 = bsfs.addDirectory("/dir2/dir3");
+		int dir1 = fileMgr.addDirectory("/dir1");
+		int dir2 = fileMgr.addDirectory("/dir2");
+		int dir3 = fileMgr.addDirectory("/dir2/dir3");
 		
 		/* create a number of tasks, each executing in one of those directories */
 		int rootTask = bts.getRootTask("root");

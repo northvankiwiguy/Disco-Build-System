@@ -18,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.TaskSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -170,7 +169,7 @@ public class TestPackageMgr {
 	@Test
 	public void testRemovePackage() {
 		
-		FileNameSpaces fns = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		BuildTasks bts = bs.getBuildTasks();
 		
 		/* try to remove package names that haven't been added */
@@ -196,7 +195,7 @@ public class TestPackageMgr {
 		
 		/* assign a package to files, then try to remove the name */
 		int pkgA = pkgMgr.getPackageId("PkgA");
-		int file1 = fns.addFile("/aardvark/bunny");
+		int file1 = fileMgr.addFile("/aardvark/bunny");
 		pkgMgr.setFilePackage(file1, pkgA, IPackageMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("PkgA"));
 		
@@ -357,12 +356,12 @@ public class TestPackageMgr {
 	public void testFilePackages() throws Exception {
 		
 		IPackageMgr pkgMgr = bs.getPackageMgr();
-		FileNameSpaces bsfs = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		
 		/* create a few files */
-		int path1 = bsfs.addFile("/banana");
-		int path2 = bsfs.addFile("/aardvark");
-		int path3 = bsfs.addFile("/carrot");
+		int path1 = fileMgr.addFile("/banana");
+		int path2 = fileMgr.addFile("/aardvark");
+		int path3 = fileMgr.addFile("/carrot");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
@@ -427,7 +426,7 @@ public class TestPackageMgr {
 	@Test
 	public void testGetFilesInPackage() throws Exception {
 
-		FileNameSpaces fns = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		
 		/* define a new package, which we'll add files to */
 		int pkgA = pkgMgr.addPackage("PkgA");
@@ -449,7 +448,7 @@ public class TestPackageMgr {
 		 * Nothing is outside the package either, since there are no files. However '/'
 		 * is implicitly there all the time, so it'll be reported.
 		 */
-		int rootPathId = fns.getPath("/");
+		int rootPathId = fileMgr.getPath("/");
 		results = pkgMgr.getFilesOutsidePackage(pkgA);
 		assertEquals(1, results.size());
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
@@ -458,7 +457,7 @@ public class TestPackageMgr {
 		assertEquals(1, results.size());
 		
 		/* add a single file to the "private" section of pkgA */
-		int file1 = fns.addFile("/myfile1");
+		int file1 = fileMgr.addFile("/myfile1");
 		pkgMgr.setFilePackage(file1, pkgA, sectPriv);
 		
 		/* check again - should be one file in pkgA and one in pkgA/priv */
@@ -478,7 +477,7 @@ public class TestPackageMgr {
 		assertEquals(1, results.size());
 		
 		/* now add another to pkgA/priv and check again */
-		int file2 = fns.addFile("/myfile2");
+		int file2 = fileMgr.addFile("/myfile2");
 		pkgMgr.setFilePackage(file2, pkgA, sectPriv);
 		results = pkgMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));
@@ -496,7 +495,7 @@ public class TestPackageMgr {
 		assertEquals(1, results.size());
 		
 		/* finally, add one to pkgA/pub and check again */
-		int file3 = fns.addFile("/myfile3");
+		int file3 = fileMgr.addFile("/myfile3");
 		pkgMgr.setFilePackage(file3, pkgA, sectPub);
 		results = pkgMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2, file3}));
@@ -538,14 +537,14 @@ public class TestPackageMgr {
 	@Test
 	public void testGetFilesInAndOutsidePackage() throws Exception {
 
-		FileNameSpaces fns = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 
 		/* create a bunch of files */
-		int f1path = fns.addFile("/a/b/c/d/e/f1.c");
-		int f2path = fns.addFile("/a/b/c/d/e/f2.c");
-		int f3path = fns.addFile("/a/b/c/d/g/f3.c");
-		int f4path = fns.addFile("/b/c/d/f4.c");
-		int f5path = fns.addFile("/b/c/d/f5.c");
+		int f1path = fileMgr.addFile("/a/b/c/d/e/f1.c");
+		int f2path = fileMgr.addFile("/a/b/c/d/e/f2.c");
+		int f3path = fileMgr.addFile("/a/b/c/d/g/f3.c");
+		int f4path = fileMgr.addFile("/b/c/d/f4.c");
+		int f5path = fileMgr.addFile("/b/c/d/f5.c");
 
 		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
 		IPackageMgr pkgMgr = bs.getPackageMgr();

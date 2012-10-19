@@ -24,7 +24,7 @@ import org.junit.Test;
 import com.buildml.model.impl.BuildTasks;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.os.SystemUtils;
@@ -43,7 +43,7 @@ public class TestCFuncExec {
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
 	private BuildTasks bts = null;
-	private FileNameSpaces fns = null;
+	private IFileMgr fileMgr = null;
 	private int shellTaskId;
 	
 	/** temporary directory into which test cases can store files */
@@ -167,7 +167,7 @@ public class TestCFuncExec {
 
 		/* fetch references to sub objects */
 		bts = bs.getBuildTasks();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
 		int rootTask = bts.getRootTask("root");
@@ -191,8 +191,8 @@ public class TestCFuncExec {
 		 */		
 		Integer[] fileWrites = bts.getFilesAccessed(parentTaskId, OperationType.OP_WRITE);
 		assertEquals(2, fileWrites.length);
-		int flag1Id = fns.getPath("/tmp/flag-file1");
-		int flag2Id = fns.getPath("/tmp/flag-file2");
+		int flag1Id = fileMgr.getPath("/tmp/flag-file1");
+		int flag2Id = fileMgr.getPath("/tmp/flag-file2");
 		assertNotSame(ErrorCode.BAD_PATH, flag1Id);
 		assertNotSame(ErrorCode.BAD_PATH, flag2Id);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {flag1Id, flag2Id}, fileWrites));
@@ -200,7 +200,7 @@ public class TestCFuncExec {
 		/* And the child task wrote to /tmp/flag-file3 */
 		fileWrites = bts.getFilesAccessed(childTaskId, OperationType.OP_WRITE);
 		assertEquals(1, fileWrites.length);
-		int flag3Id = fns.getPath("/tmp/flag-file3");
+		int flag3Id = fileMgr.getPath("/tmp/flag-file3");
 		assertNotSame(ErrorCode.BAD_PATH, flag3Id);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {flag3Id}, fileWrites));
 		
@@ -208,7 +208,7 @@ public class TestCFuncExec {
 		 * Validate that the tasks executed in the expected directory.
 		 */
 		int currentDirId = 
-			fns.getPath(PathUtils.normalizeAbsolutePath(new File(".").getAbsolutePath()));
+			fileMgr.getPath(PathUtils.normalizeAbsolutePath(new File(".").getAbsolutePath()));
 		int parentDirId = bts.getDirectory(parentTaskId);
 		assertEquals(currentDirId, parentDirId);
 		int childDirId = bts.getDirectory(childTaskId);
@@ -241,7 +241,7 @@ public class TestCFuncExec {
 	
 		/* trace the program's behaviour into a BuildStore */
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		bts = bs.getBuildTasks();
 		
 		/* validate the top-level task (the process that invokes "system"). */
@@ -461,7 +461,7 @@ public class TestCFuncExec {
 		
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
 
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		bts = bs.getBuildTasks();
 		
 		/* validate the top-level task (the process that invokes fork()). */
@@ -470,8 +470,8 @@ public class TestCFuncExec {
 		int forkTaskId = tasks[0].intValue();
 		
 		/* check that this task accessed both flag-file1 and flag-file2 */
-		int file1Id = fns.getPath("/tmp/flag-file1");
-		int file2Id = fns.getPath("/tmp/flag-file2");
+		int file1Id = fileMgr.getPath("/tmp/flag-file1");
+		int file2Id = fileMgr.getPath("/tmp/flag-file2");
 		Integer fileWrites[] = bts.getFilesAccessed(forkTaskId, OperationType.OP_WRITE);
 		assertTrue(CommonTestUtils.sortedArraysEqual(fileWrites, new Integer[] {file1Id, file2Id}));
 	}
@@ -505,7 +505,7 @@ public class TestCFuncExec {
 			"}";
 	
 		bs = BuildScannersCommonTestUtils.parseLegacyProgram(tmpDir, source, null);
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		bts = bs.getBuildTasks();
 		
 		/* validate the top-level task (the process that invokes "popen"). */
@@ -583,8 +583,8 @@ public class TestCFuncExec {
 		assertEquals(0, tasks.length);
 		
 		/* check that /etc/passwd and /tmp/flag-file4 have been accessed. */
-		assertNotSame(ErrorCode.BAD_PATH, fns.getPath("/etc/passwd"));
-		assertNotSame(ErrorCode.BAD_PATH, fns.getPath("/tmp/flag-file4"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/etc/passwd"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/tmp/flag-file4"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -609,8 +609,8 @@ public class TestCFuncExec {
 		assertEquals(0, tasks.length);
 		
 		/* check that /etc/passwd and /tmp/flag-file4 have been accessed. */
-		assertNotSame(ErrorCode.BAD_PATH, fns.getPath("/etc/passwd"));
-		assertNotSame(ErrorCode.BAD_PATH, fns.getPath("/tmp/flag-file4"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/etc/passwd"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/tmp/flag-file4"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -634,7 +634,7 @@ public class TestCFuncExec {
 		assertEquals(0, bts.getChildren(tasks[1].intValue()).length);
 
 		/* check that /etc/passwd has been accessed. */
-		assertNotSame(ErrorCode.BAD_PATH, fns.getPath("/etc/passwd"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/etc/passwd"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -21,8 +21,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.impl.BuildTasks;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.impl.BuildTasks.OperationType;
 import com.buildml.utils.os.SystemUtils;
 
@@ -39,7 +39,7 @@ public class TestCFuncPerms {
 	/* variables used in many test cases */
 	private IBuildStore bs = null;
 	private BuildTasks bts = null;
-	private FileNameSpaces fns = null;
+	private IFileMgr fileMgr = null;
 	private int rootTask;
 	private int task;
 	private Integer fileModifies[];
@@ -88,7 +88,7 @@ public class TestCFuncPerms {
 		
 		/* fetch references to sub objects */
 		bts = bs.getBuildTasks();
-		fns = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		
 		/* find the root task */
 		rootTask = bts.getRootTask("root");
@@ -138,7 +138,7 @@ public class TestCFuncPerms {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
-		assertEquals(fns.getPath(tmpDir + "/chmod-file"), fileModifies[0].intValue());
+		assertEquals(fileMgr.getPath(tmpDir + "/chmod-file"), fileModifies[0].intValue());
 		
 		/*
 		 * chmod() a file that doesn't exist - nothing should be logged.
@@ -174,7 +174,7 @@ public class TestCFuncPerms {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
-		assertEquals(fns.getPath(tmpDir + "/chown-file"), fileModifies[0].intValue());
+		assertEquals(fileMgr.getPath(tmpDir + "/chown-file"), fileModifies[0].intValue());
 		
 		/*
 		 * chmod() a file that doesn't exist - nothing should be logged.
@@ -253,7 +253,7 @@ public class TestCFuncPerms {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
-		assertEquals(fns.getPath(tmpDir + "/fchmod-file"), fileModifies[0].intValue());
+		assertEquals(fileMgr.getPath(tmpDir + "/fchmod-file"), fileModifies[0].intValue());
 		
 		/*
 		 * fchmod() with an invalid file descriptor.
@@ -289,7 +289,7 @@ public class TestCFuncPerms {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
-		assertEquals(fns.getPath(tmpDir + "/fchmodat-file"), fileModifies[0].intValue());
+		assertEquals(fileMgr.getPath(tmpDir + "/fchmodat-file"), fileModifies[0].intValue());
 		
 		/*
 		 * fchmodat() with an invalid file.
@@ -329,7 +329,7 @@ public class TestCFuncPerms {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
-		assertEquals(fns.getPath(tmpDir + "/fchown-file"), fileModifies[0].intValue());
+		assertEquals(fileMgr.getPath(tmpDir + "/fchown-file"), fileModifies[0].intValue());
 		
 		/*
 		 * chmod() a file that doesn't exist - nothing should be logged.
@@ -365,7 +365,7 @@ public class TestCFuncPerms {
 				"  return 0;" +
 				"}", null);
 		assertEquals(1, fileModifies.length);
-		assertEquals(fns.getPath(tmpDir + "/fchownat-file"), fileModifies[0].intValue());
+		assertEquals(fileMgr.getPath(tmpDir + "/fchownat-file"), fileModifies[0].intValue());
 		
 		/*
 		 * fchownat() with an invalid file.

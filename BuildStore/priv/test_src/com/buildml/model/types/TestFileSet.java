@@ -21,8 +21,8 @@ import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -38,8 +38,8 @@ public class TestFileSet {
 	/** Our test BuildStore object */
 	private IBuildStore bs;
 	
-	/** Our test FileNameSpaces object */
-	private FileNameSpaces fns;
+	/** Our test FileMgr object */
+	private IFileMgr fileMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -77,8 +77,8 @@ public class TestFileSet {
 	@Before
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
-		fns = bs.getFileNameSpaces();
-		fs = new FileSet(fns);
+		fileMgr = bs.getFileMgr();
+		fs = new FileSet(fileMgr);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -193,14 +193,14 @@ public class TestFileSet {
 	public void testPopulateWithParents() {
 		
 		/* create a bunch of files */
-		int f1path = fns.addFile("/a/b/c/d/e/f1.c");
-		int f2path = fns.addFile("/a/b/c/d/e/f2.c");
-		int f3path = fns.addFile("/a/b/c/d/g/f3.c");
-		int f4path = fns.addFile("/b/c/d/f4.c");
-		int f5path = fns.addFile("/b/c/d/f5.c");
+		int f1path = fileMgr.addFile("/a/b/c/d/e/f1.c");
+		int f2path = fileMgr.addFile("/a/b/c/d/e/f2.c");
+		int f3path = fileMgr.addFile("/a/b/c/d/g/f3.c");
+		int f4path = fileMgr.addFile("/b/c/d/f4.c");
+		int f5path = fileMgr.addFile("/b/c/d/f5.c");
 		
 		/* this one won't be added, neither will its parents */
-		fns.addFile("/c/d/e/f6.c");
+		fileMgr.addFile("/c/d/e/f6.c");
 
 		/* add them to the file set */ 
 		fs.add(f1path);		
@@ -217,16 +217,16 @@ public class TestFileSet {
 		assertTrue(fs.isMember(f5path));
 
 		/* check that the parent paths aren't added yet */
-		int parRoot = fns.getPath("/");
-		int parA = fns.getPath("/a");
-		int parAB = fns.getPath("/a/b");
-		int parABC = fns.getPath("/a/b/c");
-		int parABCD = fns.getPath("/a/b/c/d");
-		int parABCDE = fns.getPath("/a/b/c/d/e");
-		int parABCDG = fns.getPath("/a/b/c/d/g");
-		int parB = fns.getPath("/b");
-		int parBC = fns.getPath("/b/c");
-		int parBCD = fns.getPath("/b/c/d");
+		int parRoot = fileMgr.getPath("/");
+		int parA = fileMgr.getPath("/a");
+		int parAB = fileMgr.getPath("/a/b");
+		int parABC = fileMgr.getPath("/a/b/c");
+		int parABCD = fileMgr.getPath("/a/b/c/d");
+		int parABCDE = fileMgr.getPath("/a/b/c/d/e");
+		int parABCDG = fileMgr.getPath("/a/b/c/d/g");
+		int parB = fileMgr.getPath("/b");
+		int parBC = fileMgr.getPath("/b/c");
+		int parBCD = fileMgr.getPath("/b/c/d");
 		assertFalse(fs.isMember(parRoot));
 		assertFalse(fs.isMember(parA));
 		assertFalse(fs.isMember(parAB));
@@ -239,9 +239,9 @@ public class TestFileSet {
 		assertFalse(fs.isMember(parBCD));
 
 		/* these will never be added - make sure they're not there */
-		int parCDE = fns.getPath("/c/d/e");
-		int parCD = fns.getPath("/c/d");
-		int parC = fns.getPath("/c");
+		int parCDE = fileMgr.getPath("/c/d/e");
+		int parCD = fileMgr.getPath("/c/d");
+		int parC = fileMgr.getPath("/c");
 		assertFalse(fs.isMember(parCDE));
 		assertFalse(fs.isMember(parCD));
 		assertFalse(fs.isMember(parC));
@@ -275,25 +275,25 @@ public class TestFileSet {
 	 */
 	@Test
 	public void testMergeFileSet() throws Exception {
-		FileSet mainFileSet = new FileSet(fns);
+		FileSet mainFileSet = new FileSet(fileMgr);
 		
-		int file1 = fns.addFile("/apple/banana/carrot/donkey.h");
-		int file2 = fns.addFile("/apple/banana/carrot/elephant.h");
-		int file3 = fns.addFile("/apple/banana/chilly/fish.h");
-		int file4 = fns.addFile("/apple/banana/dragonfruit/goat.h");
-		int file5 = fns.addFile("/apple/banana/dragonfruit/hamster.h");
-		int file6 = fns.addFile("/apple/banana/dragonfruit/iguana.h");
+		int file1 = fileMgr.addFile("/apple/banana/carrot/donkey.h");
+		int file2 = fileMgr.addFile("/apple/banana/carrot/elephant.h");
+		int file3 = fileMgr.addFile("/apple/banana/chilly/fish.h");
+		int file4 = fileMgr.addFile("/apple/banana/dragonfruit/goat.h");
+		int file5 = fileMgr.addFile("/apple/banana/dragonfruit/hamster.h");
+		int file6 = fileMgr.addFile("/apple/banana/dragonfruit/iguana.h");
 
 		/* seed mainFileSet with one file */
 		mainFileSet.add(file1);
 
 		/* merge the empty FileSet, and make sure mainFileSet is unchanged */
-		FileSet fs2 = new FileSet(fns);
+		FileSet fs2 = new FileSet(fileMgr);
 		mainFileSet.mergeSet(fs2);
 		assertEquals(1, mainFileSet.size());
 		
 		/* merge in a single file */
-		FileSet fs3 = new FileSet(fns);
+		FileSet fs3 = new FileSet(fileMgr);
 		fs3.add(file2);
 		mainFileSet.mergeSet(fs3);
 		assertEquals(2, mainFileSet.size());
@@ -301,7 +301,7 @@ public class TestFileSet {
 		assertTrue(mainFileSet.isMember(file2));
 		
 		/* merge in a file that already exists - this shouldn't change anything */
-		FileSet fs4 = new FileSet(fns);
+		FileSet fs4 = new FileSet(fileMgr);
 		fs4.add(file1);
 		mainFileSet.mergeSet(fs4);
 		assertEquals(2, mainFileSet.size());
@@ -309,7 +309,7 @@ public class TestFileSet {
 		assertTrue(mainFileSet.isMember(file2));
 		
 		/* merge in three new files */
-		FileSet fs5 = new FileSet(fns);
+		FileSet fs5 = new FileSet(fileMgr);
 		fs5.add(file4);
 		fs5.add(file5);
 		fs5.add(file6);
@@ -332,14 +332,14 @@ public class TestFileSet {
 	 */
 	@Test
 	public void testExtractFileSet() throws Exception {
-		FileSet mainFileSet = new FileSet(fns);
+		FileSet mainFileSet = new FileSet(fileMgr);
 		
-		int file1 = fns.addFile("/apple/banana/carrot/donkey.h");
-		int file2 = fns.addFile("/apple/banana/carrot/elephant.h");
-		int file3 = fns.addFile("/apple/banana/chilly/fish.h");
-		int file4 = fns.addFile("/apple/banana/dragonfruit/goat.h");
-		int file5 = fns.addFile("/apple/banana/dragonfruit/hamster.h");
-		int file6 = fns.addFile("/apple/banana/dragonfruit/iguana.h");
+		int file1 = fileMgr.addFile("/apple/banana/carrot/donkey.h");
+		int file2 = fileMgr.addFile("/apple/banana/carrot/elephant.h");
+		int file3 = fileMgr.addFile("/apple/banana/chilly/fish.h");
+		int file4 = fileMgr.addFile("/apple/banana/dragonfruit/goat.h");
+		int file5 = fileMgr.addFile("/apple/banana/dragonfruit/hamster.h");
+		int file6 = fileMgr.addFile("/apple/banana/dragonfruit/iguana.h");
 
 		/* seed mainFileSet with all files */
 		mainFileSet.add(file1);
@@ -351,26 +351,26 @@ public class TestFileSet {
 		assertEquals(6, mainFileSet.size());
 
 		/* remove the empty FileSet, and make sure mainFileSet is unchanged */
-		FileSet fs2 = new FileSet(fns);
+		FileSet fs2 = new FileSet(fileMgr);
 		mainFileSet.extractSet(fs2);
 		assertEquals(6, mainFileSet.size());
 		
 		/* remove a single file */
-		FileSet fs3 = new FileSet(fns);
+		FileSet fs3 = new FileSet(fileMgr);
 		fs3.add(file2);
 		mainFileSet.extractSet(fs3);
 		assertEquals(5, mainFileSet.size());
 		assertFalse(mainFileSet.isMember(file2));
 		
 		/* remove a file that was already removed - this shouldn't change anything */
-		FileSet fs4 = new FileSet(fns);
+		FileSet fs4 = new FileSet(fileMgr);
 		fs4.add(file2);
 		mainFileSet.extractSet(fs4);
 		assertEquals(5, mainFileSet.size());
 		assertFalse(mainFileSet.isMember(file2));
 		
 		/* remove three additional files */
-		FileSet fs5 = new FileSet(fns);
+		FileSet fs5 = new FileSet(fileMgr);
 		fs5.add(file4);
 		fs5.add(file5);
 		fs5.add(file6);
@@ -394,33 +394,33 @@ public class TestFileSet {
 	public void testPopulateWithPaths() throws Exception {
 		
 		/* create a bunch of files */
-		int f1path = fns.addFile("/a/b/c/d/e/f1.c");
-		int f2path = fns.addFile("/a/b/c/d/e/f2.c");
-		int f3path = fns.addFile("/a/b/c/d/g/f3.c");
-		int f4path = fns.addFile("/b/c/d/f4.c");
-		int f5path = fns.addFile("/b/c/d/f5.c");
-		int dirRoot = fns.getPath("/");
-		int dirA = fns.getPath("/a");
-		int dirAB = fns.getPath("/a/b");
-		int dirABC = fns.getPath("/a/b/c");
-		int dirABCD = fns.getPath("/a/b/c/d");
-		int dirABCDG = fns.getPath("/a/b/c/d/g");
-		int dirABCDE = fns.getPath("/a/b/c/d/e");
-		int dirB = fns.getPath("/b");
-		int dirBC = fns.getPath("/b/c");
-		int dirBCD = fns.getPath("/b/c/d");
+		int f1path = fileMgr.addFile("/a/b/c/d/e/f1.c");
+		int f2path = fileMgr.addFile("/a/b/c/d/e/f2.c");
+		int f3path = fileMgr.addFile("/a/b/c/d/g/f3.c");
+		int f4path = fileMgr.addFile("/b/c/d/f4.c");
+		int f5path = fileMgr.addFile("/b/c/d/f5.c");
+		int dirRoot = fileMgr.getPath("/");
+		int dirA = fileMgr.getPath("/a");
+		int dirAB = fileMgr.getPath("/a/b");
+		int dirABC = fileMgr.getPath("/a/b/c");
+		int dirABCD = fileMgr.getPath("/a/b/c/d");
+		int dirABCDG = fileMgr.getPath("/a/b/c/d/g");
+		int dirABCDE = fileMgr.getPath("/a/b/c/d/e");
+		int dirB = fileMgr.getPath("/b");
+		int dirBC = fileMgr.getPath("/b/c");
+		int dirBCD = fileMgr.getPath("/b/c/d");
 		
 		/* add some file roots */
-		assertEquals(ErrorCode.OK, fns.addNewRoot("abcRoot", dirABC));
-		assertEquals(ErrorCode.OK, fns.addNewRoot("bRoot", dirB));
+		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("abcRoot", dirABC));
+		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("bRoot", dirB));
 		
 		/* with no arguments, no paths are added */
-		FileSet fs0 = new FileSet(fns);
+		FileSet fs0 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs0.populateWithPaths(new String [] {}));
 		assertEquals(0, fs0.size());
 		
 		/* add all paths by passing in '/' */
-		FileSet fs1 = new FileSet(fns);
+		FileSet fs1 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs1.populateWithPaths(new String [] {"/"}));
 		assertTrue(fs1.isMember(f1path)); assertTrue(fs1.isMember(f2path)); assertTrue(fs1.isMember(f3path)); 
 		assertTrue(fs1.isMember(f4path)); assertTrue(fs1.isMember(f5path)); assertTrue(fs1.isMember(dirRoot));
@@ -430,7 +430,7 @@ public class TestFileSet {
 		assertEquals(15, fs1.size());
 				
 		/* add a single directory and it's contents */
-		FileSet fs3 = new FileSet(fns);
+		FileSet fs3 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs3.populateWithPaths(new String[] {"/b/c/d/"}));
 		assertTrue(fs3.isMember(f4path)); 
 		assertTrue(fs3.isMember(f5path)); 
@@ -438,7 +438,7 @@ public class TestFileSet {
 		assertEquals(3, fs3.size());
 
 		/* add a directory (/b/c/d) and a file (/a/b/c/d/e/f1.c) */
-		FileSet fs4 = new FileSet(fns);
+		FileSet fs4 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs4.populateWithPaths(new String[] {"/b/c/d/", "/a/b/c/d/e/f1.c"}));
 		assertTrue(fs4.isMember(f1path)); 
 		assertTrue(fs4.isMember(f4path)); 
@@ -447,14 +447,14 @@ public class TestFileSet {
 		assertEquals(4, fs4.size());
 		
 		/* add a file (/b/c/d/f4.c) and another file (/a/b/c/d/e/f1.c) */
-		FileSet fs5 = new FileSet(fns);
+		FileSet fs5 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs5.populateWithPaths(new String[] {"/b/c/d/f4.c", "/a/b/c/d/e/f1.c"}));
 		assertTrue(fs5.isMember(f1path)); 
 		assertTrue(fs5.isMember(f4path));
 		assertEquals(2, fs5.size());
 		
 		/* search for all files ending in .c */
-		FileSet fs6 = new FileSet(fns);
+		FileSet fs6 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs6.populateWithPaths(new String[] {"*.c"}));
 		assertTrue(fs6.isMember(f1path));
 		assertTrue(fs6.isMember(f2path));
@@ -464,13 +464,13 @@ public class TestFileSet {
 		assertEquals(5, fs6.size());
 
 		/* search for all files that have 3 in the name */
-		FileSet fs7 = new FileSet(fns);
+		FileSet fs7 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs7.populateWithPaths(new String[] {"*3*"}));
 		assertTrue(fs7.isMember(f3path)); 
 		assertEquals(1, fs7.size());
 		
 		/* test abcRoot */
-		FileSet fs8 = new FileSet(fns);
+		FileSet fs8 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs8.populateWithPaths(new String[] {"@abcRoot"}));
 		assertEquals(7, fs8.size());
 		assertTrue(fs8.isMember(f1path)); assertTrue(fs8.isMember(f2path)); assertTrue(fs8.isMember(f3path));
@@ -478,7 +478,7 @@ public class TestFileSet {
 		assertTrue(fs8.isMember(dirABCDG));
 
 		/* test %bRoot with a path following it */
-		FileSet fs9 = new FileSet(fns);
+		FileSet fs9 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs9.populateWithPaths(new String[] {"@bRoot/c/d/f4.c"}));
 		assertEquals(1, fs9.size());
 		assertTrue(fs9.isMember(f4path));
@@ -494,13 +494,13 @@ public class TestFileSet {
 		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f5path, pkgFooId, sectPrivate));
 		
 		/* test @foo/public membership */
-		FileSet fs10 = new FileSet(fns);
+		FileSet fs10 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs10.populateWithPaths(new String[] {"%pkg/foo/public"}));
 		assertEquals(1, fs10.size());
 		assertTrue(fs10.isMember(f1path));
 
 		/* test @foo/private membership */
-		FileSet fs11 = new FileSet(fns);
+		FileSet fs11 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs11.populateWithPaths(new String[] {"%p/foo/private"}));
 		assertEquals(3, fs11.size());
 		assertTrue(fs11.isMember(f2path));
@@ -508,7 +508,7 @@ public class TestFileSet {
 		assertTrue(fs11.isMember(f5path));
 
 		/* test @foo membership */
-		FileSet fs12 = new FileSet(fns);
+		FileSet fs12 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs12.populateWithPaths(new String[] {"%pkg/foo"}));
 		assertEquals(4, fs12.size());
 		assertTrue(fs12.isMember(f1path));
@@ -517,7 +517,7 @@ public class TestFileSet {
 		assertTrue(fs12.isMember(f5path));
 
 		/* test ^@foo/public membership - includes directories */
-		FileSet fs13 = new FileSet(fns);
+		FileSet fs13 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs13.populateWithPaths(new String[] {"%not-pkg/foo/public"}));
 		assertEquals(14, fs13.size());
 		assertTrue(fs13.isMember(f2path));
@@ -526,20 +526,20 @@ public class TestFileSet {
 		assertTrue(fs13.isMember(f5path));
 		
 		/* test ^@foo/private membership - includes directories */
-		FileSet fs14 = new FileSet(fns);
+		FileSet fs14 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs14.populateWithPaths(new String[] {"%np/foo/private"}));
 		assertEquals(12, fs14.size());
 		assertTrue(fs14.isMember(f1path));
 		assertTrue(fs14.isMember(f3path));
 
 		/* test ^@foo membership  - includes directories */
-		FileSet fs15 = new FileSet(fns);
+		FileSet fs15 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs15.populateWithPaths(new String[] {"%np/foo"}));
 		assertEquals(11, fs15.size());
 		assertTrue(fs15.isMember(f3path));
 		
 		/* test with invalid paths */
-		FileSet fs16 = new FileSet(fns);
+		FileSet fs16 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.BAD_PATH, fs16.populateWithPaths(new String[] {"/a/b/x/y/z/"}));	
 		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%p/pkg"}));
 		assertEquals(ErrorCode.BAD_PATH, fs6.populateWithPaths(new String[] {"%p/foo/badsect"}));
@@ -561,12 +561,12 @@ public class TestFileSet {
 	public void testSize() {
 		
 		/* create a bunch of files */
-		int f1path = fns.addFile("/a/b/c/d/e/f1.c");
-		int f2path = fns.addFile("/a/b/c/d/e/f2.c");
-		int f3path = fns.addFile("/a/b/c/d/g/f3.c");
-		int f4path = fns.addFile("/b/c/d/f4.c");
-		int f5path = fns.addFile("/b/c/d/f5.c");		
-		int f6path = fns.addFile("/c/d/e/f6.c");
+		int f1path = fileMgr.addFile("/a/b/c/d/e/f1.c");
+		int f2path = fileMgr.addFile("/a/b/c/d/e/f2.c");
+		int f3path = fileMgr.addFile("/a/b/c/d/g/f3.c");
+		int f4path = fileMgr.addFile("/b/c/d/f4.c");
+		int f5path = fileMgr.addFile("/b/c/d/f5.c");		
+		int f6path = fileMgr.addFile("/c/d/e/f6.c");
 
 		/* add them to the file set, testing the size as we go along */ 
 		assertEquals(0, fs.size());
@@ -635,7 +635,7 @@ public class TestFileSet {
 	
 		Integer array[] = {1, 13, 145, 7626, 23232};
 		
-		FileSet fs = new FileSet(fns, array);
+		FileSet fs = new FileSet(fileMgr, array);
 		assertEquals(5, fs.size());
 		assertTrue(fs.isMember(1));
 		assertTrue(fs.isMember(13));
@@ -653,27 +653,27 @@ public class TestFileSet {
 	@Test
 	public void testAddSubTree() {
 		
-		int fileA = fns.addFile("/1/2/3/4/A.c");
-		int fileB = fns.addFile("/1/2/3/4/B.c");
-		int fileC = fns.addFile("/1/2/3/4/C.c");
-		int fileD = fns.addFile("/1/2/3/4/5/D.c");
-		int fileE = fns.addFile("/1/2/3/4/5/E.c");
-		int fileF = fns.addFile("/1/2/3/4/5/6/F.c");
-		int fileG = fns.addFile("/1/2/7/G.c");
-		int fileH = fns.addFile("/1/2/7/H.c");
-		int fileI = fns.addFile("/1/2/7/I.c");
-		int fileJ = fns.addFile("/1/2/7/8/J.c");
-		int fileK = fns.addFile("/1/2/7/8/9/K.c");
-		int dirRoot = fns.getPath("/");
-		int dir1 = fns.getPath("/1");
-		int dir2 = fns.getPath("/1/2");
-		int dir3 = fns.getPath("/1/2/3");
-		int dir4 = fns.getPath("/1/2/3/4");
-		int dir5 = fns.getPath("/1/2/3/4/5");
-		int dir6 = fns.getPath("/1/2/3/4/5/6");
-		int dir7 = fns.getPath("/1/2/7");
-		int dir8 = fns.getPath("/1/2/7/8");
-		int dir9 = fns.getPath("/1/2/7/8/9");
+		int fileA = fileMgr.addFile("/1/2/3/4/A.c");
+		int fileB = fileMgr.addFile("/1/2/3/4/B.c");
+		int fileC = fileMgr.addFile("/1/2/3/4/C.c");
+		int fileD = fileMgr.addFile("/1/2/3/4/5/D.c");
+		int fileE = fileMgr.addFile("/1/2/3/4/5/E.c");
+		int fileF = fileMgr.addFile("/1/2/3/4/5/6/F.c");
+		int fileG = fileMgr.addFile("/1/2/7/G.c");
+		int fileH = fileMgr.addFile("/1/2/7/H.c");
+		int fileI = fileMgr.addFile("/1/2/7/I.c");
+		int fileJ = fileMgr.addFile("/1/2/7/8/J.c");
+		int fileK = fileMgr.addFile("/1/2/7/8/9/K.c");
+		int dirRoot = fileMgr.getPath("/");
+		int dir1 = fileMgr.getPath("/1");
+		int dir2 = fileMgr.getPath("/1/2");
+		int dir3 = fileMgr.getPath("/1/2/3");
+		int dir4 = fileMgr.getPath("/1/2/3/4");
+		int dir5 = fileMgr.getPath("/1/2/3/4/5");
+		int dir6 = fileMgr.getPath("/1/2/3/4/5/6");
+		int dir7 = fileMgr.getPath("/1/2/7");
+		int dir8 = fileMgr.getPath("/1/2/7/8");
+		int dir9 = fileMgr.getPath("/1/2/7/8/9");
 		
 		/* initially, the set is empty */
 		assertEquals(0, fs.size());
@@ -700,20 +700,20 @@ public class TestFileSet {
 	public void testRemoveSubTree() {
 		
 		/* add a bunch of files to the fns, then populate the FileSet with them all */
-		int fileA = fns.addFile("/1/2/3/4/A.c");
-		int fileB = fns.addFile("/1/2/3/4/B.c");
-		int fileC = fns.addFile("/1/2/3/4/C.c");
-		int fileD = fns.addFile("/1/2/3/4/5/D.c");
-		int fileE = fns.addFile("/1/2/3/4/5/E.c");
-		int fileF = fns.addFile("/1/2/3/4/5/6/F.c");
-		int fileG = fns.addFile("/1/2/7/G.c");
-		int fileH = fns.addFile("/1/2/7/H.c");
-		int fileI = fns.addFile("/1/2/7/I.c");
-		int fileJ = fns.addFile("/1/2/7/8/J.c");
-		int fileK = fns.addFile("/1/2/7/8/9/K.c");
-		int dir7 = fns.getPath("/1/2/7");
-		int dir8 = fns.getPath("/1/2/8");
-		int dir9 = fns.getPath("/1/2/9");
+		int fileA = fileMgr.addFile("/1/2/3/4/A.c");
+		int fileB = fileMgr.addFile("/1/2/3/4/B.c");
+		int fileC = fileMgr.addFile("/1/2/3/4/C.c");
+		int fileD = fileMgr.addFile("/1/2/3/4/5/D.c");
+		int fileE = fileMgr.addFile("/1/2/3/4/5/E.c");
+		int fileF = fileMgr.addFile("/1/2/3/4/5/6/F.c");
+		int fileG = fileMgr.addFile("/1/2/7/G.c");
+		int fileH = fileMgr.addFile("/1/2/7/H.c");
+		int fileI = fileMgr.addFile("/1/2/7/I.c");
+		int fileJ = fileMgr.addFile("/1/2/7/8/J.c");
+		int fileK = fileMgr.addFile("/1/2/7/8/9/K.c");
+		int dir7 = fileMgr.getPath("/1/2/7");
+		int dir8 = fileMgr.getPath("/1/2/8");
+		int dir9 = fileMgr.getPath("/1/2/9");
 		fs = bs.getReportMgr().reportAllFiles();
 		
 		/* all files should be present now */

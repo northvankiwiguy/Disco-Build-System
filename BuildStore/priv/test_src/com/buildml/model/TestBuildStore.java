@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.FatalBuildStoreError;
-import com.buildml.model.impl.FileNameSpaces;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.version.Version;
 
@@ -36,8 +35,8 @@ public class TestBuildStore {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The BuildStoreFileSpace associated with this BuildStore */
-	FileNameSpaces bsfs;
+	/** The FileMgr associated with this BuildStore */
+	IFileMgr fileMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -52,7 +51,7 @@ public class TestBuildStore {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
 		/* fetch the associated FileSpace */
-		bsfs = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -90,7 +89,7 @@ public class TestBuildStore {
 			fail();
 		}
 		
-		FileNameSpaces fileMgr = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		fileMgr.addFile("/file");		
 		bs.close();
 		
@@ -100,7 +99,7 @@ public class TestBuildStore {
 		} catch (Exception e) {
 			fail();
 		}
-		fileMgr = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/file"));
 		bs.close();
 		bsFile.delete();
@@ -123,7 +122,7 @@ public class TestBuildStore {
 			fail();
 		}
 		
-		FileNameSpaces fileMgr = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		fileMgr.addFile("/file");
 		
 		/* NOT saved, changes are discarded */
@@ -135,7 +134,7 @@ public class TestBuildStore {
 		} catch (Exception e) {
 			fail();
 		}
-		fileMgr = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		assertEquals(ErrorCode.BAD_PATH, fileMgr.getPath("/file"));
 		bs.close();
 		bsFile.delete();
@@ -158,7 +157,7 @@ public class TestBuildStore {
 			fail();
 		}
 		
-		FileNameSpaces fileMgr = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		fileMgr.addFile("/file");
 		
 		/* Saved, with changes intact */
@@ -175,7 +174,7 @@ public class TestBuildStore {
 		} catch (Exception e) {
 			fail();
 		}
-		fileMgr = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/file"));
 		bs.close();
 		bsFile.delete();
@@ -202,7 +201,7 @@ public class TestBuildStore {
 		}
 		
 		/* make a first change */
-		FileNameSpaces fileMgr = bs.getFileNameSpaces();
+		IFileMgr fileMgr = bs.getFileMgr();
 		fileMgr.addFile("/file1");
 		
 		/* Save as..., with first change intact */
@@ -229,7 +228,7 @@ public class TestBuildStore {
 		} catch (Exception e) {
 			fail();
 		}
-		fileMgr = bs.getFileNameSpaces();
+		fileMgr = bs.getFileMgr();
 		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/file1"));
 		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/file2"));
 		bs.close();

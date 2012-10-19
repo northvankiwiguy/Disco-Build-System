@@ -7,7 +7,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 
 /**
  * A Eclipse plugin "PropertyTester" class for determining whether
@@ -46,8 +46,8 @@ public class PathPropertyTester extends PropertyTester {
 						/* finally, test if the path has an attached root */
 						IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 						if (buildStore != null) {
-							FileNameSpaces pathMgr = buildStore.getFileNameSpaces();
-							return pathMgr.getRootAtPath(pathId) != null;
+							IFileMgr fileMgr = buildStore.getFileMgr();
+							return fileMgr.getRootAtPath(pathId) != null;
 						}
 					}
 				}

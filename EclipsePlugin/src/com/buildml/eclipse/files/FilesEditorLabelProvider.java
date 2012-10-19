@@ -23,9 +23,9 @@ import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.impl.FileNameSpaces;
-import com.buildml.model.impl.FileNameSpaces.PathType;
+import com.buildml.model.impl.FileMgr.PathType;
 import com.buildml.model.types.FileRecord;
 
 /**
@@ -41,8 +41,8 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	/** The FilesEditor that we provide content for */
 	private FilesEditor editor = null;
 	
-	/** The FileNameSpaces object we'll use for querying file information from the BuildStore */
-	private FileNameSpaces fns;
+	/** The FileMgr object we'll use for querying file information from the BuildStore */
+	private IFileMgr fileMgr;
 	
 	/** The Packages object we'll use for querying path package information */
 	private IPackageMgr pkgMgr;
@@ -63,14 +63,14 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 * Construct a new FilesEditorLabelProvider object, which provides text and image
 	 * labels for the FilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
-	 * @param fns The FileNameSpaces object we're graphically representing.
+	 * @param fileMgr The FileNameSpaces object we're graphically representing.
 	 * @param pkgMgr The Packages object containing path component information.
 	 */
-	public FilesEditorLabelProvider(FilesEditor editor, FileNameSpaces fns,
+	public FilesEditorLabelProvider(FilesEditor editor, IFileMgr fileMgr,
 					IPackageMgr pkgMgr) {
 
 		this.editor = editor;
-		this.fns = fns;
+		this.fileMgr = fileMgr;
 		this.pkgMgr = pkgMgr;
 	
 		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
@@ -78,7 +78,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 		symlinkImage = null; // TODO: create an image for symlinks
 		
 		/* determine the top-root of this FileNameSpaces object */
-		topRootId = fns.getRootPath("root");
+		topRootId = fileMgr.getRootPath("root");
 	}
 
 	/*=====================================================================================*
@@ -99,7 +99,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 			/* we only care about FileRecord types */
 			if (element instanceof FileRecord) {
 				FileRecord fr = (FileRecord)element;
-				PathType pathType = fns.getPathType(fr.getId());
+				PathType pathType = fileMgr.getPathType(fr.getId());
 
 				switch (pathType) {
 				case TYPE_INVALID:
@@ -113,7 +113,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 					 * of images, we cache them in this plugin's image registry.
 					 */
 					IEditorRegistry editorImageRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-					String name = fns.getBaseName(fr.getId());
+					String name = fileMgr.getBaseName(fr.getId());
 					ImageDescriptor imageDescr = editorImageRegistry.getImageDescriptor(name);
 
 					/* can we get this image from the plugin's cache? */
@@ -161,9 +161,9 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 
 				/* case: show file path roots */
 				if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS)) {
-					String rootName = fns.getRootAtPath(pathId);
+					String rootName = fileMgr.getRootAtPath(pathId);
 					if (rootName != null) {
-						String fullPath = fns.getPathName(pathId);
+						String fullPath = fileMgr.getPathName(pathId);
 						return "@" + rootName + " (" + fullPath + ")";
 					}
 				}
@@ -176,10 +176,10 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				} else {
 					String pathName;
 
-					if (fns.getParentPath(pathId) == topRootId) {
-						pathName = "/" + fns.getBaseName(pathId);
+					if (fileMgr.getParentPath(pathId) == topRootId) {
+						pathName = "/" + fileMgr.getBaseName(pathId);
 					} else {
-						pathName = fns.getBaseName(pathId);					
+						pathName = fileMgr.getBaseName(pathId);					
 					}
 					return pathName;
 				}
@@ -236,16 +236,16 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 		 * If we're at the top of the tree, we'll want to put "/"
 		 * at the start of the name.
 		 */
-		if (fns.getParentPath(pathId) == topRootId) {
+		if (fileMgr.getParentPath(pathId) == topRootId) {
 			sb.append('/');
 		}
 		
 		/* loop, until we find a directory containing multiple entries */
 		while (!done) {
-			String pathName = fns.getBaseName(pathId);
+			String pathName = fileMgr.getBaseName(pathId);
 			sb.append(pathName);
 		
-			children = fns.getChildPaths(pathId);
+			children = fileMgr.getChildPaths(pathId);
 			
 			/* if there are no children or multiple children, we're done */
 			if (children.length != 1) {
@@ -255,7 +255,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 			else {
 				/* or if the single child is not a directory, we're done */
 				int childId = children[0];
-				if (fns.getPathType(childId) != PathType.TYPE_DIR) {
+				if (fileMgr.getPathType(childId) != PathType.TYPE_DIR) {
 					done = true;
 				}
 				

@@ -18,7 +18,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.FileNameSpaces;
+import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -100,25 +100,25 @@ public class CliCommandAddRoot implements ICliCommand {
 
 		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify both a root name and a single path.");
 
-		FileNameSpaces fns = buildStore.getFileNameSpaces();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		String rootName = args[0];
 		String pathName = args[1];
 		int rc;
 
-		int pathId = fns.getPath(pathName);
+		int pathId = fileMgr.getPath(pathName);
 
 		/* is the path valid, if so, set the root */
 		if (pathId != ErrorCode.BAD_PATH) {
 			/* 
 			 * There are two approaches here - if the root exists already, move it.
 			 */
-			if (fns.getRootPath(rootName) != ErrorCode.NOT_FOUND){
-				rc = fns.moveRootToPath(rootName, pathId);
+			if (fileMgr.getRootPath(rootName) != ErrorCode.NOT_FOUND){
+				rc = fileMgr.moveRootToPath(rootName, pathId);
 			}
 
 			/* else, create a new root */
 			else {
-				rc = fns.addNewRoot(rootName, pathId);
+				rc = fileMgr.addNewRoot(rootName, pathId);
 			}
 		} 
 
