@@ -36,8 +36,8 @@ import org.eclipse.ui.ide.IDE;
 
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.BuildStoreFactory;
+import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.model.impl.BuildStore;
 
 /**

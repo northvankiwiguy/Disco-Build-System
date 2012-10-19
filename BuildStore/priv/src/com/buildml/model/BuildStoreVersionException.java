@@ -10,7 +10,7 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.model.errors;
+package com.buildml.model;
 
 /**
  * Exception indicating that an existing BuildStore database that

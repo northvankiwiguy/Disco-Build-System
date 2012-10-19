@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.buildml.model.FatalBuildStoreError;
-import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**

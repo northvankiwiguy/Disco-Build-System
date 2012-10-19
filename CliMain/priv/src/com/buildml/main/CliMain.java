@@ -22,8 +22,8 @@ import org.apache.commons.cli.*;
 
 import com.buildml.main.commands.*;
 import com.buildml.model.BuildStoreFactory;
+import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.print.PrintUtils;
 import com.buildml.utils.string.StringArray;
 import com.buildml.utils.version.Version;

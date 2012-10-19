@@ -15,12 +15,12 @@ package com.buildml.model.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
-import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.utils.version.Version;
 
 

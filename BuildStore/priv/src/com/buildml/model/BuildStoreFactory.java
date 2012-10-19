@@ -15,7 +15,6 @@ package com.buildml.model;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.buildml.model.errors.BuildStoreVersionException;
 import com.buildml.model.impl.BuildStore;
 
 /**
