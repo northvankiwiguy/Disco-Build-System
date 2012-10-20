@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #
-# Test assigning packages to files, after using a scan-ea-anno command to build a buildstore.bml file.
+# Test assigning packages to files, after using a scan-ea-anno command to build a build.bml file.
 #
 
 echo "Show all files, with only default packages"

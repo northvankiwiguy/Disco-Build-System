@@ -1,1 +1,1 @@
-bml show-tasks-that-use myfile did not match incorrect output find, as expected.
+bml show-actions-that-use myfile did not match incorrect output find, as expected.

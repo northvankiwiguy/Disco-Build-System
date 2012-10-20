@@ -2,7 +2,7 @@
 
 #
 # Test commands that show the "derived" relationship between files, after using a scan-ea-anno 
-# command to build a buildstore.bml file.
+# command to build a build.bml file.
 #
 
 echo
@@ -54,73 +54,73 @@ echo "Show all .h files used to create libz.a (using full path name)"
 bml show-input-files -a -f "*.h" /home/psmith/t/cvs-1.11.23/zlib/libz.a
 
 echo
-echo "Show tasks that use zlib.o"
-bml show-tasks-that-use zlib.o
+echo "Show actions that use zlib.o"
+bml show-actions-that-use zlib.o
 
 echo
-echo "Show tasks that read zlib.o"
-bml show-tasks-that-use --read zlib.o
+echo "Show actions that read zlib.o"
+bml show-actions-that-use --read zlib.o
 
 echo
-echo "Show tasks that write zlib.o"
-bml show-tasks-that-use --write zlib.o
+echo "Show actions that write zlib.o"
+bml show-actions-that-use --write zlib.o
 
 echo
-echo "Show tasks that use trees.c"
-bml show-tasks-that-use trees.c
+echo "Show actions that use trees.c"
+bml show-actions-that-use trees.c
 
 echo
-echo "Show tasks that read trees.c"
-bml show-tasks-that-use -r trees.c
+echo "Show actions that read trees.c"
+bml show-actions-that-use -r trees.c
 
 echo
-echo "Show tasks that write trees.c (none)"
-bml show-tasks-that-use -w trees.c
+echo "Show actions that write trees.c (none)"
+bml show-actions-that-use -w trees.c
 
 echo
-echo "Show tasks that use libdiff.a"
-bml show-tasks-that-use libdiff.a
+echo "Show actions that use libdiff.a"
+bml show-actions-that-use libdiff.a
 
 echo
-echo "Show tasks that read libdiff.a"
-bml show-tasks-that-use -r libdiff.a
+echo "Show actions that read libdiff.a"
+bml show-actions-that-use -r libdiff.a
 
 echo
-echo "Show tasks that write libdiff.a"
-bml show-tasks-that-use -w libdiff.a
+echo "Show actions that write libdiff.a"
+bml show-actions-that-use -w libdiff.a
 
 echo
-echo "Show files used by task 1 (none)"
+echo "Show files used by action 1 (none)"
 bml show-files-used-by 1
 
 echo
-echo "Show files used by task 4"
+echo "Show files used by action 4"
 bml show-files-used-by 4
 
 echo
-echo "Show files read by task 4"
+echo "Show files read by action 4"
 bml show-files-used-by -r 4
 
 echo
-echo "Show files written by task 4"
+echo "Show files written by action 4"
 bml show-files-used-by -w 4
 
 echo
-echo "Show files used by task 4, 5 or 6"
+echo "Show files used by action 4, 5 or 6"
 bml show-files-used-by 4:5:6
 
 echo
-echo "Show files written by task 2's children"
+echo "Show files written by action 2's children"
 bml show-files-used-by -w 2/
 
 echo
-echo "Show .h files read by task 2's children"
+echo "Show .h files read by action 2's children"
 bml show-files-used-by --read -f "*.h" 2/
 
 echo
-echo "Show .o files read by task 102"
+echo "Show .o files read by action 102"
 bml show-files-used-by --read -f "*.o" 102
 
 echo
-echo "Show .o files read by task 102, with packages"
+echo "Show .o files read by action 102, with packages"
 bml show-files-used-by --read -f "*.o" -p 102

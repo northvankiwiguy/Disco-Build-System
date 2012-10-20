@@ -1,9 +1,9 @@
 Show the files that were somehow used when generating the specified output files.
 That is, given a set of generated files, display the list of all other files
-that were read by the build tasks that created the output files.
+that were read by the actions that created the output files.
 
-For example, an input file to myfile.o is myfile.c, assuming there's a
-build task (C compilation) that reads myfile.c and writes myfile.o.
+For example, an input file to myfile.o is myfile.c, assuming there's an
+action (C compilation) that reads myfile.c and writes myfile.o.
 
 This command is the logical opposite of show-derived-files.
 
@@ -32,8 +32,8 @@ will show all the files used when creating the obj_files package.
 
 Note that in all these cases, the derivation only goes a single step. 
 That is, file.o is an input to library.a. However, in some cases you might be 
-interested in all files that are used as input, no matter how many build 
-tasks are used. For example:
+interested in all files that are used as input, no matter how many actions 
+are used. For example:
 
     bml show-derived-files -a library.a
     
@@ -55,8 +55,8 @@ Command-specific options are:
 
 -a | --all
   
-  Display all files that are used as input, regardless of how many build
-  tasks are involved in the derivation.
+  Display all files that are used as input, regardless of how many actions
+  are involved in the derivation.
 
 #include options/file-show-pkgs.txt
 

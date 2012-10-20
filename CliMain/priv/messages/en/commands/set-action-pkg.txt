@@ -1,0 +1,36 @@
+Add an action, or set of actions, to one of the BuildML build system packages.
+Adding actions to a package provides a convenient way to group those actions,
+allowing the actions to be referred to by a single name.
+
+For example, to add a number of different actions to a package, use:
+
+    bml set-action-pkg src_code 100:23:2/:44/
+    bml set-action-pkg src_code 11:22
+    
+It is now possible to reference this complete set of actions by using the
+%pkg syntax. For example:
+
+    bml show-actions -f %pkg/src_code
+    
+will show all the actions that have been added to the "src_code" package, 
+whereas:
+
+    bml show-actions -f %not-pkg/src_code
+    
+will show all the actions that are NOT inside that package.
+
+Note: an individual action will always reside in exactly one package, even if
+it's the default "None" package. To remove an action from a package, use
+set-action-pkg to add the action to the default "None" package, or to some
+other user-defined package.
+
+The command arguments are:
+
+#include options/pkg-name.txt
+
+<action-spec>:...
+
+  A colon-separated list specifying which actions should be added to the 
+  package. This includes any of the following formats:
+
+#include options/action-spec.txt

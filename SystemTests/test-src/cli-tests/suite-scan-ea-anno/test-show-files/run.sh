@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #
-# Test the "show-files" output, after using a scan-ea-anno command to build a buildstore.bml file.
+# Test the "show-files" output, after using a scan-ea-anno command to build a build.bml file.
 #
 
 echo "show-files - with default settings"

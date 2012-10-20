@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -105,7 +105,8 @@ public class CliCommandRemovePkg implements ICliCommand {
 		String pkgName = args[0];
 		int result = pkgMgr.removePackage(pkgName);
 		if (result == ErrorCode.CANT_REMOVE) {
-			CliUtils.reportErrorAndExit("Package " + pkgName + " can't be deleted while it still contains files or tasks.");
+			CliUtils.reportErrorAndExit("Package " + pkgName + 
+					" can't be deleted while it still contains files or actions.");
 		}
 		if (result == ErrorCode.NOT_FOUND) {
 			CliUtils.reportErrorAndExit("Package " + pkgName + " is not defined.");

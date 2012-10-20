@@ -1,5 +1,5 @@
 Scan through an Electric Accelerator annotation file (typically with the
-name "emake.xml"), and import the build task and file access information
+name "emake.xml"), and import the action and file access information
 into the BuildML database. For example:
 
     bml scan-ea-anno emake.xml

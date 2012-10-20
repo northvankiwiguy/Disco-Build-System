@@ -1,5 +1,5 @@
 Execute a shell-command-based build system, such as those using a Make-based
-tool, importing the build task and file access information. The result is
+tool, importing the action and file access information. The result is
 a fully-populated BuildML database containing a complete view of how the
 legacy build system functions. For example:
 

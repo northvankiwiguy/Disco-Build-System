@@ -5,6 +5,6 @@
 # sub-directories. It is executed once per test-* directory.
 #
 
-rm -f buildstore.bml
+rm -f build.bml
 bml scan-ea-anno $TEST_SRC/../emake.xml
 

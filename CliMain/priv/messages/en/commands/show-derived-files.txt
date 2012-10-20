@@ -1,11 +1,11 @@
 Show the files that are somehow derived from the specified input files.
 That is, given a set of input files, display the list of all generated
-files that were created by tasks that read from those input files. In
+files that were created by actions that read from those input files. In
 general, this means that the output files are "derived" from the input
 files. 
 
-For example, a derived file of myfile.c is myfile.o, assuming there's a
-build task (C compilation) that reads myfile.c and writes myfile.o.
+For example, a derived file of myfile.c is myfile.o, assuming there's an
+action (C compilation) that reads myfile.c and writes myfile.o.
 
 This command is the logical opposite of show-input-files.
 
@@ -36,7 +36,7 @@ will show all the files derived from files in the "src_files" package.
 Note that in all these cases, the derivation only goes a single step.
 That is, file.o is derived from file.c. However, in some cases you might
 be interested in all files that are derived from the input files, no
-matter how many build tasks are used. For example:
+matter how many actions are used. For example:
 
     bml show-derived-files -a file.c
     
@@ -59,7 +59,7 @@ Command-specific options are:
 -a | --all
   
   Display all files that are derived from the input files, regardless of
-  how many build tasks are involved in the derivation.
+  how many actions are involved in the derivation.
 
 #include options/file-show-pkgs.txt
 

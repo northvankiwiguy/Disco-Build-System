@@ -4,9 +4,9 @@ example:
     bml show-pkg
     
 will list the names of all packages previously defined. There will always
-be a package named "None" that all files and tasks belong to if they haven't
+be a package named "None" that all files and actions belong to if they haven't
 otherwise been assigned to a package.
 
 To add new packages, use the add-pkg command. To remove packages that
-are no longer needed, use the rm-pkg command. To place files and/or tasks
-into a package, use the set-file-pkg and set-task-pkg commands.
+are no longer needed, use the rm-pkg command. To place files and/or actions
+into a package, use the set-file-pkg and set-action-pkg commands.

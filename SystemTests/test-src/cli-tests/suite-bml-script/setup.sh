@@ -5,5 +5,5 @@
 # sub-directories. It is executed once per test-* directory.
 #
 
-rm -f buildstore.bml
+rm -f build.bml
 

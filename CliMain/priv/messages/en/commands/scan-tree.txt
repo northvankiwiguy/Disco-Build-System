@@ -1,7 +1,7 @@
 Scan through the specified directories on the local file system, and add all
 files and directories to the BuildML database. This is used for importing
 an existing source or object tree, purely by looking at which files exist
-on the disk, rather than only learning about the files if a build task were to
+on the disk, rather than only learning about the files if an action were to
 access them.
 
 One or more directories may be provided to this command, with each of them

@@ -1,0 +1,16 @@
+Show all the actions in the build system. This provides a complete list of
+actions and their parent/child hierarchy. That is, one action may invoke a
+number of sub-actions, which in turn may invoke further actions.
+
+By default all actions are shown, although this can be controlled by various
+command-specific options.
+		
+Command-specific options are:
+
+#include options/action-short.txt
+
+#include options/action-long.txt
+
+#include options/action-show-pkgs.txt
+
+#include options/action-filter.txt

@@ -10,10 +10,10 @@ bmlDir=`dirname $bmlPath`
 
 #
 # We cd into the same directory that the 'bml' script is in, but ask
-# it to place the buildstore.bml file into the test-output directory.
+# it to place the build.bml file into the test-output directory.
 # To trigger the bug, we run "scan-tree", since this sub-command needs
 # to load the native libraries (but was failing).
 #
 
-cd $bmlDir && ./bml -f $thisDir/buildstore.bml scan-tree /usr/include
+cd $bmlDir && ./bml -f $thisDir/build.bml scan-tree /usr/include
 

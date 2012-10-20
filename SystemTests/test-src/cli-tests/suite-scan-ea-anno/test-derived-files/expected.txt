@@ -297,11 +297,11 @@ Show all .h files used to create libz.a (using full path name)
 /home/psmith/t/cvs-1.11.23/zlib/zlib.h
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
-Show tasks that use zlib.o
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that use zlib.o
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -327,12 +327,12 @@ Show tasks that use zlib.o
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+--- Action 101 (/home/psmith/t/cvs-1.11.23/src)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
       mv -f .deps/zlib.Tpo .deps/zlib.Po
 
---- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -345,11 +345,11 @@ Show tasks that use zlib.o
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
 
-Show tasks that read zlib.o
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that read zlib.o
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -375,7 +375,7 @@ Show tasks that read zlib.o
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -388,11 +388,11 @@ Show tasks that read zlib.o
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
 
-Show tasks that write zlib.o
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that write zlib.o
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -418,17 +418,17 @@ Show tasks that write zlib.o
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 101 (/home/psmith/t/cvs-1.11.23/src)
+--- Action 101 (/home/psmith/t/cvs-1.11.23/src)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
       mv -f .deps/zlib.Tpo .deps/zlib.Po
 
 
-Show tasks that use trees.c
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that use trees.c
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -454,15 +454,15 @@ Show tasks that use trees.c
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+--- Action 24 (/home/psmith/t/cvs-1.11.23/zlib)
       gcc -g -O2   -c -o trees.o trees.c
 
 
-Show tasks that read trees.c
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that read trees.c
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -488,17 +488,17 @@ Show tasks that read trees.c
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 24 (/home/psmith/t/cvs-1.11.23/zlib)
+--- Action 24 (/home/psmith/t/cvs-1.11.23/zlib)
       gcc -g -O2   -c -o trees.o trees.c
 
 
-Show tasks that write trees.c (none)
+Show actions that write trees.c (none)
 
-Show tasks that use libdiff.a
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that use libdiff.a
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -524,13 +524,13 @@ Show tasks that use libdiff.a
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+--- Action 46 (/home/psmith/t/cvs-1.11.23/diff)
       rm -f libdiff.a
       ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
         normal.o ifdef.o util.o dir.o version.o side.o 
       ranlib libdiff.a
 
---- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -543,11 +543,11 @@ Show tasks that use libdiff.a
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
 
-Show tasks that read libdiff.a
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that read libdiff.a
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -573,7 +573,7 @@ Show tasks that read libdiff.a
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 102 (/home/psmith/t/cvs-1.11.23/src)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -586,11 +586,11 @@ Show tasks that read libdiff.a
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
 
-Show tasks that write libdiff.a
-- Task 2 (/home/psmith/t/cvs-1.11.23)
+Show actions that write libdiff.a
+- Action 2 (/home/psmith/t/cvs-1.11.23)
     emake  all-recursive
 
--- Task 3 (/home/psmith/t/cvs-1.11.23)
+-- Action 3 (/home/psmith/t/cvs-1.11.23)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -616,30 +616,30 @@ Show tasks that write libdiff.a
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Task 46 (/home/psmith/t/cvs-1.11.23/diff)
+--- Action 46 (/home/psmith/t/cvs-1.11.23/diff)
       rm -f libdiff.a
       ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
         normal.o ifdef.o util.o dir.o version.o side.o 
       ranlib libdiff.a
 
 
-Show files used by task 1 (none)
+Show files used by action 1 (none)
 
-Show files used by task 4
+Show files used by action 4
 /home/psmith/t/cvs-1.11.23/config.h
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/argmatch.c
 /home/psmith/t/cvs-1.11.23/lib/argmatch.o
 
-Show files read by task 4
+Show files read by action 4
 /home/psmith/t/cvs-1.11.23/config.h
 /home/psmith/t/cvs-1.11.23/lib/argmatch.c
 
-Show files written by task 4
+Show files written by action 4
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/argmatch.o
 
-Show files used by task 4, 5 or 6
+Show files used by action 4, 5 or 6
 /home/psmith/t/cvs-1.11.23/config.h
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
@@ -653,7 +653,7 @@ Show files used by task 4, 5 or 6
 /home/psmith/t/cvs-1.11.23/lib/getline.o
 /home/psmith/t/cvs-1.11.23/lib/xtime.h
 
-Show files written by task 2's children
+Show files written by action 2's children
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
 /home/psmith/t/cvs-1.11.23/contrib/cvscheck
 /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
@@ -840,7 +840,7 @@ Show files written by task 2's children
 /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
-Show .h files read by task 2's children
+Show .h files read by action 2's children
 /home/psmith/t/cvs-1.11.23/config.h
 /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
 /home/psmith/t/cvs-1.11.23/diff/diff.h
@@ -885,7 +885,7 @@ Show .h files read by task 2's children
 /home/psmith/t/cvs-1.11.23/zlib/zlib.h
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
-Show .o files read by task 102
+Show .o files read by action 102
 /home/psmith/t/cvs-1.11.23/src/add.o
 /home/psmith/t/cvs-1.11.23/src/admin.o
 /home/psmith/t/cvs-1.11.23/src/annotate.o
@@ -942,7 +942,7 @@ Show .o files read by task 102
 /home/psmith/t/cvs-1.11.23/src/wrapper.o
 /home/psmith/t/cvs-1.11.23/src/zlib.o
 
-Show .o files read by task 102, with packages
+Show .o files read by action 102, with packages
 /home/psmith/t/cvs-1.11.23/src/add.o  (None/None)
 /home/psmith/t/cvs-1.11.23/src/admin.o  (None/None)
 /home/psmith/t/cvs-1.11.23/src/annotate.o  (None/None)

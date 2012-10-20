@@ -1,12 +1,12 @@
 -f | --filter <filter1>:...
 
-  Only show the tasks specified by the filter string, which is a
+  Only show the actions specified by the filter string, which is a
   colon-separated list of one or more filter specifications. Each filter
-  specification describes the type of task you're interested in seeing. 
+  specification describes the type of action you're interested in seeing. 
   Filter specifications are additive, so providing two filters results 
   in the union of the two being shown.
    
-  Filter specifications can be used to state which tasks should be 
+  Filter specifications can be used to state which actions should be 
   included in the output.
   
-#include options/task-spec.txt
+#include options/action-spec.txt

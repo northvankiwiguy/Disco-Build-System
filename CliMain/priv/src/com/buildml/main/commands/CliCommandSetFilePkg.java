@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,7 +99,8 @@ public class CliCommandSetFilePkg implements ICliCommand {
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 2, 2, "You must specify a package name and a path-spec.");
+		CliUtils.validateArgs(getName(), args, 2, 2, 
+						"You must specify a package name and a path-spec.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
@@ -109,9 +110,9 @@ public class CliCommandSetFilePkg implements ICliCommand {
 		 * isn't specified, "private" will be used.
 		 */
 		String pkgName = args[0];
-		int pkgAndSectionIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, true);
-		int pktId = pkgAndSectionIds[0];
-		int scopeId = pkgAndSectionIds[1];
+		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, true);
+		int pktId = pkgAndScopeIds[0];
+		int scopeId = pkgAndScopeIds[1];
 
 		/* find out which files the user wants to set */
 		String fileSpec = args[1];

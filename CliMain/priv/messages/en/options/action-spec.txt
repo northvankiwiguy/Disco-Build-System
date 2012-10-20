@@ -1,0 +1,41 @@
+    <action-number>
+ 
+      The unique ID number of the action to be included. To specify multiple
+      actions, separate the action number with colons (for example, 1:2:3).
+ 
+    <action-number>/
+    
+      The unique ID number of a parent action that will be included. Also
+      include all sub-actions that are invoked by that parent action.
+    
+    <action-number>/<depth>
+    
+      Similar to <action-number>/, but only include actions up to <depth> 
+      levels beneath the specified action. A depth of 1 includes only the
+      action itself, whereas a depth of 2 includes the action and its immediate
+      children.
+    
+    -<action-number>
+    
+      Exclude the specified action from the resulting set. This is most useful
+      when combined with a previous action inclusion. For example, to include
+      all actions below action 2, with the exception of actions 45 and 93, 
+      use the following syntax: 2/:-45:-93.
+    
+    -<action-number>/
+    
+      Exclude the specified actions, and all of its children.
+      
+    -<action-number>/<depth>
+  
+      Exclude the specified actions, and <depth> levels of its child actions.
+         
+    %p/<pkg-name> or %pkg/<pkg-name>
+      
+      Include all the actions that have previously been added to the <pkg-name>
+      package (using the set-action-pkg command).
+      
+    %np/<pkg-name> or %not-pkg/<pkg-name>
+    
+      Include all the actions that have NOT been added to the <pkg-name>
+      package.

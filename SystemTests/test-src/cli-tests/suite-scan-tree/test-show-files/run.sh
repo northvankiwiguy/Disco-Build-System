@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #
-# Test the "show-files" output, after using the scan-tree command to build a buildstore.bml file.
+# Test the "show-files" output, after using the scan-tree command to build a build.bml file.
 # Note that we filter out some of the command output so that our expected results can be independent of
 # directory in which the test cases are checked out.
 #

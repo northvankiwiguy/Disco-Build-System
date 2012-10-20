@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	 *=====================================================================================*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getLongDescription()
+	 * @see com.buildml.main.ICliCommand#getLongDescription()
 	 */
 	@Override
 	public String getLongDescription() {
@@ -65,7 +65,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getName()
+	 * @see com.buildml.main.ICliCommand#getName()
 	 */
 	@Override
 	public String getName() {
@@ -75,26 +75,26 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getOptions()
+	 * @see com.buildml.main.ICliCommand#getOptions()
 	 */
 	@Override
 	public Options getOptions() {
 		Options opts = super.getOptions();
 		
 		/* add the --read option */
-		Option readOpt = new Option("r", "read", false, "Only show files that are read by these tasks.");
+		Option readOpt = new Option("r", "read", false, "Only show files that are read by these actions.");
 		opts.addOption(readOpt);
 
 		/* add the --write option */
-		Option writeOpt = new Option("w", "write", false, "Only show files that are written by these tasks.");
+		Option writeOpt = new Option("w", "write", false, "Only show files that are written by these actions.");
 		opts.addOption(writeOpt);	
 		
 		/* add the --modify option */
-		Option modifyOpt = new Option("m", "modify", false, "Only show files that are modified by these tasks.");
+		Option modifyOpt = new Option("m", "modify", false, "Only show files that are modified by these actions.");
 		opts.addOption(modifyOpt);
 		
 		/* add the --delete option */
-		Option deleteOpt = new Option("d", "delete", false, "Only show files that are deleted by these tasks.");
+		Option deleteOpt = new Option("d", "delete", false, "Only show files that are deleted by these actions.");
 		opts.addOption(deleteOpt);
 		return opts;
 	}
@@ -102,27 +102,27 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getParameterDescription()
+	 * @see com.buildml.main.ICliCommand#getParameterDescription()
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "<task-spec>:...";
+		return "<action-spec>:...";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getShortDescription()
+	 * @see com.buildml.main.ICliCommand#getShortDescription()
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Report on files that are used by the specified tasks.";
+		return "Report on files that are used by the specified actions.";
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#processOptions(org.apache.commons.cli.CommandLine)
+	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
 	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
@@ -140,12 +140,12 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#invoke(com.buildml.model.BuildStore, java.lang.String[])
+	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 		
-		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of task-specs must be provided.");
+		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of action-specs must be provided.");
 
 		/* are we searching for reads, writes, or both? */
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);
@@ -155,11 +155,11 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
-		/* fetch the list of tasks we're querying */
-		String taskSpecs = args[0];
-		ActionSet ts = CliUtils.getCmdLineActionSet(actionMgr, taskSpecs);
+		/* fetch the list of actions we're querying */
+		String actionSpecs = args[0];
+		ActionSet ts = CliUtils.getCmdLineActionSet(actionMgr, actionSpecs);
 		if (ts == null) {
-			CliUtils.reportErrorAndExit("no tasks were selected.");
+			CliUtils.reportErrorAndExit("no actions were selected.");
 		}
 
 		/* run the report */

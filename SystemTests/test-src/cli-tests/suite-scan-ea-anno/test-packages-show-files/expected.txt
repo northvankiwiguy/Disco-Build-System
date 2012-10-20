@@ -1096,7 +1096,7 @@ Now show all the files in zlib
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
 
 Try to remove zlib (should fail)
-Error: Package zlib can't be deleted while it still contains files or tasks.
+Error: Package zlib can't be deleted while it still contains files or actions.
        Use bml -h for more help.
 Status is 1
 
@@ -1470,12 +1470,12 @@ New package source added.
 /home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
 
 Try to remove zlib (should fail)
-Error: Package zlib can't be deleted while it still contains files or tasks.
+Error: Package zlib can't be deleted while it still contains files or actions.
        Use bml -h for more help.
 Status is 1
 
 Remove the final file from the zlib package, then try to delete the package
-Error: Package zlib can't be deleted while it still contains files or tasks.
+Error: Package zlib can't be deleted while it still contains files or actions.
        Use bml -h for more help.
 Status is 1
 

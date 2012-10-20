@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import com.buildml.utils.print.PrintUtils;
 /**
  * A collection of utility methods that can be used by any CLI Command code. This
  * includes error reporting, command argument parsing, printing a FileSet and printing
- * a ActionSetSet. These methods are all static, so no object is required for them to be
+ * a ActionSet. These methods are all static, so no object is required for them to be
  * invoked.
  * 
  * Note: A number of these methods are used for command-line validation, and could 
@@ -91,14 +91,14 @@ public class CliUtils {
 	 *    <ol>
 	 * 	  <li> An absolute path name (starting with /), either a directory name or a file name. 
 	 *       If the path is a directory, add all files and directories below that point in the tree.</li>
-	 *    <li>A path name starting with a "root:" - the same rules apply as for #1.</li>
+	 *    <li>A path name starting with a "@root" - the same rules apply as for #1.</li>
 	 *    <li>A single file name, with one or more wildcard (*) characters. All files that match
      *       the name are added, no matter what their directory.</li>
      *    <li>A package spec, starting with %pkg, or the complement of a package, starting 
      *       with %not-pkg.</li>
      *    </ol>
      *    
-	 * @param fileMgr The FileNameSpaces object that manages the files.
+	 * @param fileMgr The FileMgr object that manages the files.
 	 * @param pathSpecs A String of ":"-separated path specs (files, directories, or regular expressions).
 	 * @return A FileSet containing all the files that were selected by the command-line arguments.
 	 */
@@ -133,7 +133,7 @@ public class CliUtils {
 	 *   <li>The special syntax "%pkg/foo" means all actions in the package "foo".</li>
 	 *   <li>The special syntax "%not-pkg/foo" means all actions outside the package "foo".</li>
 	 * </ol>
-	 * @param actionMgr The ActionMgr manager object to query.
+	 * @param actionMgr The ActionMgr object to query.
 	 * @param actionSpecs The command line argument providing the action specification string.
 	 * @return The ActionSet, as described by the input action specification.
 	 */
@@ -157,27 +157,27 @@ public class CliUtils {
 	 * used primarily for displaying the result of reports.
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
-	 * @param fileMgr The FileNameSpaces manager object containing the files to be listed.
-	 * @param pkgMgr The Packages manager object containing the package information.
+	 * @param fileMgr The FileMgr object containing the files to be listed.
+	 * @param pkgMgr The PackageMgr object containing the package information.
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
 	 *         displayed (set to null to display everything).
 	 * @param showRoots Indicates whether path roots should be displayed (true), or whether 
 	 *         absolute paths should be used (false).
-	 * @param showPkgs Indicates whether the package names should be displayed.S
+	 * @param showPkgs Indicates whether the package names should be displayed.
 	 */
 	public static void printFileSet(
 			PrintStream outStream, IFileMgr fileMgr, IPackageMgr pkgMgr, FileSet resultFileSet,
 			FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 		
 		/*
-		 * This method uses recursion to traverse the FileNameSpaces
-		 * from the root to the leaves of the tree. It maintains a StringBuffer with the 
-		 * path encountered so far. That is, if the StringBuffer contains "/a/b/c" and the
-		 * path "d" is encountered, then append "/d" to the StringBuffer to get "/a/b/c/d".
-		 * Once we've finished traversing directory "d", we pop it off the StringBuffer
-		 * and return to "/a/b/c/". This allows us to do a depth-first traversal of the
-		 * FileNameSpaces tree without doing more database access than we need to.
+		 * This method uses recursion to traverse the FileMgr from the root to the leaves 
+		 * of the tree. It maintains a StringBuffer with the path encountered so far. 
+		 * That is, if the StringBuffer contains "/a/b/c" and the path "d" is encountered, 
+		 * then append "/d" to the StringBuffer to get "/a/b/c/d". Once we've finished 
+		 * traversing directory "d", we pop it off the StringBuffer and return to 
+		 * "/a/b/c/". This allows us to do a depth-first traversal of the FileMgr tree 
+		 * without doing more database access than we need to.
 		 * 
 		 * The resultFileSet and filterFileSet work together to determine which paths are
 		 * to be displayed. resultFileSet contains all the files from the relevant database
@@ -221,9 +221,9 @@ public class CliUtils {
 	 * that all actions are displayed, you should first call ActionSet.populateWithParents().
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param actionMgr The BuildTasks manager object containing the action information.
-	 * @param fileMgr The FileNameSpaces manager object containing file name information.
-	 * @param pkgMgr The Packages manager object containing package information.
+	 * @param actionMgr The ActionMgr object containing the action information.
+	 * @param fileMgr The FileMgr object containing file name information.
+	 * @param pkgMgr The PackageMgr object containing package information.
 	 * @param resultActionSet The set of actions to be displayed (the results of some previous query).
 	 * @param filterActionSet The set of actions to actually be displayed (for post-filtering the query results).
 	 * @param outputFormat Mode for formatting the command strings.
@@ -284,7 +284,7 @@ public class CliUtils {
 	 * This method may abort the whole program (never returning) if the input string
 	 * is invalid.
 	 * 
-	 * @param pkgMgr The Packages manager object containing the package information.
+	 * @param pkgMgr The PackageMgr object containing the package information.
 	 * @param pkgString The user-supplied input string (could be anything).
 	 * @param scopeAllowed True if the input string is allowed to provide a scope name. 
 	 * @return An array of two integers. The first is the package's ID number,
@@ -463,8 +463,8 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream on which to display paths.
 	 * @param pathSoFar This path's parent path as a string, complete with trailing "/".
-	 * @param fileMgr The FileNameSpaces manager object in which these paths belong.
-	 * @param pkgMgr The Packages manager object that contains the package information.
+	 * @param fileMgr The FileMgr object in which these paths belong.
+	 * @param pkgMgr The PackageMgr object containing package information.
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
@@ -473,8 +473,9 @@ public class CliUtils {
 	 * @param showPkgs Whether to show the package names.
 	 */
 	private static void printFileSetHelper(
-			PrintStream outStream, StringBuffer pathSoFar, IFileMgr fileMgr, IPackageMgr pkgMgr, int thisPathId,
-			FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
+			PrintStream outStream, StringBuffer pathSoFar, IFileMgr fileMgr, IPackageMgr pkgMgr, 
+			int thisPathId, FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, 
+			boolean showPkgs) {
 
 		/* a StringBuffer for forming the package name */
 		StringBuffer pkgString = new StringBuffer();
@@ -619,9 +620,9 @@ public class CliUtils {
 	 * as it traverses the ActionSet's tree structure.
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param actionMgr The BuildTasks manager object containing the action information.
-	 * @param fileMgr The FileNameSpaces manager object containing file name information.
-	 * @param pkgMgr The Packages manager object containing the package information.
+	 * @param actionMgr The ActionMgr object containing the action information.
+	 * @param fileMgr The FileMgr object containing file name information.
+	 * @param pkgMgr The PackageMgr object containing the package information.
 	 * @param actionId The ID of the action we're currently displaying (at this level of recursion).
 	 * @param resultActionSet The full set of actions to be displayed (the result of some previous query).
 	 * @param filterActionSet The set of actions to actually be displayed (for post-filtering the query results).
@@ -631,20 +632,19 @@ public class CliUtils {
 	 */
 	private static void printActionSetHelper(PrintStream outStream,
 			IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr, 
-			int actionId, ActionSet resultActionSet,
-			ActionSet filterActionSet, DisplayWidth outputFormat, boolean showPkgs,
-			int indentLevel) {
+			int actionId, ActionSet resultActionSet, ActionSet filterActionSet, 
+			DisplayWidth outputFormat, boolean showPkgs, int indentLevel) {
 	
 		/* 
 		 * Display the current action, at the appropriate indentation level. The format is:
 		 * 
-		 * - Task 1 (/home/psmith/t/cvs-1.11.23)
+		 * - Action 1 (/home/psmith/t/cvs-1.11.23)
 	     *     if test ! -f config.h; then rm -f stamp-h1; emake  stamp-h1; else :;
 	     *     
-	     * -- Task 2 (/home/psmith/t/cvs-1.11.23)
+	     * -- Action 2 (/home/psmith/t/cvs-1.11.23)
 	     *      failcom='exit 1'; for f in x $MAKEFLAGS; do case $f in *=* | --[!k]*);; \
 	     *
-	     * Where Task 1 is the parent of Task 2.
+	     * Where Action 1 is the parent of Action 2.
 	     */
 		
 		/* is this action in the ActionSet to be printed? If not, terminate recursion */
@@ -675,7 +675,7 @@ public class CliUtils {
 		for (int i = 0; i != indentLevel; i++) {
 			outStream.append('-');
 		}
-		outStream.print(" Task " + actionId + " (" + actionDirName);
+		outStream.print(" Action " + actionId + " (" + actionDirName);
 		
 		/* if requested, display the action's package name */
 		if (showPkgs) {

@@ -1,5 +1,5 @@
 Remove an existing package from the BuildML build system. The package must
-no longer contain any files or tasks, otherwise the removal will fail.
+no longer contain any files or actions, otherwise the removal will fail.
 For example:
 
     bml rm-pkg src_code

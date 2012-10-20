@@ -1,14 +1,14 @@
-bml show-tasks -l -f 1 matched output small-c-makefile all
+bml show-actions -l -f 1 matched output small-c-makefile all
 bml show-files-used-by -r 1 matched output small-c-makefile/Makefile
 bml show-files-used-by -w 1 provides empty output, as expected
-bml show-tasks -l -f 2 matched output /bin/make -C subdir1 all
+bml show-actions -l -f 2 matched output /bin/make -C subdir1 all
 bml show-files-used-by -r 2 matched output subdir1/Makefile
-bml show-tasks -l -f 3 matched output -c file1.c
+bml show-actions -l -f 3 matched output -c file1.c
 bml show-files-used-by -r 3 provides empty output, as expected
 bml show-files-used-by -w 3 provides empty output, as expected
-bml show-tasks -l -f 4 matched output cc1
+bml show-actions -l -f 4 matched output cc1
 bml show-files-used-by -r 4 matched output subdir1/file1.c
-bml show-tasks -l -f 5 matched output /bin/as
+bml show-actions -l -f 5 matched output /bin/as
 bml show-files-used-by -w 5 matched output subdir1/file1.o
-bml show-tasks -l -f 19 matched output echo Hello
+bml show-actions -l -f 19 matched output echo Hello
 bml show-files-used-by 19 provides empty output, as expected

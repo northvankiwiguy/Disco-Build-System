@@ -42,7 +42,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	 *=====================================================================================*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getLongDescription()
+	 * @see com.buildml.main.ICliCommand#getLongDescription()
 	 */
 	@Override
 	public String getLongDescription() {
@@ -52,7 +52,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getName()
+	 * @see com.buildml.main.ICliCommand#getName()
 	 */
 	@Override
 	public String getName() {
@@ -62,7 +62,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getOptions()
+	 * @see com.buildml.main.ICliCommand#getOptions()
 	 */
 	@Override
 	public Options getOptions() {
@@ -80,7 +80,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getParameterDescription()
+	 * @see com.buildml.main.ICliCommand#getParameterDescription()
 	 */
 	@Override
 	public String getParameterDescription() {
@@ -90,7 +90,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#getShortDescription()
+	 * @see com.buildml.main.ICliCommand#getShortDescription()
 	 */
 	@Override
 	public String getShortDescription() {
@@ -100,7 +100,7 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#processOptions(org.apache.commons.cli.CommandLine)
+	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
 	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
@@ -115,12 +115,13 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowFiles#invoke(com.buildml.model.BuildStore, java.lang.String[])
+	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "One or more colon-separated path-specs must be provided.");
+		CliUtils.validateArgs(getName(), args, 1, 1, 
+								"One or more colon-separated path-specs must be provided.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
@@ -137,7 +138,8 @@ public class CliCommandShowDerivedFiles extends CliCommandShowFiles {
 		derivedFileSet.populateWithParents();
 
 		/* pretty print the results - no filtering used here */
-		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, derivedFileSet, filterFileSet, optionShowRoots, optionShowPkgs);	
+		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, derivedFileSet, 
+								filterFileSet, optionShowRoots, optionShowPkgs);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

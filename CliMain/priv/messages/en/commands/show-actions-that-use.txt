@@ -1,0 +1,58 @@
+Show all the actions that access a specific set of files. This is used to learn
+which actions either generate (write to), or make use of (read from) a specific
+set of files. 
+
+For example, to learn which actions access the trees.o file in some way, use:
+
+    bml show-actions-that-use trees.o
+    
+To learn which actions read from (but not write to) trees.o, use:
+
+    bml show-actions-that-use --read trees.o
+    
+Conversely, to discover which action generates trees.o, use:
+
+    bml show-actions-that-use --write trees.o
+
+The argument to show-actions-that-use must be a file specification:
+
+<file-specification>
+
+  Input files are provided in a colon-separated list, using the following
+  syntax:
+
+#include options/path-spec.txt
+
+
+By default, show-actions-that-use will display all relevant actions, although
+this can be controlled by various command-specific options.
+		
+Command-specific options are:
+
+-r | --read
+
+  Only show actions that read from any of the specified files. By default, an
+  action is reported if it either reads, writes, modifies or deletes the file.
+  
+-w | --write
+
+  Only show actions that write to any of the specified files. By default, an
+  action is reported if it either reads, writes, modifies or deletes the file.
+
+-m | --modify
+
+  Only show actions that modify any of the specified files. By default, an
+  action is reported if it either reads, writes, modifies or deletes the file.
+
+-d | --delete
+
+  Only show actions that delete any of the specified files. By default, an
+  action is reported if it either reads, writes, modifies or deletes the file.
+  
+#include options/action-short.txt
+
+#include options/action-long.txt
+
+#include options/action-show-pkgs.txt
+
+#include options/action-filter.txt

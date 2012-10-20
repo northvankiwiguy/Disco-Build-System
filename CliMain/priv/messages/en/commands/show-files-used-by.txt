@@ -1,31 +1,31 @@
-Show the files that are used by a specific build task, or set of tasks. 
+Show the files that are used by a specific action, or set of actions. 
 By default, all relevant files are shown, although this can be controlled
 by various command-specific options.
 
-A colon-separated list of tasks must be provided, using the following syntax:
+A colon-separated list of actions must be provided, using the following syntax:
 
-#include options/task-spec.txt
+#include options/action-spec.txt
 		
 The show-files-used-by command has further options for controlling the output:
 
 -r | --read
 
-  Only show files that the specified tasks read from. By default, all files
+  Only show files that the specified actions read from. By default, all files
   that are accessed (read, written, modified, or deleted) will be shown.
 
 -w | --write
 
-  Only show files that the specified tasks write to. By default, all files
+  Only show files that the specified actions write to. By default, all files
   that are accessed (read, written, modified, or deleted) will be shown. 
   
 -m | --modify
 
-  Only show files that are modified by the specified tasks. By default, all
+  Only show files that are modified by the specified actions. By default, all
   files that are accessed (read, written, modified, or deleted) will be shown.
 
 -d | --delete
 
-  Only show files that are deleted by the specified tasks. By default, all 
+  Only show files that are deleted by the specified actions. By default, all 
   files that are accessed (read, written, modified, or deleted) will be shown.
   
 #include options/file-show-pkgs.txt

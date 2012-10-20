@@ -27,7 +27,7 @@ my-pkg3
 None
 package2
 Try to delete the default package
-Error: Package None can't be deleted while it still contains files or tasks.
+Error: Package None can't be deleted while it still contains files or actions.
        Use bml -h for more help.
 Status is 1
 my-pkg3

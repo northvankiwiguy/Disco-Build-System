@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 #
-# Test adding/managing package names, after using a scan-ea-anno command to build a buildstore.bml file.
+# Test adding/managing package names, after using a scan-ea-anno command to build a build.bml file.
 #
 
 echo "Showing packages, before having defined any"

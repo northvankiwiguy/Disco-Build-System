@@ -7,5 +7,5 @@
 # examine the files.
 #
 
-rm -f buildstore.bml
+rm -f build.bml
 

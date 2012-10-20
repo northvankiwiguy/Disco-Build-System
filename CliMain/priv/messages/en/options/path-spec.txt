@@ -36,13 +36,13 @@
                 
       Use the show-pkg, add-pkg, rm-pkg commands to define package names,
       and the set-file-pkg command to add files into a package. Package 
-      names may also include a package section name, such as 'public' or
+      names may also include a package scope name, such as 'public' or
       'private'. For example:
            
           bml show-files -f %pkg/kernel_src/private
                 
       This will limit the output to only those files within the specific
-      package section.
+      package scope.
            
     %np/<pkg-name> or %not-pkg/<pkg-name>
        
@@ -51,4 +51,4 @@
            
           bml show-files -f %pkg/kernel_src
                 
-      Package section names (private, public) can also be used.
+      Package scope names (private, public) can also be used.

@@ -27,11 +27,11 @@ import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 
 /**
- * BuildML CLI Command class that implements the "show-tasks-that-use" command.
+ * BuildML CLI Command class that implements the "show-actions-that-use" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
+public class CliCommandShowActionsThatUse extends CliCommandShowActions {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -54,48 +54,48 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	 *=====================================================================================*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#getLongDescription()
+	 * @see com.buildml.main.ICliCommand#getLongDescription()
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/show-tasks-that-use.txt");
+		return CliUtils.genLocalizedMessage("#include commands/show-actions-that-use.txt");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#getName()
+	 * @see com.buildml.main.ICliCommand#getName()
 	 */
 	@Override
 	public String getName() {
-		return "show-tasks-that-use";
+		return "show-actions-that-use";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#getOptions()
+	 * @see com.buildml.main.ICliCommand#getOptions()
 	 */
 	@Override
 	public Options getOptions() {
 		
-		/* use all the options from show-tasks */
+		/* use all the options from show-actions */
 		Options opts = super.getOptions();
 		
 		/* add the --read option */
-		Option readOpt = new Option("r", "read", false, "Only show tasks that read the specified files.");
+		Option readOpt = new Option("r", "read", false, "Only show actions that read the specified files.");
 		opts.addOption(readOpt);
 
 		/* add the --write option */
-		Option writeOpt = new Option("w", "write", false, "Only show tasks that write the specified files.");
+		Option writeOpt = new Option("w", "write", false, "Only show actions that write the specified files.");
 		opts.addOption(writeOpt);	
 		
 		/* add the --modify option */
-		Option modifyOpt = new Option("m", "modify", false, "Only show tasks that modify the specified files.");
+		Option modifyOpt = new Option("m", "modify", false, "Only show actions that modify the specified files.");
 		opts.addOption(modifyOpt);
 		
 		/* add the --delete option */
-		Option deleteOpt = new Option("d", "delete", false, "Only show tasks that delete the specified files.");
+		Option deleteOpt = new Option("d", "delete", false, "Only show actions that delete the specified files.");
 		opts.addOption(deleteOpt);
 		
 		return opts;
@@ -104,7 +104,7 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#getParameterDescription()
+	 * @see com.buildml.main.ICliCommand#getParameterDescription()
 	 */
 	@Override
 	public String getParameterDescription() {
@@ -114,22 +114,22 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#getShortDescription()
+	 * @see com.buildml.main.ICliCommand#getShortDescription()
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List all tasks that access (read, write, modify or delete) the specified files.";
+		return "List all actions that access (read, write, modify or delete) the specified files.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#processOptions(org.apache.commons.cli.CommandLine)
+	 * @see com.buildml.main.ICliCommand#processOptions(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
 	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		
-		/* process the standard show-tasks options */
+		/* process the standard show-actions options */
 		super.processOptions(buildStore, cmdLine);
 		
 		/* now the specific options for show-files-used-by */
@@ -142,12 +142,13 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.main.commands.CliCommandShowTasks#invoke(com.buildml.model.BuildStore, java.lang.String[])
+	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "A colon-separated list of path-specs must be provided.");
+		CliUtils.validateArgs(getName(), args, 1, 1, 
+						"A colon-separated list of path-specs must be provided.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
@@ -155,18 +156,20 @@ public class CliCommandShowTasksThatUse extends CliCommandShowTasks {
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* are we searching for reads, writes, or both? */
-		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, optionModify, optionDelete);		
+		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, 
+						optionModify, optionDelete);		
 
 		/* fetch the FileSet of paths from the user's command line */
 		String fileSpecs = args[0];
 		FileSet fileSet = CliUtils.getCmdLineFileSet(fileMgr, fileSpecs);
 
-		/* find all tasks that access (read, write or both) these files */
-		ActionSet taskSet = reportMgr.reportActionsThatAccessFiles(fileSet, opType);
-		taskSet.populateWithParents();
+		/* find all actions that access (read, write or both) these files */
+		ActionSet actionSet = reportMgr.reportActionsThatAccessFiles(fileSet, opType);
+		actionSet.populateWithParents();
 
-		/* display the resulting set of tasks */
-		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, taskSet, filterTaskSet, outputFormat, optionShowPkgs);
+		/* display the resulting set of actions */
+		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, actionSet, 
+										filterActionSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

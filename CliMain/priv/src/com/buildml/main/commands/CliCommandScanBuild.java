@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,16 +78,19 @@ public class CliCommandScanBuild implements ICliCommand {
 		Options opts = new Options();
 
 		/* add the --trace-file option */
-		Option traceFileOpt = new Option("f", "trace-file", true, "Specify the name of the trace file to write/read.");
+		Option traceFileOpt = new Option("f", "trace-file", true, 
+				"Specify the name of the trace file to write/read.");
 		traceFileOpt.setArgName("file-name");
 		opts.addOption(traceFileOpt);
 		
 		/* add the --trace-only option */
-		Option traceOnlyOpt = new Option("t", "trace-only", false, "Trace the shell command, but don't create a database.");
+		Option traceOnlyOpt = new Option("t", "trace-only", false, 
+				"Trace the shell command, but don't create a database.");
 		opts.addOption(traceOnlyOpt);
 
 		/* add the --read-trace option */
-		Option readTraceOpt = new Option("r", "read-trace", false, "Read an existing trace file, creating a new database.");
+		Option readTraceOpt = new Option("r", "read-trace", false, 
+				"Read an existing trace file, creating a new database.");
 		opts.addOption(readTraceOpt);
 
 		/* add the --debug-level option */
@@ -96,11 +99,13 @@ public class CliCommandScanBuild implements ICliCommand {
 		opts.addOption(dumpTraceOpt);
 
 		/* add the -c option */
-		Option useShellOpt = new Option("c", "command-string", false, "Execute the quoted string as the whole command line.");
+		Option useShellOpt = new Option("c", "command-string", false, 
+				"Execute the quoted string as the whole command line.");
 		opts.addOption(useShellOpt);
 
 		/* add the --log-file option */
-		Option logFileOpt = new Option("l", "log-file", true,  "File for capturing debug information (default: cfs.log).");
+		Option logFileOpt = new Option("l", "log-file", true, 
+				"File for capturing debug information (default: cfs.log).");
 		logFileOpt.setArgName("file-name");
 		opts.addOption(logFileOpt);
 		
@@ -146,7 +151,8 @@ public class CliCommandScanBuild implements ICliCommand {
 		 * We can't specify both --trace-only and --read-trace
 		 */
 		if (optionTraceOnly && optionReadTrace) {
-			CliUtils.reportErrorAndExit("Options --trace-only and --read-trace can't be used together.");
+			CliUtils.reportErrorAndExit(
+					"Options --trace-only and --read-trace can't be used together.");
 		}
 		
 		if (cmdLine.hasOption("debug-level")) {
@@ -158,7 +164,8 @@ public class CliCommandScanBuild implements ICliCommand {
 			} else if (level.equals("2")) {
 				optionDebugLevel = 2;		/* extended debugging output */
 			} else {
-				CliUtils.reportErrorAndExit("Invalid argument to --debug-level: " + level + ".");
+				CliUtils.reportErrorAndExit(
+					"Invalid argument to --debug-level: " + level + ".");
 			}
 		}
 
@@ -172,11 +179,12 @@ public class CliCommandScanBuild implements ICliCommand {
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 		
-		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "A shell command and arguments must be specified.");
+		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, 
+				"A shell command and arguments must be specified.");
 
 		/*
-		 * Create a LegacyBuildScanner object, which can execute the shell command, generate a trace
-		 * file, and create a BuildStore.
+		 * Create a LegacyBuildScanner object, which can execute the shell command, 
+		 * generate a trace file, and create a BuildStore.
 		 */
 		LegacyBuildScanner lbs = new LegacyBuildScanner();
 		

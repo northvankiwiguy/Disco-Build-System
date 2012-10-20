@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,7 +101,8 @@ public class CliCommandScanTree implements ICliCommand {
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, "one or more directory names required.");
+		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, 
+				"one or more directory names required.");
 
 		/* validate that the directories exist */
 		for (int i = 0; i < args.length; i++) {

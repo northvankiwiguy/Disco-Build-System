@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -103,7 +103,8 @@ public class CliCommandScanEaAnno implements ICliCommand {
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 		
-		CliUtils.validateArgs(getName(), args, 1, 1, "An Electric Accelerator annotation file must be specified.");
+		CliUtils.validateArgs(getName(), args, 1, 1, 
+				"An Electric Accelerator annotation file must be specified.");
 
 		String fileName = args[0];
 		ElectricAnnoScanner eas = new ElectricAnnoScanner(buildStore);

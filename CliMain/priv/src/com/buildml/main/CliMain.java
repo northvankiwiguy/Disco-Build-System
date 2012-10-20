@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,8 @@ import com.buildml.utils.string.StringArray;
 import com.buildml.utils.version.Version;
 
 /**
- * This is the main entry point for the "bml" command line program. All other parts
- * of the code (with the exception of the Eclipse plug-in) are invoked via this point.
+ * The main entry point for the "bml" command line program. All other parts of the code 
+ * (with the exception of the Eclipse plug-in) are invoked by this code.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -40,8 +40,8 @@ public final class CliMain {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 	
-	/** The file name to use for the BuildStore database (defaults to "buildstore"). */
-	private String buildStoreFileName = "buildstore";	
+	/** The file name to use for the BuildStore database (defaults to "build.bml"). */
+	private String buildStoreFileName = "build.bml";	
 	
 	/** Set if the user selected the -h option. */
 	private boolean optionHelp = false;
@@ -59,7 +59,7 @@ public final class CliMain {
 	 */
 	private class CommandGroup {
 		
-		/** The title of the command group (e.g. "Commands for displaying task information") */
+		/** The title of the command group (e.g. "Commands for displaying action information") */
 		String groupHeading;
 		
 		/** The commands that fall within this group */
@@ -100,8 +100,8 @@ public final class CliMain {
 		/* define the bml command's arguments */
 		globalOpts = new Options();
 
-		/* add the -f / --buildstore-file option */
-		Option fOpt = new Option("f", "buildstore-file", true, "Name of buildstore database to query/edit");
+		/* add the -f / --file option */
+		Option fOpt = new Option("f", "file", true, "Name of build database to query/edit");
 		fOpt.setArgName("file-name");
 		globalOpts.addOption(fOpt);
 		
@@ -114,8 +114,9 @@ public final class CliMain {
 		globalOpts.addOption(vOpt);
 		
 		/* how many columns of output should we show (default is 80) */
-		Option widthOpt = new Option("w", "width", true, "Number of output columns in reports (default is " +
-				CliUtils.getColumnWidth() + ")");
+		Option widthOpt = new Option("w", "width", true, 
+				"Number of output columns in reports (default is " + 
+		        CliUtils.getColumnWidth() + ")");
 		globalOpts.addOption(widthOpt);
 
 		/*
@@ -168,7 +169,7 @@ public final class CliMain {
 
 	/**
 	 * Display a set of options (as defined by the Options class). This methods is used
-	 * in displaying the help text
+	 * in displaying the help text.
 	 * @param opts A set of command line options, as defined by the Options class.
 	 */
 	@SuppressWarnings("unchecked")
@@ -219,8 +220,8 @@ public final class CliMain {
 	/**
 	 * Display a formatted line in the help output. This is a helper method used for lining 
 	 * up the columns in the help text.
-	 * @param leftCol The text in the left column
-	 * @param rightCol The text in the right column
+	 * @param leftCol The text in the left column.
+	 * @param rightCol The text in the right column.
 	 */
 	private void formattedDisplayLine(String leftCol, String rightCol) {
 		System.err.print(leftCol);
@@ -232,8 +233,9 @@ public final class CliMain {
 
 	/**
 	 * Display the main help text for the "bml" command. The includes the global command line
-	 * options and the list of sub-commands. Note: this method never returns, instead the whole program
-	 * is aborted. Optionally, a text message will be displayed.
+	 * options and the list of sub-commands. Note: this method never returns, instead the whole
+	 * program is aborted. Optionally, an additional text message will be displayed to clarify
+	 * the error.
 	 * @param message A special purpose string error message.
 	 */
 	private void displayHelpAndExit(String message) {
@@ -331,19 +333,19 @@ public final class CliMain {
 		
 		registerCommandGroup("Commands for displaying file/path information",
 			new ICliCommand[] {
-					new CliCommandShowFiles(),
-					new CliCommandShowUnusedFiles(),
-					new CliCommandShowWriteOnlyFiles(),
-					new CliCommandShowPopularFiles(),
-					new CliCommandShowDerivedFiles(),
-					new CliCommandShowInputFiles(),
-					new CliCommandShowFilesUsedBy()
+				new CliCommandShowFiles(),
+				new CliCommandShowUnusedFiles(),
+				new CliCommandShowWriteOnlyFiles(),
+				new CliCommandShowPopularFiles(),
+				new CliCommandShowDerivedFiles(),
+				new CliCommandShowInputFiles(),
+				new CliCommandShowFilesUsedBy()
 			});
 
-		registerCommandGroup("Commands for displaying task information",
+		registerCommandGroup("Commands for displaying action information",
 			new ICliCommand[] {
-				new CliCommandShowTasks(),
-				new CliCommandShowTasksThatUse()
+				new CliCommandShowActions(),
+				new CliCommandShowActionsThatUse()
 			});
 		
 		registerCommandGroup("Commands for managing file system roots",
@@ -359,7 +361,7 @@ public final class CliMain {
 				new CliCommandAddPkg(),
 				new CliCommandRemovePkg(),
 				new CliCommandSetFilePkg(),
-				new CliCommandSetTaskPkg()
+				new CliCommandSetActionPkg()
 			});
 	}
 
@@ -369,7 +371,7 @@ public final class CliMain {
 	 * Given a CLI command name, find the associated ICliCommand object that describes the
 	 * command.
 	 * @param cmdName The name of the CLI command, as entered by the user on the command line.
-	 * @return The associated ICliCommand object, or null if the command wasn't registered.
+	 * @return The associated ICliCommand object, or null if the command wasn't recognized.
 	 */
 	private ICliCommand findCommand(String cmdName) {
 

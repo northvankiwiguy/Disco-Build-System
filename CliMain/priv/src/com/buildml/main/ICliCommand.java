@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import com.buildml.model.IBuildStore;
 public interface ICliCommand {
 
 	/**
-	 * Fetch the name of this CLI command (such as "show-files" or "show-tasks").
+	 * Fetch the name of this CLI command (such as "show-files" or "show-actions").
 	 * @return The command's name.
 	 */
 	public String getName();
@@ -41,7 +41,7 @@ public interface ICliCommand {
 	public String getParameterDescription();
 	
 	/**
-	 * Fetch the command's one-line description. For example, "Show the list of tasks".
+	 * Fetch the command's one-line description. For example, "Show the list of actions".
 	 * @return The command's one-line description.
 	 */
 	public String getShortDescription();

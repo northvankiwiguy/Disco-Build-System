@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Arapiki Solutions Inc.
+ * Copyright (c) 2012 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,11 +26,11 @@ import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 
 /**
- * BuildML CLI Command class that implements the "show-tasks" command.
+ * BuildML CLI Command class that implements the "show-actions" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandShowTasks implements ICliCommand {
+public class CliCommandShowActions implements ICliCommand {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -48,8 +48,8 @@ public class CliCommandShowTasks implements ICliCommand {
 	/** The output format of the report (ONE_LINE, WRAPPED, NOT_WRAPPED). */
 	protected DisplayWidth outputFormat = DisplayWidth.WRAPPED;
 	
-	/** The TaskSet used to filter our results (if -f/--filter is used). */
-	protected ActionSet filterTaskSet = null;
+	/** The ActionSet used to filter our results (if -f/--filter is used). */
+	protected ActionSet filterActionSet = null;
 	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -60,7 +60,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/show-tasks.txt");
+		return CliUtils.genLocalizedMessage("#include commands/show-actions.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -70,7 +70,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "show-tasks";
+		return "show-actions";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -84,7 +84,7 @@ public class CliCommandShowTasks implements ICliCommand {
 		Options opts = new Options();
 
 		/* add the --show-pkgs option */
-		Option showPkgsOpt = new Option("p", "show-pkgs", false, "Show the package of each task.");
+		Option showPkgsOpt = new Option("p", "show-pkgs", false, "Show the package of each action.");
 		opts.addOption(showPkgsOpt);
 		
 		/* add the -s/--short option */
@@ -96,8 +96,8 @@ public class CliCommandShowTasks implements ICliCommand {
 		opts.addOption(longOpt);
 		
 		/* add the -f/--filter option */
-		Option filterOpt = new Option("f", "filter", true, "Task-specs used to filter the output.");
-		filterOpt.setArgName("task-spec:...");
+		Option filterOpt = new Option("f", "filter", true, "Action-specs used to filter the output.");
+		filterOpt.setArgName("action-spec:...");
 		opts.addOption(filterOpt);
 		
 		return opts;
@@ -120,7 +120,7 @@ public class CliCommandShowTasks implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "List all tasks in the build system.";
+		return "List all actions in the build system.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -142,13 +142,13 @@ public class CliCommandShowTasks implements ICliCommand {
 		outputFormat = optionShort ? DisplayWidth.ONE_LINE :
 							optionLong ? DisplayWidth.NOT_WRAPPED : DisplayWidth.WRAPPED;
 		
-		/* fetch the subset of tasks we should filter-in */
+		/* fetch the subset of actions we should filter-in */
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		String filterInString = cmdLine.getOptionValue("f");
 		if (filterInString != null) {
-			filterTaskSet = CliUtils.getCmdLineActionSet(actionMgr, filterInString);
-			if (filterTaskSet != null) {
-				filterTaskSet.populateWithParents();
+			filterActionSet = CliUtils.getCmdLineActionSet(actionMgr, filterInString);
+			if (filterActionSet != null) {
+				filterActionSet.populateWithParents();
 			}
 		}
 	}
@@ -168,9 +168,10 @@ public class CliCommandShowTasks implements ICliCommand {
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
-		 * Display the selected task set.
+		 * Display the selected action set.
 		 */
-		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, null, filterTaskSet, outputFormat, optionShowPkgs);
+		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, null, 
+									filterActionSet, outputFormat, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
