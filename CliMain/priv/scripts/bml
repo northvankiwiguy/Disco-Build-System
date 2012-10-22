@@ -48,7 +48,7 @@ then
 	export CLASSPATH="$WORK/BuildScanners/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-io-2.1.jar:$WORK/CliMain/priv:$CLASSPATH"
-	export BUILDML_HOME=$WORK/Admin/priv/pkg/buildml-0.0.0/
+	export BUILDML_HOME=$WORK/Admin/priv/pkg/buildml-current/
 	
 #
 # Case 2 for a fully installed BuildML release - everything is in a single jar file.

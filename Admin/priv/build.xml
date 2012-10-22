@@ -87,6 +87,9 @@ system. Otherwise use the targets in the individual project directories.
 		<mkdir dir="${pkg-dir}/lib" />
 		<mkdir dir="${tmp-dir}" />
 		
+		<!-- for development purposes, it's helpful to have a "current" symlink to pkg-dir -->
+		<symlink failonerror="true" link="${priv-dir}/pkg/buildml-current" resource="${pkg-dir}" />
+		
 		<!-- place all the .class files into a single directory, ready to create a single jar file -->
 		<unjar src="${workspace-root}/BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/BuildStore/priv/lib/sqlitejdbc-v056.jar" dest="${tmp-dir}" />
