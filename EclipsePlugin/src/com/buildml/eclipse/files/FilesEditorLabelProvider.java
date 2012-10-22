@@ -47,7 +47,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	/** The Packages object we'll use for querying path package information */
 	private IPackageMgr pkgMgr;
 	
-	/** The ID of the top-root for our FileNameSpaces object */
+	/** The ID of the top-root for our FileMgr object */
 	private int topRootId;
 	
 	/** Images we'll use when displaying a tree of files */
@@ -63,7 +63,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 * Construct a new FilesEditorLabelProvider object, which provides text and image
 	 * labels for the FilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
-	 * @param fileMgr The FileNameSpaces object we're graphically representing.
+	 * @param fileMgr The FileMgr object we're graphically representing.
 	 * @param pkgMgr The Packages object containing path component information.
 	 */
 	public FilesEditorLabelProvider(FilesEditor editor, IFileMgr fileMgr,
@@ -77,7 +77,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 		folderImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
 		symlinkImage = null; // TODO: create an image for symlinks
 		
-		/* determine the top-root of this FileNameSpaces object */
+		/* determine the top-root of this FileMgr object */
 		topRootId = fileMgr.getRootPath("root");
 	}
 

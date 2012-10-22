@@ -49,7 +49,7 @@ import com.buildml.utils.errors.ErrorCode;
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
-	 * to us when the Reports object is first instantiated.
+	 * to us when the ReportMgr object is first instantiated.
 	 */
 	private BuildStoreDB db = null;
 	
@@ -73,13 +73,13 @@ import com.buildml.utils.errors.ErrorCode;
 		selectFileIncludesCountPrepStmt = null,
 		selectFilesNotUsedPrepStmt = null,
 		selectFilesWithMatchingNamePrepStmt = null,
-		selectTasksWithMatchingNamePrepStmt = null,
+		selectActionsWithMatchingNamePrepStmt = null,
 		selectDerivedFilesPrepStmt = null,
 		selectInputFilesPrepStmt = null,
-		selectTasksAccessingFilesPrepStmt = null,
-		selectTasksAccessingFilesAnyPrepStmt = null,
-		selectFilesAccessedByTaskPrepStmt = null,
-		selectFilesAccessedByTaskAnyPrepStmt = null,
+		selectActionsAccessingFilesPrepStmt = null,
+		selectActionsAccessingFilesAnyPrepStmt = null,
+		selectFilesAccessedByActionPrepStmt = null,
+		selectFilesAccessedByActionAnyPrepStmt = null,
 		selectWriteOnlyFilesPrepStmt = null,
 		selectAllFilesPrepStmt = null,
 		selectAllActionsPrepStmt = null;
@@ -100,57 +100,57 @@ import com.buildml.utils.errors.ErrorCode;
 		this.actionMgr = buildStore.getActionMgr();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
-				"select fileId, count(*) as usage from buildTaskFiles, files " +
-					"where pathType=? and buildTaskFiles.fileId = files.id " +
+				"select fileId, count(*) as usage from actionFiles, files " +
+					"where pathType=? and actionFiles.fileId = files.id " +
 					"group by fileId order by usage desc");
 		
 		selectFileIncludesCountPrepStmt = db.prepareStatement(
 				"select fileId1, usage from fileIncludes where fileId2 = ? order by usage desc");
 		
 		selectFilesNotUsedPrepStmt = db.prepareStatement("" +
-				"select files.id from files left join buildTaskFiles on files.id = buildTaskfiles.fileId" +
+				"select files.id from files left join actionFiles on files.id = actionFiles.fileId" +
 					" where files.pathType = " + PathType.TYPE_FILE.ordinal() + 
-					" and buildTaskFiles.taskId is null");
+					" and actionFiles.actionId is null");
 		
 		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
 				"select files.id from files where name like ? and pathType = " + PathType.TYPE_FILE.ordinal());
 
-		selectTasksWithMatchingNamePrepStmt = db.prepareStatement(
-				"select taskId from buildTasks where command like ?");
+		selectActionsWithMatchingNamePrepStmt = db.prepareStatement(
+				"select actionId from buildActions where command like ?");
 
 		selectDerivedFilesPrepStmt = db.prepareStatement(
-				"select distinct fileId from buildTaskFiles where taskId in " +
-				"(select taskId from buildTaskFiles where fileId = ? and " +
+				"select distinct fileId from actionFiles where actionId in " +
+				"(select actionId from actionFiles where fileId = ? and " +
 				"operation = " + OperationType.OP_READ.ordinal() + ") " + 
 				"and operation = " + OperationType.OP_WRITE.ordinal());
 		
 		selectInputFilesPrepStmt = db.prepareStatement(
-				"select distinct fileId from buildTaskFiles where taskId in " +
-				"(select taskId from buildTaskFiles where fileId = ? and " +
+				"select distinct fileId from actionFiles where actionId in " +
+				"(select actionId from actionFiles where fileId = ? and " +
 				"operation = " + OperationType.OP_WRITE.ordinal() + ") " + 
 				"and operation = " + OperationType.OP_READ.ordinal());
 		
-		selectTasksAccessingFilesPrepStmt = db.prepareStatement(
-				"select taskId from buildTaskFiles where fileId = ? and operation = ?");
+		selectActionsAccessingFilesPrepStmt = db.prepareStatement(
+				"select actionId from actionFiles where fileId = ? and operation = ?");
 		
-		selectTasksAccessingFilesAnyPrepStmt = db.prepareStatement(
-				"select taskId from buildTaskFiles where fileId = ?");
+		selectActionsAccessingFilesAnyPrepStmt = db.prepareStatement(
+				"select actionId from actionFiles where fileId = ?");
 		
-		selectFilesAccessedByTaskPrepStmt = db.prepareStatement(
-				"select fileId from buildTaskFiles where taskId = ? and operation = ?");
+		selectFilesAccessedByActionPrepStmt = db.prepareStatement(
+				"select fileId from actionFiles where actionId = ? and operation = ?");
 		
-		selectFilesAccessedByTaskAnyPrepStmt = db.prepareStatement(
-				"select fileId from buildTaskFiles where taskId = ?");
+		selectFilesAccessedByActionAnyPrepStmt = db.prepareStatement(
+				"select fileId from actionFiles where actionId = ?");
 		
 		selectWriteOnlyFilesPrepStmt = db.prepareStatement(
 				    "select writeFileId from (select distinct fileId as writeFileId from " +
-				    "buildTaskFiles where operation = " + OperationType.OP_WRITE.ordinal() + ") " +
-				    "left join (select distinct fileId as readFileId from buildTaskFiles " +
+				    "actionFiles where operation = " + OperationType.OP_WRITE.ordinal() + ") " +
+				    "left join (select distinct fileId as readFileId from actionFiles " +
 				    "where operation = " + OperationType.OP_READ.ordinal() + ") on writeFileId = readFileId " +
 				      "where readFileId is null");
 		
 		selectAllFilesPrepStmt = db.prepareStatement("select id from files");
-		selectAllActionsPrepStmt = db.prepareStatement("select taskId from buildTasks");
+		selectAllActionsPrepStmt = db.prepareStatement("select actionId from buildActions");
 	}
 
 	/*=====================================================================================*
@@ -273,8 +273,8 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		Integer results[];
 		try {
-			selectTasksWithMatchingNamePrepStmt.setString(1, "%" + pattern + "%");
-			results = db.executePrepSelectIntegerColumn(selectTasksWithMatchingNamePrepStmt);
+			selectActionsWithMatchingNamePrepStmt.setString(1, "%" + pattern + "%");
+			results = db.executePrepSelectIntegerColumn(selectActionsWithMatchingNamePrepStmt);
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -306,7 +306,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IReportMgr#reportActionsThatAccessFiles(com.buildml.model.types.FileSet, com.buildml.model.impl.BuildTasks.OperationType)
+	 * @see com.buildml.model.impl.IReportMgr#reportActionsThatAccessFiles(com.buildml.model.types.FileSet, com.buildml.model.IActionMgr.OperationType)
 	 */
 	@Override
 	public ActionSet reportActionsThatAccessFiles(FileSet fileSet,
@@ -319,29 +319,29 @@ import com.buildml.utils.errors.ErrorCode;
 		for (Iterator<Integer> iterator = fileSet.iterator(); iterator.hasNext();) {		
 			int fileId = (Integer) iterator.next();
 			
-			/* find the tasks that access this file */
+			/* find the actions that access this file */
 			try {
 				ResultSet rs;
 				
 				/* the case where we care about the operation type */
 				if (opType != OperationType.OP_UNSPECIFIED) {
-					selectTasksAccessingFilesPrepStmt.setInt(1, fileId);
-					selectTasksAccessingFilesPrepStmt.setInt(2, opType.ordinal());
-					rs = db.executePrepSelectResultSet(selectTasksAccessingFilesPrepStmt);
+					selectActionsAccessingFilesPrepStmt.setInt(1, fileId);
+					selectActionsAccessingFilesPrepStmt.setInt(2, opType.ordinal());
+					rs = db.executePrepSelectResultSet(selectActionsAccessingFilesPrepStmt);
 				} 
 				
 				/* the case where we don't care */
 				else {
-					selectTasksAccessingFilesAnyPrepStmt.setInt(1, fileId);
-					rs = db.executePrepSelectResultSet(selectTasksAccessingFilesAnyPrepStmt);	
+					selectActionsAccessingFilesAnyPrepStmt.setInt(1, fileId);
+					rs = db.executePrepSelectResultSet(selectActionsAccessingFilesAnyPrepStmt);	
 				}
 				
-				/* add the results into our TaskSet */
+				/* add the results into our ActionSet */
 				while (rs.next()) {
-					int taskId = rs.getInt(1);
+					int actionId = rs.getInt(1);
 				
 					/* only add the result if it's not in the set */
-					if (!results.isMember(taskId)){
+					if (!results.isMember(actionId)){
 						results.add(rs.getInt(1));
 					}
 				}
@@ -358,33 +358,33 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IReportMgr#reportFilesAccessedByActions(com.buildml.model.types.TaskSet, com.buildml.model.impl.BuildTasks.OperationType)
+	 * @see com.buildml.model.impl.IReportMgr#reportFilesAccessedByActions(com.buildml.model.types.ActionSet, com.buildml.model.IActionMgr.OperationType)
 	 */
 	@Override
-	public FileSet reportFilesAccessedByActions(ActionSet taskSet, OperationType opType) {
+	public FileSet reportFilesAccessedByActions(ActionSet actionSet, OperationType opType) {
 		
 		/* create an empty result FileSet */
 		FileSet results = new FileSet(fileMgr);
 		
-		/* for each task in the TaskSet */
-		for (Iterator<Integer> iterator = taskSet.iterator(); iterator.hasNext();) {		
-			int taskId = (Integer) iterator.next();
+		/* for each action in the ActionSet */
+		for (Iterator<Integer> iterator = actionSet.iterator(); iterator.hasNext();) {		
+			int actionId = (Integer) iterator.next();
 			
-			/* find the tasks that access this file */
+			/* find the actions that access this file */
 			try {
 				ResultSet rs;
 				
 				/* the case where we care about the operation type */
 				if (opType != OperationType.OP_UNSPECIFIED) {
-					selectFilesAccessedByTaskPrepStmt.setInt(1, taskId);
-					selectFilesAccessedByTaskPrepStmt.setInt(2, opType.ordinal());
-					rs = db.executePrepSelectResultSet(selectFilesAccessedByTaskPrepStmt);
+					selectFilesAccessedByActionPrepStmt.setInt(1, actionId);
+					selectFilesAccessedByActionPrepStmt.setInt(2, opType.ordinal());
+					rs = db.executePrepSelectResultSet(selectFilesAccessedByActionPrepStmt);
 				} 
 				
 				/* the case where we don't care */
 				else {
-					selectFilesAccessedByTaskAnyPrepStmt.setInt(1, taskId);
-					rs = db.executePrepSelectResultSet(selectFilesAccessedByTaskAnyPrepStmt);	
+					selectFilesAccessedByActionAnyPrepStmt.setInt(1, actionId);
+					rs = db.executePrepSelectResultSet(selectFilesAccessedByActionAnyPrepStmt);	
 				}
 				
 				/* add the results into our FileSet */
@@ -556,7 +556,7 @@ import com.buildml.utils.errors.ErrorCode;
 		 * Form the (complex) query string.
 		 */
 		StringBuffer sb = new StringBuffer(256);
-		sb.append("select taskId from buildTasks where ");
+		sb.append("select actionId from buildActions where ");
 		int memberCount = 0;
 		
 		String pkgList[] = pkgMgr.getPackages();

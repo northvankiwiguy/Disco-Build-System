@@ -50,7 +50,7 @@ public class TestFileMgr {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
-		/* fetch the associated FileNameSpaces, BuildTasks, etc. */
+		/* fetch the associated FileMgr, ActionMgr, etc. */
 		fileMgr = bs.getFileMgr();
 		actionMgr = bs.getActionMgr();
 		fileAttrMgr = bs.getFileAttributeMgr();
@@ -425,14 +425,14 @@ public class TestFileMgr {
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { path3 }, fileMgr.getChildPaths(path2)));
 
-		/* test that we can't remove a directory that a task was executed in */
+		/* test that we can't remove a directory that an action was executed in */
 		int path4 = fileMgr.addFile("/april/may/september");
-		int myBuildTask = actionMgr.addAction(actionMgr.getRootAction("root"), path4, "/bin/true");
+		int myBuildAction = actionMgr.addAction(actionMgr.getRootAction("root"), path4, "/bin/true");
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path4));
 		
-		/* test that we can't remove a path that's referenced by a task */
+		/* test that we can't remove a path that's referenced by an action */
 		int path5 = fileMgr.addFile("/april/may/october");
-		actionMgr.addFileAccess(myBuildTask, path5, OperationType.OP_READ);
+		actionMgr.addFileAccess(myBuildAction, path5, OperationType.OP_READ);
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path5));
 		
 		/* test that we can't remove a path that's attached to root */

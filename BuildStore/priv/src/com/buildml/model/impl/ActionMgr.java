@@ -26,8 +26,8 @@ import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
 /**
- * A manager class (that supports the BuildStore class) that manages all BuildStore
- * information pertaining to actions.
+ * A manager class (that supports the BuildStore class) responsible for managing all 
+ * BuildStore information pertaining to actions.
  * <p>
  * There should be exactly one ActionMgr object per BuildStore object. Use the
  * BuildStore's getActionMgr() method to obtain that one instance.
@@ -85,29 +85,29 @@ public class ActionMgr implements IActionMgr {
 		this.fileMgr = buildStore.getFileMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildTasks values (null, ?, ?, 0, ?)");
-		findCommandPrepStmt = db.prepareStatement("select command from buildTasks where taskId = ?");
-		findParentPrepStmt = db.prepareStatement("select parentTaskId from buildTasks where taskId = ?");
-		findDirectoryPrepStmt = db.prepareStatement("select taskDirId from buildTasks where taskId = ?");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, ?, 0, ?)");
+		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
+		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
+		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
 		findActionsInDirectoryPrepStmt =
-			db.prepareStatement("select taskId from buildTasks where taskDirId = ?");
-		findChildrenPrepStmt = db.prepareStatement("select taskId from buildTasks where parentTaskId = ?" +
-				" and parentTaskId != taskId");
-		insertActionFilesPrepStmt = db.prepareStatement("insert into buildTaskFiles values (?, ?, ?)");
+			db.prepareStatement("select actionId from buildActions where actionDirId = ?");
+		findChildrenPrepStmt = db.prepareStatement("select actionId from buildActions where parentActionId = ?" +
+				" and parentActionId != actionId");
+		insertActionFilesPrepStmt = db.prepareStatement("insert into actionFiles values (?, ?, ?)");
 		removeActionFilesPrepStmt = 
-			db.prepareStatement("delete from buildTaskFiles where taskId = ? and fileId = ?");
+			db.prepareStatement("delete from actionFiles where actionId = ? and fileId = ?");
 		updateActionFilesPrepStmt = 
-			db.prepareStatement("update buildTaskFiles set operation = ? where taskId = ? and fileId = ?");
+			db.prepareStatement("update actionFiles set operation = ? where actionId = ? and fileId = ?");
 		findOperationInActionFilesPrepStmt = 
-			db.prepareStatement("select operation from buildTaskFiles where taskId = ? and fileId = ?");
+			db.prepareStatement("select operation from actionFiles where actionId = ? and fileId = ?");
 		findFilesInActionFilesPrepStmt =
-			db.prepareStatement("select fileId from buildTaskFiles where taskId = ?");
+			db.prepareStatement("select fileId from actionFiles where actionId = ?");
 		findFilesByOperationInActionFilesPrepStmt =
-			db.prepareStatement("select fileId from buildTaskFiles where taskId = ? and operation = ?");
+			db.prepareStatement("select fileId from actionFiles where actionId = ? and operation = ?");
 		findActionsByFileInActionFilesPrepStmt =
-			db.prepareStatement("select taskId from buildTaskFiles where fileId = ?");		
+			db.prepareStatement("select actionId from actionFiles where fileId = ?");		
 		findActionsByFileAndOperationInActionFilesPrepStmt =
-			db.prepareStatement("select taskId from buildTaskFiles where fileId = ? and operation = ?");
+			db.prepareStatement("select actionId from actionFiles where fileId = ? and operation = ?");
 		
 	}
 	
@@ -257,7 +257,7 @@ public class ActionMgr implements IActionMgr {
 				}
 
 				/*
-				 * Attempt to remove the file from the FileNameSpaces. This will fail if the
+				 * Attempt to remove the file from the FileMgr. This will fail if the
 				 * same path is already used by some other action, but that's acceptable. We
 				 * only want to remove paths that were used exclusively by this action.
 				 */
@@ -281,7 +281,7 @@ public class ActionMgr implements IActionMgr {
 		
 		/* else, there's an error - can't have multiple entries */
 		else {
-			throw new FatalBuildStoreError("Multiple results find in buildTaskFiles table for taskId = " 
+			throw new FatalBuildStoreError("Multiple results find in actionFiles table for actionId = " 
 					+ actionId + " and fileId = " + fileNumber);
 		}
 	}
@@ -412,7 +412,7 @@ public class ActionMgr implements IActionMgr {
 		
 		/* else, multiple results is a bad thing */
 		else {
-			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + actionId);
+			throw new FatalBuildStoreError("Multiple results find in buildActions table for actionId = " + actionId);
 		}
 	}
 	
@@ -486,7 +486,7 @@ public class ActionMgr implements IActionMgr {
 		
 		/* else, multiple results is a bad thing */
 		else {
-			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + actionId);
+			throw new FatalBuildStoreError("Multiple results find in buildActions table for actionId = " + actionId);
 		}	
 	}
 
@@ -518,7 +518,7 @@ public class ActionMgr implements IActionMgr {
 		
 		/* else, multiple results is a bad thing */
 		else {
-			throw new FatalBuildStoreError("Multiple results find in buildTasks table for taskId = " + actionId);
+			throw new FatalBuildStoreError("Multiple results find in buildActions table for actionId = " + actionId);
 		}
 	}
 	

@@ -19,17 +19,21 @@ import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.ActionSet;
 
 /**
- * An IReportMgr object is the part of a BuildStore that handles reporting of data.
- * You should always obtain a reference to a IReportMgr from the getReportMgr()
- * method in IBuildStore.
+ * The interface conformed-to by any ReportMgr object, which represents a
+ * subset of the functionality managed by a BuildStore object. An ReportMgr
+ * object projects various "canned" reports (such as "write-only files" or
+ * "unused files".
+ * <p>
+ * There should be exactly one ReportMgr object per BuildStore object. Use the
+ * BuildStore's getReportMgr() method to obtain that one instance.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
 public interface IReportMgr {
 
 	/**
-	 * Provides an ordered array of the most commonly accessed files across the whole build store.
-	 * For each record in the result set, return the number of unique tasks that access the file.
+	 * Provides an ordered array of the most commonly accessed files across the whole BuildStore.
+	 * For each record in the result set, return the number of unique actions that access the file.
 	 * 
 	 * @return An array of FileRecord, sorted with the most commonly accessed file first.
 	 */
@@ -46,7 +50,7 @@ public interface IReportMgr {
 			int includedFile);
 
 	/**
-	 * Return a FileSet of all files in the BuildStore that aren't accessed by any tasks.
+	 * Return a FileSet of all files in the BuildStore that aren't accessed by any actions.
 	 * This helps identify which source files are never used.
 	 * 
 	 * @return The set of files that are never accessed.
@@ -66,18 +70,18 @@ public interface IReportMgr {
 	 * Return the set of actions whose command string matches the user-specified pattern.
 	 * 
 	 * @param pattern The user-specified pattern to match.
-	 * @return The TaskSet of matching file names.
+	 * @return The ActionSet of matching file names.
 	 */
 	public abstract ActionSet reportActionsThatMatchName(String pattern);
 
 	/**
 	 * Given the input FileSet (sourceFileSet), return a new FileSet containing all the 
 	 * paths that are derived from the paths listed in sourceFileSet. A file (A) is derived 
-	 * from file (B) if there's a task (or sequence of paths) that reads B and writes to A.
+	 * from file (B) if there's an action (or sequence of paths) that reads B and writes to A.
 	 * 
-	 * @param sourceFileSet The FileSet of all files we should consider as input to the tasks.
+	 * @param sourceFileSet The FileSet of all files we should consider as input to the actions.
 	 * @param reportIndirect Set if we should also report on indirectly derived files
-	 * (with multiple tasks between file A and file B).
+	 * (with multiple actions between file A and file B).
 	 * @return The FileSet of derived paths.
 	 */
 	public abstract FileSet reportDerivedFiles(FileSet sourceFileSet,
@@ -86,25 +90,25 @@ public interface IReportMgr {
 	/**
 	 * Given the input FileSet (targetFileSet), return a new FileSet containing all the 
 	 * paths that are used as input when generating the paths listed in targetFileSet. 
-	 * A file (A) is input for file (B) if there's a task (or sequence of paths) that reads A 
+	 * A file (A) is input for file (B) if there's an action (or sequence of paths) that reads A 
 	 * and writes to B. This is the opposite of reportDerivedFiles().
 	 * 
-	 * @param targetFileSet The FileSet of all files that are the target of tasks.
+	 * @param targetFileSet The FileSet of all files that are the target of actions.
 	 * @param reportIndirect Set if we should also report on indirectly derived files
-	 * (multiple tasks between file A and file B).
+	 * (multiple actions between file A and file B).
 	 * @return The FileSet of input paths.
 	 */
 	public abstract FileSet reportInputFiles(FileSet targetFileSet,
 			boolean reportIndirect);
 
 	/**
-	 * Given a FileSet, return a TaskSet containing all the actions that access this
+	 * Given a FileSet, return a ActionSet containing all the actions that access this
 	 * collection files. The opType specifies whether we want actions that read these files,
 	 * write to these files, or either read or write.
 	 * 
 	 * @param fileSet The set of input files.
 	 * @param opType Either OP_READ, OP_WRITE or OP_UNSPECIFIED.
-	 * @return a TaskSet of all tasks that access these files in the mode specified.
+	 * @return a ActionSet of all actions that access these files in the mode specified.
 	 */
 	public abstract ActionSet reportActionsThatAccessFiles(FileSet fileSet,
 			OperationType opType);
@@ -122,8 +126,8 @@ public interface IReportMgr {
 			OperationType opType);
 
 	/**
-	 * Return the set of files that are written to by a build task, but aren't ever
-	 * read by a different task. This generally implies that the file is a "final"
+	 * Return the set of files that are written to by a build action, but aren't ever
+	 * read by a different action. This generally implies that the file is a "final"
 	 * file (such as an executable program, or release package), rather than an intermediate
 	 * file (such as an object file).
 	 * 

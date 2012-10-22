@@ -27,7 +27,7 @@ import com.buildml.utils.errors.ErrorCode;
  * @author "Peter Smith <psmith@arapiki.com>"
  *
  */
-public class TestBuildTasks {
+public class TestActionMgr {
 
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
@@ -38,8 +38,8 @@ public class TestBuildTasks {
 	/** The ActionMgr object associated with this BuildStore */
 	IActionMgr actionMgr;
 	
-	/** The root task ID */
-	int rootTaskId;
+	/** The root action ID */
+	int rootActionId;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -54,11 +54,11 @@ public class TestBuildTasks {
 		/* fetch the associated FileNameSpace object */
 		fileMgr = bs.getFileMgr();
 		
-		/* fetch the associated BuildTasks object */
+		/* fetch the associated ActionMgr object */
 		actionMgr = bs.getActionMgr();
 		
-		/* if we don't care about each new task's parents, we'll use the root task */
-		rootTaskId = actionMgr.getRootAction("root");
+		/* if we don't care about each new action's parents, we'll use the root action */
+		rootActionId = actionMgr.getRootAction("root");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -67,15 +67,15 @@ public class TestBuildTasks {
 	 * Test method for {@link com.buildml.model.impl.ActionMgr#addAction(int, int, String)}.
 	 */
 	@Test
-	public void testAddBuildTask() {
+	public void testAddBuildAction() {
 		
-		/* test that each new build task is assigned a unique ID number */
-		int task1 = actionMgr.addAction(rootTaskId, 0, "gcc -o test.o test.c");
-		int task2 = actionMgr.addAction(rootTaskId, 0, "gcc -o main.o main.c");
-		int task3 = actionMgr.addAction(rootTaskId, 0, "gcc -o tree.o tree.c");
-		assertNotSame(task1, task2);
-		assertNotSame(task1, task3);
-		assertNotSame(task2, task3);
+		/* test that each new build action is assigned a unique ID number */
+		int action1 = actionMgr.addAction(rootActionId, 0, "gcc -o test.o test.c");
+		int action2 = actionMgr.addAction(rootActionId, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addAction(rootActionId, 0, "gcc -o tree.o tree.c");
+		assertNotSame(action1, action2);
+		assertNotSame(action1, action3);
+		assertNotSame(action2, action3);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -85,14 +85,14 @@ public class TestBuildTasks {
 	 */
 	@Test
 	public void testGetCommand() {
-		int task1 = actionMgr.addAction(rootTaskId, 0, "gcc -o test.o test.c");
-		int task2 = actionMgr.addAction(rootTaskId, 0, "gcc -o main.o main.c");
-		int task3 = actionMgr.addAction(rootTaskId, 0, "gcc -o tree.o tree.c");
-		assertEquals("gcc -o tree.o tree.c", actionMgr.getCommand(task3));
-		assertEquals("gcc -o main.o main.c", actionMgr.getCommand(task2));
-		assertEquals("gcc -o test.o test.c", actionMgr.getCommand(task1));
+		int action1 = actionMgr.addAction(rootActionId, 0, "gcc -o test.o test.c");
+		int action2 = actionMgr.addAction(rootActionId, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addAction(rootActionId, 0, "gcc -o tree.o tree.c");
+		assertEquals("gcc -o tree.o tree.c", actionMgr.getCommand(action3));
+		assertEquals("gcc -o main.o main.c", actionMgr.getCommand(action2));
+		assertEquals("gcc -o test.o test.c", actionMgr.getCommand(action1));
 		
-		/* an invalid task ID should return null */
+		/* an invalid action ID should return null */
 		assertNull(actionMgr.getCommand(100));
 	}
 	
@@ -104,19 +104,19 @@ public class TestBuildTasks {
 	@Test
 	public void testGetCommandSummary() {
 	
-		/* create a single task, with a long command string */
-		int mytask = actionMgr.addAction(actionMgr.getRootAction(""), 0,
+		/* create a single action, with a long command string */
+		int myaction = actionMgr.addAction(actionMgr.getRootAction(""), 0,
 				"gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
 				"-o myfile.o -c myfile.c");
 		
 		/* fetch the summary at various widths */
-		assertEquals("gcc -Ipath1/...", actionMgr.getCommandSummary(mytask, 15));
-		assertEquals("gcc -Ipath1/include -Ipath2...", actionMgr.getCommandSummary(mytask, 30));
-		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/inc...", actionMgr.getCommandSummary(mytask, 50));
+		assertEquals("gcc -Ipath1/...", actionMgr.getCommandSummary(myaction, 15));
+		assertEquals("gcc -Ipath1/include -Ipath2...", actionMgr.getCommandSummary(myaction, 30));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/inc...", actionMgr.getCommandSummary(myaction, 50));
 		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
-				"-o myfile.o -c myfile....", actionMgr.getCommandSummary(mytask, 89));
+				"-o myfile.o -c myfile....", actionMgr.getCommandSummary(myaction, 89));
 		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
-				"-o myfile.o -c myfile.c", actionMgr.getCommandSummary(mytask, 100));
+				"-o myfile.o -c myfile.c", actionMgr.getCommandSummary(myaction, 100));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -128,24 +128,24 @@ public class TestBuildTasks {
 	@Test
 	public void testGetParent() throws Exception {
 		
-		/* add a bunch of tasks in a hierarchy */
-		int task1 = actionMgr.addAction(rootTaskId, 0, "/bin/sh");
-		int task2 = actionMgr.addAction(task1, 0, "gcc -o main.o main.c");
-		int task3 = actionMgr.addAction(task1, 0, "/bin/sh");
-		int task4 = actionMgr.addAction(task3, 0, "gcc -o tree.o tree.c");
-		int task5 = actionMgr.addAction(task3, 0, "gcc -o bark.o bark.c");
+		/* add a bunch of actions in a hierarchy */
+		int action1 = actionMgr.addAction(rootActionId, 0, "/bin/sh");
+		int action2 = actionMgr.addAction(action1, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addAction(action1, 0, "/bin/sh");
+		int action4 = actionMgr.addAction(action3, 0, "gcc -o tree.o tree.c");
+		int action5 = actionMgr.addAction(action3, 0, "gcc -o bark.o bark.c");
 		
 		/* the parent of the root is ErrorCode.NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getParent(rootTaskId));
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getParent(rootActionId));
 		
-		/* all the other new tasks have valid parents */
-		assertEquals(rootTaskId, actionMgr.getParent(task1));
-		assertEquals(task1, actionMgr.getParent(task2));
-		assertEquals(task1, actionMgr.getParent(task3));
-		assertEquals(task3, actionMgr.getParent(task4));
-		assertEquals(task3, actionMgr.getParent(task5));
+		/* all the other new actions have valid parents */
+		assertEquals(rootActionId, actionMgr.getParent(action1));
+		assertEquals(action1, actionMgr.getParent(action2));
+		assertEquals(action1, actionMgr.getParent(action3));
+		assertEquals(action3, actionMgr.getParent(action4));
+		assertEquals(action3, actionMgr.getParent(action5));
 		
-		/* inquiring about the parent of an invalid task Id is ErrorCode.BAD_VALUE */
+		/* inquiring about the parent of an invalid action Id is ErrorCode.BAD_VALUE */
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.getParent(1000));
 	}
 	
@@ -158,21 +158,21 @@ public class TestBuildTasks {
 	@Test
 	public void testGetDirectory() throws Exception {
 		
-		/* add a bunch of tasks in a hierarchy, each with a different directory */
-		int task1 = actionMgr.addAction(rootTaskId, 0, "/bin/sh");
-		int task2 = actionMgr.addAction(task1, 10, "gcc -o main.o main.c");
-		int task3 = actionMgr.addAction(task1, 20, "/bin/sh");
-		int task4 = actionMgr.addAction(task3, 25, "gcc -o tree.o tree.c");
-		int task5 = actionMgr.addAction(task3, 30, "gcc -o bark.o bark.c");
+		/* add a bunch of actions in a hierarchy, each with a different directory */
+		int action1 = actionMgr.addAction(rootActionId, 0, "/bin/sh");
+		int action2 = actionMgr.addAction(action1, 10, "gcc -o main.o main.c");
+		int action3 = actionMgr.addAction(action1, 20, "/bin/sh");
+		int action4 = actionMgr.addAction(action3, 25, "gcc -o tree.o tree.c");
+		int action5 = actionMgr.addAction(action3, 30, "gcc -o bark.o bark.c");
 		
 		/* check that the directories are stored correctly */
-		assertEquals(0, actionMgr.getDirectory(task1));
-		assertEquals(10, actionMgr.getDirectory(task2));
-		assertEquals(20, actionMgr.getDirectory(task3));
-		assertEquals(25, actionMgr.getDirectory(task4));
-		assertEquals(30, actionMgr.getDirectory(task5));
+		assertEquals(0, actionMgr.getDirectory(action1));
+		assertEquals(10, actionMgr.getDirectory(action2));
+		assertEquals(20, actionMgr.getDirectory(action3));
+		assertEquals(25, actionMgr.getDirectory(action4));
+		assertEquals(30, actionMgr.getDirectory(action5));
 		
-		/* invalid task IDs should return an error */
+		/* invalid action IDs should return an error */
 		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getDirectory(1000));
 	}
 	
@@ -185,24 +185,24 @@ public class TestBuildTasks {
 	@Test
 	public void testGetChildren() throws Exception {
 
-		/* add a bunch of tasks in a hierarchy */
-		int task1 = actionMgr.addAction(rootTaskId, 0, "/bin/sh");
-		int task2 = actionMgr.addAction(task1, 0, "gcc -o main.o main.c");
-		int task3 = actionMgr.addAction(task1, 0, "/bin/sh");
-		int task4 = actionMgr.addAction(task3, 0, "gcc -o tree.o tree.c");
-		int task5 = actionMgr.addAction(task3, 0, "gcc -o bark.o bark.c");
-		int task6 = actionMgr.addAction(task3, 0, "gcc -o woof.o woof.c");
+		/* add a bunch of actions in a hierarchy */
+		int action1 = actionMgr.addAction(rootActionId, 0, "/bin/sh");
+		int action2 = actionMgr.addAction(action1, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addAction(action1, 0, "/bin/sh");
+		int action4 = actionMgr.addAction(action3, 0, "gcc -o tree.o tree.c");
+		int action5 = actionMgr.addAction(action3, 0, "gcc -o bark.o bark.c");
+		int action6 = actionMgr.addAction(action3, 0, "gcc -o woof.o woof.c");
 		
 		/* test valid parent/child relationships */
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(rootTaskId), new Integer[] {task1}));
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(task1), new Integer[] {task2, task3 }));
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(task2), new Integer[] {}));
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(task3), new Integer[] {task4, task5, task6 }));
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(task4), new Integer[] {}));
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(task5), new Integer[] {}));
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(task6), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(rootActionId), new Integer[] {action1}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(action1), new Integer[] {action2, action3 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(action2), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(action3), new Integer[] {action4, action5, action6 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(action4), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(action5), new Integer[] {}));
+		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(action6), new Integer[] {}));
 		
-		/* the children of non-existent tasks is the empty list */
+		/* the children of non-existent actions is the empty list */
 		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(1000), new Integer[] {}));
 	}
 	
@@ -213,8 +213,8 @@ public class TestBuildTasks {
 	 */
 	@Test
 	public void testAddGetFileAccess() {
-		/* create a new task */
-		int task = actionMgr.addAction(rootTaskId, 0, "gcc -o foo foo.c");
+		/* create a new action */
+		int action = actionMgr.addAction(rootActionId, 0, "gcc -o foo foo.c");
 		
 		/* create a number of new files */
 		int fileFooC = fileMgr.addFile("/a/b/c/foo.c");
@@ -222,30 +222,30 @@ public class TestBuildTasks {
 		int fileFooO = fileMgr.addFile("/a/b/c/foo.o");
 		int fileFoo = fileMgr.addFile("/a/b/c/foo");
 		
-		/* record that these files are accessed by the task */
-		actionMgr.addFileAccess(task, fileFooC, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, fileFooH, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, fileFooO, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task, fileFoo, OperationType.OP_WRITE);
+		/* record that these files are accessed by the action */
+		actionMgr.addFileAccess(action, fileFooC, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, fileFooH, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, fileFooO, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, fileFoo, OperationType.OP_WRITE);
 		
 		/* now check that the records are correct */
-		Integer allAccesses[] = actionMgr.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
+		Integer allAccesses[] = actionMgr.getFilesAccessed(action, OperationType.OP_UNSPECIFIED);
 		assertTrue(CommonTestUtils.sortedArraysEqual(allAccesses, new Integer[] { fileFooH, fileFooO, fileFooC, fileFoo }));
 
 		/* now, just the reads */
-		Integer readAccesses[] = actionMgr.getFilesAccessed(task, OperationType.OP_READ);
+		Integer readAccesses[] = actionMgr.getFilesAccessed(action, OperationType.OP_READ);
 		assertTrue(CommonTestUtils.sortedArraysEqual(readAccesses, new Integer[] { fileFooC, fileFooH }));
 		
 		/* and just the writes */
-		Integer writeAccesses[] = actionMgr.getFilesAccessed(task, OperationType.OP_WRITE);
+		Integer writeAccesses[] = actionMgr.getFilesAccessed(action, OperationType.OP_WRITE);
 		assertTrue(CommonTestUtils.sortedArraysEqual(writeAccesses, new Integer[] { fileFooO, fileFoo }));
 
-		/* check an empty task - should return no results */
-		int emptyTask = actionMgr.addAction(rootTaskId, 0, "echo Hi");
-		Integer emptyAccesses[] = actionMgr.getFilesAccessed(emptyTask, OperationType.OP_UNSPECIFIED);
+		/* check an empty action - should return no results */
+		int emptyAction = actionMgr.addAction(rootActionId, 0, "echo Hi");
+		Integer emptyAccesses[] = actionMgr.getFilesAccessed(emptyAction, OperationType.OP_UNSPECIFIED);
 		assertEquals(0, emptyAccesses.length);
 		
-		/* check with an invalid task number - should return no results */
+		/* check with an invalid action number - should return no results */
 		Integer noAccesses[] = actionMgr.getFilesAccessed(100, OperationType.OP_UNSPECIFIED);
 		assertEquals(0, noAccesses.length);
 	}
@@ -260,7 +260,7 @@ public class TestBuildTasks {
 	public void testMultipleFilesAccesses() {
 		Integer result[];
 		
-		int task = actionMgr.addAction(rootTaskId, 0, "my mystery task");
+		int action = actionMgr.addAction(rootActionId, 0, "my mystery action");
 		
 		/* create a number of new files */
 		int file1 = fileMgr.addFile("/file1");
@@ -274,58 +274,58 @@ public class TestBuildTasks {
 		int file9 = fileMgr.addFile("/file9");
 				
 		/* test read, read => read */
-		actionMgr.addFileAccess(task, file1, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, file1, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file1, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file1, OperationType.OP_READ);
 		assertEquals(1, actionMgr.getActionsThatAccess(file1, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file1, OperationType.OP_WRITE).length);
 		
 		/* test read, write => modify */
-		actionMgr.addFileAccess(task, file2, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, file2, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file2, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file2, OperationType.OP_WRITE);
 		assertEquals(1, actionMgr.getActionsThatAccess(file2, OperationType.OP_MODIFIED).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file2, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file2, OperationType.OP_WRITE).length);
 		
 		/* test write, write => write */
-		actionMgr.addFileAccess(task, file3, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task, file3, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file3, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file3, OperationType.OP_WRITE);
 		assertEquals(0, actionMgr.getActionsThatAccess(file3, OperationType.OP_READ).length);
 		assertEquals(1, actionMgr.getActionsThatAccess(file3, OperationType.OP_WRITE).length);
 		
 		/* test write, modify => write */
-		actionMgr.addFileAccess(task, file4, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task, file4, OperationType.OP_MODIFIED);
+		actionMgr.addFileAccess(action, file4, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file4, OperationType.OP_MODIFIED);
 		assertEquals(0, actionMgr.getActionsThatAccess(file4, OperationType.OP_MODIFIED).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file4, OperationType.OP_READ).length);
 		assertEquals(1, actionMgr.getActionsThatAccess(file4, OperationType.OP_WRITE).length);
 
 		/* test delete, read => read */
-		actionMgr.addFileAccess(task, file5, OperationType.OP_DELETE);
-		actionMgr.addFileAccess(task, file5, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file5, OperationType.OP_DELETE);
+		actionMgr.addFileAccess(action, file5, OperationType.OP_READ);
 		assertEquals(0, actionMgr.getActionsThatAccess(file5, OperationType.OP_MODIFIED).length);
 		assertEquals(1, actionMgr.getActionsThatAccess(file5, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file5, OperationType.OP_WRITE).length);
 		
 		/* test delete, modify => modify */
-		actionMgr.addFileAccess(task, file6, OperationType.OP_DELETE);
-		actionMgr.addFileAccess(task, file6, OperationType.OP_MODIFIED);
+		actionMgr.addFileAccess(action, file6, OperationType.OP_DELETE);
+		actionMgr.addFileAccess(action, file6, OperationType.OP_MODIFIED);
 		assertEquals(1, actionMgr.getActionsThatAccess(file6, OperationType.OP_MODIFIED).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file6, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file6, OperationType.OP_WRITE).length);
 
 		/* test read, write, delete => delete */
-		actionMgr.addFileAccess(task, file7, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, file7, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task, file7, OperationType.OP_DELETE);
+		actionMgr.addFileAccess(action, file7, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file7, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file7, OperationType.OP_DELETE);
 		assertEquals(0, actionMgr.getActionsThatAccess(file7, OperationType.OP_MODIFIED).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file7, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file7, OperationType.OP_WRITE).length);
 		assertEquals(1, actionMgr.getActionsThatAccess(file7, OperationType.OP_DELETE).length);
 		
 		/* test delete, read, write => modify */
-		actionMgr.addFileAccess(task, file8, OperationType.OP_DELETE);
-		actionMgr.addFileAccess(task, file8, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, file8, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file8, OperationType.OP_DELETE);
+		actionMgr.addFileAccess(action, file8, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file8, OperationType.OP_WRITE);
 		assertEquals(1, actionMgr.getActionsThatAccess(file8, OperationType.OP_MODIFIED).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file8, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file8, OperationType.OP_WRITE).length);
@@ -333,9 +333,9 @@ public class TestBuildTasks {
 		
 		/* test write, read, delete => temporary - and the file is deleted */
 		assertEquals(file9, fileMgr.getPath("/file9"));
-		actionMgr.addFileAccess(task, file9, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task, file9, OperationType.OP_READ);
-		actionMgr.addFileAccess(task, file9, OperationType.OP_DELETE);
+		actionMgr.addFileAccess(action, file9, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action, file9, OperationType.OP_READ);
+		actionMgr.addFileAccess(action, file9, OperationType.OP_DELETE);
 		assertEquals(0, actionMgr.getActionsThatAccess(file9, OperationType.OP_MODIFIED).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file9, OperationType.OP_READ).length);
 		assertEquals(0, actionMgr.getActionsThatAccess(file9, OperationType.OP_WRITE).length);
@@ -349,14 +349,14 @@ public class TestBuildTasks {
 	 * Test method for {@link com.buildml.model.impl.ActionMgr#getActionsThatAccess(int, OperationType)}.
 	 */
 	@Test
-	public void testGetTasksThatAccess() {
+	public void testGetActionsThatAccess() {
 
-		/* create some tasks */
-		int task1 = actionMgr.addAction(rootTaskId, 0, "gcc -o clock.o clock.c");
-		int task2 = actionMgr.addAction(rootTaskId, 0, "gcc -o banner.o banner.c");
-		int task3 = actionMgr.addAction(rootTaskId, 0, "gcc -o mult.o mult.c");
+		/* create some actions */
+		int action1 = actionMgr.addAction(rootActionId, 0, "gcc -o clock.o clock.c");
+		int action2 = actionMgr.addAction(rootActionId, 0, "gcc -o banner.o banner.c");
+		int action3 = actionMgr.addAction(rootActionId, 0, "gcc -o mult.o mult.c");
 
-		/* and a bunch of files that access those tasks */
+		/* and a bunch of files that access those actions */
 		int file1 = fileMgr.addFile("/clock.o");
 		int file2 = fileMgr.addFile("/clock.c");
 		int file3 = fileMgr.addFile("/banner.o");
@@ -365,57 +365,57 @@ public class TestBuildTasks {
 		int file6 = fileMgr.addFile("/mult.c");
 		int file7 = fileMgr.addFile("/stdio.h");
 		
-		/* now register each task's file accesses */
-		actionMgr.addFileAccess(task1, file1, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task1, file2, OperationType.OP_READ);
-		actionMgr.addFileAccess(task1, file7, OperationType.OP_READ);
+		/* now register each action's file accesses */
+		actionMgr.addFileAccess(action1, file1, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action1, file2, OperationType.OP_READ);
+		actionMgr.addFileAccess(action1, file7, OperationType.OP_READ);
 
-		actionMgr.addFileAccess(task2, file3, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task2, file4, OperationType.OP_READ);
-		actionMgr.addFileAccess(task2, file7, OperationType.OP_READ);		
+		actionMgr.addFileAccess(action2, file3, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action2, file4, OperationType.OP_READ);
+		actionMgr.addFileAccess(action2, file7, OperationType.OP_READ);		
 
-		actionMgr.addFileAccess(task3, file5, OperationType.OP_WRITE);
-		actionMgr.addFileAccess(task3, file6, OperationType.OP_READ);
-		actionMgr.addFileAccess(task3, file7, OperationType.OP_READ);		
+		actionMgr.addFileAccess(action3, file5, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(action3, file6, OperationType.OP_READ);
+		actionMgr.addFileAccess(action3, file7, OperationType.OP_READ);		
 
 		/* 
-		 * Finally, fetch the list of tasks that each file is reference by.
+		 * Finally, fetch the list of actions that each file is reference by.
 		 * There are numerous combinations to test here.
 		 */
 
 		/* for clock.o */
 		Integer results[] = actionMgr.getActionsThatAccess(file1, OperationType.OP_UNSPECIFIED);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action1 }));
 
 		results = actionMgr.getActionsThatAccess(file1, OperationType.OP_WRITE);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 }));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action1 }));
 
 		results = actionMgr.getActionsThatAccess(file1, OperationType.OP_READ);
 		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] {} ));
 
 		/* for clock.c */
 		results = actionMgr.getActionsThatAccess(file2, OperationType.OP_UNSPECIFIED);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action1 } ));
 
 		results = actionMgr.getActionsThatAccess(file2, OperationType.OP_WRITE);
 		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { } ));
 
 		results = actionMgr.getActionsThatAccess(file2, OperationType.OP_READ);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action1 } ));
 
 		/* for mult.o */
 		results = actionMgr.getActionsThatAccess(file5, OperationType.OP_UNSPECIFIED);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task3 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action3 } ));
 
 		results = actionMgr.getActionsThatAccess(file5, OperationType.OP_WRITE);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task3 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action3 } ));
 
 		results = actionMgr.getActionsThatAccess(file5, OperationType.OP_READ);
 		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { } ));
 
 		/* for stdio.h */
 		results = actionMgr.getActionsThatAccess(file7, OperationType.OP_READ);
-		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { task1, task2, task3 } ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { action1, action2, action3 } ));
 
 		results = actionMgr.getActionsThatAccess(file7, OperationType.OP_WRITE);
 		assertTrue(CommonTestUtils.sortedArraysEqual(results, new Integer[] { } ));
@@ -427,30 +427,30 @@ public class TestBuildTasks {
 	 * Test method for {@link com.buildml.model.impl.ActionMgr#getActionsInDirectory(int)}.
 	 */
 	@Test
-	public void testGetTasksInDirectory() {
+	public void testGetActionsInDirectory() {
 
 		/* create a couple of directories */
 		int dir1 = fileMgr.addDirectory("/dir1");
 		int dir2 = fileMgr.addDirectory("/dir2");
 		int dir3 = fileMgr.addDirectory("/dir2/dir3");
 		
-		/* create a number of tasks, each executing in one of those directories */
-		int rootTask = actionMgr.getRootAction("root");
-		int task11 = actionMgr.addAction(rootTask, dir1, "true");
-		int task12 = actionMgr.addAction(rootTask, dir1, "true");
-		int task21 = actionMgr.addAction(rootTask, dir2, "true");
-		int task22 = actionMgr.addAction(rootTask, dir2, "true");
-		int task23 = actionMgr.addAction(rootTask, dir2, "true");
-		int task24 = actionMgr.addAction(rootTask, dir2, "true");
-		int task13 = actionMgr.addAction(rootTask, dir1, "true");
+		/* create a number of actions, each executing in one of those directories */
+		int rootAction = actionMgr.getRootAction("root");
+		int action11 = actionMgr.addAction(rootAction, dir1, "true");
+		int action12 = actionMgr.addAction(rootAction, dir1, "true");
+		int action21 = actionMgr.addAction(rootAction, dir2, "true");
+		int action22 = actionMgr.addAction(rootAction, dir2, "true");
+		int action23 = actionMgr.addAction(rootAction, dir2, "true");
+		int action24 = actionMgr.addAction(rootAction, dir2, "true");
+		int action13 = actionMgr.addAction(rootAction, dir1, "true");
 	
-		/* fetch the list of tasks that execute in the first directory */
+		/* fetch the list of actions that execute in the first directory */
 		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getActionsInDirectory(dir1),
-				new Integer[] {task11, task12, task13}));
+				new Integer[] {action11, action12, action13}));
 		
 		/* repeat for the second directory */
 		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getActionsInDirectory(dir2),
-				new Integer[] {task21, task22, task23, task24}));
+				new Integer[] {action21, action22, action23, action24}));
 		
 		/* and the third should be empty */
 		assertEquals(0, actionMgr.getActionsInDirectory(dir3).length);
@@ -460,7 +460,7 @@ public class TestBuildTasks {
 
 	
 	/**
-	 * Test the scalability of adding build tasks and file accesses.
+	 * Test the scalability of adding build actions and file accesses.
 	 */
 	@Test
 	public void testScalability() {
@@ -487,15 +487,15 @@ public class TestBuildTasks {
 			//System.out.println("Adding " + sb);
 
 			/* add the file name to the FileSpace */
-			int taskId = actionMgr.addAction(rootTaskId, 0, sb.toString());
+			int actionId = actionMgr.addAction(rootActionId, 0, sb.toString());
 			
-			/* now add files to this tasks */
+			/* now add files to this actions */
 			for (int k = 0; k != 200; k++) {
-				actionMgr.addFileAccess(taskId, r.nextInt(100), OperationType.OP_READ);
+				actionMgr.addFileAccess(actionId, r.nextInt(100), OperationType.OP_READ);
 			}
 			
 			/* now read the files that were added */
-			actionMgr.getFilesAccessed(taskId, OperationType.OP_UNSPECIFIED);
+			actionMgr.getFilesAccessed(actionId, OperationType.OP_UNSPECIFIED);
 		}
 		bs.setFastAccessMode(false);
 	}

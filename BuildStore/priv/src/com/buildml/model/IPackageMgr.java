@@ -16,21 +16,13 @@ import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 
 /**
- * A manager class (that supports the BuildStore class) that manages all BuildStore
- * information relating to package definitions. That is, it keeps information on
- * which files and tasks belong in each package.
+ * The interface conformed-to by any PackageMgr object, which represents a
+ * subset of the functionality managed by a BuildStore object. A PackageMgr
+ * deals with all information related to grouping files and actions
+ * into packages.
  * <p>
- * A package's name is simply a text identifier that maps to underlying numeric ID.
- * These IDs are then associated with files and tasks as a means of grouping them
- * together into logical units.
- * <p>
- * In the case of files, a package is also associated with a scope within that
- * package, such as "private" and "public". That is, if a file is associated
- * with package "foo", the file will either belong to the foo/private scope, or the
- * foo/public scope.
- * <p>
- * Note: tasks can only belong to the package as a whole, rather than belonging to
- * an individual scope within that package.
+ * There should be exactly one PackageMgr object per BuildStore object. Use
+ * the BuildStore's getPackageMgr() method to obtain that one instance.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
@@ -73,10 +65,10 @@ public interface IPackageMgr {
 
 	/**
 	 * Remove the specified package from the BuildStore. The package can only be removed
-	 * if there are no files or tasks associated with the package.
+	 * if there are no files or actions associated with the package.
 	 * 
 	 * @param packageName The name of the package to be removed.
-	 * @return ErrorCode.OK if the packate was successfully removed, ErrorCode.CANT_REMOVE
+	 * @return ErrorCode.OK if the package was successfully removed, ErrorCode.CANT_REMOVE
 	 * if the package is still in use, and ErrorCode.NOT_FOUND if there's no package
 	 * with this name.
 	 */
@@ -139,7 +131,7 @@ public interface IPackageMgr {
 	/**
 	 * Get the package/scope associated with this path.
 	 * 
-	 * @param fileId The ID of the path whose package we're interested in
+	 * @param fileId The ID of the path whose package we wish to know.
 	 * @return A Integer[2] array where [0] is the package ID, and [1] is the scope ID,
 	 * or null if the file doesn't exist.
 	 */
@@ -200,7 +192,7 @@ public interface IPackageMgr {
 	public abstract FileSet getFilesOutsidePackage(String pkgSpec);
 
 	/**
-	 * Set the package associated with this task.
+	 * Set the package associated with this action.
 	 * 
 	 * @param actionId The ID of the action whose package will be set.
 	 * @param pkgId The ID of the package to be associated with this action.
@@ -209,9 +201,9 @@ public interface IPackageMgr {
 	public abstract int setActionPackage(int actionId, int pkgId);
 
 	/**
-	 * Get the package associated with this task.
+	 * Get the package associated with this action.
 	 * 
-	 * @param actionId The ID of the task whose package we're interested in.
+	 * @param actionId The ID of the action whose package we're interested in.
 	 * @return The action's package, or ErrorCode.NOT_FOUND if the action doesn't exist.
 	 */
 	public abstract int getActionPackage(int actionId);
@@ -225,7 +217,7 @@ public interface IPackageMgr {
 	public abstract ActionSet getActionsInPackage(int pkgId);
 
 	/**
-	 * Return the set of tasks that are within the specified package.
+	 * Return the set of actions that are within the specified package.
 	 * 
 	 * @param pkgSpec The name of the package to query.
 	 * @return The set of actions that reside inside that package, null if the
@@ -242,10 +234,10 @@ public interface IPackageMgr {
 	public abstract ActionSet getActionsOutsidePackage(int pkgId);
 
 	/**
-	 * Return the set of tasks that are outside the specified package.
+	 * Return the set of actions that are outside the specified package.
 	 * 
 	 * @param pkgSpec The name of the package to query.
-	 * @return An array of tasks that reside outside that package, null if the
+	 * @return An array of actions that reside outside that package, null if the
 	 * package name is invalid.
 	 */
 	public abstract ActionSet getActionsOutsidePackage(String pkgSpec);

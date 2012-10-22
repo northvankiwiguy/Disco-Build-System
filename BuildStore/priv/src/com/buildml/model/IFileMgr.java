@@ -13,11 +13,12 @@
 package com.buildml.model;
 
 /**
- * A manager class (that supports the BuildStore class) that manages all BuildStore
- * information about paths (files, directories, etc), as well as path roots.
+ * The interface conformed-to by any FileMgr object, which represents a
+ * subset of the functionality managed by a BuildStore object. A FileMgr
+ * deals with all information related to BuildML files (and directories).
  * <p>
- * There should be exactly one FileNameSpaces object per BuildStore object. Use the
- * BuildStore's getFileNameSpaces() method to obtain that one instance.
+ * There should be exactly one FileMgr object per BuildStore object. Use the
+ * BuildStore's getFileMgr() method to obtain that one instance.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
@@ -41,7 +42,7 @@ public interface IFileMgr {
 	};
 	
 	/**
-	 * The maximum number of files that this FileNamesSpaces object can handle.
+	 * The maximum number of files that this FileMgr object can handle.
 	 */
 	public static final int MAX_FILES = 16777216;
 
@@ -254,7 +255,7 @@ public interface IFileMgr {
 	/**
 	 * Remove a specific path from the build store. This operation can be only be performed
 	 * on files and directories that are unused. That is, directories must be empty, and 
-	 * files/directories must not be reference by any tasks (or any other such objects).
+	 * files/directories must not be reference by any actions (or any other such objects).
 	 * 
 	 * @param pathId The ID of the path to be removed.
 	 * 
@@ -264,8 +265,8 @@ public interface IFileMgr {
 	public abstract int removePath(int pathId);
 
 	/**
-	 * Returns a reference to this FileNameSpace's BuildStore object. 
-	 * @return A reference to this FileNameSpace's BuildStore object.
+	 * Returns a reference to this FileMgr's BuildStore object. 
+	 * @return A reference to this FileMgr's BuildStore object.
 	 */
 	public abstract IBuildStore getBuildStore();
 

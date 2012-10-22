@@ -16,7 +16,8 @@ package com.buildml.model;
  * A Java Error that can be thrown from any part of the BuildStore mechanism
  * to indicate that a fatal error occurred. The receiver of the FatalBuildStoreError
  * must simply catch and display the error. There isn't intended to be any way to
- * recover from this type of error.
+ * recover from this type of error, as it's reserved for programming logic or
+ * data corruption errors.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */

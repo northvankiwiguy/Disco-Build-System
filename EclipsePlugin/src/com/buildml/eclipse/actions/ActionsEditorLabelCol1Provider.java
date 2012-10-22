@@ -62,7 +62,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	 * Construct a new ActionsEditorLabelCol1Provider object, which provides text and image
 	 * labels for the FilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
-	 * @param actionMgr The FileNameSpaces object we're graphically representing.
+	 * @param actionMgr The FileMgr object we're graphically representing.
 	 */
 	public ActionsEditorLabelCol1Provider(SubEditor editor, IActionMgr actionMgr) {
 

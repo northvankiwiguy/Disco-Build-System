@@ -48,7 +48,7 @@ public class TestFileAttributeMgr {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
-		/* fetch the associated FileAttributes and FileNameSpaces */
+		/* fetch the associated FileAttributeMgr and FileMgr */
 		fileAttrMgr = bs.getFileAttributeMgr();
 		fileMgr = bs.getFileMgr();
 	}

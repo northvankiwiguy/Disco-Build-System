@@ -161,7 +161,7 @@ public class BuildStore implements IBuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IBuildStore#getFileNameSpaces()
+	 * @see com.buildml.model.IBuildStore#getFileMgr()
 	 */
 	@Override
 	public IFileMgr getFileMgr() {
@@ -266,7 +266,7 @@ public class BuildStore implements IBuildStore {
 	
 	/**
 	 * Fetch a reference to this BuildStore's underlying database. This is a package-scope
-	 * method to be used only by delegate classes (such as FileNameSpaces).
+	 * method to be used only by delegate classes (such as FileMgr).
 	 * 
 	 * @return Reference to this BuildStore's underlying database.
 	 */

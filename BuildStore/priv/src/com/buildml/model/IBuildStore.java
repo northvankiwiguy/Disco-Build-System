@@ -14,16 +14,16 @@ package com.buildml.model;
 
 import java.io.IOException;
 
-
 /**
- * A BuildStore object is the main class that implements a BuildML build system. By creating
- * a new BuildStore object, we create all the necessary data structures and databases
- * to store an entire BuildML build.
+ * The interface conformed-to by any BuildStore object which is the main object
+ * providing an in-memory representation of a build.bml file.
  * 
  * Note that although BuildStore is the main entry point, most of the work is done by
  * its delegate classes, such as FileMgr, ActionMgr etc. These "Managers" each deal
  * with a specific part of the build system, providing business logic and database access
  * to implement features.
+ * 
+ * To open or create a BuildStore object, you should use the BuildStoreFactory class.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
@@ -72,14 +72,14 @@ public interface IBuildStore {
 	/**
 	 * Fetch the FileAttributeMgr manager associated with this BuildStore. This object
 	 * encapsulates knowledge of which attributes are attached to the paths in
-	 * our FileNameSpaces object.
+	 * our FileMgr object.
 	 * 
 	 * @return This BuildStore's FileAttributeMgr object.
 	 */
 	public abstract IFileAttributeMgr getFileAttributeMgr();
 
 	/**
-	 * Fetch the Packages manager associated with this BuildStore. This object
+	 * Fetch the PackagesMgr associated with this BuildStore. This object
 	 * encapsulates knowledge of the package names used in the BuildStore.
 	 * 
 	 * @return A Packages manager object.
@@ -89,16 +89,19 @@ public interface IBuildStore {
 	/**
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
-	 * changes are written to the disk. Only use fast access for "large write" operations.
+	 * changes are written to the disk. Only use fast access for long-running
+	 * write operations that would otherwise be too slow in "safe" mode. Always
+	 * be sure to disable fast-access to ensure that changes are eventually
+	 * written to disk.
 	 * 
 	 * @param fast Set to true to enable fast access, or false for safe access.
 	 */
 	public abstract void setFastAccessMode(boolean fast);
 
 	/**
-	 * Close the BuildStore, and release any resources associated with it. Attempting to
-	 * access the BuildStore's content after it's closed will likely cause a
-	 * FatalBuildStoreError.
+	 * Close the BuildStore, and release any resources associated with it.
+	 * Attempting to access the BuildStore's content after it's closed will
+	 * cause a FatalBuildStoreError.
 	 */
 	public abstract void close();
 

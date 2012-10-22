@@ -54,7 +54,6 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.ActionRecord;
 import com.buildml.model.types.ActionSet;

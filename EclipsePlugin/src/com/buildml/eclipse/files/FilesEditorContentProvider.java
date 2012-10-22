@@ -47,7 +47,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 * Create a new {@link FilesEditorContentProvider} that translates the information
 	 * in the BuildStore into something that a TreeViewer can understand.
 	 * @param editor The editor that this content provider is associated with.
-	 * @param fileMgr The FileNameSpaces object that we're displaying information from.
+	 * @param fileMgr The FileMgr object that we're displaying information from.
 	 */
 	public FilesEditorContentProvider(FilesEditor editor, IFileMgr fileMgr) {
 

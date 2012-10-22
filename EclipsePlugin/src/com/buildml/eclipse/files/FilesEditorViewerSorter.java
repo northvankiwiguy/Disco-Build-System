@@ -37,7 +37,7 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 	 * Create a new FilesEditorViewerSorter, which is designed for sorting elements
 	 * within the FilesEditor page.
 	 * @param editor The FilesEditor we're sorting information for.
-	 * @param fileMgr The FileNameSpaces object the information is derived from.
+	 * @param fileMgr The FileMgr object the information is derived from.
 	 */
 	public FilesEditorViewerSorter(FilesEditor editor, IFileMgr fileMgr) {
 		

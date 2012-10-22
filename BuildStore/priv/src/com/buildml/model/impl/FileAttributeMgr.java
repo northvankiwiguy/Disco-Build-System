@@ -28,8 +28,8 @@ import com.buildml.utils.errors.ErrorCode;
  * unique ID number for the attribute. Attributes (and their int/string values)
  * can then be associated with paths.
  * <p>
- * There should be exactly one FileAttributes object per BuildStore object. Use the
- * BuildStore's getFileAttributes() method to obtain that one instance.
+ * There should be exactly one FileAttributeMgr object per BuildStore object. Use the
+ * BuildStore's getFileAttributeMgr() method to obtain that one instance.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -37,7 +37,7 @@ import com.buildml.utils.errors.ErrorCode;
 
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
-	 * to us when the FileAttributes object is first instantiated.
+	 * to us when the FileAttributeMgr object is first instantiated.
 	 */
 	private BuildStoreDB db;
 	
@@ -68,14 +68,14 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Create a new FileAttributes object.
+	 * Create a new FileAttributeMgr object.
 	 * 
-	 * @param buildStore The BuildStore object that owns this FileAttributes object.
-	 * @param fns The FileNameSpaces object that these attributes are attached to
+	 * @param buildStore The BuildStore object that owns this FileAttributeMgr object.
+	 * @param fileMgr The FileMgr object that these attributes are attached to
 	 */
-	public FileAttributeMgr(BuildStore buildStore, IFileMgr fns) {
+	public FileAttributeMgr(BuildStore buildStore, IFileMgr fileMgr) {
 		this.db = buildStore.getBuildStoreDB();
-		this.fileMgr = fns;
+		this.fileMgr = fileMgr;
 		
 		/* Prepare our database statements */
 		selectIdFromNamePrepStmt = db.prepareStatement("select id from fileAttrsName where name = ?");

@@ -108,12 +108,12 @@ import com.buildml.utils.errors.ErrorCode;
 		findFilesOutsidePackage1PrepStmt = db.prepareStatement("select id from files where pkgId != ?");
 		findFilesOutsidePackage2PrepStmt = db.prepareStatement("select id from files where " +
 				"not (pkgId = ? and pkgScopeId = ?)");
-		updateActionPackagePrepStmt = db.prepareStatement("update buildTasks set pkgId = ? " +
-				"where taskId = ?");
-		findActionPackagePrepStmt = db.prepareStatement("select pkgId from buildTasks where taskId = ?");
-		findActionsInPackagePrepStmt = db.prepareStatement("select taskId from buildTasks where pkgId = ?");
-		findActionsOutsidePackagePrepStmt = db.prepareStatement("select taskId from buildTasks " +
-				"where pkgId != ? and taskId != 0");
+		updateActionPackagePrepStmt = db.prepareStatement("update buildActions set pkgId = ? " +
+				"where actionId = ?");
+		findActionPackagePrepStmt = db.prepareStatement("select pkgId from buildActions where actionId = ?");
+		findActionsInPackagePrepStmt = db.prepareStatement("select actionId from buildActions where pkgId = ?");
+		findActionsOutsidePackagePrepStmt = db.prepareStatement("select actionId from buildActions " +
+				"where pkgId != ? and actionId != 0");
 	}
 
 	/*=====================================================================================*
@@ -539,7 +539,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#setTaskPackage(int, int)
+	 * @see com.buildml.model.IPackageMgr#setActionPackage(int, int)
 	 */
 	@Override
 	public int setActionPackage(int actionId, int pkgId) {
@@ -561,7 +561,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getTaskPackage(int)
+	 * @see com.buildml.model.IPackageMgr#getActionPackage(int)
 	 */
 	@Override
 	public int getActionPackage(int actionId) {
@@ -589,7 +589,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getTasksInPackage(int)
+	 * @see com.buildml.model.IPackageMgr#getActionsInPackage(int)
 	 */
 	@Override
 	public ActionSet getActionsInPackage(int pkgId) {
@@ -606,7 +606,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getTasksInPackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getActionsInPackage(java.lang.String)
 	 */
 	@Override
 	public ActionSet getActionsInPackage(String pkgSpec) {
@@ -623,7 +623,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getTasksOutsidePackage(int)
+	 * @see com.buildml.model.IPackageMgr#getActionsOutsidePackage(int)
 	 */
 	@Override
 	public ActionSet getActionsOutsidePackage(int pkgId) {
@@ -640,7 +640,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getTasksOutsidePackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMgr#getActionsOutsidePackage(java.lang.String)
 	 */
 	@Override
 	public ActionSet getActionsOutsidePackage(String pkgSpec) {

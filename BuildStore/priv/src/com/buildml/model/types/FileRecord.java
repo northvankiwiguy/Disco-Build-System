@@ -16,8 +16,7 @@ import com.buildml.utils.types.IntegerTreeRecord;
 
 /**
  * This class contains a summary of a single path with the BuildStore. FileRecord is 
- * used as the element type in a FileSet, as well as other "report" methods that return 
- * information about a collection of files.
+ * used by "report" methods that return information about a collection of files.
  *
  * The set of FileRecord fields that are filled out by the report depends on the nature
  * of the report. For example, if the 'size' field isn't provided by the report, it's

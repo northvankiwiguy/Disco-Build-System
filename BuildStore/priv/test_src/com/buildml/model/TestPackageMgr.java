@@ -203,14 +203,14 @@ public class TestPackageMgr {
 		pkgMgr.setFilePackage(file1, pkgNone, IPackageMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.OK, pkgMgr.removePackage("PkgA"));
 		
-		/* assign them to tasks, then try to remove the name */
+		/* assign them to actions, then try to remove the name */
 		int my_pkg = pkgMgr.getPackageId("my_package");
-		int task1 = actionMgr.addAction(0, 0, "task1");
-		pkgMgr.setActionPackage(task1, my_pkg);
+		int action1 = actionMgr.addAction(0, 0, "action1");
+		pkgMgr.setActionPackage(action1, my_pkg);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("my_package"));
 		
-		/* remove them from tasks, then try again to remove the package name */
-		pkgMgr.setActionPackage(task1, pkgNone);
+		/* remove them from actions, then try again to remove the package name */
+		pkgMgr.setActionPackage(action1, pkgNone);
 		assertEquals(ErrorCode.OK, pkgMgr.removePackage("my_package"));		
 	}
 
@@ -605,67 +605,67 @@ public class TestPackageMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test the setTaskPackage and getTaskPackage methods.
+	 * Test the setActionPackage and getActionPackage methods.
 	 * @throws Exception Something bad happened
 	 */
 	@Test
-	public void testTaskPackages() throws Exception {
+	public void testActionPackages() throws Exception {
 		
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		IActionMgr actionMgr = bs.getActionMgr();
 		
-		/* create a few tasks */
-		int task1 = actionMgr.addAction(0, 0, "task1");
-		int task2 = actionMgr.addAction(0, 0, "task2");
-		int task3 = actionMgr.addAction(0, 0, "task3");
+		/* create a few actions */
+		int action1 = actionMgr.addAction(0, 0, "action1");
+		int action2 = actionMgr.addAction(0, 0, "action2");
+		int action3 = actionMgr.addAction(0, 0, "action3");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
 		int pkgB = pkgMgr.addPackage("PkgB");
 		int pkgNone = pkgMgr.getPackageId("None");
 		
-		/* by default, all tasks are in "None" */
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task1));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task3));
+		/* by default, all actions are in "None" */
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action1));
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action2));
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
 		
-		/* add a task to PkgA and check the tasks */
-		pkgMgr.setActionPackage(task1, pkgA);
-		assertEquals(pkgA, pkgMgr.getActionPackage(task1));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task3));
+		/* add an action to PkgA and check the actions */
+		pkgMgr.setActionPackage(action1, pkgA);
+		assertEquals(pkgA, pkgMgr.getActionPackage(action1));
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action2));
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
 		
-		/* add a different task to PkgB and check the tasks */
-		pkgMgr.setActionPackage(task2, pkgB);
-		assertEquals(pkgA, pkgMgr.getActionPackage(task1));
-		assertEquals(pkgB, pkgMgr.getActionPackage(task2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task3));
+		/* add a different action to PkgB and check the actions */
+		pkgMgr.setActionPackage(action2, pkgB);
+		assertEquals(pkgA, pkgMgr.getActionPackage(action1));
+		assertEquals(pkgB, pkgMgr.getActionPackage(action2));
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
 		
-		/* revert one of the tasks back to None, and check the tasks */
-		pkgMgr.setActionPackage(task1, pkgNone);
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task1));
-		assertEquals(pkgB, pkgMgr.getActionPackage(task2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(task3));
+		/* revert one of the actions back to None, and check the actions */
+		pkgMgr.setActionPackage(action1, pkgNone);
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action1));
+		assertEquals(pkgB, pkgMgr.getActionPackage(action2));
+		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
 		
-		/* check an invalid task - should return ErrorCode.NOT_FOUND */
+		/* check an invalid action - should return ErrorCode.NOT_FOUND */
 		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getActionPackage(1000));		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test the getTasksInPackage(int) method
+	 * Test the getActionsInPackage(int) method
 	 * @throws Exception Something bad happened
 	 */
 	@Test
-	public void testGetTasksInPackage() throws Exception {
+	public void testGetActionsInPackage() throws Exception {
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		IActionMgr bts = bs.getActionMgr();
 		
-		/* create a few tasks */
-		int task1 = bts.addAction(0, 0, "task1");
-		int task2 = bts.addAction(0, 0, "task2");
-		int task3 = bts.addAction(0, 0, "task3");
+		/* create a few actions */
+		int action1 = bts.addAction(0, 0, "action1");
+		int action2 = bts.addAction(0, 0, "action2");
+		int action3 = bts.addAction(0, 0, "action3");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
@@ -677,61 +677,61 @@ public class TestPackageMgr {
 		results = pkgMgr.getActionsInPackage("PkgA");
 		assertEquals(0, results.size());
 		results = pkgMgr.getActionsOutsidePackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
 		results = pkgMgr.getActionsOutsidePackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));		
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));		
 		
-		/* add a task to pkgA */
-		pkgMgr.setActionPackage(task1, pkgA);
+		/* add an action to pkgA */
+		pkgMgr.setActionPackage(action1, pkgA);
 		results = pkgMgr.getActionsInPackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1}));
 		results = pkgMgr.getActionsInPackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1}));
 		results = pkgMgr.getActionsOutsidePackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2, action3}));
 		results = pkgMgr.getActionsOutsidePackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2, action3}));
 
-		/* add another task to pkgA */
-		pkgMgr.setActionPackage(task3, pkgA);
+		/* add another action to pkgA */
+		pkgMgr.setActionPackage(action3, pkgA);
 		results = pkgMgr.getActionsInPackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMgr.getActionsInPackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMgr.getActionsOutsidePackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 		results = pkgMgr.getActionsOutsidePackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 
 		/* Add a third */
-		pkgMgr.setActionPackage(task2, pkgA);
+		pkgMgr.setActionPackage(action2, pkgA);
 		results = pkgMgr.getActionsInPackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
 		results = pkgMgr.getActionsInPackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task2, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
 		results = pkgMgr.getActionsOutsidePackage(pkgA);
 		assertEquals(0, results.size());
 		results = pkgMgr.getActionsOutsidePackage("PkgA");
 		assertEquals(0, results.size());
 
-		/* move the second task into pkgB */
-		pkgMgr.setActionPackage(task2, pkgB);
+		/* move the second action into pkgB */
+		pkgMgr.setActionPackage(action2, pkgB);
 		results = pkgMgr.getActionsInPackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMgr.getActionsInPackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMgr.getActionsInPackage(pkgB);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 		results = pkgMgr.getActionsInPackage("PkgB");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 		results = pkgMgr.getActionsOutsidePackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 		results = pkgMgr.getActionsOutsidePackage("PkgA");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task2}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 		results = pkgMgr.getActionsOutsidePackage(pkgB);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMgr.getActionsOutsidePackage("PkgB");
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {task1, task3}));
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		
 		/* try some bad package names */
 		assertNull(pkgMgr.getActionsInPackage("badname"));

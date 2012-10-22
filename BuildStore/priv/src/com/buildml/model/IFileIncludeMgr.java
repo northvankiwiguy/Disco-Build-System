@@ -13,8 +13,13 @@
 package com.buildml.model;
 
 /**
- * This manager provides support for recording and retrieving information
- * on which files access which other files.
+ * The interface conformed-to by any FileIncludeMgr object, which represents a
+ * subset of the functionality managed by a BuildStore object. An FileIncludeMgr
+ * deals with all information related to the #include relationship between
+ * files (for example, if a .c file includes a .h file).
+ * <p>
+ * There should be exactly one FileIncludeMgr object per BuildStore object. 
+ * Use the BuildStore's getFileIncludeMgr() method to obtain that one instance.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
@@ -50,7 +55,7 @@ public interface IFileIncludeMgr {
 	/**
 	 * Return an Integer array of all files that include the specified file.
 	 * 
-	 * @param fileId ID of the file that is being included
+	 * @param fileId ID of the file that is being included.
 	 * @return An Integer array of all files that include the specified file.
 	 */
 	public abstract Integer[] getFilesThatInclude(int fileId);
@@ -59,7 +64,7 @@ public interface IFileIncludeMgr {
 	 * Return an Integer array of all files that are included by the specified file.
 	 * 
 	 * @param fileId ID of the file that does the including.
-	 * @return An Integer array of all files that are included by the specified file
+	 * @return An Integer array of all files that are included by the specified file.
 	 */
 	public abstract Integer[] getFilesIncludedBy(int fileId);
 

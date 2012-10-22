@@ -24,8 +24,8 @@ import com.buildml.model.IFileIncludeMgr;
  * information on the relationship between paths. That is, if one file in the build
  * system "includes" another file, the relationship is recorded by this class.
  * <p>
- * There should be exactly one FileIncludes object per BuildStore object. Use the
- * BuildStore's getFileIncludes() method to obtain that one instance.
+ * There should be exactly one FileIncludeMgr object per BuildStore object. Use the
+ * BuildStore's getFileIncludeMgr() method to obtain that one instance.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -37,7 +37,7 @@ import com.buildml.model.IFileIncludeMgr;
 
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
-	 * to us when the FileNameSpaces object is first instantiated.
+	 * to us when the FileIncludeMgr object is first instantiated.
 	 */
 	private BuildStoreDB db = null;
 	
@@ -58,9 +58,9 @@ import com.buildml.model.IFileIncludeMgr;
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new FileIncludes manager object.
+	 * Create a new FileIncludeMgr manager object.
 	 * 
-	 * @param buildStore The BuildStore object that owns this FileIncludes object.
+	 * @param buildStore The BuildStore object that owns this FileIncludeMgr object.
 	 */
 	public FileIncludeMgr(BuildStore buildStore) {
 		this.db = buildStore.getBuildStoreDB();

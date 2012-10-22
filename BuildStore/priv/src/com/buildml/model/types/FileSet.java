@@ -46,15 +46,15 @@ public class FileSet extends IntegerTreeSet  {
 	/**
 	 * Creates a new FileSet and initializes it to empty.
 	 * 
-	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet.
+	 * @param fileMgr The FileMgr manager object that owns the files in the FileSet.
 	 */	
-	public FileSet(IFileMgr fns) {
+	public FileSet(IFileMgr fileMgr) {
 		
 		/* most of the functionality is provided by the IntegerTreeSet class */
 		super();
 		
-		/* except we also need to record our FileNameSpaces object */
-		this.fileMgr = fns;
+		/* except we also need to record our FileMgr object */
+		this.fileMgr = fileMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -62,12 +62,12 @@ public class FileSet extends IntegerTreeSet  {
 	/**
 	 * Creates a new FileSet and initializes it from an array of path ID values.
 	 * 
-	 * @param fns The FileNameSpaces manager object that owns the files in the FileSet.
+	 * @param fileMgr The FileMgr manager object that owns the files in the FileSet.
 	 * @param paths The IDs of the paths to be added to the FileSet.
 	 */
-	public FileSet(IFileMgr fns, Integer paths[]) {
+	public FileSet(IFileMgr fileMgr, Integer paths[]) {
 		super(paths);
-		this.fileMgr = fns;
+		this.fileMgr = fileMgr;
 	}
 	
 	/*=====================================================================================*
@@ -82,7 +82,7 @@ public class FileSet extends IntegerTreeSet  {
 	 *  <ol>
 	 *    <li>An absolute path name (starting with /), either a directory name or a file name. If the
 	 *       path is a directory, all files and directories below that point in the tree are added.</li>
-	 *    <li>A path name starting with a root: - the same rules apply as for #1.</li>
+	 *    <li>A path name starting with a \@root - the same rules apply as for #1.</li>
 	 *    <li>A single file name, with one or more wildcard (*) characters. All files that match
      *       the name are added, no matter what their directory.</li>
      *    <li>A package spec, starting with %pkg, or the complement of a package, starting 
@@ -93,9 +93,9 @@ public class FileSet extends IntegerTreeSet  {
 	 */
 	public int populateWithPaths(String [] pathArgs) {
 		
-		IBuildStore bs = fileMgr.getBuildStore();
-		IPackageMgr pkgMgr = bs.getPackageMgr();
-		IReportMgr reportMgr = bs.getReportMgr();
+		IBuildStore buildStore = fileMgr.getBuildStore();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IReportMgr reportMgr = buildStore.getReportMgr();
 
 		/* for each path provided as input... */
 		for (int i = 0; i < pathArgs.length; i++) {
@@ -180,7 +180,7 @@ public class FileSet extends IntegerTreeSet  {
 	 */
 	public void mergeSet(FileSet second) {
 		
-		/* ensure the FileNameSpaces are the same for both FileSets */
+		/* ensure the FileMgrs are the same for both FileSets */
 		if (fileMgr != second.fileMgr) {
 			return;
 		}

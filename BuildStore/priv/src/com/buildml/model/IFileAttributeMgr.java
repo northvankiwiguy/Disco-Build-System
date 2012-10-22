@@ -15,31 +15,32 @@ package com.buildml.model;
 import com.buildml.model.types.FileSet;
 
 /**
- * A manager class (that supports the BuildStore class) that manages all BuildStore
- * information on which attributes are attached to the build system's files. 
- * Each attribute must first be added to the system (by name), which provides a
- * unique ID number for the attribute. Attributes (and their int/string values)
- * can then be associated with paths.
+ * The interface conformed-to by any FileAttributeMgr object, which 
+ * represents a subset of the functionality managed by a BuildStore object. A
+ * FileAttributeMgr deals with all information related to the optional
+ * "attributes" that may be associated with BuildML "files".
  * <p>
- * There should be exactly one FileAttributes object per BuildStore object. Use the
- * BuildStore's getFileAttributes() method to obtain that one instance.
+ * There should be exactly one FileAttributeMgr object per BuildStore object.
+ * Use the BuildStore's getFileAttributeMgr() method to obtain that one instance.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
 public interface IFileAttributeMgr {
 
 	/**
-	 * Add a new attribute name to the list of attributes that can be associated
-	 * with a path.
+	 * Add a new attribute name to the list of attributes that are permitted
+	 * to be associated with FileMgr paths. This method must be called in order
+	 * to declare an attribute, before that attribute can be added to any
+	 * of the paths (using the setAttr() method).
 	 * 
 	 * @param attrName The name of the new attribute.
-	 * @return The new attribute's ID number, or ALREADY_USED if this attribute name is
-	 * already in use.
+	 * @return The new attribute's ID number, or ALREADY_USED if this attribute 
+	 * name is already in use.
 	 */
 	public abstract int newAttrName(String attrName);
 
 	/**
-	 * For a given attribute name, return the corresponding ID number.
+	 * For a given attribute name, return the corresponding attribute ID number.
 	 * 
 	 * @param attrName The attribute's name.
 	 * @return The attribute's ID number, or NOT_FOUND if the attribute name isn't defined.
@@ -55,7 +56,7 @@ public interface IFileAttributeMgr {
 	public abstract String getAttrNameFromId(int attrId);
 
 	/**
-	 * Return an array of all attribute names.
+	 * Return an array of all declared attribute names.
 	 * 
 	 * @return A String array of attribute names. The names will be returned in 
 	 * alphabetical order.

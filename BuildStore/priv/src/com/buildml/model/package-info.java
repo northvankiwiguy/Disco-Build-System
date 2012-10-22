@@ -1,6 +1,6 @@
 
 /**
- * The main "Model" for a BuildML BuildStore. This code encapsulates all logic and database functionality
- * that implements BuildStore objects.
+ * The interface specification for a BuildStore object, the in-memory representation of
+ * a build.bml file.
  */
 package com.buildml.model;

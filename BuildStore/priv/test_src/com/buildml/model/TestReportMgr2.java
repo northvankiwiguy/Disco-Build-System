@@ -43,7 +43,7 @@ public class TestReportMgr2 {
 	/** Our test Reports object */
 	private IReportMgr reports;
 	
-	/** various file IDs and task IDs */
+	/** various file IDs and action IDs */
 	private int filePetH, fileHousePetH;
 	private int fileCatC, fileDogC, fileBunnyC, fileGiraffeC;
 	private int fileCatO, fileDogO, fileBunnyO, fileGiraffeO;
@@ -52,8 +52,8 @@ public class TestReportMgr2 {
 	
 	/**
 	 * Set up method for all test cases. This sets up a number of files, as well as
-	 * build tasks that access the files (including file-access records). Each test
-	 * case in this file uses the same basic file/task relationship in its test.
+	 * build actions that access the files (including file-access records). Each test
+	 * case in this file uses the same basic file/action relationship in its test.
 	 * @throws java.lang.Exception
 	 */
 	@Before
@@ -82,66 +82,66 @@ public class TestReportMgr2 {
 		fileGiraffeA = fileMgr.addFile("/home/giraffe.a");
 		fileAnimalsExe = fileMgr.addFile("/home/animals.exe");
 		
-		/* what directory were these tasks executed in? */
+		/* what directory were these actions executed in? */
 		int dirHome = fileMgr.getPath("/home");
 		
-		/* add all tasks underneath the root */
-		int rootTask = actionMgr.getRootAction("");
+		/* add all actions underneath the root */
+		int rootAction = actionMgr.getRootAction("");
 		
 		/* compile cat.c -> cat.o */
-		int taskPkgCat = actionMgr.addAction(rootTask, dirHome, "gcc -c cat.c");
-		actionMgr.addFileAccess(taskPkgCat, filePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgCat, fileHousePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgCat, fileCatC, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgCat, fileCatO, OperationType.OP_WRITE);
+		int actionPkgCat = actionMgr.addAction(rootAction, dirHome, "gcc -c cat.c");
+		actionMgr.addFileAccess(actionPkgCat, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgCat, fileHousePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgCat, fileCatC, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgCat, fileCatO, OperationType.OP_WRITE);
 
 		/* compile dog.c -> dog.o */
-		int taskPkgDog = actionMgr.addAction(rootTask, dirHome, "gcc -c dog.c");
-		actionMgr.addFileAccess(taskPkgDog, filePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgDog, fileHousePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgDog, fileDogC, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgDog, fileDogO, OperationType.OP_WRITE);
+		int actionPkgDog = actionMgr.addAction(rootAction, dirHome, "gcc -c dog.c");
+		actionMgr.addFileAccess(actionPkgDog, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgDog, fileHousePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgDog, fileDogC, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgDog, fileDogO, OperationType.OP_WRITE);
 		
 		/* compile bunny.c -> bunny.o */
-		int taskPkgBunny = actionMgr.addAction(rootTask, dirHome, "gcc -c bunny.c");
-		actionMgr.addFileAccess(taskPkgBunny, filePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgBunny, fileHousePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgBunny, fileBunnyC, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgBunny, fileBunnyO, OperationType.OP_WRITE);
+		int actionPkgBunny = actionMgr.addAction(rootAction, dirHome, "gcc -c bunny.c");
+		actionMgr.addFileAccess(actionPkgBunny, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgBunny, fileHousePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgBunny, fileBunnyC, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgBunny, fileBunnyO, OperationType.OP_WRITE);
 		
 		/* compile giraffe.c -> giraffe.o */
-		int taskPkgGiraffe = actionMgr.addAction(rootTask, dirHome, "gcc -c giraffe.c");
-		actionMgr.addFileAccess(taskPkgGiraffe, filePetH, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgGiraffe, fileGiraffeC, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskPkgGiraffe, fileGiraffeO, OperationType.OP_WRITE);
+		int actionPkgGiraffe = actionMgr.addAction(rootAction, dirHome, "gcc -c giraffe.c");
+		actionMgr.addFileAccess(actionPkgGiraffe, filePetH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgGiraffe, fileGiraffeC, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionPkgGiraffe, fileGiraffeO, OperationType.OP_WRITE);
 		
 		/* archive cat.o -> cat.a */
-		int taskArchCat = actionMgr.addAction(rootTask, dirHome, "ar c cat.a cat.o");
-		actionMgr.addFileAccess(taskArchCat, fileCatO, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskArchCat, fileCatA, OperationType.OP_WRITE);
+		int actionArchCat = actionMgr.addAction(rootAction, dirHome, "ar c cat.a cat.o");
+		actionMgr.addFileAccess(actionArchCat, fileCatO, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionArchCat, fileCatA, OperationType.OP_WRITE);
 
 		/* archive dog.o -> dog.a */
-		int taskArchDog = actionMgr.addAction(rootTask, dirHome, "ar c dog.a dog.o");
-		actionMgr.addFileAccess(taskArchDog, fileDogO, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskArchDog, fileDogA, OperationType.OP_WRITE);
+		int actionArchDog = actionMgr.addAction(rootAction, dirHome, "ar c dog.a dog.o");
+		actionMgr.addFileAccess(actionArchDog, fileDogO, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionArchDog, fileDogA, OperationType.OP_WRITE);
 		
 		/* archive bunny.o -> bunny.a */
-		int taskArchBunny = actionMgr.addAction(rootTask, dirHome, "ar c bunny.a bunny.o");
-		actionMgr.addFileAccess(taskArchBunny, fileBunnyO, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskArchBunny, fileBunnyA, OperationType.OP_WRITE);
+		int actionArchBunny = actionMgr.addAction(rootAction, dirHome, "ar c bunny.a bunny.o");
+		actionMgr.addFileAccess(actionArchBunny, fileBunnyO, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionArchBunny, fileBunnyA, OperationType.OP_WRITE);
 		
 		/* archive giraffe.o -> giraffe.a */
-		int taskArchGiraffe = actionMgr.addAction(rootTask, dirHome, "ar c giraffe.a giraffe.o");
-		actionMgr.addFileAccess(taskArchGiraffe, fileGiraffeO, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskArchGiraffe, fileGiraffeA, OperationType.OP_WRITE);
+		int actionArchGiraffe = actionMgr.addAction(rootAction, dirHome, "ar c giraffe.a giraffe.o");
+		actionMgr.addFileAccess(actionArchGiraffe, fileGiraffeO, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionArchGiraffe, fileGiraffeA, OperationType.OP_WRITE);
 
 		/* link cat.a, dog.a, giraffe.a and bunny.a -> animals.exe */
-		int taskLinkAnimals = actionMgr.addAction(rootTask, dirHome, "ln -o animals.exe cat.a dog.a bunny.a giraffe.a");
-		actionMgr.addFileAccess(taskLinkAnimals, fileCatA, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskLinkAnimals, fileDogA, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskLinkAnimals, fileBunnyA, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskLinkAnimals, fileGiraffeA, OperationType.OP_READ);
-		actionMgr.addFileAccess(taskLinkAnimals, fileAnimalsExe, OperationType.OP_WRITE);
+		int actionLinkAnimals = actionMgr.addAction(rootAction, dirHome, "ln -o animals.exe cat.a dog.a bunny.a giraffe.a");
+		actionMgr.addFileAccess(actionLinkAnimals, fileCatA, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionLinkAnimals, fileDogA, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionLinkAnimals, fileBunnyA, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionLinkAnimals, fileGiraffeA, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionLinkAnimals, fileAnimalsExe, OperationType.OP_WRITE);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

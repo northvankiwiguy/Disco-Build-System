@@ -699,7 +699,7 @@ public class TestFileSet {
 	@Test
 	public void testRemoveSubTree() {
 		
-		/* add a bunch of files to the fns, then populate the FileSet with them all */
+		/* add a bunch of files to the fileMgr, then populate the FileSet with them all */
 		int fileA = fileMgr.addFile("/1/2/3/4/A.c");
 		int fileB = fileMgr.addFile("/1/2/3/4/B.c");
 		int fileC = fileMgr.addFile("/1/2/3/4/C.c");

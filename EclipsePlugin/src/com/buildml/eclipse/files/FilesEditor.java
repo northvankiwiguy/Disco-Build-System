@@ -86,7 +86,7 @@ public class FilesEditor extends SubEditor {
 	/** The ArrayContentProvider object providing this editor's content */
 	private FilesEditorContentProvider contentProvider;
 
-	/** The set of paths (within the FileNameSpaces) that are currently visible. */
+	/** The set of paths (within the FileMgr) that are currently visible. */
 	private FileSet visiblePaths = null;
 
 	/**

@@ -32,8 +32,8 @@ import com.buildml.utils.string.PathUtils;
  * A manager class (that supports the BuildStore class) that manages all BuildStore
  * information about paths (files, directories, etc), as well as path roots.
  * <p>
- * There should be exactly one FileNameSpaces object per BuildStore object. Use the
- * BuildStore's getFileNameSpaces() method to obtain that one instance.
+ * There should be exactly one FileMgr object per BuildStore object. Use the
+ * BuildStore's getFileMgr() method to obtain that one instance.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -43,12 +43,12 @@ public class FileMgr implements IFileMgr {
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 	
-	/** The BuildStore object that "owns" this FileNameSpaces object. */
+	/** The BuildStore object that "owns" this FileMgr object. */
 	private IBuildStore buildStore;
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
-	 * to us when the FileNameSpaces is first instantiated.
+	 * to us when the FileMgr is first instantiated.
 	 */
 	private BuildStoreDB db = null;
 	
@@ -79,9 +79,9 @@ public class FileMgr implements IFileMgr {
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new FileNameSpaces object.
+	 * Create a new FileMgr object.
 	 * 
-	 * @param buildStore The BuildStore that "owns" this FileNameSpaces manager object.
+	 * @param buildStore The BuildStore that "owns" this FileMgr manager object.
 	 */
 	public FileMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
@@ -114,7 +114,7 @@ public class FileMgr implements IFileMgr {
 	 *=====================================================================================*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getRootPath(java.lang.String)
+	 * @see com.buildml.model.IFileMgr#getRootPath(java.lang.String)
 	 */
 	@Override
 	public int getRootPath(String rootName) {
@@ -146,7 +146,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#addNewRoot(java.lang.String, int)
+	 * @see com.buildml.model.IFileMgr#addNewRoot(java.lang.String, int)
 	 */
 	@Override
 	public int addNewRoot(String rootName, int pathId) {
@@ -190,7 +190,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getRoots()
+	 * @see com.buildml.model.IFileMgr#getRoots()
 	 */
 	@Override
 	public String [] getRoots() {
@@ -200,7 +200,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#moveRootToPath(java.lang.String, int)
+	 * @see com.buildml.model.IFileMgr#moveRootToPath(java.lang.String, int)
 	 */
 	@Override
 	public int moveRootToPath(String rootName, int pathId) {
@@ -241,7 +241,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getRootAtPath(int)
+	 * @see com.buildml.model.IFileMgr#getRootAtPath(int)
 	 */
 	@Override
 	public String getRootAtPath(int pathId) {
@@ -274,7 +274,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getEnclosingRoot(int)
+	 * @see com.buildml.model.IFileMgr#getEnclosingRoot(int)
 	 */
 	@Override
 	public String getEnclosingRoot(int pathId) {
@@ -296,7 +296,7 @@ public class FileMgr implements IFileMgr {
 
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#deleteRoot(java.lang.String)
+	 * @see com.buildml.model.IFileMgr#deleteRoot(java.lang.String)
 	 */
 	@Override
 	public int deleteRoot(String rootName) {
@@ -323,7 +323,7 @@ public class FileMgr implements IFileMgr {
 
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#addFile(java.lang.String)
+	 * @see com.buildml.model.IFileMgr#addFile(java.lang.String)
 	 */
 	@Override
 	public int addFile(String fullPathName) {
@@ -333,7 +333,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#addDirectory(java.lang.String)
+	 * @see com.buildml.model.IFileMgr#addDirectory(java.lang.String)
 	 */
 	@Override
 	public int addDirectory(String fullPathName) {
@@ -343,7 +343,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#addSymlink(java.lang.String)
+	 * @see com.buildml.model.IFileMgr#addSymlink(java.lang.String)
 	 */
 	@Override
 	public int addSymlink(String fullPath) {
@@ -355,7 +355,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#addChildOfPath(int, com.buildml.model.impl.FileNameSpaces.PathType, java.lang.String)
+	 * @see com.buildml.model.IFileMgr#addChildOfPath(int, com.buildml.model.IFileMgr.PathType, java.lang.String)
 	 */
 	@Override
 	public int addChildOfPath(int parentId, PathType pathType, String childName) {
@@ -374,7 +374,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getPath(java.lang.String)
+	 * @see com.buildml.model.IFileMgr#getPath(java.lang.String)
 	 */
 	@Override
 	public int getPath(String fullPathName) {
@@ -407,7 +407,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getPathName(int, boolean)
+	 * @see com.buildml.model.IFileMgr#getPathName(int, boolean)
 	 */
 	@Override
 	public String getPathName(int pathId, boolean showRoots) {
@@ -431,7 +431,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getPathName(int)
+	 * @see com.buildml.model.IFileMgr#getPathName(int)
 	 */
 	@Override
 	public String getPathName(int pathId) {
@@ -441,7 +441,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getBaseName(int)
+	 * @see com.buildml.model.IFileMgr#getBaseName(int)
 	 */
 	@Override
 	public String getBaseName(int pathId) {
@@ -456,7 +456,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getParentPath(int)
+	 * @see com.buildml.model.IFileMgr#getParentPath(int)
 	 */
 	@Override
 	public int getParentPath(int pathId) {
@@ -471,7 +471,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getPathType(int)
+	 * @see com.buildml.model.IFileMgr#getPathType(int)
 	 */
 	@Override
 	public PathType getPathType(int pathId) {		
@@ -485,7 +485,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getChildOfPath(int, java.lang.String)
+	 * @see com.buildml.model.IFileMgr#getChildOfPath(int, java.lang.String)
 	 */
 	@Override
 	public int getChildOfPath(int parentId, String childName)
@@ -501,7 +501,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getChildPaths(int)
+	 * @see com.buildml.model.IFileMgr#getChildPaths(int)
 	 */
 	@Override
 	public Integer[] getChildPaths(int pathId) {
@@ -529,7 +529,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#removePath(int)
+	 * @see com.buildml.model.IFileMgr#removePath(int)
 	 */
 	@Override
 	public int removePath(int pathId)
@@ -596,7 +596,7 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.impl.IFileMgr#getBuildStore()
+	 * @see com.buildml.model.IFileMgr#getBuildStore()
 	 */
 	@Override
 	public IBuildStore getBuildStore() {
@@ -610,7 +610,7 @@ public class FileMgr implements IFileMgr {
 	/**
 	 * Helper method for addDirectory, addFile and addSymlink. Adds a new path, of the
 	 * specified type (pathType) to the database. If the path already exists in
-	 * the FileNameSpaces object, return the ID of the existing path rather than adding
+	 * the FileMgr object, return the ID of the existing path rather than adding
 	 * a new entry.
 	 * 
 	 * @param pathType The type of the path to be added (TYPE_DIR, TYPE_FILE, TYPE_SYMLINK).

@@ -13,8 +13,9 @@
 package com.buildml.model;
 
 /**
- * A manager class (that supports the BuildStore class) that manages all BuildStore
- * information pertaining to build actions.
+ * The interface conformed-to by any ActionMgr object, which represents a
+ * subset of the functionality managed by a BuildStore object. An ActionMgr
+ * deals with all information related to BuildML "actions".
  * <p>
  * There should be exactly one ActionMgr object per BuildStore object. Use the
  * BuildStore's getActionMgr() method to obtain that one instance.
@@ -47,10 +48,11 @@ public interface IActionMgr {
 	};
 	
 	/**
-	 * Add a new build action, and return the action ID number.
+	 * Add a new build action, returning the new action ID number.
 	 * 
 	 * @param parentActionId The ID of the new action's parent.
-	 * @param actionDirId The ID of the path (a directory) in which this action was executed.
+	 * @param actionDirId The ID of the path (a directory) in which this 
+	 *                    action was executed.
 	 * @param command The shell command associated with this action.
 	 * @return The new action's ID.
 	 */
@@ -58,8 +60,8 @@ public interface IActionMgr {
 			String command);
 
 	/**
-	 * Record the fact that the specific build action accessed the specified file. Adding
-	 * the same relationship a second or successive time has no effect.
+	 * Record the fact that the specific build action accessed the specified file. 
+	 * Adding the same relationship a second or successive time has no effect.
 	 * 
 	 * @param buildActionId The ID of the build action that accessed the file.
 	 * @param fileNumber The file's ID number.
@@ -91,14 +93,15 @@ public interface IActionMgr {
 			OperationType operation);
 
 	/**
-	 * Return the list of all actions that execute within the directory specified by pathId.
+	 * Return the list of all actions that execute within the file system directory 
+	 * specified by pathId.
 	 * @param pathId The directory in which the actions must be executed.
 	 * @return The list of actions.
 	 */
 	public abstract Integer[] getActionsInDirectory(int pathId);
 
 	/**
-	 * Fetch the build action's command line string.
+	 * Fetch a build action's command line string.
 	 * 
 	 * @param actionId The action we're querying.
 	 * @return The action's command line string.

@@ -36,7 +36,7 @@ import com.buildml.utils.version.Version;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-class BuildStoreDB  {
+/* package private */ class BuildStoreDB  {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -259,17 +259,17 @@ class BuildStoreDB  {
 			stat.executeUpdate("create index buildFileIncludesIdx2 on fileIncludes (fileId1)");
 			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
-			/* Create the "buildTasks" table. */
-			stat.executeUpdate("create table buildTasks ( taskId integer primary key, parentTaskId integer, " +
-							   "taskDirId integer, pkgId integer, command text)");
-			stat.executeUpdate("insert into buildTasks values (0, 0, 0, 0, null)");
-			stat.executeUpdate("create index buildTasksIdx on buildTasks (parentTaskId)");
+			/* Create the "buildActions" table. */
+			stat.executeUpdate("create table buildActions ( actionId integer primary key, parentActionId integer, " +
+							   "actionDirId integer, pkgId integer, command text)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, null)");
+			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
-			/* Create the "buildTaskFiles" tables. */
-			stat.executeUpdate("create table buildTaskFiles ( taskId integer, fileId integer, operation integer)");			
-			stat.executeUpdate("create index buildTaskFilesIdx1 on buildTaskfiles (fileId)");
-			stat.executeUpdate("create unique index buildTaskFilesIdx2 on buildTaskfiles (taskId, fileId)");
-			stat.executeUpdate("create index buildTaskFilesIdx3 on buildTaskfiles (fileId, operation)");
+			/* Create the "actionFiles" tables. */
+			stat.executeUpdate("create table actionFiles ( actionId integer, fileId integer, operation integer)");			
+			stat.executeUpdate("create index actionFilesIdx1 on actionFiles (fileId)");
+			stat.executeUpdate("create unique index actionFilesIdx2 on actionFiles (actionId, fileId)");
+			stat.executeUpdate("create index actionFilesIdx3 on actionFiles (fileId, operation)");
 			
 			/* Create the "fileRoots" table */
 			stat.executeUpdate("create table fileRoots (name text primary key, fileId integer)");	
@@ -313,8 +313,8 @@ class BuildStoreDB  {
 			stat.executeUpdate("drop table if exists schemaVersion");
 			stat.executeUpdate("drop table if exists files");
 			stat.executeUpdate("drop table if exists fileIncludes");
-			stat.executeUpdate("drop table if exists buildTasks");
-			stat.executeUpdate("drop table if exists buildTaskFiles");
+			stat.executeUpdate("drop table if exists buildActions");
+			stat.executeUpdate("drop table if exists actionFiles");
 			stat.executeUpdate("drop table if exists fileRoots");
 			stat.executeUpdate("drop table if exists fileAttrsName");
 			stat.executeUpdate("drop table if exists fileAttrs");

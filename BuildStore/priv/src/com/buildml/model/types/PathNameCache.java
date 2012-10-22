@@ -112,7 +112,7 @@ public class PathNameCache {
 	/**
 	 * This nested class is used as the "value" of the cache. The value
 	 * is a pair consisting of <childPathId, childType>, where childType is
-	 * the ordinal value of a FileNameSpaces.PathType value. 
+	 * the ordinal value of a FileMgr.PathType value. 
 	 */
 	public class PathNameCacheValue {
 		
