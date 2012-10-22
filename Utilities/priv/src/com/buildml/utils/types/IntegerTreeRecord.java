@@ -13,7 +13,7 @@
 package com.buildml.utils.types;
 
 /**
- * This is the base class of any Record types (such as FileRecord or TaskRecord) that
+ * This is the base class of any Record types (such as FileRecord or ActionRecord) that
  * can be managed by a IntegerTreeSet object. Unless you only want to store ID numbers
  * in the record, you'll need to subclass IntegerTreeRecord.
  * 

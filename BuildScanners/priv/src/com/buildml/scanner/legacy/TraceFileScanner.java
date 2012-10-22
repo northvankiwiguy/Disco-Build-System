@@ -132,10 +132,10 @@ import com.buildml.utils.string.ShellCommandUtils;
 	
 	/** 
 	 * Mapping between the process numbers that CFS (and the trace file) provides us with
-	 * to the "task ID" numbers that BuildStore uses. As we encounter new processes, and
-	 * add them to the BuildStore, we'll be allocated corresponding build task IDs.
+	 * to the "action ID" numbers that BuildStore uses. As we encounter new processes, and
+	 * add them to the BuildStore, we'll be allocated corresponding build action IDs.
 	 */
-	private HashMap<Integer, Integer> processToTaskMap = null;
+	private HashMap<Integer, Integer> processToActionMap = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -169,11 +169,11 @@ import com.buildml.utils.string.ShellCommandUtils;
 		}
 		
 		/* 
-		 * Create a map between CFS process numbers and BuildStore task numbers.
-		 * Insert the parent/root ID numbers to signify the first process/task 
+		 * Create a map between CFS process numbers and BuildStore action numbers.
+		 * Insert the parent/root ID numbers to signify the first process/action 
 		 */
-		processToTaskMap = new HashMap<Integer, Integer>();
-		processToTaskMap.put(Integer.valueOf(0), actionMgr.getRootAction("root"));
+		processToActionMap = new HashMap<Integer, Integer>();
+		processToActionMap.put(Integer.valueOf(0), actionMgr.getRootAction("root"));
 		
 		/* set up input stream, and variables for reading it */
 		inputStream = new GZIPInputStream(new FileInputStream(fileName));
@@ -254,7 +254,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 				break;
 
 			case TRACE_FILE_NEW_PROGRAM:
-				addBuildTask(processNum);
+				addBuildAction(processNum);
 				break;
 				
 			default:
@@ -283,12 +283,12 @@ import com.buildml.utils.string.ShellCommandUtils;
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new build task in the BuildStore.
+	 * Create a new build action in the BuildStore.
 	 * 
 	 * @param processNum The Unix process ID of the scanned process.
 	 * @throws IOException A problem occurred while reading the trace file.
 	 */
-	private void addBuildTask(int processNum) throws IOException {
+	private void addBuildAction(int processNum) throws IOException {
 		
 		/* which process spawned this new process? */
 		int parentProcessNum = getInt();
@@ -326,57 +326,57 @@ import com.buildml.utils.string.ShellCommandUtils;
 		/* Update the BuildStore */
 		if (buildStore != null) {
 			
-			/* map the process number (from cfs) into the BuildStore's taskId */
-			Integer parentTaskId = getTaskId(parentProcessNum);
+			/* map the process number (from cfs) into the BuildStore's actionId */
+			Integer parentActionId = getActionId(parentProcessNum);
 		
 			/* fetch the current working directory ID */
-			int taskDirId = fileMgr.addDirectory(cwd);
-			if (taskDirId == ErrorCode.BAD_PATH){
+			int actionDirId = fileMgr.addDirectory(cwd);
+			if (actionDirId == ErrorCode.BAD_PATH){
 				throw new FatalBuildScannerError("Invalid current working directory: " + cwd);
 			}
 			
-			/* add the new task to the build store */
-			int newTaskId = actionMgr.addAction(parentTaskId, taskDirId, command);
+			/* add the new action to the build store */
+			int newActionId = actionMgr.addAction(parentActionId, actionDirId, command);
 			
-			/* associate CFS's process number with BuildStore's taskID */
-			setTaskId(processNum, newTaskId);
+			/* associate CFS's process number with BuildStore's actionID */
+			setActionId(processNum, newActionId);
 		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Add a new mapping from a CFS process number to a BuildStore taskID.
+	 * Add a new mapping from a CFS process number to a BuildStore actionID.
 	 * 
 	 * @param processNum The CFS process number.
-	 * @param newTaskId The corresponding BuildStore taskId.
+	 * @param newActionId The corresponding BuildStore actionId.
 	 * @throws FatalBuildScannerError If there's already a mapping for this process.
 	 */
-	private void setTaskId(int processNum, int newTaskId) {
+	private void setActionId(int processNum, int newActionId) {
 		
-		if (processToTaskMap.get(Integer.valueOf(processNum)) != null){
+		if (processToActionMap.get(Integer.valueOf(processNum)) != null){
 			throw new FatalBuildScannerError("Process number " + processNum + 
 					" appears to have been created twice.");
 		}
-		processToTaskMap.put(Integer.valueOf(processNum), Integer.valueOf(newTaskId));
+		processToActionMap.put(Integer.valueOf(processNum), Integer.valueOf(newActionId));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a CFS process number, translate it into a BuildStore task number. 
+	 * Given a CFS process number, translate it into a BuildStore action number. 
 	 * 
 	 * @param processNum The CFS process number.
-	 * @return The corresponding BuildStore task number.
-	 * @throws FatalBuildScannerError Ff the process-to-task mapping is unknown.
+	 * @return The corresponding BuildStore action number.
+	 * @throws FatalBuildScannerError Ff the process-to-action mapping is unknown.
 	 */
-	private int getTaskId(int processNum) {
-		Integer taskId = processToTaskMap.get(Integer.valueOf(processNum));
-		if (taskId == null){
+	private int getActionId(int processNum) {
+		Integer actionId = processToActionMap.get(Integer.valueOf(processNum));
+		if (actionId == null){
 			throw new FatalBuildScannerError("Process number " + processNum + 
-					" does not have an assigned task number");
+					" does not have an assigned action number");
 		}
-		return taskId;
+		return actionId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -416,8 +416,8 @@ import com.buildml.utils.string.ShellCommandUtils;
 					" (" + ((type == PathType.TYPE_FILE) ? "File" :
 						(type == PathType.TYPE_DIR) ? "Directory" : "Symlink") + ")");
 		
-		/* get the BuildStore taskId for the current process */
-		int taskId = getTaskId(processNum);
+		/* get the BuildStore actionId for the current process */
+		int actionId = getActionId(processNum);
 		
 		/* get the BuildStore fileId */
 		int fileId;
@@ -433,7 +433,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 		}
 		
 		/* add the file access information to the build store */
-		actionMgr.addFileAccess(taskId, fileId, direction);
+		actionMgr.addFileAccess(actionId, fileId, direction);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

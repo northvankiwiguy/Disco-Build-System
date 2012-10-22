@@ -26,7 +26,7 @@ import com.buildml.utils.errors.FatalError;
  * <p>
  * Each entry is keyed by an integer, and is either in the set or not in the set.
  * <p>
- * This class is sub-classed by FileSet and TaskSet, both of which are Integer-based sets.
+ * This class is sub-classed by FileSet and ActionSet, both of which are Integer-based sets.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
@@ -231,7 +231,7 @@ public abstract class IntegerTreeSet implements Iterable<Integer>, Cloneable {
 	/**
 	 * Create a new IntegerTreeSet and initialize it from an array of integer values.
 	 * 
-	 * @param initValues The initial values to be added to the task set.
+	 * @param initValues The initial values to be added to the set.
 	 */
 	public IntegerTreeSet(Integer[] initValues) {
 		this();

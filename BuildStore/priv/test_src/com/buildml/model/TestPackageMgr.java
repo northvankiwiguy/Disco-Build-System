@@ -660,12 +660,12 @@ public class TestPackageMgr {
 	@Test
 	public void testGetActionsInPackage() throws Exception {
 		IPackageMgr pkgMgr = bs.getPackageMgr();
-		IActionMgr bts = bs.getActionMgr();
+		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* create a few actions */
-		int action1 = bts.addAction(0, 0, "action1");
-		int action2 = bts.addAction(0, 0, "action2");
-		int action3 = bts.addAction(0, 0, "action3");
+		int action1 = actionMgr.addAction(0, 0, "action1");
+		int action2 = actionMgr.addAction(0, 0, "action2");
+		int action3 = actionMgr.addAction(0, 0, "action3");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");

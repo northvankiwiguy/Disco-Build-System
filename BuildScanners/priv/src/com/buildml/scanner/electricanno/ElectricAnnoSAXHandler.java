@@ -77,16 +77,16 @@ import com.buildml.utils.string.PathUtils;
 	/** The set of files that have been written in the current &lt;job&gt;. */	
 	private ArrayList<String> filesWritten;
 	
-	/** The ID of the current task's parent task. */
-	private int currentParentTask;
+	/** The ID of the current action's parent action. */
+	private int currentParentAction;
 	
-	/** The ID of the task we most recently processed. */
-	private int mostRecentTask;
+	/** The ID of the action we most recently processed. */
+	private int mostRecentAction;
 	
-	/** Our stack of parent tasks, recording our progress through the &lt;make&gt; &lt;/make&gt; tags. */
-	private ArrayList<Integer> taskStack;
+	/** Our stack of parent actions, recording our progress through the &lt;make&gt; &lt;/make&gt; tags. */
+	private ArrayList<Integer> actionStack;
 	
-	/** The file system directory in which the current task was performed. */
+	/** The file system directory in which the current action was performed. */
 	private int currentDirId;
 	
 	/** Maintain a stack of directories, pushing and popping as we encounter &lt;make&gt; and &lt;/make&gt;. */
@@ -106,12 +106,12 @@ import com.buildml.utils.string.PathUtils;
 		actionMgr = buildStore.getActionMgr();
 		fileMgr = buildStore.getFileMgr();
 		
-		/* create a stack to remember the hierarchy of tasks */
-		taskStack = new ArrayList<Integer>();
+		/* create a stack to remember the hierarchy of actions */
+		actionStack = new ArrayList<Integer>();
 		
-		/* To start with, all tasks we encounter are children of the root task */
-		mostRecentTask = currentParentTask = actionMgr.getRootAction("");
-		taskStack.add(currentParentTask);
+		/* To start with, all actions we encounter are children of the root action */
+		mostRecentAction = currentParentAction = actionMgr.getRootAction("");
+		actionStack.add(currentParentAction);
 		
 		/* we'll also need to track our current directory */
 		directoryStack = new ArrayList<Integer>();
@@ -152,7 +152,7 @@ import com.buildml.utils.string.PathUtils;
 		}
 		
 		/*
-		 * else, the <make> tag tells us the nesting relationship between tasks.
+		 * else, the <make> tag tells us the nesting relationship between actions.
 		 */
 		else if (localName.equals("make")) {
 			String cwd = atts.getValue("cwd");
@@ -164,9 +164,9 @@ import com.buildml.utils.string.PathUtils;
 			}
 			directoryStack.add(currentDirId);
 								
-			/* push our existing state on a stack, effectively changing our current parent task */
-			taskStack.add(Integer.valueOf(mostRecentTask));
-			currentParentTask = mostRecentTask;
+			/* push our existing state on a stack, effectively changing our current parent action */
+			actionStack.add(Integer.valueOf(mostRecentAction));
+			currentParentAction = mostRecentAction;
 		}
 		
 		/*
@@ -229,7 +229,7 @@ import com.buildml.utils.string.PathUtils;
 		
 		/* 
 		 * If we've found a </job> element tag, so we've parsed all the information related
-		 * to this job. To finish up, create a new build task and populate it with all the
+		 * to this job. To finish up, create a new build action and populate it with all the
 		 * file access information we acquired.. 
 		 */
 		if (withinJob && localName.equals("job")) {
@@ -238,7 +238,7 @@ import com.buildml.utils.string.PathUtils;
 			
 			/* 
 			 * We've seen all the details of this job, and if it's an interesting
-			 * job, then we'll add it as a build task. We currently define "interesting"
+			 * job, then we'll add it as a build action. We currently define "interesting"
 			 * as whether there's a command argv associated with it.
 			 */
 			if (commandArgv != null){
@@ -246,26 +246,26 @@ import com.buildml.utils.string.PathUtils;
 				String argvString = commandArgv.toString();
 				commandArgv = null;	
 				
-				int newTaskId = actionMgr.addAction(currentParentTask, currentDirId, argvString);
+				int newActionId = actionMgr.addAction(currentParentAction, currentDirId, argvString);
 				
-				/* record the ID of this task, since it might be the new parent task soon */
-				mostRecentTask = newTaskId;
+				/* record the ID of this action, since it might be the new parent action soon */
+				mostRecentAction = newActionId;
 
-				/* add all the file reads to the build task */
+				/* add all the file reads to the build action */
 				for (String file : filesRead) {
 					int newFileId = fileMgr.addFile(file);
 					if (newFileId != ErrorCode.BAD_PATH) {
-						actionMgr.addFileAccess(newTaskId, newFileId, OperationType.OP_READ);
+						actionMgr.addFileAccess(newActionId, newFileId, OperationType.OP_READ);
 					} else {
 						throw new FatalBuildScannerError("Unable to register new file in database: " + file);
 					}
 				}
 
-				/* add all the file writes to the build task */
+				/* add all the file writes to the build action */
 				for (String file : filesWritten) {
 					int newFileId = fileMgr.addFile(file);
 					if (newFileId != ErrorCode.BAD_PATH) {
-						actionMgr.addFileAccess(newTaskId, newFileId, OperationType.OP_WRITE);
+						actionMgr.addFileAccess(newActionId, newFileId, OperationType.OP_WRITE);
 					} else {
 						throw new FatalBuildScannerError("Unable to register new file in database: " + file);
 					}
@@ -281,19 +281,19 @@ import com.buildml.utils.string.PathUtils;
 			}
 		}
 		
-		/* else, we're done with this nesting level of tasks */
+		/* else, we're done with this nesting level of actions */
 		else if (localName.equals("make")) {
 			
 			/* 
-			 * Restore the current parent's ID and most recent task ID for the
+			 * Restore the current parent's ID and most recent action ID for the
 			 * parent's <job>
 			 */
-			int taskStackSize = taskStack.size();
-			if (taskStackSize == 0) {
+			int actionStackSize = actionStack.size();
+			if (actionStackSize == 0) {
 				throw new FatalBuildScannerError("Too many </make> tags in annotation file");
 			}
-			currentParentTask = taskStack.get(taskStackSize - 2);
-			mostRecentTask = taskStack.remove(taskStackSize - 1);
+			currentParentAction = actionStack.get(actionStackSize - 2);
+			mostRecentAction = actionStack.remove(actionStackSize - 1);
 			
 			/* restore the previous job's current directory */
 			int dirStackSize = directoryStack.size();
@@ -306,7 +306,7 @@ import com.buildml.utils.string.PathUtils;
 
 	/**
 	 * Handle occurrences of raw character in an XML stream. That is, the text that appears
-	 * between the start and end tags. FOr example, &lt;job&gt;this is the text&lt;/job&gt;.
+	 * between the start and end tags. For example, &lt;job&gt;this is the text&lt;/job&gt;.
 	 * See the definition of import org.xml.sax.helpers.DefaultHandler for parameter details.
 	 */
 	@Override

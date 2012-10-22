@@ -42,8 +42,8 @@ public class TestCFuncLink {
 	private IBuildStore bs = null;
 	private IActionMgr actionMgr = null;
 	private IFileMgr fileMgr = null;
-	private int rootTask;
-	private int task;
+	private int rootAction;
+	private int action;
 	private Integer fileAccesses[], fileReads[], fileWrites[], fileModifies[], fileDeletes[];
 	
 	/** temporary directory into which test cases can store files */
@@ -76,7 +76,7 @@ public class TestCFuncLink {
 
 	/**
 	 * Given the source code of a small C program, compile the program and scan it into a 
-	 * BuildStore. We then retrieve the one (and only) task that was registered in the 
+	 * BuildStore. We then retrieve the one (and only) action that was registered in the 
 	 * BuildStore, along with the lists of files that were accessed (accessed, read, written,
 	 * and deleted).
 	 * @param programCode The body of the small C program to be compiled.
@@ -92,22 +92,22 @@ public class TestCFuncLink {
 		actionMgr = bs.getActionMgr();
 		fileMgr = bs.getFileMgr();
 		
-		/* find the root task */
-		rootTask = actionMgr.getRootAction("root");
+		/* find the root action */
+		rootAction = actionMgr.getRootAction("root");
 		
-		/* there should only be one child task */
-		Integer childTasks[] = actionMgr.getChildren(rootTask);
-		assertEquals(1, childTasks.length);
+		/* there should only be one child action */
+		Integer childActions[] = actionMgr.getChildren(rootAction);
+		assertEquals(1, childActions.length);
 		
-		/* this is the task ID of the one task */
-		task = childTasks[0];
+		/* this is the action ID of the one action */
+		action = childActions[0];
 
 		/* fetch the file access arrays */
-		fileAccesses = actionMgr.getFilesAccessed(task, OperationType.OP_UNSPECIFIED);
-		fileReads = actionMgr.getFilesAccessed(task, OperationType.OP_READ);
-		fileWrites = actionMgr.getFilesAccessed(task, OperationType.OP_WRITE);
-		fileModifies = actionMgr.getFilesAccessed(task, OperationType.OP_MODIFIED);
-		fileDeletes = actionMgr.getFilesAccessed(task, OperationType.OP_DELETE);
+		fileAccesses = actionMgr.getFilesAccessed(action, OperationType.OP_UNSPECIFIED);
+		fileReads = actionMgr.getFilesAccessed(action, OperationType.OP_READ);
+		fileWrites = actionMgr.getFilesAccessed(action, OperationType.OP_WRITE);
+		fileModifies = actionMgr.getFilesAccessed(action, OperationType.OP_MODIFIED);
+		fileDeletes = actionMgr.getFilesAccessed(action, OperationType.OP_DELETE);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
