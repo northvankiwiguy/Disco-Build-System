@@ -27,7 +27,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -44,6 +47,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.UIJob;
 
+import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
@@ -461,6 +465,35 @@ public class EclipsePartUtils {
 			return false;
 		}
 		return true;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create an SWT Image, given the plug-in relative path of the image file (such as a .gif).
+	 * If possible, the image is retrieved from a cache of existing images.
+	 * @param plugInPath The image file's path, relative to the plug-in root.
+	 * @return An Image object, or null if the image couldn't be created.
+	 */
+	public static Image getImage(String plugInPath)
+	{
+		/* first, check if the image is already in the registry (a cache of images) */
+		ImageRegistry pluginImageRegistry = Activator.getDefault().getImageRegistry();
+		ImageDescriptor imageDescr = Activator.getImageDescriptor(plugInPath);
+		Image iconImage = pluginImageRegistry.get(imageDescr.toString());
+		
+		/* 
+		 * If not, proceed to create the image (as a new object) and store it in the
+		 * registry for future use.
+		 */
+		if (iconImage == null) {
+			iconImage = imageDescr.createImage();
+			if (iconImage == null) {
+				return null;
+			}
+			pluginImageRegistry.put(imageDescr.toString(), iconImage);
+		}
+		return iconImage;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

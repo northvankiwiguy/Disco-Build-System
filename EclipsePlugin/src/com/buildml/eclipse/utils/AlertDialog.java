@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -33,7 +33,7 @@ import org.eclipse.ui.progress.UIJob;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class AlertDialog extends TitleAreaDialog {
+public class AlertDialog extends BmlTitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -117,6 +117,10 @@ public class AlertDialog extends TitleAreaDialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 
+		/* estimate how large the error dialog should be */
+		Rectangle parentBounds = Display.getCurrent().getBounds();
+		int dialogWidth = parentBounds.width / 4;
+		
 		/* set the dialog's title, or default to "Alert" */
 		setHelpAvailable(false);
 		if (title == null) {
@@ -129,10 +133,11 @@ public class AlertDialog extends TitleAreaDialog {
 		
 		/* create a label for the message, and centre it */
 		if (message != null) {
-			Label label = new Label(composite, SWT.NONE);
+			Label label = new Label(composite, SWT.WRAP);
 			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 			gridData.horizontalAlignment = SWT.CENTER;
 			gridData.verticalAlignment = SWT.CENTER;
+			gridData.widthHint = dialogWidth;
 			label.setLayoutData(gridData);
 			label.setText(message);
 		}

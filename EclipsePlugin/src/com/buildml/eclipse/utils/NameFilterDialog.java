@@ -13,7 +13,6 @@
 package com.buildml.eclipse.utils;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -34,7 +33,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class NameFilterDialog extends TitleAreaDialog {
+public class NameFilterDialog extends BmlTitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES

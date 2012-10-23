@@ -13,7 +13,6 @@
 package com.buildml.eclipse.utils;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,7 +39,7 @@ import com.buildml.model.types.PackageSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class PackageFilterDialog extends TitleAreaDialog {
+public class PackageFilterDialog extends BmlTitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES

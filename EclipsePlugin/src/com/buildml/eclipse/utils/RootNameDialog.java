@@ -12,7 +12,6 @@
 
 package com.buildml.eclipse.utils;
 
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -28,7 +27,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class RootNameDialog extends TitleAreaDialog {
+public class RootNameDialog extends BmlTitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
