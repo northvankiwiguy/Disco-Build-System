@@ -63,7 +63,7 @@ system. Otherwise use the targets in the individual project directories.
 	   - API, and the PDF user guide.
 	   -->
 	<target name="all" description="Build the complete release package."
-		depends="cli, javadoc, userdoc" />
+		depends="cli, plugin, javadoc, userdoc" />
 	
 	<!--================================================================================-->
 
@@ -82,13 +82,14 @@ system. Otherwise use the targets in the individual project directories.
 			
 		<!-- make the packaging directory -->
 		<property name="pkg-dir" location="${priv-dir}/pkg/buildml-${version}" />
-		<property name="tmp-dir" location="${priv-dir}/pkg/tmp" />
+		<property name="tmp-dir" location="${priv-dir}/pkg/cli-tmp" />
 		<mkdir dir="${pkg-dir}/bin" />
 		<mkdir dir="${pkg-dir}/lib" />
 		<mkdir dir="${tmp-dir}" />
 		
 		<!-- for development purposes, it's helpful to have a "current" symlink to pkg-dir -->
-		<symlink failonerror="true" link="${priv-dir}/pkg/buildml-current" resource="${pkg-dir}" />
+		<symlink failonerror="true" link="${priv-dir}/pkg/buildml-current" 
+					resource="${pkg-dir}" overwrite="true"/>
 		
 		<!-- place all the .class files into a single directory, ready to create a single jar file -->
 		<unjar src="${workspace-root}/BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
@@ -135,6 +136,54 @@ system. Otherwise use the targets in the individual project directories.
 			
 	</target>
 		
+	<!--================================================================================-->
+
+	<!--
+	   - Build the Eclipse plugin - a jar file that can be dropped into an Eclipse
+	   - installation, or installed via an update site
+	  -->
+	<target name="plugin" description="Build the Eclipse plugin." depends="cli">
+		
+		<property name="pkg-dir" location="${priv-dir}/pkg/buildml-${version}" />
+		<property name="plugin-tmp-dir" location="${priv-dir}/pkg/plugin-tmp" />
+		<property name="plugin-dir" location="${priv-dir}/pkg/plugin" />
+		
+		<!-- this timestamp will be used when generating the plugin -->
+		<tstamp>
+			<format property="qualifier" pattern="yyyyMMddHHmm" />
+		</tstamp>
+		
+		<!-- create a temporary directory where the plugin content will be gathered -->
+		<mkdir dir="${plugin-dir}" />
+		
+		<!-- copy plugin classes -->
+		<copy failonerror="true" todir="${plugin-dir}">
+			<fileset dir="${workspace-root}/EclipsePlugin/bin" includes="**/*.class" />
+		</copy>
+		
+		<!-- 
+		   - copy the bin, lib and images directories, and the plugin.xml file. 
+		   - Note that buildml.jar is deliberately moved up one level in the tree.
+		  -->
+		<copy failonerror="true" todir="${plugin-dir}">
+			<fileset dir="${pkg-dir}" excludes="lib/buildml.jar" />
+			<fileset file="${pkg-dir}/lib/buildml.jar" />
+			<fileset dir="${workspace-root}/EclipsePlugin" includes="images/**/*,plugin.xml" />
+		</copy>
+		
+		<!-- Copy the manifest file, being careful to insert the correct version number -->
+		<copy file="${workspace-root}/EclipsePlugin/META-INF/MANIFEST.MF"
+				tofile="${plugin-tmp-dir}/MANIFEST.MF" />
+		<replace file="${plugin-tmp-dir}/MANIFEST.MF">
+			<replacefilter token="1.0.0.qualifier" value="${version}.${qualifier}" />
+		</replace>
+		
+		<!-- jar-up the plugin, giving it a meaningful name -->
+		<jar jarfile="${pub-dir}/com.buildml_${version}.${qualifier}.jar" basedir="${plugin-dir}"
+			manifest="${plugin-tmp-dir}/MANIFEST.MF" />
+				
+	</target>
+	
 	<!--================================================================================-->
 
 	<!--
