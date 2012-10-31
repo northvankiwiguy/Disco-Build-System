@@ -13,8 +13,12 @@
 package com.buildml.eclipse;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -33,6 +37,7 @@ import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
+import com.buildml.utils.os.SystemUtils;
 import com.buildml.utils.types.IntegerTreeRecord;
 
 /**
@@ -76,6 +81,12 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * tab (the default is "true"), or is this tab permanently fixed to the editor (false)
 	 */
 	private boolean removable = true;
+	
+	/**
+	 * Set to true the first time the user is warned about overriding the BUILDML_PATH.
+	 * They should only see the message once per Eclipse invocation, so this field is static.
+	 */
+	private static boolean warnedAboutPathOverride = false;
 
 	/*=====================================================================================*
 	 * CONSTRUCTOR
@@ -247,10 +258,46 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 				prefStore.getBoolean(PreferenceConstants.PREF_COALESCE_DIRS));
 		
 		/*
+		 * Determine where the BuildML binaries and libraries are kept. By default we get
+		 * them from within the plugin jar file, although the user is permitted
+		 * to override that path. If they do, however, they should be warned.
+		 */
+		String buildMlPath = null;
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("/files"), null);
+		if (url != null) {
+			try {
+				URL filesDirUrl = FileLocator.toFileURL(url);
+				buildMlPath = filesDirUrl.getPath();
+			} catch (IOException e) {
+				/* nothing - buildMlPath stays null, which indicates an error */
+			}
+		}
+
+		/*
+		 * If we can't locate the /files directory within the plugin, that's likely because we're
+		 * running this plugin within the eclipse PDE (as opposed to the plugin being installed
+		 * and executed in the normal way). If this is the case, then buildMlPath == null.
+		 * 
+		 * In any situation, the user is welcome to override the value of buildMlPath with their
+		 * own setting. However, if they're not using the plugin jar's copy of the files, we
+		 * should warn them.
+		 */
+		String prefBuildMlPath = prefStore.getString(PreferenceConstants.PREF_BUILDML_HOME);
+		if (!prefBuildMlPath.isEmpty() && !warnedAboutPathOverride) {
+			if (buildMlPath != null) {
+				AlertDialog.displayWarningDialog("Overriding BUILDML_HOME setting",
+						"Although the bin and lib directories have been found in the plugin jar file, " +
+						"you have chosen to override the path. Please go into the BuildML preferences " +
+						"if you wish to remove this override.");
+				warnedAboutPathOverride = true;
+			}
+			buildMlPath = prefBuildMlPath;
+		}
+		
+		/*
 		 * Check that the BUILDML_HOME preference is set, is a directory, and contains subdirectories
 		 * "lib" and "bin".
 		 */
-		String buildMlPath = prefStore.getString(PreferenceConstants.PREF_BUILDML_HOME);
 		if (buildMlPath.isEmpty()) {
 			AlertDialog.displayErrorDialog("Missing Preference Setting", 
 					"The preference setting: \"Directory containing BuildML's bin and lib directories\" " +
@@ -265,9 +312,16 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 						"The preference setting: \"Directory containing BuildML's bin and lib directories\" " +
 						"does not refer to a valid directory.");
 			}
-			/* else, the path is good */
+			/* 
+			 * Else, the path is good. The only additional requirement is that the 'cfs' command
+			 * be executable. This won't be the case if the /files directory has just been
+			 * extracted into the Eclipse configuration directory for the first time. Note that
+			 * chmod can fail if the files aren't owned by the current user, but that's not a
+			 * problem for us.
+			 */
 			else {
 				System.setProperty("BUILDML_HOME", buildMlPath);
+				SystemUtils.chmod(buildMlPath + "/bin/cfs", 0755);
 			}
 		}
 	}

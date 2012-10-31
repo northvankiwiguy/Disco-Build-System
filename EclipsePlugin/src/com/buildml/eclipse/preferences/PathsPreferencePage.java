@@ -43,7 +43,8 @@ public class PathsPreferencePage
 		Composite parent = getFieldEditorParent();
 		
 		Label buildMlHomeLabel = new Label(parent, SWT.NONE);
-		buildMlHomeLabel.setText("Directory containing BuildML's bin and lib directories:");
+		buildMlHomeLabel.setText("Directory containing BuildML's bin and lib directories " +
+				"(leave blank to use built-in path):");
 		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
 		gd.verticalIndent = 10;
 		buildMlHomeLabel.setLayoutData(gd);

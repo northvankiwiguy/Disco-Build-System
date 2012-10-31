@@ -162,11 +162,18 @@ system. Otherwise use the targets in the individual project directories.
 		</copy>
 		
 		<!-- 
-		   - copy the bin, lib and images directories, and the plugin.xml file. 
-		   - Note that buildml.jar is deliberately moved up one level in the tree.
+		   - copy the bin, lib directories into the /files subdirectory. This directory
+		   - will be fully extracted when the plugin runs.
+		  -->
+		<copy failonerror="true" todir="${plugin-dir}/files">
+			<fileset dir="${pkg-dir}" excludes="lib/buildml.jar" />
+		</copy>
+		
+		<!--
+		   - Now packet the buildml.jar file (containing the majority of the BuildML
+		   - code, the images directories, and the plugin.xml file. 
 		  -->
 		<copy failonerror="true" todir="${plugin-dir}">
-			<fileset dir="${pkg-dir}" excludes="lib/buildml.jar" />
 			<fileset file="${pkg-dir}/lib/buildml.jar" />
 			<fileset dir="${workspace-root}/EclipsePlugin" includes="images/**/*,plugin.xml" />
 		</copy>

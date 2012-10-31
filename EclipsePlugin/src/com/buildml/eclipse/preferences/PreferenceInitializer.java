@@ -25,9 +25,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		/* Set defaults for preferences on the "Appearance" page. */
 		store.setDefault(PreferenceConstants.PREF_COALESCE_DIRS, true);
-		
-		// TODO: set the default for PreferenceConstants.PREF_BUILDML_HOME, which should be
-		// somewhere within the Eclipse plugin directory.
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
