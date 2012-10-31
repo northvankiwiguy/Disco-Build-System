@@ -12,9 +12,6 @@
 
 package com.buildml.eclipse.utils;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
@@ -25,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.progress.UIJob;
 
 /**
  * A general purpose dialog box for reporting information, warnings and errors to the 
@@ -177,16 +173,15 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 * @param severity The severity level (e.g. IMessageProvider.ERROR).
 	 */
 	private static void openDialog(final String title, final String message, final int severity) {
-		UIJob dialogJob = new UIJob("Dialog") {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+		
+		/* Open the dialog in the UI thread, blocking until the user presses "OK" */
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
 				AlertDialog dialog = new AlertDialog(title, message, severity);
-				dialog.open();
-				return Status.OK_STATUS;
+				dialog.setBlockOnOpen(true);
+				dialog.open();		
 			}
-		};
-		dialogJob.setSystem(true);
-		dialogJob.schedule();
+		});
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
