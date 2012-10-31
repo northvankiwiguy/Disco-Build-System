@@ -147,3 +147,30 @@ JNIEXPORT jint JNICALL Java_com_buildml_utils_os_SystemUtils_createSymlink
     return rc;
 }
 
+/*
+ * Class:     com_buildml_utils_os_SystemUtils
+ * Method:    chmod
+ * Signature: (Ljava/lang/String;I)I
+ */
+JNIEXPORT jint JNICALL Java_com_buildml_utils_os_SystemUtils_chmod
+  (JNIEnv *env, jclass clazz, jstring fileName, jint mode)
+{
+	/* NULL pointers not allowed */
+	if (fileName == NULL) {
+		JNU_ThrowByName(env, "java/lang/NullPointerException", "null file name not permitted.");
+		return 0;
+	}
+
+    jboolean iscopy;
+    const char *cFileName = (*env)->GetStringUTFChars(env, fileName, &iscopy);
+
+    int rc = chmod(cFileName, mode);
+
+    /* free memory used by strings */
+    (*env)->ReleaseStringUTFChars(env, fileName, cFileName);
+
+    return rc;
+}
+
+
+

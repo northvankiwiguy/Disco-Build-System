@@ -69,11 +69,18 @@ public class SystemUtils {
 			}
 		}
 
-		/* load our JNI libraries */
+		/* 
+		 * load our JNI library. This could be in /lib if we're running a CLI-based mode,
+		 * or /files/lib/ if we're running as an Eclipse plugin.
+		 */
 		try {
 			System.load(buildMlHome + "/lib/libnativeLib.so");
-		} catch (UnsatisfiedLinkError ex) {
-			throw new FatalError("Unable to load native methods: " + ex.getMessage(), ex);
+		} catch (UnsatisfiedLinkError ex1) {
+			try {
+				System.load(buildMlHome + "/files/lib/libnativeLib.so");
+			} catch (UnsatisfiedLinkError ex2) {
+				throw new FatalError("Unable to load native methods: " + ex2.getMessage(), ex2);
+			}
 		}
 	}
 	
@@ -112,6 +119,17 @@ public class SystemUtils {
 	 * @return 0 if the symlink was created successfully, otherwise non-zero.
 	 */
 	public static native int createSymlink(String fileName, String targetFileName);
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set the Unix file permissions on the specified file/directory.
+	 * 
+	 * @param fileName The name of the file/directory to have permissions set.
+	 * @param mode The Unix mode (in octal, such as 0755).
+	 * @return 0 on success, or -1 on error.
+	 */
+	public static native int chmod(String fileName, int mode);
 	
 	/*-------------------------------------------------------------------------------------*/
 
