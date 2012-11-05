@@ -15,6 +15,7 @@
 		<or>
 			<equals arg1="${ant.java.version}" arg2="1.5" />
 			<equals arg1="${ant.java.version}" arg2="1.6" />
+			<equals arg1="${ant.java.version}" arg2="1.7" />
 		</or>
 	</condition>
 	<fail unless="java-ok">
