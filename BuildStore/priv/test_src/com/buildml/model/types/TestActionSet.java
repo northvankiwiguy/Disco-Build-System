@@ -357,7 +357,7 @@ public class TestActionSet {
 		assertFalse(ts.isMember(actionA2));
 
 		/* test invalid syntax */
-		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "+123" }));
+		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "*123" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "X" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "123-" }));
 		assertEquals(ErrorCode.BAD_VALUE, ts.populateWithActions(new String[] { "123/foo" }));
