@@ -68,13 +68,13 @@
 		<exec executable="gcc" failonerror="true">
 			<arg line="-o" />
 			<arg line="${native-lib}" />
+			<arg line="-fPIC" />
 			<arg line="-shared" />
 			<arg line="-Wl,-soname,libnative.so" />
 			<arg line="-I${gen-src}" />
 			<arg line="-I${java.home}/../include" />
 			<arg line="-I${java.home}/../include/linux" />
 			<arg line="${native-src}/com_buildml_utils_os_SystemUtils.c" />
-			<arg line="-static" />
 			<arg line="-lc" />
 		</exec>
 
