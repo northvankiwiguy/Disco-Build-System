@@ -499,6 +499,63 @@ int euidaccess(const char *pathname, int mode)
 }
 
 /*======================================================================
+ * Macros for supporting execl, execle and execlp.
+ *======================================================================*/
+
+/*
+ * Macro for copying a function's varargs into a contiguous buffer. Although
+ * many CPU architectures store vararg parameters in a contiguous range of
+ * memory on the stack, this isn't true for all architectures. The only
+ * official way of doing this is to call va_arg() multiple times and create
+ * our own buffer.
+ *
+ * This is implemented as a macro (not an inline function) because it needs
+ * access to the calling function's argument list.
+ *
+ * pArgs[out] - The contiguous buffer of arguments that this macro return.
+ * arg0[in] - The name of the first argument (of the varargs).
+ * getEnvp[in] - TRUE if we should look for an envp pointer after the arguments.
+ * pEnvp[out] - If getEnvp is TRUE, returns the envp.
+ */
+#define COPY_VARARGS(pArgs, arg0, getEnvp, pEnvp) \
+    { \
+		va_list ap; \
+		\
+		/* count the number of arguments (and the terminating NULL) */ \
+		int argCount = 1; \
+		va_start(ap, arg0); \
+		do { \
+			argCount++; \
+		} while (va_arg(ap, char *) != NULL); \
+		va_end(ap); \
+		\
+		/* allocate a buffer to copy the arguments into */ \
+		*(pArgs) = malloc(sizeof(char *) * argCount); \
+		\
+		/* copy the arguments */ \
+		va_start(ap, arg0); \
+		char *p = (char *)(arg0); \
+		int i = 0; \
+		do { \
+			(*(pArgs))[i++] = p; \
+			p = va_arg(ap, char *); \
+		} while (p != NULL); \
+		(args)[i] = NULL; \
+		if (getEnvp) { \
+			*(pEnvp) = va_arg(ap, char **); \
+		} \
+		va_end(ap); \
+	}
+
+#define FREE_VARARGS(args) \
+	{ \
+		int saved_errno = errno; \
+		free((args)); \
+		errno = saved_errno; \
+	}
+
+
+/*======================================================================
  * Interposed - execl()
  *======================================================================*/
 
@@ -506,11 +563,23 @@ int
 execl(const char *path, const char *arg0, ...)
 {
 	extern char **environ;
+	char **args;
+	char * const *envp;
+
+	COPY_VARARGS(&args, arg0, FALSE, &envp);
+	if (args == NULL) {
+		errno = ENOMEM;
+		return -1;
+	}
 
 	_cfs_debug(1, "execl(\"%s\", ..., ...)", path);
 
 	/* execl is simply a wrapper for execve()s */
-	return _cfs_execve_common(path, (char * const *)&arg0, environ);
+	int ret_code = _cfs_execve_common(path, (char * const *)args, environ);
+
+	/* free the argument buffer */
+	FREE_VARARGS(args);
+	return ret_code;
 }
 
 /*======================================================================
@@ -520,22 +589,22 @@ execl(const char *path, const char *arg0, ...)
 int
 execle(const char *path, const char *arg0, ... /*, 0, char *const envp[] */)
 {
+	char **args;
+	char * const *envp;
+
+	COPY_VARARGS(&args, arg0, TRUE, &envp);
+	if (args == NULL) {
+		errno = ENOMEM;
+		return -1;
+	}
+
 	_cfs_debug(1, "execle(\"%s\", ..., ...)", path);
 
-	/*
-	 * execle is a wrapper for execve, but we first need to identify
-	 * the envp pointer. It should be immediately beyond the NULL pointer
-	 * at the end of the argv array.
-	 */
-	char * const *p = (char * const *)&arg0;
+	int ret_code = _cfs_execve_common(path, (char * const *)args, envp);
 
-	/* skip through the argv array */
-	while (*p++ != NULL) { /* empty */ }
-
-	/* finally, grab the environment pointer */
-	char * const *envp = (char * const *)*p;
-
-	return _cfs_execve_common(path, (char * const *)&arg0, envp);
+	/* free the argument buffer */
+	FREE_VARARGS(args);
+	return ret_code;
 }
 
 /*======================================================================
@@ -546,13 +615,25 @@ int
 execlp(const char *file, const char *arg0, ...)
 {
 	extern char **environ;
+	char **args;
+	char * const *envp;
+
+	COPY_VARARGS(&args, arg0, FALSE, &envp);
+	if (args == NULL) {
+		errno = ENOMEM;
+		return -1;
+	}
 
 	_cfs_debug(1, "execlp(\"%s\", ..., ...)", file);
 
 	/*
 	 * execlp is a wrapper for execvpe().
 	 */
-	return _cfs_execvpe_common(file, (char * const *)&arg0, environ);
+	int ret_code = _cfs_execvpe_common(file, (char * const *)args, environ);
+
+	/* free the argument buffer */
+	FREE_VARARGS(args);
+	return ret_code;
 }
 
 /*======================================================================
