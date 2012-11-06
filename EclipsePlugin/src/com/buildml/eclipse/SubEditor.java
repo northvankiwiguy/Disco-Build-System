@@ -298,7 +298,7 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 		 * Check that the BUILDML_HOME preference is set, is a directory, and contains subdirectories
 		 * "lib" and "bin".
 		 */
-		if (buildMlPath.isEmpty()) {
+		if ((buildMlPath == null) || buildMlPath.isEmpty()) {
 			AlertDialog.displayErrorDialog("Missing Preference Setting", 
 					"The preference setting: \"Directory containing BuildML's bin and lib directories\" " +
 					"is not defined. Please go into the BuildML preferences and set a suitable value.");
