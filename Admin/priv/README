@@ -1,12 +1,62 @@
+Maintaining BuildML
+-------------------
+
+These instructions are targeted towards people who are developing the BuildML
+product, or who are trying to build for a non-supported platform. Most users
+of BuildML should simply obtain the software in pre-compiled form from the
+update site at http://www.buildml.com.
+
+This documentation includes:
+  * Third-party tools required to compile BuildML.
+  * Instructions on compiling the code for a production release.
+  * Instructions on compiling within a development environment.
+
+Prerequisite Tools
+------------------
+
+The following third-party tools and packages are required in order to
+build the BuildML software. So far, BuildML has been built on OpenSuSE (32 and
+64-bit versions), and Redhat Enterprise Linux (64-bit). It's expected that 
+other versions of Linux should also work correctly, although possibly with
+minor tweaks to the BuildML code.
+
+For simplicity, it's recommended that you obtain these tools via your Linux
+distribution's package manager, although it's really your choice how you get
+hold of them.
+
+* scons (build tool) - Version 2.1.0 or above.
+* ant (build tool) - Version 1.8 or higher.
+* make (build tool) - Not used in BuildML, but useful for testing build imports.
+* jdk (Java Development Kit) version 1.5 or higher. Although OpenJDK is installed
+  by default on many Linux distributions, it's recommended that you use Sun/Oracle
+  JDK (from java.oracle.com).
+* latex (document formatter) - You may also need to installed the related "tex"
+  packages.
+* git (source code management) - Although you probably have this already if you've
+  already obtained the BuildML source tree.
+* Eclipse (IDE) - Tested with Eclipse Indigo and Juno. At a minimum, you'll need
+  the JDT (Java Development Tools) and PDE (Plug-in Development Environment).
+* junit - for running junit-based tests. Insure that you have junit version 4, and
+  that any junit.jar files in your Java classpath refer to version 4.
+* The ant-junit library that allows ant scripts to invoke junit tests.
+* cunit - for running cunit-based tests. Make sure that the CUnit include and library
+  directories are in your include/library path (such as /usr/include and /usr/lib).
+
+As a general approach, the BuildML build tool will warn you if you don't have the
+correct tools installed. However, this mechanism still needs a bit more work and
+will evolve over time and new platforms are supported.
+
+
 How to Compile BuildML
 ----------------------
 
 To compile the BuildML release from source code, execute the following commands
-in this directory:
+in this directory (Admin/priv).
 
   % ant all
   
-This will generate a release "tar-ball" in Admin/pub/ directory. The release
+This generates a release "tar-ball", the Eclipse plug-in, and various
+documentation files, placing them in the Admin/pub/ directory. The release
 image is named buildml-W.X.Y.tar.gz, where W.X.Y is the version number of the
 current code base.
 
@@ -26,7 +76,7 @@ For more choices on what to build, see the help information:
   % ant help
 
 
-Building BuildML in a Development Envionment
+Building BuildML in a Development Environment
 --------------------------------------------
 
 Given that the above procedure for compiling BuildML is rather time-consuming
@@ -34,26 +84,15 @@ for BuildML developers, there's a faster way to get a runnable program. This
 feature allows you to edit source code using Eclipse, then immediately run
 the "bml" command to test your changes.
 
-There are two steps required to make this work:
+To make this work, set your shell $PATH variable to include:
 
-1) Set your shell $PATH variable to include:
-
-   .../CliMain/priv/scripts/
+   .../CliMain/priv/scripts
    
-   you'll be able to run the "bml" shell script that's resident in that
+   you'll then be able to run the "bml" shell script that's resident in that
    directory (as opposed to extracting the buildml-W.Y.Z.tar.gz in order to run 
    it). When used in this mode, the "bml" script picks up .class files and
-   .jar files directly from your source tree. 
+   .jar files directly from your source tree. Note however, changes to C-language
+   source files will require that you compile the full release package.
 
-2) Make sure you've built version 0.0.0 of the full BuildML package. This is
-   required since the dynamically loadable .so files, and the "cfs" executable
-   program must be in a well-known place. The bml script will look in this
-   directory when loading those programs. Unfortunately, this implies that
-   native C/C++ code must be compiled with the full "ant all" build step.
-   
-It's very important that you build with version 0.0.0 ("ant all 
--Dversion=0.0.0"), and that all BuildML databases you use have the embedded
-schema version of 0. When executing .class files directly from the source
-tree, they'll automatically use schema version 0, and the code and the
-database content must use the exact same schema version numbers.
+
  
