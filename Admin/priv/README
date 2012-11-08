@@ -8,6 +8,7 @@ update site at http://www.buildml.com.
 
 This documentation includes:
   * Third-party tools required to compile BuildML.
+  * How to import the source code into Eclipse.
   * Instructions on compiling the code for a production release.
   * Instructions on compiling within a development environment.
 
@@ -36,15 +37,40 @@ hold of them.
   already obtained the BuildML source tree.
 * Eclipse (IDE) - Tested with Eclipse Indigo and Juno. At a minimum, you'll need
   the JDT (Java Development Tools) and PDE (Plug-in Development Environment).
-* junit - for running junit-based tests. Insure that you have junit version 4, and
-  that any junit.jar files in your Java classpath refer to version 4.
+* junit - for running junit-based tests. Ensure that you have junit version 4, and
+  that any junit.jar files in your Java classpath refer to version 4. For example,
+  depending on your system, you may need to symlink /usr/share/ant/lib/junit.jar
+  to /usr/share/java/junit4.jar.
 * The ant-junit library that allows ant scripts to invoke junit tests.
 * cunit - for running cunit-based tests. Make sure that the CUnit include and library
   directories are in your include/library path (such as /usr/include and /usr/lib).
+  If you can't find a suitable package to install, download and compile the source
+  code from http://sourceforge.net/projects/cunit/.
+* The zlib compression library (headers and libraries).
 
 As a general approach, the BuildML build tool will warn you if you don't have the
 correct tools installed. However, this mechanism still needs a bit more work and
 will evolve over time and new platforms are supported.
+
+
+Opening the Source Code in Eclipse
+----------------------------------
+
+To check out the BuildML source code, use the following command:
+
+   git clone https://github.com/northvankiwiguy/Disco-Build-System.git
+
+This will pull a copy of the code repository into the "Disco-Build-System" directory
+within your current working directory.
+
+Next, start Eclipse and change your current workspace (File -> Switch Workspace) to
+point to the Disco-Build-System directory. 
+
+Although the workspace will open, you won't see any projects. To add the projects,
+select "File -> Import -> General -> Existing Project into Workspace". Select your
+Disco-Build-System directory as the "root", which will list all of BuildML's projects.
+Select all of the projects, then select "Finish". All the projects should now appear
+in the workspace.
 
 
 How to Compile BuildML
@@ -94,5 +120,22 @@ To make this work, set your shell $PATH variable to include:
    .jar files directly from your source tree. Note however, changes to C-language
    source files will require that you compile the full release package.
 
+To be able to run the EclipsePlugin project from within Eclipse, you must do
+the following two things:
 
+  1) In the EclipsePlugin sub-directory, create a symlink to the buildml.jar file
+     in the Admin/priv/pkg/buildml-current/lib directory.
+     
+     $ cd EclipsePlugin
+     $ ln -s ../Admin/priv/pkg/buildml-current/lib/buildml.jar .
+     
+  2) Once you start up the EclipsePlugin project (by selecting "Run As" ->
+     "Eclipse Application"), you'll be prompted to set a preference that points
+     to the bin and lib directories. To do so (within the newly-started Eclipse
+     window), select Window -> Preferences -> BuildML -> Paths and browse
+     to the path of your Admin/priv/pkg/buildml-current directory. This allows
+     your Eclipse plug-in to access the native binaries from your development
+     workspace.
+     
+ 
  
