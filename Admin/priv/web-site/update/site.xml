@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.buildml_1.0.0.qualifier.jar" id="com.buildml" version="1.0.0.qualifier" os="linux" arch="ia64,x86_64">
+      <category name="com.buildml"/>
+   </feature>
+   <feature url="features/com.buildml_1.0.0.qualifier.jar" id="com.buildml" version="1.0.0.qualifier" os="linux" arch="ia64,x86_64">
+      <category name="com.buildml"/>
+   </feature>
+   <category-def name="com.buildml" label="BuildML Build Tool">
+      <description>
+         The BuildML Build Tool provides a UML-like interface for managing software build systems.
+      </description>
+   </category-def>
+</site>

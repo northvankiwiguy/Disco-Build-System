@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.buildml"
+      label="The BuildML Build Tool"
+      version="1.0.0.qualifier"
+      provider-name="Arapiki Solutions Inc."
+      os="linux"
+      arch="ia64,x86_64">
+
+   <description>
+      The BuildML Build Tool provides the ability to create and manage a software build system using a UML-like visual language. Instead of describing the software build system using an obscure language (such as that required by GNU Make), users may drag and drop files and compilation actions onto a drawing canvas, allowing easy specification of the build steps. For large build systems, the build steps can be divided into packages, making it possible to comprehend the higher level build process, but also to drill down into the detail when necessary.
+   </description>
+
+   <copyright>
+      Copyright (c) 2010-2012 Arapiki Solutions Inc.
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+   </copyright>
+
+   <url>
+      <update label="The BuildML Build Tool" url="http://www.buildml.com/update"/>
+      <discovery label="The BuildML Build Tool" url="http://www.buildml.com"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.ui.console" version="3.5.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+   </requires>
+
+   <plugin
+         id="com.buildml"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+</feature>

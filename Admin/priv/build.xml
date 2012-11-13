@@ -8,7 +8,7 @@ system. Otherwise use the targets in the individual project directories.
 	</description>
 
 	<!--================================================================================
-	   - Constant definitions
+	   - Imports and task definitions
 	   =================================================================================-->
 
 	<import file="shared/build/build-version.xml"/>
@@ -16,6 +16,11 @@ system. Otherwise use the targets in the individual project directories.
 	<!-- check for that we have the correct compilers installed -->
 	<import file="shared/build/build-toolcheck.xml" />
 
+	<!-- this timestamp will be used when generating the plugin -->
+	<tstamp>
+		<format property="qualifier" pattern="yyyyMMddHHmm" />
+	</tstamp>
+		
 	<!--================================================================================
 	   - Path definitions
 	   =================================================================================-->
@@ -63,7 +68,7 @@ system. Otherwise use the targets in the individual project directories.
 	   - API, and the PDF user guide.
 	   -->
 	<target name="all" description="Build the complete release package."
-		depends="cli, plugin, javadoc, userdoc" />
+		depends="cli, plugin, javadoc, userdoc, update-site" />
 	
 	<!--================================================================================-->
 
@@ -125,7 +130,7 @@ system. Otherwise use the targets in the individual project directories.
 		
 		<!-- finally, tar up the whole release package -->
 		<delete file="${pub-dir}/buildml-${version}.tar.gz" />
-		<tar destfile="${pub-dir}/buildml-${version}.tar.gz" compression="gzip" > 
+		<tar destfile="${pub-dir}/releases/buildml-${version}.tar.gz" compression="gzip" > 
 			<tarfileset dir="${pkg-dir}/.." dirmode="755" mode="755">
 				<include name="buildml-${version}/bin/**"/>
 			</tarfileset>
@@ -147,11 +152,6 @@ system. Otherwise use the targets in the individual project directories.
 		<property name="pkg-dir" location="${priv-dir}/pkg/buildml-${version}" />
 		<property name="plugin-tmp-dir" location="${priv-dir}/pkg/plugin-tmp" />
 		<property name="plugin-dir" location="${priv-dir}/pkg/plugin" />
-		
-		<!-- this timestamp will be used when generating the plugin -->
-		<tstamp>
-			<format property="qualifier" pattern="yyyyMMddHHmm" />
-		</tstamp>
 		
 		<!-- create a temporary directory where the plugin content will be gathered -->
 		<mkdir dir="${plugin-dir}" />
@@ -180,15 +180,55 @@ system. Otherwise use the targets in the individual project directories.
 		
 		<!-- Copy the manifest file, being careful to insert the correct version number -->
 		<copy file="${workspace-root}/EclipsePlugin/META-INF/MANIFEST.MF"
-				tofile="${plugin-tmp-dir}/MANIFEST.MF" />
+				tofile="${plugin-tmp-dir}/MANIFEST.MF" overwrite="true" />
 		<replace file="${plugin-tmp-dir}/MANIFEST.MF">
 			<replacefilter token="1.0.0.qualifier" value="${version}.${qualifier}" />
 		</replace>
 		
 		<!-- jar-up the plugin, giving it a meaningful name -->
-		<jar jarfile="${pub-dir}/com.buildml_${version}.${qualifier}.jar" basedir="${plugin-dir}"
-			manifest="${plugin-tmp-dir}/MANIFEST.MF" />
+		<jar jarfile="${pub-dir}/update/plugins/com.buildml_${version}.${qualifier}.jar"
+			basedir="${plugin-dir}" manifest="${plugin-tmp-dir}/MANIFEST.MF" />
 				
+	</target>
+	
+	<!--================================================================================-->
+
+	<!--
+	   - Build the Eclipse feature and update site, in preparation for posting to the
+	   - public web site.
+	  -->
+	<target name="update-site" description="Build the Eclipse update-site">
+		
+		<!-- delete old content from update directory -->
+		<delete dir="${pub-dir}/update" />
+				
+		<!-- build the Eclipse plugin, which is placed into the update/plugins directory -->
+		<antcall target="plugin" />
+		
+		<!-- copy pure-html / image files to public directory - these are statically edited -->
+		<copy todir="${pub-dir}">
+			<fileset dir="web-site">
+				<include name="**" />
+				<exclude name="update/**" />
+			</fileset>
+		</copy>
+		
+		<!-- copy the site.xml file, taking care to update the version numbers -->
+		<copy file="web-site/update/site.xml" tofile="${pub-dir}/update/site.xml" />
+		<replace file="${pub-dir}/update/site.xml">
+			<replacefilter token="1.0.0.qualifier" value="${version}.${qualifier}" />
+		</replace>
+		
+		<!-- copy the feature.xml file, update the version numbers, then jar it up -->
+		<copy file="web-site/update/feature.xml" 
+			tofile="${pub-dir}/update/features/feature.xml" />
+		<replace file="${pub-dir}/update/features/feature.xml">
+			<replacefilter token="1.0.0.qualifier" value="${version}.${qualifier}" />
+		</replace>
+		<jar basedir="${pub-dir}/update/features/" 
+		     jarfile="${pub-dir}/update/features/com.buildml_${version}.${qualifier}.jar" />
+		<delete file="${pub-dir}/update/features/feature.xml" />
+		
 	</target>
 	
 	<!--================================================================================-->
@@ -236,7 +276,7 @@ system. Otherwise use the targets in the individual project directories.
 		<exec dir="user-docs" executable="dvipdf" failonerror="true">
 			<arg value="buildml-user-guide.dvi"/>
 		</exec>
-		<move file="user-docs/buildml-user-guide.pdf" todir="${pub-dir}/" />	
+		<move file="user-docs/buildml-user-guide.pdf" todir="${pub-dir}/docs/" />	
 	</target>
 		
 	<!--
@@ -305,5 +345,90 @@ system. Otherwise use the targets in the individual project directories.
 	  -->
 	<target name="test" depends="unit-test, cli-test" 
 		description="Run all regression tests (unit tests and CLI tests)." />
+
+	<!--================================================================================-->
+
+	<!--
+	   - Obtain the FTP site's login credentials.
+	  -->
+	<target name="ftp-user">
+		<property name="ftp.server" value="003b96b.netsolhost.com" />
+		<input message="Enter FTP user name: " addproperty="ftp.userid" />
+		<input message="Enter FTP password : " addproperty="ftp.password" />
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Transfer the update directory to the public web site.
+	  -->
+	<target name="post-update-site" depends="update-site, ftp-user" 
+	    description="Post the Eclipse update site information to the public website.">
+		
+		<ftp action="mkdir" server="${ftp.server}" userid="${ftp.userid}"
+			password="${ftp.password}" passive="yes" remotedir="/htdocs/buildml/update" />
+		<ftp action="put" server="${ftp.server}" userid="${ftp.userid}" 
+			password="${ftp.password}" passive="yes" verbose="yes"
+			remotedir="/htdocs/buildml/update">
+			<fileset dir="${pub-dir}/update" />
+		</ftp>
+	</target>
+
+	<!--================================================================================-->
 	
+	<!--
+       - Transfer the release directory to the public web site.
+	  -->
+	<target name="post-release" depends="cli, ftp-user"
+		description="Post the release package to the public website.">
+			
+		<ftp action="mkdir" server="${ftp.server}" userid="${ftp.userid}"
+			password="${ftp.password}" passive="yes" remotedir="/htdocs/buildml/releases" />
+		<ftp action="put" server="${ftp.server}" userid="${ftp.userid}" 
+			password="${ftp.password}" passive="yes" verbose="yes"
+			remotedir="/htdocs/buildml/releases">
+			<fileset dir="${pub-dir}/releases" />
+		</ftp>
+	</target>
+
+	<!--================================================================================-->
+
+	<!--
+	   - Transfer the javadoc directory to the public web site.
+	  -->
+	<target name="post-javadoc" depends="javadoc, ftp-user" 
+	    description="Post the javadoc pages to the public website.">
+		
+		<property name="javadocdir" value="/htdocs/buildml/javadoc/buildml-${version}" />
+		<ftp action="mkdir" server="${ftp.server}" userid="${ftp.userid}"
+			password="${ftp.password}" passive="yes" 
+			remotedir="${javadocdir}" />
+		<ftp action="put" server="${ftp.server}" userid="${ftp.userid}" 
+			password="${ftp.password}" passive="yes" verbose="yes"
+			remotedir="${javadocdir}">
+			<fileset dir="${pub-dir}/javadoc" />
+		</ftp>
+	</target>
+	
+	<!--================================================================================-->
+
+	<!--
+	   - Transfer the html/image to the public web site.
+	  -->
+	<target name="post-static-html" depends="ftp-user, update-site" 
+	    description="Post the static web pages to the public website.">
+		
+		<ftp action="put" server="${ftp.server}" userid="${ftp.userid}" 
+			password="${ftp.password}" passive="yes" verbose="yes"
+			remotedir="/htdocs/buildml">
+			<fileset dir="${pub-dir}/">
+				<exclude name="javadoc/**" />
+				<exclude name="update/**" />
+				<exclude name="releases/**" />
+			</fileset>
+		</ftp>
+	</target>
+
+	<!--================================================================================-->
+
 </project>

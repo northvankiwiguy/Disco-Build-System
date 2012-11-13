@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: com.buildml
+Bundle-Name: BuildML Build Tool.
 Bundle-SymbolicName: com.buildml;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.buildml.eclipse.Activator
@@ -17,3 +17,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: buildml.jar,
  .
 Import-Package: org.eclipse.core.filesystem
+Bundle-Vendor: Arapiki Solutions Inc.

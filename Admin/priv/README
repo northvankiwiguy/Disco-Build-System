@@ -47,6 +47,8 @@ hold of them.
   If you can't find a suitable package to install, download and compile the source
   code from http://sourceforge.net/projects/cunit/.
 * The zlib compression library (headers and libraries).
+* If you need to update the public web site (using ftp), also install Apache 
+  commons-net and ant-commons-net. Most users won't need to do this.
 
 As a general approach, the BuildML build tool will warn you if you don't have the
 correct tools installed. However, this mechanism still needs a bit more work and

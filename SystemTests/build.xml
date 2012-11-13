@@ -39,7 +39,7 @@
 		<exec executable="./run_tests.pl"
 			dir="test-src/cli-tests"
 			failonerror="true">
-			<arg value="${workspace-root}/Admin/pub/buildml-${version}.tar.gz" />
+			<arg value="${workspace-root}/Admin/pub/releases/buildml-${version}.tar.gz" />
 		</exec>
 	</target>
 
