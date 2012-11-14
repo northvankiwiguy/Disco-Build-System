@@ -26,3 +26,9 @@ Release 0.2.0 - February 6th, 2012
 - Numerous bug fixes, performance improvements and refactoring of
   the 0.1.0 features.
 
+Release 0.3.0 - November 14th, 2012
+-----------------------------------
+
+- Eclipse plug-in support for all existing text-based features.
+- No new functionality, other than Eclipse support.
+
