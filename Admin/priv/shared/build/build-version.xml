@@ -4,6 +4,6 @@
 	   - This is the default version number of BuildML. Be sure to
 	   - update this after every major release.
 	  -->
-	<property name="version" value="0.3.0" />
+	<property name="version" value="0.4.0" />
 	
 </project>
