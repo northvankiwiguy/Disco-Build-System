@@ -30,6 +30,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
@@ -104,15 +105,15 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 
-		if (! (input instanceof IFileEditorInput)) {
-			throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+		if (! (input instanceof IURIEditorInput)) {
+			throw new PartInitException("Invalid Input: Must be IURIEditorInput");
 		}
 		super.init(site, input);
 		
 		/* open the BuildStore file we're editing */
 		
-		IFileEditorInput editorInput = (IFileEditorInput)input;
-		fileInput = editorInput.getFile().getLocation().toFile();
+		IURIEditorInput editorInput = (IURIEditorInput)input;
+		fileInput = new File(editorInput.getURI().getPath());
 
 		// TODO: handle the case where multiple editors have the same BuildStore open.
 		
@@ -304,12 +305,17 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 			/* save the database to disk */
 			buildStore.save();
 			
-			/* update Eclipse's resources, so it notices that the file has changed */
-			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
-			try {
-				file.refreshLocal(IFile.DEPTH_ONE, monitor);
-			} catch (CoreException e) {
-				throw new FatalBuildStoreError("Unable to update file resource after save", e);
+			/* 
+			 * Update Eclipse's resources, so it notices that the file has changed. This
+			 * is only necessary if the file is in the workspace.
+			 */
+			if (getEditorInput() instanceof IFileEditorInput) {
+				IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+				try {
+					file.refreshLocal(IFile.DEPTH_ONE, monitor);
+				} catch (CoreException e) {
+					throw new FatalBuildStoreError("Unable to update file resource after save", e);
+				}
 			}
 
 			/* save was successful - notify other parts of Eclipse */
@@ -337,7 +343,7 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 		 */
 		Shell shell = getSite().getWorkbenchWindow().getShell();
 		SaveAsDialog dialog = new SaveAsDialog(shell);
-		dialog.setOriginalFile(((IFileEditorInput) getEditorInput()).getFile());
+		dialog.setOriginalName("Copy of " + getPartName());
 		dialog.open();
 
 		/* if the user provided a file name (as opposed to hitting cancel) */

@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -142,8 +142,8 @@ public class ActionsEditor extends SubEditor {
 			throws PartInitException {
 
 		/* we can only handle files as input */
-		if (! (input instanceof IFileEditorInput)) {
-			throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+		if (! (input instanceof IURIEditorInput)) {
+			throw new PartInitException("Invalid Input: Must be IURIEditorInput");
 		}
 		
 		/* save our site and input data */
