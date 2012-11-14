@@ -1,0 +1,70 @@
+BuildML Eclipse Plug-in Test Plan
+---------------------------------
+
+Given that we don't yet have automated testing for the BuildML Eclipse Plug-in, the following manual tests should be performed
+before each software release. As new GUI features are added, corresponding test cases should also be documented here.
+
+Creating New Files and Importing
+--------------------------------
+
+* Create an empty file
+  - Select “File -> New -> BuildML File” and create a new build.bml file in the Eclipse workspace. The file should 
+    automatically open in the BuildML editor, albeit empty.
+  - Flip between the Files and Action tabs, to ensure that both are empty.
+
+* Import a directory hierarchy.
+  - Select “File -> Import -> Import Directory Hierarchy”.
+  - Select “/usr/include” as the directory to include, and select your new build.bml file from the “choose open buildml 
+    file” field.
+  - Click “finish”, the check that the “files” tab contains the content of the /usr/include directory. The actions tab 
+    should remain empty.
+  - Repeat the import with a new build2.bml file, but make sure the file is not open. When you perform the import, you won’t be
+    presented with a “choose open buildml file” field, so instead you should browse for the build2.bml file.
+  - Repeat the import with both build.bml and build2.bml. You should see that both files are listed in the “choose open 
+    buildml file” field. Selecting each option will fill in the absolute path of the .bml file.
+
+Browsing the Files tab
+----------------------
+
+* Basic browsing:
+  - Browse the file hierarchy, opening and closing folder nodes. Double-clicking on a folder will expand the content
+    of that folder (or contract it).
+  - Right click on a folder and select “Expand Subtree”. This will fully expand all the descendants of the folder. 
+    Pressing Ctrl-E should do the same thing.
+  - Right click on a (non-folder) file and see that Expand Subtree is greyed out.
+  - Press “Ctrl-A” to select all nodes, then use “Ctrl-E” to expand all the files/folders.
+  - Notice that each file type is associated with an appropriate icon for that type of file.
+  - Double click on a file should open it (assuming it exists on the file system). Try different types of file 
+    (.c, .h, .java, .o, etc) to see that different editors are opened.
+
+* Hiding and Revealing:
+  - Select one or more files (or folders), then right click and select “Hide selected”. The nodes should vanish.
+  - Repeat the operation, but this time use the “Del” key to hide the files.
+  - On the tool bar, select the “Reveal items that were previously hidden” button and check that the hidden files 
+    appear, but greyed out.
+  - Select a subset of the files that you hid, and reveal them by right-clicking and selecting “Reveal Selected.”
+  - Repeat, but this time use the “Ins” key.
+
+Opening and Saving Files
+------------------------
+
+* Open a build.bml file that’s in the current Eclipse workspace.
+  - Make a copy of the open file – the file should remain open, with the new file also appearing in package 
+    explorer (but not opening).
+  - Change the name of the open file – The name of file at top of editor window should change.
+  - Delete an open file – The editor should close.
+  - Rename the copy of the file back to original name, and open it again – The content should be the same as the
+    original file.
+  - Add a file system root to the editor, then save, close editor, then reopen – the root should be intact.
+  - Add a second file system root, then quit without saving – The root should not be there. 
+  - Use saveAs to save the current editor with a new name (use the suggested name in the save-as dialog). The current
+    editor’s tab name should be updated. Make a change in the new editor, save it, then verify that only the new file
+    has the change.
+
+* Open build.bml file that resides outside of the Eclipse workspace (using File -> Open File)
+  - Add a file system root to the editor, then save, close editor, then reopen – the root should be intact.
+  - Add a second file system root, then quit without saving – The root should not be there. 
+  - Use saveAs to save the current editor with a new name (which must be in the workspace). The current editor’s
+    tab name should be updated. Make a change in the new editor, save it, then verify that only the new file
+    has the change.
+
