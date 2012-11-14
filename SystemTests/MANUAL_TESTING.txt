@@ -68,3 +68,22 @@ Opening and Saving Files
     tab name should be updated. Make a change in the new editor, save it, then verify that only the new file
     has the change.
 
+Testing the Web Site / Update Site
+----------------------------------
+
+* Testing the tar-ball
+  - Download the latest tar-ball from the www.buildml.com web site.
+  - extract the tar-ball onto the local filesystem, the set PATH to include the bin/ directory.
+  - Using that version of "bml" do "bml scan-build make" on some make-based build.
+  - Use "bml show-files" and "bml show-actions" to convince yourself that the import worked.
+  
+* Testing the plug-in
+  - In Eclipse, go to "Help -> Install Software" and select "http://www.buildml.com/update" as the
+    update site. Proceed to install the software.
+  - Attempt to load the build.bml file that was created by the "bml" script (see above). Do some
+    basic sanity testing.
+  - Browse the "Help -> About Eclipse" menu, and check that the plug-in is correctly described
+    (copyright, etc).
+  - Uninstall the plugin (so it doesn't get in the way of development).
+    
+
