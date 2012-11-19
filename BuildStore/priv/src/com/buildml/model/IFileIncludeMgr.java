@@ -69,6 +69,16 @@ public interface IFileIncludeMgr {
 	public abstract Integer[] getFilesIncludedBy(int fileId);
 
 	/**
+	 * Delete the fact that pathId1 somehow includes pathId2. If the two files do not
+	 * currently have an include relationship, no change is made. Also, no checking
+	 * is done to validate that pathId1 and pathId2 refer to valid files.
+	 * 
+	 * @param pathId1 The file that does the including.
+	 * @param pathId2 The file that is included.
+	 */
+	public abstract void deleteFileIncludes(int pathId1, int pathId2);
+	
+	/**
 	 * Delete any file-includes relationship where the specified file does the including.
 	 * @param pathId The file that does the include.
 	 */

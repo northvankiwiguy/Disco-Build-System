@@ -47,6 +47,7 @@ import com.buildml.model.IFileIncludeMgr;
 	private PreparedStatement 
 		insertFileIncludesPrepStmt = null,
 		updateFileIncludesPrepStmt = null,
+		deleteFileIncludesPrepStmt = null,
 		deleteFilesIncludedByPrepStmt = null,
 		selectUsageFromFileIncludesPrepStmt = null,
 		selectTotalUsageFromFileIncludesPrepStmt = null,
@@ -69,6 +70,8 @@ import com.buildml.model.IFileIncludeMgr;
 		insertFileIncludesPrepStmt = db.prepareStatement("insert into fileIncludes values (?, ?, 1)");
 		updateFileIncludesPrepStmt = db.prepareStatement("update fileIncludes set usage = usage + 1 " +
 				"where fileId1 = ? and fileId2 = ?");
+		deleteFileIncludesPrepStmt = db.prepareStatement(
+				"delete from fileIncludes where fileId1 = ? and fileId2 = ?");
 		deleteFilesIncludedByPrepStmt = db.prepareStatement("delete from fileIncludes where fileId1 = ?");
 		selectUsageFromFileIncludesPrepStmt = db.prepareStatement(
 				"select usage from fileIncludes where fileId1 = ? and fileId2 = ?");
@@ -199,6 +202,24 @@ import com.buildml.model.IFileIncludeMgr;
 		}
 
 		return results;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileIncludeMgr#deleteFileIncludes(int, int)
+	 */
+	@Override
+	public void deleteFileIncludes(int pathId1, int pathId2) {
+		
+		try {
+			deleteFileIncludesPrepStmt.setInt(1, pathId1);
+			deleteFileIncludesPrepStmt.setInt(2, pathId2);
+			db.executePrepUpdate(deleteFileIncludesPrepStmt);
+		
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

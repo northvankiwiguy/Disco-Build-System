@@ -172,6 +172,41 @@ public class TestFileIncludeMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.buildml.model.IFileIncludeMgr#deleteFileIncludes(int, int)}.
+	 */
+	@Test
+	public void deleteFileIncludes() {
+		
+		/* add a number of file relationships */
+		fileIncludeMgr.addFileIncludes(2, 1);
+		fileIncludeMgr.addFileIncludes(2, 3);
+		fileIncludeMgr.addFileIncludes(2, 4);
+		fileIncludeMgr.addFileIncludes(2, 10);
+		fileIncludeMgr.addFileIncludes(3, 2);
+		fileIncludeMgr.addFileIncludes(3, 3);
+		fileIncludeMgr.addFileIncludes(3, 9);
+		fileIncludeMgr.addFileIncludes(3, 10);
+		fileIncludeMgr.addFileIncludes(10, 1);
+		
+		/* delete the files-include relationship for files 10 and 1 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1 }, fileIncludeMgr.getFilesIncludedBy(10)));
+		fileIncludeMgr.deleteFileIncludes(10, 1);
+		assertEquals(0, fileIncludeMgr.getFilesIncludedBy(10).length);
+
+		/* the same for 3 and 2 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 2, 3, 9, 10 }, fileIncludeMgr.getFilesIncludedBy(3)));
+		fileIncludeMgr.deleteFileIncludes(3, 2);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 3, 9, 10 }, fileIncludeMgr.getFilesIncludedBy(3)));
+
+		/* the same for 2 and 4 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1, 3, 4, 10 }, fileIncludeMgr.getFilesIncludedBy(2)));
+		fileIncludeMgr.deleteFileIncludes(2, 4);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { 1, 3, 10 }, fileIncludeMgr.getFilesIncludedBy(2)));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.buildml.model.IFileIncludeMgr#deleteFilesIncludedBy(int)}.
 	 */
 	@Test
