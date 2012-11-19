@@ -546,4 +546,70 @@ public class TestActionMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test the moveActionToTrash() method.
+	 * @throws Exception
+	 */
+	@Test
+	public void testMoveToTrash() throws Exception {
+		
+		/* for starters, the root action can't be trashed */
+		int rootAction = actionMgr.getRootAction("root");
+		assertEquals(ErrorCode.CANT_REMOVE, actionMgr.moveActionToTrash(rootAction));
+		
+		/* add a new action, a sub-action, and a file. The sub-action references the file */
+		int rootDir = fileMgr.getPath("/home");
+		int fileId = fileMgr.addFile("/home/joe");
+		int parentAction = actionMgr.addAction(rootAction, rootDir, "parent");
+		int childAction = actionMgr.addAction(parentAction, rootDir, "child");		
+		actionMgr.addFileAccess(childAction, fileId, OperationType.OP_READ);
+		
+		/* check that the parent has the child and that the child is in the directory */
+		Integer children[] = actionMgr.getChildren(parentAction);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction }, children));
+		Integer actions[] = actionMgr.getActionsInDirectory(rootDir);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction, parentAction }, actions));
+		
+		/* Attempt to delete the parent action - should fail because of child action. */
+		assertEquals(ErrorCode.CANT_REMOVE, actionMgr.moveActionToTrash(parentAction));
+		
+		/* Attempt to delete the sub-action - should fail because of referenced file */
+		assertEquals(ErrorCode.CANT_REMOVE, actionMgr.moveActionToTrash(childAction));
+		
+		/* remove the action-file relationship, then try again to delete sub-action - success */
+		actionMgr.removeFileAccess(childAction, fileId);
+		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(childAction));
+		
+		/* query the list of the parent action's children */
+		assertEquals(0, actionMgr.getChildren(parentAction).length);
+		
+		/* query the list of actions in the specified directory */
+		actions = actionMgr.getActionsInDirectory(rootDir);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { parentAction }, actions));
+		
+		/* now move the parent action into the trash */
+		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(parentAction));
+
+		/* query the list of actions in the specified directory - should be one fewer. */
+		actions = actionMgr.getActionsInDirectory(rootDir);
+		assertEquals(0, actions.length);
+		
+		/* try to revive the child - can't be done because the parent is trashed */
+		assertEquals(ErrorCode.CANT_REVIVE, actionMgr.reviveActionFromTrash(childAction));
+		
+		/* revive the parent - this is allowed */
+		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(parentAction));
+		actions = actionMgr.getActionsInDirectory(rootDir);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { parentAction }, actions));
+
+		/* finally, revive the child - this is now possible. */
+		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(childAction));
+		children = actionMgr.getChildren(parentAction);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction }, children));
+		actions = actionMgr.getActionsInDirectory(rootDir);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction, parentAction }, actions));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

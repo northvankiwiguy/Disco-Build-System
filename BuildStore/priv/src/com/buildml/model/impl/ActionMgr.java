@@ -68,7 +68,9 @@ public class ActionMgr implements IActionMgr {
 		findActionsInDirectoryPrepStmt = null,
 		findFilesByOperationInActionFilesPrepStmt = null,
 		findActionsByFileInActionFilesPrepStmt = null,
-		findActionsByFileAndOperationInActionFilesPrepStmt = null;
+		findActionsByFileAndOperationInActionFilesPrepStmt = null,
+		trashActionPrepStmt = null,
+		actionIsTrashPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -91,9 +93,9 @@ public class ActionMgr implements IActionMgr {
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
 		findActionsInDirectoryPrepStmt =
-			db.prepareStatement("select actionId from buildActions where actionDirId = ?");
+			db.prepareStatement("select actionId from buildActions where (actionDirId = ?) and (trashed = 0)");
 		findChildrenPrepStmt = db.prepareStatement("select actionId from buildActions where parentActionId = ?" +
-				" and parentActionId != actionId");
+				" and (parentActionId != actionId) and (trashed = 0)");
 		insertActionFilesPrepStmt = db.prepareStatement("insert into actionFiles values (?, ?, ?)");
 		removeActionFilesPrepStmt = 
 			db.prepareStatement("delete from actionFiles where actionId = ? and fileId = ?");
@@ -109,7 +111,10 @@ public class ActionMgr implements IActionMgr {
 			db.prepareStatement("select actionId from actionFiles where fileId = ?");		
 		findActionsByFileAndOperationInActionFilesPrepStmt =
 			db.prepareStatement("select actionId from actionFiles where fileId = ? and operation = ?");
-		
+		trashActionPrepStmt =
+			db.prepareStatement("update buildActions set trashed = ? where actionId = ?");
+		actionIsTrashPrepStmt =
+			db.prepareStatement("select trashed from buildActions where actionId = ?");
 	}
 	
 	/*=====================================================================================*
@@ -569,6 +574,97 @@ public class ActionMgr implements IActionMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#moveActionToTrash(int)
+	 */
+	@Override
+	public int moveActionToTrash(int actionId) {
+		
+		/* check that the action is not the root action */
+		if (getParent(actionId) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* check that the action has no children */
+		Integer children[] = getChildren(actionId);
+		if (children.length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+		
+		/* check that the action is not referenced by a file */
+		Integer filesAccess[] = getFilesAccessed(actionId, OperationType.OP_UNSPECIFIED);
+		if (filesAccess.length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+
+		/* mark action as trashed */		
+		try {
+			trashActionPrepStmt.setInt(1, 1);
+			trashActionPrepStmt.setInt(2, actionId);
+			db.executePrepUpdate(trashActionPrepStmt);
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#reviveActionFromTrash(int)
+	 */
+	@Override
+	public int reviveActionFromTrash(int actionId) {
+		
+		/* first, check that the parent action is not trashed */
+		int parentId = getParent(actionId);
+		if ((parentId == ErrorCode.NOT_FOUND) || (parentId == ErrorCode.BAD_VALUE)) {
+			return ErrorCode.CANT_REVIVE;
+		}
+		if (isActionTrashed(parentId)) {
+			return ErrorCode.CANT_REVIVE;
+		}
+		
+		/* mark action as not trashed */		
+		try {
+			trashActionPrepStmt.setInt(1, 0);
+			trashActionPrepStmt.setInt(2, actionId);
+			db.executePrepUpdate(trashActionPrepStmt);
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#isActionTrashed(int)
+	 */
+	@Override
+	public boolean isActionTrashed(int actionId) {
+		Integer results[] = null;
+		
+		try {
+			actionIsTrashPrepStmt.setInt(1, actionId);
+			results = db.executePrepSelectIntegerColumn(actionIsTrashPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* action isn't even known - let's assume it's trashed */
+		if (results.length != 1) {
+			return true;
+		}
+		
+		/* if "trashed" field is 1, then the action is trashed */
+		return results[0] == 1;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getBuildStore()
 	 */
@@ -601,6 +697,6 @@ public class ActionMgr implements IActionMgr {
 				throw new FatalBuildStoreError("Invalid value found in operation field: " + opTypeNum);
 		}
 	}
-	/*=====================================================================================*/
 
+	/*-------------------------------------------------------------------------------------*/
 }

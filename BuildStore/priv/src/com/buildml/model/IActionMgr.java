@@ -165,6 +165,35 @@ public interface IActionMgr {
 	public abstract int getRootAction(String rootName);
 
 	/**
+	 * Remove a specific action from the build store. This operation can be only be performed
+	 * on actions that are unused. That is, there must be no files that depend on this action.
+	 * A trashed action can later be revived by calling the reviveActionFromTrash() method.
+	 * 
+	 * @param actionId The ID of the action to be move to the trash.
+	 * 
+	 * @return ErrorCode.OK on successful removal, or ErrorCode.CANT_REMOVE if the
+	 * action is still used in some way.
+	 */
+	public abstract int moveActionToTrash(int actionId);
+
+	/**
+	 * Revive an action that had previously been deleted by the moveActionToTrash() method.
+	 * @param actionId The ID of the action to be revived.
+	 * @return ErrorCode.OK on successful revival, or ErrorCode.CANT_REVIVE if
+	 * for some reason the action can't be revived.
+	 */
+	public abstract int reviveActionFromTrash(int actionId);
+	
+	/**
+	 * Determine whether an action is currently marked as "trash" (to be deleted
+	 * when the BuildStore is next closed).
+	 * 
+	 * @param actionId The ID of the action we are querying.
+	 * @return true if the action has been marked as trash, else false.
+	 */
+	public abstract boolean isActionTrashed(int actionId);
+	
+	/**
 	 * Return the BuildStore object that owns this IActionMgr object.
 	 *
 	 * @return The BuildStore object that owns this IActionMgr object.
