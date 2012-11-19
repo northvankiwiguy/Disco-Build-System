@@ -76,12 +76,12 @@ public interface IFileIncludeMgr {
 	 * @param pathId1 The file that does the including.
 	 * @param pathId2 The file that is included.
 	 */
-	public abstract void deleteFileIncludes(int pathId1, int pathId2);
+	public abstract void removeFileIncludes(int pathId1, int pathId2);
 	
 	/**
 	 * Delete any file-includes relationship where the specified file does the including.
 	 * @param pathId The file that does the include.
 	 */
-	public abstract void deleteFilesIncludedBy(int pathId);
+	public abstract void removeFilesIncludedBy(int pathId);
 
 }

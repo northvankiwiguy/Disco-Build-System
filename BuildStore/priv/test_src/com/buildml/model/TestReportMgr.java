@@ -703,17 +703,17 @@ public class TestReportMgr {
 		assertTrue(result.isMember(dirC));
 		
 		/* delete a few paths and try again */
-		fileMgr.removePath(fileAC);
+		fileMgr.movePathToTrash(fileAC);
 		result = reports.reportAllFiles();
 		assertEquals(9, result.size());
 		assertFalse(result.isMember(fileAC));
 
-		fileMgr.removePath(fileCC);
+		fileMgr.movePathToTrash(fileCC);
 		result = reports.reportAllFiles();
 		assertEquals(8, result.size());
 		assertFalse(result.isMember(fileCC));
 
-		fileMgr.removePath(dirC);
+		fileMgr.movePathToTrash(dirC);
 		result = reports.reportAllFiles();
 		assertEquals(7, result.size());
 		assertFalse(result.isMember(dirC));

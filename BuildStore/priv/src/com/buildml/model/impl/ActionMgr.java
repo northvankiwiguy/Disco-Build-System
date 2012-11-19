@@ -61,6 +61,7 @@ public class ActionMgr implements IActionMgr {
 		findChildrenPrepStmt = null,
 		insertActionFilesPrepStmt = null,
 		removeActionFilesPrepStmt = null,
+		removeFileAccessesPrepStmt = null,
 		updateActionFilesPrepStmt = null,
 		findOperationInActionFilesPrepStmt = null,
 		findFilesInActionFilesPrepStmt = null,
@@ -85,7 +86,7 @@ public class ActionMgr implements IActionMgr {
 		this.fileMgr = buildStore.getFileMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, ?, 0, ?)");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
@@ -248,20 +249,16 @@ public class ActionMgr implements IActionMgr {
 			 * by this action.
 			 */
 			if ((existingOp == OperationType.OP_WRITE) && (combinedOp == OperationType.OP_DELETE)) {
-				try {
-					removeActionFilesPrepStmt.setInt(1, actionId);
-					removeActionFilesPrepStmt.setInt(2, fileNumber);
-					db.executePrepUpdate(removeActionFilesPrepStmt);
-				} catch (SQLException e) {
-					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-				}
+				
+				/* remove all file accesses that we previously added */
+				removeFileAccess(actionId, fileNumber);
 
 				/*
 				 * Attempt to remove the file from the FileMgr. This will fail if the
 				 * same path is already used by some other action, but that's acceptable. We
 				 * only want to remove paths that were used exclusively by this action.
 				 */
-				fileMgr.removePath(fileNumber);
+				fileMgr.movePathToTrash(fileNumber);
 			}
 			
 			/*
@@ -365,6 +362,22 @@ public class ActionMgr implements IActionMgr {
 		
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#removeAccessesToPath(int)
+	 */
+	@Override
+	public void removeFileAccess(int actionId, int pathId) {
+		try {
+			removeActionFilesPrepStmt.setInt(1, actionId);
+			removeActionFilesPrepStmt.setInt(2, pathId);
+			db.executePrepUpdate(removeActionFilesPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}		
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)

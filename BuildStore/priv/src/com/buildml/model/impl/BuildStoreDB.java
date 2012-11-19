@@ -248,9 +248,9 @@ import com.buildml.utils.version.Version;
 			stat.executeUpdate("insert into schemaVersion values ( " + Version.getVersionNumberAsInt() + ")");
 
 			/* Create the "files" table. */
-			stat.executeUpdate("create table files ( id integer primary key, parentId integer, " +
+			stat.executeUpdate("create table files ( id integer primary key, parentId integer, trashed integer, " +
 							   "pathType integer, pkgId integer, pkgScopeId integer, name text not null)");
-			stat.executeUpdate("insert into files values (0, 0, 1, 0, 0, \"/\")");
+			stat.executeUpdate("insert into files values (0, 0, 0, 1, 0, 0, \"/\")");
 			stat.executeUpdate("create unique index filesIdx on files (parentId, name)");
 			
 			/* Create the "fileIncludes" table */
@@ -261,8 +261,8 @@ import com.buildml.utils.version.Version;
 			
 			/* Create the "buildActions" table. */
 			stat.executeUpdate("create table buildActions ( actionId integer primary key, parentActionId integer, " +
-							   "actionDirId integer, pkgId integer, command text)");
-			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, null)");
+							   "trashed integer, actionDirId integer, pkgId integer, command text)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null)");
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */
@@ -596,10 +596,14 @@ import com.buildml.utils.version.Version;
 	 */
 	/* package private */
 	void close() {
-				
+		
 		/* make sure the database connection is still open */
 		checkDatabase();
 
+		// TODO: clean up garbage by deleting from files and actions tables.
+		// TODO: when cleaning up garbage, remove fileAttributes associated
+		// with the garbage file.
+		
 		/* make sure all changes are committed */
 		setFastAccessMode(false);
 		try {

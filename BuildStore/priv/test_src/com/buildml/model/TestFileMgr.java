@@ -416,52 +416,179 @@ public class TestFileMgr {
 		assertNotSame(ErrorCode.BAD_PATH, path1);
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { path1, path3 }, fileMgr.getChildPaths(path2)));
-		assertEquals(ErrorCode.OK, fileMgr.removePath(path1));
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(path1));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { path3 }, fileMgr.getChildPaths(path2)));
 		
 		/* test that we can't remove paths that have children */
-		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path2));
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path2));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { path3 }, fileMgr.getChildPaths(path2)));
 
 		/* test that we can't remove a directory that an action was executed in */
 		int path4 = fileMgr.addFile("/april/may/september");
 		int myBuildAction = actionMgr.addAction(actionMgr.getRootAction("root"), path4, "/bin/true");
-		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path4));
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path4));
 		
 		/* test that we can't remove a path that's referenced by an action */
 		int path5 = fileMgr.addFile("/april/may/october");
 		actionMgr.addFileAccess(myBuildAction, path5, OperationType.OP_READ);
-		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path5));
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path5));
 		
 		/* test that we can't remove a path that's attached to root */
 		int path6 = fileMgr.addDirectory("/april/may/november");
 		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("myroot", path6));
-		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path6));
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path6));
 		
 		/* test that any attributes on that path have been removed. */
 		int path7 = fileMgr.addFile("/april/may/december");
 		int myAttrId = fileAttrMgr.newAttrName("myattr");
 		fileAttrMgr.setAttr(path7, myAttrId, 1);
 		assertEquals(1, fileAttrMgr.getAttrsOnPath(path7).length);
-		assertEquals(ErrorCode.OK, fileMgr.removePath(path7));
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(path7));
 		assertEquals(0, fileAttrMgr.getAttrsOnPath(path7).length);
 		
 		/* test that we can't remove a path that is included by another path */
 		int path8 = fileMgr.addFile("/april/may/january");
 		int path9 = fileMgr.addFile("/april/may/february");
 		fileIncludeMgr.addFileIncludes(path8, path9);
-		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.removePath(path9));
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path9));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				fileIncludeMgr.getFilesIncludedBy(path8), new Integer[] { path9 }));
 		
-		/* but, we can remove a path that does the including */
+		/* and we can't remove a path that does the including */
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path8));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				fileIncludeMgr.getFilesThatInclude(path9), new Integer[] { path8 }));
-		assertEquals(ErrorCode.OK, fileMgr.removePath(path8));
-		assertEquals(0, fileIncludeMgr.getFilesThatInclude(path9).length);
-		assertEquals(0, fileIncludeMgr.getFilesIncludedBy(path8).length);
+		
+		/* remove the include relationship, then the remove is possible */
+		fileIncludeMgr.removeFileIncludes(path8, path9);
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(path8));
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(path9));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test removing and then reviving a path. It should only work if there are no connections
+	 * between the path and other objects. These connections must first be removed.
+	 * @throws Exception
+	 */
+	@Test
+	public void testRevivePath1() throws Exception {
+
+		/* add some paths - we'll remove "june" later. */
+		int pathJune = fileMgr.addFile("/april/may/june");
+		int pathAugust = fileMgr.addFile("/april/may/august");
+		int pathMay = fileMgr.getPath("/april/may");
+		
+		/* add an action that writes to (generates) "june" */
+		int action1 = actionMgr.addAction(actionMgr.getRootAction("root"), 
+											fileMgr.getPath("/"), "");
+		actionMgr.addFileAccess(action1, pathJune, OperationType.OP_WRITE);
+		
+		/* indicate that "june" includes "august" */
+		fileIncludeMgr.addFileIncludes(pathJune, pathAugust);
+		
+		/* 
+		 * Validate that all our queries work as expected. First, assert that "june" is 
+		 * not garbage (yet).
+		 */
+		assertFalse(fileMgr.isPathTrashed(pathJune));
+
+		/* test the relationship between "june" and the action */
+		Integer[] actions = actionMgr.getActionsThatAccess(pathJune, OperationType.OP_UNSPECIFIED);
+		assertArrayEquals(new Integer[] { action1 }, actions);
+		Integer[] files = actionMgr.getFilesAccessed(action1, OperationType.OP_UNSPECIFIED);
+		assertArrayEquals(new Integer[] { pathJune }, files);
+		
+		/* test the relationship between "june" and "august" */
+		assertArrayEquals(new Integer[] { pathAugust }, fileIncludeMgr.getFilesIncludedBy(pathJune));	
+		assertArrayEquals(new Integer[] { pathJune }, fileIncludeMgr.getFilesThatInclude(pathAugust));
+
+		/* try to delete the file "june", even though it's in use - should fail. */
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(pathJune));
+
+		/* OK, remove the relationships first, then it can be removed */
+		actionMgr.removeFileAccess(action1, pathJune);
+		fileIncludeMgr.removeFileIncludes(pathJune, pathAugust);
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(pathJune));
+		
+		/* Now test that the file is trashed */
+		assertTrue(fileMgr.isPathTrashed(pathJune));
+		
+		/* revive the path */
+		fileMgr.revivePathFromTrash(pathJune);
+		assertFalse(fileMgr.isPathTrashed(pathJune));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test removing a path to check that it's no longer visible in searches.
+	 * @throws Exception
+	 */
+	@Test
+	public void testRevivePath2() throws Exception {
+
+		/* add some paths - we'll remove "june" later. */
+		int pathJune = fileMgr.addFile("/april/may/june");
+		int pathAugust = fileMgr.addFile("/april/may/august");
+		int pathMay = fileMgr.getPath("/april/may");
+
+		/* test that the "june" file exists */
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/april/may/june"));
+		assertNotSame(ErrorCode.NOT_FOUND, fileMgr.getChildOfPath(pathMay, "june"));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { pathJune, pathAugust }, fileMgr.getChildPaths(pathMay)));	
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(pathJune));
+
+		/* move "june" to trash */
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(pathJune));
+
+		/* the "june" file doesn't show up when accessed via an absolute or relative path */
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.getPath("/april/may/june"));
+		assertEquals(ErrorCode.NOT_FOUND, fileMgr.getChildOfPath(pathMay, "june"));
+		assertArrayEquals(new Integer[] { pathAugust }, fileMgr.getChildPaths(pathMay));	
+
+		/* we can't add a new path with the same name */
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.addFile("/april/may/june"));
+		
+		/* revive the path */
+		assertEquals(ErrorCode.OK, fileMgr.revivePathFromTrash(pathJune));
+		assertFalse(fileMgr.isPathTrashed(pathJune));
+		
+		/* test all the above queries again - they should work */
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/april/may/june"));
+		assertNotSame(ErrorCode.NOT_FOUND, fileMgr.getChildOfPath(pathMay, "june"));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { pathJune, pathAugust }, fileMgr.getChildPaths(pathMay)));
+		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(pathJune));
+	}	
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test removing a path to check that it's no longer visible in searches.
+	 * @throws Exception
+	 */
+	@Test
+	public void testRevivePath3() throws Exception {
+		
+		/* set up some directories, and add a root */
+		int pathA = fileMgr.addDirectory("/a");
+		int pathB = fileMgr.addDirectory("/a/b");
+		int pathC = fileMgr.addDirectory("/a/b/c");
+		fileMgr.addNewRoot("myRoot", pathB);
+		
+		/* delete the pathC directory */
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(pathC));
+		
+		/* attempt to add a new root to this path - should fail because path doesn't exist */
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.addNewRoot("yourRoot", pathC));
+		
+		/* attempt to move an existing root to this path - should fail */
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.moveRootToPath("myRoot", pathC));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

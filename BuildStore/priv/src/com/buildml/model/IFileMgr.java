@@ -256,14 +256,32 @@ public interface IFileMgr {
 	 * Remove a specific path from the build store. This operation can be only be performed
 	 * on files and directories that are unused. That is, directories must be empty, and 
 	 * files/directories must not be reference by any actions (or any other such objects).
+	 * A trashed path can later be revived by calling the revivePathFromTrash() method.
 	 * 
-	 * @param pathId The ID of the path to be removed.
+	 * @param pathId The ID of the path to be move to the trash.
 	 * 
 	 * @return ErrorCode.OK on successful removal, or ErrorCode.CANT_REMOVE if the
 	 * path is still used in some way.
 	 */
-	public abstract int removePath(int pathId);
+	public abstract int movePathToTrash(int pathId);
 
+	/**
+	 * Revive a path that had previously been deleted by the movePathToTrash() method.
+	 * @param pathId The ID of the path to be revived.
+	 * @return ErrorCode.OK on successful revival, or ErrorCode.CANT_REVIVE if
+	 * for some reason the path can't be revived.
+	 */
+	public abstract int revivePathFromTrash(int pathId);
+	
+	/**
+	 * Determine whether a path is currently marked as "trash" (to be deleted
+	 * when the BuildStore is next closed).
+	 * 
+	 * @param pathId The ID of the path we are querying.
+	 * @return true if the path has been marked as trash, else false.
+	 */
+	public abstract boolean isPathTrashed(int pathId);
+	
 	/**
 	 * Returns a reference to this FileMgr's BuildStore object. 
 	 * @return A reference to this FileMgr's BuildStore object.

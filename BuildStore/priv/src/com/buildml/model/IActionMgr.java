@@ -93,6 +93,16 @@ public interface IActionMgr {
 			OperationType operation);
 
 	/**
+	 * Remove all file-access information between the specified action and path. If there
+	 * is no pre-existing relationship between the action and path, no change is made.
+	 * No checking is done to ensure that the action and path are defined.
+	 * 
+	 * @param actionId The action that is linked to the specified file.
+	 * @param pathId The path that is linked to the specified action.
+	 */
+	public abstract void removeFileAccess(int actionId, int pathId);
+
+	/**
 	 * Return the list of all actions that execute within the file system directory 
 	 * specified by pathId.
 	 * @param pathId The directory in which the actions must be executed.

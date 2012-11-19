@@ -66,13 +66,14 @@ public class FileMgr implements IFileMgr {
 		insertChildPrepStmt = null,
 		findPathDetailsPrepStmt = null,
 		findPathIdFromParentPrepStmt = null,
-		deletePathPrepStmt = null,
+		trashPathPrepStmt = null,
 		insertRootPrepStmt = null,
 		findRootPathIdPrepStmt = null,
 		findRootNamesPrepStmt = null,
 		findRootNamePrepStmt = null,
 		updateRootPathPrepStmt = null,
-		deleteFileRootPrepStmt = null;
+		deleteFileRootPrepStmt = null,
+		pathIsTrashPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -88,19 +89,21 @@ public class FileMgr implements IFileMgr {
 		this.db = buildStore.getBuildStoreDB();
 		
 		/* initialize prepared database statements */
-		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ?");
-		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, ?, 0, 0, ?)");
+		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ? " +
+												"and trashed = 0");
+		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, 0, ?, 0, 0, ?)");
 		findPathDetailsPrepStmt = db.prepareStatement("select parentId, pathType, files.name, fileRoots.name " +
 				" from files left join fileRoots on files.id = fileRoots.fileId where files.id = ?");
 		findPathIdFromParentPrepStmt = db.prepareStatement(
-				"select id from files where parentId = ? and name != \"/\" order by name");
-		deletePathPrepStmt = db.prepareStatement("delete from files where id = ?");
+				"select id from files where parentId = ? and trashed = 0 and name != \"/\" order by name");
+		trashPathPrepStmt = db.prepareStatement("update files set trashed = ? where id = ?");
 		insertRootPrepStmt = db.prepareStatement("insert into fileRoots values (?, ?)");	
 		findRootPathIdPrepStmt = db.prepareStatement("select fileId from fileRoots where name = ?");
 		findRootNamesPrepStmt = db.prepareStatement("select name from fileRoots order by name");
 		findRootNamePrepStmt = db.prepareStatement("select name from fileRoots where fileId = ?");
 		updateRootPathPrepStmt = db.prepareStatement("update fileRoots set fileId = ? where name = ?");
 		deleteFileRootPrepStmt = db.prepareStatement("delete from fileRoots where name = ?");
+		pathIsTrashPrepStmt = db.prepareStatement("select trashed from files where id = ?");
 		
 		/* 
 		 * Create an empty cache to record the most-recently accessed file name mapping, to save us from
@@ -161,6 +164,11 @@ public class FileMgr implements IFileMgr {
 			return ErrorCode.INVALID_NAME;
 		}
 		
+		/* the path must not be trashed */
+		if (isPathTrashed(pathId)) {
+			return ErrorCode.BAD_PATH;
+		}
+		
 		/* this path must be valid, and refer to a directory, not a file */
 		PathType pathType = getPathType(pathId);
 		if (pathType == PathType.TYPE_INVALID) {
@@ -208,6 +216,11 @@ public class FileMgr implements IFileMgr {
 		/* if the root doesn't already exists, that's an error */
 		if (getRootPath(rootName) == ErrorCode.NOT_FOUND) {
 			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* the path must not be trashed */
+		if (isPathTrashed(pathId)) {
+			return ErrorCode.BAD_PATH;
 		}
 		
 		/* is the new path valid? */
@@ -532,7 +545,7 @@ public class FileMgr implements IFileMgr {
 	 * @see com.buildml.model.IFileMgr#removePath(int)
 	 */
 	@Override
-	public int removePath(int pathId)
+	public int movePathToTrash(int pathId)
 	{
 		/* 
 		 * We need to refer to all these helper objects, to see if they
@@ -567,30 +580,77 @@ public class FileMgr implements IFileMgr {
 		if (fileIncludeMgr.getFilesThatInclude(pathId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
-		
+
+		/* check that it's not including another file */
+		if (fileIncludeMgr.getFilesIncludedBy(pathId).length != 0) {
+			return ErrorCode.CANT_REMOVE;
+		}
+
 		/* 
 		 * All checks have passed, so remove from the file name cache, in 
 		 * case it's there.
 		 */
 		fileNameCache.remove(getParentPath(pathId), getBaseName(pathId));
 		
-		/* now remove the entry from the "files" table */
+		/* now remove the entry from the "files" table (marking it as trashed) */
 		try {
-			deletePathPrepStmt.setInt(1, pathId);
-			db.executePrepUpdate(deletePathPrepStmt);
+			trashPathPrepStmt.setInt(1, 1);
+			trashPathPrepStmt.setInt(2, pathId);
+			db.executePrepUpdate(trashPathPrepStmt);
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}	
-		
-		/* remove any attributes that are associated with this file */
-		fileAttrMgr.deleteAllAttrOnPath(pathId);
-		
-		/* remove any file-includes where this file does the including */
-		fileIncludeMgr.deleteFilesIncludedBy(pathId);
-		
+		}
+				
 		/* success, the path has been removed */
 		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#revivePath(int)
+	 */
+	@Override
+	public int revivePathFromTrash(int pathId) {
+				
+		/* untrash the file record */
+		try {
+			trashPathPrepStmt.setInt(1, 0);
+			trashPathPrepStmt.setInt(2, pathId);
+			db.executePrepUpdate(trashPathPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		return 0;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#isPathTrashed(int)
+	 */
+	@Override
+	public boolean isPathTrashed(int pathId) {
+		Integer results[] = null;
+		
+		try {
+			pathIsTrashPrepStmt.setInt(1, pathId);
+			results = db.executePrepSelectIntegerColumn(pathIsTrashPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* file isn't even known - let's assume it's trashed */
+		if (results.length != 1) {
+			return true;
+		}
+		
+		/* if "trashed" field is 1, then the path is trashed */
+		return results[0] == 1;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -895,6 +955,12 @@ public class FileMgr implements IFileMgr {
 				db.executePrepUpdate(insertChildPrepStmt);
 			} catch (SQLException e) {
 				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			} catch (FatalBuildStoreError e) {
+				/* 
+				 * This is likely to happen if there's already a database row with the same name
+				 * (which means there's a path with the same name that was trashed).
+				 */
+				return ErrorCode.BAD_PATH;
 			}
 
 			int lastRowId = db.getLastRowID();

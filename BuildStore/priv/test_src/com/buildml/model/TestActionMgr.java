@@ -253,6 +253,50 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.buildml.model.impl.ActionMgr#removeFileAccess(int, int)}.
+	 */
+	@Test
+	public void testRemoveFileAccess() {
+		
+		/* create a new action */
+		int actionFoo = actionMgr.addAction(rootActionId, 0, "gcc -o foo foo.c");
+		int actionBar = actionMgr.addAction(rootActionId, 0, "gcc -o bar bar.c");
+		
+		/* create some new files */
+		int fileFooC = fileMgr.addFile("/a/b/c/foo.c");
+		int fileBarC = fileMgr.addFile("/a/b/c/bar.c");
+		int fileSharedH = fileMgr.addFile("/a/b/c/shared.h");
+		
+		/* record that these files are accessed by the action */
+		actionMgr.addFileAccess(actionFoo, fileFooC, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionFoo, fileSharedH, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionBar, fileBarC, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionBar, fileSharedH, OperationType.OP_READ);
+		
+		/* now check that the records are correct */
+		Integer accesses[] = actionMgr.getFilesAccessed(actionFoo, OperationType.OP_UNSPECIFIED);
+		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileFooC, fileSharedH }));
+		accesses = actionMgr.getFilesAccessed(actionBar, OperationType.OP_UNSPECIFIED);
+		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileBarC, fileSharedH }));
+
+		/* delete the relationship between actionFoo and fileSharedH */
+		actionMgr.removeFileAccess(actionFoo, fileSharedH);
+		accesses = actionMgr.getFilesAccessed(actionFoo, OperationType.OP_UNSPECIFIED);
+		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileFooC }));
+		accesses = actionMgr.getFilesAccessed(actionBar, OperationType.OP_UNSPECIFIED);
+		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileBarC, fileSharedH }));
+
+		/* delete the relationship between actionBar and fileBarC */
+		actionMgr.removeFileAccess(actionBar, fileBarC);
+		accesses = actionMgr.getFilesAccessed(actionFoo, OperationType.OP_UNSPECIFIED);
+		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileFooC }));
+		accesses = actionMgr.getFilesAccessed(actionBar, OperationType.OP_UNSPECIFIED);
+		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileSharedH }));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
 	 * Test what happens when a single file is accessed multiple times, in many different
 	 * modes (e.g. reading, then writing, then delete, etc).
 	 */

@@ -85,17 +85,24 @@ import com.buildml.utils.errors.ErrorCode;
 		deleteFileAttrsNamePrepStmt = db.prepareStatement("delete from fileAttrsName where name = ?");
 		countFileAttrUsagePrepStmt = db.prepareStatement("select count(*) from fileAttrs where attrId = ?");
 		insertFileAttrsPrepStmt = db.prepareStatement("insert into fileAttrs values (?, ?, ?)");
-		selectValueFromFileAttrsPrepStmt = db.prepareStatement("select value from fileAttrs where " +
-				"pathId = ? and attrId = ?");
+		selectValueFromFileAttrsPrepStmt = db.prepareStatement(
+				"select fileAttrs.value from files, fileAttrs " +
+		        "where (files.id = fileAttrs.pathId) and pathId = ? and attrId = ? and files.trashed = 0");
 		updateFileAttrsPrepStmt = db.prepareStatement("update fileAttrs set value = ? "
 				+ "where pathId = ? and attrId = ?");
 		deleteFileAttrsPrepStmt = db.prepareStatement("delete from fileAttrs where " +
 				"pathId = ? and attrId = ?");
 		deleteAllFileAttrsPrepStmt = db.prepareStatement("delete from fileAttrs where pathId = ?");
-		findAttrsOnPathPrepStmt = db.prepareStatement("select attrId from fileAttrs where pathId = ?");
-		findPathsWithAttrPrepStmt = db.prepareStatement("select pathId from fileAttrs where attrId = ?");
+		findAttrsOnPathPrepStmt = db.prepareStatement(
+				"select fileAttrs.attrId from files, fileAttrs " +
+		        "where (files.id = fileAttrs.pathId) and fileAttrs.pathId = ? and files.trashed = 0");
+		findPathsWithAttrPrepStmt = db.prepareStatement(
+				"select fileAttrs.pathId from files, fileAttrs " +
+		        "where (files.id = fileAttrs.pathId) and fileAttrs.attrId = ? and files.trashed = 0");
 		findPathsWithAttrValuePrepStmt = db.prepareStatement(
-				"select pathId from fileAttrs where attrId = ? and value = ?");
+				"select fileAttrs.pathId from files, fileAttrs " +
+		        "where (files.id = fileAttrs.pathId) and fileAttrs.attrId = ? and fileAttrs.value = ? " +
+				"and files.trashed = 0");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

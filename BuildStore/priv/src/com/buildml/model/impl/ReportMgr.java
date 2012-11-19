@@ -101,19 +101,20 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from actionFiles, files " +
-					"where pathType=? and actionFiles.fileId = files.id " +
+					"where pathType=? and (actionFiles.fileId = files.id) and (files.trashed = 0)" +
 					"group by fileId order by usage desc");
 		
 		selectFileIncludesCountPrepStmt = db.prepareStatement(
 				"select fileId1, usage from fileIncludes where fileId2 = ? order by usage desc");
 		
 		selectFilesNotUsedPrepStmt = db.prepareStatement("" +
-				"select files.id from files left join actionFiles on files.id = actionFiles.fileId" +
-					" where files.pathType = " + PathType.TYPE_FILE.ordinal() + 
-					" and actionFiles.actionId is null");
+				"select files.id from files left join actionFiles on (files.id = actionFiles.fileId)" +
+					" where (files.pathType = " + PathType.TYPE_FILE.ordinal() + 
+					") and (actionFiles.actionId is null) and (files.trashed = 0)");
 		
 		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
-				"select files.id from files where name like ? and pathType = " + PathType.TYPE_FILE.ordinal());
+				"select files.id from files where (name like ?) and (files.trashed = 0) and " +
+		        "(pathType = " + PathType.TYPE_FILE.ordinal() + ")");
 
 		selectActionsWithMatchingNamePrepStmt = db.prepareStatement(
 				"select actionId from buildActions where command like ?");
@@ -149,7 +150,7 @@ import com.buildml.utils.errors.ErrorCode;
 				    "where operation = " + OperationType.OP_READ.ordinal() + ") on writeFileId = readFileId " +
 				      "where readFileId is null");
 		
-		selectAllFilesPrepStmt = db.prepareStatement("select id from files");
+		selectAllFilesPrepStmt = db.prepareStatement("select id from files where trashed = 0");
 		selectAllActionsPrepStmt = db.prepareStatement("select actionId from buildActions");
 	}
 

@@ -51,6 +51,9 @@ public class ErrorCode {
 	/** An invalid value was provided. */
 	public static final int BAD_VALUE 			= -8;
 
+	/** This item can't be revived */
+	public static final int CANT_REVIVE         = -9;
+	
 	/**
 	 * This class can't be instantiated.
 	 */

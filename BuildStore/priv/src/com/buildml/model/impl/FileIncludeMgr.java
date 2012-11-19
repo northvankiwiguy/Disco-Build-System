@@ -210,7 +210,7 @@ import com.buildml.model.IFileIncludeMgr;
 	 * @see com.buildml.model.IFileIncludeMgr#deleteFileIncludes(int, int)
 	 */
 	@Override
-	public void deleteFileIncludes(int pathId1, int pathId2) {
+	public void removeFileIncludes(int pathId1, int pathId2) {
 		
 		try {
 			deleteFileIncludesPrepStmt.setInt(1, pathId1);
@@ -228,7 +228,7 @@ import com.buildml.model.IFileIncludeMgr;
 	 * @see com.buildml.model.impl.IFileIncludeMgr#deleteFilesIncludedBy(int)
 	 */
 	@Override
-	public void deleteFilesIncludedBy(int pathId) {
+	public void removeFilesIncludedBy(int pathId) {
 		
 		try {
 			deleteFilesIncludedByPrepStmt.setInt(1, pathId);
