@@ -34,6 +34,7 @@ system. Otherwise use the targets in the individual project directories.
 	<!-- sourcepath for generating javadoc documentation -->
 	<path id="javadoc-path">
 		<pathelement location="${workspace-root}/BuildScanners/priv/src" />
+		<pathelement location="${workspace-root}/BuildRefactor/priv/src" />
 		<pathelement location="${workspace-root}/BuildStore/priv/src" />
 		<pathelement location="${workspace-root}/BuildTreeScanner/priv/src" />
 		<pathelement location="${workspace-root}/Utilities/priv/src" />
@@ -100,6 +101,7 @@ system. Otherwise use the targets in the individual project directories.
 		<unjar src="${workspace-root}/BuildStore/pub/build-store.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/BuildStore/priv/lib/sqlitejdbc-v056.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/BuildScanners/pub/build-scanners.jar" dest="${tmp-dir}" />
+		<unjar src="${workspace-root}/BuildRefactor/pub/refactoring.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/CliMain/pub/cli-main.jar" dest="${tmp-dir}" />		
 		<unjar src="${workspace-root}/Utilities/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />
@@ -298,6 +300,7 @@ system. Otherwise use the targets in the individual project directories.
 	<target name="clean" description="Clean all generated files, in all projects.">
 		<ant antfile="${workspace-root}/BuildStore/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="clean" inheritall="false" />
+		<ant antfile="${workspace-root}/BuildRefactor/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/CliMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="clean" inheritall="false" />
@@ -322,6 +325,7 @@ system. Otherwise use the targets in the individual project directories.
 	<target name="unit-test" depends="cli" description="Run all unit tests.">
 		<ant antfile="${workspace-root}/BuildStore/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="unit-test" inheritall="false" />
+		<ant antfile="${workspace-root}/BuildRefactor/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/CliMain/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="unit-test" inheritall="false" />

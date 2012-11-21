@@ -13,6 +13,7 @@
 	<!-- extra classpath for this project -->
 	<path id="project-classpath">
 		<pathelement location="${workspace-root}/BuildScanners/pub/build-scanners.jar" />
+		<pathelement location="${workspace-root}/BuildRefactor/pub/refactoring.jar" />
 		<pathelement location="${workspace-root}/Utilities/pub/utilities.jar" />
 		<pathelement location="${workspace-root}/BuildStore/pub/build-store.jar" />
 		<pathelement location="${workspace-root}/BuildTreeScanner/pub/build-tree-scanner.jar" />
@@ -27,6 +28,7 @@
 	<target name="build-upstream-components">
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="jars" inheritall="false"/>
 		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="jars" inheritall="false"/>
+		<ant antfile="${workspace-root}/BuildRefactor/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
 	
 	<!-- specific cleaning operation for this project only -->
