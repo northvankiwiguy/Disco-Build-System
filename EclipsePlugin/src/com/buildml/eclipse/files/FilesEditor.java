@@ -485,6 +485,8 @@ public class FilesEditor extends SubEditor {
 	public boolean hasFeature(String feature) {
 		if (feature.equals("removable")) {
 			return isRemovable();
+		} else if (feature.equals("paths")) {
+			return true;
 		} else if (feature.equals("path-roots")) {
 			return true;
 		} else if (feature.equals("filter-packages-by-scope")) {

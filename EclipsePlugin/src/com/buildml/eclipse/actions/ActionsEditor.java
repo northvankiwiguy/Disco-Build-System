@@ -479,6 +479,8 @@ public class ActionsEditor extends SubEditor {
 	public boolean hasFeature(String feature) {
 		if (feature.equals("removable")) {
 			return isRemovable();
+		} else if (feature.equals("actions")) {
+			return true;
 		}
 		return false;
 	}
