@@ -1,0 +1,42 @@
+Remove a file from the build system, and if necessary, remove the action that
+generates the file. There are numerous restrictions around the deletion of
+files:
+
+* If the path refers to a directory, it must be empty (no files within it).
+  To delete a full directory hierarchy, instead consider using the
+  "bml rm-dir" command.
+    
+* If the file is being used as input to one or more actions, there is no way
+  to delete the file. You must first delete the actions that use the file,
+  which typically requires that you delete files further in the compilation
+  chain. For example, to delete "foo.c", you will first need to delete
+  "foo.o" and the action that generates "foo.o". At this point, "foo.c" is no
+  longer referenced by any actions and can be deleted. 
+
+* If the file to be deleted is a generated file (it is the output of an
+  action), you must also delete the action. To perform this additional
+  deletion, specify the -f option. For example:
+    
+    bml -f /home/psmith/mysrc/foo.o
+     
+  will delete both foo.o and the action that generates foo.o.
+    
+* The action that generates the path must be atomic. That is, the action must
+  not have any child actions. If it does, first consider using the
+  "bml make-atomic" command.
+    
+* If a generating action is deleted (with -f), that action may also generate
+  other output files. If any of those output files are still in use (used as
+  input to downstream actions), the deletion can not take place. In other
+  words, if one of an action's files is to be deleted, they must all be
+  deleted.
+    
+The command arguments are:
+  
+<path>
+
+  The absolute path name of the file to be deleted.
+        
+      bml rm-file /home/work/mysrc/file.c
+      bml rm-file -f /home/work/myobj/file.o
+ 

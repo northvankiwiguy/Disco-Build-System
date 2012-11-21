@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildScanners"/>
 	<classpathentry kind="lib" path="/Utilities/priv/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="/Utilities/priv/lib/commons-io-2.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BuildRefactor"/>
 	<classpathentry kind="output" path="priv/bin"/>
 </classpath>

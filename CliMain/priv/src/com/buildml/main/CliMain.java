@@ -363,6 +363,11 @@ public final class CliMain {
 				new CliCommandSetFilePkg(),
 				new CliCommandSetActionPkg()
 			});
+		
+		registerCommandGroup("Commands for modifying the build system",
+			new ICliCommand[] {
+				new CliCommandRmFile()
+			});
 	}
 
 	/*-------------------------------------------------------------------------------------*/
