@@ -36,7 +36,8 @@ hold of them.
 * git (source code management) - Although you probably have this already if you've
   already obtained the BuildML source tree.
 * Eclipse (IDE) - Tested with Eclipse Indigo and Juno. At a minimum, you'll need
-  the JDT (Java Development Tools) and PDE (Plug-in Development Environment).
+  the JDT (Java Development Tools), PDE (Plug-in Development Environment) and
+  the Eclipse RCP Plug-in Developer Resources.
 * junit - for running junit-based tests. Ensure that you have junit version 4, and
   that any junit.jar files in your Java classpath refer to version 4. For example,
   depending on your system, you may need to symlink /usr/share/ant/lib/junit.jar
