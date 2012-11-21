@@ -56,6 +56,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
+import com.buildml.utils.types.IntegerTreeSet;
 
 /**
  * A BuildML editor that displays the set of files within a BuildStore.
@@ -345,10 +346,11 @@ public class FilesEditor extends SubEditor {
 	 * update the view.
 	 * @param visiblePaths The subset of paths that should be visible in the editor.
 	 */
-	public void setVisibilityFilterSet(FileSet visiblePaths) {
-		this.visiblePaths = visiblePaths;
+    @Override
+	public void setVisibilityFilterSet(IntegerTreeSet visiblePaths) {
+		this.visiblePaths = (FileSet) visiblePaths;
 		if (visibilityProvider != null) {
-			visibilityProvider.setPrimaryFilterSet(visiblePaths);
+			visibilityProvider.setPrimaryFilterSet(this.visiblePaths);
 		}
 	}
 	
@@ -357,7 +359,8 @@ public class FilesEditor extends SubEditor {
 	/**
 	 * @return The set of files that are currently visible in this editor's tree viewer.
 	 */
-	public FileSet getVisibilityFilterSet() {
+	@Override
+	public IntegerTreeSet getVisibilityFilterSet() {
 		return visibilityProvider.getPrimaryFilterSet();
 	}
 

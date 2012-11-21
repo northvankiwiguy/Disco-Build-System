@@ -191,9 +191,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 		/* create an undo/redo operation */
 		AssignRootNameOperation operation = new AssignRootNameOperation(rootName, pathId);
 		MainEditor editor = EclipsePartUtils.getActiveMainEditor();		
-		// TODO: This addContext() is disabled for now, so this operation won't be
-		// added to the editor's undo/redo queue.
-		// operation.addContext(editor.getUndoContext());		
+		operation.addContext(editor.getUndoContext());		
 		
 		/* make it so... */
 		IOperationHistory history = OperationHistoryFactory.getOperationHistory();

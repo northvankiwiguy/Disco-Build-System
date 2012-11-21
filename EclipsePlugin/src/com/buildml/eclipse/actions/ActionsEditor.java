@@ -57,6 +57,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.ActionRecord;
 import com.buildml.model.types.ActionSet;
+import com.buildml.utils.types.IntegerTreeSet;
 
 /**
  * Implements an sub-editor for browsing a BuildStore's actions.
@@ -335,10 +336,11 @@ public class ActionsEditor extends SubEditor {
 	 * update the view.
 	 * @param visibleActions The subset of actions that should be visible in the editor.
 	 */
-	public void setVisibilityFilterSet(ActionSet visibleActions) {
-		this.visibleActions = visibleActions;
+	@Override
+	public void setVisibilityFilterSet(IntegerTreeSet visibleActions) {
+		this.visibleActions = (ActionSet) visibleActions;
 		if (visibilityProvider != null) {
-			visibilityProvider.setPrimaryFilterSet(visibleActions);
+			visibilityProvider.setPrimaryFilterSet(this.visibleActions);
 		}
 	}
 	
@@ -347,7 +349,8 @@ public class ActionsEditor extends SubEditor {
 	/**
 	 * @return The set of actions that are currently visible in this editor's tree viewer.
 	 */
-	public ActionSet getVisibilityFilterSet() {
+	@Override
+	public IntegerTreeSet getVisibilityFilterSet() {
 		return visibilityProvider.getPrimaryFilterSet();
 	}
 

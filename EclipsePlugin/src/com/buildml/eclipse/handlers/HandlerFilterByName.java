@@ -87,7 +87,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Depending on the selected mode, either merge or filter these files from the
 		 * current tab's file set. 
 		 */
-		FileSet currentFileSet = editor.getVisibilityFilterSet();
+		FileSet currentFileSet = (FileSet) editor.getVisibilityFilterSet();
 		switch (resultCode) {
 		
 		case NameFilterDialog.SELECT_ONLY_MATCHING_ITEMS:
@@ -175,7 +175,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Depending on the selected mode, either merge or filter these actions from the
 		 * current tab's action set. 
 		 */
-		ActionSet currentActionSet = editor.getVisibilityFilterSet();
+		ActionSet currentActionSet = (ActionSet)editor.getVisibilityFilterSet();
 		switch (resultCode) {
 		
 		case NameFilterDialog.SELECT_ONLY_MATCHING_ITEMS:

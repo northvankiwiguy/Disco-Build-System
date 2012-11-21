@@ -39,6 +39,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.os.SystemUtils;
 import com.buildml.utils.types.IntegerTreeRecord;
+import com.buildml.utils.types.IntegerTreeSet;
 
 /**
  * An abstract class that all BuildML editor tabs (such as FilesEditor and ActionsEditor)
@@ -496,6 +497,23 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * options were modified since the last refresh.
 	 */
 	public abstract void refreshView(boolean force);
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set the complete set of actions that this editor's tree viewer will show. After
+	 * calling this method, it will be necessary to also call refreshView() to actually
+	 * update the view.
+	 * @param visibleActions The subset of actions that should be visible in the editor.
+	 */
+	public abstract void setVisibilityFilterSet(IntegerTreeSet visibleActions);
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * @return The set of files/actions that are currently visible in this editor's tree viewer.
+	 */
+	public abstract IntegerTreeSet getVisibilityFilterSet();
 	
 	/*-------------------------------------------------------------------------------------*/
 	
