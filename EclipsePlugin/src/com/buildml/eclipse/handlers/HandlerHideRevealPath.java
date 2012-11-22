@@ -7,17 +7,11 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -91,8 +85,10 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		public IStatus redo() throws ExecutionException {
 
 			/* mark all the selected items with their new state */
-			for (Object item : changesToMake) {
-				subEditor.setItemVisibilityState(item, revealState);
+			if (!subEditor.isDisposed()) {
+				for (Object item : changesToMake) {
+					subEditor.setItemVisibilityState(item, revealState);
+				}
 			}
 			return Status.OK_STATUS;
 		}
@@ -117,8 +113,10 @@ public class HandlerHideRevealPath extends AbstractHandler {
 			 * Set the visibility filter set to what it was before the operation
 			 * was invoked. Then refresh our view with the old selection.
 			 */
-			subEditor.setVisibilityFilterSet(revertedSet);
-			subEditor.refreshView(true);
+			if (!subEditor.isDisposed()) {
+				subEditor.setVisibilityFilterSet(revertedSet);
+				subEditor.refreshView(true);
+			}
 			return Status.OK_STATUS;
 		}
 

@@ -95,6 +95,12 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * less than the MainEditor.getModelChangeCount() then the view is out of date.
 	 */
 	private long lastRefreshedAtChange = 0;
+	
+	/**
+	 * Record whether or not we've been disposed. Nobody should be allowed to make this
+	 * sub-editor active if it's disposed.
+	 */
+	private boolean editorIsDisposed = false;
 
 	/*=====================================================================================*
 	 * CONSTRUCTOR
@@ -389,6 +395,9 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 */
 	@Override
 	public void dispose() {
+		
+		editorIsDisposed = true;
+		
 		/* remove this preference store listener */
 		Activator.getDefault().getPreferenceStore().
 		removePropertyChangeListener(preferenceStoreChangeListener);
@@ -435,6 +444,15 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 */
 	public boolean isRemovable() {
 		return removable;
+	}
+		
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return True if this sub-editor has been closed/disposed.
+	 */
+	public boolean isDisposed() {
+		return editorIsDisposed;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

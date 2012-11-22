@@ -3,24 +3,16 @@ package com.buildml.eclipse.files.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.Activator;
-import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.model.IBuildStore;
-import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -95,7 +87,9 @@ public class HandlerRemoveRoot extends AbstractHandler {
 			}
 			
 			/* All is now good, refresh the editor so that the root disappears */
-			subEditor.refreshView(true);
+			if (!subEditor.isDisposed()) {
+				subEditor.refreshView(true);
+			}
 			
 			/* mark the editor as dirty */
 			EclipsePartUtils.markEditorDirty();
@@ -117,7 +111,9 @@ public class HandlerRemoveRoot extends AbstractHandler {
 				/* this is an "undo", so it shouldn't fail (if it does, fail silently) */
 				return errorStatus;
 			}
-			subEditor.refreshView(true);
+			if (!subEditor.isDisposed()) {
+				subEditor.refreshView(true);
+			}
 			return Status.OK_STATUS;
 		}
 

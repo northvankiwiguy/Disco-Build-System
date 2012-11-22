@@ -3,25 +3,16 @@ package com.buildml.eclipse.files.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.window.Window;
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
-import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.RootNameDialog;
-import com.buildml.model.IBuildStore;
-import com.buildml.model.IFileMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -105,8 +96,10 @@ public class HandlerAssignRootName extends AbstractHandler {
 			 * All is now good, so go ahead and enable the "show roots" option (if not
 			 * already enabled), and refresh the editor's content to show the new root.
 			 */
-			subEditor.setOptions(EditorOptions.OPT_SHOW_ROOTS);
-			subEditor.refreshView(true);
+			if (!subEditor.isDisposed()) {
+				subEditor.setOptions(EditorOptions.OPT_SHOW_ROOTS);
+				subEditor.refreshView(true);
+			}
 			
 			/* mark the editor as dirty */
 			EclipsePartUtils.markEditorDirty();
@@ -131,7 +124,9 @@ public class HandlerAssignRootName extends AbstractHandler {
 			}
 			
 			/* refresh the relevant editors */
-			subEditor.refreshView(true);
+			if (!subEditor.isDisposed()) {
+				subEditor.refreshView(true);
+			}
 			return Status.OK_STATUS;
 		}
 		

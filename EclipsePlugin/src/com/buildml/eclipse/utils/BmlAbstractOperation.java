@@ -88,8 +88,10 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		
-		mainEditor.setActiveEditor(subEditor);
+
+		if (!subEditor.isDisposed()) {
+			mainEditor.setActiveEditor(subEditor);
+		}
 		return undo();
 	}
 
@@ -104,7 +106,9 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
 
-		mainEditor.setActiveEditor(subEditor);
+		if (!subEditor.isDisposed()) {
+			mainEditor.setActiveEditor(subEditor);
+		}
 		return redo();
 	}
 	

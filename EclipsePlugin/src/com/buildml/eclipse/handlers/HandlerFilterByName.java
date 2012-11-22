@@ -3,13 +3,10 @@ package com.buildml.eclipse.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 
-import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
@@ -110,9 +107,10 @@ public class HandlerFilterByName extends AbstractHandler {
 			}
 			
 			/* set the visibility set and refresh the view */
-			SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
-			subEditor.setVisibilityFilterSet(nextSet);
-			subEditor.refreshView(true);
+			if (!subEditor.isDisposed()) {
+				subEditor.setVisibilityFilterSet(nextSet);
+				subEditor.refreshView(true);
+			}
 			return Status.OK_STATUS;
 		}
 		

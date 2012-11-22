@@ -245,8 +245,11 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 		subEditor.pageChange();
 		
 		/* remember the previous actively page, so it's easier to return to */
-		previousPageIndex = currentPageIndex;
-		currentPageIndex = getActivePage();
+		int activatingPageIndex = getActivePage();
+		if (currentPageIndex != activatingPageIndex) {
+			previousPageIndex = currentPageIndex;
+			currentPageIndex = activatingPageIndex;
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
