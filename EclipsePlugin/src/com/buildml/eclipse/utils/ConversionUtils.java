@@ -89,6 +89,44 @@ public class ConversionUtils {
 		}
 		return result;
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Given an array of action ID numbers, return a pretty-printed string that can be
+	 * used in dialog boxes.
+	 * 
+	 * @param actionMgr The ActionMgr that owns the actions.
+	 * @param actionIds The array of actions to be displayed.
+	 * @return A formatted string showing the command summary of the actions.
+	 */
+	public static String getActionsAsText(IActionMgr actionMgr, Integer[] actionIds) {
+		StringBuffer sb = new StringBuffer();
+		for (int actionId : actionIds) {
+			sb.append(actionMgr.getCommand(actionId));
+			sb.append("\n\n");
+		}
+		return sb.toString();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given an array of path ID numbers, return a pretty-printed string that can be
+	 * used in dialog boxes.
+	 * 
+	 * @param fileMgr The FileMgr that owns the paths.
+	 * @param pathIds The array of paths to be displayed.
+	 * @return A formatted string showing the absolute paths.
+	 */
+	public static String getPathsAsText(IFileMgr fileMgr, Integer[] pathIds) {
+		StringBuffer sb = new StringBuffer();
+		for (int pathId : pathIds) {
+			sb.append(fileMgr.getPathName(pathId));
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 }

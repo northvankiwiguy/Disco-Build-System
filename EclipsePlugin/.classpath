@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Utilities"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildTreeScanner"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildScanners"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BuildRefactor"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

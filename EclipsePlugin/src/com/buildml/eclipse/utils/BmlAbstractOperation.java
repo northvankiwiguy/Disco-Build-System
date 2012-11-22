@@ -75,9 +75,23 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
 			throws ExecutionException {
-		return redo(monitor, info);
+		return execute();
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Default implementation of no-arg execute(). Sub-classes can override this if they
+	 * actually want to do something different when the command is first executed. By default,
+	 * the execute() behaviour is to simply can redo().
+	 * 
+	 * @return The status of the operation (typically IStatus.OK_STATUS).
+	 * @throws ExecutionException Something went wrong during execution.
+	 */
+	public IStatus execute() throws ExecutionException {
+		return redo();
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/** 

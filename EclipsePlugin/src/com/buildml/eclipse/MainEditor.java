@@ -46,6 +46,8 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
+import com.buildml.refactor.IImportRefactorer;
+import com.buildml.refactor.imports.ImportRefactorer;
 
 /**
  * The main Eclipse editor for editing/viewing BuildML files. This editor is a "multi-part"
@@ -61,6 +63,9 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 
 	/** the BuildStore we've opened for editing */
 	private IBuildStore buildStore = null;
+	
+	/** The refactorer that will manage refactoring (and its history) for this editor */
+	private IImportRefactorer importRefactorer;
 	
 	/** the currently active tab index */
 	private int currentPageIndex = -1;
@@ -91,7 +96,7 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 *=====================================================================================*/
 	
 	/**
-	 * 
+	 * Create a new top-level BuildML Editor.
 	 */
 	public MainEditor() {
 		super();
@@ -133,6 +138,13 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 		 * know if somebody deletes or renames the file we're editing.
 		 */
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+		
+		/*
+		 * Create a refactor manager that will be responsible for doing refactoring
+		 * (deletion, merging, etc) for this BuildStore. This also handles the undo/redo
+		 * of those operations.
+		 */
+		importRefactorer = new ImportRefactorer(buildStore);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -481,6 +493,15 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 */
 	public SubEditor getActiveSubEditor() {
 		return (SubEditor) this.getActiveEditor();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The IImportRefactorer that manages the refactoring operations on this editor.
+	 */
+	public IImportRefactorer getImportRefactorer() {
+		return importRefactorer;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

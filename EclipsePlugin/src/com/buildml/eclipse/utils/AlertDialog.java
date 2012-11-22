@@ -44,6 +44,9 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	/** The severity level */
 	private int severity;
 	
+	/** Should the dialog box provide a "cancel" choice? */
+	private boolean allowCancel;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -54,12 +57,14 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 * @param title The title to display in the dialog box.
 	 * @param message The detailed message to display in the dialog box.
 	 * @param severity The severity level (e.g. IMessageProvider.ERROR).
+	 * @param allowCancel Should the dialog provide a "cancel" option?
 	 */
-	private AlertDialog(String title, String message, int severity) {
+	private AlertDialog(String title, String message, int severity, boolean allowCancel) {
 		super(Display.getDefault().getActiveShell());
 		this.title = title;
 		this.message = message;
 		this.severity = severity;
+		this.allowCancel = allowCancel;
 	}
 	
 	/*=====================================================================================*
@@ -74,7 +79,7 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 * @param message The detailed reason for the event.
 	 */
 	public static void displayInfoDialog(String title, String message) {
-		openDialog(title, message, IMessageProvider.INFORMATION);
+		openDialog(title, message, IMessageProvider.INFORMATION, false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -87,7 +92,7 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 * @param message The detailed reason for the event.
 	 */
 	public static void displayWarningDialog(String title, String message) {
-		openDialog(title, message, IMessageProvider.WARNING);
+		openDialog(title, message, IMessageProvider.WARNING, false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -100,7 +105,19 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 * @param message The detailed reason for the event.
 	 */
 	public static void displayErrorDialog(final String title, final String message) {
-		openDialog(title, message, IMessageProvider.ERROR);
+		openDialog(title, message, IMessageProvider.ERROR, false);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+    /**
+     * Display an question dialog box in the context of the current shell. The user will
+     * be expected to click on OK or CANCEL to answer the question.
+     * @param message The question to be displayed.
+     * @return The answer to the question (IDialogConstants.OK_ID or IDialogConstants.CANCEL_ID).
+     */
+	public static int displayOKCancelDialog(final String message) {
+		return openDialog("Question...", message, IMessageProvider.INFORMATION, true);
 	}
 	
 	/*=====================================================================================*
@@ -151,9 +168,9 @@ public class AlertDialog extends BmlTitleAreaDialog {
 			boolean defaultButton) {
 		
 		/*
-		 * Ignore the CANCEL button, but display the OK button.
+		 * Ignore the CANCEL button (if not needed), but display the OK button.
 		 */
-		if (id == IDialogConstants.CANCEL_ID) {
+		if (!allowCancel && (id == IDialogConstants.CANCEL_ID)) {
 			return null;
 		} else {
 			return super.createButton(parent, id, label, defaultButton);
@@ -171,17 +188,25 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 * @param title The title to display in the dialog box.
 	 * @param message The detailed message to display in the dialog box.
 	 * @param severity The severity level (e.g. IMessageProvider.ERROR).
+	 * @param allowCancel Should the dialog provide a "cancel" option?
+	 * @return The dialog status (typically IDialogConstants.OK_ID or
+	 * 				IDialogConstants.CANCEL_ID).
 	 */
-	private static void openDialog(final String title, final String message, final int severity) {
+	private static int openDialog(
+			final String title, final String message, final int severity,
+			final boolean allowCancel) {
 		
+		final AlertDialog dialog = new AlertDialog(title, message, severity, allowCancel);
+
 		/* Open the dialog in the UI thread, blocking until the user presses "OK" */
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				AlertDialog dialog = new AlertDialog(title, message, severity);
 				dialog.setBlockOnOpen(true);
 				dialog.open();		
 			}
 		});
+		
+		return dialog.getReturnCode();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
