@@ -692,15 +692,17 @@ _cfs_fopen_common(const char *filename, const char *opentype)
 	if (trace_buffer_lock() == 0){
 		/*
 		 * for 'r' and 'rb' modes, the operation is a read, for "r+" and "rb+",
-		 * or "r+b" it's modify, else it's a write.
+		 * or "r+b" it's modify, else it's a write. Note that GNU C supports
+		 * non-standard flags, such as "c", "m", "e" and "x". We should ignore
+		 * all of these.
 		 */
-		if ((strcmp(opentype, "r") == 0) ||
-			(strcmp(opentype, "rb") == 0)){
-			trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
-		} else if ((strcmp(opentype, "r+") == 0) ||
-				   (strcmp(opentype, "rb+") == 0) ||
-				   (strcmp(opentype, "r+b") == 0)) {
-			trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
+		if ((strstr(opentype, "r+") != NULL) ||
+			(strstr(opentype, "rb+") != NULL) ||
+			(strstr(opentype, "r+b") != NULL)) {
+				trace_buffer_write_byte(isdir ? TRACE_DIR_MODIFY : TRACE_FILE_MODIFY);
+		} else if ((strstr(opentype, "r") != NULL) ||
+			       (strstr(opentype, "rb") != NULL)){
+				trace_buffer_write_byte(isdir ? TRACE_DIR_READ : TRACE_FILE_READ);
 		} else {
 			trace_buffer_write_byte(isdir ? TRACE_DIR_WRITE : TRACE_FILE_WRITE);
 		}
