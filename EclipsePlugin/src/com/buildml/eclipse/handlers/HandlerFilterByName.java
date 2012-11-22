@@ -1,10 +1,20 @@
 package com.buildml.eclipse.handlers;
 
+import java.util.List;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.commands.operations.IOperationHistory;
+import org.eclipse.core.commands.operations.OperationHistoryFactory;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 
+import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
@@ -16,6 +26,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
+import com.buildml.utils.types.IntegerTreeSet;
 
 /**
  * Command Handler for the "filter by name" command.
@@ -24,6 +35,112 @@ import com.buildml.model.types.ActionSet;
  */
 public class HandlerFilterByName extends AbstractHandler {
 
+	/*=====================================================================================*
+	 * NESTED CLASSES
+	 *=====================================================================================*/
+
+	/**
+	 * An undo/redo operation for recording changes in an editor's visibility state
+	 * when "filter by name" is used to modify the visible tree items.
+	 *
+	 * @author Peter Smith <psmith@arapiki.com>
+	 */
+	private class FilterOperation extends AbstractOperation {
+
+		/** The existing visibility set, recording the state before the operation takes place. */
+		private IntegerTreeSet existingSet;
+
+		/** The new visibility set to put in place */
+		private IntegerTreeSet newSet;
+
+		/*--------------------------------------------------------------------------------*/
+
+		/**
+		 * Create a new FilterOperation object.
+		 * 
+		 * @param existingSet The visibility set, before the operation takes place.
+		 * @param newSet The visibility set to start using.
+		 */
+		public FilterOperation(IntegerTreeSet existingSet, IntegerTreeSet newSet) {
+			
+			/* set up the operation "label" that appears in the undo/redo menu */
+			super("Filter Items");
+			
+			/* 
+			 * We need to make a copy of the visibility sets, since they'll be changing
+			 * and we need it to be constant.
+			 */
+			try {
+				this.existingSet = (IntegerTreeSet) existingSet.clone();
+				this.newSet = (IntegerTreeSet) newSet.clone();
+			} catch (CloneNotSupportedException e) {
+				/* can't happen */
+			}
+		}
+
+		/*--------------------------------------------------------------------------------*/
+
+		/**
+		 * Execute the hide/reveal operation.
+		 */
+		@Override
+		public IStatus execute(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException {
+			return redo(monitor, info);
+		}
+
+		/*--------------------------------------------------------------------------------*/
+
+		/**
+		 * Do, or redo an operation.
+		 */
+		@Override
+		public IStatus redo(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException {
+
+			return useVisibilitySet(newSet);
+		}
+
+		/*--------------------------------------------------------------------------------*/
+
+		/**
+		 * Undo an operation.
+		 */
+		@Override
+		public IStatus undo(IProgressMonitor monitor, IAdaptable info)
+				throws ExecutionException {
+			
+			return useVisibilitySet(existingSet);
+		}
+		
+		/*--------------------------------------------------------------------------------*/
+
+		/**
+		 * Set the current editor's visibility set to the specified set.
+		 * @param setToUse The visibility set to use for this editor.
+		 * @return The status of the action.
+		 */
+		private IStatus useVisibilitySet(IntegerTreeSet setToUse) {
+			
+			/* copy the set, since this will be used for making future changes */
+			IntegerTreeSet nextSet = null;
+			try {
+				nextSet = (IntegerTreeSet) setToUse.clone();
+			} catch (CloneNotSupportedException e) {
+				/* can't happen */
+			}
+			
+			/* set the visibility set and refresh the view */
+			SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+			subEditor.setVisibilityFilterSet(nextSet);
+			subEditor.refreshView(true);
+			return Status.OK_STATUS;
+		}
+		
+		/*--------------------------------------------------------------------------------*/
+
+	}
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -121,12 +238,16 @@ public class HandlerFilterByName extends AbstractHandler {
 			break;
 		}
 		
-		/*
-		 * Refresh the file set. 
-		 */
+		/* create a new undo/redo operation, for recording this change */
 		newVisibilitySet.populateWithParents();
-		editor.setVisibilityFilterSet(newVisibilitySet);
-		editor.refreshView(true);
+		FilterOperation operation = 
+				new FilterOperation(currentFileSet, newVisibilitySet); 
+		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();		
+		operation.addContext(mainEditor.getUndoContext());		
+		
+		/* make it so... */
+		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
+		history.execute(operation, null, null);
 		return null;
 	}
 
@@ -209,12 +330,16 @@ public class HandlerFilterByName extends AbstractHandler {
 			break;
 		}
 		
-		/*
-		 * Refresh the action set. 
-		 */
+		/* create a new undo/redo operation, for recording this change */
 		newVisibilitySet.populateWithParents();
-		editor.setVisibilityFilterSet(newVisibilitySet);
-		editor.refreshView(true);
+		FilterOperation operation = 
+				new FilterOperation(currentActionSet, newVisibilitySet); 
+		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();		
+		operation.addContext(mainEditor.getUndoContext());		
+		
+		/* make it so... */
+		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
+		history.execute(operation, null, null);
 		return null;
 	}
 
