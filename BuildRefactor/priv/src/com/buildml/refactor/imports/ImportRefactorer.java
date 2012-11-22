@@ -132,7 +132,8 @@ public class ImportRefactorer implements IImportRefactorer {
 			for (int writtenPathId : filesWrittenByAction) {
 				
 				/* are there other actions (other than us) that use this generated path? */
-				if (actionMgr.getActionsThatAccess(writtenPathId, OperationType.OP_UNSPECIFIED).length != 1) {
+				if (actionMgr.getActionsThatAccess(writtenPathId, OperationType.OP_UNSPECIFIED).length != 
+						actionsUsingPath.length) {
 					allPathsInUse.add(writtenPathId);
 				}
 			}
@@ -154,6 +155,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		 *  3) Trash any write-only paths (we already know they're not used
 		 *     by other actions).
 		 */
+		List<Integer> writtenFilesToRemove = new ArrayList<Integer>();
 		for (int actionId : actionsUsingPath) {
 			Integer pathsReadByAction[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_READ);
 			Integer pathsWrittenByAction[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_WRITE);
@@ -180,17 +182,22 @@ public class ImportRefactorer implements IImportRefactorer {
 						ItemOpType.REMOVE_ACTION_PATH_LINK, actionId, pathUsed, OperationType.OP_DELETE);
 			}
 
-			/* For write-only paths, we also delete the path */
+			/* For write-only paths, we also delete the path, but not until all action links are gone. */
 			for (int pathUsed : pathsWrittenByAction) {
 				historyItem.addPathAccessOp(
 						ItemOpType.REMOVE_ACTION_PATH_LINK, actionId, pathUsed, OperationType.OP_WRITE);
-				historyItem.addPathOp(ItemOpType.REMOVE_PATH, pathUsed);
+				writtenFilesToRemove.add(pathUsed);
 			}
 			
 			/*
 			 * Move the action into the trash.
 			 */
 			historyItem.addActionOp(ItemOpType.REMOVE_ACTION, actionId);
+		}
+
+		/* remove all written files - we can only do this once all action-path links are removed. */
+		for (int writtenPathId : writtenFilesToRemove) {
+			historyItem.addPathOp(ItemOpType.REMOVE_PATH, writtenPathId);			
 		}
 		
 		/* 
