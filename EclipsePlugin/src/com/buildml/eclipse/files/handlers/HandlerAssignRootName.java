@@ -17,6 +17,7 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.RootNameDialog;
 import com.buildml.model.IBuildStore;
@@ -42,7 +43,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 	 * 
 	 * @author Peter Smith <psmith@arapiki.com>
 	 */
-	private class AssignRootNameOperation extends AbstractOperation {
+	private class AssignRootNameOperation extends BmlAbstractOperation {
 		
 		/** Name of the root to be added */
 		private String rootName;
@@ -53,9 +54,6 @@ public class HandlerAssignRootName extends AbstractHandler {
 		/** Error status, in case the operation fails */
 		private IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 
 											"Unable to add or remove path root.");
-
-		/** The FileMgr that contains the path and the root */
-		private IFileMgr fileMgr;
 		
 		/*---------------------------------------------------------------------------*/
 
@@ -79,15 +77,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 		 *      org.eclipse.core.runtime.IAdaptable)
 		 */
 		@Override
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-			
-			/* identify the PathMgr to be used */
-			IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
-			if (buildStore == null) {
-				return errorStatus;
-			}
-			fileMgr = buildStore.getFileMgr();
+		public IStatus redo() throws ExecutionException {
 			
 			/* try to add the root to the selected path. On error, give a message */
 			int errCode = fileMgr.addNewRoot(rootName, pathId);
@@ -115,7 +105,6 @@ public class HandlerAssignRootName extends AbstractHandler {
 			 * All is now good, so go ahead and enable the "show roots" option (if not
 			 * already enabled), and refresh the editor's content to show the new root.
 			 */
-			SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 			subEditor.setOptions(EditorOptions.OPT_SHOW_ROOTS);
 			subEditor.refreshView(true);
 			
@@ -132,8 +121,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 		 *      org.eclipse.core.runtime.IAdaptable)
 		 */
 		@Override
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
+		public IStatus undo() throws ExecutionException {
 
 			/* reverse the operation, using saved state */
 			int errCode = fileMgr.deleteRoot(rootName);
@@ -143,19 +131,8 @@ public class HandlerAssignRootName extends AbstractHandler {
 			}
 			
 			/* refresh the relevant editors */
-			EclipsePartUtils.getActiveSubEditor().refreshView(true);
+			subEditor.refreshView(true);
 			return Status.OK_STATUS;
-		}
-		
-		/*---------------------------------------------------------------------------*/
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.commands.operations.IUndoableOperation#execute(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IAdaptable)
-		 */
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-			return redo(monitor, info);
 		}
 		
 		/*---------------------------------------------------------------------------*/
@@ -188,14 +165,9 @@ public class HandlerAssignRootName extends AbstractHandler {
 		}
 		String rootName = dialog.getRootName();
 		
-		/* create an undo/redo operation */
+		/* create an undo/redo operation and execute it */
 		AssignRootNameOperation operation = new AssignRootNameOperation(rootName, pathId);
-		MainEditor editor = EclipsePartUtils.getActiveMainEditor();		
-		operation.addContext(editor.getUndoContext());		
-		
-		/* make it so... */
-		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
-		history.execute(operation, null, null);		
+		operation.recordAndInvoke();
 		return null;
 	}
 	

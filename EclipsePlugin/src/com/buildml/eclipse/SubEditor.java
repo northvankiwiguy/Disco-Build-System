@@ -35,6 +35,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.os.SystemUtils;
@@ -88,6 +89,12 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * They should only see the message once per Eclipse invocation, so this field is static.
 	 */
 	private static boolean warnedAboutPathOverride = false;
+	
+	/**
+	 * Records the time at which this sub-editor's view was last updated. If this is 
+	 * less than the MainEditor.getModelChangeCount() then the view is out of date.
+	 */
+	private long lastRefreshedAtChange = 0;
 
 	/*=====================================================================================*
 	 * CONSTRUCTOR
@@ -432,6 +439,25 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Check whether this sub-editor's view is up to date with respect to the underlying
+	 * model. If not, refresh it. This is typically performed on a page-change to ensure
+	 * that model changes in one sub-editor are reflected in other sub-editors.
+	 */
+	protected void refreshViewIfOutDated() {
+
+		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
+		if (mainEditor != null) {
+			long modelChangeCount = mainEditor.getModelChangeCount();
+			if (lastRefreshedAtChange < modelChangeCount) {
+				refreshView(true);
+				lastRefreshedAtChange = modelChangeCount;
+			}
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IElementComparer#equals(java.lang.Object, java.lang.Object)
 	 */
@@ -468,7 +494,7 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	}
 	
 	/*=====================================================================================*
-	 * PUBLIC METHODS
+	 * ABSTRACT METHODS
 	 *=====================================================================================*/
 
 	/**

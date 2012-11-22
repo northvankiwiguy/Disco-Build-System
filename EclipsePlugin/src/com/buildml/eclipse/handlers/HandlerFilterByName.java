@@ -1,15 +1,10 @@
 package com.buildml.eclipse.handlers;
 
-import java.util.List;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -18,6 +13,7 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.NameFilterDialog;
 import com.buildml.model.IActionMgr;
@@ -42,10 +38,8 @@ public class HandlerFilterByName extends AbstractHandler {
 	/**
 	 * An undo/redo operation for recording changes in an editor's visibility state
 	 * when "filter by name" is used to modify the visible tree items.
-	 *
-	 * @author Peter Smith <psmith@arapiki.com>
 	 */
-	private class FilterOperation extends AbstractOperation {
+	private class FilterOperation extends BmlAbstractOperation {
 
 		/** The existing visibility set, recording the state before the operation takes place. */
 		private IntegerTreeSet existingSet;
@@ -81,23 +75,10 @@ public class HandlerFilterByName extends AbstractHandler {
 		/*--------------------------------------------------------------------------------*/
 
 		/**
-		 * Execute the hide/reveal operation.
-		 */
-		@Override
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-			return redo(monitor, info);
-		}
-
-		/*--------------------------------------------------------------------------------*/
-
-		/**
 		 * Do, or redo an operation.
 		 */
 		@Override
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-
+		public IStatus redo() throws ExecutionException {
 			return useVisibilitySet(newSet);
 		}
 
@@ -107,9 +88,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Undo an operation.
 		 */
 		@Override
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-			
+		public IStatus undo() throws ExecutionException {
 			return useVisibilitySet(existingSet);
 		}
 		
@@ -240,14 +219,8 @@ public class HandlerFilterByName extends AbstractHandler {
 		
 		/* create a new undo/redo operation, for recording this change */
 		newVisibilitySet.populateWithParents();
-		FilterOperation operation = 
-				new FilterOperation(currentFileSet, newVisibilitySet); 
-		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();		
-		operation.addContext(mainEditor.getUndoContext());		
-		
-		/* make it so... */
-		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
-		history.execute(operation, null, null);
+		FilterOperation operation = new FilterOperation(currentFileSet, newVisibilitySet);
+		operation.recordAndInvoke();
 		return null;
 	}
 
@@ -332,14 +305,10 @@ public class HandlerFilterByName extends AbstractHandler {
 		
 		/* create a new undo/redo operation, for recording this change */
 		newVisibilitySet.populateWithParents();
-		FilterOperation operation = 
-				new FilterOperation(currentActionSet, newVisibilitySet); 
-		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();		
-		operation.addContext(mainEditor.getUndoContext());		
+		FilterOperation operation = new FilterOperation(currentActionSet, newVisibilitySet);
 		
-		/* make it so... */
-		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
-		history.execute(operation, null, null);
+		/* execute! */
+		operation.recordAndInvoke();
 		return null;
 	}
 

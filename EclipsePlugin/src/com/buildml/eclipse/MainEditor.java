@@ -83,6 +83,9 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	/** "dirty" state of this editor - true means that it needs saving */
 	private boolean editorIsDirty = false;
 	
+	/** Counts the number of times the underlying BuildStore model has changed */
+	private long modelChangeCounter = 0;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -409,14 +412,38 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 * option will now be available).
 	 */
 	public void markDirty() {
+		
+		/* tell Eclipse that we're changing our dirty state (it should put a * in our title). */
 		if (!editorIsDirty) {
 			editorIsDirty = true;
 			firePropertyChange(PROP_DIRTY);
 		}
+		
+		/* 
+		 * Increment our "change counter". This is used by sub-editors to know whether they
+		 * need to refresh themselves. That is, if a sub-editor makes a change to the
+		 * underlying model, other sub-editors will need to refresh themselves. However,
+		 * if there were no model changes since the last refresh, there's no need to refresh.
+		 */
+		modelChangeCounter++;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Return the number of times the underlying BuildStore model has changed. This is
+	 * can be used by sub-editors to determine if their content needs to be refreshed
+	 * on a page-change operation.
+	 * 
+	 * @return The number of times the underlying BuildStore has changed.
+	 */
+	public long getModelChangeCount() {
+		return modelChangeCounter;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#dispose()
 	 */

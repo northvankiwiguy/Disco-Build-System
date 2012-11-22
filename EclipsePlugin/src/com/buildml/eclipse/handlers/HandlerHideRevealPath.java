@@ -19,6 +19,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -40,7 +41,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 	 *
 	 * @author Peter Smith <psmith@arapiki.com>
 	 */
-	private class HideRevealOperation extends AbstractOperation {
+	private class HideRevealOperation extends BmlAbstractOperation {
 
 		/** The existing visibility set, recording the state before the operation takes place. */
 		private IntegerTreeSet existingSet;
@@ -84,25 +85,12 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		/*--------------------------------------------------------------------------------*/
 
 		/**
-		 * Execute the hide/reveal operation.
-		 */
-		@Override
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-			return redo(monitor, info);
-		}
-
-		/*--------------------------------------------------------------------------------*/
-
-		/**
 		 * Do, or redo an operation.
 		 */
 		@Override
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
+		public IStatus redo() throws ExecutionException {
 
 			/* mark all the selected items with their new state */
-			SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 			for (Object item : changesToMake) {
 				subEditor.setItemVisibilityState(item, revealState);
 			}
@@ -115,8 +103,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		 * Undo an operation.
 		 */
 		@Override
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
+		public IStatus undo() throws ExecutionException {
 			
 			/* Make a copy of the set, so that our copy stays intact */
 			IntegerTreeSet revertedSet = null;
@@ -130,7 +117,6 @@ public class HandlerHideRevealPath extends AbstractHandler {
 			 * Set the visibility filter set to what it was before the operation
 			 * was invoked. Then refresh our view with the old selection.
 			 */
-			SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 			subEditor.setVisibilityFilterSet(revertedSet);
 			subEditor.refreshView(true);
 			return Status.OK_STATUS;
@@ -177,12 +163,8 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		/* create a new undo/redo operation, for recording this change */
 		HideRevealOperation operation = 
 				new HideRevealOperation(existingVisibleItems, listOfChanges, revealState); 
-		MainEditor editor = EclipsePartUtils.getActiveMainEditor();		
-		operation.addContext(editor.getUndoContext());		
+		operation.recordAndInvoke();
 		
-		/* make it so... */
-		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
-		history.execute(operation, null, null);
 		return null;
 	}
 

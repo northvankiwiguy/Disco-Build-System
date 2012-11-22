@@ -17,6 +17,7 @@ import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -37,7 +38,7 @@ public class HandlerRemoveRoot extends AbstractHandler {
 	 * 
 	 * @author Peter Smith <psmith@arapiki.com>
 	 */
-	private class RemoveRootOperation extends AbstractOperation {
+	private class RemoveRootOperation extends BmlAbstractOperation {
 		
 		/** Name of the root to be removed */
 		String rootName;
@@ -70,15 +71,7 @@ public class HandlerRemoveRoot extends AbstractHandler {
 		 *      org.eclipse.core.runtime.IAdaptable)
 		 */
 		@Override
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-
-			/* identify the PathMgr object containing the path */
-			IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
-			if (buildStore == null) {
-				return errorStatus;
-			}
-			IFileMgr fileMgr = buildStore.getFileMgr();
+		public IStatus redo() throws ExecutionException {
 			
 			/* fetch the root's name (error if it doesn't exist) */
 			rootName = fileMgr.getRootAtPath(pathId);
@@ -102,7 +95,7 @@ public class HandlerRemoveRoot extends AbstractHandler {
 			}
 			
 			/* All is now good, refresh the editor so that the root disappears */
-			EclipsePartUtils.getActiveSubEditor().refreshView(true);
+			subEditor.refreshView(true);
 			
 			/* mark the editor as dirty */
 			EclipsePartUtils.markEditorDirty();
@@ -117,35 +110,17 @@ public class HandlerRemoveRoot extends AbstractHandler {
 		 *      org.eclipse.core.runtime.IAdaptable)
 		 */
 		@Override
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
+		public IStatus undo() throws ExecutionException {
 
-			IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
-			if (buildStore == null) {
-				return errorStatus;
-			}
-			IFileMgr fileMgr = buildStore.getFileMgr();
 			int errCode = fileMgr.addNewRoot(rootName, pathId);
 			if (errCode != 0) {
 				/* this is an "undo", so it shouldn't fail (if it does, fail silently) */
 				return errorStatus;
 			}
-			EclipsePartUtils.getActiveSubEditor().refreshView(true);
+			subEditor.refreshView(true);
 			return Status.OK_STATUS;
 		}
 
-		/*---------------------------------------------------------------------------*/
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.commands.operations.IUndoableOperation#execute(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IAdaptable)
-		 */
-		@Override
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-				throws ExecutionException {
-			return redo(monitor, info);
-		}
-		
 		/*---------------------------------------------------------------------------*/
 	};
 	
@@ -170,14 +145,9 @@ public class HandlerRemoveRoot extends AbstractHandler {
 		}
 		int pathId = ((UIFileRecordDir)nodeObject).getId();
 		
-		/* create an undo/redo operation */
+		/* create an undo/redo operation and execute it */
 		RemoveRootOperation operation = new RemoveRootOperation(pathId);
-		MainEditor editor = EclipsePartUtils.getActiveMainEditor();		
-		operation.addContext(editor.getUndoContext());
-		
-		/* make it so... */
-		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
-		history.execute(operation, null, null);
+		operation.recordAndInvoke();
 		return null;
 	}
 
