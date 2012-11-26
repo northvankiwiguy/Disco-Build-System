@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -294,6 +295,87 @@ public class TestActionMgr {
 		assertTrue(CommonTestUtils.sortedArraysEqual(accesses, new Integer[] { fileSharedH }));
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the addition, removal and re-addition of file-access operations.
+	 */
+	@Test
+	public void testSequenceFileAccesses() {
+		
+		int parentActionId = actionMgr.getRootAction("root");
+		int dirId = fileMgr.getPath("/");
+		int fileId = fileMgr.addFile("/test");
+		
+		int actionId0 = actionMgr.addAction(parentActionId, dirId, "");
+		int actionId1 = actionMgr.addAction(parentActionId, dirId, "");
+		int actionId2 = actionMgr.addAction(actionId0, dirId, "");
+		int actionId3 = actionMgr.addAction(actionId1, dirId, "");
+		Integer actions[] = new Integer[] { actionId0, actionId1, actionId2, actionId3 };
+		
+		/* Initially, there are no file accesses */
+		FileAccess results[] = actionMgr.getSequencedFileAccesses(actions);
+		assertEquals(0, results.length);
+		
+		/* Add four accesses */
+		actionMgr.addFileAccess(actionId0, fileId, OperationType.OP_READ);
+		actionMgr.addFileAccess(actionId1, fileId, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(actionId2, fileId, OperationType.OP_MODIFIED);
+		actionMgr.addFileAccess(actionId3, fileId, OperationType.OP_DELETE);
+		
+		/* Retrieve the file accesses, they should appear in the order they were added */
+		results = actionMgr.getSequencedFileAccesses(actions);
+		assertEquals(4, results.length);
+		assertEquals(actionId0, results[0].actionId);
+		assertEquals(OperationType.OP_READ, results[0].opType);
+		assertEquals(actionId1, results[1].actionId);
+		assertEquals(OperationType.OP_WRITE, results[1].opType);
+		assertEquals(actionId2, results[2].actionId);
+		assertEquals(OperationType.OP_MODIFIED, results[2].opType);
+		assertEquals(actionId3, results[3].actionId);
+		assertEquals(OperationType.OP_DELETE, results[3].opType);
+		int savedId0Seqno = results[0].seqno;
+		int savedId2Seqno = results[2].seqno;
+
+		/* Remove the actionId2 file access, and test again */
+		actionMgr.removeFileAccess(actionId2, fileId);
+		results = actionMgr.getSequencedFileAccesses(actions);
+		assertEquals(3, results.length);
+		assertEquals(actionId0, results[0].actionId);
+		assertEquals(OperationType.OP_READ, results[0].opType);
+		assertEquals(actionId1, results[1].actionId);
+		assertEquals(OperationType.OP_WRITE, results[1].opType);
+		assertEquals(actionId3, results[2].actionId);
+		assertEquals(OperationType.OP_DELETE, results[2].opType);
+		
+		/* Remove the actionId1 file access, and test again */
+		actionMgr.removeFileAccess(actionId1, fileId);
+		results = actionMgr.getSequencedFileAccesses(actions);
+		assertEquals(2, results.length);
+		assertEquals(actionId0, results[0].actionId);
+		assertEquals(OperationType.OP_READ, results[0].opType);
+		assertEquals(actionId3, results[1].actionId);
+		assertEquals(OperationType.OP_DELETE, results[1].opType);
+		
+		/* Try to add something with an in-use sequence number - should fail */
+		assertEquals(ErrorCode.ONLY_ONE_ALLOWED, 
+				actionMgr.addSequencedFileAccess(savedId0Seqno, actionId0, fileId, 
+						OperationType.OP_READ));
+		
+		/* Try to add the actionId2 entry back again - should succeed */
+		assertEquals(ErrorCode.OK, 
+				actionMgr.addSequencedFileAccess(savedId2Seqno, actionId2, fileId, 
+						OperationType.OP_MODIFIED));
+		results = actionMgr.getSequencedFileAccesses(actions);
+		assertEquals(3, results.length);
+		assertEquals(actionId0, results[0].actionId);
+		assertEquals(OperationType.OP_READ, results[0].opType);
+		assertEquals(actionId2, results[1].actionId);
+		assertEquals(OperationType.OP_MODIFIED, results[1].opType);
+		assertEquals(actionId3, results[2].actionId);
+		assertEquals(OperationType.OP_DELETE, results[2].opType);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**

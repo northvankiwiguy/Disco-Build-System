@@ -48,6 +48,24 @@ public interface IActionMgr {
 	};
 	
 	/**
+	 * A structure, returned by getSequencedFileAccesses, describing an individual
+	 * file access.
+	 */
+	public class FileAccess {
+		/** The globally-unique sequence number of this access */
+		public int seqno;
+		
+		/** The action that accessed the file */
+		public int actionId;
+		
+		/** The file that has been accessed */
+		public int pathId;
+		
+		/** The mode in which the file was access (read, write, etc) */
+		public OperationType opType;
+	}
+	
+	/**
 	 * Add a new build action, returning the new action ID number.
 	 * 
 	 * @param parentActionId The ID of the new action's parent.
@@ -71,6 +89,26 @@ public interface IActionMgr {
 			OperationType newOperation);
 
 	/**
+	 * Record the fact that the specific build action accessed the specified file. 
+	 * This is similar to addFileAccess(), but allows specific control over the
+	 * sequence number of the operation. Instead of adding the file access information
+	 * to the end of the list, it can be inserted at an arbitrary location.
+	 * 
+	 * This method should primarily be used when undoing a deletion operation. Normally,
+	 * file accesses should be added in the order they're performed, by calling
+	 * addFileAccess().
+	 * 
+	 * @param seqno The sequence position in which the file access will be added.
+	 * @param actionId The ID of the build action that accessed the file.
+	 * @param fileNumber The file's ID number.
+	 * @param newOperation How the action accessed the file (read, write, delete, etc).
+	 * @return ErrorCode.OK on success, or ErrorCode.ONLY_ONE_ALLOWED if there's
+	 * already a file-access operation at this sequence number.
+	 */
+	public abstract int addSequencedFileAccess(int seqno, int actionId, 
+			int fileNumber,	OperationType newOperation);
+	
+	/**
 	 * Return an array of files that were accessed by this build action.
 	 * 
 	 * @param actionId The build action that accessed the files.
@@ -80,6 +118,16 @@ public interface IActionMgr {
 	 */
 	public abstract Integer[] getFilesAccessed(int actionId,
 			OperationType operation);
+	
+	/**
+	 * Return an array of files that were access by this set of actions, including
+	 * details of the sequence order (in which the accesses occurred) and the type of
+	 * operation that occurred.
+	 * 
+	 * @param actionIds An array of the IDs of actions to query.
+	 * @return An ordered array of file access information.
+	 */
+	public abstract FileAccess[] getSequencedFileAccesses(Integer actionIds[]);
 
 	/**
 	 * Return an array of actions that accessed a specific file.

@@ -23,6 +23,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
 
 /**
@@ -135,6 +136,7 @@ public class TestImportRefactorMergeActions {
 		actionA1b = actionMgr.addAction(actionA1, dirWork, "as -o foo.o /tmp/aaa.s");
 		actionMgr.addFileAccess(actionA1b, fileTmpAaaS, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA1b, fileWorkFooO, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(actionA1,  fileTmpAaaS, OperationType.OP_DELETE);
 	
 		actionA2 = actionMgr.addAction(actionA, dirWork, "gcc -c bar.o bar.c");
 	
@@ -150,6 +152,7 @@ public class TestImportRefactorMergeActions {
 		actionMgr.addFileAccess(actionA3, fileWorkFooO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA3, fileWorkBarO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA3, fileWorkLibA, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(actionA3,  fileTmpBbbS, OperationType.OP_DELETE);
 
 		actionA4 = actionMgr.addAction(actionA, dirWork, "gcc -o main main.c lib.a");
 		
@@ -167,6 +170,7 @@ public class TestImportRefactorMergeActions {
 		actionMgr.addFileAccess(actionA4c, fileWorkLibA, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4c, fileUsrCrtendO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4c, fileWorkMain, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(actionA4,  fileTmpCccS, OperationType.OP_DELETE);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -185,12 +189,65 @@ public class TestImportRefactorMergeActions {
 	 *=====================================================================================*/
 
 	/**
-	 * 
-	 * @throws Exception
+	 * Test the "make atomic" operation.
 	 */
 	@Test
-	public void testMakeAtomic() throws Exception {
+	public void testMakeAtomic() {
 		System.out.println("Making atomic");
+		
+		/* actionA4c is already atomic - no work required */
+		try {
+			importRefactorer.makeActionAtomic(actionA4c);
+		} catch (CanNotRefactorException e) {
+			fail("Action is already atomic, but got an error.");
+		}
+		assertEquals(0, actionMgr.getChildren(actionA4c).length);
+		CommonTestUtils.sortedArraysEqual(
+				new Integer[] { fileUsrCrt0O, fileWorkMainO, fileWorkLibA, fileUsrCrtendO, fileWorkMain },  
+				actionMgr.getFilesAccessed(actionA4c, OperationType.OP_UNSPECIFIED));
+		
+		/* actionA4 has three children */
+		assertEquals(3, actionMgr.getChildren(actionA4).length);
+		try {
+			importRefactorer.makeActionAtomic(actionA4);
+		} catch (CanNotRefactorException e) {
+			fail("Failed to make action4 atomic.");
+		}
+		
+		/* Check that the former children have been deleted */
+		assertEquals(0, actionMgr.getChildren(actionA4).length);
+		assertTrue(actionMgr.isActionTrashed(actionA4a));
+		assertTrue(actionMgr.isActionTrashed(actionA4b));
+		assertTrue(actionMgr.isActionTrashed(actionA4c));
+		
+		/* Check the new set of file accesses */
+		CommonTestUtils.sortedArraysEqual(
+				new Integer[] { fileWorkMainC, fileUsrCrt0O, fileWorkLibA, fileUsrCrtendO },  
+				actionMgr.getFilesAccessed(actionA4, OperationType.OP_READ));
+		CommonTestUtils.sortedArraysEqual(
+				new Integer[] { fileWorkMainO, fileWorkMain },  
+				actionMgr.getFilesAccessed(actionA4, OperationType.OP_WRITE));
+		assertEquals(0, actionMgr.getFilesAccessed(actionA4, OperationType.OP_MODIFIED).length);
+		assertEquals(0, actionMgr.getFilesAccessed(actionA4, OperationType.OP_DELETE).length);
+		
+		/* Try to make a trashed file atomic - should fail */
+		try {
+			importRefactorer.makeActionAtomic(actionA4a);
+			fail("Was able to make a trashed file atomic.");
+		} catch (CanNotRefactorException e1) {
+			assertEquals(Cause.ACTION_IS_TRASHED, e1.getCauseCode());
+		}		
+		
+		/* under the operation, and check that things are back to normal */
+		try {
+			importRefactorer.undoRefactoring();
+		} catch (CanNotRefactorException e) {
+			fail("Failed to undo make atomic operation.");
+		}
+		assertEquals(3, actionMgr.getChildren(actionA4).length);
+		assertFalse(actionMgr.isActionTrashed(actionA4a));
+		assertFalse(actionMgr.isActionTrashed(actionA4b));
+		assertFalse(actionMgr.isActionTrashed(actionA4c));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -47,8 +47,11 @@ public class CanNotRefactorException extends Exception {
 		/** The action is not atomic, so this operation can not proceed */
 		ACTION_NOT_ATOMIC,
 		
+		/** The action has been trashed, so this operation is invalid */
+		ACTION_IS_TRASHED,
+		
 		/** Couldn't delete a directory, since it's not empty */
-		DIRECTORY_NOT_EMPTY
+		DIRECTORY_NOT_EMPTY,
 	}
 	
 	/** The cause of the exception */
@@ -88,8 +91,9 @@ public class CanNotRefactorException extends Exception {
 			actionIds = args;
 			break;
 		
-		/* The action is in use by certain files */
+		/* The action is in use by certain files, or is trashed */
 		case ACTION_IN_USE:
+		case ACTION_IS_TRASHED:
 			pathIds = args;
 			break;
 		

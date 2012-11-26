@@ -167,6 +167,7 @@
       </command>
       <command
             category="com.buildml.eclipse.commands.category"
+            defaultHandler="com.buildml.eclipse.actions.handlers.HandlerMakeAtomic"
             id="com.buildml.eclipse.commands.makeActionAtomic"
             name="Make Action Atomic">
       </command>

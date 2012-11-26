@@ -266,7 +266,8 @@ import com.buildml.utils.version.Version;
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */
-			stat.executeUpdate("create table actionFiles ( actionId integer, fileId integer, operation integer)");			
+			stat.executeUpdate("create table actionFiles ( seqno integer primary key, actionId integer, " +
+							   "fileId integer, operation integer)");			
 			stat.executeUpdate("create index actionFilesIdx1 on actionFiles (fileId)");
 			stat.executeUpdate("create unique index actionFilesIdx2 on actionFiles (actionId, fileId)");
 			stat.executeUpdate("create index actionFilesIdx3 on actionFiles (fileId, operation)");

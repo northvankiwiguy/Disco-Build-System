@@ -19,6 +19,7 @@ import java.util.Stack;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.refactor.CanNotRefactorException;
@@ -155,43 +156,24 @@ public class ImportRefactorer implements IImportRefactorer {
 		 *  3) Trash any write-only paths (we already know they're not used
 		 *     by other actions).
 		 */
-		List<Integer> writtenFilesToRemove = new ArrayList<Integer>();
+		List<Integer> writtenFilesToRemove = new ArrayList<Integer>();	
+			
+		/* 
+		 * Remove links between this action and all paths it accesses. We need information on
+		 * which operation is used to access the path, so we break this out.
+		 */
+		FileAccess[] fileAccesses = actionMgr.getSequencedFileAccesses(actionsUsingPath);
+		for (FileAccess fileAccess : fileAccesses) {
+			historyItem.addPathAccessOp(ItemOpType.REMOVE_ACTION_PATH_LINK, fileAccess.seqno, 
+					fileAccess.actionId, fileAccess.pathId, fileAccess.opType);
+			if (fileAccess.opType == OperationType.OP_WRITE){
+				writtenFilesToRemove.add(fileAccess.pathId);
+			}
+		
+		}
+			
+		/* Move the actions into the trash.*/
 		for (int actionId : actionsUsingPath) {
-			Integer pathsReadByAction[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_READ);
-			Integer pathsWrittenByAction[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_WRITE);
-			Integer pathsModifiedByAction[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_MODIFIED);
-			Integer pathsDeletedByAction[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_DELETE);
-
-			// TODO: when deleting an action (and its file accesses), make sure that the file accesses
-			// are kept in a consistent order so that if we do a "makeAtomic" later on, things will work.
-			
-			/* 
-			 * Remove links between this action and all paths it accesses. We need information on
-			 * which operation is used to access the path, so we break this out.
-			 */
-			for (int pathUsed : pathsReadByAction) {
-				historyItem.addPathAccessOp(
-						ItemOpType.REMOVE_ACTION_PATH_LINK, actionId, pathUsed, OperationType.OP_READ);
-			}
-			for (int pathUsed : pathsModifiedByAction) {
-				historyItem.addPathAccessOp(
-						ItemOpType.REMOVE_ACTION_PATH_LINK, actionId, pathUsed, OperationType.OP_MODIFIED);
-			}
-			for (int pathUsed : pathsDeletedByAction) {
-				historyItem.addPathAccessOp(
-						ItemOpType.REMOVE_ACTION_PATH_LINK, actionId, pathUsed, OperationType.OP_DELETE);
-			}
-
-			/* For write-only paths, we also delete the path, but not until all action links are gone. */
-			for (int pathUsed : pathsWrittenByAction) {
-				historyItem.addPathAccessOp(
-						ItemOpType.REMOVE_ACTION_PATH_LINK, actionId, pathUsed, OperationType.OP_WRITE);
-				writtenFilesToRemove.add(pathUsed);
-			}
-			
-			/*
-			 * Move the action into the trash.
-			 */
 			historyItem.addActionOp(ItemOpType.REMOVE_ACTION, actionId);
 		}
 
@@ -237,20 +219,50 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#makeActionAtomic(int)
 	 */
 	@Override
-	public void makeActionAtomic(int actionId) {
+	public void makeActionAtomic(int actionId) throws CanNotRefactorException {
 		
-		// if action is already atomic (no children):
-		//         return success.
+		/* if the action has been trashed, that's a problem */
+		if (actionMgr.isActionTrashed(actionId)) {
+			throw new CanNotRefactorException(Cause.ACTION_IS_TRASHED, new Integer[] { actionId });
+		}
 		
-		// for each child, recursively call makeActionAtomic(). On error from child,
-		//         unwind previous changes and return error.
+		/* if this action has no children, it's already atomic */
+		Integer children[] = actionMgr.getChildren(actionId);
+		if (children.length == 0) {
+			return;
+		}
 		
-		// clone action (which makes it a sibling of original action).
-		// mark original action as garbage.
-		// for each child:
-		//     obtain list of file access.
-		//     add file access to newly cloned parent.
-		//     mark child as garbage.
+		/* figure out the complete list of actions that we'll be merging */
+		List<Integer> actionsToMerge = new ArrayList<Integer>();
+		collectChildren(actionMgr, actionId, actionsToMerge);
+		
+		/* obtain the complete list of file access across those actions */
+		FileAccess[] fileAccesses = 
+				actionMgr.getSequencedFileAccesses(actionsToMerge.toArray(new Integer[0]));
+		
+		/* schedule all existing file accesses for removal */
+		ImportHistoryItem historyItem = new ImportHistoryItem(buildStore);
+		for (FileAccess fileAccess : fileAccesses) {
+			historyItem.addPathAccessOp(ItemOpType.REMOVE_ACTION_PATH_LINK, 
+					fileAccess.seqno, fileAccess.actionId, 
+					fileAccess.pathId, fileAccess.opType);
+		}
+		
+		/* schedule those same file access to be performed by the parent action */
+		for (FileAccess fileAccess : fileAccesses) {
+			historyItem.addPathAccessOp(ItemOpType.ADD_ACTION_PATH_LINK, 
+					fileAccess.seqno, actionId, fileAccess.pathId, fileAccess.opType);
+		}
+		
+		/* move the child actions to the trash */
+		for (int childActionId : actionsToMerge) {
+			if (childActionId != actionId) {
+				historyItem.addActionOp(ItemOpType.REMOVE_ACTION, childActionId);
+			}
+		}
+		
+		/* success */
+		invokeHistoryItem(historyItem);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -321,7 +333,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		/* if there's something we can undo... */
 		if (!undoStack.isEmpty()) {
 
-			System.out.println("UNDO:");
+			// System.out.println("UNDO:");
 
 			/* undo all the operations in this history item */
 			ImportHistoryItem item = undoStack.pop();
@@ -344,7 +356,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		/* if there is something to redo... */
 		if (!redoStack.isEmpty()) {
 			
-			System.out.println("REDO:");
+			// System.out.println("REDO:");
 			
 			/* redo all the operations in this history item */
 			ImportHistoryItem item = redoStack.pop();
@@ -368,7 +380,6 @@ public class ImportRefactorer implements IImportRefactorer {
 	private void invokeHistoryItem(ImportHistoryItem item) {
 		
 		/* perform the item, then add it to our undo stack */
-		System.out.println("INVOKING:");
 		item.redo();
 		undoStack.push(item);
 		
@@ -378,4 +389,21 @@ public class ImportRefactorer implements IImportRefactorer {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Collect together a list of all an action's child action IDs. For complex actions, this
+	 * may involve traversing multiple levels of the action tree.
+	 * 
+	 * @param actionMgr The action mgr that owns the actions.
+	 * @param actionId The parent action ID.
+	 * @param actionsToMerge A list to which the action's descendents will be added.
+	 */
+	private void collectChildren(IActionMgr actionMgr, int actionId, List<Integer> actionsToMerge) {		
+		Integer children[] = actionMgr.getChildren(actionId);
+		for (int childActionId : children) {
+			collectChildren(actionMgr, childActionId, actionsToMerge);
+		}
+		actionsToMerge.add(actionId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

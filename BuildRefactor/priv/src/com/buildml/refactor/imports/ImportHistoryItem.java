@@ -21,6 +21,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.impl.BuildStore;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -50,12 +51,19 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/** Remove an action-file relationship */
 		REMOVE_ACTION_PATH_LINK,
+		
+		/** Add a new action-file relationship */
+		ADD_ACTION_PATH_LINK,
 	}
 
 	/*=====================================================================================*
 	 * PRIVATE TYPES/FIELDS
 	 *=====================================================================================*/
 
+	
+	/** The BuildStore used by these refactorings */
+	private IBuildStore buildStore;
+	
 	/** The FileMgr used by these refactorings */
 	private IFileMgr fileMgr;
 
@@ -70,6 +78,9 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/** type of the operation */
 		ItemOpType type;
+		
+		/** Sequence number to use (if needed) */
+		int seqno;
 		
 		/** path ID (for file-related operations) */
 		int pathId;
@@ -97,6 +108,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @param buildStore The BuildStore on which to operate.
 	 */
 	ImportHistoryItem(IBuildStore buildStore) {
+		this.buildStore = buildStore;
 		this.fileMgr = buildStore.getFileMgr();
 		this.actionMgr = buildStore.getActionMgr();
 		
@@ -115,13 +127,15 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	void redo() {
 
+		buildStore.setFastAccessMode(true);
+		
 		/* iterate through all the operations, invoking them as required */
 		for (Iterator<ItemOp> iter = opList.iterator(); iter.hasNext();) {
 			ItemOp op = (ItemOp) iter.next();
 			
 			switch (op.type) {
 			case REMOVE_PATH:
-				System.out.println(" - Moving file to trash: " + fileMgr.getPathName(op.pathId));
+				//System.out.println(" - Moving file to trash: " + fileMgr.getPathName(op.pathId));
 				if (fileMgr.movePathToTrash(op.pathId) != ErrorCode.OK) {
 					throw new FatalBuildStoreError(
 							"Unable to move file to trash: " + fileMgr.getPathName(op.pathId));
@@ -129,7 +143,7 @@ import com.buildml.utils.errors.ErrorCode;
 				break;
 				
 			case REMOVE_ACTION:
-				System.out.println(" - Moving action to trash: " + op.actionId);
+				//System.out.println(" - Moving action to trash: " + op.actionId);
 				if (actionMgr.moveActionToTrash(op.actionId) != ErrorCode.OK) {
 					throw new FatalBuildStoreError(
 							"Unable to move action to trash: " + op.actionId);
@@ -137,9 +151,15 @@ import com.buildml.utils.errors.ErrorCode;
 				break;
 				
 			case REMOVE_ACTION_PATH_LINK:
-				System.out.println(" - Removing action/file access: " + 
-							op.actionId + " " + fileMgr.getPathName(op.pathId));
+				//System.out.println(" - Removing action/file access: " + 
+				//			op.actionId + " " + fileMgr.getPathName(op.pathId));
 				actionMgr.removeFileAccess(op.actionId, op.pathId);
+				break;
+				
+			case ADD_ACTION_PATH_LINK:
+				//System.out.println(" - Adding action/file access: " + 
+				//		op.actionId + " " + fileMgr.getPathName(op.pathId));
+				actionMgr.addSequencedFileAccess(op.seqno, op.actionId, op.pathId, op.accessType);
 				break;
 				
 			default:
@@ -148,6 +168,7 @@ import com.buildml.utils.errors.ErrorCode;
 						
 		}
 		
+		buildStore.setFastAccessMode(false);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -159,13 +180,15 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	void undo() {
 
+		buildStore.setFastAccessMode(true);
+
 		/* iterate through all the operations in reverse, invoking them as required */
 		for (int i = opList.size() - 1; i >= 0; i--) {
 			ItemOp op = opList.get(i);
 			
 			switch (op.type) {
 			case REMOVE_PATH:
-				System.out.println(" - Reviving file from trash: " + fileMgr.getPathName(op.pathId));
+				//System.out.println(" - Reviving file from trash: " + fileMgr.getPathName(op.pathId));
 				if (fileMgr.revivePathFromTrash(op.pathId) != ErrorCode.OK) {
 					throw new FatalBuildStoreError(
 							"Unable to revive file from trash: " + fileMgr.getPathName(op.pathId));
@@ -173,7 +196,7 @@ import com.buildml.utils.errors.ErrorCode;
 				break;
 				
 			case REMOVE_ACTION:
-				System.out.println(" - Reviving action from trash: " + op.actionId);
+				//System.out.println(" - Reviving action from trash: " + op.actionId);
 				if (actionMgr.reviveActionFromTrash(op.actionId) != ErrorCode.OK) {
 					throw new FatalBuildStoreError(
 							"Unable to revive action from trash: " + op.actionId);
@@ -181,9 +204,16 @@ import com.buildml.utils.errors.ErrorCode;
 				break;
 				
 			case REMOVE_ACTION_PATH_LINK:
-				System.out.println(" - Re-adding action/file access: " + 
-						op.actionId + " " + fileMgr.getPathName(op.pathId));
-				actionMgr.addFileAccess(op.actionId, op.pathId, op.accessType);
+				//System.out.println(" - Re-adding action/file access: " + 
+				//		op.actionId + " " + fileMgr.getPathName(op.pathId));
+				actionMgr.addSequencedFileAccess(op.seqno, op.actionId, op.pathId, op.accessType);
+				fileMgr.revivePathFromTrash(op.pathId);
+				break;
+				
+			case ADD_ACTION_PATH_LINK:
+				//System.out.println(" - Re-removing action/file access: " + 
+				//		op.actionId + " " + fileMgr.getPathName(op.pathId));
+				actionMgr.removeFileAccess(op.actionId, op.pathId);
 				break;
 				
 			default:
@@ -191,6 +221,8 @@ import com.buildml.utils.errors.ErrorCode;
 			}
 						
 		}
+		
+		buildStore.setFastAccessMode(false);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -228,12 +260,15 @@ import com.buildml.utils.errors.ErrorCode;
 	/**
 	 * Add an individual action/file-access operation at the end of this history item.
 	 * @param op The type of operation to perform (e.g. REMOVE_ACTION_FILE_LINK).
+	 * @param seqno The sequence number to use (or -1 for the next available).
 	 * @param actionId The action that performs the path access.
 	 * @param pathId The path being accessed.
 	 * @param accessType The style of the access (OP_READ, OP_WRITE, etc).
 	 */
-	public void addPathAccessOp(ItemOpType op, int actionId, int pathId,  OperationType accessType) {
+	public void addPathAccessOp(ItemOpType op, int seqno, int actionId, int pathId, 
+								OperationType accessType) {
 		ItemOp item = new ItemOp();
+		item.seqno = seqno;
 		item.type = op;
 		item.actionId = actionId;
 		item.pathId = pathId;

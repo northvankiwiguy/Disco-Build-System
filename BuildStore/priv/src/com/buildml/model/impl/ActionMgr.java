@@ -22,6 +22,7 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -62,6 +63,7 @@ public class ActionMgr implements IActionMgr {
 		insertActionFilesPrepStmt = null,
 		removeActionFilesPrepStmt = null,
 		removeFileAccessesPrepStmt = null,
+		findFileAccessBySeqnoPrepStmt = null,
 		updateActionFilesPrepStmt = null,
 		findOperationInActionFilesPrepStmt = null,
 		findFilesInActionFilesPrepStmt = null,
@@ -96,9 +98,11 @@ public class ActionMgr implements IActionMgr {
 			db.prepareStatement("select actionId from buildActions where (actionDirId = ?) and (trashed = 0)");
 		findChildrenPrepStmt = db.prepareStatement("select actionId from buildActions where parentActionId = ?" +
 				" and (parentActionId != actionId) and (trashed = 0)");
-		insertActionFilesPrepStmt = db.prepareStatement("insert into actionFiles values (?, ?, ?)");
+		insertActionFilesPrepStmt = db.prepareStatement("insert into actionFiles values (?, ?, ?, ?)");
 		removeActionFilesPrepStmt = 
 			db.prepareStatement("delete from actionFiles where actionId = ? and fileId = ?");
+		findFileAccessBySeqnoPrepStmt =
+			db.prepareStatement("select seqno, actionId, fileId, operation from actionFiles where seqno = ?");
 		updateActionFilesPrepStmt = 
 			db.prepareStatement("update actionFiles set operation = ? where actionId = ? and fileId = ?");
 		findOperationInActionFilesPrepStmt = 
@@ -196,100 +200,42 @@ public class ActionMgr implements IActionMgr {
 	 * @see com.buildml.model.IActionMgr#addFileAccess(int, int, com.buildml.model.IActionMgr.OperationType)
 	 */
 	@Override
-	public void addFileAccess(int actionId, int fileNumber, OperationType newOperation) {
+	public void addFileAccess(int actionId, int fileId, OperationType newOperation) {
 		
-		/* 
-		 * We don't want to add the same record twice, but we might want to merge the two
-		 * operations together. That is, if a action reads a file, then writes a file, we want
-		 * to mark it as OP_MODIFIED.
-		 */
-		Integer intResults[] = null;
-		try {
-			findOperationInActionFilesPrepStmt.setInt(1, actionId);
-			findOperationInActionFilesPrepStmt.setInt(2, fileNumber);
-			intResults = db.executePrepSelectIntegerColumn(findOperationInActionFilesPrepStmt);
-			
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		/*
-		 * If there was no existing record, we'll insert a fresh record.
-		 */
-		if (intResults.length == 0) {
-			try {
-				insertActionFilesPrepStmt.setInt(1, actionId);
-				insertActionFilesPrepStmt.setInt(2, fileNumber);
-				insertActionFilesPrepStmt.setInt(3, newOperation.ordinal());
-				db.executePrepUpdate(insertActionFilesPrepStmt);
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-			}
-		}
-		
-		/*
-		 * Else, if there's one record, see if the operation needs to be merged. The DFA
-		 * for transitioning to a new state is as follows:
-		 * 
-		 *             New:    |  Read    Write   Modify  Delete
-		 *             -----------------------------------------
-		 *             Read    |  Read    Modify  Modify  Delete
-		 *  Existing:  Write   |  Write   Write   Write   Temporary
-		 *             Modify  |  Modify  Modify  Modify  Delete
-		 *             Delete  |  Read    Write   Modify  Delete
-		 *             
-		 *  Remember:
-		 *    - Read = the process has *only* ever read this file.
-		 *    - Write = the process created this file (it didn't exist before).
-		 *    - Modify = the process read and then wrote to this file.
-		 *    - Delete = the process ended up by deleting this file.
-		 */
-		else if (intResults.length == 1) {
-			OperationType existingOp = intToOperationType(intResults[0]);
-			OperationType combinedOp = operationTypeMapping[existingOp.ordinal()][newOperation.ordinal()];
-			
-			/*
-			 * Handle a special case of temporary files. That is, if the existingOp is WRITE,
-			 * and the combinedOp is DELETE, then this file was both created and deleted
-			 * by this action.
-			 */
-			if ((existingOp == OperationType.OP_WRITE) && (combinedOp == OperationType.OP_DELETE)) {
-				
-				/* remove all file accesses that we previously added */
-				removeFileAccess(actionId, fileNumber);
-
-				/*
-				 * Attempt to remove the file from the FileMgr. This will fail if the
-				 * same path is already used by some other action, but that's acceptable. We
-				 * only want to remove paths that were used exclusively by this action.
-				 */
-				fileMgr.movePathToTrash(fileNumber);
-			}
-			
-			/*
-			 * else, the normal case is to replace the old state with the new state.
-			 */
-			else {
-				try {
-					updateActionFilesPrepStmt.setInt(1, combinedOp.ordinal());
-					updateActionFilesPrepStmt.setInt(2, actionId);
-					updateActionFilesPrepStmt.setInt(3, fileNumber);
-					db.executePrepUpdate(updateActionFilesPrepStmt);
-				} catch (SQLException e) {
-					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-				}
-			}
-		}
-		
-		/* else, there's an error - can't have multiple entries */
-		else {
-			throw new FatalBuildStoreError("Multiple results find in actionFiles table for actionId = " 
-					+ actionId + " and fileId = " + fileNumber);
-		}
+		addFileAccessCommon(-1, actionId, fileId, newOperation);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#addSequencedFileAccess(int, int, int, com.buildml.model.IActionMgr.OperationType)
+	 */
+	public int addSequencedFileAccess(int seqno, int actionId, 
+			int fileId,	OperationType newOperation) {
+		
+		/* check if there's already a file access with the required sequence number */
+		if (seqno != -1) {
+			Integer intResults[] = null;
+			try {
+				findFileAccessBySeqnoPrepStmt.setInt(1, seqno);
+				intResults = db.executePrepSelectIntegerColumn(findFileAccessBySeqnoPrepStmt);
 
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+			if (intResults.length != 0) {
+				return ErrorCode.ONLY_ONE_ALLOWED;
+			}
+		}
+		
+		/* proceed to add the access, possibly merging it with existing actions */
+		addFileAccessCommon(seqno, actionId, fileId, newOperation);
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getFilesAccessed(int, com.buildml.model.IActionMgr.OperationType)
 	 */
@@ -327,6 +273,54 @@ public class ActionMgr implements IActionMgr {
 		return results.toArray(new Integer[0]);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getSequencedFileAccesses(int[])
+	 */
+	@Override
+	public FileAccess[] getSequencedFileAccesses(Integer[] actionIds) {
+				
+		List<FileAccess> results = new ArrayList<FileAccess>();
+		try {
+			ResultSet rs;
+
+            /* Form a comma-separated list of action IDs */
+			StringBuilder actSb = new StringBuilder();
+			int length = actionIds.length;
+			for (int i = 0; i < length; i++) {
+				actSb.append(actionIds[i]);
+				if (i != length - 1) {
+					actSb.append(", ");
+				}
+			}
+			String actionsString = actSb.toString();
+			
+			/* query for all actionFile entries for any of the specified actions */
+			String stmt = "select seqno, actionId, fileId, operation from actionFiles " +
+			              "where actionId in (" + actionsString + ") order by seqno;";	
+			rs = db.executeSelectResultSet(stmt);				
+			
+			/* read the results into an array */
+			results = new ArrayList<FileAccess>();
+			while (rs.next()) {
+				FileAccess access = new FileAccess();
+				access.seqno = rs.getInt(1);
+				access.actionId = rs.getInt(2);
+				access.pathId = rs.getInt(3);
+				access.opType = intToOperationType(rs.getInt(4));
+				results.add(access);
+			}
+			rs.close();
+		
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* convert from List to FileAccess[] */
+		return results.toArray(new FileAccess[results.size()]);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -699,4 +693,111 @@ public class ActionMgr implements IActionMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * A helper method for addFileAccess() and addSequencedFileAccess().
+	 * 
+	 * @param seqno The sequence number to use for the new file-access, or -1 if we should use
+	 * 		        the next available number.
+	 * @param actionId The action that performs the access.
+	 * @param fileId The file that is accessed.
+	 * @param newOperation The operation type of the access.
+	 */
+	private void addFileAccessCommon(int seqno, int actionId, 
+			int fileId, OperationType newOperation) {
+		
+		/* 
+		 * We don't want to add the same record twice, but we might want to merge the two
+		 * operations together. That is, if a action reads a file, then writes a file, we want
+		 * to mark it as OP_MODIFIED.
+		 */
+		Integer intResults[] = null;
+		try {
+			findOperationInActionFilesPrepStmt.setInt(1, actionId);
+			findOperationInActionFilesPrepStmt.setInt(2, fileId);
+			intResults = db.executePrepSelectIntegerColumn(findOperationInActionFilesPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/*
+		 * If there was no existing record, we'll insert a fresh record.
+		 */
+		if (intResults.length == 0) {
+			try {
+				if (seqno == -1) {
+					insertActionFilesPrepStmt.setNull(1, java.sql.Types.INTEGER);
+				} else {
+					insertActionFilesPrepStmt.setInt(1, seqno);
+				}
+				insertActionFilesPrepStmt.setInt(2, actionId);
+				insertActionFilesPrepStmt.setInt(3, fileId);
+				insertActionFilesPrepStmt.setInt(4, newOperation.ordinal());
+				db.executePrepUpdate(insertActionFilesPrepStmt);
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+		}
+		
+		/*
+		 * Else, if there's one record, see if the operation needs to be merged. The DFA
+		 * for transitioning to a new state is as follows:
+		 * 
+		 *             New:    |  Read    Write   Modify  Delete
+		 *             -----------------------------------------
+		 *             Read    |  Read    Modify  Modify  Delete
+		 *  Existing:  Write   |  Write   Write   Write   Temporary
+		 *             Modify  |  Modify  Modify  Modify  Delete
+		 *             Delete  |  Read    Write   Modify  Delete
+		 *             
+		 *  Remember:
+		 *    - Read = the process has *only* ever read this file.
+		 *    - Write = the process created this file (it didn't exist before).
+		 *    - Modify = the process read and then wrote to this file.
+		 *    - Delete = the process ended up by deleting this file.
+		 */
+		else if (intResults.length == 1) {
+			OperationType existingOp = intToOperationType(intResults[0]);
+			OperationType combinedOp = operationTypeMapping[existingOp.ordinal()][newOperation.ordinal()];
+			
+			/*
+			 * Handle a special case of temporary files. That is, if the existingOp is WRITE,
+			 * and the combinedOp is DELETE, then this file was both created and deleted
+			 * by this action.
+			 */
+			if ((existingOp == OperationType.OP_WRITE) && (combinedOp == OperationType.OP_DELETE)) {
+				
+				/* remove all file accesses that we previously added */
+				removeFileAccess(actionId, fileId);
+
+				/*
+				 * Attempt to remove the file from the FileMgr. This will fail if the
+				 * same path is already used by some other action, but that's acceptable. We
+				 * only want to remove paths that were used exclusively by this action.
+				 */
+				fileMgr.movePathToTrash(fileId);
+			}
+			
+			/*
+			 * else, the normal case is to replace the old state with the new state.
+			 */
+			else {
+				try {
+					updateActionFilesPrepStmt.setInt(1, combinedOp.ordinal());
+					updateActionFilesPrepStmt.setInt(2, actionId);
+					updateActionFilesPrepStmt.setInt(3, fileId);
+					db.executePrepUpdate(updateActionFilesPrepStmt);
+				} catch (SQLException e) {
+					throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+				}
+			}
+		}
+		
+		/* else, there's an error - can't have multiple entries */
+		else {
+			throw new FatalBuildStoreError("Multiple results find in actionFiles table for actionId = " 
+					+ actionId + " and fileId = " + fileId);
+		}
+	}
 }
