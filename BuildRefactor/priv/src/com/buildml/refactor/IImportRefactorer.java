@@ -55,8 +55,13 @@ public interface IImportRefactorer {
 			throws CanNotRefactorException;
 	
 	/**
-	 * @param actionId
-	 * @throws CanNotRefactorException 
+	 * Modify a build action so that it no longer has child actions, yet has the same
+	 * effect as the original action hierarchy. For many tools, a process may create
+	 * additional sub-processes to complete the job. If we are not interested in
+	 * knowing about these sub-processes, the parent action can be made "atomic".
+	 * 
+	 * @param actionId ID of the action to be made atomic.
+	 * @throws CanNotRefactorException If the refactoring can not proceed for some reason.
 	 */
 	public void makeActionAtomic(int actionId) throws CanNotRefactorException;
 	

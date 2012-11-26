@@ -366,7 +366,8 @@ public final class CliMain {
 		
 		registerCommandGroup("Commands for modifying the build system",
 			new ICliCommand[] {
-				new CliCommandRmFile()
+				new CliCommandRmFile(),
+				new CliCommandMakeAtomic()
 			});
 	}
 

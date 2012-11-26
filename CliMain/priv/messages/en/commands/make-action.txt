@@ -1,0 +1,30 @@
+Modify a build action so that it no longer has child actions, yet has the same
+effect as the original action hierarchy. For many tools, a process may create
+additional sub-processes to complete the job. If we are not interested in
+knowing about these sub-processes, the parent action can be made "atomic".
+
+For example, the original action hierarchy may be:
+
+  gcc -c -o foo.o foo.c
+    cc1 -o /tmp/zyzyz.s foo.c
+    as -o foo.o /tmp/zyzyz.s
+    
+By making the parent action (gcc) atomic, the two child processes are removed.
+You will therefore be left with a single parent action:
+
+  gcc -c -o foo.o foo.c
+
+All file accesses performed by the parent action, or any of its child actions,
+will now be associated with the parent action. Temporary files (such as 
+/tmp/zyzyzs.s) will be automatically removed.
+    
+The command arguments are:
+  
+<action ID>
+
+  The number ID number of the parent action.
+        
+      bml make-atomic 12
+      bml make-atomic 167
+
+ 
