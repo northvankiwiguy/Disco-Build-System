@@ -1,0 +1,13 @@
+Remove an action from the build system, moving any child actions up one level
+in the action tree. This is used when an action doesn't provide a meaningful
+contribution to the build system. 
+
+This command is often used when the action represents an invoke of a legacy
+build tool, such as "make". In this case, we don't want to import the "make"
+process itself, but we do care about make's children.
+
+The command arguments are:
+  
+<action>
+
+      bml rm-action 8
