@@ -216,24 +216,6 @@ public class ImportRefactorer implements IImportRefactorer {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.refactor.IImportRefactorer#deleteActionSubTree(int)
-	 */
-	@Override
-	public void deleteActionTree(int actionId)
-			throws CanNotRefactorException {
-
-		// Mark start of history record
-		
-		// Do a bottom-up traversal of the action's children.
-		// Invoke deleteAction() on each children.
-		// On error, roll back history and return an error.
-		
-		// Mark end of history record
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.refactor.IImportRefactorer#mergeActions(int[])
 	 */
 	@Override

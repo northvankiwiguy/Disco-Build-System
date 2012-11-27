@@ -72,12 +72,6 @@ public interface IImportRefactorer {
 	public void deleteAction(int actionId) throws CanNotRefactorException;
 	
 	/**
-	 * @param actionId
-	 * @throws CanNotRefactorException
-	 */
-	public void deleteActionTree(int actionId) throws CanNotRefactorException;
-	
-	/**
 	 * @param actionIds
 	 * @throws CanNotRefactorException
 	 */

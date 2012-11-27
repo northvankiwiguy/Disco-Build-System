@@ -259,19 +259,7 @@
             </command>
             <command
                   commandId="com.buildml.eclipse.commands.deleteActionPromote"
-                  label="Delete Action (Promote Children)"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <test
-                        args="actions"
-                        property="com.buildml.eclipse.hasFeature">
-                  </test>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="com.buildml.eclipse.commands.deleteActionChildren"
-                  label="Delete Action (Including Children)"
+                  label="Delete Action"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
