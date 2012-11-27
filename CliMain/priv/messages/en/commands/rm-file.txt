@@ -3,8 +3,7 @@ generates the file. There are numerous restrictions around the deletion of
 files:
 
 * If the path refers to a directory, it must be empty (no files within it).
-  To delete a full directory hierarchy, instead consider using the
-  "bml rm-dir" command.
+  If not empty, use the -r option to recursively delete files.
     
 * If the file is being used as input to one or more actions, there is no way
   to delete the file. You must first delete the actions that use the file,
@@ -39,4 +38,5 @@ The command arguments are:
         
       bml rm-file /home/work/mysrc/file.c
       bml rm-file -f /home/work/myobj/file.o
+      bml rm-file -r /home/work/unused
  

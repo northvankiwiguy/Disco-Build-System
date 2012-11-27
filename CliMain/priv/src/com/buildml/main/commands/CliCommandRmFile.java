@@ -40,6 +40,9 @@ public class CliCommandRmFile implements ICliCommand {
 	/** Set if we should force removal of associated actions. */
 	private boolean optionForceRmAction = false;
 	
+	/** Set if we want to delete directory content recursively */
+	private boolean optionRecursive = false;
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -76,7 +79,12 @@ public class CliCommandRmFile implements ICliCommand {
 		Option deleteActionsOpt = new Option("f", "force-rm-action", false, 
 				"Also delete the action generating this file.");
 		opts.addOption(deleteActionsOpt);
-		
+
+		/* add the --recursive option */
+		Option deleteRecursiveOpt = new Option("r", "recursive", false, 
+				"Delete sub-tree recursively.");
+		opts.addOption(deleteRecursiveOpt);
+
 		return opts;
 	}
 
@@ -87,7 +95,7 @@ public class CliCommandRmFile implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[-f] <path>";
+		return "[-r] [-f] <path>";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -108,6 +116,7 @@ public class CliCommandRmFile implements ICliCommand {
 	@Override
 	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
 		optionForceRmAction = cmdLine.hasOption("force-rm-action");
+		optionRecursive = cmdLine.hasOption("recursive");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -130,8 +139,12 @@ public class CliCommandRmFile implements ICliCommand {
 		if (pathId != ErrorCode.BAD_PATH) {
 			IImportRefactorer refactor = new ImportRefactorer(buildStore);
 			try {
-				refactor.deletePath(pathId, optionForceRmAction);
-			
+				if (optionRecursive) {
+					refactor.deletePathTree(pathId, optionForceRmAction);
+				} else {
+					refactor.deletePath(pathId, optionForceRmAction);
+				}
+				
 			/* 
 			 * Handle the array of possible error cases.
 			 */
