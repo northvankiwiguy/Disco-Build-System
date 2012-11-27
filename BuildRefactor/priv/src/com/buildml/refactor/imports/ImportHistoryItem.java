@@ -54,6 +54,9 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/** Add a new action-file relationship */
 		ADD_ACTION_PATH_LINK,
+		
+		/** Reparent an action */
+		REPARENT_ACTION
 	}
 
 	/*=====================================================================================*
@@ -90,6 +93,12 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/** type of action-file relationship */
 		OperationType accessType;
+		
+		/** Old parent ID */
+		int oldParentId;
+		
+		/** New parent ID */
+		int newParentId;
 	}
 	
 	/** The ordered List of operations */
@@ -162,6 +171,12 @@ import com.buildml.utils.errors.ErrorCode;
 				actionMgr.addSequencedFileAccess(op.seqno, op.actionId, op.pathId, op.accessType);
 				break;
 				
+			case REPARENT_ACTION:
+				//System.out.println("Reparenting action " + op.actionId + " from parent " + op.oldParentId +
+				//		" to new parent " + op.newParentId);
+				actionMgr.setParent(op.actionId, op.newParentId);
+				break;
+				
 			default:
 				throw new FatalBuildStoreError("Encountered unrecognized operation type: " + op.type);
 			}
@@ -215,7 +230,13 @@ import com.buildml.utils.errors.ErrorCode;
 				//		op.actionId + " " + fileMgr.getPathName(op.pathId));
 				actionMgr.removeFileAccess(op.actionId, op.pathId);
 				break;
-				
+
+			case REPARENT_ACTION:
+				//System.out.println("Reparenting action " + op.actionId + " from parent " + op.newParentId +
+				//		" to old parent " + op.oldParentId);
+				actionMgr.setParent(op.actionId, op.oldParentId);
+				break;
+
 			default:
 				throw new FatalBuildStoreError("Encountered unrecognized operation type: " + op.type);
 			}
@@ -273,6 +294,26 @@ import com.buildml.utils.errors.ErrorCode;
 		item.actionId = actionId;
 		item.pathId = pathId;
 		item.accessType = accessType;
+		opList.add(item);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Change an object's parent.
+	 * 
+	 * @param op 			The operation to perform (e.g. REPARENT_ACTION)
+	 * @param thisId		This object's ID (for an action or path, etc).
+	 * @param oldParentId	The object's old parent ID (for un-doing).
+	 * @param newParentId	The object's new parent ID.
+	 */
+	public void addReparentOp(ItemOpType op, int thisId, int oldParentId,
+									int newParentId) {
+		ItemOp item = new ItemOp();
+		item.type = op;
+		item.actionId = thisId;
+		item.oldParentId = oldParentId;
+		item.newParentId = newParentId;
 		opList.add(item);
 	}
 

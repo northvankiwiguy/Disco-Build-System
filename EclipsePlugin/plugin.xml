@@ -152,6 +152,7 @@
       </command>
       <command
             category="com.buildml.eclipse.commands.category"
+            defaultHandler="com.buildml.eclipse.actions.handlers.HandlerDeleteAction"
             id="com.buildml.eclipse.commands.deleteActionPromote"
             name="Delete Action (Promote Children)">
       </command>

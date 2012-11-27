@@ -193,7 +193,6 @@ public class TestImportRefactorMergeActions {
 	 */
 	@Test
 	public void testMakeAtomic() {
-		System.out.println("Making atomic");
 		
 		/* actionA4c is already atomic - no work required */
 		try {
@@ -252,4 +251,160 @@ public class TestImportRefactorMergeActions {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test the "make atomic" operation, with an "in use" action.
+	 */
+	@Test
+	public void testDeleteActionInUse() {
+		
+		/* 
+		 * Delete actionA2b (left action)
+		 */
+		assertFalse(actionMgr.isActionTrashed(actionA2b));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionA2a, actionA2b },
+													 actionMgr.getChildren(actionA2)));
+		try {
+			importRefactorer.deleteAction(actionA2b);
+			fail("Failed to detect in-use action");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.ACTION_IN_USE, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { fileWorkBarO }, e.getPathIds()));
+		}
+		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the "make atomic" operation on actionA4c (a leaf)
+	 */
+	@Test
+	public void testDeleteActionLeaf() {
+		
+		/* 
+		 * Delete actionA4c (leaf action)
+		 */
+		assertFalse(actionMgr.isActionTrashed(actionA4c));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA4a, actionA4b, actionA4c },
+				actionMgr.getChildren(actionA4)));
+		try {
+			importRefactorer.deleteAction(actionA4c);
+			/* success */
+		} catch (CanNotRefactorException e) {
+			fail("Failed to delete actionA4c");
+		}
+		
+		/* check the after state */
+		assertTrue(actionMgr.isActionTrashed(actionA4c));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionA4a, actionA4b },
+				 actionMgr.getChildren(actionA4)));
+		
+		/* undo the operation */
+		try {
+			importRefactorer.undoRefactoring();
+		} catch (CanNotRefactorException e) {
+			fail("Failed to undo deleteAction");
+		}
+		assertFalse(actionMgr.isActionTrashed(actionA4c));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA4a, actionA4b, actionA4c },
+				actionMgr.getChildren(actionA4)));
+		
+		/* redo the operation */
+		try {
+			importRefactorer.redoRefactoring();
+			/* success */
+		} catch (CanNotRefactorException e) {
+			fail("Failed to redo delete of actionA4c");
+		}
+		assertTrue(actionMgr.isActionTrashed(actionA4c));
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionA4a, actionA4b },
+				 actionMgr.getChildren(actionA4)));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the "make atomic" operation the root action, or an invalid action - should fail.
+	 */
+	@Test
+	public void testDeleteActionInvalid() {
+
+		/* deleting the root action is illegal */
+		int rootAction = actionMgr.getRootAction("root");
+		try {
+			importRefactorer.deleteAction(rootAction);
+			fail("Incorrectly deleted root action");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { rootAction }, e.getActionIds()));
+		}
+
+		/* deleting an invalid actionID is illegal */
+		try {
+			importRefactorer.deleteAction(1234);
+			fail("Incorrectly deleted root action");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { 1234 }, e.getActionIds()));
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the "make atomic" operation on an unused parent action.
+	 */
+	@Test
+	public void testDeleteActionValidParent() {
+
+		/* 
+		 * Delete actionA (parent action)
+		 */
+		int rootAction = actionMgr.getRootAction("root");
+		assertFalse(actionMgr.isActionTrashed(actionA));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA }, actionMgr.getChildren(rootAction)));
+		try {
+			importRefactorer.deleteAction(actionA);
+			/* success */
+		} catch (CanNotRefactorException e) {
+			fail("Failed to delete actionA");
+		}
+		
+		/* check the after state */
+		assertTrue(actionMgr.isActionTrashed(actionA));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1, actionA2, actionA3, actionA4 },
+				actionMgr.getChildren(rootAction)));
+		
+		/* undo the operation */
+		try {
+			importRefactorer.undoRefactoring();
+		} catch (CanNotRefactorException e) {
+			fail("Failed to undo deleteAction");
+		}
+		assertFalse(actionMgr.isActionTrashed(actionA));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA }, actionMgr.getChildren(rootAction)));
+		
+		/* redo the operation */
+		try {
+			importRefactorer.redoRefactoring();
+			/* success */
+		} catch (CanNotRefactorException e) {
+			fail("Failed to redo delete of actionA");
+		}
+		assertTrue(actionMgr.isActionTrashed(actionA));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1, actionA2, actionA3, actionA4 },
+				actionMgr.getChildren(rootAction)));	
+	}
 }
