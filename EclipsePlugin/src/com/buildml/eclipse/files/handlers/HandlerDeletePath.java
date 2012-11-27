@@ -273,11 +273,16 @@ public class HandlerDeletePath extends AbstractHandler {
 								"the related files are still in use:\n\n" +
 								ConversionUtils.getPathsAsText(fileMgr, pathIds));
 						break;
-
+						
 					/*
-					 * These shouldn't happen.
+					 * Ignore this case - it's likely because the parent has already been deleted.
 					 */
 					case INVALID_PATH:
+						break;
+						
+						/*
+					 * These shouldn't happen.
+					 */
 					default:
 						AlertDialog.displayErrorDialog("Deletion failed", 
 								"Deletion of the file/directory: " + pathName + 
