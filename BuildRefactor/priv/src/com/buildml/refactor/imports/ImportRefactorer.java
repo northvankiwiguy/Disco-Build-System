@@ -84,67 +84,19 @@ public class ImportRefactorer implements IImportRefactorer {
 	public void deletePath(int pathId, boolean alsoDeleteAction) 
 			throws CanNotRefactorException {
 
-		/* the path must exist and must not be trashed - otherwise give an error */
-		PathType pathType = fileMgr.getPathType(pathId);
-		if ((pathType == PathType.TYPE_INVALID) ||
-			(fileMgr.isPathTrashed(pathId))) {
-			throw new CanNotRefactorException(Cause.INVALID_PATH, pathId);
-		}		
-
 		/* the path must not be a non-empty directory - otherwise give an error */
+		PathType pathType = fileMgr.getPathType(pathId);
 		if (pathType == PathType.TYPE_DIR) {
 			if (fileMgr.getChildPaths(pathId).length != 0) {
 				throw new CanNotRefactorException(Cause.DIRECTORY_NOT_EMPTY, new Integer[] { pathId });
 			}
 		}
 		
-		/* the path must not currently be used as input to an action - otherwise give an error */
-		Integer actionsReadingPath[] = actionMgr.getActionsThatAccess(pathId, OperationType.OP_READ);
-		if (actionsReadingPath.length != 0) {
-			throw new CanNotRefactorException(Cause.PATH_IN_USE, actionsReadingPath);
-		}
-
-		/* 
-		 * If there are actions that generate (not READ) this path, then we must delete those
-		 * actions too. However, only delete them if "alsoDeleteActions" is set.
-		 */
-		Integer actionsUsingPath[] = actionMgr.getActionsThatAccess(pathId, OperationType.OP_UNSPECIFIED);
-		if ((actionsUsingPath.length != 0) && !alsoDeleteAction) {
-			throw new CanNotRefactorException(Cause.PATH_IS_GENERATED, actionsUsingPath);
-		}
-		
-		/*
-		 * Make sure that all the actions that generate the path are atomic.
-		 */
-		for (int actionId: actionsUsingPath) {
-			if (actionMgr.getChildren(actionId).length != 0) {
-				throw new CanNotRefactorException(Cause.ACTION_NOT_ATOMIC, actionId);
-			}
-		}
-		
-		/*
-		 * For the action (or actions) that we'll now need to delete, check to see if any of their generated
-		 * paths are used as input into other actions. If so, the output paths are considered "in use".
-		 * Calling this method will throw a CanNotRefactorException if anything goes wrong.
-		 */
-		validateActionsNotInUse(actionsUsingPath);
-		
-		/*
-		 * All is good, now go ahead and start deleting things. We can now build up a history item
-		 * of the changes to be made to the BuildStore.
-		 */
+		/* we'll add delete operation steps to this operation */
 		ImportHistoryItem historyItem = new ImportHistoryItem(buildStore);
 
-		/* remove the actions, and any associated file accesses */
-		scheduleRemoveAction(historyItem, actionsUsingPath);
-		
-		/* 
-		 * If we didn't already delete the action (and the paths it generates), we need to
-		 * explicitly delete it (this is the case where it's an unused path we're deleting).
-		 */
-		if (actionsUsingPath.length == 0) {
-			historyItem.addPathOp(ItemOpType.REMOVE_PATH, pathId);
-		}
+		/* the helper does most of the work */
+		deletePathHelper(pathId, alsoDeleteAction, historyItem);
 		
 		/* success */
 		invokeHistoryItem(historyItem);
@@ -156,17 +108,17 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#deleteFileTree(int)
 	 */
 	@Override
-	public void deletePathTree(int fileId, boolean alsoDeleteActions)
+	public void deletePathTree(int dirId, boolean alsoDeleteActions)
 			throws CanNotRefactorException {
+
+		/* we'll add delete operation steps to this operation */
+		ImportHistoryItem historyItem = new ImportHistoryItem(buildStore);
+
+		/* the helper does most of the work */
+		deletePathTreeHelper(dirId, alsoDeleteActions, historyItem);
 		
-		// Mark the start of the history record.
-		
-		// Do a bottom-up traversal of fileId's children, calling deleteFile() for each.
-		
-		// If error received from any deleteFile() call, rollback history.
-		
-		// Mark end of history record.
-		// Return success.
+		/* success */
+		invokeHistoryItem(historyItem);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -452,5 +404,104 @@ public class ImportRefactorer implements IImportRefactorer {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * A helper function, shared by deletePath() and deletePathTree().
+	 * 
+	 * @param pathId			The path to be deleted.
+	 * @param alsoDeleteAction  True if we should also delete actions that generate the path.
+	 * @param historyItem		Undo/redo history item to add operation steps to.
+	 * @throws CanNotRefactorException Something went wrong.
+	 */
+	private void deletePathHelper(int pathId, boolean alsoDeleteAction, ImportHistoryItem historyItem)
+			throws CanNotRefactorException {
+		
+		/* the path must exist and must not be trashed - otherwise give an error */
+		PathType pathType = fileMgr.getPathType(pathId);
+		if ((pathType == PathType.TYPE_INVALID) ||
+			(fileMgr.isPathTrashed(pathId))) {
+			throw new CanNotRefactorException(Cause.INVALID_PATH, pathId);
+		}		
+		
+		/* the path must not currently be used as input to an action - otherwise give an error */
+		Integer actionsReadingPath[] = actionMgr.getActionsThatAccess(pathId, OperationType.OP_READ);
+		if (actionsReadingPath.length != 0) {
+			throw new CanNotRefactorException(Cause.PATH_IN_USE, actionsReadingPath);
+		}
+
+		/* the path must not be the "current directory" for any actions */
+		Integer actionsExecutingInDir[] = actionMgr.getActionsInDirectory(pathId);
+		if (actionsExecutingInDir.length != 0) {
+			throw new CanNotRefactorException(Cause.DIRECTORY_CONTAINS_ACTIONS, actionsExecutingInDir);
+		}
+		
+		/* 
+		 * If there are actions that generate (not READ) this path, then we must delete those
+		 * actions too. However, only delete them if "alsoDeleteActions" is set.
+		 */
+		Integer actionsUsingPath[] = actionMgr.getActionsThatAccess(pathId, OperationType.OP_UNSPECIFIED);
+		if ((actionsUsingPath.length != 0) && !alsoDeleteAction) {
+			throw new CanNotRefactorException(Cause.PATH_IS_GENERATED, actionsUsingPath);
+		}
+		
+		/*
+		 * Make sure that all the actions that generate the path are atomic.
+		 */
+		for (int actionId: actionsUsingPath) {
+			if (actionMgr.getChildren(actionId).length != 0) {
+				throw new CanNotRefactorException(Cause.ACTION_NOT_ATOMIC, actionId);
+			}
+		}
+		
+		/*
+		 * For the action (or actions) that we'll now need to delete, check to see if any of their generated
+		 * paths are used as input into other actions. If so, the output paths are considered "in use".
+		 * Calling this method will throw a CanNotRefactorException if anything goes wrong.
+		 */
+		validateActionsNotInUse(actionsUsingPath);
+		
+		/*
+		 * All is good, now go ahead and start deleting things. We can now build up a history item
+		 * of the changes to be made to the BuildStore.
+		 */
+
+		/* remove the actions, and any associated file accesses */
+		scheduleRemoveAction(historyItem, actionsUsingPath);
+		
+		/* 
+		 * If we didn't already delete the action (and the paths it generates), we need to
+		 * explicitly delete it (this is the case where it's an unused path we're deleting).
+		 */
+		if (actionsUsingPath.length == 0) {
+			historyItem.addPathOp(ItemOpType.REMOVE_PATH, pathId);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * A helper method for deletePathTree(). Performs a bottom up traversal of a directory
+	 * hierarchy.
+	 * 
+	 * @param pathId			 The path (file or directory) to be deleted.
+	 * @param alsoDeleteActions  True if we should also delete actions that generate the path.
+	 * @param historyItem		 Undo/redo history item to add operation steps to.
+	 * @throws CanNotRefactorException 
+	 */
+	private void deletePathTreeHelper(int pathId, boolean alsoDeleteActions, 
+									  ImportHistoryItem historyItem) 
+							throws CanNotRefactorException {
+		
+		/* delete children first */
+		Integer children[] = fileMgr.getChildPaths(pathId);
+		for (int childId : children) {
+			deletePathTreeHelper(childId, alsoDeleteActions, historyItem);
+		}
+		
+		/* now delete the current path */
+		deletePathHelper(pathId, alsoDeleteActions, historyItem);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

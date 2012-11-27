@@ -25,6 +25,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Test cases to verify the IImportRefactorer implementation. These tests focus on
@@ -414,11 +415,87 @@ public class TestImportRefactorDeleteFile {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	// TODO: delete a sub-tree where files are in use - fails.
+	/**
+	 * Attempt to delete a sub-tree where one or more files are in use.
+	 */
+	@Test
+	public void testDeleteInUseSubTree() {
+		
+		/* we can't delete the whole /home/work directory - it's in use */
+		try {
+			importRefactorer.deletePathTree(dirWork, true);
+			fail("Incorrectly deleted in-use files");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.PATH_IN_USE, e.getCauseCode());			
+		}
+		
+		/* delete fileWorkLog - will have NOT_ATOMIC error */
+		try {
+			importRefactorer.deletePathTree(fileWorkLog, true);
+			fail("Incorrectly deleted in-use files");			
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.ACTION_NOT_ATOMIC, e.getCauseCode());			
+		}
+		
+		/* delete fileWorkKOut - will fail unless we set alsoDeleteActions */
+		assertFalse(fileMgr.isPathTrashed(fileWorkKOut));
+		assertFalse(actionMgr.isActionTrashed(actionA6));
+		try {
+			importRefactorer.deletePathTree(fileWorkKOut, false);
+			fail("Incorrectly deleted in-use files");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.PATH_IS_GENERATED, e.getCauseCode());			
+		}
+		try {
+			importRefactorer.deletePathTree(fileWorkKOut, true);
+			assertTrue(fileMgr.isPathTrashed(fileWorkKOut));
+			assertTrue(actionMgr.isActionTrashed(actionA6));
+			
+		} catch (CanNotRefactorException e) {
+			fail("Couldn't delete file and generating action");
+		}
+	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	// TODO: delete a sub-tree where files are all unused - succeeds.
+	/**
+	 * Delete a sub-tree that's not in use.
+	 */
+	@Test
+	public void testDeleteSubTree() {
+
+		assertEquals(dirUnused, fileMgr.getPath("/home/work/unused"));
+		try {
+			importRefactorer.deletePathTree(dirUnused, false);
+			
+		} catch (CanNotRefactorException e) {
+			fail("Failed to delete unused file sub-tree: " + e.getCauseCode());
+		}
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.getPath("/home/work/unused"));
+		
+		/* undo the delete */
+		try {
+			importRefactorer.undoRefactoring();
+		} catch (CanNotRefactorException e) {
+			fail("Failed to undo sub-tree deletion.");
+		}
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/home/work/unused"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/home/work/unused/1/2/3"));
+		assertNotSame(ErrorCode.BAD_PATH, fileMgr.getPath("/home/work/unused/1/4/5"));
+		
+		/* redo the delete */
+		try {
+			importRefactorer.redoRefactoring();
+			
+		} catch (CanNotRefactorException e) {
+			fail("Failed to redo delete of unused file sub-tree: " + e.getCauseCode());
+		}
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.getPath("/home/work/unused"));
+	}
+	
 
 	/*-------------------------------------------------------------------------------------*/
 

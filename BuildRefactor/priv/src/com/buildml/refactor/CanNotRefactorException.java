@@ -55,6 +55,9 @@ public class CanNotRefactorException extends Exception {
 		
 		/** Couldn't delete a directory, since it's not empty */
 		DIRECTORY_NOT_EMPTY,
+		
+		/** The directory is used as the working directory for some actions */
+		DIRECTORY_CONTAINS_ACTIONS
 	}
 	
 	/** The cause of the exception */
@@ -91,6 +94,7 @@ public class CanNotRefactorException extends Exception {
 		/* the file is currently in use, or is still being generated */
 		case PATH_IN_USE:
 		case PATH_IS_GENERATED:
+		case DIRECTORY_CONTAINS_ACTIONS:
 			actionIds = args;
 			break;
 		
