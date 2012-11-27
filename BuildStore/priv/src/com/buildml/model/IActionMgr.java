@@ -188,6 +188,17 @@ public interface IActionMgr {
 	public abstract int getParent(int actionId);
 
 	/**
+	 * Move an action so it resides underneath a different parent action.
+	 * 
+	 * @param actionId     The action to be moved.
+	 * @param newParentId  The action's new parent.
+	 * @return ErrorCode.OK on success, or BAD_VALUE if either ID is invalid
+     * or if the new parent-child relationship would cause a loop in the
+     * action tree.
+	 */
+	public abstract int setParent(int actionId, int newParentId);
+
+	/**
 	 * Return the path ID of the directory in which this action was executed.
 	 * 
 	 * @param actionId The ID of the action.

@@ -149,6 +149,71 @@ public class TestActionMgr {
 		/* inquiring about the parent of an invalid action Id is ErrorCode.BAD_VALUE */
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.getParent(1000));
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.buildml.model.impl.ActionMgr#setParent(int, int)}
+	 */
+	@Test
+	public void testSetParent() {
+		
+		/* 
+		 * Set up hierarchy of actions:
+		 * 
+		 * actionA
+		 *   actionA1
+		 *     actionA1a
+		 *     actionA1b
+		 *   actionA2
+		 *     actionA2a
+		 *     actionA2b
+		 */
+		int rootAction = actionMgr.getRootAction("root");
+		int rootDir = fileMgr.getPath("/");
+		int actionA = actionMgr.addAction(rootAction, rootDir, "A");
+		int actionA1 = actionMgr.addAction(actionA, rootDir, "A1");
+		int actionA1a = actionMgr.addAction(actionA1, rootDir, "A1a");
+		int actionA1b = actionMgr.addAction(actionA1, rootDir, "A1b");
+		int actionA2 = actionMgr.addAction(actionA, rootDir, "A1");
+		int actionA2a = actionMgr.addAction(actionA2, rootDir, "A2a");
+		int actionA2b = actionMgr.addAction(actionA2, rootDir, "A2b");
+		
+		/* try to change the parent of the root action - illegal */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setParent(rootAction, actionA2a));
+		
+		/* try to change an action's parent to itself - illegal */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setParent(actionA2, actionA2));
+
+		/* try to change our parent to be our own child - illegal */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setParent(actionA, actionA2));
+		
+		/* try to change our parent to be our own grandchild - illegal */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setParent(actionA, actionA1a));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setParent(actionA, actionA2b));
+
+		/* perform a legal move - move actionA1b under actionA2 */
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1a, actionA1b }, actionMgr.getChildren(actionA1)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA2a, actionA2b }, actionMgr.getChildren(actionA2)));
+		assertEquals(ErrorCode.OK, actionMgr.setParent(actionA1b, actionA2));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1a }, actionMgr.getChildren(actionA1)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1b, actionA2a, actionA2b }, 
+				actionMgr.getChildren(actionA2)));
+		
+		/* perform a legal move - move actionA1a under actionA */
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1, actionA2 }, actionMgr.getChildren(actionA)));
+		assertEquals(ErrorCode.OK, actionMgr.setParent(actionA1a, actionA));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { }, actionMgr.getChildren(actionA1)));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { actionA1, actionA2, actionA1a }, 
+				actionMgr.getChildren(actionA)));
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 

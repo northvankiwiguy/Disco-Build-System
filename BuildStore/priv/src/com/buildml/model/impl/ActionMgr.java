@@ -58,6 +58,7 @@ public class ActionMgr implements IActionMgr {
 		insertActionPrepStmt = null,
 		findCommandPrepStmt = null,
 		findParentPrepStmt = null,
+		updateParentPrepStmt = null,
 		findDirectoryPrepStmt = null,
 		findChildrenPrepStmt = null,
 		insertActionFilesPrepStmt = null,
@@ -93,6 +94,7 @@ public class ActionMgr implements IActionMgr {
 		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
+		updateParentPrepStmt = db.prepareStatement("update buildActions set parentActionId = ? where actionId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
 		findActionsInDirectoryPrepStmt =
 			db.prepareStatement("select actionId from buildActions where (actionDirId = ?) and (trashed = 0)");
@@ -505,6 +507,59 @@ public class ActionMgr implements IActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#setParent(int, int)
+	 */
+	@Override
+	public int setParent(int actionId, int newParentId) {
+		
+		/* we can't be our own parent */
+		if (actionId == newParentId) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* we can't change the parent of the root */
+		if (actionId == getRootAction("root")) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* 
+		 * Check that we are not an ancestor of our new parent (this would cause
+		 * a loop in the tree - not allowed). Loop upwards through the tree,
+		 * until we reach the root (parent is NOT_FOUND).
+		 */
+		int ancestorId = newParentId;
+		while (ancestorId != ErrorCode.NOT_FOUND) {
+			ancestorId = getParent(ancestorId);
+
+			/* is newParentId a bad action ID? */
+			if (ancestorId == ErrorCode.BAD_VALUE) {
+				return ErrorCode.BAD_VALUE;
+			}
+		
+			/* else, is actionId in the ancestor chain of newParentId? */
+			if (actionId == ancestorId) {
+				return ErrorCode.BAD_VALUE;
+			}
+		}
+
+		/* attempt to update the existing record for actionId */
+		try {
+			updateParentPrepStmt.setInt(1, newParentId);
+			updateParentPrepStmt.setInt(2, actionId);
+			if (db.executePrepUpdate(updateParentPrepStmt) != 1) {
+				/* there was no record for actionId */
+				return ErrorCode.BAD_VALUE;
+			}
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getDirectory(int)
 	 */
 	@Override
@@ -800,4 +855,5 @@ public class ActionMgr implements IActionMgr {
 					+ actionId + " and fileId = " + fileId);
 		}
 	}
+
 }
