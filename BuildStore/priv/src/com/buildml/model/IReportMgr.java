@@ -114,6 +114,17 @@ public interface IReportMgr {
 			OperationType opType);
 
 	/**
+	 * Given a FileSet, return all the actions that use one of these paths as their
+	 * working directory.
+	 * 
+	 * @param directories The paths to query. These paths should represent directories,
+	 * although non-directory paths will be silently ignored.
+	 * @return The ActionSet of actions that use one or more of the input paths as their
+	 * current working directory.
+	 */
+	public abstract ActionSet reportActionsInDirectory(FileSet directories);
+
+	/**
 	 * Given an ActionSet, return a FileSet containing all the files that are accessed by this
 	 * collection of actions. The opType specifies whether we want files that are read by
 	 * these actions, written by these actions, or either read or written. 
@@ -166,5 +177,4 @@ public interface IReportMgr {
 	 * @return The ActionSet of actions that are within the selected packages.
 	 */
 	public abstract ActionSet reportActionsFromPackageSet(PackageSet pkgSet);
-
 }

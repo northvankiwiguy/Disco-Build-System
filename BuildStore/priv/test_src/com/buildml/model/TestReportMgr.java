@@ -596,6 +596,49 @@ public class TestReportMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.buildml.model.IReportMgr#reportActionsInDirectory(FileSet)}.
+	 */
+	@Test
+	public void testActionsInDirectory() {
+		
+		/*
+		 * Create a couple of directory, and execute actions in those directories.
+		 */
+		int dirIdA = fileMgr.addDirectory("/dirA");
+		int dirIdB = fileMgr.addDirectory("/dirB");
+		int fileIdC = fileMgr.addFile("/file");
+		int rootAction = actionMgr.getRootAction("root");
+		int action1 = actionMgr.addAction(rootAction, dirIdA, "");
+		int action2 = actionMgr.addAction(rootAction, dirIdA, "");
+		int action3 = actionMgr.addAction(rootAction, dirIdB, "");
+		int action4 = actionMgr.addAction(rootAction, dirIdB, "");
+	
+		FileSet dirs = new FileSet(fileMgr);
+		
+		/* empty directory list => no actions */
+		ActionSet results = reports.reportActionsInDirectory(dirs);
+		assertEquals(0, results.size());
+		
+		/* files (non-directories) provide no results */
+		dirs.add(fileIdC);
+		results = reports.reportActionsInDirectory(dirs);
+		assertEquals(0, results.size());
+		
+		/* with one directory => two of the actions */
+		dirs.add(dirIdB);
+		results = reports.reportActionsInDirectory(dirs);
+		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] { action3, action4}));
+
+		/* with two directories => four of the actions */
+		dirs.add(dirIdA);
+		results = reports.reportActionsInDirectory(dirs);
+		assertTrue(CommonTestUtils.treeSetEqual(results, 
+				new Integer[] { action1, action2, action3, action4}));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.buildml.model.IReportMgr#reportWriteOnlyFiles()}.
 	 */
 	@Test

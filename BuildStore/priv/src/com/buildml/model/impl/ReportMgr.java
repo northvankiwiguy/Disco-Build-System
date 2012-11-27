@@ -359,6 +359,23 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IReportMgr#getActionsInDirectory(com.buildml.model.types.FileSet)
+	 */
+	@Override
+	public ActionSet reportActionsInDirectory(FileSet directories) {
+		ActionSet results = new ActionSet(actionMgr);
+		for (int pathId : directories) {
+			Integer actions[] = actionMgr.getActionsInDirectory(pathId);
+			for (int i = 0; i < actions.length; i++) {
+				results.add(actions[i]);
+			}
+		}
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.impl.IReportMgr#reportFilesAccessedByActions(com.buildml.model.types.ActionSet, com.buildml.model.IActionMgr.OperationType)
 	 */
 	@Override
@@ -681,6 +698,6 @@ import com.buildml.utils.errors.ErrorCode;
 		/* return the combined set of results */
 		return results;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }

@@ -370,6 +370,29 @@
                      value="write">
                </parameter>
             </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.showActionsThatUse"
+                  label="Execute In This Directory"
+                  mnemonic="E"
+                  style="push">
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.accessType"
+                     value="workdir">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="com.buildml.eclipse.files.UIFileRecordDir">
+                        </instanceof>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+            </command>
             <visibleWhen>
                <with
                      variable="selection">
