@@ -100,6 +100,28 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.buildml.model.impl.ActionMgr#setCommand(int,String)}
+	 */
+	@Test
+	public void testSetCommand() {
+		int action1 = actionMgr.addAction(rootActionId, 0, "A");
+		int action2 = actionMgr.addAction(rootActionId, 0, "B");
+		int action3 = actionMgr.addAction(rootActionId, 0, "C");
+		
+		assertEquals(ErrorCode.OK, actionMgr.setCommand(action2, "Bprime"));
+		assertEquals(ErrorCode.OK, actionMgr.setCommand(action3, "Cprime"));
+		
+		assertEquals("Bprime", actionMgr.getCommand(action2));
+		assertEquals("Cprime", actionMgr.getCommand(action3));
+		assertEquals("A", actionMgr.getCommand(action1));
+		
+		/* an invalid action ID should return an error */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setCommand(100, "command"));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.buildml.model.impl.ActionMgr#getCommandSummary(int, int)}
 	 */
 	@Test

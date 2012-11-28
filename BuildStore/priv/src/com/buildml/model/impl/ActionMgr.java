@@ -57,6 +57,7 @@ public class ActionMgr implements IActionMgr {
 	private PreparedStatement 
 		insertActionPrepStmt = null,
 		findCommandPrepStmt = null,
+		updateCommandPrepStmt = null,
 		findParentPrepStmt = null,
 		updateParentPrepStmt = null,
 		findDirectoryPrepStmt = null,
@@ -93,13 +94,14 @@ public class ActionMgr implements IActionMgr {
 		/* create prepared database statements */
 		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
+		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
 		updateParentPrepStmt = db.prepareStatement("update buildActions set parentActionId = ? where actionId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
 		findActionsInDirectoryPrepStmt =
 			db.prepareStatement("select actionId from buildActions where (actionDirId = ?) and (trashed = 0)");
 		findChildrenPrepStmt = db.prepareStatement("select actionId from buildActions where parentActionId = ?" +
-				" and (parentActionId != actionId) and (trashed = 0)");
+				" and (parentActionId != actionId) and (trashed = 0) order by actionId");
 		insertActionFilesPrepStmt = db.prepareStatement("insert into actionFiles values (?, ?, ?, ?)");
 		removeActionFilesPrepStmt = 
 			db.prepareStatement("delete from actionFiles where actionId = ? and fileId = ?");
@@ -433,6 +435,31 @@ public class ActionMgr implements IActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#setCommand(int, java.lang.String)
+	 */
+	@Override
+	public int setCommand(int actionId, String command) {
+
+		int rowsChanged = 0;
+		try {
+			updateCommandPrepStmt.setString(1, command);
+			updateCommandPrepStmt.setInt(2, actionId);
+			rowsChanged = db.executePrepUpdate(updateCommandPrepStmt);
+			
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* if there were no results, return null */
+		if (rowsChanged == 0) {
+			return ErrorCode.BAD_VALUE;
+		}
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getCommandSummary(int, int)
 	 */
 	@Override
@@ -689,6 +716,18 @@ public class ActionMgr implements IActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#isActionValid(int)
+	 */
+	@Override
+	public boolean isActionValid(int actionId) {
+		
+		/* all valid actions have parents */
+		return getParent(actionId) != ErrorCode.BAD_VALUE;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#isActionTrashed(int)
 	 */
 	@Override
@@ -855,5 +894,4 @@ public class ActionMgr implements IActionMgr {
 					+ actionId + " and fileId = " + fileId);
 		}
 	}
-
 }

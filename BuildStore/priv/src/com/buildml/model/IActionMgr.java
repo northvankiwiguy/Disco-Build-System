@@ -167,6 +167,16 @@ public interface IActionMgr {
 	public abstract String getCommand(int actionId);
 
 	/**
+	 * Set a build action's command line string.
+	 * 
+	 * @param actionId The action we're updating.
+	 * @param command The action's new command line string.
+	 * @return ErrorCode.OK on success, or ErrorCode.BAD_VALUE if the actionID
+	 * is invalid.
+	 */
+	public abstract int setCommand(int actionId, String command);
+	
+	/**
 	 * Fetch a summary of this action's command. The summary string is designed to give a
 	 * high-level overview of what the command does. The summary string for certain commands
 	 * may contain the command name and most important parameters, whereas for other commands
@@ -242,6 +252,16 @@ public interface IActionMgr {
 	 * for some reason the action can't be revived.
 	 */
 	public abstract int reviveActionFromTrash(int actionId);
+
+	/**
+	 * Determine whether an actionID is valid. Note that a trashed action is still
+     * considered valid.
+	 * 
+	 * @param actionId The ID of the action we are querying.
+	 * @return true if the actionId is valid, else false.
+	 */
+	public abstract boolean isActionValid(int actionId);
+
 	
 	/**
 	 * Determine whether an action is currently marked as "trash" (to be deleted
