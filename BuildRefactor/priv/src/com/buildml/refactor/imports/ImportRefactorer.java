@@ -14,7 +14,9 @@ package com.buildml.refactor.imports;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
@@ -219,17 +221,104 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#mergeActions(int[])
 	 */
 	@Override
-	public void mergeActions(int[] actionIds) throws CanNotRefactorException {
+	public void mergeActions(Integer[] actionIds) throws CanNotRefactorException {
 		
-		// check that there are multiple actionId specified (else, return success).
-		// check that all actions have the same parent (else, return error).
-		// check that all actions are atomic (else, return error).
+		/* check that all actions are valid and non-atomic */
+		List<Integer> invalidActions = new ArrayList<Integer>();
+		List<Integer> trashedActions = new ArrayList<Integer>();
+		List<Integer> nonAtomicActions = new ArrayList<Integer>();
+		SortedSet<Integer> actionIdSet = new TreeSet<Integer>();
 		
-		// clone the first action, and mark the original as garbage.
-		// for each remaining action:
-		//     merge the shell command into the cloned action.
-		//     add the action's file access to the cloned action.
-		//     mark the action as garbage.
+		for (int actionId : actionIds) {		
+			if (!actionMgr.isActionValid(actionId)) {
+				invalidActions.add(actionId); 
+			}
+			else if (actionMgr.isActionTrashed(actionId)) {
+				trashedActions.add(actionId); 
+			}
+			else if (actionMgr.getChildren(actionId).length != 0) {
+				nonAtomicActions.add(actionId);
+			}
+			actionIdSet.add(actionId);
+		}
+		
+		if (invalidActions.size() != 0) {
+			throw new CanNotRefactorException(
+					Cause.INVALID_ACTION, invalidActions.toArray(new Integer[0]));
+		}
+				
+		if (trashedActions.size() != 0) {
+			throw new CanNotRefactorException(
+					Cause.ACTION_IS_TRASHED, trashedActions.toArray(new Integer[0]));
+		}
+				
+		if (nonAtomicActions.size() != 0) {
+			throw new CanNotRefactorException(
+					Cause.ACTION_NOT_ATOMIC, nonAtomicActions.toArray(new Integer[0]));
+		}		
+		
+		/* if there's only one action (or no actions), there's nothing to do */
+		if (actionIds.length < 2) {
+			return;
+		}
+		
+		/* obtain a sorted array of actions, with duplicates removed */
+		Integer actionsArray[] = actionIdSet.toArray(new Integer[actionIdSet.size()]);
+		int firstActionId = actionsArray[0];
+		
+		/* all the inputs are valid, start scheduling changes */
+		ImportHistoryItem historyItem = new ImportHistoryItem(buildStore);
+
+		/* 
+		 * Foreach action, schedule the file-access links for removal. This will ensure
+		 * that the file-access links can be recovered after an "undo", even if some
+		 * of the links are dissolved due to merging the actions (i.e. temporary files
+		 * being dissolved).
+		 */
+		FileAccess[] fileAccesses = actionMgr.getSequencedFileAccesses(actionsArray);
+		for (FileAccess fileAccess : fileAccesses) {
+			historyItem.addPathAccessOp(ItemOpType.REMOVE_ACTION_PATH_LINK, fileAccess.seqno, 
+					fileAccess.actionId, fileAccess.pathId, fileAccess.opType);
+		}
+		
+		/*
+		 * Schedule all the file-access links to be added to the first action. This may
+		 * cause some of the links to be dissolved (if they're repetitions, or if they
+		 * cancel each other out).
+		 */
+		for (FileAccess fileAccess : fileAccesses) {
+			historyItem.addPathAccessOp(ItemOpType.ADD_ACTION_PATH_LINK, fileAccess.seqno, 
+					firstActionId, fileAccess.pathId, fileAccess.opType);
+		}
+		
+		/*
+		 * Schedule the shell command for the first action to be the concatenation of
+		 * all shell commands, across all merged actions.
+		 */
+		StringBuilder newShellCommand = new StringBuilder();
+		String firstActionCommand = null;
+		for (int i = 0; i < actionsArray.length; i++) {
+			String actionCommand = actionMgr.getCommand(actionsArray[i]);
+			if (i == 0) {
+				firstActionCommand = actionCommand;
+			} else {
+				/* insert \n between merged commands */
+				newShellCommand.append('\n');
+			}			
+			newShellCommand.append(actionCommand);
+		}
+		historyItem.addCommandOp(ItemOpType.CHANGE_COMMAND, firstActionId,
+				firstActionCommand, newShellCommand.toString());
+		
+		/*
+		 * Schedule all actions to be trashed, except for the first.
+		 */
+		for (int i = 1; i < actionsArray.length; i++) {
+			historyItem.addActionOp(ItemOpType.REMOVE_ACTION, actionsArray[i]);
+		}
+		
+		/* success - make it all happen */
+		invokeHistoryItem(historyItem);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

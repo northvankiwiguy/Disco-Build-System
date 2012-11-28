@@ -25,6 +25,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Test cases to verify the IImportRefactorer implementation. These tests focus
@@ -407,4 +408,126 @@ public class TestImportRefactorMergeActions {
 				new Integer[] { actionA1, actionA2, actionA3, actionA4 },
 				actionMgr.getChildren(rootAction)));	
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test merging of multiple actions - these test cases should fail.
+	 */
+	@Test
+	public void testMergeActionsFail() {
+		
+		/* test merging of non-atomic action (actionA1) - should fail */
+		try {
+			importRefactorer.mergeActions(new Integer[] { actionA1a, actionA1 });
+			fail("Incorrectly merged an atomic action.");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.ACTION_NOT_ATOMIC, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { actionA1 }, e.getActionIds()));
+		}
+
+		/* test merging of invalid action ID */
+		try {
+			importRefactorer.mergeActions(new Integer[] { actionA1a, 1234 });
+			fail("Incorrectly merged an atomic action.");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { 1234 }, e.getActionIds()));
+		}
+		
+		/* test merging of trashed action - actionA4c */
+		try {
+			importRefactorer.deleteAction(actionA4c);
+		} catch (CanNotRefactorException e1) {
+			fail("Failed to remove actionA4c");
+		}
+		try {
+			importRefactorer.mergeActions(new Integer[] { actionA4b, actionA4c });
+			fail("Incorrectly merged a trashed action.");
+			
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.ACTION_IS_TRASHED, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { actionA4c }, e.getActionIds()));
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test merging of multiple actions - these test cases should pass.
+	 */
+	@Test
+	public void testMergeActions() {
+		
+		/* test merging of a single atomic action (actionA4b) - will succeed */
+		try {
+			importRefactorer.mergeActions(new Integer[] { actionA4b });
+		} catch (CanNotRefactorException e1) {
+			fail("Failed to merge single action actionA4b");
+		}
+		
+		/* test merging of two actions - will succeed */
+		try {
+			importRefactorer.mergeActions(new Integer[] { actionA1b, actionA1a });
+			
+			assertFalse(actionMgr.isActionTrashed(actionA1a));
+			assertTrue(actionMgr.isActionTrashed(actionA1b));
+			assertEquals("cc1 -o /tmp/aaa.s foo.c\nas -o foo.o /tmp/aaa.s", 
+						 actionMgr.getCommand(actionA1a));
+			assertArrayEquals(new Integer[] { fileWorkFooC },
+				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { fileWorkFooO, fileTmpAaaS },
+					actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE)));
+			
+		} catch (CanNotRefactorException e1) {
+			fail("Failed to merge two actions.");
+		}
+		
+		/* test undo */
+		try {
+			importRefactorer.undoRefactoring();
+
+			assertFalse(actionMgr.isActionTrashed(actionA1a));
+			assertFalse(actionMgr.isActionTrashed(actionA1b));
+			assertEquals("cc1 -o /tmp/aaa.s foo.c", actionMgr.getCommand(actionA1a));
+			assertEquals("as -o foo.o /tmp/aaa.s", actionMgr.getCommand(actionA1b));			
+			assertArrayEquals(new Integer[] { fileWorkFooC },
+				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
+			assertArrayEquals(new Integer[] { fileTmpAaaS },
+				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE));
+			assertArrayEquals(new Integer[] { fileTmpAaaS },
+				actionMgr.getFilesAccessed(actionA1b, OperationType.OP_READ));
+			assertArrayEquals(new Integer[] { fileWorkFooO },
+				actionMgr.getFilesAccessed(actionA1b, OperationType.OP_WRITE));
+		
+		} catch (CanNotRefactorException e) {
+			fail("Failed to undo merge action.");
+		}
+		
+		/* test redo */
+		try {
+			importRefactorer.redoRefactoring();
+
+			assertFalse(actionMgr.isActionTrashed(actionA1a));
+			assertTrue(actionMgr.isActionTrashed(actionA1b));
+			assertEquals("cc1 -o /tmp/aaa.s foo.c\nas -o foo.o /tmp/aaa.s", 
+						 actionMgr.getCommand(actionA1a));
+			assertArrayEquals(new Integer[] { fileWorkFooC },
+				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
+			assertTrue(CommonTestUtils.sortedArraysEqual(
+					new Integer[] { fileWorkFooO, fileTmpAaaS },
+					actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE)));
+
+		} catch (CanNotRefactorException e) {
+			fail("Failed to redo merge action.");
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }

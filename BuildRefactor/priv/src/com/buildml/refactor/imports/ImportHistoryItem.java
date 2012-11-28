@@ -21,7 +21,6 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.impl.BuildStore;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -56,7 +55,10 @@ import com.buildml.utils.errors.ErrorCode;
 		ADD_ACTION_PATH_LINK,
 		
 		/** Reparent an action */
-		REPARENT_ACTION
+		REPARENT_ACTION,
+		
+		/** Change an actions's command string */
+		CHANGE_COMMAND
 	}
 
 	/*=====================================================================================*
@@ -99,6 +101,12 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/** New parent ID */
 		int newParentId;
+		
+		/** Old shell command string */
+		String oldShellCommand;
+
+		/** New shell command string */
+		String newShellCommand;
 	}
 	
 	/** The ordered List of operations */
@@ -176,6 +184,12 @@ import com.buildml.utils.errors.ErrorCode;
 				//		" to new parent " + op.newParentId);
 				actionMgr.setParent(op.actionId, op.newParentId);
 				break;
+
+			case CHANGE_COMMAND:
+				//System.out.println("Changing shell command from " + op.oldShellCommand + " to " +
+				//					op.newShellCommand);
+				actionMgr.setCommand(op.actionId, op.newShellCommand);
+				break;
 				
 			default:
 				throw new FatalBuildStoreError("Encountered unrecognized operation type: " + op.type);
@@ -235,6 +249,11 @@ import com.buildml.utils.errors.ErrorCode;
 				//System.out.println("Reparenting action " + op.actionId + " from parent " + op.newParentId +
 				//		" to old parent " + op.oldParentId);
 				actionMgr.setParent(op.actionId, op.oldParentId);
+				break;
+
+			case CHANGE_COMMAND:
+				//System.out.println("Changing shell command back to " + op.newShellCommand);
+				actionMgr.setCommand(op.actionId, op.oldShellCommand);
 				break;
 
 			default:
@@ -314,6 +333,26 @@ import com.buildml.utils.errors.ErrorCode;
 		item.actionId = thisId;
 		item.oldParentId = oldParentId;
 		item.newParentId = newParentId;
+		opList.add(item);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Change an action's shell command.
+	 * 
+	 * @param op				The operation to perform (e.g. CHANGE_COMMAND).
+	 * @param actionId			The action whose shell command will be modified.
+	 * @param oldShellCommand   The existing shell command for the action.
+	 * @param newShellCommand	The new shell command for the action.
+	 */
+	public void addCommandOp(ItemOpType op, int actionId,
+			                 String oldShellCommand, String newShellCommand) {
+		ItemOp item = new ItemOp();
+		item.type = op;
+		item.actionId = actionId;
+		item.oldShellCommand = oldShellCommand;
+		item.newShellCommand = newShellCommand;
 		opList.add(item);
 	}
 

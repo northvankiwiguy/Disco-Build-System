@@ -72,10 +72,14 @@ public interface IImportRefactorer {
 	public void deleteAction(int actionId) throws CanNotRefactorException;
 	
 	/**
-	 * @param actionIds
-	 * @throws CanNotRefactorException
+	 * Merge two or more actions into a single action, with the shell commands
+	 * from each action merged into a single shell command. The actions must
+	 * all be atomic.
+	 * 
+	 * @param actionIds The actions to be merged.
+	 * @throws CanNotRefactorException If the refactoring can not proceed for some reason.
 	 */
-	public void mergeActions(int actionIds[]) throws CanNotRefactorException;
+	public void mergeActions(Integer[] actionIds) throws CanNotRefactorException;
 	
 	/**
 	 * Undo the previous refactoring operation. Operations are held on a stack,

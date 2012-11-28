@@ -154,12 +154,7 @@
             category="com.buildml.eclipse.commands.category"
             defaultHandler="com.buildml.eclipse.actions.handlers.HandlerDeleteAction"
             id="com.buildml.eclipse.commands.deleteActionPromote"
-            name="Delete Action (Promote Children)">
-      </command>
-      <command
-            category="com.buildml.eclipse.commands.category"
-            id="com.buildml.eclipse.commands.deleteActionChildren"
-            name="Delete Action (Including Children)">
+            name="Delete Action">
       </command>
       <command
             category="com.buildml.eclipse.commands.category"
@@ -881,6 +876,15 @@
             </and>
          </enabledWhen>
       </handler>
+      <handler
+            class="com.buildml.eclipse.actions.handlers.HandlerMergeActions"
+            commandId="com.buildml.eclipse.commands.mergeActions">
+         <enabledWhen>
+            <count
+                  value="+">
+            </count>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -1049,6 +1053,24 @@
                id="com.buildml.eclipse.commandParameters.accessType"
                value="read">
          </parameter>
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.mergeActions"
+            contextId="com.buildml.eclipse.contexts.actionseditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="SHIFT+NUMPAD_DIVIDE">
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.deleteActionPromote"
+            contextId="com.buildml.eclipse.contexts.actionseditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="SHIFT+NUMPAD_SUBTRACT">
+      </key>
+      <key
+            commandId="com.buildml.eclipse.commands.makeActionAtomic"
+            contextId="com.buildml.eclipse.contexts.actionseditor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="SHIFT+NUMPAD_MULTIPLY">
       </key>
    </extension>
    <extension
