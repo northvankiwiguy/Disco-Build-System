@@ -98,14 +98,14 @@ public class CanNotRefactorException extends Exception {
 			actionIds = args;
 			break;
 		
-		/* The action is in use by certain files, or is trashed */
+		/* The action is in use by certain files */
 		case ACTION_IN_USE:
-		case ACTION_IS_TRASHED:
 			pathIds = args;
 			break;
 		
-		/* The action is not atomic, so the operation can't complete */
+		/* The action is not atomic, or is trashed, so the operation can't complete */
 		case ACTION_NOT_ATOMIC:
+		case ACTION_IS_TRASHED:
 			actionIds = args;
 			break;
 			
