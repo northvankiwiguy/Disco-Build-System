@@ -368,6 +368,7 @@ public final class CliMain {
 			new ICliCommand[] {
 				new CliCommandRmFile(),
 				new CliCommandMakeAtomic(),
+				new CliCommandMergeActions(),
 				new CliCommandRmAction()
 			});
 	}

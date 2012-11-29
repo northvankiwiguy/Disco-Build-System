@@ -1,0 +1,13 @@
+Merge two or more shell command actions into a single action. The shell
+commands from each of the actions will be merged into a single shell command.
+
+The only requirement for the selected actions is that they all be atomic (no
+child actions).
+
+The command arguments are:
+
+<action-set>
+
+This set of actions must conform to the following specifications:
+
+#include options/action-spec.txt
