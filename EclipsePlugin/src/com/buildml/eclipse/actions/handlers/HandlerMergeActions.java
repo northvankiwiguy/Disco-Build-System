@@ -135,17 +135,9 @@ public class HandlerMergeActions extends AbstractHandler {
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		ActionSet selectedActions = EclipsePartUtils.getActionSetFromSelection(buildStore, selection);
 		
-		/* convert our ActionSet into an array of actions */
-		int numActionsSelected = selectedActions.size();
-		Integer actionIds[] = new Integer[numActionsSelected];
-		int i = 0;
-		for (int action : selectedActions) {
-			actionIds[i++] = action;
-		}
-		
 		/* attempt to perform the "merge action" operation */
 		try {
-			refactorer.mergeActions(actionIds);
+			refactorer.mergeActions(selectedActions);
 
 			// TODO: limit this scope of this refresh
 			subEditor.refreshView(true);

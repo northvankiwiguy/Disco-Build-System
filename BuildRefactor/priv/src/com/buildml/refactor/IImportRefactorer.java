@@ -12,6 +12,8 @@
 
 package com.buildml.refactor;
 
+import com.buildml.model.types.ActionSet;
+
 /**
  * Various refactoring operations that can be performed on an imported BuildStore.
  * That is, when we use a build scanner to import a legacy build, it's often necessary
@@ -79,7 +81,7 @@ public interface IImportRefactorer {
 	 * @param actionIds The actions to be merged.
 	 * @throws CanNotRefactorException If the refactoring can not proceed for some reason.
 	 */
-	public void mergeActions(Integer[] actionIds) throws CanNotRefactorException;
+	public void mergeActions(ActionSet actionIds) throws CanNotRefactorException;
 	
 	/**
 	 * Undo the previous refactoring operation. Operations are held on a stack,

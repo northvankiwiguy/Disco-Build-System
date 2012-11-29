@@ -24,6 +24,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.types.ActionSet;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.IImportRefactorer;
@@ -221,7 +222,7 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#mergeActions(int[])
 	 */
 	@Override
-	public void mergeActions(Integer[] actionIds) throws CanNotRefactorException {
+	public void mergeActions(ActionSet actionIds) throws CanNotRefactorException {
 		
 		/* check that all actions are valid and non-atomic */
 		List<Integer> invalidActions = new ArrayList<Integer>();
@@ -258,7 +259,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		}		
 		
 		/* if there's only one action (or no actions), there's nothing to do */
-		if (actionIds.length < 2) {
+		if (actionIds.size() < 2) {
 			return;
 		}
 		

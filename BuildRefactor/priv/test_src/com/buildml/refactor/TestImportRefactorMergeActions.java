@@ -23,6 +23,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.types.ActionSet;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
 import com.buildml.utils.errors.ErrorCode;
@@ -419,7 +420,8 @@ public class TestImportRefactorMergeActions {
 		
 		/* test merging of non-atomic action (actionA1) - should fail */
 		try {
-			importRefactorer.mergeActions(new Integer[] { actionA1a, actionA1 });
+			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA1a, actionA1 }); 
+			importRefactorer.mergeActions(set);
 			fail("Incorrectly merged an atomic action.");
 			
 		} catch (CanNotRefactorException e) {
@@ -430,7 +432,8 @@ public class TestImportRefactorMergeActions {
 
 		/* test merging of invalid action ID */
 		try {
-			importRefactorer.mergeActions(new Integer[] { actionA1a, 1234 });
+			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA1a, 1234 });
+			importRefactorer.mergeActions(set);
 			fail("Incorrectly merged an atomic action.");
 			
 		} catch (CanNotRefactorException e) {
@@ -446,7 +449,8 @@ public class TestImportRefactorMergeActions {
 			fail("Failed to remove actionA4c");
 		}
 		try {
-			importRefactorer.mergeActions(new Integer[] { actionA4b, actionA4c });
+			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA4b, actionA4c });
+			importRefactorer.mergeActions(set);
 			fail("Incorrectly merged a trashed action.");
 			
 		} catch (CanNotRefactorException e) {
@@ -466,14 +470,16 @@ public class TestImportRefactorMergeActions {
 		
 		/* test merging of a single atomic action (actionA4b) - will succeed */
 		try {
-			importRefactorer.mergeActions(new Integer[] { actionA4b });
+			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA4b });
+			importRefactorer.mergeActions(set);
 		} catch (CanNotRefactorException e1) {
 			fail("Failed to merge single action actionA4b");
 		}
 		
 		/* test merging of two actions - will succeed */
 		try {
-			importRefactorer.mergeActions(new Integer[] { actionA1b, actionA1a });
+			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA1b, actionA1a });
+			importRefactorer.mergeActions(set);
 			
 			assertFalse(actionMgr.isActionTrashed(actionA1a));
 			assertTrue(actionMgr.isActionTrashed(actionA1b));
