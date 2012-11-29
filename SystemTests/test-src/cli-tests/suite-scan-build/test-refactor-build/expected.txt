@@ -1,0 +1,12 @@
+bml show-actions -f 3 matched output -c file1.c
+bml show-actions -f 3 matched output -c file2.c
+bml show-actions -f 11 matched output -c file3.c
+bml show-actions -f 11 matched output -c file4.c
+bml show-actions -f 9 matched output ar cq lib1.a file1.o file2.o
+bml show-actions -f 17 matched output ar cq lib2.a file3.o file4.o
+bml show-actions -f 20 matched output -o prog main.c subdir1/lib1.a subdir2/lib2.a
+bml show-actions -f 1 provides empty output, as expected
+bml show-actions -f 2 provides empty output, as expected
+bml show-actions -f 10 provides empty output, as expected
+bml show-actions -f 18 provides empty output, as expected
+bml show-actions -f 19 provides empty output, as expected
