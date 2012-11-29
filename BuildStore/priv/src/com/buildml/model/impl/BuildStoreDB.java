@@ -605,15 +605,7 @@ import com.buildml.utils.version.Version;
 		 * Remove all database rows that are associated with "trashed" files
 		 * and actions. This includes fileAttributes.
 		 */
-		try {
-			Statement stat = dbConn.createStatement();
-			stat.executeUpdate("delete from fileAttrs where pathId in (select id from files where trashed=1);");
-			stat.executeUpdate("delete from files where trashed=1");
-			stat.executeUpdate("delete from buildActions where trashed=1;");
-			
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to remove trashed files and actions", e);
-		}
+		emptyTrash();
 		
 		/* make sure all changes are committed */
 		setFastAccessMode(false);
@@ -670,6 +662,25 @@ import com.buildml.utils.version.Version;
 		if (saveRequired) {
 			databaseFileName = fileToSave;
 			save();
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Purge the database on any trashed files or actions that may still be present.
+	 * 
+	 * @throws FatalBuildStoreError Something went wrong.
+	 */
+	public void emptyTrash() throws FatalBuildStoreError {
+		try {
+			Statement stat = dbConn.createStatement();
+			stat.executeUpdate("delete from fileAttrs where pathId in (select id from files where trashed=1);");
+			stat.executeUpdate("delete from files where trashed=1");
+			stat.executeUpdate("delete from buildActions where trashed=1;");
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to remove trashed files and actions", e);
 		}
 	}
 	

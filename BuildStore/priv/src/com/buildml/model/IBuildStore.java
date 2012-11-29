@@ -122,4 +122,10 @@ public interface IBuildStore {
 	 */
 	public abstract void saveAs(String fileToSave) throws IOException;
 
+	/**
+	 * Remove any trashed files or actions that may still be in the database. Use
+	 * of this method will permanently delete files and actions, making it impossible
+	 * to "undo" or "redo" historical changes.
+	 */
+	public void emptyTrash();
 }

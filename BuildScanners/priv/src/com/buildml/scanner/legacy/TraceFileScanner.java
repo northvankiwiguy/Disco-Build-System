@@ -429,11 +429,32 @@ import com.buildml.utils.string.ShellCommandUtils;
 			fileId = fileMgr.addSymlink(fileName);
 		}
 		if (fileId < 0){
-			throw new FatalBuildScannerError("Failed to add file: " + fileName + " to the BuildStore");
+			String msg = "Failed to add file: " + fileName + " to the BuildML database.";
+			int existingPathId = fileMgr.getPath(fileName);
+			if (existingPathId >= 0) {
+				PathType existingType = fileMgr.getPathType(existingPathId);
+				if (existingType != type) {
+					msg += "\nThere is already a path with this name, but with a " +
+				           "different type (file versus directory).\n";
+					msg += "You must modify the legacy build system to fix this problem.";
+				}
+			}
+			
+			throw new FatalBuildScannerError(msg);
 		}
 		
 		/* add the file access information to the build store */
 		actionMgr.addFileAccess(actionId, fileId, direction);
+		
+		/* 
+		 * If the file we are accessing has been trashed, that's because it was a temporary
+		 * file that's no longer required. Because temporary file names can sometimes be
+		 * reused, we need to permanently empty the trash, otherwise we can't re-add the
+		 * same path.
+		 */
+		if (fileMgr.isPathTrashed(fileId)) {
+			buildStore.emptyTrash();
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/

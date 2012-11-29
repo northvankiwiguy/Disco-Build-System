@@ -19,6 +19,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
+import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.scanner.legacy.LegacyBuildScanner;
 
 /**
@@ -200,6 +201,7 @@ public class CliCommandScanBuild implements ICliCommand {
 		 */
 		if (optionDebugLevel != 0) {
 			lbs.setDebugLevel(optionDebugLevel);
+			System.err.println("Debug output will be recorded in cfs.log.");
 		}
 		
 		/*
@@ -219,24 +221,29 @@ public class CliCommandScanBuild implements ICliCommand {
 		 * Invoke the shell commands via "cfs", and collect the trace output. However, skip this
 		 * step if the user selected --read-trace (which uses an existing trace file)
 		 */
-		if (!optionReadTrace) {
-			try {
-				/* invoke the shell commands, and construct the trace file */
-				lbs.traceShellCommand(args, null, System.out, optionUseShell);
+		try {
+			if (!optionReadTrace) {
+				try {
+					/* invoke the shell commands, and construct the trace file */
+					lbs.traceShellCommand(args, null, System.out, optionUseShell);
 
-			} catch (Exception e) {
-				CliUtils.reportErrorAndExit("The shell command returned a non-zero exit code." +
-						" The legacy build process will not be scanned.");
+				} catch (Exception e) {
+					CliUtils.reportErrorAndExit("The shell command returned a non-zero exit code." +
+							" The legacy build process will not be scanned.");
+				}
 			}
-		}
-		
-		/* 
-		 * Now create the BuildStore and/or display debug trace information (depending on 
-		 * what the user has chosen to do). If they want to dump the trace file, or if they
-		 * didn't select --trace-only, parse the trace file.
-		 */
-		if ((optionDebugLevel != 0) || !optionTraceOnly) {
-			lbs.parseTraceFile();
+
+			/* 
+			 * Now create the BuildStore and/or display debug trace information (depending on 
+			 * what the user has chosen to do). If they want to dump the trace file, or if they
+			 * didn't select --trace-only, parse the trace file.
+			 */
+			if ((optionDebugLevel != 0) || !optionTraceOnly) {
+				lbs.parseTraceFile();
+			}
+
+		} catch (FatalBuildScannerError e) {
+			System.err.println(e.getMessage());
 		}
 	}
 	

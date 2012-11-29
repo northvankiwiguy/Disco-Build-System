@@ -260,6 +260,15 @@ public class BuildStore implements IBuildStore {
 		db.saveAs(fileToSave);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#emptyTrash()
+	 */
+	public void emptyTrash() {
+		db.emptyTrash();
+	}	
+	
 	/*=====================================================================================*
 	 * PACKAGE-LEVEL METHODS
 	 *=====================================================================================*/
