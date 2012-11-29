@@ -202,6 +202,16 @@ public class FileSet extends IntegerTreeSet  {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.utils.types.IntegerTreeSet#isValid(int)
+	 */
+	@Override
+	public boolean isValid(int id) {
+		return !fileMgr.isPathTrashed(id);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Given a path ID, return the array of children of the path.
 	 * @param id The ID of the path whose children we wish to determine.

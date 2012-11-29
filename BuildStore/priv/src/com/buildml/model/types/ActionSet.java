@@ -98,6 +98,16 @@ public class ActionSet extends IntegerTreeSet {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.utils.types.IntegerTreeSet#isValid(int)
+	 */
+	@Override
+	public boolean isValid(int id) {
+		return actionMgr.isActionValid(id) && !actionMgr.isActionTrashed(id);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Given a action's ID, return the array of children of the action.
 	 * @param id The ID of the action whose children we wish to determine.

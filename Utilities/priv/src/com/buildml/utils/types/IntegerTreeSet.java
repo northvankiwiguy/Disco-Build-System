@@ -446,6 +446,17 @@ public abstract class IntegerTreeSet implements Iterable<Integer>, Cloneable {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Abstract method for determining whether a particular element is valid (exists in
+	 * the database and isn't trashed).
+	 * 
+	 * @param id The ID of the element to determine the valid status of.
+	 * @return True if the ID is valid, else false.
+	 */
+	public abstract boolean isValid(int id);
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Abstract method for fetching the array of children of a particular element. This
 	 * method must be overridden by sub-classes that actually know what the parent-child
 	 * relations should be.
@@ -484,6 +495,10 @@ public abstract class IntegerTreeSet implements Iterable<Integer>, Cloneable {
 		 * add it again.
 		 */
 		for (Integer elementId : copy) {
+			
+			if (!isValid(elementId)) {
+				continue;
+			}
 			
 			int parentId;
 			while (true) {
