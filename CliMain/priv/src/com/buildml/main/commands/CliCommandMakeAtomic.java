@@ -38,7 +38,7 @@ public class CliCommandMakeAtomic implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/make-action.txt");
+		return CliUtils.genLocalizedMessage("#include commands/make-atomic.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
