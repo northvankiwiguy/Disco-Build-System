@@ -360,6 +360,8 @@ public final class CliMain {
 				new CliCommandShowPkg(),
 				new CliCommandAddPkg(),
 				new CliCommandRemovePkg(),
+				new CliCommandMovePkg(),
+				new CliCommandRenamePkg(),
 				new CliCommandSetFilePkg(),
 				new CliCommandSetActionPkg()
 			});

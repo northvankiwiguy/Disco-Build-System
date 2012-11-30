@@ -77,7 +77,7 @@ public class CliCommandRemovePkg implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Remove an existing (but unused) package.";
+		return "Remove an existing (but unused) package or folder.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -98,18 +98,20 @@ public class CliCommandRemovePkg implements ICliCommand {
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a package name.");
+		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a package or folder name.");
 
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		String pkgName = args[0];
 		int pkgId = pkgMgr.getId(pkgName);
 		if (pkgId == ErrorCode.NOT_FOUND) {
-			CliUtils.reportErrorAndExit("Package " + pkgName + " is not defined.");			
+			CliUtils.reportErrorAndExit("Package/folder " + pkgName + " is not defined.");			
 		}
+		String objName = pkgMgr.isFolder(pkgId) ? "Folder" : "Package";
+		
 		int result = pkgMgr.remove(pkgId);
 		if (result == ErrorCode.CANT_REMOVE) {
-			CliUtils.reportErrorAndExit("Package " + pkgName + 
+			CliUtils.reportErrorAndExit(objName + " " + pkgName + 
 					" can't be deleted. It may still contain files or actions.");
 		}
 

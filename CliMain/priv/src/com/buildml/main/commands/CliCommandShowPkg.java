@@ -12,6 +12,8 @@
 
 package com.buildml.main.commands;
 
+import java.io.PrintStream;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
@@ -19,6 +21,7 @@ import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.utils.print.PrintUtils;
 
 /**
  * BuildML CLI Command class that implements the "show-pkg" command.
@@ -101,9 +104,40 @@ public class CliCommandShowPkg implements ICliCommand {
 	
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 		
-		String pkgNames[] = pkgMgr.getPackages();
-		for (int i = 0; i < pkgNames.length; i++) {
-			System.out.println(pkgNames[i]);
+		int rootId = pkgMgr.getRootFolder();
+		invokeHelper(System.out, pkgMgr, rootId, 0);
+	}
+
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * A helper function for displaying a package folder hierarchy. This method is called
+	 * recursively to display the package tree.
+	 * 
+	 * @param out 	   The PrintStream on which the tree should be displayed.
+	 * @param pkgMgr   The PackageMgr that owns the packages.
+	 * @param thisId   The current package/folder ID (at this level of the tree).
+	 * @param indent   The indent level.
+	 */
+	private void invokeHelper(PrintStream out, IPackageMgr pkgMgr, int thisId, int indent) {
+		
+		String name = pkgMgr.getName(thisId);
+		boolean isFolder = pkgMgr.isFolder(thisId);
+		
+		PrintUtils.indent(out, indent);
+		
+		if (isFolder) {
+			out.println(name + "/");
+			
+			Integer children[] = pkgMgr.getFolderChildren(thisId);
+			for (int i = 0; i < children.length; i++) {
+				invokeHelper(out, pkgMgr, children[i], indent + 2);
+			}
+			
+		} else {
+			out.println(name);
 		}
 	}
 

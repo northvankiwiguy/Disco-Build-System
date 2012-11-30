@@ -1,12 +1,20 @@
-Remove an existing package from the BuildML build system. The package must
+Remove an existing package from the BuildML build system. A package must
 no longer contain any files or actions, otherwise the removal will fail.
+Likewise, a folder must not contain any packages or sub-folders.
+
 For example:
 
     bml rm-pkg src_code
     
 will remove the "src_code" package, assuming it is no longer in use. It is
-not possible to remove the "<import>" package, even if it's empty.
+not possible to remove the "<import>" package or the "Root" folder, even if
+they're empty.
 
 The command arguments are:
 
 #include options/pkg-name.txt
+
+<folder-name>
+    
+  An identifier representing the package folder name. The same syntax rules
+  apply as for <pkg-name>.

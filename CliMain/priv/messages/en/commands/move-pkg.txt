@@ -1,0 +1,25 @@
+Move an existing package or folder into a new parent folder.
+
+For example:
+
+    bml move-pkg packageA Folder2
+
+will move the package named "packageA" into the folder named "Folder2". Also,
+
+	bml move-pkg Folder2 OldFolder
+	
+will move the folder named "Folder2" and all of its content (packages and
+other folders) into the folder named "OldFolder".    
+
+The command arguments are:
+
+#include options/pkg-name.txt
+
+<folder-name>
+    
+  The folder to be moved. The same syntax rules apply as for <pkg-name>.
+  
+<dest-folder-name>
+
+  The destination folder into which the package (or source folder) will be
+  moved.

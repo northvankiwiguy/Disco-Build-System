@@ -1,0 +1,26 @@
+Rename an existing package or folder. The name must be unique across all
+existing packages and folders. Changing a package or folder name does not
+change its parent folder.
+
+For example:
+
+    bml rename-pkg packageA compressLib
+
+will rename the package named "packageA" with a more suitable name,
+"compressLib". Also,
+
+	bml rename-pkg Folder2 LibFolder
+	
+will rename the folder named "Folder2" to "LibFolder". The content of the
+folder is unchanged.    
+
+The command arguments are:
+
+<old-name>
+    
+  The name of the existing package or folder.
+  
+<new-name>
+
+  The new name to give to the package or folder. This name must be unique
+  across all existing packages and folders.

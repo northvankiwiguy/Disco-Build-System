@@ -1,5 +1,6 @@
-Add a new package to the BuildML build system. The package will initially 
-not contain any files or actions. For example:
+Add a new package or package folder to the BuildML build system. The package
+or folder will be placed directly beneath the "Root" folder, and will 
+initially not contain any files, actions, or sub-folders. For example:
 
     bml add-pkg src_code
     
@@ -7,6 +8,19 @@ will create a new empty package named "src_code". It will now be possible
 to add files and actions into the "src_code" package using the set-file-pkg
 and set-action-pkg commands.
 
+To add a package folder, use the -f (--folder) flag:
+
+    bml add-pkg -f src_folder
+
+Packages (and other folders) may be moved into this new folder by using the
+move-pkg command.
+
 The command arguments are:
 
 #include options/pkg-name.txt
+
+<folder-name>
+    
+  An identifier representing the package folder name. The same syntax rules
+  apply as for <pkg-name>.
+      

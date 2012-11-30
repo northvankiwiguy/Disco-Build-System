@@ -9,4 +9,6 @@ haven't otherwise been assigned to a package.
 
 To add new packages, use the add-pkg command. To remove packages that
 are no longer needed, use the rm-pkg command. To place files and/or actions
-into a package, use the set-file-pkg and set-action-pkg commands.
+into a package, use the set-file-pkg and set-action-pkg commands. To create
+a new package folder, using add-pkg with the -f option.
+

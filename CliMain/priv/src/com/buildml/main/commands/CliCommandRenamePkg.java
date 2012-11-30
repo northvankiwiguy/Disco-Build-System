@@ -13,7 +13,6 @@
 package com.buildml.main.commands;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
@@ -23,19 +22,12 @@ import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
- * BuildML CLI Command class that implements the "add-pkg" command.
+ * BuildML CLI Command class that implements the "rename-pkg" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandAddPkg implements ICliCommand {
-
-	/*=====================================================================================*
-	 * FIELDS/TYPES
-	 *=====================================================================================*/
-
-	/** Set if we should show create a folder (not just a package) */
-	protected static boolean optionAddFolder = false;
-
+public class CliCommandRenamePkg implements ICliCommand {
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -45,9 +37,9 @@ public class CliCommandAddPkg implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/add-pkg.txt");
+		return CliUtils.genLocalizedMessage("#include commands/rename-pkg.txt");
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -55,7 +47,7 @@ public class CliCommandAddPkg implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "add-pkg";
+		return "rename-pkg";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -65,14 +57,7 @@ public class CliCommandAddPkg implements ICliCommand {
 	 */
 	@Override
 	public Options getOptions() {
-		
-		Options opts = new Options();
-
-		/* add the --folder option */
-		Option addFolderOpt = new Option("f", "folder", false, "Create a folder.");
-		opts.addOption(addFolderOpt);
-		
-		return opts;
+		return new Options();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -82,7 +67,7 @@ public class CliCommandAddPkg implements ICliCommand {
 	 */
 	@Override
 	public String getParameterDescription() {
-		return "[ <pkg-name> | <folder-name> ]";
+		return "<old-name> <new-name>";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -92,7 +77,7 @@ public class CliCommandAddPkg implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Add a new (empty) package, or a new folder.";
+		return "Rename a package (or folder).";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -102,7 +87,7 @@ public class CliCommandAddPkg implements ICliCommand {
 	 */
 	@Override
 	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
-		optionAddFolder = cmdLine.hasOption("folder");
+		/* no options */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -113,33 +98,30 @@ public class CliCommandAddPkg implements ICliCommand {
 	@Override
 	public void invoke(IBuildStore buildStore, String[] args) {
 
-		String objName = optionAddFolder ? "folder" : "package";
-		
-		CliUtils.validateArgs(getName(), args, 1, 1, "You must provide a " + objName + " name.");
+		CliUtils.validateArgs(getName(), args, 2, 2,
+				"You must provide both old and new package/folder names.");
 
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
-		String pkgName = args[0];
-		int pkgId;
+		String oldName = args[0];
+		String newName = args[1];
 		
-		if (optionAddFolder) {
-			pkgId = pkgMgr.addFolder(pkgName);
-		} else {
-			pkgId = pkgMgr.addPackage(pkgName);			
+		/* check validity of old name */		
+		int oldId = pkgMgr.getId(oldName);
+		if (oldId == ErrorCode.NOT_FOUND) {
+			CliUtils.reportErrorAndExit("Package/folder " + oldName + " is not defined.");			
 		}
 		
-		/* was the syntax of the name valid? */
-		if (pkgId == ErrorCode.INVALID_NAME){
-			CliUtils.reportErrorAndExit("Invalid " + objName + " name " + pkgName + ".");
+		/* attempt the rename, possibly getting an error message back */
+		int result = pkgMgr.setName(oldId, newName);
+		if (result == ErrorCode.ALREADY_USED) {
+			CliUtils.reportErrorAndExit("The name " + newName + " is already in use.");
+		} else if (result == ErrorCode.INVALID_NAME) {
+			CliUtils.reportErrorAndExit("The name " + newName + " is not a valid name.");
 		}
 
-		/* was the name already defined in the buildstore? */
-		if (pkgId == ErrorCode.ALREADY_USED){
-			CliUtils.reportErrorAndExit("The " + objName + " " + pkgName + " is already defined.");
-		}
-
-		/* all is good */
-		System.out.println("New " + objName + " " + pkgName + " added.");		
+		/* else, all is good */
+		System.out.println("Package " + oldName + " renamed to " + newName + ".");		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

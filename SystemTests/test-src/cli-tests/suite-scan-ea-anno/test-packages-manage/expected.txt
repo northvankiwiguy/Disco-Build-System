@@ -1,35 +1,117 @@
 Showing packages, before having defined any
-<import>
+Root/
+  <import>
 Remove a package that doesn't exist yet - should fail
-Error: Package pkg1 is not defined.
+Error: Package/folder pkg1 is not defined.
        Use bml -h for more help.
 Status is 1
 Add a couple of new packages, then show the list again
 New package package2 added.
 New package my-pkg3 added.
-<import>
-my-pkg3
-package2
+Root/
+  <import>
+  my-pkg3
+  package2
 Try to add the same package name twice
-Error: Package my-pkg3 is already defined.
+Error: The package my-pkg3 is already defined.
        Use bml -h for more help.
 Status is 1
-<import>
-my-pkg3
-package2
+Root/
+  <import>
+  my-pkg3
+  package2
 Delete a package, making sure it no longer exists
 Package my-pkg3 removed.
-<import>
-package2
+Root/
+  <import>
+  package2
 Add a package name back, essentially reusing it
 New package my-pkg3 added.
-<import>
-my-pkg3
-package2
+Root/
+  <import>
+  my-pkg3
+  package2
 Try to delete the default package
 Error: Package <import> can't be deleted. It may still contain files or actions.
        Use bml -h for more help.
 Status is 1
-<import>
-my-pkg3
-package2
+Root/
+  <import>
+  my-pkg3
+  package2
+Renaming a package
+Package my-pkg3 renamed to package3.
+Root/
+  <import>
+  package2
+  package3
+Rename a package to an existing name
+Error: The name package2 is already in use.
+       Use bml -h for more help.
+Status is 1
+Root/
+  <import>
+  package2
+  package3
+Adding a two new folders
+New folder Folder1 added.
+New folder Folder2 added.
+Root/
+  Folder1/
+  Folder2/
+  <import>
+  package2
+  package3
+Adding a folder with a pre-existing name
+Error: The folder Folder2 is already defined.
+       Use bml -h for more help.
+Status is 1
+Root/
+  Folder1/
+  Folder2/
+  <import>
+  package2
+  package3
+Moving a package into a sub-folder
+Package package2 moved.
+Root/
+  Folder1/
+  Folder2/
+    package2
+  <import>
+  package3
+Moving a folder into a sub-folder
+Package Folder1 moved.
+Root/
+  Folder2/
+    Folder1/
+    package2
+  <import>
+  package3
+Trying to create a folder-cycle
+Error: The package Folder2 can't be moved into the folder Folder1.
+       Use bml -h for more help.
+Status is 1
+Root/
+  Folder2/
+    Folder1/
+    package2
+  <import>
+  package3
+Try to remove a folder that has children
+Error: Folder Folder2 can't be deleted. It may still contain files or actions.
+       Use bml -h for more help.
+Status is 1
+Root/
+  Folder2/
+    Folder1/
+    package2
+  <import>
+  package3
+Remove a folder that doesn't have children
+Package Folder1 removed.
+Root/
+  Folder2/
+    package2
+  <import>
+  package3
