@@ -572,6 +572,10 @@ public class TestPackageMgr {
 		
 		/* try to get a non-existent file */
 		assertNull(pkgMgr.getFilePackage(2000));
+		
+		/* try to place a file into a folder - should fail */
+		int folder = pkgMgr.addFolder("Folder");
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.setFilePackage(path1, folder, IPackageMgr.SCOPE_NONE));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -807,7 +811,11 @@ public class TestPackageMgr {
 		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
 		
 		/* check an invalid action - should return ErrorCode.NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getActionPackage(1000));		
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getActionPackage(1000));
+		
+		/* try to place an action into a folder - should fail */
+		int folder = pkgMgr.addFolder("Folder");
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.setActionPackage(action1, folder));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -549,6 +549,11 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public int setFilePackage(int fileId, int pkgId, int pkgScopeId) {
 		
+		/* we can't assign files into folders (only into packages) */
+		if (isFolder(pkgId)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
 		try {
 			updateFilePackagePrepStmt.setInt(1, pkgId);
 			updateFilePackagePrepStmt.setInt(2, pkgScopeId);
@@ -739,6 +744,11 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public int setActionPackage(int actionId, int pkgId) {
 		
+		/* we can't assign actions into folders (only into packages) */
+		if (isFolder(pkgId)) {
+			return ErrorCode.BAD_VALUE;
+		}
+
 		try {
 			updateActionPackagePrepStmt.setInt(1, pkgId);
 			updateActionPackagePrepStmt.setInt(2, actionId);
