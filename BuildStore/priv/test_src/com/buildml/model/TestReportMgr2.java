@@ -368,7 +368,7 @@ public class TestReportMgr2 {
 		FileSet fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(0, fs.size());
 		
-		/* add a bunch of files - they should all be in the None package */
+		/* add a bunch of files - they should all be in the <import> package */
 		int file1 = fileMgr.addFile("/file1");
 		int file2 = fileMgr.addFile("/file2");
 		int file3 = fileMgr.addFile("/file3");
@@ -459,7 +459,7 @@ public class TestReportMgr2 {
 		ActionSet tset = reports.reportActionsFromPackageSet(cs);
 		assertEquals(0, tset.size());
 		
-		/* add a bunch of actions - they should all be in the None package */
+		/* add a bunch of actions - they should all be in the <import> package */
 		int action1 = actionMgr.addAction(0, 0, "command 1");
 		int action2 = actionMgr.addAction(0, 0, "command 2");
 		int action3 = actionMgr.addAction(0, 0, "command 3");

@@ -513,7 +513,7 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		String pkgList[] = pkgMgr.getPackages();
 		for (String pkgName : pkgList) {
-			int pkgId = pkgMgr.getPackageId(pkgName);
+			int pkgId = pkgMgr.getId(pkgName);
 			if (pkgId != ErrorCode.NOT_FOUND) {
 				
 				/* is this package in the set? */
@@ -579,7 +579,7 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		String pkgList[] = pkgMgr.getPackages();
 		for (String pkgName : pkgList) {
-			int pkgId = pkgMgr.getPackageId(pkgName);
+			int pkgId = pkgMgr.getId(pkgName);
 			if (pkgId != ErrorCode.NOT_FOUND) {
 				
 				/* is this package in the set? */

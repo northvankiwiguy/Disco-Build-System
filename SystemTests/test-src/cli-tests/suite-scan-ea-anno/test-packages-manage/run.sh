@@ -35,7 +35,7 @@ bml show-pkg
 
 echo "Try to delete the default package"
 set +e
-bml rm-pkg None
+bml rm-pkg "<import>"
 echo "Status is $?"
 set -e
 bml show-pkg

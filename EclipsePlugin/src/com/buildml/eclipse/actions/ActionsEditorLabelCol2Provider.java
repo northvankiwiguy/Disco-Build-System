@@ -84,7 +84,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 			if (pkgId == 0) {
 				return "";
 			}
-			String pkgName = pkgMgr.getPackageName(pkgId);
+			String pkgName = pkgMgr.getName(pkgId);
 			if (pkgName == null) {
 				return "<invalid>";
 			}

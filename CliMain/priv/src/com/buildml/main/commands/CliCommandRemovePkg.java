@@ -103,13 +103,14 @@ public class CliCommandRemovePkg implements ICliCommand {
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		String pkgName = args[0];
-		int result = pkgMgr.removePackage(pkgName);
+		int pkgId = pkgMgr.getId(pkgName);
+		if (pkgId == ErrorCode.NOT_FOUND) {
+			CliUtils.reportErrorAndExit("Package " + pkgName + " is not defined.");			
+		}
+		int result = pkgMgr.remove(pkgId);
 		if (result == ErrorCode.CANT_REMOVE) {
 			CliUtils.reportErrorAndExit("Package " + pkgName + 
-					" can't be deleted while it still contains files or actions.");
-		}
-		if (result == ErrorCode.NOT_FOUND) {
-			CliUtils.reportErrorAndExit("Package " + pkgName + " is not defined.");
+					" can't be deleted. It may still contain files or actions.");
 		}
 
 		/* else, all is good */

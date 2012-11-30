@@ -38,8 +38,8 @@ gives the files "private" scope. Scope names are predefined and
 can not be modified by the user.
 
 Note: an individual file will always reside in exactly one package, even if
-it's the default "None" package. To remove a file from a package, use
-set-file-pkg to add the file to the default "None" package, or to some
+it's the default "<import>" package. To remove a file from a package, use
+set-file-pkg to add the file to the default "<import>" package, or to some
 other user-defined package.
 
 The command arguments are:

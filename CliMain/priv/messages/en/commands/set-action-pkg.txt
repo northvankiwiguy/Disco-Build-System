@@ -20,8 +20,8 @@ whereas:
 will show all the actions that are NOT inside that package.
 
 Note: an individual action will always reside in exactly one package, even if
-it's the default "None" package. To remove an action from a package, use
-set-action-pkg to add the action to the default "None" package, or to some
+it's the default "<import>" package. To remove an action from a package, use
+set-action-pkg to add the action to the default "<import>" package, or to some
 other user-defined package.
 
 The command arguments are:

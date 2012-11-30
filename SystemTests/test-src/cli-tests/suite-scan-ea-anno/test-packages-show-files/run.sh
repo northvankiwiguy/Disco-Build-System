@@ -67,7 +67,7 @@ set -e
 
 echo
 echo "Remove the final file from the zlib package, then try to delete the package"
-bml set-file-pkg None/None /home/psmith/t/cvs-1.11.23/zlib/libz.a
+bml set-file-pkg "<import>/None" /home/psmith/t/cvs-1.11.23/zlib/libz.a
 set +e
 bml rm-pkg zlib
 echo "Status is $?"
@@ -75,7 +75,7 @@ set -e
 
 echo
 echo "Remove the zlib directory from the package too, then try to delete the package"
-bml set-file-pkg None/None /home/psmith/t/cvs-1.11.23/zlib
+bml set-file-pkg "<import>/None" /home/psmith/t/cvs-1.11.23/zlib
 bml rm-pkg zlib
 
 

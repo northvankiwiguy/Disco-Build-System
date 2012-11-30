@@ -1,14 +1,14 @@
 Show all actions, with only default packages
-- Action 1 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 1 (/home/psmith/t/cvs-1.11.23 - <import>)
     if test ! -f config.h; then \
     	  rm -f stamp-h1; \
     	  emake  stamp-h1; \
     	else :; fi
 
-- Action 2 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 2 (/home/psmith/t/cvs-1.11.23 - <import>)
     emake  all-recursive
 
--- Action 3 (/home/psmith/t/cvs-1.11.23 - None)
+-- Action 3 (/home/psmith/t/cvs-1.11.23 - <import>)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -34,478 +34,478 @@ Show all actions, with only default packages
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Action 4 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 4 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
         -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
       mv -f .deps/argmatch.Tpo .deps/argmatch.Po
 
---- Action 5 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 5 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
         .deps/getdate.Tpo -c -o getdate.o getdate.c
       mv -f .deps/getdate.Tpo .deps/getdate.Po
 
---- Action 6 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 6 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
         .deps/getline.Tpo -c -o getline.o getline.c
       mv -f .deps/getline.Tpo .deps/getline.Po
 
---- Action 7 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 7 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
         .deps/getopt.Tpo -c -o getopt.o getopt.c
       mv -f .deps/getopt.Tpo .deps/getopt.Po
 
---- Action 8 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 8 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
         .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
       mv -f .deps/getopt1.Tpo .deps/getopt1.Po
 
---- Action 9 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 9 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
         .deps/getpass.Tpo -c -o getpass.o getpass.c
       mv -f .deps/getpass.Tpo .deps/getpass.Po
 
---- Action 10 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 10 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
         .deps/md5.Tpo -c -o md5.o md5.c
       mv -f .deps/md5.Tpo .deps/md5.Po
 
---- Action 11 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 11 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
         .deps/regex.Tpo -c -o regex.o regex.c
       mv -f .deps/regex.Tpo .deps/regex.Po
 
---- Action 12 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 12 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
         .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
       mv -f .deps/savecwd.Tpo .deps/savecwd.Po
 
---- Action 13 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 13 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
         -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
       mv -f .deps/sighandle.Tpo .deps/sighandle.Po
 
---- Action 14 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 14 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
         -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
       mv -f .deps/stripslash.Tpo .deps/stripslash.Po
 
---- Action 15 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 15 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
         .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
       mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
 
---- Action 16 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 16 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
         .deps/yesno.Tpo -c -o yesno.o yesno.c
       mv -f .deps/yesno.Tpo .deps/yesno.Po
 
---- Action 17 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 17 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       rm -f libcvs.a
       ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
         getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
         yesno.o 
       ranlib libcvs.a
 
---- Action 18 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 18 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o adler32.o adler32.c
 
---- Action 19 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 19 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o compress.o compress.c
 
---- Action 20 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 20 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o crc32.o crc32.c
 
---- Action 21 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 21 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o gzio.o gzio.c
 
---- Action 22 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 22 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o uncompr.o uncompr.c
 
---- Action 23 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 23 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o deflate.o deflate.c
 
---- Action 24 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 24 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o trees.o trees.c
 
---- Action 25 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 25 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o zutil.o zutil.c
 
---- Action 26 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 26 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o inflate.o inflate.c
 
---- Action 27 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 27 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o infblock.o infblock.c
 
---- Action 28 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 28 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o inftrees.o inftrees.c
 
---- Action 29 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 29 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o infcodes.o infcodes.c
 
---- Action 30 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 30 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o infutil.o infutil.c
 
---- Action 31 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 31 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       gcc -g -O2   -c -o inffast.o inffast.c
 
---- Action 32 (/home/psmith/t/cvs-1.11.23/zlib - None)
+--- Action 32 (/home/psmith/t/cvs-1.11.23/zlib - <import>)
       ar rc libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o \
         trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o \
         inffast.o 
       (ranlib libz.a || true) >/dev/null 2>&1
 
---- Action 33 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 33 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
         .deps/diff.Tpo -c -o diff.o diff.c
       mv -f .deps/diff.Tpo .deps/diff.Po
 
---- Action 34 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 34 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
         .deps/diff3.Tpo -c -o diff3.o diff3.c
       mv -f .deps/diff3.Tpo .deps/diff3.Po
 
---- Action 35 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 35 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
         .deps/analyze.Tpo -c -o analyze.o analyze.c
       mv -f .deps/analyze.Tpo .deps/analyze.Po
 
---- Action 36 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 36 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
         .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
       mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
 
---- Action 37 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 37 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
         .deps/io.Tpo -c -o io.o io.c
       mv -f .deps/io.Tpo .deps/io.Po
 
---- Action 38 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 38 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
         .deps/context.Tpo -c -o context.o context.c
       mv -f .deps/context.Tpo .deps/context.Po
 
---- Action 39 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 39 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
         .deps/ed.Tpo -c -o ed.o ed.c
       mv -f .deps/ed.Tpo .deps/ed.Po
 
---- Action 40 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 40 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
         .deps/normal.Tpo -c -o normal.o normal.c
       mv -f .deps/normal.Tpo .deps/normal.Po
 
---- Action 41 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 41 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
         .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
       mv -f .deps/ifdef.Tpo .deps/ifdef.Po
 
---- Action 42 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 42 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
         .deps/util.Tpo -c -o util.o util.c
       mv -f .deps/util.Tpo .deps/util.Po
 
---- Action 43 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 43 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
         .deps/dir.Tpo -c -o dir.o dir.c
       mv -f .deps/dir.Tpo .deps/dir.Po
 
---- Action 44 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 44 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
         .deps/version.Tpo -c -o version.o version.c
       mv -f .deps/version.Tpo .deps/version.Po
 
---- Action 45 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 45 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
         .deps/side.Tpo -c -o side.o side.c
       mv -f .deps/side.Tpo .deps/side.Po
 
---- Action 46 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 46 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       rm -f libdiff.a
       ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
         normal.o ifdef.o util.o dir.o version.o side.o 
       ranlib libdiff.a
 
---- Action 47 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 47 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
       mv -f .deps/add.Tpo .deps/add.Po
 
---- Action 48 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 48 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
       mv -f .deps/admin.Tpo .deps/admin.Po
 
---- Action 49 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 49 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
       mv -f .deps/annotate.Tpo .deps/annotate.Po
 
---- Action 50 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 50 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
       mv -f .deps/buffer.Tpo .deps/buffer.Po
 
---- Action 51 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 51 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
       mv -f .deps/checkin.Tpo .deps/checkin.Po
 
---- Action 52 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 52 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
       mv -f .deps/checkout.Tpo .deps/checkout.Po
 
---- Action 53 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 53 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
       mv -f .deps/classify.Tpo .deps/classify.Po
 
---- Action 54 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 54 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
       mv -f .deps/client.Tpo .deps/client.Po
 
---- Action 55 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 55 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
       mv -f .deps/commit.Tpo .deps/commit.Po
 
---- Action 56 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 56 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
         create_adm.c
       mv -f .deps/create_adm.Tpo .deps/create_adm.Po
 
---- Action 57 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 57 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
       mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
 
---- Action 58 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 58 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
       mv -f .deps/diff.Tpo .deps/diff.Po
 
---- Action 59 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 59 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
       mv -f .deps/edit.Tpo .deps/edit.Po
 
---- Action 60 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 60 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
       mv -f .deps/entries.Tpo .deps/entries.Po
 
---- Action 61 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 61 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
       mv -f .deps/error.Tpo .deps/error.Po
 
---- Action 62 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 62 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
         expand_path.c
       mv -f .deps/expand_path.Tpo .deps/expand_path.Po
 
---- Action 63 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 63 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
       mv -f .deps/fileattr.Tpo .deps/fileattr.Po
 
---- Action 64 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 64 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
       mv -f .deps/filesubr.Tpo .deps/filesubr.Po
 
---- Action 65 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 65 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
         find_names.c
       mv -f .deps/find_names.Tpo .deps/find_names.Po
 
---- Action 66 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 66 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
       mv -f .deps/hardlink.Tpo .deps/hardlink.Po
 
---- Action 67 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 67 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
       mv -f .deps/hash.Tpo .deps/hash.Po
 
---- Action 68 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 68 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
       mv -f .deps/history.Tpo .deps/history.Po
 
---- Action 69 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 69 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
       mv -f .deps/ignore.Tpo .deps/ignore.Po
 
---- Action 70 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 70 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
       mv -f .deps/import.Tpo .deps/import.Po
 
---- Action 71 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 71 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
       mv -f .deps/lock.Tpo .deps/lock.Po
 
---- Action 72 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 72 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
       mv -f .deps/log.Tpo .deps/log.Po
 
---- Action 73 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 73 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
       mv -f .deps/login.Tpo .deps/login.Po
 
---- Action 74 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 74 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
       mv -f .deps/logmsg.Tpo .deps/logmsg.Po
 
---- Action 75 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 75 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
       mv -f .deps/main.Tpo .deps/main.Po
 
---- Action 76 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 76 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
         mkmodules.c
       mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
 
---- Action 77 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 77 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
       mv -f .deps/modules.Tpo .deps/modules.Po
 
---- Action 78 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 78 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
       mv -f .deps/myndbm.Tpo .deps/myndbm.Po
 
---- Action 79 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 79 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
       mv -f .deps/no_diff.Tpo .deps/no_diff.Po
 
---- Action 80 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 80 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
         parseinfo.c
       mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
 
---- Action 81 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 81 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
       mv -f .deps/patch.Tpo .deps/patch.Po
 
---- Action 82 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 82 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
       mv -f .deps/rcs.Tpo .deps/rcs.Po
 
---- Action 83 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 83 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
       mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
 
---- Action 84 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 84 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
       mv -f .deps/recurse.Tpo .deps/recurse.Po
 
---- Action 85 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 85 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
       mv -f .deps/release.Tpo .deps/release.Po
 
---- Action 86 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 86 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
       mv -f .deps/remove.Tpo .deps/remove.Po
 
---- Action 87 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 87 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
       mv -f .deps/repos.Tpo .deps/repos.Po
 
---- Action 88 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 88 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
       mv -f .deps/root.Tpo .deps/root.Po
 
---- Action 89 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 89 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
       mv -f .deps/run.Tpo .deps/run.Po
 
---- Action 90 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 90 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
       mv -f .deps/scramble.Tpo .deps/scramble.Po
 
---- Action 91 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 91 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
       mv -f .deps/server.Tpo .deps/server.Po
 
---- Action 92 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 92 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
       mv -f .deps/stack.Tpo .deps/stack.Po
 
---- Action 93 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 93 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
       mv -f .deps/status.Tpo .deps/status.Po
 
---- Action 94 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 94 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
       mv -f .deps/subr.Tpo .deps/subr.Po
 
---- Action 95 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 95 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
       mv -f .deps/tag.Tpo .deps/tag.Po
 
---- Action 96 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 96 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
       mv -f .deps/update.Tpo .deps/update.Po
 
---- Action 97 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 97 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
       mv -f .deps/version.Tpo .deps/version.Po
 
---- Action 98 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 98 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
       mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
 
---- Action 99 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 99 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
       mv -f .deps/watch.Tpo .deps/watch.Po
 
---- Action 100 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 100 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
       mv -f .deps/wrapper.Tpo .deps/wrapper.Po
 
---- Action 101 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 101 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
       mv -f .deps/zlib.Tpo .deps/zlib.Po
 
---- Action 102 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src - <import>)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -517,27 +517,27 @@ Show all actions, with only default packages
         version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
---- Action 103 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 103 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f cvs2vendor
       cp cvs2vendor.sh cvs2vendor
       chmod +x cvs2vendor
 
---- Action 104 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 104 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f cvscheck
       cp cvscheck.sh cvscheck
       chmod +x cvscheck
 
---- Action 105 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 105 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f debug_check_log
       cp debug_check_log.sh debug_check_log
       chmod +x debug_check_log
 
---- Action 106 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 106 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f rcs-to-cvs
       cp rcs-to-cvs.sh rcs-to-cvs
       chmod +x rcs-to-cvs
 
---- Action 107 (/home/psmith/t/cvs-1.11.23/windows-NT - None)
+--- Action 107 (/home/psmith/t/cvs-1.11.23/windows-NT - <import>)
       failcom='exit 1'; \
       	for f in x $MAKEFLAGS; do \
       	  case $f in \
@@ -562,7 +562,7 @@ Show all actions, with only default packages
       	  emake  "$target-am" || exit 1; \
       	fi; test -z "$fail"
 
---- Action 108 (/home/psmith/t/cvs-1.11.23/vms - None)
+--- Action 108 (/home/psmith/t/cvs-1.11.23/vms - <import>)
       echo "/* This file is generated via a rule in Makefile.am from the" \
       	  >config.tmp
       echo " * config.h.in file." >>config.tmp
@@ -581,7 +581,7 @@ Show all actions, with only default packages
       rm -f config.tmp
       cp ./config.h stamp-ch
 
---- Action 109 (/home/psmith/t/cvs-1.11.23 - None)
+--- Action 109 (/home/psmith/t/cvs-1.11.23 - <import>)
       if test ! -f config.h; then \
       	  rm -f stamp-h1; \
       	  emake  stamp-h1; \
@@ -594,16 +594,16 @@ New package zlib added.
 Add actions 18-32 to the package
 
 Show all actions, with their packages
-- Action 1 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 1 (/home/psmith/t/cvs-1.11.23 - <import>)
     if test ! -f config.h; then \
     	  rm -f stamp-h1; \
     	  emake  stamp-h1; \
     	else :; fi
 
-- Action 2 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 2 (/home/psmith/t/cvs-1.11.23 - <import>)
     emake  all-recursive
 
--- Action 3 (/home/psmith/t/cvs-1.11.23 - None)
+-- Action 3 (/home/psmith/t/cvs-1.11.23 - <import>)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -629,72 +629,72 @@ Show all actions, with their packages
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Action 4 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 4 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
         -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
       mv -f .deps/argmatch.Tpo .deps/argmatch.Po
 
---- Action 5 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 5 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
         .deps/getdate.Tpo -c -o getdate.o getdate.c
       mv -f .deps/getdate.Tpo .deps/getdate.Po
 
---- Action 6 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 6 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
         .deps/getline.Tpo -c -o getline.o getline.c
       mv -f .deps/getline.Tpo .deps/getline.Po
 
---- Action 7 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 7 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
         .deps/getopt.Tpo -c -o getopt.o getopt.c
       mv -f .deps/getopt.Tpo .deps/getopt.Po
 
---- Action 8 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 8 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
         .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
       mv -f .deps/getopt1.Tpo .deps/getopt1.Po
 
---- Action 9 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 9 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
         .deps/getpass.Tpo -c -o getpass.o getpass.c
       mv -f .deps/getpass.Tpo .deps/getpass.Po
 
---- Action 10 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 10 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
         .deps/md5.Tpo -c -o md5.o md5.c
       mv -f .deps/md5.Tpo .deps/md5.Po
 
---- Action 11 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 11 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
         .deps/regex.Tpo -c -o regex.o regex.c
       mv -f .deps/regex.Tpo .deps/regex.Po
 
---- Action 12 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 12 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
         .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
       mv -f .deps/savecwd.Tpo .deps/savecwd.Po
 
---- Action 13 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 13 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
         -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
       mv -f .deps/sighandle.Tpo .deps/sighandle.Po
 
---- Action 14 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 14 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
         -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
       mv -f .deps/stripslash.Tpo .deps/stripslash.Po
 
---- Action 15 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 15 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
         .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
       mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
 
---- Action 16 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 16 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
         .deps/yesno.Tpo -c -o yesno.o yesno.c
       mv -f .deps/yesno.Tpo .deps/yesno.Po
 
---- Action 17 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 17 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       rm -f libcvs.a
       ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
         getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
@@ -749,358 +749,358 @@ Show all actions, with their packages
         inffast.o 
       (ranlib libz.a || true) >/dev/null 2>&1
 
---- Action 33 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 33 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
         .deps/diff.Tpo -c -o diff.o diff.c
       mv -f .deps/diff.Tpo .deps/diff.Po
 
---- Action 34 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 34 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
         .deps/diff3.Tpo -c -o diff3.o diff3.c
       mv -f .deps/diff3.Tpo .deps/diff3.Po
 
---- Action 35 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 35 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
         .deps/analyze.Tpo -c -o analyze.o analyze.c
       mv -f .deps/analyze.Tpo .deps/analyze.Po
 
---- Action 36 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 36 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
         .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
       mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
 
---- Action 37 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 37 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
         .deps/io.Tpo -c -o io.o io.c
       mv -f .deps/io.Tpo .deps/io.Po
 
---- Action 38 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 38 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
         .deps/context.Tpo -c -o context.o context.c
       mv -f .deps/context.Tpo .deps/context.Po
 
---- Action 39 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 39 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
         .deps/ed.Tpo -c -o ed.o ed.c
       mv -f .deps/ed.Tpo .deps/ed.Po
 
---- Action 40 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 40 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
         .deps/normal.Tpo -c -o normal.o normal.c
       mv -f .deps/normal.Tpo .deps/normal.Po
 
---- Action 41 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 41 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
         .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
       mv -f .deps/ifdef.Tpo .deps/ifdef.Po
 
---- Action 42 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 42 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
         .deps/util.Tpo -c -o util.o util.c
       mv -f .deps/util.Tpo .deps/util.Po
 
---- Action 43 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 43 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
         .deps/dir.Tpo -c -o dir.o dir.c
       mv -f .deps/dir.Tpo .deps/dir.Po
 
---- Action 44 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 44 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
         .deps/version.Tpo -c -o version.o version.c
       mv -f .deps/version.Tpo .deps/version.Po
 
---- Action 45 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 45 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
         .deps/side.Tpo -c -o side.o side.c
       mv -f .deps/side.Tpo .deps/side.Po
 
---- Action 46 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 46 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       rm -f libdiff.a
       ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
         normal.o ifdef.o util.o dir.o version.o side.o 
       ranlib libdiff.a
 
---- Action 47 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 47 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
       mv -f .deps/add.Tpo .deps/add.Po
 
---- Action 48 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 48 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
       mv -f .deps/admin.Tpo .deps/admin.Po
 
---- Action 49 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 49 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
       mv -f .deps/annotate.Tpo .deps/annotate.Po
 
---- Action 50 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 50 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
       mv -f .deps/buffer.Tpo .deps/buffer.Po
 
---- Action 51 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 51 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
       mv -f .deps/checkin.Tpo .deps/checkin.Po
 
---- Action 52 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 52 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
       mv -f .deps/checkout.Tpo .deps/checkout.Po
 
---- Action 53 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 53 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
       mv -f .deps/classify.Tpo .deps/classify.Po
 
---- Action 54 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 54 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
       mv -f .deps/client.Tpo .deps/client.Po
 
---- Action 55 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 55 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
       mv -f .deps/commit.Tpo .deps/commit.Po
 
---- Action 56 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 56 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
         create_adm.c
       mv -f .deps/create_adm.Tpo .deps/create_adm.Po
 
---- Action 57 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 57 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
       mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
 
---- Action 58 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 58 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
       mv -f .deps/diff.Tpo .deps/diff.Po
 
---- Action 59 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 59 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
       mv -f .deps/edit.Tpo .deps/edit.Po
 
---- Action 60 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 60 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
       mv -f .deps/entries.Tpo .deps/entries.Po
 
---- Action 61 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 61 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
       mv -f .deps/error.Tpo .deps/error.Po
 
---- Action 62 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 62 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
         expand_path.c
       mv -f .deps/expand_path.Tpo .deps/expand_path.Po
 
---- Action 63 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 63 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
       mv -f .deps/fileattr.Tpo .deps/fileattr.Po
 
---- Action 64 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 64 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
       mv -f .deps/filesubr.Tpo .deps/filesubr.Po
 
---- Action 65 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 65 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
         find_names.c
       mv -f .deps/find_names.Tpo .deps/find_names.Po
 
---- Action 66 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 66 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
       mv -f .deps/hardlink.Tpo .deps/hardlink.Po
 
---- Action 67 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 67 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
       mv -f .deps/hash.Tpo .deps/hash.Po
 
---- Action 68 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 68 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
       mv -f .deps/history.Tpo .deps/history.Po
 
---- Action 69 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 69 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
       mv -f .deps/ignore.Tpo .deps/ignore.Po
 
---- Action 70 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 70 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
       mv -f .deps/import.Tpo .deps/import.Po
 
---- Action 71 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 71 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
       mv -f .deps/lock.Tpo .deps/lock.Po
 
---- Action 72 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 72 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
       mv -f .deps/log.Tpo .deps/log.Po
 
---- Action 73 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 73 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
       mv -f .deps/login.Tpo .deps/login.Po
 
---- Action 74 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 74 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
       mv -f .deps/logmsg.Tpo .deps/logmsg.Po
 
---- Action 75 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 75 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
       mv -f .deps/main.Tpo .deps/main.Po
 
---- Action 76 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 76 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
         mkmodules.c
       mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
 
---- Action 77 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 77 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
       mv -f .deps/modules.Tpo .deps/modules.Po
 
---- Action 78 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 78 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
       mv -f .deps/myndbm.Tpo .deps/myndbm.Po
 
---- Action 79 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 79 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
       mv -f .deps/no_diff.Tpo .deps/no_diff.Po
 
---- Action 80 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 80 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
         parseinfo.c
       mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
 
---- Action 81 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 81 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
       mv -f .deps/patch.Tpo .deps/patch.Po
 
---- Action 82 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 82 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
       mv -f .deps/rcs.Tpo .deps/rcs.Po
 
---- Action 83 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 83 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
       mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
 
---- Action 84 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 84 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
       mv -f .deps/recurse.Tpo .deps/recurse.Po
 
---- Action 85 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 85 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
       mv -f .deps/release.Tpo .deps/release.Po
 
---- Action 86 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 86 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
       mv -f .deps/remove.Tpo .deps/remove.Po
 
---- Action 87 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 87 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
       mv -f .deps/repos.Tpo .deps/repos.Po
 
---- Action 88 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 88 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
       mv -f .deps/root.Tpo .deps/root.Po
 
---- Action 89 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 89 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
       mv -f .deps/run.Tpo .deps/run.Po
 
---- Action 90 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 90 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
       mv -f .deps/scramble.Tpo .deps/scramble.Po
 
---- Action 91 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 91 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
       mv -f .deps/server.Tpo .deps/server.Po
 
---- Action 92 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 92 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
       mv -f .deps/stack.Tpo .deps/stack.Po
 
---- Action 93 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 93 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
       mv -f .deps/status.Tpo .deps/status.Po
 
---- Action 94 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 94 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
       mv -f .deps/subr.Tpo .deps/subr.Po
 
---- Action 95 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 95 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
       mv -f .deps/tag.Tpo .deps/tag.Po
 
---- Action 96 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 96 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
       mv -f .deps/update.Tpo .deps/update.Po
 
---- Action 97 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 97 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
       mv -f .deps/version.Tpo .deps/version.Po
 
---- Action 98 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 98 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
       mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
 
---- Action 99 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 99 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
       mv -f .deps/watch.Tpo .deps/watch.Po
 
---- Action 100 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 100 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
       mv -f .deps/wrapper.Tpo .deps/wrapper.Po
 
---- Action 101 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 101 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
       mv -f .deps/zlib.Tpo .deps/zlib.Po
 
---- Action 102 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src - <import>)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -1112,27 +1112,27 @@ Show all actions, with their packages
         version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
---- Action 103 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 103 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f cvs2vendor
       cp cvs2vendor.sh cvs2vendor
       chmod +x cvs2vendor
 
---- Action 104 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 104 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f cvscheck
       cp cvscheck.sh cvscheck
       chmod +x cvscheck
 
---- Action 105 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 105 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f debug_check_log
       cp debug_check_log.sh debug_check_log
       chmod +x debug_check_log
 
---- Action 106 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 106 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f rcs-to-cvs
       cp rcs-to-cvs.sh rcs-to-cvs
       chmod +x rcs-to-cvs
 
---- Action 107 (/home/psmith/t/cvs-1.11.23/windows-NT - None)
+--- Action 107 (/home/psmith/t/cvs-1.11.23/windows-NT - <import>)
       failcom='exit 1'; \
       	for f in x $MAKEFLAGS; do \
       	  case $f in \
@@ -1157,7 +1157,7 @@ Show all actions, with their packages
       	  emake  "$target-am" || exit 1; \
       	fi; test -z "$fail"
 
---- Action 108 (/home/psmith/t/cvs-1.11.23/vms - None)
+--- Action 108 (/home/psmith/t/cvs-1.11.23/vms - <import>)
       echo "/* This file is generated via a rule in Makefile.am from the" \
       	  >config.tmp
       echo " * config.h.in file." >>config.tmp
@@ -1176,7 +1176,7 @@ Show all actions, with their packages
       rm -f config.tmp
       cp ./config.h stamp-ch
 
---- Action 109 (/home/psmith/t/cvs-1.11.23 - None)
+--- Action 109 (/home/psmith/t/cvs-1.11.23 - <import>)
       if test ! -f config.h; then \
       	  rm -f stamp-h1; \
       	  emake  stamp-h1; \
@@ -1184,10 +1184,10 @@ Show all actions, with their packages
 
 
 Show only those actions in the zlib package
-- Action 2 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 2 (/home/psmith/t/cvs-1.11.23 - <import>)
     emake  all-recursive
 
--- Action 3 (/home/psmith/t/cvs-1.11.23 - None)
+-- Action 3 (/home/psmith/t/cvs-1.11.23 - <import>)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -1263,16 +1263,16 @@ Show only those actions in the zlib package
 
 
 Show only those actions outside the zlib package
-- Action 1 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 1 (/home/psmith/t/cvs-1.11.23 - <import>)
     if test ! -f config.h; then \
     	  rm -f stamp-h1; \
     	  emake  stamp-h1; \
     	else :; fi
 
-- Action 2 (/home/psmith/t/cvs-1.11.23 - None)
+- Action 2 (/home/psmith/t/cvs-1.11.23 - <import>)
     emake  all-recursive
 
--- Action 3 (/home/psmith/t/cvs-1.11.23 - None)
+-- Action 3 (/home/psmith/t/cvs-1.11.23 - <import>)
      failcom='exit 1'; \
      	for f in x $MAKEFLAGS; do \
      	  case $f in \
@@ -1298,430 +1298,430 @@ Show only those actions outside the zlib package
      	  emake  "$target-am" || exit 1; \
      	fi; test -z "$fail"
 
---- Action 4 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 4 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT argmatch.o -MD -MP \
         -MF .deps/argmatch.Tpo -c -o argmatch.o argmatch.c
       mv -f .deps/argmatch.Tpo .deps/argmatch.Po
 
---- Action 5 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 5 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getdate.o -MD -MP -MF \
         .deps/getdate.Tpo -c -o getdate.o getdate.c
       mv -f .deps/getdate.Tpo .deps/getdate.Po
 
---- Action 6 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 6 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getline.o -MD -MP -MF \
         .deps/getline.Tpo -c -o getline.o getline.c
       mv -f .deps/getline.Tpo .deps/getline.Po
 
---- Action 7 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 7 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt.o -MD -MP -MF \
         .deps/getopt.Tpo -c -o getopt.o getopt.c
       mv -f .deps/getopt.Tpo .deps/getopt.Po
 
---- Action 8 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 8 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getopt1.o -MD -MP -MF \
         .deps/getopt1.Tpo -c -o getopt1.o getopt1.c
       mv -f .deps/getopt1.Tpo .deps/getopt1.Po
 
---- Action 9 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 9 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT getpass.o -MD -MP -MF \
         .deps/getpass.Tpo -c -o getpass.o getpass.c
       mv -f .deps/getpass.Tpo .deps/getpass.Po
 
---- Action 10 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 10 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT md5.o -MD -MP -MF \
         .deps/md5.Tpo -c -o md5.o md5.c
       mv -f .deps/md5.Tpo .deps/md5.Po
 
---- Action 11 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 11 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT regex.o -MD -MP -MF \
         .deps/regex.Tpo -c -o regex.o regex.c
       mv -f .deps/regex.Tpo .deps/regex.Po
 
---- Action 12 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 12 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT savecwd.o -MD -MP -MF \
         .deps/savecwd.Tpo -c -o savecwd.o savecwd.c
       mv -f .deps/savecwd.Tpo .deps/savecwd.Po
 
---- Action 13 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 13 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT sighandle.o -MD -MP \
         -MF .deps/sighandle.Tpo -c -o sighandle.o sighandle.c
       mv -f .deps/sighandle.Tpo .deps/sighandle.Po
 
---- Action 14 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 14 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT stripslash.o -MD -MP \
         -MF .deps/stripslash.Tpo -c -o stripslash.o stripslash.c
       mv -f .deps/stripslash.Tpo .deps/stripslash.Po
 
---- Action 15 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 15 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT xgetwd.o -MD -MP -MF \
         .deps/xgetwd.Tpo -c -o xgetwd.o xgetwd.c
       mv -f .deps/xgetwd.Tpo .deps/xgetwd.Po
 
---- Action 16 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 16 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../src     -g -O2 -MT yesno.o -MD -MP -MF \
         .deps/yesno.Tpo -c -o yesno.o yesno.c
       mv -f .deps/yesno.Tpo .deps/yesno.Po
 
---- Action 17 (/home/psmith/t/cvs-1.11.23/lib - None)
+--- Action 17 (/home/psmith/t/cvs-1.11.23/lib - <import>)
       rm -f libcvs.a
       ar cru libcvs.a argmatch.o getdate.o getline.o getopt.o getopt1.o \
         getpass.o md5.o regex.o savecwd.o sighandle.o stripslash.o xgetwd.o \
         yesno.o 
       ranlib libcvs.a
 
---- Action 33 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 33 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff.o -MD -MP -MF \
         .deps/diff.Tpo -c -o diff.o diff.c
       mv -f .deps/diff.Tpo .deps/diff.Po
 
---- Action 34 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 34 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT diff3.o -MD -MP -MF \
         .deps/diff3.Tpo -c -o diff3.o diff3.c
       mv -f .deps/diff3.Tpo .deps/diff3.Po
 
---- Action 35 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 35 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT analyze.o -MD -MP -MF \
         .deps/analyze.Tpo -c -o analyze.o analyze.c
       mv -f .deps/analyze.Tpo .deps/analyze.Po
 
---- Action 36 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 36 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT cmpbuf.o -MD -MP -MF \
         .deps/cmpbuf.Tpo -c -o cmpbuf.o cmpbuf.c
       mv -f .deps/cmpbuf.Tpo .deps/cmpbuf.Po
 
---- Action 37 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 37 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT io.o -MD -MP -MF \
         .deps/io.Tpo -c -o io.o io.c
       mv -f .deps/io.Tpo .deps/io.Po
 
---- Action 38 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 38 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT context.o -MD -MP -MF \
         .deps/context.Tpo -c -o context.o context.c
       mv -f .deps/context.Tpo .deps/context.Po
 
---- Action 39 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 39 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ed.o -MD -MP -MF \
         .deps/ed.Tpo -c -o ed.o ed.c
       mv -f .deps/ed.Tpo .deps/ed.Po
 
---- Action 40 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 40 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT normal.o -MD -MP -MF \
         .deps/normal.Tpo -c -o normal.o normal.c
       mv -f .deps/normal.Tpo .deps/normal.Po
 
---- Action 41 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 41 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT ifdef.o -MD -MP -MF \
         .deps/ifdef.Tpo -c -o ifdef.o ifdef.c
       mv -f .deps/ifdef.Tpo .deps/ifdef.Po
 
---- Action 42 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 42 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT util.o -MD -MP -MF \
         .deps/util.Tpo -c -o util.o util.c
       mv -f .deps/util.Tpo .deps/util.Po
 
---- Action 43 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 43 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT dir.o -MD -MP -MF \
         .deps/dir.Tpo -c -o dir.o dir.c
       mv -f .deps/dir.Tpo .deps/dir.Po
 
---- Action 44 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 44 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT version.o -MD -MP -MF \
         .deps/version.Tpo -c -o version.o version.c
       mv -f .deps/version.Tpo .deps/version.Po
 
---- Action 45 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 45 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib    -g -O2 -MT side.o -MD -MP -MF \
         .deps/side.Tpo -c -o side.o side.c
       mv -f .deps/side.Tpo .deps/side.Po
 
---- Action 46 (/home/psmith/t/cvs-1.11.23/diff - None)
+--- Action 46 (/home/psmith/t/cvs-1.11.23/diff - <import>)
       rm -f libdiff.a
       ar cru libdiff.a diff.o diff3.o analyze.o cmpbuf.o io.o context.o ed.o \
         normal.o ifdef.o util.o dir.o version.o side.o 
       ranlib libdiff.a
 
---- Action 47 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 47 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         add.o -MD -MP -MF .deps/add.Tpo -c -o add.o add.c
       mv -f .deps/add.Tpo .deps/add.Po
 
---- Action 48 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 48 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         admin.o -MD -MP -MF .deps/admin.Tpo -c -o admin.o admin.c
       mv -f .deps/admin.Tpo .deps/admin.Po
 
---- Action 49 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 49 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         annotate.o -MD -MP -MF .deps/annotate.Tpo -c -o annotate.o annotate.c
       mv -f .deps/annotate.Tpo .deps/annotate.Po
 
---- Action 50 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 50 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         buffer.o -MD -MP -MF .deps/buffer.Tpo -c -o buffer.o buffer.c
       mv -f .deps/buffer.Tpo .deps/buffer.Po
 
---- Action 51 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 51 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         checkin.o -MD -MP -MF .deps/checkin.Tpo -c -o checkin.o checkin.c
       mv -f .deps/checkin.Tpo .deps/checkin.Po
 
---- Action 52 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 52 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         checkout.o -MD -MP -MF .deps/checkout.Tpo -c -o checkout.o checkout.c
       mv -f .deps/checkout.Tpo .deps/checkout.Po
 
---- Action 53 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 53 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         classify.o -MD -MP -MF .deps/classify.Tpo -c -o classify.o classify.c
       mv -f .deps/classify.Tpo .deps/classify.Po
 
---- Action 54 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 54 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         client.o -MD -MP -MF .deps/client.Tpo -c -o client.o client.c
       mv -f .deps/client.Tpo .deps/client.Po
 
---- Action 55 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 55 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         commit.o -MD -MP -MF .deps/commit.Tpo -c -o commit.o commit.c
       mv -f .deps/commit.Tpo .deps/commit.Po
 
---- Action 56 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 56 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         create_adm.o -MD -MP -MF .deps/create_adm.Tpo -c -o create_adm.o \
         create_adm.c
       mv -f .deps/create_adm.Tpo .deps/create_adm.Po
 
---- Action 57 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 57 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         cvsrc.o -MD -MP -MF .deps/cvsrc.Tpo -c -o cvsrc.o cvsrc.c
       mv -f .deps/cvsrc.Tpo .deps/cvsrc.Po
 
---- Action 58 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 58 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         diff.o -MD -MP -MF .deps/diff.Tpo -c -o diff.o diff.c
       mv -f .deps/diff.Tpo .deps/diff.Po
 
---- Action 59 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 59 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         edit.o -MD -MP -MF .deps/edit.Tpo -c -o edit.o edit.c
       mv -f .deps/edit.Tpo .deps/edit.Po
 
---- Action 60 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 60 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         entries.o -MD -MP -MF .deps/entries.Tpo -c -o entries.o entries.c
       mv -f .deps/entries.Tpo .deps/entries.Po
 
---- Action 61 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 61 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         error.o -MD -MP -MF .deps/error.Tpo -c -o error.o error.c
       mv -f .deps/error.Tpo .deps/error.Po
 
---- Action 62 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 62 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         expand_path.o -MD -MP -MF .deps/expand_path.Tpo -c -o expand_path.o \
         expand_path.c
       mv -f .deps/expand_path.Tpo .deps/expand_path.Po
 
---- Action 63 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 63 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         fileattr.o -MD -MP -MF .deps/fileattr.Tpo -c -o fileattr.o fileattr.c
       mv -f .deps/fileattr.Tpo .deps/fileattr.Po
 
---- Action 64 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 64 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         filesubr.o -MD -MP -MF .deps/filesubr.Tpo -c -o filesubr.o filesubr.c
       mv -f .deps/filesubr.Tpo .deps/filesubr.Po
 
---- Action 65 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 65 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         find_names.o -MD -MP -MF .deps/find_names.Tpo -c -o find_names.o \
         find_names.c
       mv -f .deps/find_names.Tpo .deps/find_names.Po
 
---- Action 66 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 66 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         hardlink.o -MD -MP -MF .deps/hardlink.Tpo -c -o hardlink.o hardlink.c
       mv -f .deps/hardlink.Tpo .deps/hardlink.Po
 
---- Action 67 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 67 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         hash.o -MD -MP -MF .deps/hash.Tpo -c -o hash.o hash.c
       mv -f .deps/hash.Tpo .deps/hash.Po
 
---- Action 68 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 68 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         history.o -MD -MP -MF .deps/history.Tpo -c -o history.o history.c
       mv -f .deps/history.Tpo .deps/history.Po
 
---- Action 69 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 69 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         ignore.o -MD -MP -MF .deps/ignore.Tpo -c -o ignore.o ignore.c
       mv -f .deps/ignore.Tpo .deps/ignore.Po
 
---- Action 70 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 70 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         import.o -MD -MP -MF .deps/import.Tpo -c -o import.o import.c
       mv -f .deps/import.Tpo .deps/import.Po
 
---- Action 71 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 71 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         lock.o -MD -MP -MF .deps/lock.Tpo -c -o lock.o lock.c
       mv -f .deps/lock.Tpo .deps/lock.Po
 
---- Action 72 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 72 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         log.o -MD -MP -MF .deps/log.Tpo -c -o log.o log.c
       mv -f .deps/log.Tpo .deps/log.Po
 
---- Action 73 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 73 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         login.o -MD -MP -MF .deps/login.Tpo -c -o login.o login.c
       mv -f .deps/login.Tpo .deps/login.Po
 
---- Action 74 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 74 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         logmsg.o -MD -MP -MF .deps/logmsg.Tpo -c -o logmsg.o logmsg.c
       mv -f .deps/logmsg.Tpo .deps/logmsg.Po
 
---- Action 75 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 75 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
       mv -f .deps/main.Tpo .deps/main.Po
 
---- Action 76 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 76 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         mkmodules.o -MD -MP -MF .deps/mkmodules.Tpo -c -o mkmodules.o \
         mkmodules.c
       mv -f .deps/mkmodules.Tpo .deps/mkmodules.Po
 
---- Action 77 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 77 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         modules.o -MD -MP -MF .deps/modules.Tpo -c -o modules.o modules.c
       mv -f .deps/modules.Tpo .deps/modules.Po
 
---- Action 78 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 78 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         myndbm.o -MD -MP -MF .deps/myndbm.Tpo -c -o myndbm.o myndbm.c
       mv -f .deps/myndbm.Tpo .deps/myndbm.Po
 
---- Action 79 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 79 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         no_diff.o -MD -MP -MF .deps/no_diff.Tpo -c -o no_diff.o no_diff.c
       mv -f .deps/no_diff.Tpo .deps/no_diff.Po
 
---- Action 80 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 80 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         parseinfo.o -MD -MP -MF .deps/parseinfo.Tpo -c -o parseinfo.o \
         parseinfo.c
       mv -f .deps/parseinfo.Tpo .deps/parseinfo.Po
 
---- Action 81 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 81 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         patch.o -MD -MP -MF .deps/patch.Tpo -c -o patch.o patch.c
       mv -f .deps/patch.Tpo .deps/patch.Po
 
---- Action 82 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 82 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         rcs.o -MD -MP -MF .deps/rcs.Tpo -c -o rcs.o rcs.c
       mv -f .deps/rcs.Tpo .deps/rcs.Po
 
---- Action 83 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 83 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         rcscmds.o -MD -MP -MF .deps/rcscmds.Tpo -c -o rcscmds.o rcscmds.c
       mv -f .deps/rcscmds.Tpo .deps/rcscmds.Po
 
---- Action 84 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 84 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         recurse.o -MD -MP -MF .deps/recurse.Tpo -c -o recurse.o recurse.c
       mv -f .deps/recurse.Tpo .deps/recurse.Po
 
---- Action 85 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 85 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         release.o -MD -MP -MF .deps/release.Tpo -c -o release.o release.c
       mv -f .deps/release.Tpo .deps/release.Po
 
---- Action 86 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 86 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         remove.o -MD -MP -MF .deps/remove.Tpo -c -o remove.o remove.c
       mv -f .deps/remove.Tpo .deps/remove.Po
 
---- Action 87 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 87 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         repos.o -MD -MP -MF .deps/repos.Tpo -c -o repos.o repos.c
       mv -f .deps/repos.Tpo .deps/repos.Po
 
---- Action 88 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 88 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         root.o -MD -MP -MF .deps/root.Tpo -c -o root.o root.c
       mv -f .deps/root.Tpo .deps/root.Po
 
---- Action 89 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 89 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         run.o -MD -MP -MF .deps/run.Tpo -c -o run.o run.c
       mv -f .deps/run.Tpo .deps/run.Po
 
---- Action 90 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 90 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         scramble.o -MD -MP -MF .deps/scramble.Tpo -c -o scramble.o scramble.c
       mv -f .deps/scramble.Tpo .deps/scramble.Po
 
---- Action 91 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 91 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         server.o -MD -MP -MF .deps/server.Tpo -c -o server.o server.c
       mv -f .deps/server.Tpo .deps/server.Po
 
---- Action 92 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 92 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         stack.o -MD -MP -MF .deps/stack.Tpo -c -o stack.o stack.c
       mv -f .deps/stack.Tpo .deps/stack.Po
 
---- Action 93 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 93 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         status.o -MD -MP -MF .deps/status.Tpo -c -o status.o status.c
       mv -f .deps/status.Tpo .deps/status.Po
 
---- Action 94 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 94 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         subr.o -MD -MP -MF .deps/subr.Tpo -c -o subr.o subr.c
       mv -f .deps/subr.Tpo .deps/subr.Po
 
---- Action 95 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 95 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         tag.o -MD -MP -MF .deps/tag.Tpo -c -o tag.o tag.c
       mv -f .deps/tag.Tpo .deps/tag.Po
 
---- Action 96 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 96 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         update.o -MD -MP -MF .deps/update.Tpo -c -o update.o update.c
       mv -f .deps/update.Tpo .deps/update.Po
 
---- Action 97 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 97 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         version.o -MD -MP -MF .deps/version.Tpo -c -o version.o version.c
       mv -f .deps/version.Tpo .deps/version.Po
 
---- Action 98 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 98 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         vers_ts.o -MD -MP -MF .deps/vers_ts.Tpo -c -o vers_ts.o vers_ts.c
       mv -f .deps/vers_ts.Tpo .deps/vers_ts.Po
 
---- Action 99 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 99 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         watch.o -MD -MP -MF .deps/watch.Tpo -c -o watch.o watch.c
       mv -f .deps/watch.Tpo .deps/watch.Po
 
---- Action 100 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 100 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         wrapper.o -MD -MP -MF .deps/wrapper.Tpo -c -o wrapper.o wrapper.c
       mv -f .deps/wrapper.Tpo .deps/wrapper.Po
 
---- Action 101 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 101 (/home/psmith/t/cvs-1.11.23/src - <import>)
       gcc -DHAVE_CONFIG_H -I. -I.. -I../lib -I../diff -I../zlib     -g -O2 -MT \
         zlib.o -MD -MP -MF .deps/zlib.Tpo -c -o zlib.o zlib.c
       mv -f .deps/zlib.Tpo .deps/zlib.Po
 
---- Action 102 (/home/psmith/t/cvs-1.11.23/src - None)
+--- Action 102 (/home/psmith/t/cvs-1.11.23/src - <import>)
       rm -f cvs
       gcc  -g -O2   -o cvs add.o admin.o annotate.o buffer.o checkin.o \
         checkout.o classify.o client.o commit.o create_adm.o cvsrc.o diff.o \
@@ -1733,27 +1733,27 @@ Show only those actions outside the zlib package
         version.o vers_ts.o watch.o wrapper.o zlib.o ../diff/libdiff.a \
         ../lib/libcvs.a ../zlib/libz.a -lcrypt -lnsl 
 
---- Action 103 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 103 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f cvs2vendor
       cp cvs2vendor.sh cvs2vendor
       chmod +x cvs2vendor
 
---- Action 104 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 104 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f cvscheck
       cp cvscheck.sh cvscheck
       chmod +x cvscheck
 
---- Action 105 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 105 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f debug_check_log
       cp debug_check_log.sh debug_check_log
       chmod +x debug_check_log
 
---- Action 106 (/home/psmith/t/cvs-1.11.23/contrib - None)
+--- Action 106 (/home/psmith/t/cvs-1.11.23/contrib - <import>)
       rm -f rcs-to-cvs
       cp rcs-to-cvs.sh rcs-to-cvs
       chmod +x rcs-to-cvs
 
---- Action 107 (/home/psmith/t/cvs-1.11.23/windows-NT - None)
+--- Action 107 (/home/psmith/t/cvs-1.11.23/windows-NT - <import>)
       failcom='exit 1'; \
       	for f in x $MAKEFLAGS; do \
       	  case $f in \
@@ -1778,7 +1778,7 @@ Show only those actions outside the zlib package
       	  emake  "$target-am" || exit 1; \
       	fi; test -z "$fail"
 
---- Action 108 (/home/psmith/t/cvs-1.11.23/vms - None)
+--- Action 108 (/home/psmith/t/cvs-1.11.23/vms - <import>)
       echo "/* This file is generated via a rule in Makefile.am from the" \
       	  >config.tmp
       echo " * config.h.in file." >>config.tmp
@@ -1797,7 +1797,7 @@ Show only those actions outside the zlib package
       rm -f config.tmp
       cp ./config.h stamp-ch
 
---- Action 109 (/home/psmith/t/cvs-1.11.23 - None)
+--- Action 109 (/home/psmith/t/cvs-1.11.23 - <import>)
       if test ! -f config.h; then \
       	  rm -f stamp-h1; \
       	  emake  stamp-h1; \
@@ -1805,11 +1805,11 @@ Show only those actions outside the zlib package
 
 
 Try to delete the zlib package (should fail)
-Error: Package zlib can't be deleted while it still contains files or actions.
+Error: Package zlib can't be deleted. It may still contain files or actions.
        Use bml -h for more help.
 Status is 1
 
-Set the package of all files (under action 2) to be None
+Set the package of all files (under action 2) to be <import>
 
 Show only those actions in the zlib package (empty)
 

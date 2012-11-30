@@ -1,5 +1,5 @@
 Showing packages, before having defined any
-None
+<import>
 Remove a package that doesn't exist yet - should fail
 Error: Package pkg1 is not defined.
        Use bml -h for more help.
@@ -7,29 +7,29 @@ Status is 1
 Add a couple of new packages, then show the list again
 New package package2 added.
 New package my-pkg3 added.
+<import>
 my-pkg3
-None
 package2
 Try to add the same package name twice
 Error: Package my-pkg3 is already defined.
        Use bml -h for more help.
 Status is 1
+<import>
 my-pkg3
-None
 package2
 Delete a package, making sure it no longer exists
 Package my-pkg3 removed.
-None
+<import>
 package2
 Add a package name back, essentially reusing it
 New package my-pkg3 added.
+<import>
 my-pkg3
-None
 package2
 Try to delete the default package
-Error: Package None can't be deleted while it still contains files or actions.
+Error: Package <import> can't be deleted. It may still contain files or actions.
        Use bml -h for more help.
 Status is 1
+<import>
 my-pkg3
-None
 package2

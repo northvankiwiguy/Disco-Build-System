@@ -105,7 +105,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 			checkBoxes = new Button[IPackageMgr.SCOPE_MAX];
 			
 			/* we'll use the package's internal ID when accessing the package Set */
-			pkgId = pkgMgr.getPackageId(pkgName);
+			pkgId = pkgMgr.getId(pkgName);
 			
 			/* make sure this widget is stretched to the full width of the shell */
 			this.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));

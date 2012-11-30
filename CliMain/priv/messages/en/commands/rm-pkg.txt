@@ -5,7 +5,7 @@ For example:
     bml rm-pkg src_code
     
 will remove the "src_code" package, assuming it is no longer in use. It is
-not possible to remove the "None" package, even if it's empty.
+not possible to remove the "<import>" package, even if it's empty.
 
 The command arguments are:
 

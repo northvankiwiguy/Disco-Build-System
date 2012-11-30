@@ -193,7 +193,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				if (pkgInfo[0] == 0) {
 					return "";
 				}
-				String pkgName = pkgMgr.getPackageName(pkgInfo[0]);
+				String pkgName = pkgMgr.getName(pkgInfo[0]);
 				if (pkgName == null) {
 					break; /* return "invalid" */
 				}

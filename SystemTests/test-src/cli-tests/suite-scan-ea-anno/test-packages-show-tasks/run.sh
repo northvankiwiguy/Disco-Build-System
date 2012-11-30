@@ -36,8 +36,8 @@ echo Status is $?
 set -e
 
 echo
-echo "Set the package of all files (under action 2) to be None"
-bml set-action-pkg None 2/
+echo "Set the package of all files (under action 2) to be <import>"
+bml set-action-pkg "<import>" 2/
 
 echo
 echo "Show only those actions in the zlib package (empty)"

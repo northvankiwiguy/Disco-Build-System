@@ -69,6 +69,11 @@ public class TestPackageMgr {
 		assertNotSame(c1, c3);
 		assertNotSame(c2, c3);
 		
+		/* validate that these are packages (not folders) */
+		assertFalse(pkgMgr.isFolder(c1));
+		assertFalse(pkgMgr.isFolder(c2));
+		assertFalse(pkgMgr.isFolder(c3));
+		
 		/* add packages that have already been added */
 		int c4 = pkgMgr.addPackage("package1");
 		assertEquals(ErrorCode.ALREADY_USED, c4);
@@ -91,127 +96,198 @@ public class TestPackageMgr {
 		int c12 = pkgMgr.addPackage("1more");
 		assertEquals(ErrorCode.INVALID_NAME, c12);	
 		
-		/* try to add the None package, which exists by default */
-		int cNone = pkgMgr.addPackage("None");
-		assertEquals(ErrorCode.ALREADY_USED, cNone);
+		/* try to add the <import> package, which exists by default */
+		int cImport = pkgMgr.addPackage("<import>");
+		assertEquals(ErrorCode.ALREADY_USED, cImport);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.IPackageMgr#getPackageName(int)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#addFolder(java.lang.String)}.
 	 */
 	@Test
-	public void testGetPackageName() {
+	public void testAddFolder() {
+	
+		/* We can't re-add the root folder */
+		assertEquals(ErrorCode.ALREADY_USED, pkgMgr.addFolder("Root"));
 		
-		/* add package names, then make sure their names are correct */
+		/* We can't add a folder with the name "<import>" (pre-defined) */
+		assertEquals(ErrorCode.ALREADY_USED, pkgMgr.addFolder("<import>"));
+		
+		/* can't add a folder with the same name as an existing package. */
+		pkgMgr.addPackage("MyPackage");
+		assertEquals(ErrorCode.ALREADY_USED, pkgMgr.addFolder("MyPackage"));
+		
+		/* Successfully add several folders, making sure they get unique IDs */
+		int folderA = pkgMgr.addFolder("FolderA");
+		int folderB = pkgMgr.addFolder("FolderB");
+		int folderC = pkgMgr.addFolder("FolderC");
+		assertTrue(folderA > 0);
+		assertTrue(folderB > 0);
+		assertTrue(folderC > 0);
+		assertNotSame(folderA, folderB);
+		assertNotSame(folderB, folderC);
+		assertNotSame(folderA, folderC);
+		
+		/* validate that these are folders (not packages) */
+		assertTrue(pkgMgr.isFolder(folderA));
+		assertTrue(pkgMgr.isFolder(folderB));
+		assertTrue(pkgMgr.isFolder(folderC));
+		
+		/* We can't add the same folder twice */
+		assertEquals(ErrorCode.ALREADY_USED, pkgMgr.addFolder("FolderB"));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.buildml.model.IPackageMgr#getName(int)} and
+	 * {@link com.buildml.model.IPackageMgr#setName(int, String)}.
+	 */
+	@Test
+	public void testGetSetName() {
+		
+		/* add package/folder names, then make sure their names are correct */
 		int c1 = pkgMgr.addPackage("PkgA");
-		assertEquals("PkgA", pkgMgr.getPackageName(c1));
+		assertEquals("PkgA", pkgMgr.getName(c1));
 		int c2 = pkgMgr.addPackage("my-other-package");
-		assertEquals("my-other-package", pkgMgr.getPackageName(c2));
+		assertEquals("my-other-package", pkgMgr.getName(c2));
 		int c3 = pkgMgr.addPackage("and_a_3rd");
-		assertEquals("and_a_3rd", pkgMgr.getPackageName(c3));
-				
-		/* try to fetch names for invalid package IDs */
-		assertEquals(null, pkgMgr.getPackageName(1000));		
-		assertEquals(null, pkgMgr.getPackageName(-1));
+		assertEquals("and_a_3rd", pkgMgr.getName(c3));
+		int f1 = pkgMgr.addFolder("MyFolder");
+		assertEquals("MyFolder", pkgMgr.getName(f1));
 		
-		/* test for the default "None" package */
-		assertEquals("None", pkgMgr.getPackageName(0));
+		/* try to fetch names for invalid package IDs */
+		assertEquals(null, pkgMgr.getName(1000));		
+		assertEquals(null, pkgMgr.getName(-1));
+		
+		/* test for the default "<import>" package */
+		assertEquals("<import>", pkgMgr.getName(pkgMgr.getImportPackage()));
+		
+		/* now change some names are check them again */
+		assertEquals(ErrorCode.OK, pkgMgr.setName(c1, "my_new_package_name"));	
+		assertEquals("my_new_package_name", pkgMgr.getName(c1));
+		assertEquals(ErrorCode.OK, pkgMgr.setName(f1, "RevisedFolderName"));	
+		assertEquals("RevisedFolderName", pkgMgr.getName(f1));
+		
+		/* try with names that are already in use */
+		assertEquals(ErrorCode.ALREADY_USED, pkgMgr.setName(c1, "and_a_3rd"));
+		
+		/* try with invalid names */
+		assertEquals(ErrorCode.INVALID_NAME, pkgMgr.setName(c1, "+"));
+		assertEquals(ErrorCode.INVALID_NAME, pkgMgr.setName(c1, "f"));
+		assertEquals(ErrorCode.INVALID_NAME, pkgMgr.setName(c1, "long name with spaces"));
+		
+		/* try to set the name of an invalid ID */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.setName(1234, "valid_name"));
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.IPackageMgr#getPackageId(String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#getId(String)}.
 	 */
 	@Test
-	public void testGetPackageId() {
+	public void testGetId() {
 		
-		/* get the ID for the "None" package */
-		assertEquals(0, pkgMgr.getPackageId("None"));
+		/* get the ID for the "<import>" package */
+		assertEquals(pkgMgr.getImportPackage(), pkgMgr.getId("<import>"));
 
 		/* fetch package names that haven't been added - should be NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getPackageId("foo"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getPackageId("my_package"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getId("foo"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getId("my_package"));
 		
 		/* add package names, then make sure their IDs are correct */
 		int c1 = pkgMgr.addPackage("my_pkg_A");
 		int c2 = pkgMgr.addPackage("ourpackage");
-		int c3 = pkgMgr.addPackage("another-package");
-		assertEquals(c1, pkgMgr.getPackageId("my_pkg_A"));
-		assertEquals(c3, pkgMgr.getPackageId("another-package"));
-		assertEquals(c2, pkgMgr.getPackageId("ourpackage"));
+		int f1 = pkgMgr.addFolder("MyFolder");
+		assertEquals(c1, pkgMgr.getId("my_pkg_A"));
+		assertEquals(f1, pkgMgr.getId("MyFolder"));
+		assertEquals(c2, pkgMgr.getId("ourpackage"));
 		
 		/* add duplicate names, and make sure the old ID is returned */
 		int c4 = pkgMgr.addPackage("ourpackage");
 		assertEquals(ErrorCode.ALREADY_USED, c4);
-		int c5 = pkgMgr.addPackage("another-package");
+		int c5 = pkgMgr.addPackage("MyFolder");
 		assertEquals(ErrorCode.ALREADY_USED, c5);
-		assertEquals(c3, pkgMgr.getPackageId("another-package"));
-		assertEquals(c2, pkgMgr.getPackageId("ourpackage"));
+		assertEquals(f1, pkgMgr.getId("MyFolder"));
+		assertEquals(c2, pkgMgr.getId("ourpackage"));
 				
 		/* Names that haven't been added will return NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getPackageId("invalid"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getPackageId("missing"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getId("invalid"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getId("missing"));
 		
 		/* try to fetch IDs for invalid package names - returns NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getPackageId("miss*ing"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getPackageId("invalid name"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getId("miss*ing"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getId("invalid name"));		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.IPackageMgr#removePackage(java.lang.String)}.
+	 * Test method for {@link com.buildml.model.IPackageMgr#remove(int)}.
 	 */
 	@Test
-	public void testRemovePackage() {
+	public void testRemove() {
 		
 		IFileMgr fileMgr = bs.getFileMgr();
 		IActionMgr actionMgr = bs.getActionMgr();
 		
-		/* try to remove package names that haven't been added */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.removePackage("PkgA"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.removePackage("my_package"));
+		/* try to remove package ID that haven't been added */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.remove(1234));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.remove(5678));
 		
-		/* try to remove the "None" package - should fail */
-		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("None"));
+		/* try to remove the root folder or import package - should fail */
+		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgMgr.getRootFolder()));
+		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgMgr.getImportPackage()));
 
 		/* add package names, then remove them */
-		assertTrue(pkgMgr.addPackage("PkgA") > 0);
-		assertTrue(pkgMgr.addPackage("my_package") > 0);	
-		assertEquals(ErrorCode.OK, pkgMgr.removePackage("PkgA"));
-		assertEquals(ErrorCode.OK, pkgMgr.removePackage("my_package"));
+		int pkgAId = pkgMgr.addPackage("PkgA"); 
+		int myPackageId = pkgMgr.addPackage("my_package");
+		assertTrue(pkgAId > 0);
+		assertTrue(myPackageId > 0);	
+		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgAId));
+		assertEquals(ErrorCode.OK, pkgMgr.remove(myPackageId));
 		
 		/* try to remove the same names again - should fail */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.removePackage("PkgA"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.removePackage("my_package"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.remove(pkgAId));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.remove(myPackageId));
 		
 		/* add the same package names again - should work */
 		assertTrue(pkgMgr.addPackage("PkgA") > 0);
 		assertTrue(pkgMgr.addPackage("my_package") > 0);	
 		
 		/* assign a package to files, then try to remove the name */
-		int pkgA = pkgMgr.getPackageId("PkgA");
+		int pkgA = pkgMgr.getId("PkgA");
 		int file1 = fileMgr.addFile("/aardvark/bunny");
 		pkgMgr.setFilePackage(file1, pkgA, IPackageMgr.SCOPE_PRIVATE);
-		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("PkgA"));
+		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgA));
 		
 		/* remove the package from the file, then try again to remove the package name */
-		int pkgNone = pkgMgr.getPackageId("None");
-		pkgMgr.setFilePackage(file1, pkgNone, IPackageMgr.SCOPE_PRIVATE);
-		assertEquals(ErrorCode.OK, pkgMgr.removePackage("PkgA"));
+		int pkgImport = pkgMgr.getId("<import>");
+		pkgMgr.setFilePackage(file1, pkgImport, IPackageMgr.SCOPE_PRIVATE);
+		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
 		
 		/* assign them to actions, then try to remove the name */
-		int my_pkg = pkgMgr.getPackageId("my_package");
+		int my_pkg = pkgMgr.getId("my_package");
 		int action1 = actionMgr.addAction(0, 0, "action1");
 		pkgMgr.setActionPackage(action1, my_pkg);
-		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.removePackage("my_package"));
+		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(my_pkg));
 		
 		/* remove them from actions, then try again to remove the package name */
-		pkgMgr.setActionPackage(action1, pkgNone);
-		assertEquals(ErrorCode.OK, pkgMgr.removePackage("my_package"));		
+		pkgMgr.setActionPackage(action1, pkgImport);
+		assertEquals(ErrorCode.OK, pkgMgr.remove(my_pkg));
+		
+		/* test removal of an empty folder */
+		int f1 = pkgMgr.addFolder("MyEmptyFolder");
+		assertEquals(ErrorCode.OK, pkgMgr.remove(f1));
+		
+		/* test removal of a folder that contains packages */
+		int f2 = pkgMgr.addFolder("MyNonEmptyFolder");
+		int f2p1 = pkgMgr.addPackage("child_package");
+		assertEquals(ErrorCode.OK, pkgMgr.setParent(f2p1, f2));
+		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(f2));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -224,37 +300,117 @@ public class TestPackageMgr {
 		
 		/* fetch the list of packages, before adding any. */
 		String results[] = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"None"}, results);
+		assertArrayEquals(new String[] {"<import>"}, results);
 		
 		/* add some packages, then check the list */
 		pkgMgr.addPackage("my_pkg1");
 		pkgMgr.addPackage("my_pkg2");
+		pkgMgr.addFolder("ignored");
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"my_pkg1", "my_pkg2", "None"}, results);		
+		assertArrayEquals(new String[] {"<import>", "my_pkg1", "my_pkg2"}, results);		
 		
 		/* add some more, then check again */
-		pkgMgr.addPackage("Linux");
-		pkgMgr.addPackage("freeBSD");
+		int linuxId = pkgMgr.addPackage("Linux");
+		int freebsdId = pkgMgr.addPackage("freeBSD");
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"freeBSD", "Linux", "my_pkg1", 
-				"my_pkg2", "None"}, results);		
+		assertArrayEquals(new String[] {"<import>", "freeBSD", "Linux", "my_pkg1", 
+				"my_pkg2"}, results);		
 		
 		/* remove some packages, then check the list again */
-		pkgMgr.removePackage("Linux");
-		pkgMgr.removePackage("my_pkg2");
+		pkgMgr.remove(linuxId);
+		pkgMgr.remove(freebsdId);
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"freeBSD", "my_pkg1", "None"}, results);		
+		assertArrayEquals(new String[] {"<import>", "my_pkg1", "my_pkg2" }, results);		
 		
 		/* add some names back, and re-check the list */
 		pkgMgr.addPackage("Linux");
 		pkgMgr.addPackage("MacOS");
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"freeBSD", "Linux", "MacOS", "my_pkg1", 
-				"None"}, results);
+		assertArrayEquals(new String[] {"<import>", "Linux", "MacOS", "my_pkg1", "my_pkg2"}, 
+				results);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.buildml.model.IPackageMgr#getParent(int)} and
+	 * {@link com.buildml.model.IPackageMgr#setParent(int, int)}
+	 */
+	@Test
+	public void testGetSetParent() {
+		
+		/* add some packages are folders - add them in non-alphabetical order */
+		int fRoot = pkgMgr.getRootFolder();
+		int pImport = pkgMgr.getImportPackage();
+		int p1 = pkgMgr.addPackage("Package_1");
+		int p3 = pkgMgr.addPackage("Package_3");
+		int p2 = pkgMgr.addPackage("Package_2");
+		int f1 = pkgMgr.addFolder("Folder_1");
+		int f3 = pkgMgr.addFolder("Folder_3");
+		int f2 = pkgMgr.addFolder("Folder_2");
 	
+		/* first, check that invalid IDs are captured */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getParent(1234));
+		
+		/* test that newly added packages are folders are parented under "Root" */
+		assertEquals(fRoot, pkgMgr.getParent(p1));
+		assertEquals(fRoot, pkgMgr.getParent(p2));
+		assertEquals(fRoot, pkgMgr.getParent(p3));
+		assertEquals(fRoot, pkgMgr.getParent(f1));
+		assertEquals(fRoot, pkgMgr.getParent(f2));
+		assertEquals(fRoot, pkgMgr.getParent(f3));
+		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, p1, p2, p3 },
+						  pkgMgr.getFolderChildren(fRoot));
+		assertEquals(0, pkgMgr.getFolderChildren(f1).length);
+		assertEquals(0, pkgMgr.getFolderChildren(f2).length);
+		assertEquals(0, pkgMgr.getFolderChildren(f3).length);
+
+		/* Try to move a package underneath a package (not a folder) */
+		assertEquals(ErrorCode.NOT_A_DIRECTORY, pkgMgr.setParent(p1, p2));
+		
+		/* Try to move a package underneath an invalid ID */
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.setParent(p1, 1234));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.setParent(1234, f1));
+
+		/* Move package p1 underneath sub-folder f1 and verify structure */
+		assertEquals(ErrorCode.OK, pkgMgr.setParent(p1, f1));
+		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, p2, p3 },
+				  pkgMgr.getFolderChildren(fRoot));
+		assertArrayEquals(new Integer[] { p1 },
+				  pkgMgr.getFolderChildren(f1));
+		
+		/* Move the package to another sub-folder, then re-verify */
+		assertEquals(ErrorCode.OK, pkgMgr.setParent(p1, f2));
+		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, p2, p3 },
+				  pkgMgr.getFolderChildren(fRoot));
+		assertArrayEquals(new Integer[] { },
+				  pkgMgr.getFolderChildren(f1));
+		assertArrayEquals(new Integer[] { p1 },
+				  pkgMgr.getFolderChildren(f2));
+		
+		/* Move a folder underneath a sub-folder and verify structure */
+		assertEquals(ErrorCode.OK, pkgMgr.setParent(f3, f2));
+		assertArrayEquals(new Integer[] { f1, f2, pImport, p2, p3 },
+				  pkgMgr.getFolderChildren(fRoot));
+		assertArrayEquals(new Integer[] { f3, p1 },
+				  pkgMgr.getFolderChildren(f2));
+		
+		/* Try to move the <import> package to a sub-folder - fails */
+		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(pImport, f2));
+		
+		/* Try to move the root folder - fails */
+		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(fRoot, f2));
+
+		/* 
+		 * Try to create a cycle in the folder tree (f2 is currently the
+		 * parent of f3, so setting f2's parent to be f3 is invalid since
+		 * it would create a cycle).
+		 */
+		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(f2, f3));		
+	}
+		
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Test method for {@link com.buildml.model.IPackageMgr#getScopeName(int)}.
 	 */
@@ -365,17 +521,17 @@ public class TestPackageMgr {
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
 		int pkgB = pkgMgr.addPackage("PkgB");
-		int pkgNone = pkgMgr.getPackageId("None");
+		int pkgImport = pkgMgr.getImportPackage();
 
-		/* by default, all files are in None/None */
+		/* by default, all files are in <import>/None */
 		Integer results[] = pkgMgr.getFilePackage(path1);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path2);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path3);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 
 		/* set one of the files into PkgA/public */
@@ -384,10 +540,10 @@ public class TestPackageMgr {
 		assertEquals(pkgA, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 		results = pkgMgr.getFilePackage(path2);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path3);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		
 		/* set another file to another package */
@@ -396,16 +552,16 @@ public class TestPackageMgr {
 		assertEquals(pkgA, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 		results = pkgMgr.getFilePackage(path2);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		results = pkgMgr.getFilePackage(path3);
 		assertEquals(pkgB, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
 		
-		/* set a file's package back to None/None */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgNone, IPackageMgr.SCOPE_NONE));
+		/* set a file's package back to <import>/None */
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgImport, IPackageMgr.SCOPE_NONE));
 		results = pkgMgr.getFilePackage(path1);
-		assertEquals(pkgNone, results[0].intValue());
+		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		
 		/* try to set a non-existent file */
@@ -429,7 +585,7 @@ public class TestPackageMgr {
 		
 		/* define a new package, which we'll add files to */
 		int pkgA = pkgMgr.addPackage("PkgA");
-		int pkgNone = pkgMgr.addPackage("None");
+		int pkgImport = pkgMgr.getImportPackage();
 		
 		/* what are the sections? */
 		int sectPub = pkgMgr.getScopeId("public");
@@ -509,8 +665,8 @@ public class TestPackageMgr {
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file3}));
 		
-		/* move file1 back into None */
-		pkgMgr.setFilePackage(file1, pkgNone, sectPriv);
+		/* move file1 back into <import> */
+		pkgMgr.setFilePackage(file1, pkgImport, sectPriv);
 		results = pkgMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file2, file3}));
 		results = pkgMgr.getFilesInPackage(pkgA, sectPub);
@@ -622,30 +778,30 @@ public class TestPackageMgr {
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
 		int pkgB = pkgMgr.addPackage("PkgB");
-		int pkgNone = pkgMgr.getPackageId("None");
+		int pkgImport = pkgMgr.getImportPackage();
 		
-		/* by default, all actions are in "None" */
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action1));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
+		/* by default, all actions are in "<import>" */
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action1));
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action2));
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
 		
 		/* add an action to PkgA and check the actions */
 		pkgMgr.setActionPackage(action1, pkgA);
 		assertEquals(pkgA, pkgMgr.getActionPackage(action1));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action2));
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
 		
 		/* add a different action to PkgB and check the actions */
 		pkgMgr.setActionPackage(action2, pkgB);
 		assertEquals(pkgA, pkgMgr.getActionPackage(action1));
 		assertEquals(pkgB, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
 		
-		/* revert one of the actions back to None, and check the actions */
-		pkgMgr.setActionPackage(action1, pkgNone);
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action1));
+		/* revert one of the actions back to <import>, and check the actions */
+		pkgMgr.setActionPackage(action1, pkgImport);
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action1));
 		assertEquals(pkgB, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgNone, pkgMgr.getActionPackage(action3));
+		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
 		
 		/* check an invalid action - should return ErrorCode.NOT_FOUND */
 		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getActionPackage(1000));		

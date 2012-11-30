@@ -315,7 +315,7 @@ public class CliUtils {
 		}
 
 		/* compute the IDs */
-		int pkgId = pkgMgr.getPackageId(pkgName);
+		int pkgId = pkgMgr.getId(pkgName);
 		int scopeId = pkgMgr.getScopeId(scopeName);
 		
 		if (pkgId == ErrorCode.NOT_FOUND) {
@@ -524,7 +524,7 @@ public class CliUtils {
 				int pkgId = pkgAndScopeId[0];
 				int scopeId = pkgAndScopeId[1];
 
-				String pkgName = pkgMgr.getPackageName(pkgId);
+				String pkgName = pkgMgr.getName(pkgId);
 				String scopeName = pkgMgr.getScopeName(scopeId);
 			
 				/* if we can't fetch the text name of the package or scope... */
@@ -683,7 +683,7 @@ public class CliUtils {
 			if (pkgId == ErrorCode.NOT_FOUND) {
 				outStream.print(" - Invalid action");
 			} else {
-				String pkgName = pkgMgr.getPackageName(pkgId);
+				String pkgName = pkgMgr.getName(pkgId);
 				if (pkgName == null) {
 					outStream.print(" - Invalid package");
 				} else {

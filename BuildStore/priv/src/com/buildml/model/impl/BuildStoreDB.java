@@ -286,8 +286,10 @@ import com.buildml.utils.version.Version;
 			stat.executeUpdate("create unique index fileAttrsIdx2 on fileAttrs (pathId, attrId)");
 			
 			/* Create the packages table */
-			stat.executeUpdate("create table packages (id integer primary key, name text)");
-			stat.executeUpdate("insert into packages values (0, 'None')");
+			stat.executeUpdate("create table packages (id integer primary key, isFolder integer, " +
+							   "parent integer, name text)");
+			stat.executeUpdate("insert into packages values (0, 0, 1, '<import>')");
+			stat.executeUpdate("insert into packages values (1, 1, 1, 'Root')");
 			
 			stat.close();
 						
