@@ -403,16 +403,15 @@ import com.buildml.utils.errors.ErrorCode;
 			 */
 			int ancestor = parentId;
 			while (true) {
-				int nextAncestor = getParent(ancestor);
-				
+				/* a cycle has been detected */
+				if (ancestor == folderOrPackageId) {
+					return ErrorCode.BAD_PATH;
+				}
+								
 				/* did we reach the root, without a cycle? */
+				int nextAncestor = getParent(ancestor);
 				if (nextAncestor == ancestor) {
 					break;
-				}
-				
-				/* a cycle has been detected */
-				if (nextAncestor == folderOrPackageId) {
-					return ErrorCode.BAD_PATH;
 				}
 				ancestor = nextAncestor;
 			}

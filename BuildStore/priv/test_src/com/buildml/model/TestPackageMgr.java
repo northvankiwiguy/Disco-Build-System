@@ -406,7 +406,10 @@ public class TestPackageMgr {
 		 * parent of f3, so setting f2's parent to be f3 is invalid since
 		 * it would create a cycle).
 		 */
-		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(f2, f3));		
+		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(f2, f3));
+		
+		/* try to move a folder into itself */
+		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(f2, f2));
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
