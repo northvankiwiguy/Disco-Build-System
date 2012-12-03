@@ -70,4 +70,27 @@ public class UIInteger {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof UIInteger)) {
+			return false;
+		}
+		return ((UIInteger)obj).getId() == id;	
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return id;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
