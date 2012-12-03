@@ -18,6 +18,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Image;
@@ -39,13 +42,17 @@ import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.outline.OutlinePage;
+import com.buildml.eclipse.outline.UIPackage;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMgr;
 import com.buildml.refactor.IImportRefactorer;
 import com.buildml.refactor.imports.ImportRefactorer;
 
@@ -55,7 +62,8 @@ import com.buildml.refactor.imports.ImportRefactorer;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class MainEditor extends MultiPageEditorPart implements IResourceChangeListener {
+public class MainEditor extends MultiPageEditorPart 
+	implements IResourceChangeListener, ISelectionChangedListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -90,6 +98,9 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	
 	/** Counts the number of times the underlying BuildStore model has changed */
 	private long modelChangeCounter = 0;
+	
+	/** This editor's associated outline page content */
+	private OutlinePage outlinePage = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -254,13 +265,15 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 		
 		/* trigger the pageChange() method on the sub-editor, so it can update the UI */
 		SubEditor subEditor = (SubEditor)getActiveEditor();
-		subEditor.pageChange();
+		if (subEditor != null) {
+			subEditor.pageChange();
 		
-		/* remember the previous actively page, so it's easier to return to */
-		int activatingPageIndex = getActivePage();
-		if (currentPageIndex != activatingPageIndex) {
-			previousPageIndex = currentPageIndex;
-			currentPageIndex = activatingPageIndex;
+			/* remember the previous actively page, so it's easier to return to */
+			int activatingPageIndex = getActivePage();
+			if (currentPageIndex != activatingPageIndex) {
+				previousPageIndex = currentPageIndex;
+				currentPageIndex = activatingPageIndex;
+			}
 		}
 	}
 
@@ -549,6 +562,25 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Returns various objects that are associated with this BuildML editor.
+	 */
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+		
+		/* Provides the content of the Outline view */
+		if (adapter.equals(IContentOutlinePage.class)) {
+			if (outlinePage == null) {
+				outlinePage = new OutlinePage(this);
+				outlinePage.addSelectionChangedListener(this);
+			}
+			return outlinePage;
+		}
+		
+		return super.getAdapter(adapter);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * This method is called whenever a resource in our project is modified. We only
 	 * care about this if somebody has deleted or renamed the file that we're editing. 
 	 * Otherwise this event is ignored.
@@ -644,6 +676,29 @@ public class MainEditor extends MultiPageEditorPart implements IResourceChangeLi
 			}
 		}
 		dialog.close();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * This method is called when the user clicks on a package (or package folder) in the 
+	 * outline view. This causes the editor to switch to the appropriate package diagram tab.
+	 */
+	@Override
+	public void selectionChanged(SelectionChangedEvent event) {
+		
+		IStructuredSelection selection = (IStructuredSelection)event.getSelection();
+		Object node = selection.getFirstElement();
+		
+		/* is the selection a "package" (as opposed to a folder, or anything else) */
+		if (node instanceof UIPackage) {
+			int pkgId = ((UIPackage)node).getId();
+			IPackageMgr pkgMgr = buildStore.getPackageMgr();
+			String pkgName = pkgMgr.getName(pkgId);
+			
+			// TODO: implement switching of editor tabs.
+			System.out.println("Selection changed to " + pkgName);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

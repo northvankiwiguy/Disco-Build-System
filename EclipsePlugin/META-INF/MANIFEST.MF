@@ -16,5 +16,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: buildml.jar,
  .
-Import-Package: org.eclipse.core.filesystem
+Import-Package: org.eclipse.core.filesystem,
+ org.eclipse.ui.views.contentoutline
 Bundle-Vendor: Arapiki Solutions Inc.
