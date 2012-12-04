@@ -58,7 +58,7 @@ import com.buildml.model.IPackageMgr;
 		/* pre-obtain images for packages and package folders */
 		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
 		folderImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
-		packageImage = EclipsePartUtils.getImage("images/small_packages_icon.gif");
+		packageImage = EclipsePartUtils.getImage("images/package_icon.gif");
 	}
 
 	/*=====================================================================================*

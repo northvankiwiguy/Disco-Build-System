@@ -167,6 +167,26 @@
             id="com.buildml.eclipse.commands.makeActionAtomic"
             name="Make Action Atomic">
       </command>
+      <command
+            defaultHandler="com.buildml.eclipse.outline.handlers.HandlerAddOutlineContent"
+            id="com.buildml.eclipse.commands.addOutlineContent"
+            name="Add Outline Content">
+         <commandParameter
+               id="com.buildml.eclipse.commandParameters.outlineContent"
+               name="operation"
+               optional="true">
+         </commandParameter>
+      </command>
+      <command
+            defaultHandler="com.buildml.eclipse.outline.handlers.HandlerRemoveOutlineContent"
+            id="com.buildml.eclipse.commands.removeOutlineContent"
+            name="Remove Outline Content">
+      </command>
+      <command
+            defaultHandler="com.buildml.eclipse.outline.handlers.HandlerRenameOutlineContent"
+            id="com.buildml.eclipse.commands.renameOutlineContent"
+            name="Rename Outline Content">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -727,6 +747,88 @@
                   name="com.buildml.eclipse.commandParameters.newEditorTab"
                   value="mostPopularFiles">
             </parameter>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.views.ContentOutline?after=additions">
+         <command
+               commandId="com.buildml.eclipse.commands.addOutlineContent"
+               icon="images/add_folder_icon.gif"
+               label="New Package Folder"
+               style="push"
+               tooltip="Add BuildML Package Folder">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditorId">
+                  <equals
+                        value="com.buildml.eclipse.editors.main">
+                  </equals>
+               </with>
+            </visibleWhen>
+            <parameter
+                  name="com.buildml.eclipse.commandParameters.outlineContent"
+                  value="newPackageFolder">
+            </parameter>
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.addOutlineContent"
+               icon="images/add_package_icon.gif"
+               label="New Package"
+               style="push"
+               tooltip="Add BuildML Package">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditorId">
+                  <equals
+                        value="com.buildml.eclipse.editors.main">
+                  </equals>
+               </with>
+            </visibleWhen>
+            <parameter
+                  name="com.buildml.eclipse.commandParameters.outlineContent"
+                  value="newPackage">
+            </parameter>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.views.ContentOutline?after=buildmladditions">
+         <command
+               commandId="com.buildml.eclipse.commands.addOutlineContent"
+               icon="images/add_package_icon.gif"
+               label="New Package"
+               style="push"
+               tooltip="Add BuildML Package">
+            <parameter
+                  name="com.buildml.eclipse.commandParameters.outlineContent"
+                  value="newPackage">
+            </parameter>
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.addOutlineContent"
+               icon="images/add_folder_icon.gif"
+               label="New Package Folder"
+               style="push"
+               tooltip="Add BuildML Package Folder">
+            <parameter
+                  name="com.buildml.eclipse.commandParameters.outlineContent"
+                  value="newPackageFolder">
+            </parameter>
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.renameOutlineContent"
+               label="Rename"
+               style="push"
+               tooltip="Rename BuildML Package or Folder">
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.removeOutlineContent"
+               label="Remove"
+               style="push"
+               tooltip="Remove BuildML Package or Folder">
          </command>
       </menuContribution>
    </extension>
