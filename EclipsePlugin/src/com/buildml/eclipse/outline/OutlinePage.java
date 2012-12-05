@@ -177,6 +177,12 @@ public class OutlinePage extends ContentOutlinePage {
 		 * selected when we want to add or delete elements.
 		 */
 		addSelectionChangedListener(this);
+		
+		/*
+		 * Add the DragSource and DropTarget so that we can copy/move packages around.
+		 */
+		new OutlineDragSource(treeViewer, mainEditor);
+		new OutlineDropTarget(treeViewer, mainEditor);		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
