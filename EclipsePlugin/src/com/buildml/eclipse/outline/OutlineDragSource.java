@@ -55,10 +55,11 @@ public class OutlineDragSource implements DragSourceListener {
 	 * for each OutlineContentPage object (view).
 	 * 
 	 * @param treeViewer The TreeViewer that elements will be dragged from.
-	 * @param mainEditor The main BuildML editor associated with the outline content view.
+	 * @param outlinePage The outline content view.
 	 */
-	public OutlineDragSource(TreeViewer treeViewer, MainEditor mainEditor) {
+	public OutlineDragSource(TreeViewer treeViewer, OutlinePage outlinePage) {
 		this.treeViewer = treeViewer;
+		MainEditor mainEditor = outlinePage.getMainEditor();
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = buildStore.getPackageMgr();
 		

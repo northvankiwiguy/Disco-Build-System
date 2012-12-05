@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.UIInteger;
 import com.buildml.model.FatalBuildStoreError;
@@ -153,7 +154,7 @@ public class OutlinePage extends ContentOutlinePage {
 		 * OutlineContentCellModifier class does most of the hard work.
 		 */
 		treeViewer.setColumnProperties(new String[] { "NAME" });
-		treeViewer.setCellModifier(new OutlineContentCellModifier(treeViewer, mainEditor));
+		treeViewer.setCellModifier(new OutlineContentCellModifier(this, mainEditor));
 		treeViewer.setCellEditors(new CellEditor [] { new TextCellEditor(treeViewer.getTree()) });
 		
 		/*
@@ -181,8 +182,8 @@ public class OutlinePage extends ContentOutlinePage {
 		/*
 		 * Add the DragSource and DropTarget so that we can copy/move packages around.
 		 */
-		new OutlineDragSource(treeViewer, mainEditor);
-		new OutlineDropTarget(treeViewer, mainEditor);		
+		new OutlineDragSource(treeViewer, this);
+		new OutlineDropTarget(treeViewer, this);		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -233,14 +234,20 @@ public class OutlinePage extends ContentOutlinePage {
 
 		/* now mark the new node for editing, to encourage the user to change the name */
 		UIInteger newNode;
+		OutlineUndoOperation op;
 		if (createFolder) {
 			newNode = new UIPackageFolder(id);
+			op = new OutlineUndoOperation(this, "Create Package Folder", 
+										  OpType.OP_NEW_PACKAGE_FOLDER, newName, parentId);
 		} else {
 			newNode = new UIPackage(id);			
+			op = new OutlineUndoOperation(this, "Create Package", 
+					  					  OpType.OP_NEW_PACKAGE, newName, parentId);
 		}
 		treeViewer.editElement(newNode, 0);
 		
-		// TODO: add undo/redo support.
+		/* record the undo/redo operation */
+		op.record(mainEditor);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -268,6 +275,9 @@ public class OutlinePage extends ContentOutlinePage {
 		if (status == IDialogConstants.CANCEL_ID) {
 			return;
 		}
+		
+		/* record the item's parent, in case we need to undo later */
+		int parentId = pkgMgr.getParent(id);
 		
 		/* go ahead and remove it, possibly with an error code being returned */
 		int rc = pkgMgr.remove(id);
@@ -297,7 +307,10 @@ public class OutlinePage extends ContentOutlinePage {
 		
 		/* Success - element removed. Update view accordingly. */
 		else {
-			// TODO: add undo/redo support.
+			OutlineUndoOperation op = 
+					new OutlineUndoOperation(this, "Remove Package", 
+											 OpType.OP_REMOVE, name, parentId, isFolder);
+			op.record(mainEditor);
 			treeViewer.refresh();
 			mainEditor.markDirty();
 		}
@@ -383,6 +396,24 @@ public class OutlinePage extends ContentOutlinePage {
 	 */
 	public boolean getRenameEnabled() {
 		return renameEnabled;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The main BuildML editor associated with this outline view.
+	 */
+	public MainEditor getMainEditor() {
+		return mainEditor;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Refresh this page's view, due to an external change in the underlying model.
+	 */
+	public void refresh() {
+		treeViewer.refresh();
 	}
 	
 	/*=====================================================================================*

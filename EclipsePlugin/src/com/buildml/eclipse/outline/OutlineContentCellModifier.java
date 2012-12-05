@@ -13,10 +13,10 @@
 package com.buildml.eclipse.outline;
 
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Item;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.UIInteger;
 import com.buildml.model.IBuildStore;
@@ -45,8 +45,8 @@ public class OutlineContentCellModifier implements ICellModifier {
 	/** The BuildStore's package manager */
 	private IPackageMgr pkgMgr;
 	
-	/** The SWT TreeViewer that displays the outline */
-	private TreeViewer treeViewer;
+	/** The Outline view page that initiated this cell modify operation */
+	private OutlinePage outlinePage;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -55,12 +55,12 @@ public class OutlineContentCellModifier implements ICellModifier {
 	/**
 	 * Create a new OutlineContentCellModifier which will be called into action whenever
 	 * the user wishes to rename a package or folder.
-	 * 
-	 * @param treeViewer The TreeViewer used to display the hierarchy of packages.
+
+	 * @param outlinePage The Outline view page that initiated this cell modify operation.
 	 * @param mainEditor The main BuildML editor that we're outlining.
 	 */
-	public OutlineContentCellModifier(TreeViewer treeViewer, MainEditor mainEditor) {
-		this.treeViewer = treeViewer;
+	public OutlineContentCellModifier(OutlinePage outlinePage, MainEditor mainEditor) {
+		this.outlinePage = outlinePage;
 		this.mainEditor = mainEditor;
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = buildStore.getPackageMgr();
@@ -150,9 +150,11 @@ public class OutlineContentCellModifier implements ICellModifier {
 				 * the undo/redo history.
 				 */
 				else {
-					// TODO: undo/redo
+					OutlineUndoOperation op = new OutlineUndoOperation(outlinePage, "Rename", 
+														OpType.OP_RENAME, id, oldName, newName);
+					op.record(mainEditor);
 					mainEditor.markDirty();
-					treeViewer.refresh();				
+					outlinePage.refresh();				
 				}
 			}
 		}

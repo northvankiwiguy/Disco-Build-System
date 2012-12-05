@@ -18,6 +18,7 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.UIInteger;
 import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
 import com.buildml.eclipse.utils.dnd.BuildMLTransferType;
@@ -43,6 +44,9 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	/** The BuildStore underlying the main editor */
 	private IBuildStore buildStore;
 	
+	/** The OutlinePage view we're supporting */
+	private OutlinePage outlinePage;
+	
 	/** The main BuildML editor we're operating on */
 	private MainEditor mainEditor;
 	
@@ -58,12 +62,13 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	 * for each OutlineContentPage object (view).
 	 *
 	 * @param treeViewer The TreeViewer that elements will be dragged from.
-	 * @param mainEditor The main BuildML editor associated with the outline content view. 
+	 * @param outlinePage The outline content view. 
 	 */
-	public OutlineDropTarget(TreeViewer treeViewer, MainEditor mainEditor) {
+	public OutlineDropTarget(TreeViewer treeViewer, OutlinePage outlinePage) {
 		super(treeViewer);
 		this.treeViewer = treeViewer;
-		this.mainEditor = mainEditor;
+		this.outlinePage = outlinePage;
+		this.mainEditor = outlinePage.getMainEditor();
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = this.buildStore.getPackageMgr();
 	
@@ -139,7 +144,9 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 				}
 				
 				/* If the parent won't actually be changing, we don't need to do anything. */
-				if (pkgMgr.getParent(myTypes[0].id) == targetId) {
+				int nodeId = myTypes[0].id;
+				int parentId = pkgMgr.getParent(nodeId);
+				if (parentId == targetId) {
 					return false;
 				}
 				
@@ -147,7 +154,7 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 				 * Attempt to move the incoming item to a new parent. On error,
 				 * we fail silently (aborting the drag).
 				 */
-				if (pkgMgr.setParent(myTypes[0].id, targetId) != ErrorCode.OK) {
+				if (pkgMgr.setParent(nodeId, targetId) != ErrorCode.OK) {
 					return false;
 				}
 				
@@ -155,7 +162,10 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 				treeViewer.refresh();
 				treeViewer.setExpandedState(new UIInteger(targetId), true);
 				mainEditor.markDirty();
-				// TODO: undo/redo
+				OutlineUndoOperation op = 
+						new OutlineUndoOperation(outlinePage, "Move", OpType.OP_MOVE, 
+											     nodeId, parentId, targetId);
+				op.record(mainEditor);
 				return true;
 			}
 		}
