@@ -86,4 +86,40 @@ Testing the Web Site / Update Site
     (copyright, etc).
   - Uninstall the plugin (so it doesn't get in the way of development).
     
+Testing the Outline View
+------------------------
+
+* Add an empty build.bml file and switch to that editor.
+* Check that the outline contains "Root" and "<import>", but nothing else.
+* Right click, without selecting a node in the tree. Only "New Package" and "New Package Folder"
+  should be enabled.
+* Right click on "Root" and "<import>". Ensure that neither of them can be removed or renamed.
+* Click on the "Add BuildML Package Folder" icon - a new folder should appear, called "Untitled". 
+  Rename this to "Graphics".
+* With "Graphics" selected, click on the "New BuildML Package" icon. The new package should appear
+  inside the Graphics folder. Rename this package to "jpeg".
+* With "jpeg" selected, click on the "New BuildML Package" icon again. The package should be created
+  at the same level as "jpeg". Call this package "gif".
+* Check that the two packages are listed in alphabetical order.
+* Now add "png" and "bmp", but this time, use the context menu to add the new package.
+* Within "Graphics", create a sub-folder by clicking on the "New BuildML Package Folder" button. Call
+  this folder "Static".
+* In the same way, use the context menu to create another sub-folder called "Moving".
+* For each of the existing packages (bmp, gif, jpeg, etc), drag and drop the package into the
+  "Static" folder.
+* Using the "Rename" menu item, rename "Moving" to "Movies".
+* Try to remove the "Static" folder (from the context menu) - the menu choice should be greyed out.
+* Trying to remove the "Movies" folder will succeed.
+* At the top level, create a new folder named "File Formats". This should fail due to the space in
+  the name. Repeat again, but this time use "File-Formats".
+* Click undo (Ctrl-Z or Edit->Redo menu) once to undo the rename. Click a second time to completely
+  remove the new folder.
+* Click redo twice to redo the folder creation, and redo the renaming.
+* Drag/drop all packages into the "File-Formats" folder. Then undo all the moves. Finally, redo all
+  the moves.
+* Delete the "bmp" and "gif" packages, then undo the delete.
+* Drag/drop the "File-Formats"  folder inside the Graphics folder. Then undo and redo.
+
+
+
 
