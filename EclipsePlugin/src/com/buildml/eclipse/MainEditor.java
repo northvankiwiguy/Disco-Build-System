@@ -569,7 +569,7 @@ public class MainEditor extends MultiPageEditorPart
 		/* Provides the content of the Outline view */
 		if (adapter.equals(IContentOutlinePage.class)) {
 			if (outlinePage == null) {
-				outlinePage = new OutlinePage(this);
+				outlinePage = new OutlinePage(this, undoAction, redoAction);
 				outlinePage.addSelectionChangedListener(this);
 			}
 			return outlinePage;

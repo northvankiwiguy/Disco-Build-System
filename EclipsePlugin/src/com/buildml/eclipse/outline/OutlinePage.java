@@ -30,6 +30,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.operations.RedoActionHandler;
+import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.buildml.eclipse.MainEditor;
@@ -74,6 +77,12 @@ public class OutlinePage extends ContentOutlinePage {
 	/** Based on the current tree selection, can the selected node be renamed? */
 	private boolean renameEnabled = false;
 
+	/** The undo handler from our main BuildML editor */
+	private UndoActionHandler undoAction;
+
+	/** The redo handler from our main BuildML editor */
+	private RedoActionHandler redoAction;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -83,11 +92,21 @@ public class OutlinePage extends ContentOutlinePage {
 	 * each BuildML MainEditor object.
 	 * 
 	 * @param mainEditor The associate MainEditor object.
+	 * @param redoAction The MainEditor's redo action (for redoing operations).
+	 * @param undoAction The MainEditor's undo action (for undoing operations).
 	 * 
 	 */
-	public OutlinePage(MainEditor mainEditor) {
+	public OutlinePage(MainEditor mainEditor, UndoActionHandler undoAction, 
+				       RedoActionHandler redoAction) {
 		super();
 		
+		/* 
+		 * Save these handlers for later. We'll apply them to our action bar in
+		 * the createControl method.
+		 */
+		this.undoAction = undoAction;
+		this.redoAction = redoAction;
+
 		/* our outline view will display information from this IPackageMgr object. */
 		this.mainEditor = mainEditor;
 		buildStore = mainEditor.getBuildStore();
@@ -183,7 +202,14 @@ public class OutlinePage extends ContentOutlinePage {
 		 * Add the DragSource and DropTarget so that we can copy/move packages around.
 		 */
 		new OutlineDragSource(treeViewer, this);
-		new OutlineDropTarget(treeViewer, this);		
+		new OutlineDropTarget(treeViewer, this);
+		
+		/*
+		 * Add the undo/redo actions from the main editor to our action bar. This allows
+		 * the user to use Ctrl-Z etc. to undo/redo while focused on our window.
+		 */
+		getSite().getActionBars().setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
+		getSite().getActionBars().setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
