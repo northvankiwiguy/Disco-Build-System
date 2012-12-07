@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -48,7 +48,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 	 * @param editor The editor that we're providing text/images for.
 	 * @param pkgMgr The Packages object containing path component information.
 	 */
-	public ActionsEditorLabelCol2Provider(SubEditor editor, IPackageMgr pkgMgr) {
+	public ActionsEditorLabelCol2Provider(ISubEditor editor, IPackageMgr pkgMgr) {
 		this.pkgMgr = pkgMgr;
 	}
 

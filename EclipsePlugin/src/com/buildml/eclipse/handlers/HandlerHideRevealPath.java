@@ -12,7 +12,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
@@ -145,7 +145,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		}
 
 		/* fetch the active editor, and its BuildStore */
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		
 		/* get the set of items (files/actions) that are currently visible */
 		IntegerTreeSet existingVisibleItems = subEditor.getVisibilityFilterSet();

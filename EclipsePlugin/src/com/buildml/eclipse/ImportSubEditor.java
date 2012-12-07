@@ -43,14 +43,14 @@ import com.buildml.utils.types.IntegerTreeRecord;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**
- * An abstract class that all BuildML editor tabs (such as FilesEditor and ActionsEditor)
- * should support. Editors of this type can be placed within a tab of the top-level 
+ * An abstract class that BuildML "import" editor tabs (such as FilesEditor and ActionsEditor)
+ * should be derived from. Editors of this type can be placed within a tab of the top-level 
  * BuildML. They share common features, such as option settings, item visibility, and
  * the ability to filter based on a selected set of packages.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public abstract class SubEditor extends EditorPart implements IElementComparer {
+public abstract class ImportSubEditor extends EditorPart implements IElementComparer, ISubEditor {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -111,7 +111,7 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * @param buildStore The BuildStore to display/edit.
 	 * @param tabTitle The text to appear on the editor's tab.
 	 */
-	public SubEditor(IBuildStore buildStore, String tabTitle) {
+	public ImportSubEditor(IBuildStore buildStore, String tabTitle) {
 		super();
 	
 		/* set the name of the tab that this editor appears in */
@@ -130,39 +130,52 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
+		/* not implemented - is handled by MainEditor */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#doSaveAs()
+	 */
 	@Override
 	public void doSaveAs() {
-		/* not implemented */
+		/* not implemented - is handled by MainEditor */
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
-		/* not implemented for now, while this editor is for read-only purposes */
+		/* not implemented - is handled by MainEditor */
 		return false;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#isSaveAsAllowed()
+	 */
 	@Override
 	public boolean isSaveAsAllowed() {
-		/* save-as is not permitted */
+		/* not implemented - is handled by MainEditor */
 		return false;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * @return An image to be displayed on this sub editor's tab.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#getEditorImage()
 	 */
+	@Override
 	public Image getEditorImage() {
 		
 		/* ask the subeditor instance where its image is (if it has one) */
@@ -191,16 +204,10 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Either set or clear specific options (e.g. OPT_COALESCE_DIR or OPT_SHOW_ROOTS) from
-	 * this editor's current option settings. This can be used to modify one or more
-	 * binary configuration settings in this control.
-	 * 
-	 * @param optionBits One or more bits that should be either set or cleared from this
-	 * 		  editor's options. The state of options that are not specified in this parameter
-	 *        will not be changed.
-	 * @param enable "true" if the options should be enabled, or "false" if they should be cleared.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#setOption(int, boolean)
 	 */
+	@Override
 	public void setOption(int optionBits, boolean enable)
 	{
 		/* if enable is set, then we're adding the new options */
@@ -219,11 +226,10 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Set the editor options (e.g. OPT_COALESCE_ROOTS) for this sub-editor.
-	 * @param optionBits The option bits setting (a 1-bit enables a feature, whereas a 0-bit
-	 * 		disables that feature).
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#setOptions(int)
 	 */
+	@Override
 	public void setOptions(int optionBits)
 	{
 		/* we call setOptions for each option, to ensure that side-effects are triggered */ 
@@ -237,10 +243,10 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * @return The bitmap of all editor options that are currently set 
-	 * (e.g. OPT_COALESCE_ROOTS)
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#getOptions()
 	 */
+	@Override
 	public int getOptions()
 	{
 		return editorOptionBits;
@@ -248,10 +254,10 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * @param optionBit The option to test for.
-	 * @return Whether or the specified editor option is set.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#isOptionSet(int)
 	 */
+	@Override
 	public boolean isOptionSet(int optionBit)
 	{
 		return (editorOptionBits & optionBit) != 0;
@@ -259,11 +265,10 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Set this editor's options by reading the current values from the preference store.
-	 * This should be called when the editor is first created, as well as whenever the
-	 * preference store is updated.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#updateOptionsFromPreferenceStore()
 	 */
+	@Override
 	public void updateOptionsFromPreferenceStore()
 	{
 		IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
@@ -406,51 +411,50 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Fetch this editor's package filter set. This set is used by the viewer when 
-	 * deciding which files should be displayed (versus being filtered out).
-	 * @return This editor's package filter set.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#getFilterPackageSet()
 	 */
+	@Override
 	public PackageSet getFilterPackageSet() {
 		return filterPackageSet;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Set this editor's package filter set. This set is used by the viewer when 
-	 * deciding which files should be displayed (versus being filtered out).
-	 * @param newSet This editor's new package filter set.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#setFilterPackageSet(com.buildml.model.types.PackageSet)
 	 */
+	@Override
 	public void setFilterPackageSet(PackageSet newSet) {
 		filterPackageSet = newSet;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Set the "removable" state of this tab. 
-	 * @param removable true means that the editor tab can be closed, and false means
-	 * that it's a permanent part of the editor.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#setRemovable(boolean)
 	 */
+	@Override
 	public void setRemovable(boolean removable) {
 		this.removable = removable;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * @return The removable state of this editor tab.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#isRemovable()
 	 */
+	@Override
 	public boolean isRemovable() {
 		return removable;
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * @return True if this sub-editor has been closed/disposed.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#isDisposed()
 	 */
+	@Override
 	public boolean isDisposed() {
 		return editorIsDisposed;
 	}
@@ -515,11 +519,10 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	 * ABSTRACT METHODS
 	 *=====================================================================================*/
 
-	/**
-	 * Given an item in the editor, expand all the descendants of that item so
-	 * that they're visible in the tree viewer.
-	 * @param node The tree node representing the item in the tree to be expanded.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#expandSubtree(java.lang.Object)
 	 */
+	@Override
 	public abstract void expandSubtree(Object node);
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -534,75 +537,66 @@ public abstract class SubEditor extends EditorPart implements IElementComparer {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Cause the editor to refresh its view, taking into account any options that
-	 * have been set (or removed) since it was last refreshed.
-	 * @param force If true, force a refresh. If false, only refresh if the editor's
-	 * options were modified since the last refresh.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#refreshView(boolean)
 	 */
+	@Override
 	public abstract void refreshView(boolean force);
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Set the complete set of actions that this editor's tree viewer will show. After
-	 * calling this method, it will be necessary to also call refreshView() to actually
-	 * update the view.
-	 * @param visibleActions The subset of actions that should be visible in the editor.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#setVisibilityFilterSet(com.buildml.utils.types.IntegerTreeSet)
 	 */
+	@Override
 	public abstract void setVisibilityFilterSet(IntegerTreeSet visibleActions);
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * @return The set of files/actions that are currently visible in this editor's tree viewer.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#getVisibilityFilterSet()
 	 */
+	@Override
 	public abstract IntegerTreeSet getVisibilityFilterSet();
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Set the visibility state for an item that appears in the editor's content. This
-	 * either hides the item from view, or greys it out, depending on which mode is set.
-	 * @param item The item to hide (or reveal).
-	 * @param state True if the path should be made visible, else false.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#setItemVisibilityState(java.lang.Object, boolean)
 	 */
+	@Override
 	public abstract void setItemVisibilityState(Object item, boolean state);
 	
 	/*-------------------------------------------------------------------------------------*/
 	
-	/**
-	 * Invoked when this editor comes into view, when the parent (multi-tabbed editor) is
-	 * switched from another tab, to this tab.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#pageChange()
 	 */
+	@Override
 	public abstract void pageChange();
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * Returns true or false, to specify whether this sub editor supports the specified
-	 * feature.
-	 * @param feature A textual name for an editor feature.
-	 * @return true if the feature is supported, or false.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#hasFeature(java.lang.String)
 	 */
+	@Override
 	public abstract boolean hasFeature(String feature);
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * The "copy" command has been invoked in the current sub editor (via the Edit menu, or 
-	 * via Ctrl-C). Process the event by copying the current selection to the clipboard.
-	 * @param clipboard The clipboard to copy onto.
-	 * @param selection The elements in the current editor that are selected.
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#doCopyCommand(org.eclipse.swt.dnd.Clipboard, org.eclipse.jface.viewers.ISelection)
 	 */
+	@Override
 	public abstract void doCopyCommand(Clipboard clipboard, ISelection selection);
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * @return The plugin-relative path to the image file that represents this editor.
-	 * (for example, "images/files_icon.gif").
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.ISubEditor#getEditorImagePath()
 	 */
+	@Override
 	public abstract String getEditorImagePath();
 
 	/*-------------------------------------------------------------------------------------*/

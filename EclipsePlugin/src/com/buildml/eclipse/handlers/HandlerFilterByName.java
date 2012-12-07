@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
@@ -125,7 +125,7 @@ public class HandlerFilterByName extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor instanceof FilesEditor) {
 			return executeFilesEditor(event);
 		} else if (subEditor instanceof ActionsEditor) {

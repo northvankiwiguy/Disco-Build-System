@@ -8,8 +8,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 
 /**
@@ -38,7 +38,7 @@ public class HandlerExpandItemSubTree extends AbstractHandler {
 		 * selected items are part of.
 		 */
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);		
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 			
 		/* for each selected item, ask the editor to expand it. */
 		for (Iterator<?> iter = selection.iterator(); iter.hasNext();) {

@@ -7,8 +7,8 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -40,7 +40,7 @@ public class HandlerShowActionsThatUse extends AbstractHandler {
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		SubEditor existingEditor = mainEditor.getActiveSubEditor();
+		ISubEditor existingEditor = mainEditor.getActiveSubEditor();
 		
 		/* build a FileSet of all the selected files */
 		FileSet selectedFiles = EclipsePartUtils.getFileSetFromSelection(buildStore, selection);

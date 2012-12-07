@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.Activator;
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -64,7 +64,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	 * @param editor The editor that we're providing text/images for.
 	 * @param actionMgr The FileMgr object we're graphically representing.
 	 */
-	public ActionsEditorLabelCol1Provider(SubEditor editor, IActionMgr actionMgr) {
+	public ActionsEditorLabelCol1Provider(ISubEditor editor, IActionMgr actionMgr) {
 
 		this.actionMgr = actionMgr;
 		this.buildStore = actionMgr.getBuildStore();

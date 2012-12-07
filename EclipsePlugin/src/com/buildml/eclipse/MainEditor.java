@@ -168,7 +168,7 @@ public class MainEditor extends MultiPageEditorPart
 	 * 			a FilesEditor, ActionsEditor, or similar.
 	 * @return The tab index of the newly added tab.
 	 */
-	public int newPage(SubEditor editor) {
+	public int newPage(ISubEditor editor) {
 		IEditorInput editorInput = getEditorInput();
 		int index = -1;
 		
@@ -201,8 +201,8 @@ public class MainEditor extends MultiPageEditorPart
 	public void removePage(int tabIndex) {
 		
 		IEditorPart editor = getEditor(tabIndex);
-		if (editor instanceof SubEditor) {
-			SubEditor subEditor = (SubEditor)editor;
+		if (editor instanceof ISubEditor) {
+			ISubEditor subEditor = (ISubEditor)editor;
 			if (subEditor.hasFeature("removable")) {
 				int pageToReturnTo = previousPageIndex;
 				super.removePage(tabIndex);
@@ -264,7 +264,7 @@ public class MainEditor extends MultiPageEditorPart
 		super.pageChange(newPageIndex);
 		
 		/* trigger the pageChange() method on the sub-editor, so it can update the UI */
-		SubEditor subEditor = (SubEditor)getActiveEditor();
+		ISubEditor subEditor = (ISubEditor)getActiveEditor();
 		if (subEditor != null) {
 			subEditor.pageChange();
 		
@@ -504,8 +504,8 @@ public class MainEditor extends MultiPageEditorPart
 	 * operations that occur.
 	 * @return The editor that's currently visible.
 	 */
-	public SubEditor getActiveSubEditor() {
-		return (SubEditor) this.getActiveEditor();
+	public ISubEditor getActiveSubEditor() {
+		return (ISubEditor) this.getActiveEditor();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -47,7 +47,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.EditorOptions;
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ImportSubEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
@@ -63,7 +63,7 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FilesEditor extends SubEditor {
+public class FilesEditor extends ImportSubEditor {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES

@@ -15,7 +15,7 @@ package com.buildml.eclipse.actions;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.model.IActionMgr;
 
@@ -32,7 +32,7 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	 *=====================================================================================*/
 
 	/** The ActionsEditor that we provide content for */
-	private SubEditor editor = null;
+	private ISubEditor editor = null;
 	
 	/** The Action Manager object we should query for file information */
 	private IActionMgr actionMgr = null;
@@ -47,7 +47,7 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	 * @param editor The editor that this content provider is associated with.
 	 * @param actionMgr The ActionMgr object that we're displaying information from.
 	 */
-	public ActionsEditorContentProvider(SubEditor editor, IActionMgr actionMgr) {
+	public ActionsEditorContentProvider(ISubEditor editor, IActionMgr actionMgr) {
 
 		this.editor = editor;
 		this.actionMgr = actionMgr;

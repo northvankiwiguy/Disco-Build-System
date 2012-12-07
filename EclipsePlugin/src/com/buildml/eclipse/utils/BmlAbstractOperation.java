@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -43,7 +43,7 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	protected MainEditor mainEditor = null;
 	
 	/** The sub-editor (tab) that this operation was performed on */
-	protected SubEditor subEditor = null;
+	protected ISubEditor subEditor = null;
 	
 	/** The BuildStore this operation is acting upon */
 	protected IBuildStore buildStore = null;

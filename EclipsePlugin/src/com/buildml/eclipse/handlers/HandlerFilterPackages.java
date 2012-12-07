@@ -6,8 +6,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.PackageFilterDialog;
 import com.buildml.model.types.PackageSet;
 
@@ -32,7 +32,7 @@ public class HandlerFilterPackages extends AbstractHandler {
 		
 		/* figure out which editor is currently active */
 		MainEditor editor = (MainEditor) HandlerUtil.getActiveEditor(event);
-		SubEditor subEditor = editor.getActiveSubEditor();
+		ISubEditor subEditor = editor.getActiveSubEditor();
 		
 		/* 
 		 * If the sub-editor supports package filtering, we should start a 

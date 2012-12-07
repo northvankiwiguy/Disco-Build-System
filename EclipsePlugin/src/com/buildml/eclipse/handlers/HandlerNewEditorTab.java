@@ -17,8 +17,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ImportSubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
@@ -48,8 +49,8 @@ public class HandlerNewEditorTab extends AbstractHandler {
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		IReportMgr reports = buildStore.getReportMgr();
-		SubEditor currentEditor = mainEditor.getActiveSubEditor();
-		SubEditor newEditor = null;
+		ISubEditor currentEditor = mainEditor.getActiveSubEditor();
+		ISubEditor newEditor = null;
 		
 		/* 
 		 * Determine exactly which (sub)command should be executed. If this is null, then the user

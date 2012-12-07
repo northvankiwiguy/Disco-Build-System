@@ -48,8 +48,8 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.UIJob;
 
 import com.buildml.eclipse.Activator;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.files.UIFileRecordDir;
@@ -173,7 +173,7 @@ public class EclipsePartUtils {
 	 * Returns the currently active SubEditor.
 	 * @return The currently active SubEditor instance, or null;
 	 */
-	public static SubEditor getActiveSubEditor() {
+	public static ISubEditor getActiveSubEditor() {
 		MainEditor mainEditor = getActiveMainEditor();
 		if (mainEditor == null) {
 			return null;
@@ -189,7 +189,7 @@ public class EclipsePartUtils {
 	 * @return The currently active FilesEditor instance, or null;
 	 */
 	public static FilesEditor getActiveFilesEditor() {
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor instanceof FilesEditor) {
 			return (FilesEditor)subEditor;
 		}
@@ -204,7 +204,7 @@ public class EclipsePartUtils {
 	 * @return The currently active ActionsEditor instance, or null;
 	 */
 	public static ActionsEditor getActiveActionsEditor() {
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor instanceof ActionsEditor) {
 			return (ActionsEditor)subEditor;
 		}
@@ -248,7 +248,7 @@ public class EclipsePartUtils {
 	 * for some reason, also return false.
 	 */
 	public static boolean activeSubEditorHasFeature(String feature) {
-		SubEditor subEditor = getActiveSubEditor();
+		ISubEditor subEditor = getActiveSubEditor();
 		if (subEditor == null) {
 			return false;
 		}

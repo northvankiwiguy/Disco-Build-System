@@ -20,7 +20,7 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.SubEditor;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 
 /**
@@ -42,7 +42,7 @@ public class HandlerCopyCommand extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
 		/* we delegate the "copy" command to the active sub editor */
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor != null) {
 			ISelection selection = HandlerUtil.getCurrentSelection(event);
 			

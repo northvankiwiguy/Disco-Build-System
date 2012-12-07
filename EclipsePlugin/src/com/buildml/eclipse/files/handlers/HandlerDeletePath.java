@@ -9,8 +9,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.ConversionUtils;
@@ -141,7 +141,7 @@ public class HandlerDeletePath extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
-		SubEditor subEditor = mainEditor.getActiveSubEditor();
+		ISubEditor subEditor = mainEditor.getActiveSubEditor();
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();

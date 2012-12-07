@@ -27,8 +27,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
 
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 
@@ -95,7 +95,7 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 		 * the new state of the command.
 		 */
 		MainEditor editor = (MainEditor)HandlerUtil.getActiveEditor(event);
-		final SubEditor subEditor = (SubEditor)editor.getActiveSubEditor();
+		final ISubEditor subEditor = (ISubEditor)editor.getActiveSubEditor();
 		
 		if (savedHandlerOptionBit == -1) {
 			savedHandlerOptionBit = computeOptionBits(paramValue);
@@ -135,7 +135,7 @@ public class HandlerShowDetail extends AbstractHandler implements IElementUpdate
 		 * We need to query the current editor page to see what the settings for the 
 		 * editor are.
 		 */
-		SubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		
 		/* 
 		 * Note: this handler instance is specific to the option we're setting/querying, so

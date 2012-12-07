@@ -7,8 +7,8 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.SubEditor;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -62,7 +62,7 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 		/* fetch the active editor, its BuildStore, and the active sub-editor */
 		MainEditor mainEditor = (MainEditor)HandlerUtil.getActiveEditor(event);
 		IBuildStore buildStore = mainEditor.getBuildStore();
-		SubEditor subEditor = mainEditor.getActiveSubEditor();
+		ISubEditor subEditor = mainEditor.getActiveSubEditor();
 		FilesEditor existingEditor = (FilesEditor)subEditor;
 		
 		/* build a FileSet of all the selected files */
