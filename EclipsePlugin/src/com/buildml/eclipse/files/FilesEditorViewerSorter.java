@@ -15,9 +15,9 @@ package com.buildml.eclipse.files;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -55,10 +55,10 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 	public int compare(Viewer viewer, Object r1, Object r2) {
 		
 		/* Sort first by type (directories before files/symlinks), and then by name */
-		FileRecord fr1 = (FileRecord)r1;
-		FileRecord fr2 = (FileRecord)r2;
-		PathType pt1 = fileMgr.getPathType(fr1.getId());
-		PathType pt2 = fileMgr.getPathType(fr2.getId());
+		UIInteger uiInt1 = (UIInteger)r1;
+		UIInteger uiInt2 = (UIInteger)r2;
+		PathType pt1 = fileMgr.getPathType(uiInt1.getId());
+		PathType pt2 = fileMgr.getPathType(uiInt2.getId());
 		
 		/* if r1 is a directory, and r2 isn't, then r1 comes first */
 		if ((pt1 == PathType.TYPE_DIR) && (pt2 != PathType.TYPE_DIR)) {
@@ -71,8 +71,8 @@ public class FilesEditorViewerSorter extends ViewerSorter {
 		}
 		
 		/* else, compare their names */
-		String name1 = fileMgr.getBaseName(fr1.getId());
-		String name2 = fileMgr.getBaseName(fr2.getId());
+		String name1 = fileMgr.getBaseName(uiInt1.getId());
+		String name2 = fileMgr.getBaseName(uiInt2.getId());
 		return name1.compareToIgnoreCase(name2);
 	}
 	

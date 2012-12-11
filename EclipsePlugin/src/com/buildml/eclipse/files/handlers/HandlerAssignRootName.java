@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.window.Window;
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
-import com.buildml.eclipse.files.UIFileRecordDir;
+import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -147,7 +147,7 @@ public class HandlerAssignRootName extends AbstractHandler {
 		 * Determine the Path ID of the path we're adding the root to. There must be exactly
 		 * one folder selected.
 		 */
-		UIFileRecordDir pathNode = EclipsePartUtils.getSingleSelectedPathDir(event);
+		UIDirectory pathNode = EclipsePartUtils.getSingleSelectedPathDir(event);
 		if (pathNode == null) {
 			return null;
 		}

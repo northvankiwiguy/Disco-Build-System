@@ -16,10 +16,12 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
-import com.buildml.model.types.FileRecord;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -65,12 +67,12 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		
-		/* We only care about FileRecord elements */
-		if (parentElement instanceof FileRecord) {
+		/* We only care about UIFile or UIDirectory elements */
+		if ((parentElement instanceof UIFile) || (parentElement instanceof UIDirectory)) {
 			
 			Integer childIds[];
-			FileRecord fr = (FileRecord)parentElement;
-			int pathId = fr.getId();
+			UIInteger uiInt = (UIInteger)parentElement;
+			int pathId = uiInt.getId();
 			
 			/* repeat until we've found the children (or grandchildren) we want */
 			while (true) {
@@ -105,8 +107,8 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 				}
 			}
 			
-			/* Convert our child list from an Integer[] to a FileRecord[] */
-			return ConversionUtils.convertIntArrToFileRecordArr(fileMgr, childIds);
+			/* Convert our child list from an Integer[] to a UIInteger[] */
+			return ConversionUtils.convertIntArrToUIIntegerArr(fileMgr, childIds);
 		}
 		return null;
 	}
@@ -119,14 +121,14 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	@Override
 	public Object getParent(Object element) {
 
-		if (element instanceof FileRecord) {
+		if ((element instanceof UIFile) || (element instanceof UIDirectory)) {
 			
 			/* query the BuildStore for this element's parent */
-			FileRecord frElement = (FileRecord)element;
-			int parentId = fileMgr.getParentPath(frElement.getId());
+			UIInteger uiInt = (UIInteger)element;
+			int parentId = fileMgr.getParentPath(uiInt.getId());
 
 			/* base case - parent of / is null */
-			if (parentId == frElement.getId()) {
+			if (parentId == uiInt.getId()) {
 				return null;
 			}
 						
@@ -135,8 +137,8 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 				return null;
 			}
 			
-			/* construct a new FileRecord (which must be a directory) */
-			return new UIFileRecordDir(parentId);
+			/* construct a new UIDirectory (which must be a directory) */
+			return new UIDirectory(parentId);
 		}
 		return null;
 	}
@@ -149,12 +151,12 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	@Override
 	public boolean hasChildren(Object element) {
 		
-		/* we only care about FileRecord element types */
-		if (element instanceof FileRecord) {
-			FileRecord fr = (FileRecord)element;
+		/* we only care about UIDirectory element types */
+		if (element instanceof UIDirectory) {
+			UIInteger uiInt = (UIInteger)element;
 			
 			/* query the BuildStore to see if there are any children */
-			Integer childIds[] = fileMgr.getChildPaths(fr.getId());
+			Integer childIds[] = fileMgr.getChildPaths(uiInt.getId());
 			if (childIds.length > 0) {
 				return true;
 			}
@@ -170,15 +172,15 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 * Return the top-level elements, which represent the starting point for displaying
 	 * the tree. Depending on the FilesEditor's mode, we may have a different set
 	 * of root elements.
-	 * @return The list of FileRecord elements
+	 * @return The list of UIInteger elements
 	 */
-	public FileRecord[] getRootElements() {
+	public UIInteger[] getRootElements() {
 		
 		int topRootId = fileMgr.getRootPath("root");
 		if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS))
 		{
 			String rootNames[] = fileMgr.getRoots();
-			FileRecord fileRecords[] = new FileRecord[rootNames.length];
+			UIInteger uiIntegers[] = new UIInteger[rootNames.length];
 			for (int i = 0; i < rootNames.length; i++) {
 				int id = fileMgr.getRootPath(rootNames[i]);
 				
@@ -191,16 +193,16 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 					id = topRootId;
 				}
 				
-				/* create either a UIFileRecordFile, or a UIFileRecordDir object */
-				fileRecords[i] = ConversionUtils.createFileRecordWithType(fileMgr, id);
+				/* create either a UIFile, or a UIDirectory object */
+				uiIntegers[i] = ConversionUtils.createUIIntegerWithType(fileMgr, id);
 			}
-			return fileRecords;
+			return uiIntegers;
 		}
 		
 		/* else, the directories at the / level are the top-level elements */
 		else {
 			Integer childIds[] = fileMgr.getChildPaths(topRootId);
-			return ConversionUtils.convertIntArrToFileRecordArr(fileMgr, childIds);
+			return ConversionUtils.convertIntArrToUIIntegerArr(fileMgr, childIds);
 		}
 	}
 

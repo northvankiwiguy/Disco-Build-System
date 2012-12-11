@@ -12,12 +12,12 @@
 
 package com.buildml.eclipse.utils;
 
-import com.buildml.eclipse.actions.UIActionRecord;
-import com.buildml.eclipse.files.UIFileRecordDir;
-import com.buildml.eclipse.files.UIFileRecordFile;
+import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.types.FileRecord;
 
 /**
  * A collection of static methods implementing type conversions, as required
@@ -32,20 +32,20 @@ public class ConversionUtils {
 	 *=====================================================================================*/
 
 	/**
-	 * Given a path ID number, return a suitable subclass of FileRecord that reflects
-	 * the type of the path. For example, return a UIFileRecordFile() if the pathId refers
-	 * to a file, or a UIFileRecordDir() if it refers to a directory.
+	 * Given a path ID number, return a suitable subclass of UIInteger that reflects
+	 * the type of the path. For example, return a UIFile() if the pathId refers
+	 * to a file, or a UIDirectory() if it refers to a directory.
 	 * @param fileMgr The FileMgr object that this path belongs to
-	 * @param pathId The ID of the path we need to create a FileRecord for.
-	 * @return The new object, whose class is a sub-class of FileRecord.
+	 * @param pathId The ID of the path we need to create a UIInteger for.
+	 * @return The new object, whose class is a sub-class of UIInteger.
 	 */
-	public static FileRecord createFileRecordWithType(IFileMgr fileMgr, int pathId)
+	public static UIInteger createUIIntegerWithType(IFileMgr fileMgr, int pathId)
 	{
 		switch (fileMgr.getPathType(pathId)) {
 		case TYPE_DIR:
-			return new UIFileRecordDir(pathId);
+			return new UIDirectory(pathId);
 		case TYPE_FILE:
-			return new UIFileRecordFile(pathId);
+			return new UIFile(pathId);
 		case TYPE_INVALID:
 		case TYPE_SYMLINK:
 			// TODO: handle this error somehow
@@ -56,18 +56,18 @@ public class ConversionUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given an Integer[], return a corresponding FileRecord[]
+	 * Given an Integer[], return a corresponding UIInteger[]
 	 * @param fileMgr The FileMgr object that this path belongs to.
 	 * @param intArr The Integer[] to be converted.
-	 * @return The equivalent FileRecord[].
+	 * @return The equivalent UIInteger[].
 	 */
-	public static FileRecord[] convertIntArrToFileRecordArr(
+	public static UIInteger[] convertIntArrToUIIntegerArr(
 			IFileMgr fileMgr,
 			Integer[] intArr)
 	{
-		FileRecord result[] = new FileRecord[intArr.length];
+		UIInteger result[] = new UIInteger[intArr.length];
 		for (int i = 0; i < intArr.length; i++) {
-			result[i] = createFileRecordWithType(fileMgr, intArr[i]);
+			result[i] = createUIIntegerWithType(fileMgr, intArr[i]);
 		}
 		return result;		
 	}
@@ -75,17 +75,17 @@ public class ConversionUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given an Integer[], return a corresponding ActionRecord[]
+	 * Given an Integer[], return a corresponding UIAction[]
 	 * @param actionMgr The ActionMgr object that these actions belong to.
 	 * @param intArr The Integer[] to be converted.
-	 * @return The equivalent UIActionRecord[].
+	 * @return The equivalent UIAction[].
 	 */
-	public static UIActionRecord[] convertIntArrToActionRecordArr(
+	public static UIAction[] convertIntArrToUIActionArr(
 			IActionMgr actionMgr, Integer[] intArr) {
 		
-		UIActionRecord result[] = new UIActionRecord[intArr.length];
+		UIAction result[] = new UIAction[intArr.length];
 		for (int i = 0; i < intArr.length; i++) {
-			result[i] = new UIActionRecord(intArr[i]);
+			result[i] = new UIAction(intArr[i]);
 		}
 		return result;
 	}

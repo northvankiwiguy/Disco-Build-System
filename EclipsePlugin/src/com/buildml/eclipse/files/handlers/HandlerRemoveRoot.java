@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.Activator;
-import com.buildml.eclipse.files.UIFileRecordDir;
+import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -136,10 +136,10 @@ public class HandlerRemoveRoot extends AbstractHandler {
 			return null;
 		}
 		Object nodeObject = selection.getFirstElement();
-		if (!(nodeObject instanceof UIFileRecordDir)) {
+		if (!(nodeObject instanceof UIDirectory)) {
 			return null;
 		}
-		int pathId = ((UIFileRecordDir)nodeObject).getId();
+		int pathId = ((UIDirectory)nodeObject).getId();
 		
 		/* create an undo/redo operation and execute it */
 		RemoveRootOperation operation = new RemoveRootOperation(pathId);

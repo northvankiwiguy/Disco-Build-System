@@ -33,7 +33,7 @@ public class HandlerShowActionsThatUse extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 				
-		/* fetch the FileRecord nodes that were selected */
+		/* fetch the UIInteger nodes that were selected */
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		
 		/* fetch the active editor, and its BuildStore */

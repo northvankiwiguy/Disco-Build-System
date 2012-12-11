@@ -12,8 +12,10 @@
 
 package com.buildml.eclipse.files;
 
+import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.utils.IVisibilityProvider;
-import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -67,9 +69,9 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	@Override
 	public boolean isVisible(Object element) {
-		if (element instanceof FileRecord) {
-			FileRecord fr = (FileRecord)element;
-			int fileId = fr.getId();
+		if ((element instanceof UIFile) || (element instanceof UIDirectory)) {
+			UIInteger uiInt = (UIInteger)element;
+			int fileId = uiInt.getId();
 			
 			/* is this file a member of both primaryFilterSet and secondaryFilterSet. */
 			return (primaryFilterSet.isMember(fileId) && 
@@ -85,12 +87,12 @@ public class FilesEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	@Override
 	public void setVisibility(Object element, boolean visible) {
-		if (element instanceof FileRecord) {
-			FileRecord fr = (FileRecord)element;
+		if ((element instanceof UIFile) || (element instanceof UIDirectory)) {
+			UIInteger uiInt = (UIInteger)element;
 			if (visible) {
-				primaryFilterSet.addSubTree(fr.getId());
+				primaryFilterSet.addSubTree(uiInt.getId());
 			} else {
-				primaryFilterSet.removeSubTree(fr.getId());
+				primaryFilterSet.removeSubTree(uiInt.getId());
 			}
 		}
 	}

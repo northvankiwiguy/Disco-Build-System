@@ -48,12 +48,12 @@ import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.ImportSubEditor;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -227,7 +227,7 @@ public class FilesEditor extends ImportSubEditor {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				FileRecord node = (FileRecord)selection.getFirstElement();
+				UIInteger node = (UIInteger)selection.getFirstElement();
 			
 				if (filesTreeViewer.isExpandable(node)){
 					filesTreeViewer.setExpandedState(node, 

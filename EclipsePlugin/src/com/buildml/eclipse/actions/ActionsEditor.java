@@ -49,13 +49,13 @@ import org.eclipse.ui.progress.IProgressService;
 
 import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.ImportSubEditor;
+import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
-import com.buildml.model.types.ActionRecord;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -111,7 +111,7 @@ public class ActionsEditor extends ImportSubEditor {
 	 * The current tree item that has its text expanded. When a new tree item
 	 * is selected, this item's text will be contracted again.
 	 */
-	UIActionRecord previousSelection = null;
+	UIAction previousSelection = null;
 
 	/*=====================================================================================*
 	 * CONSTRUCTOR
@@ -228,7 +228,7 @@ public class ActionsEditor extends ImportSubEditor {
 		actionsTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				ActionRecord node = (ActionRecord)selection.getFirstElement();
+				UIAction node = (UIAction)selection.getFirstElement();
 				if (actionsTreeViewer.isExpandable(node)){
 					actionsTreeViewer.setExpandedState(node, 
 							!actionsTreeViewer.getExpandedState(node));

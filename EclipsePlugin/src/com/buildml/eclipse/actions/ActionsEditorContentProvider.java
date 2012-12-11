@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.ISubEditor;
+import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.model.IActionMgr;
 
@@ -63,18 +64,18 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		
-		/* We only care about UIActionRecord elements */
-		if (parentElement instanceof UIActionRecord) {
+		/* We only care about UIAction elements */
+		if (parentElement instanceof UIAction) {
 			
 			Integer childIds[];
-			UIActionRecord actionRecord = (UIActionRecord)parentElement;
-			int actionId = actionRecord.getId();
+			UIAction uiAction = (UIAction)parentElement;
+			int actionId = uiAction.getId();
 				
 			/* Fetch the children IDs from the BuildStore */
 			childIds = actionMgr.getChildren(actionId);
 			
-			/* Convert our child list from an Integer[] to a FileRecord[] */
-			return ConversionUtils.convertIntArrToActionRecordArr(actionMgr, childIds);
+			/* Convert our child list from an Integer[] to a UIInteger[] */
+			return ConversionUtils.convertIntArrToUIActionArr(actionMgr, childIds);
 		}
 		return null;
 	}
@@ -87,10 +88,10 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	@Override
 	public Object getParent(Object element) {
 
-		if (element instanceof UIActionRecord) {
+		if (element instanceof UIAction) {
 			
 			/* query the BuildStore for this element's parent */
-			UIActionRecord actElement = (UIActionRecord)element;
+			UIAction actElement = (UIAction)element;
 			int parentId = actionMgr.getParent(actElement.getId());
 
 			/* base case - parent of top-level action is null */
@@ -103,8 +104,8 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 				return null;
 			}
 			
-			/* construct a new ActionRecord */
-			return new UIActionRecord(parentId);
+			/* construct a new UIAction object */
+			return new UIAction(parentId);
 		}
 		return null;
 	}
@@ -117,9 +118,9 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	@Override
 	public boolean hasChildren(Object element) {
 		
-		/* we only care about UIActionRecord element types */
-		if (element instanceof UIActionRecord) {
-			UIActionRecord act = (UIActionRecord)element;
+		/* we only care about UIAction element types */
+		if (element instanceof UIAction) {
+			UIAction act = (UIAction)element;
 			
 			/* query the BuildStore to see if there are any children */
 			Integer childIds[] = actionMgr.getChildren(act.getId());
@@ -137,13 +138,13 @@ public class ActionsEditorContentProvider extends ArrayContentProvider
 	/**
 	 * Return the top-level elements, which represent the starting point for displaying
 	 * the tree.
-	 * @return The list of ActionRecord elements
+	 * @return The list of UIAction elements
 	 */
-	public UIActionRecord[] getRootElements() {
+	public UIAction[] getRootElements() {
 		
 		int topRootId = actionMgr.getRootAction("root");
 		Integer childIds[] = actionMgr.getChildren(topRootId);
-		return ConversionUtils.convertIntArrToActionRecordArr(actionMgr, childIds);
+		return ConversionUtils.convertIntArrToUIActionArr(actionMgr, childIds);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

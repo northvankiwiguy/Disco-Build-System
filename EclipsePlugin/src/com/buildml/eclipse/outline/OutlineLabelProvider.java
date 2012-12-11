@@ -17,8 +17,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.utils.EclipsePartUtils;
-import com.buildml.eclipse.utils.UIInteger;
 import com.buildml.model.IPackageMgr;
 
 /**

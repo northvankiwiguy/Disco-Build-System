@@ -36,9 +36,11 @@ import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.bobj.UIInteger;
+import com.buildml.eclipse.bobj.UIPackage;
+import com.buildml.eclipse.bobj.UIPackageFolder;
 import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.UIInteger;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;

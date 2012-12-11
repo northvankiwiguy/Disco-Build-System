@@ -15,7 +15,9 @@ package com.buildml.eclipse.outline;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
-import com.buildml.eclipse.utils.UIInteger;
+import com.buildml.eclipse.bobj.UIInteger;
+import com.buildml.eclipse.bobj.UIPackage;
+import com.buildml.eclipse.bobj.UIPackageFolder;
 import com.buildml.model.IPackageMgr;
 
 /**

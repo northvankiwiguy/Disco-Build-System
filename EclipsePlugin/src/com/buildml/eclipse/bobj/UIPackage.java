@@ -10,9 +10,8 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.outline;
+package com.buildml.eclipse.bobj;
 
-import com.buildml.eclipse.utils.UIInteger;
 
 /**
  * A type used in Eclipse TreeViewers to represent a "package".

@@ -390,7 +390,7 @@
                            ifEmpty="false"
                            operator="and">
                         <instanceof
-                              value="com.buildml.eclipse.files.UIFileRecordDir">
+                              value="com.buildml.eclipse.bobj.UIDirectory">
                         </instanceof>
                      </iterate>
                   </with>
@@ -402,9 +402,14 @@
                   <iterate
                         ifEmpty="false"
                         operator="or">
-                     <instanceof
-                           value="com.buildml.model.types.FileRecord">
-                     </instanceof>
+                     <or>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIFile">
+                        </instanceof>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIDirectory">
+                        </instanceof>
+                     </or>
                   </iterate>
                </with>
             </visibleWhen>
@@ -465,7 +470,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="com.buildml.model.types.ActionRecord">
+                           value="com.buildml.eclipse.bobj.UIAction">
                      </instanceof>
                   </iterate>
                </with>
@@ -500,9 +505,14 @@
                   <iterate
                         ifEmpty="false"
                         operator="or">
-                     <instanceof
-                           value="com.buildml.model.types.FileRecord">
-                     </instanceof>
+                     <or>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIFile">
+                        </instanceof>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIDirectory">
+                        </instanceof>
+                     </or>
                   </iterate>
                </with>
             </visibleWhen>
@@ -536,9 +546,14 @@
                   <iterate
                         ifEmpty="false"
                         operator="or">
-                     <instanceof
-                           value="com.buildml.model.types.FileRecord">
-                     </instanceof>
+                     <or>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIFile">
+                        </instanceof>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIDirectory">
+                        </instanceof>
+                     </or>
                   </iterate>
                </with>
             </visibleWhen>
@@ -855,9 +870,14 @@
                   <iterate
                         ifEmpty="false"
                         operator="or">
-                     <instanceof
-                           value="com.buildml.model.types.FileRecord">
-                     </instanceof>
+                     <or>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIFile">
+                        </instanceof>
+                        <instanceof
+                              value="com.buildml.eclipse.bobj.UIDirectory">
+                        </instanceof>
+                     </or>
                   </iterate>
                </with>
             </and>
@@ -874,10 +894,10 @@
                      operator="or">
                   <or>
                      <instanceof
-                           value="com.buildml.eclipse.files.UIFileRecordDir">
+                           value="com.buildml.eclipse.bobj.UIDirectory">
                      </instanceof>
                      <instanceof
-                           value="com.buildml.eclipse.actions.UIActionRecord">
+                           value="com.buildml.eclipse.bobj.UIAction">
                      </instanceof></or>
                </iterate>
             </with>
@@ -945,7 +965,7 @@
                      ifEmpty="false"
                      operator="and">
                   <instanceof
-                        value="com.buildml.eclipse.files.UIFileRecordDir">
+                        value="com.buildml.eclipse.bobj.UIDirectory">
                   </instanceof>
                </iterate>
             </and>
@@ -965,7 +985,7 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="com.buildml.eclipse.files.UIFileRecordDir">
+                        value="com.buildml.eclipse.bobj.UIDirectory">
                   </instanceof>
                </iterate>
                <test
@@ -1263,5 +1283,22 @@
             Execute a legacy build command and import the files and actions into a BuildML file.
          </description>
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+      <diagramType
+            description="A BuildML Package-centric Diagram"
+            id="com.buildml.eclipse.diagram.package"
+            name="BuildML Package Diagram"
+            type="BuildMLPackageDiagram">
+      </diagramType>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+      <diagramTypeProvider
+            class="com.buildml.eclipse.packages.DiagramTypeProvider"
+            id="com.buildml.eclipse.diagram.package.provider"
+            name="BuildML Package Diagram Provider">
+      </diagramTypeProvider>
    </extension>
 </plugin>

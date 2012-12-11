@@ -10,29 +10,26 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.files;
-
-import com.buildml.model.types.FileRecord;
+package com.buildml.eclipse.bobj;
 
 /**
- * A subclass of FileRecord used by the UI to distinguish FileRecords that represent
- * directories, versus those that represent files (or other types).
+ * A sub-class of UIInteger used to represent "action" objects in the Eclipse UI.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class UIFileRecordDir extends FileRecord {
+public class UIAction extends UIInteger {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new UIFileRecordDir
-	 * @param parentId The ID of this UIFileRecordDir
+	 * Create a new UIAction, with the specified "id".
+	 * @param id The unique ID that describes this UIAction (as managed by the ActionMgr).
 	 */
-	public UIFileRecordDir(int parentId) {
-		super(parentId);
+	public UIAction(int id) {
+		super(id);
 	}
-
-	/*-------------------------------------------------------------------------------------*/
+	
+	/*-------------------------------------------------------------------------------------*/	
 }

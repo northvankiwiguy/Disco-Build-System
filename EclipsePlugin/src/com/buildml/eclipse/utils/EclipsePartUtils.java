@@ -51,16 +51,17 @@ import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
+import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.files.UIFileRecordDir;
 import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.types.FileRecord;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.types.ActionRecord;
 import com.buildml.model.types.ActionSet;
 
 /**
@@ -74,9 +75,9 @@ public class EclipsePartUtils {
 	 *=====================================================================================*/
 
 	/**
-	 * Given an Eclipse command handler's selection, such as when a user selects a bunch of FileRecord
+	 * Given an Eclipse command handler's selection, such as when a user selects a bunch of UIInteger
 	 * nodes from a TreeViewer, convert the selection into a FileSet. Selected items that are not of type
-	 * FileRecord are ignored.
+	 * UIFile or UIDirectory are ignored.
 	 * @param buildStore The BuildStore that stores the selected objects.
 	 * @param selection The Eclipse command handler's selection.
 	 * @return The equivalent FileSet.
@@ -88,8 +89,9 @@ public class EclipsePartUtils {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object item = iter.next();
-			if (item instanceof FileRecord) {
-				fs.add(((FileRecord)item).getId());
+			if ((item instanceof UIFile) || (item instanceof UIDirectory)) {
+				UIInteger uiInt = (UIInteger)item;
+				fs.add(uiInt.getId());
 			}
 		}
 		return fs;
@@ -98,9 +100,9 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * Given an Eclipse command handler's selection, such as when a user selects a bunch of ActionRecord
+	 * Given an Eclipse command handler's selection, such as when a user selects a bunch of UIAction
 	 * nodes from a TreeViewer, convert the selection into an ActionSet. Selected items that are not of type
-	 * ActionRecord are ignored.
+	 * UIAction are ignored.
 	 * @param buildStore The BuildStore that stores the selected objects.
 	 * @param selection The Eclipse command handler's selection.
 	 * @return The equivalent ActionSet.
@@ -112,8 +114,8 @@ public class EclipsePartUtils {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object item = iter.next();
-			if (item instanceof ActionRecord) {
-				acts.add(((ActionRecord)item).getId());
+			if (item instanceof UIAction) {
+				acts.add(((UIAction)item).getId());
 			}
 		}
 		return acts;
@@ -122,23 +124,23 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Given a UI event handler's selection, return the one (and only) UIFileRecordDir
+	 * Given a UI event handler's selection, return the one (and only) UIInteger
 	 * object that was selected. Otherwise return null;
 	 * 
 	 * @param event The UI event, as passed into the UI handler code.
-	 * @return The selected UIFileRecordDir, or null if something else (or nothing at all)
+	 * @return The selected UIDirectory, or null if something else (or nothing at all)
 	 * was selected.
 	 */
-	public static UIFileRecordDir getSingleSelectedPathDir(ExecutionEvent event) {
+	public static UIDirectory getSingleSelectedPathDir(ExecutionEvent event) {
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		if ((selection == null) || (selection.size() != 1)) {
 			return null;
 		}
 		Object nodeObject = selection.getFirstElement();
-		if (!(nodeObject instanceof UIFileRecordDir)) {
+		if (!(nodeObject instanceof UIDirectory)) {
 			return null;
 		}
-		return (UIFileRecordDir)nodeObject;
+		return (UIDirectory)nodeObject;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

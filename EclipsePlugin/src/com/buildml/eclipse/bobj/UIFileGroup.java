@@ -10,29 +10,26 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.outline;
-
-import com.buildml.eclipse.utils.UIInteger;
+package com.buildml.eclipse.bobj;
 
 /**
- * A type used in Eclipse TreeViewers to represent a "package folder".
+ * A sub-class of UIInteger used to represent "file group" objects in the Eclipse UI.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class UIPackageFolder extends UIInteger {
+public class UIFileGroup extends UIInteger {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new UIPackageFolder, which represents a BuildML package folder as displayed
-	 * in an SWT tree/table.
+	 * Create a new UIFileGroup.
 	 * 
-	 * @param id The underlying ID number for the BuildML package folder.
+	 * @param groupId The ID of this file group (as managed by FileGroupMgr).
 	 */
-	public UIPackageFolder(int id) {
-		super(id);
+	public UIFileGroup(int groupId) {
+		super(groupId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

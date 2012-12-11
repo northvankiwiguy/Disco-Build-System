@@ -6,33 +6,33 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    "Peter Smith <psmith@arapiki.com>" - initial API and 
+ *    psmith - initial API and 
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.files;
+package com.buildml.eclipse.bobj;
 
-import com.buildml.model.types.FileRecord;
 
 /**
- * A subclass of FileRecord used by the UI to distinguish FileRecords that represent
- * files, versus those that represent directories (or other types).
+ * A type used in Eclipse TreeViewers to represent a "package folder".
  * 
- * @author "Peter Smith <psmith@arapiki.com>"
+ * @author Peter Smith <psmith@arapiki.com>
  */
-public class UIFileRecordFile extends FileRecord {
+public class UIPackageFolder extends UIInteger {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new UIFileRecordFile
-	 * @param parentId The ID of this UIFileRecordFile
+	 * Create a new UIPackageFolder, which represents a BuildML package folder as displayed
+	 * in an SWT tree/table.
+	 * 
+	 * @param id The underlying ID number for the BuildML package folder.
 	 */
-	public UIFileRecordFile(int parentId) {
-		super(parentId);
+	public UIPackageFolder(int id) {
+		super(id);
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 }

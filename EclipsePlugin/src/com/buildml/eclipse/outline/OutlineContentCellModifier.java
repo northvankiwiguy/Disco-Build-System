@@ -16,9 +16,9 @@ import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.swt.widgets.Item;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.UIInteger;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;

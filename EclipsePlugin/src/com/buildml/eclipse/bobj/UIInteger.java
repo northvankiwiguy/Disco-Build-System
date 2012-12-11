@@ -10,7 +10,9 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.utils;
+package com.buildml.eclipse.bobj;
+
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * A simple class that holds a single integer value. This is somewhat similar to the
@@ -23,9 +25,11 @@ package com.buildml.eclipse.utils;
  * represents BuildML package folders. We can use "instanceof" to distinguish between these
  * types when an element is selected in the Eclipse UI.
  * 
+ * The class extends EObjectImpl, as required to be used by Graphiti.
+ * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class UIInteger {
+public class UIInteger extends EObjectImpl {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES

@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.ISubEditor;
+import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -74,9 +75,9 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 	 */
 	public String getText(Object element) {
 		
-		if (element instanceof UIActionRecord) {
-			UIActionRecord actionRecord = (UIActionRecord)element;
-			int actionId = actionRecord.getId();
+		if (element instanceof UIAction) {
+			UIAction uiAction = (UIAction)element;
+			int actionId = uiAction.getId();
 			int pkgId = pkgMgr.getActionPackage(actionId);
 			if (pkgId == ErrorCode.NOT_FOUND) {
 				return "<invalid>";

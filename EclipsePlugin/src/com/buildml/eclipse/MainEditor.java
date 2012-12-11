@@ -45,9 +45,10 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.buildml.eclipse.actions.ActionsEditor;
+import com.buildml.eclipse.bobj.UIPackage;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.outline.OutlinePage;
-import com.buildml.eclipse.outline.UIPackage;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.FatalBuildStoreError;
@@ -295,6 +296,10 @@ public class MainEditor extends MultiPageEditorPart
 		ActionsEditor editor2 = new ActionsEditor(buildStore, "Actions");
 		editor2.setRemovable(false);
 		newPage(editor2);
+		
+	//	PackageDiagramEditor editor3 = new PackageDiagramEditor(buildStore, 0);
+	//	editor3.setRemovable(true);
+	//	newPage(editor3);
 			
 		/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());

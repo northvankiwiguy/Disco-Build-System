@@ -10,28 +10,27 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.actions;
+package com.buildml.eclipse.bobj;
 
-import com.buildml.model.types.ActionRecord;
 
 /**
- * A type of ActionRecord that's specifically used for displaying in the UI.
+ * A sub-class of UIInteger used to represent "file" objects in the Eclipse UI.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class UIActionRecord extends ActionRecord {
+public class UIFile extends UIInteger {
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new UIActionRecord, with the specified "id".
-	 * @param id The unique ID that describes this UIActionRecord.
+	 * Create a new UIFile.
+	 * @param pathId The ID of this directory (as managed by the FileMgr).
 	 */
-	public UIActionRecord(int id) {
-		super(id);
+	public UIFile(int pathId) {
+		super(pathId);
 	}
-	
-	/*-------------------------------------------------------------------------------------*/	
+
+	/*-------------------------------------------------------------------------------------*/
 }

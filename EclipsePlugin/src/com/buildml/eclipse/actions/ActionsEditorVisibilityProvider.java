@@ -12,8 +12,8 @@
 
 package com.buildml.eclipse.actions;
 
+import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.utils.IVisibilityProvider;
-import com.buildml.model.types.ActionRecord;
 import com.buildml.model.types.ActionSet;
 
 /**
@@ -67,9 +67,9 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	@Override
 	public boolean isVisible(Object element) {
-		if (element instanceof ActionRecord) {
-			ActionRecord actionRecord = (ActionRecord)element;
-			int actionId = actionRecord.getId();
+		if (element instanceof UIAction) {
+			UIAction uiAction = (UIAction)element;
+			int actionId = uiAction.getId();
 			
 			/* is this file a member of both primaryFilterSet and secondaryFilterSet. */
 			return (primaryFilterSet.isMember(actionId) && 
@@ -85,12 +85,12 @@ public class ActionsEditorVisibilityProvider implements IVisibilityProvider {
 	 */
 	@Override
 	public void setVisibility(Object element, boolean visible) {
-		if (element instanceof ActionRecord) {
-			ActionRecord actionRecord = (ActionRecord)element;
+		if (element instanceof UIAction) {
+			UIAction uiAction = (UIAction)element;
 			if (visible) {
-				primaryFilterSet.addSubTree(actionRecord.getId());
+				primaryFilterSet.addSubTree(uiAction.getId());
 			} else {
-				primaryFilterSet.removeSubTree(actionRecord.getId());
+				primaryFilterSet.removeSubTree(uiAction.getId());
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.expressions.PropertyTester;
 
-import com.buildml.eclipse.files.UIFileRecordDir;
+import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -39,8 +39,8 @@ public class PathPropertyTester extends PropertyTester {
 				if (selection.size() == 1) {
 					
 					/* the selection must be a directory (not a file) */
-					if (selection.get(0) instanceof UIFileRecordDir) {
-						UIFileRecordDir node = (UIFileRecordDir)selection.get(0);
+					if (selection.get(0) instanceof UIDirectory) {
+						UIDirectory node = (UIDirectory)selection.get(0);
 						int pathId = node.getId();
 						
 						/* finally, test if the path has an attached root */

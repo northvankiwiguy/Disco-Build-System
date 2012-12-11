@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.ISubEditor;
+import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -100,9 +101,9 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	 */
 	public String getText(Object element) {
 		
-		if (element instanceof UIActionRecord) {
-			UIActionRecord actionRecord = (UIActionRecord)element;
-			int actionId = actionRecord.getId();
+		if (element instanceof UIAction) {
+			UIAction uiAction = (UIAction)element;
+			int actionId = uiAction.getId();
 			return " " + actionMgr.getCommandSummary(actionId, 200);
 		}
 		return " <invalid>";
@@ -118,9 +119,9 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 	 */
 	@Override
 	public String getToolTipText(Object element) {
-		if (element instanceof UIActionRecord) {
-			UIActionRecord actionRecord = (UIActionRecord)element;
-			int actionId = actionRecord.getId();
+		if (element instanceof UIAction) {
+			UIAction uiAction = (UIAction)element;
+			int actionId = uiAction.getId();
 
 			/* We'll accumulate the full text of the tooltip in a StringBuffer */
 			StringBuffer fullText = new StringBuffer();

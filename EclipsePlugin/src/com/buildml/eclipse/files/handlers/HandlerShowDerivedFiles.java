@@ -56,7 +56,7 @@ public class HandlerShowDerivedFiles extends AbstractHandler {
 			throw new FatalError("Unable to handle command: " + cmdName);
 		}
 		
-		/* fetch the FileRecord nodes that are selected in the currently active editor. */
+		/* fetch the UIInteger nodes that are selected in the currently active editor. */
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		
 		/* fetch the active editor, its BuildStore, and the active sub-editor */

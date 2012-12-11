@@ -23,10 +23,12 @@ import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.Activator;
 import com.buildml.eclipse.EditorOptions;
+import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.types.FileRecord;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -96,10 +98,10 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 		 /* select an image for the tree column */
 		case 0:
 			
-			/* we only care about FileRecord types */
-			if (element instanceof FileRecord) {
-				FileRecord fr = (FileRecord)element;
-				PathType pathType = fileMgr.getPathType(fr.getId());
+			/* we only care about UIInteger types */
+			if ((element instanceof UIDirectory) || (element instanceof UIFile)) {
+				UIInteger uiInt = (UIInteger)element;
+				PathType pathType = fileMgr.getPathType(uiInt.getId());
 
 				switch (pathType) {
 				case TYPE_INVALID:
@@ -113,7 +115,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 					 * of images, we cache them in this plugin's image registry.
 					 */
 					IEditorRegistry editorImageRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-					String name = fileMgr.getBaseName(fr.getId());
+					String name = fileMgr.getBaseName(uiInt.getId());
 					ImageDescriptor imageDescr = editorImageRegistry.getImageDescriptor(name);
 
 					/* can we get this image from the plugin's cache? */
@@ -148,16 +150,16 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 */
 	public String getColumnText(Object element, int columnIndex) {
 
-		if (element instanceof FileRecord) {
-			FileRecord fr = (FileRecord)element;
-			int pathId = fr.getId();
+		if ((element instanceof UIFile) || (element instanceof UIDirectory)) {
+			UIInteger uiInt = (UIInteger)element;
+			int pathId = uiInt.getId();
 
 			switch (columnIndex) {
 
 			/* select the text for the file tree column */
 			case 0:
 
-				/* for FileRecords, we return the path's base name */
+				/* for UIFile and UIDirectory, we return the path's base name */
 
 				/* case: show file path roots */
 				if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS)) {
