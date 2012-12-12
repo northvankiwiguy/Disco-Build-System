@@ -297,9 +297,9 @@ public class MainEditor extends MultiPageEditorPart
 		editor2.setRemovable(false);
 		newPage(editor2);
 		
-	//	PackageDiagramEditor editor3 = new PackageDiagramEditor(buildStore, 0);
-	//	editor3.setRemovable(true);
-	//	newPage(editor3);
+		PackageDiagramEditor editor3 = new PackageDiagramEditor(buildStore, 0);
+		editor3.setRemovable(true);
+		newPage(editor3);
 			
 		/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());
