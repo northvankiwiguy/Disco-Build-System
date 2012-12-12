@@ -47,9 +47,12 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 	/** The PackageMgr we're using for package information */
 	private IPackageMgr pkgMgr = null;
 	
+	/** The ID of the package we're displaying */
+	private int packageId;
+	
 	/** The textual name of this package */
 	private String pkgName = null;
-	
+		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -66,14 +69,7 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 		/* Save away our BuildStore information, for later use */
 		this.buildStore = buildStore;
 		this.pkgMgr = buildStore.getPackageMgr();
-		
-		/* set the name of the tab that this editor appears in */
-		pkgName = pkgMgr.getName(packageId);
-		if (pkgName == null) {
-			pkgName = "<invalid>";
-		}
-		
-		setPartName("Package: " + pkgName);
+		this.packageId = packageId;
 	}
 	
 	/*=====================================================================================*
@@ -293,6 +289,24 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 		return null;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The BuildStore associated with this sub-editor.
+	 */
+	public IBuildStore getBuildStore() {
+		return buildStore;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The ID of the package that this editor represents.
+	 */
+	public int getPackageId() {
+		return packageId;
+	}
+
 	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/
@@ -317,7 +331,7 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 	protected DiagramEditorInput convertToDiagramEditorInput(IEditorInput input)
 			throws PartInitException {
 								
-		URI pkgURI = URI.createURI("buildml:" + pkgName);
+		URI pkgURI = URI.createURI("buildml:" + packageId);
 		return new DiagramEditorInput(pkgURI, "com.buildml.eclipse.diagram.package.provider");
 	}
 	

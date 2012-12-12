@@ -23,6 +23,13 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 
+import com.buildml.eclipse.utils.ConversionUtils;
+import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMgr;
+import com.buildml.utils.errors.ErrorCode;
+
 /**
  * A customized version of {@link DefaultPersistencyBehavior} that uses our own 
  * method of loading/saving from the database, rather than via a standard resource. 
@@ -31,6 +38,16 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
  */
 /* package */ class EditorPersistencyBehavior extends DefaultPersistencyBehavior {
 
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+
+	/** The PackageDiagramEditor we're owned by */
+	private PackageDiagramEditor diagramEditor;
+	
+	/** The IBuildStore that the editor represents */
+	private IBuildStore buildStore;
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -43,6 +60,8 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
 	 */
 	public EditorPersistencyBehavior(DiagramEditor diagramEditor) {
 		super(diagramEditor);
+
+		this.diagramEditor = (PackageDiagramEditor)diagramEditor;
 	}
 
 	/*=====================================================================================*
@@ -55,13 +74,22 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
 	@Override
 	public Diagram loadDiagram(URI uri) {
 		
+		/* Parse the URI to determine which package we're managing */
+		int pkgId = ConversionUtils.extractPkgIdFromURI(uri);
+		if (pkgId == ErrorCode.NOT_FOUND) {
+			throw new FatalBuildStoreError("Invalid package ID in URI: " + uri);
+		}
+		buildStore = this.diagramEditor.getBuildStore();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		String pkgName = pkgMgr.getName(pkgId);
+
 		/*
 		 * Create a new Graphiti diagram, and associate it with the package type provider
 		 * (as defined in plugin.xml).
 		 */
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final Diagram diagram = peCreateService.createDiagram("com.buildml.eclipse.diagram.package", 
-															  "BuildML Package", true);
+															  "Package: " + pkgName, true);
 		final Resource resource = diagramEditor.getResourceSet().createResource(uri);
 		
 		/*

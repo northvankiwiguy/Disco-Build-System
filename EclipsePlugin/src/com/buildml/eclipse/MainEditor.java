@@ -64,7 +64,7 @@ import com.buildml.refactor.imports.ImportRefactorer;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class MainEditor extends MultiPageEditorPart 
-	implements IResourceChangeListener, ISelectionChangedListener {
+	implements IResourceChangeListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -296,11 +296,7 @@ public class MainEditor extends MultiPageEditorPart
 		ActionsEditor editor2 = new ActionsEditor(buildStore, "Actions");
 		editor2.setRemovable(false);
 		newPage(editor2);
-		
-		PackageDiagramEditor editor3 = new PackageDiagramEditor(buildStore, 0);
-		editor3.setRemovable(true);
-		newPage(editor3);
-			
+
 		/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());
 		setTitleToolTip(editorInput.getToolTipText());
@@ -575,7 +571,6 @@ public class MainEditor extends MultiPageEditorPart
 		if (adapter.equals(IContentOutlinePage.class)) {
 			if (outlinePage == null) {
 				outlinePage = new OutlinePage(this, undoAction, redoAction);
-				outlinePage.addSelectionChangedListener(this);
 			}
 			return outlinePage;
 		}
@@ -686,24 +681,27 @@ public class MainEditor extends MultiPageEditorPart
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * This method is called when the user clicks on a package (or package folder) in the 
-	 * outline view. This causes the editor to switch to the appropriate package diagram tab.
+	 * Open a new package diagram, or if such a diagram already exists, bring it to the front.
+	 * 
+	 * @param pkgId PackageMgr ID of the package to be displayed.
 	 */
-	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
+	public void openPackageDiagram(int pkgId) {
 		
-		IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-		Object node = selection.getFirstElement();
-		
-		/* is the selection a "package" (as opposed to a folder, or anything else) */
-		if (node instanceof UIPackage) {
-			int pkgId = ((UIPackage)node).getId();
-			IPackageMgr pkgMgr = buildStore.getPackageMgr();
-			String pkgName = pkgMgr.getName(pkgId);
-			
-			// TODO: implement switching of editor tabs.
-			System.out.println("Selection changed to " + pkgName);
+		/* first, see if a suitable editor is already open */
+		int numEditors = getPageCount();
+		for (int i = 0; i < numEditors; i++) {
+			IEditorPart subEditor = getEditor(i);
+			if (subEditor instanceof PackageDiagramEditor) {
+				if (((PackageDiagramEditor)subEditor).getPackageId() == pkgId) {
+					setActivePage(i);
+					return;
+				}
+			}
 		}
+		
+		/* no existing editor for this package, open a new one */
+		PackageDiagramEditor newEditor = new PackageDiagramEditor(buildStore, pkgId);
+		setActivePage(newPage(newEditor));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -12,12 +12,16 @@
 
 package com.buildml.eclipse.utils;
 
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.xml.type.internal.RegEx;
+
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * A collection of static methods implementing type conversions, as required
@@ -126,6 +130,34 @@ public class ConversionUtils {
 			sb.append('\n');
 		}
 		return sb.toString();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a URI of the form "buildml:pkgId#/0", return the pkgId portion as an integer.
+	 * 
+	 * @param uri The BuildML URI.
+	 * @return The package ID as an integer, or NOT_FOUND if the URI format is invalid.
+	 */
+	public static int extractPkgIdFromURI(URI uri) {
+		String str = uri.toString();
+		
+		/* check the prefix and suffix of the URI string */
+		if (!str.startsWith("buildml:") || !str.endsWith("#/0")) {
+			return ErrorCode.NOT_FOUND;
+		}
+		int endIndex = str.lastIndexOf('#');
+		String subStr = str.substring("buildml:".length(), endIndex);
+
+		/* Parse out and return the pkgId portion*/
+		int pkgId;
+		try {
+			pkgId = Integer.valueOf(subStr);
+		} catch (NumberFormatException ex) {
+			return ErrorCode.NOT_FOUND;
+		}
+		return pkgId;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

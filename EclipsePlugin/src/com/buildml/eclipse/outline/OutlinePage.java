@@ -155,7 +155,8 @@ public class OutlinePage extends ContentOutlinePage {
 
 		/*
 		 * When the user double-clicks on a folder name, automatically expand the content
-		 * of that folder.
+		 * of that folder. If they double-click on a package name, open that package
+		 * as a new Diagram in the main editor.
 		 */
 		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
@@ -166,6 +167,16 @@ public class OutlinePage extends ContentOutlinePage {
 				if (treeViewer.isExpandable(node)){
 					treeViewer.setExpandedState(node, 
 							!treeViewer.getExpandedState(node));
+				}
+				
+				/* else, open the package diagram editor */
+				else {
+					if (node instanceof UIPackage) {
+						int selectedPkgId = ((UIPackage)node).getId();
+						if (selectedPkgId != pkgMgr.getImportPackage()) {
+							mainEditor.openPackageDiagram(selectedPkgId);
+						}
+					}
 				}
 			}
 		});

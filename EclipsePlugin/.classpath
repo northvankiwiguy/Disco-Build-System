@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildTreeScanner"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildScanners"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuildRefactor"/>
+	<classpathentry kind="lib" path="buildml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
