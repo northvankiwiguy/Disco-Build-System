@@ -45,6 +45,14 @@ public interface IBuildStore {
 	public abstract IFileMgr getFileMgr();
 
 	/**
+	 * Fetch the FileGroupMgr manager associated with this BuildStore. This object
+	 * encapsulates knowledge about groups of paths.
+	 * 
+	 * @return A FileGroupMgr manager object.
+	 */
+	public abstract IFileGroupMgr getFileGroupMgr();
+
+	/**
 	 * Fetch the FileIncludeMgr associated with this BuildStore. This object
 	 * encapsulates knowledge of which source files textually include which other
 	 * source files.

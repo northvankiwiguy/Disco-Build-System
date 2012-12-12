@@ -19,6 +19,7 @@ import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
@@ -52,6 +53,9 @@ public class BuildStore implements IBuildStore {
 	
 	/** The FileMgr manager object we'll delegate work to. */
 	private IFileMgr fileMgr;
+
+	/** The FileGroupMgr manager object we'll delegate work to. */
+	private IFileGroupMgr fileGroupMgr;
 
 	/** The FileIncludeMgr object we'll delegate work to. */
 	private IFileIncludeMgr fileIncludeMgr;
@@ -112,7 +116,10 @@ public class BuildStore implements IBuildStore {
 		
 		/* create a new FileMgr object to manage our list of files */
 		fileMgr = new FileMgr(this);
-		
+
+		/* create a new FileGroupMgr object to group together files */
+		fileGroupMgr = new FileGroupMgr(this);
+
 		/* create a new FileIncludeMgr object to manage the relationship between files */
 		fileIncludeMgr = new FileIncludeMgr(this);
 
@@ -166,6 +173,16 @@ public class BuildStore implements IBuildStore {
 	@Override
 	public IFileMgr getFileMgr() {
 		return fileMgr;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getFileGroupMgr()
+	 */
+	@Override
+	public IFileGroupMgr getFileGroupMgr() {
+		return fileGroupMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
