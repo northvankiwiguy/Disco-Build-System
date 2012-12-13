@@ -333,4 +333,19 @@ public interface IPackageMgr {
 	 */
 	public abstract ActionSet getActionsOutsidePackage(String pkgSpec);
 
+	/**
+	 * Add the specified listener to the list of objects that are notified when
+	 * a package changes in some way.
+	 * 
+	 * @param listener The object to be added as a listener.
+	 */
+	public void addListener(IPackageMgrListener listener);
+
+	/**
+	 * Remove the specified listener from the list of objects to be notified when
+	 * a package changes in some way.
+	 * 
+	 * @param listener The object to be removed from the list of listeners.
+	 */
+	public void removeListener(IPackageMgrListener listener);
 }

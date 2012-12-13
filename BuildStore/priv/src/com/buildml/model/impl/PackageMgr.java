@@ -15,11 +15,14 @@ package com.buildml.model.impl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -81,6 +84,9 @@ import com.buildml.utils.errors.ErrorCode;
 		findActionPackagePrepStmt = null,
 		findActionsInPackagePrepStmt = null,
 		findActionsOutsidePackagePrepStmt = null;
+	
+	/** The event listeners who are registered to learn about package changes */
+	List<IPackageMgrListener> listeners = new ArrayList<IPackageMgrListener>();
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -214,6 +220,11 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public int setName(int folderOrPackageId, String newName) {
 		
+		/* if there's no change in name, there's nothing to update */
+		if (newName.equals(getName(folderOrPackageId))) {
+			return ErrorCode.OK;
+		}
+		
 		/* check that the package/folder doesn't already exist in the database */
 		if (getId(newName) != ErrorCode.NOT_FOUND){
 			return ErrorCode.ALREADY_USED;
@@ -236,6 +247,7 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 				
+		notifyListeners(folderOrPackageId, IPackageMgrListener.CHANGED_NAME);
 		return ErrorCode.OK;
 	}
 	
@@ -858,6 +870,26 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		return getActionsOutsidePackage(pkgId);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#addListener(com.buildml.model.IPackageMgrListener)
+	 */
+	@Override
+	public void addListener(IPackageMgrListener listener) {
+		listeners.add(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#removeListener(com.buildml.model.IPackageMgrListener)
+	 */
+	@Override
+	public void removeListener(IPackageMgrListener listener) {
+		listeners.remove(listener);
+	};
 	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
@@ -941,7 +973,20 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/* return the new package's ID number */
 		return db.getLastRowID();
-	};
+	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Notify any registered listeners about our change in state.
+	 * @param pkgId   The package that has changed.
+	 * @param how     The way in which the package changed (see {@link IPackageMgrListener}).
+	 */
+	private void notifyListeners(int pkgId, int how) {
+		for (IPackageMgrListener listener : listeners) {
+			listener.packageChangeNotification(pkgId, how);
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

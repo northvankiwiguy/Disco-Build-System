@@ -907,4 +907,49 @@ public class TestPackageMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/** Our tests set these appropriately */
+	private int notifyPkgValue = 0;
+	private int notifyHowValue = 0;
+	
+	/**
+	 * Test listener notifications
+	 */
+	@Test
+	public void testNotify() {
+		
+		int pkgA = pkgMgr.addPackage("PkgA");
+		
+		/* set up a listener */
+		IPackageMgrListener listener = new IPackageMgrListener() {
+			@Override
+			public void packageChangeNotification(int pkgId, int how) {
+				TestPackageMgr.this.notifyPkgValue = pkgId;
+				TestPackageMgr.this.notifyHowValue = how;
+			}
+		};
+		pkgMgr.addListener(listener);
+		
+		/* Changing a name to itself doesn't trigger the notification */
+		notifyPkgValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgA"));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);
+
+		/* Changing a name to something new will trigger the notification */
+		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgB"));
+		assertEquals(pkgA, notifyPkgValue);
+		assertEquals(IPackageMgrListener.CHANGED_NAME, notifyHowValue);
+
+		/* remove the listener, and change the package again */
+		pkgMgr.removeListener(listener);
+		notifyPkgValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgC"));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

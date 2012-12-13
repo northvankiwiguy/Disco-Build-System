@@ -54,6 +54,7 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.refactor.IImportRefactorer;
 import com.buildml.refactor.imports.ImportRefactorer;
 
@@ -64,7 +65,7 @@ import com.buildml.refactor.imports.ImportRefactorer;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class MainEditor extends MultiPageEditorPart 
-	implements IResourceChangeListener {
+	implements IResourceChangeListener, IPackageMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -72,6 +73,9 @@ public class MainEditor extends MultiPageEditorPart
 
 	/** the BuildStore we've opened for editing */
 	private IBuildStore buildStore = null;
+	
+	/** The BuildStore's package manager */
+	private IPackageMgr pkgMgr;
 	
 	/** The refactorer that will manage refactoring (and its history) for this editor */
 	private IImportRefactorer importRefactorer;
@@ -144,12 +148,16 @@ public class MainEditor extends MultiPageEditorPart
 		if (buildStore == null) {
 			throw new PartInitException("Can't open the BuildML database.");
 		}
+		pkgMgr = buildStore.getPackageMgr();
 		
 		/* 
 		 * Register to learn about changes to resources in our workspace. We might need to
 		 * know if somebody deletes or renames the file we're editing.
 		 */
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+		
+		/* Listen to changes in the package naming */
+		pkgMgr.addListener(this);
 		
 		/*
 		 * Create a refactor manager that will be responsible for doing refactoring
@@ -484,7 +492,8 @@ public class MainEditor extends MultiPageEditorPart
 		
 		/* stop listening to resource changes */
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-
+		pkgMgr.removeListener(this);
+		
 		super.dispose();
 	}
 
@@ -647,6 +656,48 @@ public class MainEditor extends MultiPageEditorPart
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Open a new package diagram, or if such a diagram already exists, bring it to the front.
+	 * 
+	 * @param pkgId PackageMgr ID of the package to be displayed.
+	 */
+	public void openPackageDiagram(int pkgId) {
+		
+		/* first, see if a suitable editor is already open */
+		int index = findPackageDiagramById(pkgId);
+		if (index == -1) {
+			/* no existing editor for this package, open a new one */
+			PackageDiagramEditor newEditor = new PackageDiagramEditor(buildStore, pkgId);
+			index = newPage(newEditor);
+		}
+		setActivePage(index);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * A package has been renamed or modified in some way, so make sure any open editors
+	 * are updated from the model.
+	 * @param pkgId The ID of the package that was updated.
+	 * @param how   The way in which is was changed.
+	 */
+	@Override
+	public void packageChangeNotification(int pkgId, int how) {
+	
+		/* for now, we only care about name changes */
+		if (how == IPackageMgrListener.CHANGED_NAME) {
+			int index = findPackageDiagramById(pkgId);
+			if (index != -1) {
+			
+				/* update the editor tab's text */
+				String pkgName = pkgMgr.getName(pkgId);
+				setPageText(index, "Package: " + pkgName);
+			}
+		}
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -681,28 +732,26 @@ public class MainEditor extends MultiPageEditorPart
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Open a new package diagram, or if such a diagram already exists, bring it to the front.
+	 * Given a package ID number, return the tab index of the editor (if it's currently open).
 	 * 
-	 * @param pkgId PackageMgr ID of the package to be displayed.
+	 * @param pkgId The package ID for which we want to find an open PackageDiagramEditor.
+	 * @return The tab index of the open editor, or -1 if no such editor can be found.
 	 */
-	public void openPackageDiagram(int pkgId) {
-		
-		/* first, see if a suitable editor is already open */
+	private int findPackageDiagramById(int pkgId) {
+
 		int numEditors = getPageCount();
 		for (int i = 0; i < numEditors; i++) {
 			IEditorPart subEditor = getEditor(i);
 			if (subEditor instanceof PackageDiagramEditor) {
 				if (((PackageDiagramEditor)subEditor).getPackageId() == pkgId) {
-					setActivePage(i);
-					return;
+					return i;
 				}
 			}
 		}
 		
-		/* no existing editor for this package, open a new one */
-		PackageDiagramEditor newEditor = new PackageDiagramEditor(buildStore, pkgId);
-		setActivePage(newPage(newEditor));
+		/* not found */
+		return -1;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }
