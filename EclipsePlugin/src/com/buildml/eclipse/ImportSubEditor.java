@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.EditorPart;
 
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -480,8 +481,10 @@ public abstract class ImportSubEditor extends EditorPart implements IElementComp
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IElementComparer#equals(java.lang.Object, java.lang.Object)
+	/**
+	 * This method is used by TreeViewers to compare elements in the tree for "sameness".
+	 * This is useful when refreshing a TreeViewer, to ensure that expanded elements stay
+	 * expanded after a refresh.
 	 */
 	@Override
 	public boolean equals(Object a, Object b) {
@@ -492,10 +495,10 @@ public abstract class ImportSubEditor extends EditorPart implements IElementComp
 
 		/* 
 		 * Ensure that both a and b have the same class, which must be a class that's
-		 * derived from IntegerTreeRecord.
+		 * derived from UIInteger.
 		 */
-		if ((a instanceof IntegerTreeRecord) && (a.getClass() == b.getClass())) {
-			return ((IntegerTreeRecord)a).getId() == ((IntegerTreeRecord)b).getId();		
+		if ((a instanceof UIInteger) && (a.getClass() == b.getClass())) {
+			return ((UIInteger)a).getId() == ((UIInteger)b).getId();		
 		}
 		
 		return false;
