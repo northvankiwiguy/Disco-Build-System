@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.eclipse.utils.fieldeditors.WorkspaceFileSelectFieldEditor;
 
 /**
  * An abstract parent class for any Eclipse import wizard dialog pages that
@@ -50,7 +51,7 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 	 *=====================================================================================*/
 	
 	/** The field used to select the output file */
-	private FileFieldEditor outputFile;
+	private WorkspaceFileSelectFieldEditor outputFile;
 	
 	/** The textual name/path of the output file */
 	private String outputPath;
@@ -159,18 +160,27 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 			bmlFileComboBox = new Combo(outputGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 			bmlFileComboBox.add("");
 			for (int i = 0; i < openEditors.length; i++) {
-				String option = openEditors[i].getPartName(); 
-				bmlFileComboBox.add(option);
+				String option = openEditors[i].getFile().toString();
+				bmlFileComboBox.add(EclipsePartUtils.absoluteToWorkspaceRelativePath(option));
 			}
 			bmlFileComboBox.setLayoutData(
 					new GridData(SWT.FILL, SWT.CENTER, true, false));
 			
+			/* 
+			 * When the user selects from the combo box, update the text field with the
+			 * workspace-relative path of the build.bml file.
+			 */
 			bmlFileComboBox.addModifyListener(new ModifyListener() {				
 				@Override
 				public void modifyText(ModifyEvent e) {
 					int index = bmlFileComboBox.getSelectionIndex();
 					if (index > 0) {
-						outputFile.setStringValue(openEditors[index - 1].getFile().toString());
+						String absPath = openEditors[index - 1].getFile().toString();
+						String relPath = EclipsePartUtils.absoluteToWorkspaceRelativePath(absPath);
+						if (relPath == null) {
+							relPath = "";
+						}
+						outputFile.setStringValue(relPath);
 					}
 				}
 			});
@@ -179,9 +189,9 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 		/* Or select the BuildML file via a file browser */
 		Composite outputFileComposite = new Composite(outputGroup, SWT.NONE);
 		outputFileComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-		outputFile = new FileFieldEditor("outputFile", 
-				(openEditorsExist ? "or " : "") + "Browse BuildML Files: ", outputFileComposite);
-		outputFile.setFileExtensions(new String[] { "*.bml" });
+		outputFile = new WorkspaceFileSelectFieldEditor("outputFile", 
+				(openEditorsExist ? "or " : "") + "Browse BuildML Files: ", outputFileComposite,
+				new String[] { "*.bml" });
 		outputFile.getTextControl(outputFileComposite).addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent e) {
 				contentChanged();
@@ -201,8 +211,10 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 					IFile file = (IFile)obj;
 					String relativePath = file.getFullPath().toString();
 					if (relativePath.endsWith(".bml")) {
-						outputFile.setStringValue(
-								EclipsePartUtils.workspaceRelativeToAbsolutePath(relativePath));
+						outputFile.setStringValue(relativePath);
+						if (bmlFileComboBox != null) {
+							bmlFileComboBox.setText(relativePath);
+						}
 					}
 				}
 			}
@@ -215,13 +227,13 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return the path of the output file (with .bml extension) that the user has
+	 * Return the absolute path of the output file (with .bml extension) that the user has
 	 * selected. This method should be called once the "finish" button has been pressed.
 	 * @return The output file's full path.
 	 */
 	public String getOutputPath()
 	{
-		return outputPath;
+		return EclipsePartUtils.workspaceRelativeToAbsolutePath(outputPath);
 	}
 
 	/*=====================================================================================*
@@ -260,7 +272,8 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 		
 		ImportToBuildStorePage.this.setPageComplete(
 				outputPath.endsWith(".bml") &&
-				new File(outputPath).isFile() && isInputValid());	
+				new File(EclipsePartUtils.workspaceRelativeToAbsolutePath(outputPath)).isFile() &&
+				isInputValid());	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

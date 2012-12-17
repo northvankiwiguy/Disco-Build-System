@@ -336,6 +336,24 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Given an absolute file path, return it as a workspace-relative path (or null if
+	 * it's not within the workspace).
+	 * 
+	 * @param file The absolute file path.
+	 * @return The workspace-relative version of this path, or null if it's outside the
+	 * 	       workspace.
+	 */
+	public static String absoluteToWorkspaceRelativePath(String file) {
+		String root = workspaceRelativeToAbsolutePath("");
+		if (file.startsWith(root)) {
+			return file.substring(root.length());
+		}
+		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Open an Eclipse console view, ready for textual output to be displayed. This involves
 	 * either finding an existing console (with the specified name), or creating a new console.
 	 * In either case, ensure that the console is visible so the user can see the output.
@@ -497,6 +515,6 @@ public class EclipsePartUtils {
 		}
 		return iconImage;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }

@@ -108,7 +108,7 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage implements IPr
 	public void propertyChange(PropertyChangeEvent event) {
 		
 		String message = null;
-		String dirName = directoryFieldEditor.getAbsoluteDirectoryPath();
+		String dirName = directoryFieldEditor.getDirectoryPath();
 		IResource container = directoryFieldEditor.getResource();
 
 		/* determine if it's a valid directory */
