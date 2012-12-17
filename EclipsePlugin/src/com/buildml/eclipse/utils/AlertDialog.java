@@ -196,17 +196,23 @@ public class AlertDialog extends BmlTitleAreaDialog {
 			final String title, final String message, final int severity,
 			final boolean allowCancel) {
 		
-		final AlertDialog dialog = new AlertDialog(title, message, severity, allowCancel);
+		/* for returning the dialog code (OK/Cancel/etc) from the UI thread */
+		final Integer retCode[] = new Integer[1];
 
 		/* Open the dialog in the UI thread, blocking until the user presses "OK" */
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
+				AlertDialog dialog = new AlertDialog(title, message, severity, allowCancel);
 				dialog.setBlockOnOpen(true);
-				dialog.open();		
+				dialog.open();
+				
+				/* return response back to our calling thread */
+				retCode[0] = dialog.getReturnCode();
 			}
 		});
 		
-		return dialog.getReturnCode();
+		/* status code? (OK, Cancel, etc) */
+		return retCode[0];
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
