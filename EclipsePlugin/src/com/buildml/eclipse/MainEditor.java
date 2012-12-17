@@ -19,9 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Image;
@@ -46,7 +43,6 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.buildml.eclipse.actions.ActionsEditor;
-import com.buildml.eclipse.bobj.UIPackage;
 import com.buildml.eclipse.files.FilesEditor;
 import com.buildml.eclipse.outline.OutlinePage;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
@@ -347,15 +343,18 @@ public class MainEditor extends MultiPageEditorPart
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		try {
+			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+
 			/* save the database to disk */
-			buildStore.save();
+			String absPath = EclipsePartUtils.workspaceRelativeToAbsolutePath(
+													file.getFullPath().toOSString());
+			buildStore.saveAs(absPath);
 			
 			/* 
 			 * Update Eclipse's resources, so it notices that the file has changed. This
 			 * is only necessary if the file is in the workspace.
 			 */
 			if (getEditorInput() instanceof IFileEditorInput) {
-				IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 				try {
 					file.refreshLocal(IFile.DEPTH_ONE, monitor);
 				} catch (CoreException e) {
@@ -628,9 +627,13 @@ public class MainEditor extends MultiPageEditorPart
 								/* 
 								 * if so, record the new name, and proceed to change the name
 								 * of the editor tab (in a UI thread) to be the basename of the
-								 * file's path.
+								 * file's path. Also, update the editor's "input" so that Eclipse
+								 * knows that the editor content has moved.
 								 */
-								fileInput = newFile;								
+								fileInput = newFile;
+								IResource newIFile = ResourcesPlugin.getWorkspace().getRoot().
+															findMember(change.getMovedToPath());
+								setInput(new FileEditorInput((IFile) newIFile));
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
