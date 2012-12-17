@@ -2,6 +2,7 @@ package com.buildml.eclipse;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
@@ -137,7 +138,11 @@ public class MainEditor extends MultiPageEditorPart
 		/* open the BuildStore file we're editing */
 		
 		IURIEditorInput editorInput = (IURIEditorInput)input;
-		fileInput = new File(editorInput.getURI().getPath());
+		URI uri = editorInput.getURI();
+		if (uri == null) {
+			throw new PartInitException("Invalid Input: File URI is invalid");			
+		}
+		fileInput = new File(uri.getPath());
 
 		// TODO: handle the case where multiple editors have the same BuildStore open.
 		
@@ -488,12 +493,13 @@ public class MainEditor extends MultiPageEditorPart
 	public void dispose() {
 
 		/* close the BuildStore to release resources */
-		buildStore.close();
+		if (buildStore != null) {
+			buildStore.close();
+			pkgMgr.removeListener(this);
+		}
 		
 		/* stop listening to resource changes */
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-		pkgMgr.removeListener(this);
-		
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);		
 		super.dispose();
 	}
 
@@ -591,23 +597,27 @@ public class MainEditor extends MultiPageEditorPart
 
 	/**
 	 * This method is called whenever a resource in our project is modified. We only
-	 * care about this if somebody has deleted or renamed the file that we're editing. 
+	 * care about this if somebody has deleted, moved or renamed the file that we're editing. 
 	 * Otherwise this event is ignored.
 	 */
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		IResourceDelta changes = event.getDelta();
 		try {
+			final String workspaceFileInput = 
+					EclipsePartUtils.absoluteToWorkspaceRelativePath(fileInput.toString());
+			
+			/* process each file change that was made... */
 			changes.accept(new IResourceDeltaVisitor() {
 				public boolean visit(IResourceDelta change) {
 					if (change.getResource().getType() == IResource.FILE) {
-						IResource resource = change.getResource();
 						
 						/* 
 						 * Is the changed file the file that we're editing? Also, is the
 						 * change a "remove" operation (a delete or a rename).
 						 */
-						if (resource.getLocation().toFile().equals(fileInput) &&
+						IPath location = change.getFullPath();
+						if (location.toString().equals(workspaceFileInput) &&
 								(change.getKind() == IResourceDelta.REMOVED)) {
 
 							/* was the file renamed? */
