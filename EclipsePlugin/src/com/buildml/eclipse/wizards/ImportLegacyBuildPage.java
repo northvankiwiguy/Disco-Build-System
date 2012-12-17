@@ -12,9 +12,9 @@
 
 package com.buildml.eclipse.wizards;
 
-import java.io.File;
-
-import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.core.resources.IResource;import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import com.buildml.eclipse.utils.fieldeditors.WorkspaceDirSelectFieldEditor;
 
 /**
  * An Eclipse import wizard page, for importing a legacy build process into a BuildStore. 
@@ -29,7 +30,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class ImportLegacyBuildPage extends ImportToBuildStorePage {
+public class ImportLegacyBuildPage extends ImportToBuildStorePage implements IPropertyChangeListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -44,12 +45,13 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage {
 	/** The textual shell command that the user has entered */
 	private String inputCommandString;
 	
-	/** The textual path of the user-selected directory */
-	private String inputPath;
+	/** Flag indicating whether the current "import directory" content is valid */
+	private boolean isDirectoryValid = false;
 		
-	/**
-	 * Textual instructions, to be shown near the top of the wizard page.
-	 */
+	/** The directory browser widget */
+	private WorkspaceDirSelectFieldEditor directoryFieldEditor;
+	
+	/** Textual instructions, to be shown near the top of the wizard page. */
 	private static String instructions = "The legacy build process will be executed and " +
 			"parsed, with the files and actions being inserted into the selected " +
 			"BuildML (.bml) file.";
@@ -79,7 +81,7 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage {
 	 */
 	public String getInputPath()
 	{
-		return inputPath;
+		return directoryFieldEditor.getAbsoluteDirectoryPath();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -92,6 +94,35 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage {
 	public String getInputCommand()
 	{
 		return inputCommandString;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called whenever the user enters text into the "execution directory" field. This method
+	 * updates the status after determining whether the directory path is valid.
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		
+		String message = null;
+		String dirName = directoryFieldEditor.getAbsoluteDirectoryPath();
+		IResource container = directoryFieldEditor.getResource();
+
+		/* determine if it's a valid directory */
+		if (dirName.length() == 0) {
+			message = "Import project/folder must be specified.";
+		} else if ((container == null) || 
+				((!dirName.equals("/")) && 
+				(container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0)) {
+			message = "Import project/folder doesn't exist.";
+		}
+		
+		setErrorMessage(message);
+		isDirectoryValid = (message == null);
+		
+		/* re-evaluate whether the "finish" button should be highlighted */
+		contentChanged();
 	}
 	
 	/*=====================================================================================*
@@ -114,13 +145,14 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage {
 		addTextValidator(inputCommand);
 		
 		/* second, the directory in which the command should be executed */
-		Composite inputDirectoryComposite = new Composite(parent, SWT.NONE);
-		inputDirectoryComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		inputDirectory = new DirectoryFieldEditor("inputDirectory", 
-				"Select Execution Directory: ", inputDirectoryComposite);
-		addTextValidator(inputDirectory.getTextControl(inputDirectoryComposite));
+		Composite container = new Composite(parent, SWT.NULL);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		container.setLayoutData(gd);
+		directoryFieldEditor = 
+				new WorkspaceDirSelectFieldEditor("Directory", "Execution Directory: ", container);
+		directoryFieldEditor.setPropertyChangeListener(this);
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -131,10 +163,9 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage {
 	 */
 	@Override
 	protected boolean isInputValid() {
-		inputPath = inputDirectory.getStringValue();
 		inputCommandString = inputCommand.getText();
-		return (!inputCommandString.isEmpty()) && new File(inputPath).isDirectory();
+		return (!inputCommandString.isEmpty()) && isDirectoryValid;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }

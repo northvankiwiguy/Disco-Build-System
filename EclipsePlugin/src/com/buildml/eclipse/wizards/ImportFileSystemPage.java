@@ -12,13 +12,14 @@
 
 package com.buildml.eclipse.wizards;
 
-import java.io.File;
-
-import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import com.buildml.eclipse.utils.fieldeditors.WorkspaceDirSelectFieldEditor;
 
 /**
  * An Eclipse import wizard page, for importing a file system hierarchy
@@ -27,24 +28,22 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class ImportFileSystemPage extends ImportToBuildStorePage {
+public class ImportFileSystemPage extends ImportToBuildStorePage implements IPropertyChangeListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
-	
-	/** The UI field for entering the directory hierarchy */
-	protected DirectoryFieldEditor inputFile;
 
-	/** The textual path of the user-selected directory path */
-	private String inputPath;
+	/** Flag indicating whether the current "import directory" content is valid */
+	private boolean isValid = false;
 	
-	/**
-	 * Textual instructions, to be shown near the top of the wizard page.
-	 */
-	private static String instructions = "The file system directory will be scanned, with " +
-			" the files and directories being inserted into the selected " +
+	/** Textual instructions, to be shown near the top of the wizard page. */
+	private static String instructions = "The workspace directory will be scanned, with " +
+			"the files and directories being inserted into the selected " +
 			"BuildML (.bml) file.";
+
+	/** The directory browser widget */
+	private WorkspaceDirSelectFieldEditor directoryFieldEditor;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -58,7 +57,7 @@ public class ImportFileSystemPage extends ImportToBuildStorePage {
 	 */
 	public ImportFileSystemPage(String pageName, ISelection selection) {
 		super(pageName, instructions, selection);
-		setDescription("Select the source directory hierarchy and the destination BuildML file.");
+		setDescription("Select the source directory and the destination BuildML file.");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -70,7 +69,36 @@ public class ImportFileSystemPage extends ImportToBuildStorePage {
 	 */
 	public String getDirectoryPath()
 	{
-		return inputPath;
+		return directoryFieldEditor.getAbsoluteDirectoryPath();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called whenever the user enters text into the "import directory" field. This method
+	 * updates the status after determining whether the directory path is valid.
+	 */
+	public void propertyChange(PropertyChangeEvent event) {
+
+		String message = null;
+
+		/* determine if the current field entry refers to a directory */
+		String dirName = directoryFieldEditor.getStringValue();
+		IResource container = directoryFieldEditor.getResource();
+
+		if (dirName.length() == 0) {
+			message = "Import project/folder must be specified.";
+		} else if ((container == null) || 
+				((!dirName.equals("/")) && 
+				(container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0)) {
+			message = "Import project/folder doesn't exist.";
+		}
+		
+		setErrorMessage(message);
+		isValid = (message == null);
+		
+		/* re-evaluate whether the "finish" button should be highlighted */
+		contentChanged();
 	}
 	
 	/*=====================================================================================*
@@ -82,26 +110,24 @@ public class ImportFileSystemPage extends ImportToBuildStorePage {
 	 * @param parent The group box we're adding the fields into.
 	 */
 	protected void createInputFields(Composite parent) {
-		Composite inputFileComposite = new Composite(parent, SWT.NONE);
-		inputFileComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		inputFile = new DirectoryFieldEditor("inputDirectory", "Select Directory Hierarchy: ", 
-										inputFileComposite);
-		addTextValidator(inputFile.getTextControl(inputFileComposite));
+		Composite container = new Composite(parent, SWT.NULL);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		container.setLayoutData(gd);
+		directoryFieldEditor = 
+				new WorkspaceDirSelectFieldEditor("Directory", "Import Directory: ", container);
+		directoryFieldEditor.setPropertyChangeListener(this);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Determine whether the input field contains valid content. The only check we do is
-	 * whether the directory exists.
-	 * 
+	 * Determine whether the input field contains valid content. 
 	 * @return true if the fields are valid, else false.
 	 */
 	@Override
 	protected boolean isInputValid() {
-		inputPath = inputFile.getStringValue();
-		return new File(inputPath).isDirectory();
+		return isValid;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

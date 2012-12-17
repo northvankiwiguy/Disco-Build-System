@@ -247,6 +247,21 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * This method should be called after any input field is modified (including those
+	 * added by sub-classes). The goal is to determine whether the current combination of
+	 * input fields is valid.
+	 */
+	protected void contentChanged() {
+		outputPath = ImportToBuildStorePage.this.outputFile.getStringValue();
+		
+		ImportToBuildStorePage.this.setPageComplete(
+				outputPath.endsWith(".bml") &&
+				new File(outputPath).isFile() && isInputValid());	
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Given a Text input field, monitor changes to that field to determine whether the
 	 * content is valid. The subclass must implement isInputValid() to state whether their
 	 * input fields are valid, or not (valid means that the value can be used to perform
@@ -257,11 +272,7 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 	protected void addTextValidator(Text textControl) {
 		textControl.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent e) {
-				outputPath = ImportToBuildStorePage.this.outputFile.getStringValue();
-				
-				ImportToBuildStorePage.this.setPageComplete(
-						outputPath.endsWith(".bml") &&
-						new File(outputPath).isFile() && isInputValid());
+				contentChanged();
 			}
 		});
 	}
