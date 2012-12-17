@@ -89,8 +89,8 @@ public class ImportFileSystemPage extends ImportToBuildStorePage implements IPro
 		if (dirName.length() == 0) {
 			message = "Import project/folder must be specified.";
 		} else if ((container == null) || 
-				((!dirName.equals("/")) && 
-				(container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0)) {
+				   (container.getType() & 
+						(IResource.PROJECT | IResource.FOLDER | IResource.ROOT)) == 0) {
 			message = "Import project/folder doesn't exist.";
 		}
 		

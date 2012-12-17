@@ -17,6 +17,8 @@ import java.io.File;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -88,7 +90,11 @@ public class ImportEaAnnoPage extends ImportToBuildStorePage {
 		inputFile = new FileFieldEditor("inputFile", "Select an Annotation File: ", 
 										inputFileComposite);
 		inputFile.setFileExtensions(new String[] { "*.xml" });
-		addTextValidator(inputFile.getTextControl(inputFileComposite));
+		inputFile.getTextControl(inputFileComposite).addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				contentChanged();
+			}
+		});
 	}
 
 	/*-------------------------------------------------------------------------------------*/

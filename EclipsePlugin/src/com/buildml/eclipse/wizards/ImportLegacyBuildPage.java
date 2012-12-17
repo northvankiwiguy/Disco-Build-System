@@ -17,6 +17,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -112,9 +114,9 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage implements IPr
 		/* determine if it's a valid directory */
 		if (dirName.length() == 0) {
 			message = "Import project/folder must be specified.";
-		} else if ((container == null) || 
-				((!dirName.equals("/")) && 
-				(container.getType() & (IResource.PROJECT | IResource.FOLDER)) == 0)) {
+		} else if ((container == null) ||  
+				   (container.getType() & 
+					(IResource.PROJECT | IResource.FOLDER | IResource.ROOT)) == 0) {
 			message = "Import project/folder doesn't exist.";
 		}
 		
@@ -142,7 +144,11 @@ public class ImportLegacyBuildPage extends ImportToBuildStorePage implements IPr
 		GridData inputCommandData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		inputCommandData.heightHint = Display.getCurrent().getClientArea().height / 8;
 		inputCommand.setLayoutData(inputCommandData);
-		addTextValidator(inputCommand);
+		inputCommand.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				contentChanged();
+			}
+		});
 		
 		/* second, the directory in which the command should be executed */
 		Composite container = new Composite(parent, SWT.NULL);

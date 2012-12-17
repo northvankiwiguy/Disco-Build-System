@@ -13,6 +13,7 @@
 package com.buildml.eclipse.utils.fieldeditors;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.StringButtonFieldEditor;
@@ -65,7 +66,13 @@ public class WorkspaceDirSelectFieldEditor extends StringButtonFieldEditor {
 	 * not valid.
 	 */
 	public IResource getResource() {
-		return ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getStringValue()));
+		String path = getStringValue();
+		IWorkspaceRoot rootResource = ResourcesPlugin.getWorkspace().getRoot();
+		if (path.equals("/")) {
+			return rootResource;
+		} else {
+			return rootResource.findMember(new Path(path));
+		}
 	}
 
 	/*=====================================================================================*

@@ -182,7 +182,11 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 		outputFile = new FileFieldEditor("outputFile", 
 				(openEditorsExist ? "or " : "") + "Browse BuildML Files: ", outputFileComposite);
 		outputFile.setFileExtensions(new String[] { "*.bml" });
-		addTextValidator(outputFile.getTextControl(outputFileComposite));
+		outputFile.getTextControl(outputFileComposite).addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent e) {
+				contentChanged();
+			}
+		});
 
 		/*
 		 * If there was a .bml file selected when the "import" operation was initiated, select
@@ -257,24 +261,6 @@ public abstract class ImportToBuildStorePage extends WizardPage {
 		ImportToBuildStorePage.this.setPageComplete(
 				outputPath.endsWith(".bml") &&
 				new File(outputPath).isFile() && isInputValid());	
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Given a Text input field, monitor changes to that field to determine whether the
-	 * content is valid. The subclass must implement isInputValid() to state whether their
-	 * input fields are valid, or not (valid means that the value can be used to perform
-	 * the "finish" operation).
-	 * 
-	 * @param textControl The text input field for which changes will be monitored.
-	 */
-	protected void addTextValidator(Text textControl) {
-		textControl.addModifyListener(new ModifyListener(){
-			public void modifyText(ModifyEvent e) {
-				contentChanged();
-			}
-		});
 	}
 
 	/*-------------------------------------------------------------------------------------*/
