@@ -11,9 +11,14 @@ Creating New Files and Importing
   - Select “File -> New -> BuildML File” and create a new build.bml file in the Eclipse workspace. The file should 
     automatically open in the BuildML editor, albeit empty.
   - Flip between the Files and Action tabs, to ensure that both are empty.
+  - For error checking purposes, go back to the "New -> BuildML File" and try various values in the "parent folder"
+    and "file name" fields. The "Finish" button should be grayed out if the field values are invalid (invalid
+    folder, or file name that doesn't end with .bml).
 
 * Import a directory hierarchy.
   - Select “File -> Import -> Import Directory Hierarchy”.
+  - Try out various value in the input fields, making sure that the "Finish" button is grayed out if not all
+    input fields are valid (invalid directory, or invalid .bml file).
   - Select “/usr/include” as the directory to include, and select your new build.bml file from the “choose open buildml 
     file” field.
   - Click “finish”, the check that the “files” tab contains the content of the /usr/include directory. The actions tab 
@@ -22,6 +27,20 @@ Creating New Files and Importing
     presented with a “choose open buildml file” field, so instead you should browse for the build2.bml file.
   - Repeat the import with both build.bml and build2.bml. You should see that both files are listed in the “choose open 
     buildml file” field. Selecting each option will fill in the absolute path of the .bml file.
+
+Renaming Files
+--------------
+
+* Test that the editor knows that it has been moved/renamed.
+  - Open a build.bml file in the editor.
+  - Modify the name of the editor (in the package explorer). The name at the top of the editor should change to the
+    new name.
+  - Make a modification to the editor (such as adding a new package).
+  - Save the dirty editor, then reload the editor to ensure that the change got saved to the file's new location.
+  - Repeat, but this time change the name of the project that contains the editor file.
+  - Finally, with the editor still open, go to the "Import -> Legacy Build" wizard and check that the editor's
+    correct (new) location appears in the .bml file combo box.
+
 
 Browsing the Files tab
 ----------------------
