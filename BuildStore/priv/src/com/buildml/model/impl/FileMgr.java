@@ -425,6 +425,8 @@ public class FileMgr implements IFileMgr {
 	@Override
 	public String getPathName(int pathId, boolean showRoots) {
 
+		// TODO: show relevant package root.
+		
 		// TODO: handle case where the pathId is invalid.
 		StringBuffer sb = new StringBuffer();
 		
@@ -449,6 +451,17 @@ public class FileMgr implements IFileMgr {
 	@Override
 	public String getPathName(int pathId) {
 		return getPathName(pathId, false);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#getNativePath(int)
+	 */
+	@Override
+	public String getNativePathName(int pathId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -980,6 +993,6 @@ public class FileMgr implements IFileMgr {
 			return (Integer)childPathAndType[0];
 		}
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }

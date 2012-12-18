@@ -253,6 +253,17 @@ public interface IFileMgr {
 	public abstract Integer[] getChildPaths(int pathId);
 
 	/**
+	 * For the specified pathId, return the corresponding native path (on the underlying
+	 * file system), which is relevant for accessing files on the current build machine.
+	 * The native file location will be dependent on the mapped location of the file's
+	 * package root.
+	 * 
+	 * @param pathId The ID of the path.
+	 * @return The path of the file which is accessible on the local native file system.
+	 */
+	public abstract String getNativePathName(int pathId);
+
+	/**
 	 * Remove a specific path from the build store. This operation can be only be performed
 	 * on files and directories that are unused. That is, directories must be empty, and 
 	 * files/directories must not be reference by any actions (or any other such objects).

@@ -23,6 +23,7 @@ import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.utils.version.Version;
 
@@ -72,6 +73,9 @@ public class BuildStore implements IBuildStore {
 	/** The Packages manager object we'll delegate work to. */
 	private IPackageMgr packages;
 	
+	/** The PackageRootMgr object we'll delegate work to */
+	private IPackageRootMgr pkgRootMgr;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -113,27 +117,18 @@ public class BuildStore implements IBuildStore {
 						". Expected version " + actualVersion + ".");
 			}
 		}
-		
-		/* create a new FileMgr object to manage our list of files */
+
+		/*
+		 * Create a bunch of manager objects that we'll delegate work to.
+		 */
 		fileMgr = new FileMgr(this);
-
-		/* create a new FileGroupMgr object to group together files */
 		fileGroupMgr = new FileGroupMgr(this);
-
-		/* create a new FileIncludeMgr object to manage the relationship between files */
 		fileIncludeMgr = new FileIncludeMgr(this);
-
-		/* create a new ActionMgr object to manage the relationship between files */
 		actionMgr = new ActionMgr(this);
-		
-		/* create a new ReportMgr object to provide reporting methods */
 		reportMgr = new ReportMgr(this);
-		
-		/* create a new FileAttributeMgr object to manage the attributes on files */
 		fileAttrMgr = new FileAttributeMgr(this, fileMgr);
-		
-		/* create a new Packages object */
-		packages = new PackageMgr(this);		
+		packages = new PackageMgr(this);
+		pkgRootMgr = new PackageRootMgr(this);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -233,6 +228,16 @@ public class BuildStore implements IBuildStore {
 	@Override
 	public IPackageMgr getPackageMgr() {
 		return packages;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getPackageRootMgr()
+	 */
+	@Override
+	public IPackageRootMgr getPackageRootMgr() {
+		return pkgRootMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

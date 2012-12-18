@@ -95,6 +95,14 @@ public interface IBuildStore {
 	public abstract IPackageMgr getPackageMgr();
 
 	/**
+	 * Fetch the PackageRootMgr associated with this BuildStore. This object
+	 * encapsulates knowledge of the package roots and their location.
+	 * 
+	 * @return A PackageRootMgr manager object.
+	 */
+	public abstract IPackageRootMgr getPackageRootMgr();
+
+	/**
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
 	 * changes are written to the disk. Only use fast access for long-running
