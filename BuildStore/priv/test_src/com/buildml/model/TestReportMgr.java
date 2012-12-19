@@ -719,7 +719,7 @@ public class TestReportMgr {
 
 		/* an empty file store still has the "/" path in it */
 		FileSet result = reports.reportAllFiles();
-		assertEquals(1, result.size());
+		assertEquals(2, result.size());		/* includes /tmp */
 		assertTrue(result.isMember(dirRoot));
 		
 		/* add a bunch of paths and test that their in the set */
@@ -734,7 +734,7 @@ public class TestReportMgr {
 		int dirC = fileMgr.getPath("/a/b/c");
 		
 		result = reports.reportAllFiles();
-		assertEquals(10, result.size());
+		assertEquals(11, result.size());		/* includes /tmp */
 		assertTrue(result.isMember(fileAJava));
 		assertTrue(result.isMember(fileBJava));
 		assertTrue(result.isMember(fileCJava));
@@ -748,17 +748,17 @@ public class TestReportMgr {
 		/* delete a few paths and try again */
 		fileMgr.movePathToTrash(fileAC);
 		result = reports.reportAllFiles();
-		assertEquals(9, result.size());
+		assertEquals(10, result.size());
 		assertFalse(result.isMember(fileAC));
 
 		fileMgr.movePathToTrash(fileCC);
 		result = reports.reportAllFiles();
-		assertEquals(8, result.size());
+		assertEquals(9, result.size());
 		assertFalse(result.isMember(fileCC));
 
 		fileMgr.movePathToTrash(dirC);
 		result = reports.reportAllFiles();
-		assertEquals(7, result.size());
+		assertEquals(8, result.size());
 		assertFalse(result.isMember(dirC));
 	}
 	

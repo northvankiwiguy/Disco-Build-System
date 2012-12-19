@@ -27,33 +27,59 @@ public interface IPackageRootMgr {
 	public static final int GENERATED_ROOT = 1;
 	
 	/**
-	 * Set the location of the workspace root. This is done by specifying the
-	 * number of parent directories between the location of the current 
-	 * build.bml file and the workspace root.
+	 * Specify the location of the workspace root, within the BuildML
+	 * build tree. The workspace root must be further up the tree than
+	 * any package roots, or the BuildML database file.
 	 * 
-	 * That is, if the build.bml file is in /a/b/c/d/build.bml, and the
-	 * workspace root is at /a/b/, pass a value of 2 to this method. 
-	 * 
-	 * This setting is persistent (stored in the database) and allows all files
-	 * in the BuildStore to be stored as relative paths, without any absolute 
-	 * (machine-specific) paths involved.
-	 *
-	 * @param distance  The distance between the workspace and the current 
-	 * 					build.bml file.
-	 * @return ErrorCode.OK on success or ErrorCode.BAD_PATH if the distance
-	 *         is invalid (too large or too small).
+	 * @param pathId The ID of the path (directory) to set as the workspace
+	 *        root.
+	 * @return ErrorCode.OK on success, ErrorCode.BAD_VALUE if the
+	 *         pathId is invalid or not a directory, or ErrorCode.BAD_PATH 
+	 *         if any package root, or the BuildML database file, would not
+	 *         be encompassed by the new root.
 	 */
-	public int setRelativeWorkspace(int distance);
-
+	public int setWorkspaceRoot(int pathId);
+	
 	/**
-	 * Return the distance to the current workspace root, as previously set
-	 * by a call to setRelativeWorkspace(). If no call has yet been made
-	 * to setRelativeWorkspace, the directory containing the build.bml
-	 * file will be given (value of 0).
-	 * 
-	 * @return The distance between build.bml and the workspace root.
+	 * @return The ID of the path that is currently set as the workspace root
+	 * or ErrorCode.NOT_FOUND if a root hasn't yet been set.
 	 */
-	public int getRelativeWorkspace();
+	public int getWorkspaceRoot();
+	
+	/**
+	 * Set (override) the native path associated with the workspace root. When
+	 * file are actually accessed on the file system, this will be done so using
+	 * the nativePath-relative location, making it possible to move the files
+	 * to a new location, yet still use the same BuildML database content.
+	 * 
+	 * @param nativePath The new setting for the 
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_A_DIRECTORY if the
+	 *         specified path is not a valid native directory.
+	 */
+	public int setWorkspaceRootNative(String nativePath);
+	
+	/**
+	 * Return the native path of the workspace root. Unless overridden by a call
+	 * to setWorkspaceRootNative, the path will be calculated as being "depth"
+	 * levels above the location of the current BuildML database file. "depth"
+	 * is defined by a call to setBuildMLFileDepth().
+	 * 
+	 * @return The native path of the workspace root.
+	 */
+	public String getWorkspaceRootNative();
+		
+	/**
+	 * Specify how many directory levels exist between the workspace root
+	 * and this BuildML database file. This "depth" value is persisted
+	 * in the database and can be used to reverse-engineer the native 
+	 * workspace root, based on the native path to the database file.
+	 *
+	 * @param depth  The distance between the workspace root and the current 
+	 * 				 build.bml file.
+	 * @return ErrorCode.OK on success, or ErrorCode.BAD_PATH if the depth
+	 * 	       is invalid (the workspace would be above the file system root).
+	 */
+	public int setBuildMLFileDepth(int depth);
 
 	/**
 	 * Set the default (persistent) source or generated root for a particular package.
@@ -69,7 +95,7 @@ public interface IPackageRootMgr {
 	 *         valid, ErrorCode.BAD_VALUE if type is invalid, or ErrorCode.BAD_PATH
 	 *         if the path is not enclosed within the workspace root.
 	 */
-	public int setPackageRoot(int packageId, int type, String pathId);
+	public int setPackageRoot(int packageId, int type, int pathId);
 	
 	/**
 	 * Set the temporary source or generated root for a particular package. This method
@@ -93,7 +119,7 @@ public interface IPackageRootMgr {
 	 *         valid, ErrorCode.BAD_VALUE if type is invalid, or ErrorCode.BAD_PATH
 	 *         if the path does not exist on the native file system.
 	 */
-	public int setRootMapping(int packageId, int type, String path);
+	public int setPackageRootNative(int packageId, int type, String path);
 	
 	/**
 	 * Remove the previous root, as set by overridePackageRoot(). This only affects
@@ -106,7 +132,7 @@ public interface IPackageRootMgr {
 	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if the packageId is not
 	 *         valid, or ErrorCode.BAD_VALUE if type is invalid.
 	 */
-	public int clearRootMapping(int packageId, int type);
+	public int clearPackageRootNative(int packageId, int type);
 	
 	/**
 	 * Retrieve the source or generate root for the specified package, as a
@@ -123,7 +149,7 @@ public interface IPackageRootMgr {
 	 *                   IPackageRootMgr.GENERATED_ROOT.
 	 * @return The native path to the package's root.
 	 */
-	public String getRootNativePath(int packageId, int type);
+	public String getPackageRootNative(int packageId, int type);
 
 	/**
 	 * Retrieve the specified root, as a native path. This will return the value last
@@ -138,7 +164,7 @@ public interface IPackageRootMgr {
 	 * @param rootName The textual name of the root.
 	 * @return The path to the package's root.
 	 */
-	public String getRootNativePath(String rootName);
+	public String getRootNative(String rootName);
 
 	/**
 	 * Return an array of all root names that are currently valid. The list is returned
@@ -151,11 +177,11 @@ public interface IPackageRootMgr {
 	public String[] getRoots();
 		
 	/**
-	 * If this path has an associated root attached to it, return the root name. If there's
-	 * no root, return null. There can be at most one root associated with this path.
+	 * If this path has one or more roots attached to it, return the root names
+	 * (in alphabetical order).
 	 * 
 	 * @param pathId The ID of the path we're querying.
-	 * @return The name of the root, or null if there's no root attached.
+	 * @return The names of the associated roots (possibly empty).
 	 */
-	public String getRootAtPath(int pathId);
+	public String[] getRootsAtPath(int pathId);
 }

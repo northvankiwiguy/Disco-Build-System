@@ -378,7 +378,7 @@ public class TestFileMgr {
 		/* case 1 - child of root */
 		int path1 = fileMgr.getRootPath("root");
 		Integer children[] = fileMgr.getChildPaths(path1);
-		assertEquals(0, children.length);
+		assertEquals(1, children.length);  /* /tmp */
 		
 		/* 
 		 * Add a couple of paths and check that they're returned

@@ -104,7 +104,7 @@ import com.buildml.utils.version.Version;
 		}
 		
 		/* save the user-facing name of the database file, for when we need to save */
-		databaseFileName = fileToOpen;
+		databaseFileName = new File(fileToOpen).getAbsolutePath();
 		
 		/*
 		 * If we want save/saveAs functionality, create a temporary database file
@@ -276,9 +276,12 @@ import com.buildml.utils.version.Version;
 			stat.executeUpdate("create table fileRoots (name text primary key, fileId integer)");	
 			stat.executeUpdate("insert into fileRoots values (\"root\", 0)");
 			
+			/* Create the "workspace" table */
+			stat.executeUpdate("create table workspace (distance integer)");
+			stat.executeUpdate("insert into workspace values (0)");			
+			
 			/* Create the fileAttrsName table */
 			stat.executeUpdate("create table fileAttrsName (id integer primary key, name text)");
-			
 			
 			/* Create the fileAttrs table */
 			stat.executeUpdate("create table fileAttrs (pathId integer, attrId integer, value text)");
@@ -662,7 +665,7 @@ import com.buildml.utils.version.Version;
 	 */
 	public void saveAs(String fileToSave) throws IOException {
 		if (saveRequired) {
-			databaseFileName = fileToSave;
+			databaseFileName = new File(fileToSave).getAbsolutePath();
 			save();
 		}
 	}
@@ -684,6 +687,15 @@ import com.buildml.utils.version.Version;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to remove trashed files and actions", e);
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The (native) path to the file containing our database.
+	 */
+	public String getDatabaseFileName() {
+		return databaseFileName;
 	}
 	
 	/*=====================================================================================*

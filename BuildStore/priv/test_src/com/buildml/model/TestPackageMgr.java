@@ -612,11 +612,11 @@ public class TestPackageMgr {
 		 */
 		int rootPathId = fileMgr.getPath("/");
 		results = pkgMgr.getFilesOutsidePackage(pkgA);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());		/* includes /tmp */
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());		/* includes /tmp */
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());		/* includes /tmp */
 		
 		/* add a single file to the "private" section of pkgA */
 		int file1 = fileMgr.addFile("/myfile1");
@@ -632,11 +632,12 @@ public class TestPackageMgr {
 
 		/* now, we one file in pkgA/priv, we have some files outside the other packages */
 		results = pkgMgr.getFilesOutsidePackage(pkgA);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());	/* includes /tmp */
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1}));
+		assertTrue(results.isMember(rootPathId));
+		assertTrue(results.isMember(file1));
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());	/* includes /tmp */
 		
 		/* now add another to pkgA/priv and check again */
 		int file2 = fileMgr.addFile("/myfile2");
@@ -650,11 +651,12 @@ public class TestPackageMgr {
 		
 		/* now, we two files, we have some more files outside */
 		results = pkgMgr.getFilesOutsidePackage(pkgA);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());	/* includes /tmp */
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		assertTrue(results.isMember(file1));
+		assertTrue(results.isMember(file2));
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());	/* include /tmp */
 		
 		/* finally, add one to pkgA/pub and check again */
 		int file3 = fileMgr.addFile("/myfile3");
@@ -666,11 +668,12 @@ public class TestPackageMgr {
 		results = pkgMgr.getFilesInPackage(pkgA, sectPriv);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));		
 		results = pkgMgr.getFilesOutsidePackage(pkgA);
-		assertEquals(1, results.size());
+		assertEquals(2, results.size());	/* includes /tmp */
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		assertTrue(results.isMember(file1));
+		assertTrue(results.isMember(file2));
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file3}));
+		assertTrue(results.isMember(file3));
 		
 		/* move file1 back into <import> */
 		pkgMgr.setFilePackage(file1, pkgImport, sectPriv);
@@ -683,11 +686,13 @@ public class TestPackageMgr {
 		
 		/* now we have a file outside of pkgA */
 		results = pkgMgr.getFilesOutsidePackage(pkgA);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1}));		
+		assertTrue(results.isMember(file1));
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file2}));		
+		assertTrue(results.isMember(file1));
+		assertTrue(results.isMember(file2));
 		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
-		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {rootPathId, file1, file3}));		
+		assertTrue(results.isMember(file1));
+		assertTrue(results.isMember(file3));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -741,7 +746,7 @@ public class TestPackageMgr {
 		 * have a bunch of directories too.
 		 */
 		fs = pkgMgr.getFilesOutsidePackage("foo/public");
-		assertEquals(14, fs.size());
+		assertEquals(15, fs.size());		/* includes /tmp */
 		assertTrue(fs.isMember(f2path));
 		assertTrue(fs.isMember(f3path));
 		assertTrue(fs.isMember(f4path));
@@ -749,13 +754,13 @@ public class TestPackageMgr {
 
 		/* test ^@foo/private membership - which includes directories*/
 		fs = pkgMgr.getFilesOutsidePackage("foo/private");
-		assertEquals(12, fs.size());
+		assertEquals(13, fs.size());	/* includes /tmp */
 		assertTrue(fs.isMember(f1path));
 		assertTrue(fs.isMember(f3path));
 
 		/* test ^@foo membership - which includes directories */
 		fs = pkgMgr.getFilesOutsidePackage("foo");
-		assertEquals(11, fs.size());
+		assertEquals(12, fs.size());		/* includes /tmp */
 		assertTrue(fs.isMember(f3path));
 		
 		/* test bad names */

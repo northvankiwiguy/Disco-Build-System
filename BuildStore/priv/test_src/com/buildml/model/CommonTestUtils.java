@@ -32,32 +32,45 @@ public class CommonTestUtils {
 	/**
 	 * Create a new empty BuildStore, with an empty database. For
 	 * testing purposes only.
+	 * @param saveRequired True if this database must be explicitly saved.
 	 * @return The empty BuildStore database
 	 * @throws FileNotFoundException If the database file can't be opened
 	 * @throws IOException An I/O problem occurred while opening the database.
 	 */
+	public static IBuildStore getEmptyBuildStore(boolean saveRequired) 
+			throws FileNotFoundException, IOException {
+		return getEmptyBuildStore(new File("/tmp"), saveRequired);
+	}	
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * Similar to getEmptyBuildStore(boolean), but default to false for saveRequired.
+	 */
+	@SuppressWarnings("javadoc")
 	public static IBuildStore getEmptyBuildStore() 
 			throws FileNotFoundException, IOException {
-		return getEmptyBuildStore(new File("/tmp"));
+		return getEmptyBuildStore(new File("/tmp"), false);
 	}	
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Create a new empty BuildStore in the user-specified directory. For testing
 	 * purposes only.
 	 * @param tmpDir The directory in which to place the BuildStore file.
+	 * @param saveRequired True if this database must be explicitly saved.
 	 * @return The empty BuildStore database.
 	 * @throws FileNotFoundException If the database file can't be opened.
 	 * @throws IOException An I/O problem occurred while opening the database.
 	 */
-	public static IBuildStore getEmptyBuildStore(File tmpDir) 
+	public static IBuildStore getEmptyBuildStore(File tmpDir, boolean saveRequired) 
 			throws FileNotFoundException, IOException {
 		IBuildStore bs;
 		try {
 			File bsFile = new File(tmpDir, "testBuildStore.bml");
 			bsFile.delete();
-			bs = BuildStoreFactory.openBuildStore(bsFile.toString());
+			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), saveRequired);
 		} catch (BuildStoreVersionException e) {
 			/* we can't handle schema version problems - make it a fatal error */
 			throw new FatalBuildStoreError(e.getMessage());
@@ -65,6 +78,17 @@ public class CommonTestUtils {
 		
 		return bs;
 	}	
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * Similar to getEmptyBuildStore(File, boolean), but default to false for saveRequired.
+	 */
+	@SuppressWarnings("javadoc")
+	public static IBuildStore getEmptyBuildStore(File tmpDir) 
+			throws FileNotFoundException, IOException {
+		return getEmptyBuildStore(tmpDir, false);
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 

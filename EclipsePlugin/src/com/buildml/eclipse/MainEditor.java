@@ -52,6 +52,7 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.refactor.IImportRefactorer;
 import com.buildml.refactor.imports.ImportRefactorer;
 
@@ -73,7 +74,10 @@ public class MainEditor extends MultiPageEditorPart
 	
 	/** The BuildStore's package manager */
 	private IPackageMgr pkgMgr;
-	
+
+	/** The BuildStore's package root manager */
+	private IPackageRootMgr pkgRootMgr;
+
 	/** The refactorer that will manage refactoring (and its history) for this editor */
 	private IImportRefactorer importRefactorer;
 	
@@ -150,7 +154,8 @@ public class MainEditor extends MultiPageEditorPart
 			throw new PartInitException("Can't open the BuildML database.");
 		}
 		pkgMgr = buildStore.getPackageMgr();
-		
+		pkgRootMgr = buildStore.getPackageRootMgr();
+				
 		/* 
 		 * Register to learn about changes to resources in our workspace. We might need to
 		 * know if somebody deletes or renames the file we're editing.

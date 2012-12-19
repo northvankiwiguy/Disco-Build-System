@@ -12,6 +12,7 @@
 
 package com.buildml.eclipse.wizards;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -35,9 +36,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageRootMgr;
+import com.buildml.scanner.FatalBuildScannerError;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * This class provides Eclipse wizard functionality for creating a new empty BuildML
@@ -131,7 +137,9 @@ public class NewBmlFile extends Wizard implements INewWizard {
 		IPath location = file.getLocation();
 		if (location != null) {
 			try {
-				IBuildStore bs = BuildStoreFactory.openBuildStore(location.toOSString());
+				String fullPath = location.toOSString();
+				IBuildStore bs = BuildStoreFactory.openBuildStore(fullPath);
+				configureWorkspace(bs, fullPath);
 				bs.close();
 			} catch (FileNotFoundException e) {
 				AlertDialog.displayErrorDialog("Error", 
@@ -167,6 +175,38 @@ public class NewBmlFile extends Wizard implements INewWizard {
 		});
 		
 		return true;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Configure the newly-created BuildStore with the workspace root.
+	 * @param buildStore The newly-created BuildStore.
+	 * @param fullPath Path to the BuildML database file.
+	 */
+	private void configureWorkspace(IBuildStore buildStore, String fullPath) {
+	
+		/* Set the "workspace" root in the FileMgr */
+		String workspaceRootNative = EclipsePartUtils.workspaceRelativeToAbsolutePath("");
+		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		int workspaceRootId = fileMgr.addDirectory(workspaceRootNative);
+		if ((workspaceRootId == ErrorCode.BAD_PATH) ||
+		    (pkgRootMgr.setWorkspaceRoot(workspaceRootId) != ErrorCode.OK)) {
+				throw new FatalBuildScannerError("Unable to set workspace root");
+		}
+		
+		/* Compute and set the depth of the build.ml file within the workspace */
+		if (!fullPath.startsWith(workspaceRootNative + "/")) {
+			throw new FatalBuildScannerError("Can not save file outside of workspace");
+		}
+		int newDepth = 0;
+		File parentFile = new File(fullPath).getParentFile();
+		while (!(parentFile.toString().equals(workspaceRootNative))) {
+			parentFile = parentFile.getParentFile();
+			newDepth++;
+		}
+		pkgRootMgr.setBuildMLFileDepth(newDepth);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

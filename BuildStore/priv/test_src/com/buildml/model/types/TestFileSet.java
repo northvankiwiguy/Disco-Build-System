@@ -427,7 +427,7 @@ public class TestFileSet {
 		assertTrue(fs1.isMember(dirA)); assertTrue(fs1.isMember(dirAB)); assertTrue(fs1.isMember(dirABC)); 
 		assertTrue(fs1.isMember(dirABCD)); assertTrue(fs1.isMember(dirABCDE)); assertTrue(fs1.isMember(dirABCDG));
 		assertTrue(fs1.isMember(dirB)); assertTrue(fs1.isMember(dirBC)); assertTrue(fs1.isMember(dirBCD));
-		assertEquals(15, fs1.size());
+		assertEquals(16, fs1.size()); /* includes /tmp, the location of the build.bml file */
 				
 		/* add a single directory and it's contents */
 		FileSet fs3 = new FileSet(fileMgr);
@@ -519,7 +519,7 @@ public class TestFileSet {
 		/* test ^@foo/public membership - includes directories */
 		FileSet fs13 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs13.populateWithPaths(new String[] {"%not-pkg/foo/public"}));
-		assertEquals(14, fs13.size());
+		assertEquals(15, fs13.size());
 		assertTrue(fs13.isMember(f2path));
 		assertTrue(fs13.isMember(f3path));
 		assertTrue(fs13.isMember(f4path));
@@ -528,14 +528,14 @@ public class TestFileSet {
 		/* test ^@foo/private membership - includes directories */
 		FileSet fs14 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs14.populateWithPaths(new String[] {"%np/foo/private"}));
-		assertEquals(12, fs14.size());
+		assertEquals(13, fs14.size());   /* includes /tmp */
 		assertTrue(fs14.isMember(f1path));
 		assertTrue(fs14.isMember(f3path));
 
 		/* test ^@foo membership  - includes directories */
 		FileSet fs15 = new FileSet(fileMgr);
 		assertEquals(ErrorCode.OK, fs15.populateWithPaths(new String[] {"%np/foo"}));
-		assertEquals(11, fs15.size());
+		assertEquals(12, fs15.size());  /* includes /tmp */
 		assertTrue(fs15.isMember(f3path));
 		
 		/* test with invalid paths */
@@ -717,11 +717,11 @@ public class TestFileSet {
 		fs = bs.getReportMgr().reportAllFiles();
 		
 		/* all files should be present now */
-		assertEquals(21, fs.size());
+		assertEquals(22, fs.size());  /* includes /tmp */
 		
 		/* remove the sub-tree, rooted at directory 7 */
 		fs.removeSubTree(dir7);
-		assertEquals(13, fs.size());
+		assertEquals(14, fs.size());  /* includes /tmp */
 		checkNotMembers(fs, new Integer[] {dir7, dir8, dir9, fileG, fileH, fileI, fileJ, fileK});
 	}
 	

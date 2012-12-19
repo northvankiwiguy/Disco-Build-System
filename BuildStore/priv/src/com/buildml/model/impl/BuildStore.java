@@ -12,10 +12,12 @@
 
 package com.buildml.model.impl;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.buildml.model.BuildStoreVersionException;
+import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
@@ -25,6 +27,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IReportMgr;
+import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.version.Version;
 
 
@@ -94,6 +97,8 @@ public class BuildStore implements IBuildStore {
 	public BuildStore(String buildStoreName, boolean saveRequired)
 			throws FileNotFoundException, IOException, BuildStoreVersionException {
 		
+		boolean freshDatabase = false;
+		
 		/* create a new DB manager to handle all the SQL connection issues */
 		db = new BuildStoreDB(buildStoreName, saveRequired);
 		
@@ -103,6 +108,7 @@ public class BuildStore implements IBuildStore {
 			/* changes must be committed promptly */
 			db.setFastAccessMode(false); 
 			db.initDatabase();
+			freshDatabase = true;
 		}
 		
 		/* 
@@ -129,6 +135,24 @@ public class BuildStore implements IBuildStore {
 		fileAttrMgr = new FileAttributeMgr(this, fileMgr);
 		packages = new PackageMgr(this);
 		pkgRootMgr = new PackageRootMgr(this);
+		
+		/*
+		 * When the database is first created, it won't have the "workspace" root set.
+		 * By default, we set it to the parent directory of the build.bml file.
+		 */
+		if (freshDatabase) {
+			File dbFile = new File(db.getDatabaseFileName());
+			File workspaceDir = dbFile.getParentFile();
+			if (workspaceDir == null) {
+				throw new FatalBuildStoreError("Unable to determine initial \"workspace\" directory.");
+			}
+			int workspacePathId = fileMgr.addDirectory(workspaceDir.getPath());
+			if (workspacePathId == ErrorCode.BAD_PATH) {
+				throw new FatalBuildStoreError("Unable to add initial \"workspace\" directory.");				
+			}
+			pkgRootMgr.setWorkspaceRoot(workspacePathId);
+			pkgRootMgr.setBuildMLFileDepth(0);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -279,6 +303,20 @@ public class BuildStore implements IBuildStore {
 	@Override
 	public void saveAs(String fileToSave) throws IOException
 	{
+		/* if we're changing the saveAs path, we might need to change the workspace depth */
+		String workspaceRoot = pkgRootMgr.getWorkspaceRootNative();
+		if (!fileToSave.startsWith(workspaceRoot + "/")) {
+			throw new IOException("Can not save file outside of workspace");
+		}
+		int newDepth = 0;
+		File parentFile = new File(fileToSave).getParentFile();
+		while (!(parentFile.toString().equals(workspaceRoot))) {
+			parentFile = parentFile.getParentFile();
+			newDepth++;
+		}
+		pkgRootMgr.setBuildMLFileDepth(newDepth);
+		
+		/* proceed to save the database in the new location */
 		db.saveAs(fileToSave);
 	}
 	
