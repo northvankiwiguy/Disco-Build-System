@@ -147,6 +147,19 @@ public class TestPackageRootMgr {
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test setBuildMLFileDepth() with invalid input.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetBuildMLFileDepthError() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		assertEquals(ErrorCode.BAD_PATH, pkgRootMgr.setBuildMLFileDepth(-1));
+		assertEquals(ErrorCode.BAD_PATH, pkgRootMgr.setBuildMLFileDepth(10));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
      * Create a build.bml file in src, then saveAs it to src/dirA. Close and re-open it,
@@ -158,7 +171,7 @@ public class TestPackageRootMgr {
 		
 		/* create a new BuildStore at the second level of the workspace */
 		getNewBuildStore(new File(tmpTestDir, "src"));
-		pkgRootMgr.setBuildMLFileDepth(1);
+		assertEquals(ErrorCode.OK, pkgRootMgr.setBuildMLFileDepth(1));
 
 		/* save the build store into the third level. */
 		buildStore.saveAs(tmpTestDir.toString() + "/src/dirA/testBuildStore.bml");
@@ -206,7 +219,7 @@ public class TestPackageRootMgr {
 	@Test
 	public void testMoveBuildStoreInError() throws Exception {
 		getNewBuildStore(new File(tmpTestDir, "src"));
-		pkgRootMgr.setBuildMLFileDepth(1);
+		assertEquals(ErrorCode.OK, pkgRootMgr.setBuildMLFileDepth(1));
 
 		/* save the build store into an invalid location. */
 		buildStore.saveAs(tmpTestDir.toString() + "/src/dirA/testBuildStore.bml");
@@ -216,11 +229,231 @@ public class TestPackageRootMgr {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	// TODO: test setDepth() with -1 or with very large number.
-	// TODO: test trying to move workspace below build.bml
-	// TODO: test trying to move workspace below another root.
-	// TODO: test setting of depth, then close and reopen the database. Check native path.
+	/**
+	 * Test setWorkspaceRoot with invalid input.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetWorkspaceRootError() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		/* test with invalid path ID */
+		assertEquals(ErrorCode.BAD_PATH, pkgRootMgr.setWorkspaceRoot(10000));
+
+		/* test with file path ID */
+		int fileId = fileMgr.addFile("/a/b/file");
+		assertTrue(fileId >= 0);
+		assertEquals(ErrorCode.NOT_A_DIRECTORY, pkgRootMgr.setWorkspaceRoot(fileId));
+
+		/* test with trashed path */
+		int dir1Id = fileMgr.addDirectory("/a/b/dir1");
+		assertTrue(dir1Id >= 0);
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(dir1Id));
+		assertEquals(ErrorCode.BAD_PATH, pkgRootMgr.setWorkspaceRoot(dir1Id));
+		
+		/* can't trash a path that has a root attached */
+		int dir2Id = fileMgr.addDirectory("/a/b/dir2");
+		assertTrue(dir2Id >= 0);
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dir2Id));
+		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(dir2Id));
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test that addition of new packages makes new roots available.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetPackageRoot1() throws Exception {
+		getNewBuildStore(tmpTestDir);
+	
+		int pkgId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgId > 0);
+		
+		int workspacePathId = pkgRootMgr.getWorkspaceRoot();
+		assertTrue(workspacePathId > 0);
+		
+		/* check that the source and generated roots both refer to "@workspace" */
+		int pkgSrcPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT);
+		int pkgGenPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.GENERATED_ROOT);
+		assertEquals(workspacePathId, pkgSrcPathId);
+		assertEquals(workspacePathId, pkgGenPathId);
+		
+		/* check that both roots show up in the list of roots */
+		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "root", "workspace"}, 
+					      pkgRootMgr.getRoots());
+		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "workspace"},
+						  pkgRootMgr.getRootsAtPath(workspacePathId));
+	}	
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test that addition of two new packages makes new roots available, and set two of the
+	 * package roots to different directories.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetPackageRoot2() throws Exception {
+		getNewBuildStore(tmpTestDir);
+		
+		int pkgBId = pkgMgr.addPackage("pkgB");
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgAId > 0);
+		assertTrue(pkgBId > 0);
+		
+		int workspacePathId = pkgRootMgr.getWorkspaceRoot();
+		assertTrue(workspacePathId > 0);
+		String workspacePath = fileMgr.getPathName(workspacePathId);
+		
+		/* check that all the source and generated roots both refer to "@workspace" */
+		int pkgSrcPathId = pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT);
+		int pkgGenPathId = pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.GENERATED_ROOT);
+		assertEquals(workspacePathId, pkgSrcPathId);
+		assertEquals(workspacePathId, pkgGenPathId);
+		pkgSrcPathId = pkgRootMgr.getPackageRoot(pkgBId, IPackageRootMgr.SOURCE_ROOT);
+		pkgGenPathId = pkgRootMgr.getPackageRoot(pkgBId, IPackageRootMgr.GENERATED_ROOT);
+		assertEquals(workspacePathId, pkgSrcPathId);
+		assertEquals(workspacePathId, pkgGenPathId);
+		
+		/* check that all roots show up in the list of roots */
+		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
+										"root", "workspace"}, pkgRootMgr.getRoots());
+		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
+										"workspace"}, pkgRootMgr.getRootsAtPath(workspacePathId));
+
+		/* create some new directories to move the roots to */
+		int objAPathId = fileMgr.addDirectory(workspacePath + "/obj/pkgA");
+		int srcAPathId = fileMgr.addDirectory(workspacePath + "/src/pkgA");
+		
+		/* move the pkgA roots */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(
+										pkgAId, IPackageRootMgr.SOURCE_ROOT, srcAPathId));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(
+										pkgAId, IPackageRootMgr.GENERATED_ROOT, objAPathId));
+
+		/* now test the roots again */
+		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
+				"root", "workspace"}, pkgRootMgr.getRoots());
+		assertArrayEquals(new String[] {"pkgB_gen", "pkgB_src", "workspace"}, 
+										pkgRootMgr.getRootsAtPath(workspacePathId));
+		assertArrayEquals(new String[] {"pkgA_gen"}, pkgRootMgr.getRootsAtPath(objAPathId));
+		assertArrayEquals(new String[] {"pkgA_src"}, pkgRootMgr.getRootsAtPath(srcAPathId));
+		
+		/* test each root individually */
+		assertEquals(srcAPathId, pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(objAPathId, pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.GENERATED_ROOT));
+		assertEquals(workspacePathId, pkgRootMgr.getPackageRoot(pkgBId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(workspacePathId, pkgRootMgr.getPackageRoot(pkgBId, IPackageRootMgr.GENERATED_ROOT));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create and remove a package, checking that the roots have disappeared.
+	 * @throws Exception
+	 */
+	@Test
+	public void testRemovePackage() throws Exception {
+		getNewBuildStore(tmpTestDir);
+		
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgAId > 0);
+		
+		int workspacePathId = pkgRootMgr.getWorkspaceRoot();
+		assertTrue(workspacePathId > 0);
+		
+		/* check that the source and generated roots both refer to "@workspace" */
+		int pkgSrcPathId = pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT);
+		int pkgGenPathId = pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.GENERATED_ROOT);
+		assertEquals(workspacePathId, pkgSrcPathId);
+		assertEquals(workspacePathId, pkgGenPathId);
+		
+		/* check that all roots show up in the list of roots */
+		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "root", "workspace"}, 
+				                        pkgRootMgr.getRoots());
+		
+		/* remove the package */
+		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgAId));
+		
+		/* check that the roots have disappeared */
+		assertArrayEquals(new String[] {"root", "workspace"}, pkgRootMgr.getRoots());
+		assertEquals(ErrorCode.NOT_FOUND, pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(ErrorCode.NOT_FOUND, pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.GENERATED_ROOT));	
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create and remove a package, checking that the roots have disappeared.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetPackageRootError() throws Exception {
+		getNewBuildStore(tmpTestDir);
+				
+		int dirId = fileMgr.addDirectory("/valid-dir");
+		int fileId = fileMgr.addFile("/valid-file");
+		int pkgId = pkgMgr.addPackage("validPkg");
+		int folderId = pkgMgr.addFolder("validFolder");
+		assertTrue(dirId > 0);
+		assertTrue(pkgId > 0);
+		assertTrue(folderId > 0);
+		
+		/* test setPackageRoot with <import> package - error */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.setPackageRoot(pkgMgr.getImportPackage(), IPackageRootMgr.SOURCE_ROOT, dirId));
+		
+		/* test setPackageRoot with a folder - error */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.setPackageRoot(folderId, IPackageRootMgr.SOURCE_ROOT, dirId));
+		
+		/* test setPackageRoot with invalid packageId */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.setPackageRoot(1000, IPackageRootMgr.SOURCE_ROOT, dirId));
+
+		/* test setPackageRoot with invalid type */
+		assertEquals(ErrorCode.NOT_FOUND, pkgRootMgr.setPackageRoot(pkgId, 10, dirId));
+
+		/* test setPackageRoot with invalid path */
+		assertEquals(ErrorCode.BAD_PATH, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, 1000));
+
+		/* test setPackageRoot with file (not directory) */
+		assertEquals(ErrorCode.NOT_A_DIRECTORY, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, fileId));
+
+		/* test getPackageRoot with invalid packageId */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.getPackageRoot(1000, IPackageRootMgr.SOURCE_ROOT));
+
+		/* test getPackageRoot with invalid type */
+		assertEquals(ErrorCode.NOT_FOUND, pkgRootMgr.getPackageRoot(pkgId, 10));
+		
+		/* test removePackageRoot with invalid packageId */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.removePackageRoot(1000, IPackageRootMgr.SOURCE_ROOT));
+
+		/* test removePackageRoot with invalid type */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.removePackageRoot(pkgId, 10));
+
+		/* test removePackageRoot of the same root twice */
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.removePackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(ErrorCode.NOT_FOUND, 
+				pkgRootMgr.removePackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	// TODO: try to move a package root above the workspace root - error.
+	// TODO: test trying to move workspace below a package root.
+	// TODO: test trying to move workspace below build.bml
+
+	// TODO: create a new package, set overrides for the root, then clear them.
+	// TODO: create a new package, set an override for the workspace root, then check the package root.
+
+	/*-------------------------------------------------------------------------------------*/
 }

@@ -24,7 +24,7 @@ public interface IPackageRootMgr {
 	public static final int SOURCE_ROOT = 1;
 
 	/** Used to identify a package's "generated" root */
-	public static final int GENERATED_ROOT = 1;
+	public static final int GENERATED_ROOT = 2;
 	
 	/**
 	 * Specify the location of the workspace root, within the BuildML
@@ -33,10 +33,11 @@ public interface IPackageRootMgr {
 	 * 
 	 * @param pathId The ID of the path (directory) to set as the workspace
 	 *        root.
-	 * @return ErrorCode.OK on success, ErrorCode.BAD_VALUE if the
-	 *         pathId is invalid or not a directory, or ErrorCode.BAD_PATH 
-	 *         if any package root, or the BuildML database file, would not
-	 *         be encompassed by the new root.
+	 * @return ErrorCode.OK on success, ErrorCode.BAD_PATH if the
+	 *         pathId is invalid, ErrorCode.NOT_A_DIRECTORY if it's not a 
+	 *         directory, or ErrorCode.OUT_OF_RANGE if any package root, or 
+	 *         the BuildML database file, would not be encompassed by the
+	 *         new root.
 	 */
 	public int setWorkspaceRoot(int pathId);
 	
@@ -91,11 +92,35 @@ public interface IPackageRootMgr {
 	 *                   IPackageRootMgr.GENERATED_ROOT.
 	 * @param pathId     The ID of the path to the package root. Must be within
 	 *                   the enclosing workspace root.
-	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if the packageId is not
-	 *         valid, ErrorCode.BAD_VALUE if type is invalid, or ErrorCode.BAD_PATH
-	 *         if the path is not enclosed within the workspace root.
+	 * @return ErrorCode.OK on success, ErrorCode.BAD_PATH if the pathId is not
+	 *         valid, ErrorCode.NOT_A_DIRECTORY is it's not a directory,
+	 *         ErrorCode.NOT_FOUND if packageId or type is invalid, or
+	 *         ErrorCode.OUT_OF_RANGE if the path is not enclosed within the
+	 *         workspace root.
 	 */
 	public int setPackageRoot(int packageId, int type, int pathId);
+	
+	/**
+	 * Fetch the pathId (from FileMgr) that's associated with the specified
+	 * package root.
+	 * 
+	 * @param packageId  The ID of the package to be modified.
+	 * @param type		 Either IPackageRootMgr.SOURCE_ROOT or 
+	 *                   IPackageRootMgr.GENERATED_ROOT.
+	 * @return The pathId, ErrorCode.NOT_FOUND if the packageId or type is invalid.
+	 */
+	public int getPackageRoot(int packageId, int type);
+	
+	/**
+	 * Remove the specified package root.
+	 * 
+	 * @param packageId  The ID of the package to be removed.
+	 * @param type		 Either IPackageRootMgr.SOURCE_ROOT or 
+	 *                   IPackageRootMgr.GENERATED_ROOT.
+	 * @return ErrorCode.OK on success or ErrorCode.NOT_FOUND if the packageId or 
+	 *         type is invalid.
+	 */
+	public int removePackageRoot(int packageId, int type);
 	
 	/**
 	 * Set the temporary source or generated root for a particular package. This method

@@ -18,7 +18,10 @@ import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -35,6 +38,12 @@ public class PackageRootMgr implements IPackageRootMgr {
 	/** The IBuildStore object that owns this manager */
 	private IBuildStore buildStore;
 	
+	/** The associated FileMgr */
+	private IFileMgr fileMgr;
+
+	/** The associated PackageMgr */
+	private IPackageMgr pkgMgr;
+
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
 	 * to us when the PackageRootMgr object is first instantiated.
@@ -60,8 +69,10 @@ public class PackageRootMgr implements IPackageRootMgr {
 		findRootPathIdPrepStmt = null,
 		insertRootPrepStmt = null,
 		updateRootPathPrepStmt = null,
-		findRootNamesPrepStmt = null;
-	
+		findRootNamesPrepStmt = null,
+		findRootNamesAtPathPrepStmt = null,
+		deleteFileRootPrepStmt = null;
+
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -73,6 +84,8 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 */
 	public PackageRootMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
+		this.fileMgr = buildStore.getFileMgr();
+		this.pkgMgr = buildStore.getPackageMgr();
 		this.db = buildStore.getBuildStoreDB();
 		
 		/* initialize prepared database statements */
@@ -88,6 +101,10 @@ public class PackageRootMgr implements IPackageRootMgr {
 				db.prepareStatement("update fileRoots set fileId = ? where name = ?");
 		findRootNamesPrepStmt = 
 				db.prepareStatement("select name from fileRoots order by name");
+		findRootNamesAtPathPrepStmt = 
+				db.prepareStatement("select name from fileRoots where fileId = ? order by name");
+		deleteFileRootPrepStmt = 
+				db.prepareStatement("delete from fileRoots where name = ?");
 	}
 	
 	/*=====================================================================================*
@@ -100,20 +117,11 @@ public class PackageRootMgr implements IPackageRootMgr {
 	@Override
 	public int setWorkspaceRoot(int pathId) {
 		// TODO: make sure that it's above all other roots (except for "root") and the bml file.
+		// TODO: return ErrorCode.OUT_OF_RANGE in this case.
 
-		/* start by trying to update the existing "workspace" record */
-		try {
-			updateRootPathPrepStmt.setInt(1, pathId);
-			updateRootPathPrepStmt.setString(2, "workspace");
-			if (db.executePrepUpdate(updateRootPathPrepStmt) == 0) {
-				
-				/* doesn't exist yet, insert it */
-				insertRootPrepStmt.setString(1, "workspace");
-				insertRootPrepStmt.setInt(2, pathId);
-				db.executePrepUpdate(insertRootPrepStmt);				
-			}
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		int rc = addRoot("workspace", pathId);
+		if (rc != ErrorCode.OK) {
+			return rc;
 		}
 		
 		/* cache the value for performance reasons */
@@ -239,8 +247,57 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 */
 	@Override
 	public int setPackageRoot(int packageId, int type, int pathId) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		// TODO: check that pathId is below "workspace". If not, return ErrorCode.OUT_OF_RANGE.
+		
+		/* derive the root name, e.g <package>_src or <package>_gen */
+		String rootName = computePackageRootName(packageId, type);
+		if (rootName == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		return addRoot(rootName, pathId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.buildml.model.IPackageRootMgr#getPackageRoot(int, int)
+	 */
+	@Override
+	public int getPackageRoot(int packageId, int type)
+	{
+		String rootName = computePackageRootName(packageId, type);
+		if (rootName == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		return getRoot(rootName);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageRootMgr#removePackageRoot(int, int)
+	 */
+	@Override
+	public int removePackageRoot(int packageId, int type) {
+		
+		String rootName = computePackageRootName(packageId, type);
+		if (rootName == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		try {
+			deleteFileRootPrepStmt.setString(1, rootName);
+			int rowCount = db.executePrepUpdate(deleteFileRootPrepStmt);
+			if (rowCount == 0) {
+				return ErrorCode.NOT_FOUND;
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -320,9 +377,117 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 */
 	@Override
 	public String[] getRootsAtPath(int pathId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		/* fetch all records at this path */
+		try {
+			findRootNamesAtPathPrepStmt.setInt(1, pathId);
+			return db.executePrepSelectStringColumn(findRootNamesAtPathPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+	}
+	
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * @param rootName  Name of the root to be added (updated).
+	 * @param pathId	The ID of the path to attach the root to.
+	 * @return ErrorCode.OK on success, ErrorCode.BAD_PATH if the pathId is invalid,
+	 *         ErrorCode.NOT_A_DIRECTORY if the pathId doesn't reference a directory.
+	 */
+	private int addRoot(String rootName, int pathId) {
+		
+		/* the path must not be trashed */
+		if (fileMgr.isPathTrashed(pathId)) {
+			return ErrorCode.BAD_PATH;
+		}
+		
+		/* this path must be valid, and refer to a directory, not a file */
+		PathType pathType = fileMgr.getPathType(pathId);
+		if (pathType == PathType.TYPE_INVALID) {
+			return ErrorCode.BAD_PATH;
+		}
+		if (pathType != PathType.TYPE_DIR){
+			return ErrorCode.NOT_A_DIRECTORY;
+		}
+		
+		/* start by trying to update the existing "workspace" record */
+		try {
+			updateRootPathPrepStmt.setInt(1, pathId);
+			updateRootPathPrepStmt.setString(2, rootName);
+			if (db.executePrepUpdate(updateRootPathPrepStmt) == 0) {
+				
+				/* doesn't exist yet, insert it */
+				insertRootPrepStmt.setString(1, rootName);
+				insertRootPrepStmt.setInt(2, pathId);
+				db.executePrepUpdate(insertRootPrepStmt);				
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a root name, return the associated path ID.
+	 * 
+	 * @param rootName Name of the root to search for. 
+	 * @return The pathId associated with the root, or ErrorCode.NOT_FOUND if the root name
+	 *         is invalid.
+	 */
+	private int getRoot(String rootName) {
+
+		try {
+			findRootPathIdPrepStmt.setString(1, rootName);
+			Integer results[] = db.executePrepSelectIntegerColumn(findRootPathIdPrepStmt);
+
+			/* is there exactly one root registered? */
+			if (results.length == 1) {
+				return results[0];
+			}
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return ErrorCode.NOT_FOUND;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Compute the name of a package root, based on the packageId and type (SOURCE_ROOT
+	 * or GENERATED_ROOT). For example, the "libz" package will have two roots: "libz_src"
+	 * and "libz_gen".
+	 * 
+	 * @param packageId The ID of the package.
+	 * @param type		The root type (SOURCE_ROOT or GENERATED_ROOT).
+	 * @return			The corresponding root name, or null if either input parameter is invalid
+	 * 					(including if packageId relates to a folder, or the <import> package).
+	 */
+	private String computePackageRootName(int packageId, int type) {
+
+		/* Not supported for folders, invalid packages or <import> */
+		if (pkgMgr.isFolder(packageId) || !pkgMgr.isValid(packageId) ||
+				(packageId == pkgMgr.getImportPackage())) {
+			return null;
+		}
+		
+		/* get the package name, and append _src or _gen */
+		String packageName = pkgMgr.getName(packageId);
+		if (packageName == null) {
+			return null;
+		}
+		if (type == IPackageRootMgr.SOURCE_ROOT) {
+			return packageName + "_src";
+		} else if (type == IPackageRootMgr.GENERATED_ROOT) {
+			return packageName + "_gen";
+		}
+		return null;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

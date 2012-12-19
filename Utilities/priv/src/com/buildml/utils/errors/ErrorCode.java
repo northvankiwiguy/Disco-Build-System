@@ -54,6 +54,9 @@ public class ErrorCode {
 	/** This item can't be revived */
 	public static final int CANT_REVIVE         = -9;
 	
+	/** This item is out of range */
+	public static final int OUT_OF_RANGE		= -10;
+	
 	/**
 	 * This class can't be instantiated.
 	 */

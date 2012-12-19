@@ -20,9 +20,11 @@ import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -47,6 +49,9 @@ import com.buildml.utils.errors.ErrorCode;
 	
 	/** ID number for the "Root" folder */
 	private final static int ROOT_FOLDER_ID = 1;
+	
+	/** The BuildStore that owns this package manager */
+	private IBuildStore buildStore;
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
@@ -99,6 +104,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @param buildStore The BuildStore that this Packages object belongs to.
 	 */
 	public PackageMgr(BuildStore buildStore) {
+		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
 		this.actionMgr = buildStore.getActionMgr();
@@ -165,7 +171,29 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public int addPackage(String packageName) {
-		return addPackageOrFolderHelper(packageName, false);
+		
+		/* add the new package */
+		int pkgId = addPackageOrFolderHelper(packageName, false);
+		if (pkgId < 0) {
+			return pkgId;
+		}
+		
+		/* set the package's roots to the same level as the workspace root */
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		int workspaceRootId = pkgRootMgr.getWorkspaceRoot();
+		if (workspaceRootId == ErrorCode.NOT_FOUND) {
+			throw new FatalBuildStoreError(
+					"Workspace root must be set before addPackage is called");
+		}
+		int rc = pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, workspaceRootId);
+		if (rc != ErrorCode.OK) {
+			return rc;
+		}
+		rc = pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.GENERATED_ROOT, workspaceRootId);
+		if (rc != ErrorCode.OK) {
+			return rc;
+		}
+		return pkgId;
 	};
 
 	/*-------------------------------------------------------------------------------------*/
@@ -313,6 +341,19 @@ import com.buildml.utils.errors.ErrorCode;
 		/* determine if the folder has any children */
 		if (getFolderChildren(folderOrPackageId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
+		}
+
+		/* remove any associated package roots */
+		if (!isFolder(folderOrPackageId)) {
+			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+			int rc = pkgRootMgr.removePackageRoot(folderOrPackageId, IPackageRootMgr.SOURCE_ROOT);
+			if (rc != ErrorCode.OK) {
+				return rc;
+			}
+			rc = pkgRootMgr.removePackageRoot(folderOrPackageId, IPackageRootMgr.GENERATED_ROOT);
+			if (rc != ErrorCode.OK) {
+				return rc;
+			}
 		}
 		
 		/* remove from the database */
