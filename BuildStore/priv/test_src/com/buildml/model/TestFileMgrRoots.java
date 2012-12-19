@@ -144,37 +144,6 @@ public class TestFileMgrRoots {
 		
 		// TODO: should we be able to ../../ above a root?
 	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test method for {@link com.buildml.model.impl.FileMgr#getRoots()}.
-	 */
-	@Test
-	public void testGetRoots() {
-		
-		/* by default, there should be one root only */
-		String roots[] = fileMgr.getRoots();
-		CommonTestUtils.sortedArraysEqual(roots, new String[] { "root" });
-		
-		/* add one with a low-alphabetical name */
-		int path1 = fileMgr.addDirectory("@root/aardvark/bear/cat/donkey");
-		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("aroot", path1));
-		roots = fileMgr.getRoots();
-		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root" });
-
-		/* add one with a high-alphabetical name */
-		int path2 = fileMgr.addDirectory("@root/aardvark/bear/cat/deer");
-		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("zebraroot", path2));
-		roots = fileMgr.getRoots();
-		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });
-
-		/* adding an invalid root doesn't change anything */
-		int path3 = fileMgr.addDirectory("@root/aardvark/bear/cat/dragon");
-		assertEquals(ErrorCode.INVALID_NAME, fileMgr.addNewRoot("zebra root", path3));
-		roots = fileMgr.getRoots();
-		CommonTestUtils.sortedArraysEqual(roots, new String[] { "aroot", "root", "zebraroot" });		
-	}
 
 	/*-------------------------------------------------------------------------------------*/
 

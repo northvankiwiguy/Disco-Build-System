@@ -72,14 +72,6 @@ public interface IFileMgr {
 	public abstract int addNewRoot(String rootName, int pathId);
 
 	/**
-	 * Return an array of all root names that are currently valid. The list is returned
-	 * in alphabetical order.
-	 * 
-	 * @return A String array of root names.
-	 */
-	public abstract String[] getRoots();
-
-	/**
 	 * Move an existing root to be associated with a new path.
 	 * 
 	 * @param rootName Name of the root to be moved.

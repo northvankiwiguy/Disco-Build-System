@@ -22,6 +22,7 @@ import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -40,6 +41,9 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	
 	/** The FileMgr object we should query for file information */
 	private IFileMgr fileMgr = null;
+	
+	/** The PackageRootMgr object we should query for root information */
+	private IPackageRootMgr pkgRootMgr = null;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -50,11 +54,14 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 * in the BuildStore into something that a TreeViewer can understand.
 	 * @param editor The editor that this content provider is associated with.
 	 * @param fileMgr The FileMgr object that we're displaying information from.
+	 * @param pkgRootMgr The PackageRootMgr object that manages package roots.
 	 */
-	public FilesEditorContentProvider(FilesEditor editor, IFileMgr fileMgr) {
+	public FilesEditorContentProvider(FilesEditor editor, IFileMgr fileMgr, 
+										IPackageRootMgr pkgRootMgr) {
 
 		this.editor = editor;
 		this.fileMgr = fileMgr;
+		this.pkgRootMgr = pkgRootMgr;
 	}
 	
 	/*=====================================================================================*
@@ -179,7 +186,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 		int topRootId = fileMgr.getRootPath("root");
 		if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS))
 		{
-			String rootNames[] = fileMgr.getRoots();
+			String rootNames[] = pkgRootMgr.getRoots();
 			UIInteger uiIntegers[] = new UIInteger[rootNames.length];
 			for (int i = 0; i < rootNames.length; i++) {
 				int id = fileMgr.getRootPath(rootNames[i]);

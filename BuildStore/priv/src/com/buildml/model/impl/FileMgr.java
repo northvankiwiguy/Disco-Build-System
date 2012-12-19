@@ -71,7 +71,6 @@ public class FileMgr implements IFileMgr {
 		trashPathPrepStmt = null,
 		insertRootPrepStmt = null,
 		findRootPathIdPrepStmt = null,
-		findRootNamesPrepStmt = null,
 		findRootNamePrepStmt = null,
 		updateRootPathPrepStmt = null,
 		deleteFileRootPrepStmt = null,
@@ -101,7 +100,6 @@ public class FileMgr implements IFileMgr {
 		trashPathPrepStmt = db.prepareStatement("update files set trashed = ? where id = ?");
 		insertRootPrepStmt = db.prepareStatement("insert into fileRoots values (?, ?)");	
 		findRootPathIdPrepStmt = db.prepareStatement("select fileId from fileRoots where name = ?");
-		findRootNamesPrepStmt = db.prepareStatement("select name from fileRoots order by name");
 		findRootNamePrepStmt = db.prepareStatement("select name from fileRoots where fileId = ?");
 		updateRootPathPrepStmt = db.prepareStatement("update fileRoots set fileId = ? where name = ?");
 		deleteFileRootPrepStmt = db.prepareStatement("delete from fileRoots where name = ?");
@@ -195,16 +193,6 @@ public class FileMgr implements IFileMgr {
 		}
 		
 		return ErrorCode.OK;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-	
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#getRoots()
-	 */
-	@Override
-	public String [] getRoots() {
-		return db.executePrepSelectStringColumn(findRootNamesPrepStmt);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

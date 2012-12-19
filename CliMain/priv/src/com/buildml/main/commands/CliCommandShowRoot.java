@@ -19,6 +19,7 @@ import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -101,10 +102,11 @@ public class CliCommandShowRoot implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 0, 1, "Only one root name can be specified.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 
 		/* no arguments == display all roots */
 		if (args.length == 0) {
-			String [] roots = fileMgr.getRoots();
+			String [] roots = pkgRootMgr.getRoots();
 			for (int i = 0; i < roots.length; i++) {
 				String rootName = roots[i];
 				String associatedPath = fileMgr.getPathName(fileMgr.getRootPath(rootName));
