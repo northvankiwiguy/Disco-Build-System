@@ -55,22 +55,6 @@ public interface IFileMgr {
 	public abstract int getRootPath(String rootName);
 
 	/**
-	 * Move an existing root to be associated with a new path.
-	 * 
-	 * @param rootName Name of the root to be moved.
-	 * @param pathId The ID of the new path to attach the root to.
-	 * @return
-	 * <ul>
-	 *    <li>ErrorCode.OK if the move completed successfully.</li>
-	 *    <li>ErrorCode.NOT_FOUND if the root doesn't exist.</li>
-	 *    <li>ErrorCode.NOT_A_DIRECTORY if the new pathID doesn't refer to a directory.</li>
-	 *    <li>ErrorCode.ONLY_ONE_ALLOWED if the target pathId already has a root.</li>
-	 *    <li>ErrorCode.BAD_PATH an invalid path ID was provided.</li>
-	 * </ul>
-	 */
-	public abstract int moveRootToPath(String rootName, int pathId);
-
-	/**
 	 * If this path has an associated root attached to it, return the root name. If there's
 	 * no root, return null. There can be at most one root associated with this path.
 	 * 
@@ -78,16 +62,6 @@ public interface IFileMgr {
 	 * @return The name of the root, or null if there's no root attached.
 	 */
 	public abstract String getRootAtPath(int pathId);
-
-	/**
-	 * Return the name of the root that encloses this path. There may be multiple roots
-	 * above this path, but return the root that's closest to the path. The "root" root
-	 * will always be the default if there's no closer root.
-	 * 
-	 * @param pathId The ID of the path to be queried.
-	 * @return The name of the root that encloses the path.
-	 */
-	public abstract String getEnclosingRoot(int pathId);
 
 	/**
 	 * Add a new file to the database.

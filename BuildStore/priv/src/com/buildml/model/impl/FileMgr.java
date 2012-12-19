@@ -149,52 +149,6 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#moveRootToPath(java.lang.String, int)
-	 */
-	@Override
-	public int moveRootToPath(String rootName, int pathId) {
-	
-		/* if the root doesn't already exists, that's an error */
-		if (getRootPath(rootName) == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		/* the path must not be trashed */
-		if (isPathTrashed(pathId)) {
-			return ErrorCode.BAD_PATH;
-		}
-		
-		/* is the new path valid? */
-		PathType pathType = getPathType(pathId);
-		if (pathType == PathType.TYPE_INVALID) {
-			return ErrorCode.BAD_PATH;
-		}
-		
-		/* is it a directory? */
-		if (pathType != PathType.TYPE_DIR) {
-			return ErrorCode.NOT_A_DIRECTORY;
-		}
-		
-		/* does the pathId already have a root associated with it? */
-		if (getRootAtPath(pathId) != null){
-			return ErrorCode.ONLY_ONE_ALLOWED;
-		}
-		
-		/* now, update the fileRoots table to refer to this new path */
-		try {
-			updateRootPathPrepStmt.setInt(1, pathId);
-			updateRootPathPrepStmt.setString(2, rootName);
-			db.executePrepUpdate(updateRootPathPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		return ErrorCode.OK;
-	}
-		
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileMgr#getRootAtPath(int)
 	 */
 	@Override
@@ -223,27 +177,6 @@ public class FileMgr implements IFileMgr {
 		else {
 			throw new FatalBuildStoreError("Multiple entries found in fileRoots table, for path ID " + pathId);
 		}
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#getEnclosingRoot(int)
-	 */
-	@Override
-	public String getEnclosingRoot(int pathId) {
-		
-		do {
-			/* if the current path has a root, use it */
-			String thisRoot = getRootAtPath(pathId);
-			if (thisRoot != null) {
-				return thisRoot;
-			}
-			/* else, move up to the parent */
-			pathId = getParentPath(pathId);
-		} while (pathId != ErrorCode.NOT_FOUND);
-			
-		return null;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
