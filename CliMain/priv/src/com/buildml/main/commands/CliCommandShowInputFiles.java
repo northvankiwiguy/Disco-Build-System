@@ -19,7 +19,6 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
 
@@ -124,7 +123,6 @@ public class CliCommandShowInputFiles extends CliCommandShowFiles {
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* fetch the list of files that are the target of the derivation */
 		FileSet sourceFileSet = CliUtils.getCmdLineFileSet(fileMgr, args[0]);
@@ -137,7 +135,7 @@ public class CliCommandShowInputFiles extends CliCommandShowFiles {
 		inputFileSet.populateWithParents();
 
 		/* pretty print the results - no filtering used here */
-		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, inputFileSet, filterFileSet, optionShowRoots, optionShowPkgs);	
+		CliUtils.printFileSet(System.out, buildStore, inputFileSet, filterFileSet, optionShowRoots, optionShowPkgs);	
 	}
 
 	/*-------------------------------------------------------------------------------------*/

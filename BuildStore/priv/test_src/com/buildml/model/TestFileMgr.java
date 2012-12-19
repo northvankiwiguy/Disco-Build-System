@@ -65,7 +65,7 @@ public class TestFileMgr {
 	@Test
 	public void testGetRootPath() throws Exception {
 		
-		int root = fileMgr.getRootPath("root");		
+		int root = pkgRootMgr.getRootPath("root");		
 		assertEquals(root, 0);
 	}
 
@@ -78,7 +78,7 @@ public class TestFileMgr {
 	@Test
 	public void testGetChildOfPath() throws Exception {
 		
-		int rootPath = fileMgr.getRootPath("root");
+		int rootPath = pkgRootMgr.getRootPath("root");
 		
 		/* check that a new path starts out as missing */
 		int missingPath = fileMgr.getChildOfPath(rootPath, "apple");
@@ -125,7 +125,7 @@ public class TestFileMgr {
 		 * already been added should provide the same ID back again.
 		 * If file names are not the same, they should have different IDs.
 		 */
-		int rootPath = fileMgr.getRootPath("root");
+		int rootPath = pkgRootMgr.getRootPath("root");
 		int newPath1 = fileMgr.addChildOfPath(rootPath, PathType.TYPE_DIR, "cmpt1");
 		int newPath2 = fileMgr.addChildOfPath(rootPath, PathType.TYPE_DIR, "cmpt2");
 		int newPath3 = fileMgr.addChildOfPath(rootPath, PathType.TYPE_DIR, "cmpt1");
@@ -300,7 +300,7 @@ public class TestFileMgr {
 		int path1 = fileMgr.addFile("/pen");
 		int path2 = fileMgr.addFile("/apple/blueberry/carrot");
 		int path3 = fileMgr.addFile("/ear/foot/knee");
-		int path4 = fileMgr.getRootPath("root");
+		int path4 = pkgRootMgr.getRootPath("root");
 
 		assertEquals("pen", fileMgr.getBaseName(path1));
 		assertEquals("carrot", fileMgr.getBaseName(path2));
@@ -325,7 +325,7 @@ public class TestFileMgr {
 		int path2 = fileMgr.getPath("/albania/bolivia/canada");
 		int path3 = fileMgr.getPath("/albania/bolivia");		
 		int path4 = fileMgr.getPath("/albania");
-		int path5 = fileMgr.getRootPath("root");
+		int path5 = pkgRootMgr.getRootPath("root");
 		
 		assertEquals(path2, fileMgr.getParentPath(path1));
 		assertEquals(path3, fileMgr.getParentPath(path2));
@@ -374,7 +374,7 @@ public class TestFileMgr {
 	public void testGetChildPaths() throws Exception {
 		
 		/* case 1 - child of root */
-		int path1 = fileMgr.getRootPath("root");
+		int path1 = pkgRootMgr.getRootPath("root");
 		Integer children[] = fileMgr.getChildPaths(path1);
 		assertEquals(1, children.length);  /* /tmp */
 		

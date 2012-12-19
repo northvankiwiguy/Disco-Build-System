@@ -26,9 +26,11 @@ import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIInteger;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 
 /**
  * @author "Peter Smith <psmith@arapiki.com>"
@@ -43,11 +45,10 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	/** The FilesEditor that we provide content for */
 	private FilesEditor editor = null;
 	
-	/** The FileMgr object we'll use for querying file information from the BuildStore */
+	/** The manager objects for this BuildStore */
 	private IFileMgr fileMgr;
-	
-	/** The Packages object we'll use for querying path package information */
 	private IPackageMgr pkgMgr;
+	private IPackageRootMgr pkgRootMgr;
 	
 	/** The ID of the top-root for our FileMgr object */
 	private int topRootId;
@@ -65,22 +66,21 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 * Construct a new FilesEditorLabelProvider object, which provides text and image
 	 * labels for the FilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
-	 * @param fileMgr The FileMgr object we're graphically representing.
-	 * @param pkgMgr The Packages object containing path component information.
+	 * @param buildStore The BuildStore object we're graphically representing.
 	 */
-	public FilesEditorLabelProvider(FilesEditor editor, IFileMgr fileMgr,
-					IPackageMgr pkgMgr) {
+	public FilesEditorLabelProvider(FilesEditor editor, IBuildStore buildStore) {
 
 		this.editor = editor;
-		this.fileMgr = fileMgr;
-		this.pkgMgr = pkgMgr;
+		this.fileMgr = buildStore.getFileMgr();
+		this.pkgMgr = buildStore.getPackageMgr();
+		this.pkgRootMgr = buildStore.getPackageRootMgr();
 	
 		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
 		folderImage = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
 		symlinkImage = null; // TODO: create an image for symlinks
 		
 		/* determine the top-root of this FileMgr object */
-		topRootId = fileMgr.getRootPath("root");
+		topRootId = pkgRootMgr.getRootPath("root");
 	}
 
 	/*=====================================================================================*
@@ -163,10 +163,10 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 
 				/* case: show file path roots */
 				if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS)) {
-					String rootName = fileMgr.getRootAtPath(pathId);
-					if (rootName != null) {
+					String rootNames[] = pkgRootMgr.getRootsAtPath(pathId);
+					if (rootNames.length != 0) {
 						String fullPath = fileMgr.getPathName(pathId);
-						return "@" + rootName + " (" + fullPath + ")";
+						return "@" + rootNames[0] + " (" + fullPath + ")";
 					}
 				}
 

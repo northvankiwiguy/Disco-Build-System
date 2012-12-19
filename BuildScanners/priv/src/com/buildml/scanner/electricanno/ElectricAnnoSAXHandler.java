@@ -21,6 +21,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.scanner.FatalBuildScannerError;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.PathUtils;
@@ -70,7 +71,10 @@ import com.buildml.utils.string.PathUtils;
 	
 	/** The FileMgr object associated with this BuildStore. */
 	private IFileMgr fileMgr;
-	
+
+	/** The PackageRootMgr object associated with this BuildStore. */
+	private IPackageRootMgr pkgRootMgr;
+
 	/** The set of files that have been read in the current &lt;job&gt;. */
 	private ArrayList<String> filesRead;
 	
@@ -105,6 +109,7 @@ import com.buildml.utils.string.PathUtils;
 	public ElectricAnnoSAXHandler(IBuildStore buildStore) {
 		actionMgr = buildStore.getActionMgr();
 		fileMgr = buildStore.getFileMgr();
+		pkgRootMgr = buildStore.getPackageRootMgr();
 		
 		/* create a stack to remember the hierarchy of actions */
 		actionStack = new ArrayList<Integer>();
@@ -115,7 +120,7 @@ import com.buildml.utils.string.PathUtils;
 		
 		/* we'll also need to track our current directory */
 		directoryStack = new ArrayList<Integer>();
-		directoryStack.add(fileMgr.getRootPath("root"));
+		directoryStack.add(pkgRootMgr.getRootPath("root"));
 	}
 	
 	/*=====================================================================================*

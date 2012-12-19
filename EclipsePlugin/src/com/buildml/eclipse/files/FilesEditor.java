@@ -204,7 +204,7 @@ public class FilesEditor extends ImportSubEditor {
 		 */
 		contentProvider = new FilesEditorContentProvider(this, fileMgr, pkgRootMgr);
 		FilesEditorLabelProvider labelProvider = 
-				new FilesEditorLabelProvider(this, fileMgr, buildStore.getPackageMgr());
+				new FilesEditorLabelProvider(this, buildStore);
 		FilesEditorViewerSorter viewerSorter = new FilesEditorViewerSorter(this, fileMgr);
 		filesTreeViewer.setContentProvider(contentProvider);
 		filesTreeViewer.setLabelProvider(labelProvider);

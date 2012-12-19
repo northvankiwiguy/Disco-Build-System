@@ -7,7 +7,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageRootMgr;
 
 /**
  * A Eclipse plugin "PropertyTester" class for determining whether
@@ -46,8 +46,8 @@ public class PathPropertyTester extends PropertyTester {
 						/* finally, test if the path has an attached root */
 						IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 						if (buildStore != null) {
-							IFileMgr fileMgr = buildStore.getFileMgr();
-							return fileMgr.getRootAtPath(pathId) != null;
+							IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+							return pkgRootMgr.getRootsAtPath(pathId).length != 0;
 						}
 					}
 				}

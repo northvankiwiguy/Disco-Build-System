@@ -183,13 +183,13 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 	 */
 	public UIInteger[] getRootElements() {
 		
-		int topRootId = fileMgr.getRootPath("root");
+		int topRootId = pkgRootMgr.getRootPath("root");
 		if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS))
 		{
 			String rootNames[] = pkgRootMgr.getRoots();
 			UIInteger uiIntegers[] = new UIInteger[rootNames.length];
 			for (int i = 0; i < rootNames.length; i++) {
-				int id = fileMgr.getRootPath(rootNames[i]);
+				int id = pkgRootMgr.getRootPath(rootNames[i]);
 				
 				/* 
 				 * if the name is missing, it's an internal error, but just

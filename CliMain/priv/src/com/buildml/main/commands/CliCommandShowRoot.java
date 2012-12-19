@@ -109,7 +109,7 @@ public class CliCommandShowRoot implements ICliCommand {
 			String [] roots = pkgRootMgr.getRoots();
 			for (int i = 0; i < roots.length; i++) {
 				String rootName = roots[i];
-				String associatedPath = fileMgr.getPathName(fileMgr.getRootPath(rootName));
+				String associatedPath = fileMgr.getPathName(pkgRootMgr.getRootPath(rootName));
 				System.out.println(rootName + " " + associatedPath);
 			}
 		}
@@ -117,7 +117,7 @@ public class CliCommandShowRoot implements ICliCommand {
 		/* else, one arg == show the path for this specific root */
 		else {
 			String rootName = args[0];
-			int rootId = fileMgr.getRootPath(rootName);
+			int rootId = pkgRootMgr.getRootPath(rootName);
 			if (rootId == ErrorCode.NOT_FOUND) {
 				CliUtils.reportErrorAndExit("Root name not found - " + rootName + ".");
 			}

@@ -69,11 +69,6 @@ public class FileMgr implements IFileMgr {
 		findPathDetailsPrepStmt = null,
 		findPathIdFromParentPrepStmt = null,
 		trashPathPrepStmt = null,
-		insertRootPrepStmt = null,
-		findRootPathIdPrepStmt = null,
-		findRootNamePrepStmt = null,
-		updateRootPathPrepStmt = null,
-		deleteFileRootPrepStmt = null,
 		pathIsTrashPrepStmt = null;
 	
 	/*=====================================================================================*
@@ -98,11 +93,6 @@ public class FileMgr implements IFileMgr {
 		findPathIdFromParentPrepStmt = db.prepareStatement(
 				"select id from files where parentId = ? and trashed = 0 and name != \"/\" order by name");
 		trashPathPrepStmt = db.prepareStatement("update files set trashed = ? where id = ?");
-		insertRootPrepStmt = db.prepareStatement("insert into fileRoots values (?, ?)");	
-		findRootPathIdPrepStmt = db.prepareStatement("select fileId from fileRoots where name = ?");
-		findRootNamePrepStmt = db.prepareStatement("select name from fileRoots where fileId = ?");
-		updateRootPathPrepStmt = db.prepareStatement("update fileRoots set fileId = ? where name = ?");
-		deleteFileRootPrepStmt = db.prepareStatement("delete from fileRoots where name = ?");
 		pathIsTrashPrepStmt = db.prepareStatement("select trashed from files where id = ?");
 		
 		/* 
@@ -115,71 +105,6 @@ public class FileMgr implements IFileMgr {
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
-	
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#getRootPath(java.lang.String)
-	 */
-	@Override
-	public int getRootPath(String rootName) {
-		Integer results[] = null;
-		
-		/* by default, assume it won't be found */
-		int pathId = ErrorCode.NOT_FOUND;
-		
-		try {
-			findRootPathIdPrepStmt.setString(1, rootName);
-			results = db.executePrepSelectIntegerColumn(findRootPathIdPrepStmt);
-			
-			/* is there exactly one root registered? */
-			if (results.length == 1) {
-				pathId = results[0];
-			}
-			
-			/* were there multiple roots with this name? Throw an error */
-			else if (results.length > 1) {
-				throw new FatalBuildStoreError("More than one root found with name: " + rootName);
-			}			
-			
-		} catch (SQLException e) {
-			new FatalBuildStoreError("Error in SQL: " + e);
-		}	
-		return pathId;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#getRootAtPath(int)
-	 */
-	@Override
-	public String getRootAtPath(int pathId) {
-		
-		/* query the table to see if there's a record for this path ID */
-		String results[] = null;
-		try {
-			findRootNamePrepStmt.setInt(1, pathId);
-			results = db.executePrepSelectStringColumn(findRootNamePrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		/* no result == no root at this path */
-		if (results.length == 0) {
-			return null;
-		} 
-		
-		/* one result == we have the correct result */
-		else if (results.length == 1) {
-			return results[0];
-		}
-		
-		/* multiple results is an error */
-		else {
-			throw new FatalBuildStoreError("Multiple entries found in fileRoots table, for path ID " + pathId);
-		}
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileMgr#addFile(java.lang.String)
@@ -246,7 +171,8 @@ public class FileMgr implements IFileMgr {
 		/* split the path into components, separated by / */
 		String components[] = PathUtils.tokenizePath(pathName);
 
-		int parentID = getRootPath(rootName);
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		int parentID = pkgRootMgr.getRootPath(rootName);
 		for (int i = 0; i < components.length; i++) {
 			
 			/* get the next child ID, if it's missing, then the full path is missing */
@@ -453,7 +379,8 @@ public class FileMgr implements IFileMgr {
 		}
 		
 		/* check that it's not associated with a root */
-		if (getRootAtPath(pathId) != null) {
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		if (pkgRootMgr.getRootsAtPath(pathId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -574,7 +501,8 @@ public class FileMgr implements IFileMgr {
 		/* convert the absolute path in /-separated path components */
 		String components[] = PathUtils.tokenizePath(pathName);
 		
-		int parentId = getRootPath(rootName);
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		int parentId = pkgRootMgr.getRootPath(rootName);
 		
 		/* for each path name component, make sure it's added, then move to the next */
 		int len = components.length - 1;

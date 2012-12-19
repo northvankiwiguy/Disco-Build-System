@@ -20,8 +20,10 @@ import org.apache.commons.io.IOUtils;
 
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.ActionSet;
@@ -157,8 +159,7 @@ public class CliUtils {
 	 * used primarily for displaying the result of reports.
 	 * 
 	 * @param outStream The PrintStream on which the output should be displayed.
-	 * @param fileMgr The FileMgr object containing the files to be listed.
-	 * @param pkgMgr The PackageMgr object containing the package information.
+	 * @param buildStore The BuildStore object containing the files to be listed.
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
 	 *         displayed (set to null to display everything).
@@ -167,8 +168,12 @@ public class CliUtils {
 	 * @param showPkgs Indicates whether the package names should be displayed.
 	 */
 	public static void printFileSet(
-			PrintStream outStream, IFileMgr fileMgr, IPackageMgr pkgMgr, FileSet resultFileSet,
+			PrintStream outStream, IBuildStore buildStore, FileSet resultFileSet,
 			FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
+		
+		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		
 		/*
 		 * This method uses recursion to traverse the FileMgr from the root to the leaves 
@@ -191,7 +196,7 @@ public class CliUtils {
 		 * of the paths underneath that root. Also, figure out the root's name
 		 * (it's '/' or '@root').
 		 */
-		int topRoot = fileMgr.getRootPath("root");
+		int topRoot = pkgRootMgr.getRootPath("root");
 		String rootPathName = fileMgr.getPathName(topRoot, showRoots);
 	
 		/*
@@ -209,7 +214,7 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = fileMgr.getChildPaths(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printFileSetHelper(outStream, sb, fileMgr, pkgMgr, children[i], 
+			printFileSetHelper(outStream, sb, buildStore, children[i], 
 					resultFileSet, filterFileSet, showRoots, showPkgs);
 		}
 	}
@@ -463,8 +468,7 @@ public class CliUtils {
 	 * 
 	 * @param outStream The PrintStream on which to display paths.
 	 * @param pathSoFar This path's parent path as a string, complete with trailing "/".
-	 * @param fileMgr The FileMgr object in which these paths belong.
-	 * @param pkgMgr The PackageMgr object containing package information.
+	 * @param buildStore The BuildStore in which these paths belong.
 	 * @param thisPathId The path to display (assuming it's in the filesToShow FileSet).
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
@@ -473,10 +477,14 @@ public class CliUtils {
 	 * @param showPkgs Whether to show the package names.
 	 */
 	private static void printFileSetHelper(
-			PrintStream outStream, StringBuffer pathSoFar, IFileMgr fileMgr, IPackageMgr pkgMgr, 
+			PrintStream outStream, StringBuffer pathSoFar, IBuildStore buildStore, 
 			int thisPathId, FileSet resultFileSet, FileSet filterFileSet, boolean showRoots, 
 			boolean showPkgs) {
 
+		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		
 		/* a StringBuffer for forming the package name */
 		StringBuffer pkgString = new StringBuffer();
 		
@@ -496,9 +504,9 @@ public class CliUtils {
 		 * 	1) Roots should be displayed, and this path is a root.
 		 *  2) Roots shouldn't be displayed, OR this isn't a root.
 		 */
-		String rootName = null;
+		String rootNames[] = null;
 		if (showRoots) {
-			rootName = fileMgr.getRootAtPath(thisPathId);
+			rootNames = pkgRootMgr.getRootsAtPath(thisPathId);
 		}
 		
 		/* what is this path? A directory or something else? */
@@ -544,7 +552,7 @@ public class CliUtils {
 		}
 		
 		/* this path isn't a root, or we're not interested in displaying roots */
-		if (rootName == null) {
+		if ((rootNames == null) || (rootNames.length == 0)) {
 			
 			/* get the name of this path */
 			baseName = fileMgr.getBaseName(thisPathId);
@@ -577,8 +585,21 @@ public class CliUtils {
 			 * has a reference to it and will use it for displaying our sibling paths).
 			 */
 			pathSoFar = new StringBuffer();
-			pathSoFar.append('@');
-			pathSoFar.append(rootName);
+			
+			/* display a root name, or comma-separated root names */
+			if (rootNames.length == 1) {
+				pathSoFar.append('@');
+				pathSoFar.append(rootNames[0]);
+			} else if (rootNames.length > 1) {
+				pathSoFar.append("@{");
+				for (int i = 0; i < rootNames.length; i++) {
+					if (i != 0) {
+						pathSoFar.append(", ");
+					}
+					pathSoFar.append(rootNames[i]);
+				}
+				pathSoFar.append('}');
+			}				
 			
 			/* display information about this root. */
 			outStream.print(pathSoFar + " (" + fileMgr.getPathName(thisPathId) + ") ");
@@ -604,7 +625,7 @@ public class CliUtils {
 		
 			/* display each of the children */
 			for (int i = 0; i < children.length; i++) {
-				printFileSetHelper(outStream, pathSoFar, fileMgr, pkgMgr, children[i], 
+				printFileSetHelper(outStream, pathSoFar, buildStore, children[i], 
 						resultFileSet, filterFileSet, showRoots, showPkgs);
 			}
 			

@@ -20,8 +20,6 @@ import com.buildml.main.CliUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.IFileMgr;
-import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
@@ -152,8 +150,6 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		IFileMgr fileMgr = buildStore.getFileMgr();
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* fetch the list of actions we're querying */
 		String actionSpecs = args[0];
@@ -167,7 +163,7 @@ public class CliCommandShowFilesUsedBy extends CliCommandShowFiles {
 		accessedFiles.populateWithParents();
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, accessedFiles, filterFileSet, optionShowRoots, optionShowPkgs);
+		CliUtils.printFileSet(System.out, buildStore, accessedFiles, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -138,7 +138,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 	public int getWorkspaceRoot() {
 
 		/* If we don't have a cached copy, query the database */
-		if (cachedWorkspaceRootId != -1) {
+		if (cachedWorkspaceRootId == -1) {
 			Integer results[] = null;
 			try {
 				findRootPathIdPrepStmt.setString(1, "workspace");
@@ -272,7 +272,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 		if (rootName == null) {
 			return ErrorCode.NOT_FOUND;
 		}
-		return getRoot(rootName);
+		return getRootPath(rootName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -327,6 +327,31 @@ public class PackageRootMgr implements IPackageRootMgr {
 			return packageName + "_gen";
 		}
 		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a root name, return the associated path ID.
+	 * 
+	 * @param rootName Name of the root to search for. 
+	 * @return The pathId associated with the root, or ErrorCode.NOT_FOUND if the root name
+	 *         is invalid.
+	 */
+	public int getRootPath(String rootName) {
+
+		try {
+			findRootPathIdPrepStmt.setString(1, rootName);
+			Integer results[] = db.executePrepSelectIntegerColumn(findRootPathIdPrepStmt);
+
+			/* is there exactly one root registered? */
+			if (results.length == 1) {
+				return results[0];
+			}
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return ErrorCode.NOT_FOUND;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -458,31 +483,6 @@ public class PackageRootMgr implements IPackageRootMgr {
 		}
 		
 		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Given a root name, return the associated path ID.
-	 * 
-	 * @param rootName Name of the root to search for. 
-	 * @return The pathId associated with the root, or ErrorCode.NOT_FOUND if the root name
-	 *         is invalid.
-	 */
-	private int getRoot(String rootName) {
-
-		try {
-			findRootPathIdPrepStmt.setString(1, rootName);
-			Integer results[] = db.executePrepSelectIntegerColumn(findRootPathIdPrepStmt);
-
-			/* is there exactly one root registered? */
-			if (results.length == 1) {
-				return results[0];
-			}
-		} catch (SQLException e) {
-			new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		return ErrorCode.NOT_FOUND;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

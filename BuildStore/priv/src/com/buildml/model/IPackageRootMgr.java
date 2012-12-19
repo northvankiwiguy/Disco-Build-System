@@ -135,6 +135,15 @@ public interface IPackageRootMgr {
 	public String getPackageRootName(int packageId, int type);
 	
 	/**
+	 * Given a root name, return the associated path ID.
+	 * 
+	 * @param rootName Name of the root to search for. 
+	 * @return The pathId associated with the root, or ErrorCode.NOT_FOUND if the root name
+	 *         is invalid.
+	 */
+	public int getRootPath(String rootName);
+	
+	/**
 	 * Set the temporary source or generated root for a particular package. This method
 	 * is similar to setDefaultPackageRoot but is specified as a native file system
 	 * path and is not persisted in the database. It is therefore used for overriding

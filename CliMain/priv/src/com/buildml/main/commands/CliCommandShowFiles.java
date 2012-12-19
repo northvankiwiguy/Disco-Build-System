@@ -20,7 +20,6 @@ import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.FileSet;
 
 /**
@@ -143,9 +142,6 @@ public class CliCommandShowFiles implements ICliCommand {
 		
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 
-		IFileMgr fileMgr = buildStore.getFileMgr();
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
-
 		/* 
 		 * There were no search "results", so we'll show everything (except those
 		 * that are filtered-out by filterFileSet).
@@ -153,7 +149,7 @@ public class CliCommandShowFiles implements ICliCommand {
 		FileSet resultFileSet = null;
 
 		/* pretty print the results */
-		CliUtils.printFileSet(System.out, fileMgr, pkgMgr, resultFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
+		CliUtils.printFileSet(System.out, buildStore, resultFileSet, filterFileSet, optionShowRoots, optionShowPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

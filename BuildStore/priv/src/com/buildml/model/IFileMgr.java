@@ -47,23 +47,6 @@ public interface IFileMgr {
 	public static final int MAX_FILES = 16777216;
 
 	/**
-	 * Retrieve the ID of the path that's currently associated with this path root.
-	 * 
-	 * @param rootName The name of the root.
-	 * @return The namespace's root path ID, or ErrorCode.NOT_FOUND if it's not defined.
-	 */
-	public abstract int getRootPath(String rootName);
-
-	/**
-	 * If this path has an associated root attached to it, return the root name. If there's
-	 * no root, return null. There can be at most one root associated with this path.
-	 * 
-	 * @param pathId The ID of the path we're querying.
-	 * @return The name of the root, or null if there's no root attached.
-	 */
-	public abstract String getRootAtPath(int pathId);
-
-	/**
 	 * Add a new file to the database.
 	 * 
 	 * @param fullPathName The full path of the file.
