@@ -30,18 +30,14 @@ public class TestFileMgr {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The FileMgr associated with this BuildStore */
+	/** The managers associated with this BuildStore */
 	IFileMgr fileMgr;
-	
-	/** The ActionMgr associated with this BuildStore */
 	IActionMgr actionMgr;
-	
-	/** The FileAttributeMgr associated with this BuildStore */
 	IFileAttributeMgr fileAttrMgr;
-
-	/** The FileIncludes associated with this BuildStore */
 	IFileIncludeMgr fileIncludeMgr;
-
+	IPackageMgr pkgMgr;
+	IPackageRootMgr pkgRootMgr;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -55,6 +51,8 @@ public class TestFileMgr {
 		actionMgr = bs.getActionMgr();
 		fileAttrMgr = bs.getFileAttributeMgr();
 		fileIncludeMgr = bs.getFileIncludeMgr();
+		pkgMgr = bs.getPackageMgr();
+		pkgRootMgr = bs.getPackageRootMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -437,7 +435,9 @@ public class TestFileMgr {
 		
 		/* test that we can't remove a path that's attached to root */
 		int path6 = fileMgr.addDirectory("/april/may/november");
-		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("myroot", path6));
+		int pkgA = pkgMgr.addPackage("pkgA");
+		assertEquals(ErrorCode.OK, 
+				     pkgRootMgr.setPackageRoot(pkgA, IPackageRootMgr.SOURCE_ROOT, path6));
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path6));
 		
 		/* test that any attributes on that path have been removed. */
@@ -564,31 +564,6 @@ public class TestFileMgr {
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { pathJune, pathAugust }, fileMgr.getChildPaths(pathMay)));
 		assertEquals(PathType.TYPE_FILE, fileMgr.getPathType(pathJune));
-	}	
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test removing a path to check that it's no longer visible in searches.
-	 * @throws Exception
-	 */
-	@Test
-	public void testRevivePath3() throws Exception {
-		
-		/* set up some directories, and add a root */
-		int pathA = fileMgr.addDirectory("/a");
-		int pathB = fileMgr.addDirectory("/a/b");
-		int pathC = fileMgr.addDirectory("/a/b/c");
-		fileMgr.addNewRoot("myRoot", pathB);
-		
-		/* delete the pathC directory */
-		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(pathC));
-		
-		/* attempt to add a new root to this path - should fail because path doesn't exist */
-		assertEquals(ErrorCode.BAD_PATH, fileMgr.addNewRoot("yourRoot", pathC));
-		
-		/* attempt to move an existing root to this path - should fail */
-		assertEquals(ErrorCode.BAD_PATH, fileMgr.moveRootToPath("myRoot", pathC));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

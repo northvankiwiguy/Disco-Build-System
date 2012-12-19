@@ -137,14 +137,6 @@
             name="Switch to Previous Editor Tab">
       </command>
       <command
-            id="com.buildml.eclipse.commands.assignRoot"
-            name="Assign Root Name">
-      </command>
-      <command
-            id="com.buildml.eclipse.commands.removeRoot"
-            name="Remove Root Name">
-      </command>
-      <command
             category="com.buildml.eclipse.commands.category"
             defaultHandler="com.buildml.eclipse.files.handlers.HandlerDeletePath"
             id="com.buildml.eclipse.commands.deletePath"
@@ -280,30 +272,6 @@
                      checkEnabled="false">
                   <test
                         args="actions"
-                        property="com.buildml.eclipse.hasFeature">
-                  </test>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="com.buildml.eclipse.commands.assignRoot"
-                  label="Assign Root Name"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <test
-                        args="path-roots"
-                        property="com.buildml.eclipse.hasFeature">
-                  </test>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="com.buildml.eclipse.commands.removeRoot"
-                  label="Remove Root Name"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <test
-                        args="path-roots"
                         property="com.buildml.eclipse.hasFeature">
                   </test>
                </visibleWhen>
@@ -943,60 +911,6 @@
                </equals>
             </with>
          </activeWhen>
-      </handler>
-      <handler
-            class="com.buildml.eclipse.files.handlers.HandlerAssignRootName"
-            commandId="com.buildml.eclipse.commands.assignRoot">
-         <enabledWhen>
-            <and>
-               <test
-                     args="path-roots"
-                     property="com.buildml.eclipse.hasFeature">
-               </test>
-               <not>
-                  <test
-                        property="com.buildml.eclipse.hasAttachedRoot">
-                  </test>
-               </not>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <instanceof
-                        value="com.buildml.eclipse.bobj.UIDirectory">
-                  </instanceof>
-               </iterate>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="com.buildml.eclipse.files.handlers.HandlerRemoveRoot"
-            commandId="com.buildml.eclipse.commands.removeRoot">
-         <enabledWhen>
-            <and>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-               </with>
-               <iterate
-                     operator="and">
-                  <instanceof
-                        value="com.buildml.eclipse.bobj.UIDirectory">
-                  </instanceof>
-               </iterate>
-               <test
-                     property="com.buildml.eclipse.hasAttachedRoot">
-               </test>
-               <test
-                     args="path-roots"
-                     property="com.buildml.eclipse.hasFeature">
-               </test>
-            </and>
-         </enabledWhen>
       </handler>
       <handler
             class="com.buildml.eclipse.actions.handlers.HandlerMergeActions"

@@ -55,23 +55,6 @@ public interface IFileMgr {
 	public abstract int getRootPath(String rootName);
 
 	/**
-	 * Add a new root, to be associated with a specified path ID (which must refer to an
-	 * existing directory).
-	 * 
-	 * @param rootName The name of the new root to be created.
-	 * @param pathId The ID of the path the root should be attached to.
-	 * @return 
-	 * <ul>
-	 *   <li>ErrorCode.OK on success.</li>
-	 *   <li>ErrorCode.ONLY_ONE_ALLOWED if there's already a root associated with this path ID.</li>
-	 *   <li>ErrorCode.ALREADY_USED if the root name is already in use.</li>
-	 *   <li>ErrorCode.INVALID_NAME if the new proposed name is invalid.</li>
-	 *   <li>ErrorCode.NOT_A_DIRECTORY if the path doesn't refer to a valid directory.</li>
-	 * </ul>
-	 */
-	public abstract int addNewRoot(String rootName, int pathId);
-
-	/**
 	 * Move an existing root to be associated with a new path.
 	 * 
 	 * @param rootName Name of the root to be moved.
@@ -105,19 +88,6 @@ public interface IFileMgr {
 	 * @return The name of the root that encloses the path.
 	 */
 	public abstract String getEnclosingRoot(int pathId);
-
-	/**
-	 * Delete the specified root from the database. The very top root ("root") can't be removed.
-	 * 
-	 * @param rootName The name of the root to be deleted.
-	 * @return
-	 *  <ul>
-	 *    <li>ErrorCode.OK on success.</li>
-	 *    <li>ErrorCode.NOT_FOUND if the root doesn't exist.</li>
-	 *    <li>ErrorCode.CANT_REMOVE the "root" root can't be removed.</li>
-	 *  </ul>
-	 */
-	public abstract int deleteRoot(String rootName);
 
 	/**
 	 * Add a new file to the database.

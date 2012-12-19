@@ -149,55 +149,6 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#addNewRoot(java.lang.String, int)
-	 */
-	@Override
-	public int addNewRoot(String rootName, int pathId) {
-		
-		/* the root name can't already be in use */
-		if (getRootPath(rootName) != ErrorCode.NOT_FOUND) {
-			return ErrorCode.ALREADY_USED;
-		}
-		
-		/* names can't contain @, :, or spaces, since this are considered root name separators */
-		if (rootName.contains("@") || rootName.contains(":") || rootName.contains(" ")){
-			return ErrorCode.INVALID_NAME;
-		}
-		
-		/* the path must not be trashed */
-		if (isPathTrashed(pathId)) {
-			return ErrorCode.BAD_PATH;
-		}
-		
-		/* this path must be valid, and refer to a directory, not a file */
-		PathType pathType = getPathType(pathId);
-		if (pathType == PathType.TYPE_INVALID) {
-			return ErrorCode.BAD_PATH;
-		}
-		if (pathType != PathType.TYPE_DIR){
-			return ErrorCode.NOT_A_DIRECTORY;
-		}
-		
-		/* there can't already be a root at this path */
-		if (getRootAtPath(pathId) != null) {
-			return ErrorCode.ONLY_ONE_ALLOWED;
-		}
-		
-		/* insert the root into our table */
-		try {
-			insertRootPrepStmt.setString(1, rootName);
-			insertRootPrepStmt.setInt(2, pathId);
-			db.executePrepUpdate(insertRootPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		return ErrorCode.OK;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileMgr#moveRootToPath(java.lang.String, int)
 	 */
 	@Override
@@ -296,34 +247,6 @@ public class FileMgr implements IFileMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
-
-	
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileMgr#deleteRoot(java.lang.String)
-	 */
-	@Override
-	public int deleteRoot(String rootName) {
-		
-		if (rootName.equals("root")) {
-			return ErrorCode.CANT_REMOVE;
-		}
-		
-		/* try to delete it from the database, but if no records where removed, that's an error */
-		try {
-			deleteFileRootPrepStmt.setString(1, rootName);
-			int rowCount = db.executePrepUpdate(deleteFileRootPrepStmt);
-			if (rowCount == 0) {
-				return ErrorCode.NOT_FOUND;
-			}
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		return ErrorCode.OK;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
 	
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileMgr#addFile(java.lang.String)

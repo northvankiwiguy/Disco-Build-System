@@ -23,6 +23,7 @@ import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -38,8 +39,10 @@ public class TestFileSet {
 	/** Our test BuildStore object */
 	private IBuildStore bs;
 	
-	/** Our test FileMgr object */
+	/** Our test manager objects */
 	private IFileMgr fileMgr;
+	private IPackageMgr pkgMgr;
+	private IPackageRootMgr pkgRootMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -78,6 +81,8 @@ public class TestFileSet {
 	public void setUp() throws Exception {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		fileMgr = bs.getFileMgr();
+		pkgMgr = bs.getPackageMgr();
+		pkgRootMgr = bs.getPackageRootMgr();
 		fs = new FileSet(fileMgr);
 	}
 
@@ -411,8 +416,11 @@ public class TestFileSet {
 		int dirBCD = fileMgr.getPath("/b/c/d");
 		
 		/* add some file roots */
-		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("abcRoot", dirABC));
-		assertEquals(ErrorCode.OK, fileMgr.addNewRoot("bRoot", dirB));
+		int pkgA = pkgMgr.addPackage("pkgA");
+		assertEquals(ErrorCode.OK, 
+				     pkgRootMgr.setPackageRoot(pkgA, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		assertEquals(ErrorCode.OK, 
+			     pkgRootMgr.setPackageRoot(pkgA, IPackageRootMgr.GENERATED_ROOT, dirB));
 		
 		/* with no arguments, no paths are added */
 		FileSet fs0 = new FileSet(fileMgr);
@@ -469,17 +477,17 @@ public class TestFileSet {
 		assertTrue(fs7.isMember(f3path)); 
 		assertEquals(1, fs7.size());
 		
-		/* test abcRoot */
+		/* test pkgA_src */
 		FileSet fs8 = new FileSet(fileMgr);
-		assertEquals(ErrorCode.OK, fs8.populateWithPaths(new String[] {"@abcRoot"}));
+		assertEquals(ErrorCode.OK, fs8.populateWithPaths(new String[] {"@pkgA_src"}));
 		assertEquals(7, fs8.size());
 		assertTrue(fs8.isMember(f1path)); assertTrue(fs8.isMember(f2path)); assertTrue(fs8.isMember(f3path));
 		assertTrue(fs8.isMember(dirABC)); assertTrue(fs8.isMember(dirABCD)); assertTrue(fs8.isMember(dirABCDE));
 		assertTrue(fs8.isMember(dirABCDG));
 
-		/* test %bRoot with a path following it */
+		/* test @pkgA_gen with a path following it */
 		FileSet fs9 = new FileSet(fileMgr);
-		assertEquals(ErrorCode.OK, fs9.populateWithPaths(new String[] {"@bRoot/c/d/f4.c"}));
+		assertEquals(ErrorCode.OK, fs9.populateWithPaths(new String[] {"@pkgA_gen/c/d/f4.c"}));
 		assertEquals(1, fs9.size());
 		assertTrue(fs9.isMember(f4path));
 		
