@@ -29,8 +29,10 @@ public class TestFileMgrRoots {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The FileMgr associated with this BuildStore */
-	IFileMgr fileMgr;
+	/** The managers associated with this BuildStore */
+	private IFileMgr fileMgr;
+	private IPackageMgr pkgMgr;
+	private IPackageRootMgr pkgRootMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -42,8 +44,10 @@ public class TestFileMgrRoots {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
-		/* fetch the associated FileSpace */
+		/* fetch the associated FileMgr, PackageMgr and PackageRootMgr */
 		fileMgr = bs.getFileMgr();
+		pkgMgr = bs.getPackageMgr();
+		pkgRootMgr = bs.getPackageRootMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -330,7 +334,10 @@ public class TestFileMgrRoots {
 	 */
 	@Test
 	public void testGetPathName() {
-		int path1 = fileMgr.addFile("@root/a/b/c/d/e.h");
+				
+		int path1 = fileMgr.addFile("/a/b/c/d/e.h");
+		int path2 = fileMgr.addFile("/a/b/c/d/f.h");
+		int path3 = fileMgr.addFile("/g/h/i.h");
 
 		/* show the path, without roots */
 		assertEquals("/a/b/c/d/e.h", fileMgr.getPathName(path1));
@@ -338,25 +345,51 @@ public class TestFileMgrRoots {
 		/* now again, with the top level root */
 		assertEquals("@root/a/b/c/d/e.h", fileMgr.getPathName(path1, true));
 		
-		/* add a subroot, and test again */
-		fileMgr.addNewRoot("subRoot", fileMgr.addDirectory("@root/a/b"));
-		assertEquals("@subRoot/c/d/e.h", fileMgr.getPathName(path1, true));
-
-		/* add a subsubroot, and test again */
-		fileMgr.addNewRoot("subSubRoot", fileMgr.addDirectory("@root/a/b/c"));
-		assertEquals("@subSubRoot/d/e.h", fileMgr.getPathName(path1, true));
+		/* set the workspace root to /a/b */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/a/b")));
 		
-		/* the full path, without roots, hasn't changed */
+		/* test again, but this time we should see @workspace, not @root */
 		assertEquals("/a/b/c/d/e.h", fileMgr.getPathName(path1));
+		assertEquals("@workspace/c/d/e.h", fileMgr.getPathName(path1, true));
 		
-		/* delete the subsubroot, so the subroot is now returned */
-		assertEquals(ErrorCode.OK, fileMgr.deleteRoot("subSubRoot"));
-		assertEquals("@subRoot/c/d/e.h", fileMgr.getPathName(path1, true));
+		/* except when the path is truly outside the workspace */
+		assertEquals("@root/g/h/i.h", fileMgr.getPathName(path3, true));
+		
+		/* add a package, and set the root to /a/b/c */
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT, 
+						                  fileMgr.getPath("/a/b/c")));
+		
+		/* test again, but this time we should still see @workspace */
+		assertEquals("/a/b/c/d/e.h", fileMgr.getPathName(path1));
+		assertEquals("@workspace/c/d/e.h", fileMgr.getPathName(path1, true));
+		assertEquals("@workspace/c/d/f.h", fileMgr.getPathName(path2, true));
+		
+		/* now add path1 (e.h) into this new package and test again */
+		assertEquals(ErrorCode.OK, 
+					 pkgMgr.setFilePackage(path1, pkgAId, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals("@pkgA_src/d/e.h", fileMgr.getPathName(path1, true));
+		assertEquals("@workspace/c/d/f.h", fileMgr.getPathName(path2, true));
+
+		/* now add path2 (f.h) into this new package and test again */
+		assertEquals(ErrorCode.OK, 
+					pkgMgr.setFilePackage(path2, pkgAId, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals("@pkgA_src/d/e.h", fileMgr.getPathName(path1, true));
+		assertEquals("@pkgA_src/d/f.h", fileMgr.getPathName(path2, true));
+
+		/* remove path1 from the package */
+		assertEquals(ErrorCode.OK, 
+				 pkgMgr.setFilePackage(path1, pkgMgr.getImportPackage(), 
+						               IPackageMgr.SCOPE_PUBLIC));
+		assertEquals("@workspace/c/d/e.h", fileMgr.getPathName(path1, true));
+		assertEquals("@pkgA_src/d/f.h", fileMgr.getPathName(path2, true));
 		
 		/* test that the "/" case is handled properly */
 		int rootPath = fileMgr.getPath("/");
 		assertEquals("/", fileMgr.getPathName(rootPath, false));
-		assertEquals("@root", fileMgr.getPathName(rootPath, true));
-		
+		assertEquals("@root", fileMgr.getPathName(rootPath, true));		
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

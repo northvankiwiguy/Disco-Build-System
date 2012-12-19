@@ -23,6 +23,8 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.PathNameCache;
 import com.buildml.model.types.PathNameCache.PathNameCacheValue;
 import com.buildml.utils.errors.ErrorCode;
@@ -92,8 +94,8 @@ public class FileMgr implements IFileMgr {
 		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ? " +
 												"and trashed = 0");
 		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, 0, ?, 0, 0, ?)");
-		findPathDetailsPrepStmt = db.prepareStatement("select parentId, pathType, files.name, fileRoots.name " +
-				" from files left join fileRoots on files.id = fileRoots.fileId where files.id = ?");
+		findPathDetailsPrepStmt = db.prepareStatement(
+				"select parentId, pathType, files.name from files where files.id = ?");
 		findPathIdFromParentPrepStmt = db.prepareStatement(
 				"select id from files where parentId = ? and trashed = 0 and name != \"/\" order by name");
 		trashPathPrepStmt = db.prepareStatement("update files set trashed = ? where id = ?");
@@ -424,8 +426,6 @@ public class FileMgr implements IFileMgr {
 	 */
 	@Override
 	public String getPathName(int pathId, boolean showRoots) {
-
-		// TODO: show relevant package root.
 		
 		// TODO: handle case where the pathId is invalid.
 		StringBuffer sb = new StringBuffer();
@@ -438,7 +438,31 @@ public class FileMgr implements IFileMgr {
 				sb.append('/');
 			}
 		} else {
-			getPathNameHelper(sb, pathId, showRoots);
+			
+			/* determine which package this file is in */
+			IPackageMgr pkgMgr = buildStore.getPackageMgr();
+			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+			int workspaceRootPathId = pkgRootMgr.getWorkspaceRoot();
+			Integer pathPackage[] = pkgMgr.getFilePackage(pathId);
+			int pkgRootPathId = 0;
+			String pkgRootName = null;
+			
+			/* error case: package not available - disable showRoots */
+			if ((workspaceRootPathId == ErrorCode.NOT_FOUND) ||
+				(pathPackage == null)) {
+				showRoots = false;
+			}
+			
+			/* else, determine path of package root */
+			else {
+				pkgRootPathId = pkgRootMgr.getPackageRoot(pathPackage[0], 
+													IPackageRootMgr.SOURCE_ROOT);
+				pkgRootName = pkgRootMgr.getPackageRootName(pathPackage[0],
+													IPackageRootMgr.SOURCE_ROOT);
+			}
+			
+			getPathNameHelper(sb, pathId, showRoots, 
+								workspaceRootPathId, pkgRootPathId, pkgRootName);
 		}
 		return sb.toString();
 	}
@@ -734,17 +758,16 @@ public class FileMgr implements IFileMgr {
 	 * Return the given path's parent path ID, and the path's own name.
 	 * 
 	 * @param pathId The ID of the path to query.
-	 * @return An array of four Objects:
+	 * @return An array of three Objects:
 	 * <ul>
 	 *    <li>The first is the parent's path ID (Integer)</li>
 	 *    <li>The second is true if this is a directory, else false.</li>
 	 *    <li>The third is the path's own name (String).</li>
-	 *    <li>The fourth is the name of the attached root (if any).</li>
 	 * </ul>
 	 * Return null if there's no matching record.
 	 */
 	private Object[] getPathDetails(int pathId) {
-		Object result[] = new Object[4];
+		Object result[] = new Object[3];
 		
 		try {
 			findPathDetailsPrepStmt.setInt(1, pathId);
@@ -753,7 +776,6 @@ public class FileMgr implements IFileMgr {
 				result[0] = rs.getInt(1);
 				result[1] = intToPathType(rs.getInt(2));
 				result[2] = rs.getString(3);
-				result[3] = rs.getString(4);
 				rs.close();
 			} else {
 				
@@ -801,8 +823,13 @@ public class FileMgr implements IFileMgr {
 	 * @param sb The StringBuffer we'll append path component names onto (as we recurse).
 	 * @param pathId The ID of the path we're currently looking at (whose name we'll append to sb).
 	 * @param showRoots True if we should return a file system root (e.g. "@root") in the path name.
+	 * @param workspaceRootPathId Path ID of the "@workspace" root.
+	 * @param pkgRootPathId PathID of the root for this file's package.
+	 * @param pkgRootName Name of this file's package.
 	 */
-	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots) {
+	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots, 
+									int workspaceRootPathId, int pkgRootPathId, 
+									String pkgRootName) {
 
 		/*
 		 * Get the details of this path, including it's parent ID, its name and whether
@@ -811,15 +838,23 @@ public class FileMgr implements IFileMgr {
 		Object pathDetails[] = getPathDetails(pathId);
 		int parentId = (Integer)pathDetails[0];
 		String name = (String)pathDetails[2];
-		String rootName = (String)pathDetails[3];
 	
 		/* 
-		 * If we're showing root names, and we've reached one, display it and terminate recursion
+		 * If we're showing root names, and we've reached one, display it. This can
+		 * be @root, @workspace, or the path's own package root.
 		 */
-		if (showRoots && (rootName != null)) {
-			sb.append('@');
-			sb.append(rootName);
-			return;
+		if (showRoots) {
+			if (pathId == 0) {
+				sb.append("@root");
+				return;
+			} else if (pathId == workspaceRootPathId) {
+				sb.append("@workspace");
+				return;
+			} else if (pathId == pkgRootPathId) {
+				sb.append('@');
+				sb.append(pkgRootName);
+				return;
+			}
 		}
 		
 		/*
@@ -834,7 +869,8 @@ public class FileMgr implements IFileMgr {
 		 * of paths until we reach the original path again. At each step, we'll append
 		 * the path component onto the full result string.
 		 */
-		getPathNameHelper(sb, parentId, showRoots);
+		getPathNameHelper(sb, parentId, showRoots, 
+				          workspaceRootPathId, pkgRootPathId, pkgRootName);
 		sb.append("/");
 		sb.append(name);
 	}

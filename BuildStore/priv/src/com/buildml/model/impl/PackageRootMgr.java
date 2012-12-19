@@ -251,7 +251,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 		// TODO: check that pathId is below "workspace". If not, return ErrorCode.OUT_OF_RANGE.
 		
 		/* derive the root name, e.g <package>_src or <package>_gen */
-		String rootName = computePackageRootName(packageId, type);
+		String rootName = getPackageRootName(packageId, type);
 		if (rootName == null) {
 			return ErrorCode.NOT_FOUND;
 		}
@@ -268,7 +268,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 	@Override
 	public int getPackageRoot(int packageId, int type)
 	{
-		String rootName = computePackageRootName(packageId, type);
+		String rootName = getPackageRootName(packageId, type);
 		if (rootName == null) {
 			return ErrorCode.NOT_FOUND;
 		}
@@ -283,7 +283,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 	@Override
 	public int removePackageRoot(int packageId, int type) {
 		
-		String rootName = computePackageRootName(packageId, type);
+		String rootName = getPackageRootName(packageId, type);
 		if (rootName == null) {
 			return ErrorCode.NOT_FOUND;
 		}
@@ -300,6 +300,35 @@ public class PackageRootMgr implements IPackageRootMgr {
 		return ErrorCode.OK;
 	}
 
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.buildml.model.IPackageRootMgr#getPackageRootName(int, int)
+	 */
+	@Override
+	public String getPackageRootName(int packageId, int type) {
+
+		/* Not supported for folders, invalid packages or <import> */
+		if (pkgMgr.isFolder(packageId) || !pkgMgr.isValid(packageId) ||
+				(packageId == pkgMgr.getImportPackage())) {
+			return null;
+		}
+		
+		/* get the package name, and append _src or _gen */
+		String packageName = pkgMgr.getName(packageId);
+		if (packageName == null) {
+			return null;
+		}
+		if (type == IPackageRootMgr.SOURCE_ROOT) {
+			return packageName + "_src";
+		} else if (type == IPackageRootMgr.GENERATED_ROOT) {
+			return packageName + "_gen";
+		}
+		return null;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -454,39 +483,6 @@ public class PackageRootMgr implements IPackageRootMgr {
 			new FatalBuildStoreError("Error in SQL: " + e);
 		}
 		return ErrorCode.NOT_FOUND;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Compute the name of a package root, based on the packageId and type (SOURCE_ROOT
-	 * or GENERATED_ROOT). For example, the "libz" package will have two roots: "libz_src"
-	 * and "libz_gen".
-	 * 
-	 * @param packageId The ID of the package.
-	 * @param type		The root type (SOURCE_ROOT or GENERATED_ROOT).
-	 * @return			The corresponding root name, or null if either input parameter is invalid
-	 * 					(including if packageId relates to a folder, or the <import> package).
-	 */
-	private String computePackageRootName(int packageId, int type) {
-
-		/* Not supported for folders, invalid packages or <import> */
-		if (pkgMgr.isFolder(packageId) || !pkgMgr.isValid(packageId) ||
-				(packageId == pkgMgr.getImportPackage())) {
-			return null;
-		}
-		
-		/* get the package name, and append _src or _gen */
-		String packageName = pkgMgr.getName(packageId);
-		if (packageName == null) {
-			return null;
-		}
-		if (type == IPackageRootMgr.SOURCE_ROOT) {
-			return packageName + "_src";
-		} else if (type == IPackageRootMgr.GENERATED_ROOT) {
-			return packageName + "_gen";
-		}
-		return null;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

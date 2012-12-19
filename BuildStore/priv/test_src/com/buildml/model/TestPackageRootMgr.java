@@ -451,6 +451,8 @@ public class TestPackageRootMgr {
 	// TODO: try to move a package root above the workspace root - error.
 	// TODO: test trying to move workspace below a package root.
 	// TODO: test trying to move workspace below build.bml
+	// TODO: try to move a package below a file/dir that's in the package.
+	// TODO: try to add a file/dir to to package, at a path that's above the root.
 
 	// TODO: create a new package, set overrides for the root, then clear them.
 	// TODO: create a new package, set an override for the workspace root, then check the package root.

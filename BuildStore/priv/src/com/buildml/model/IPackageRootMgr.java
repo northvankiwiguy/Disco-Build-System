@@ -123,6 +123,18 @@ public interface IPackageRootMgr {
 	public int removePackageRoot(int packageId, int type);
 	
 	/**
+	 * Compute the name of a package root, based on the packageId and type (SOURCE_ROOT
+	 * or GENERATED_ROOT). For example, the "libz" package will have two roots: "libz_src"
+	 * and "libz_gen".
+	 * 
+	 * @param packageId The ID of the package.
+	 * @param type		The root type (SOURCE_ROOT or GENERATED_ROOT).
+	 * @return			The corresponding root name, or null if either input parameter is invalid
+	 * 					(including if packageId relates to a folder, or the <import> package).
+	 */
+	public String getPackageRootName(int packageId, int type);
+	
+	/**
 	 * Set the temporary source or generated root for a particular package. This method
 	 * is similar to setDefaultPackageRoot but is specified as a native file system
 	 * path and is not persisted in the database. It is therefore used for overriding
