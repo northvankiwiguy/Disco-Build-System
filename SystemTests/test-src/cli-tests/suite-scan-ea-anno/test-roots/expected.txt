@@ -1045,3 +1045,11 @@ Show only the files within zlib_gen
 @{workspace, zlib_gen, zlib_src}/zlib/zutil.c
 @{workspace, zlib_gen, zlib_src}/zlib/zutil.h
 @{workspace, zlib_gen, zlib_src}/zlib/zutil.o
+
+Rename the zlib package to compress
+Package root: zlib_src set to /home/psmith/t/cvs-1.11.23/zlib.
+Package zlib renamed to compress.
+compress_gen /home/psmith/t/cvs-1.11.23
+compress_src /home/psmith/t/cvs-1.11.23/zlib
+root /
+workspace /home/psmith/t/cvs-1.11.23

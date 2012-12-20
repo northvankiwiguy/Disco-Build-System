@@ -386,6 +386,38 @@ public class TestPackageRootMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Create and rename a package, checking that the roots also change.
+	 * @throws Exception
+	 */
+	@Test
+	public void testRenamePackage() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		/* add a new package */
+		int pkgId = pkgMgr.addPackage("zlib");
+		assertTrue(pkgId > 0);
+		
+		/* set the roots to sub-directories */
+		int srcDirA = fileMgr.addDirectory("@workspace/src/dirA");
+		assertTrue(srcDirA > 0);
+		int genDirA = fileMgr.addDirectory("@workspace/obj/dirA");
+		assertTrue(genDirA > 0);
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, srcDirA));
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.GENERATED_ROOT, genDirA));
+		assertEquals(srcDirA, fileMgr.getPath("@zlib_src"));
+		assertEquals(genDirA, fileMgr.getPath("@zlib_gen"));
+		
+		/* now rename the package */
+		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgId, "qlib"));
+		assertEquals(srcDirA, fileMgr.getPath("@qlib_src"));
+		assertEquals(genDirA, fileMgr.getPath("@qlib_gen"));		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Create and remove a package, checking that the roots have disappeared.
 	 * @throws Exception
 	 */

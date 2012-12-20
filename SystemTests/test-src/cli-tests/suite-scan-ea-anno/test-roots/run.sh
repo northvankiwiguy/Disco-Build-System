@@ -53,3 +53,9 @@ echo
 echo "Show only the files within zlib_gen"
 bml show-files -r -f @zlib_gen
 
+echo
+echo "Rename the zlib package to compress"
+bml set-pkg-root zlib_src /home/psmith/t/cvs-1.11.23/zlib
+bml rename-pkg zlib compress
+bml show-root
+

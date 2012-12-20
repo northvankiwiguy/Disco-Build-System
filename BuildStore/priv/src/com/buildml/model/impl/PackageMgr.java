@@ -262,6 +262,21 @@ import com.buildml.utils.errors.ErrorCode;
 		if (!isValidName(newName)){
 			return ErrorCode.INVALID_NAME;
 		}
+
+		/* 
+		 * If this is a package (not a folder), we also must rename the associated
+		 * roots. This is done by deleting the old roots and adding new roots.
+		 */
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		boolean isFolder = isFolder(folderOrPackageId); 
+		int srcRootPath = 0;
+		int genRootPath = 0;
+		if (!isFolder) {
+			srcRootPath = pkgRootMgr.getPackageRoot(folderOrPackageId, IPackageRootMgr.SOURCE_ROOT);
+			genRootPath = pkgRootMgr.getPackageRoot(folderOrPackageId, IPackageRootMgr.GENERATED_ROOT);
+			pkgRootMgr.removePackageRoot(folderOrPackageId, IPackageRootMgr.SOURCE_ROOT);
+			pkgRootMgr.removePackageRoot(folderOrPackageId, IPackageRootMgr.GENERATED_ROOT);
+		}
 		
 		/* update the database */
 		try {
@@ -274,7 +289,14 @@ import com.buildml.utils.errors.ErrorCode;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-				
+		
+		/* now, add the new package roots at the same location as the old */
+		if (!isFolder){
+			pkgRootMgr.setPackageRoot(folderOrPackageId, IPackageRootMgr.SOURCE_ROOT, srcRootPath);
+			pkgRootMgr.setPackageRoot(folderOrPackageId, IPackageRootMgr.GENERATED_ROOT, genRootPath);
+		}
+		
+		/* notify anybody who cares that our name has changed */
 		notifyListeners(folderOrPackageId, IPackageMgrListener.CHANGED_NAME);
 		return ErrorCode.OK;
 	}
