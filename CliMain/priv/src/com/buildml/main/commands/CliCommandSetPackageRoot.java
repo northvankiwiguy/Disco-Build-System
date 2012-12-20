@@ -158,6 +158,8 @@ public class CliCommandSetPackageRoot implements ICliCommand {
 			CliUtils.reportErrorAndExit("Unable to set root. " + msg);
 		}
 
+		System.out.println("Package root: " + pkgRootName + " set to " + 
+							fileMgr.getPathName(pathId) + ".");		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

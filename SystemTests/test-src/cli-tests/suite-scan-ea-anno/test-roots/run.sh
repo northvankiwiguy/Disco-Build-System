@@ -4,35 +4,29 @@
 # Test commands that use file roots.
 #
 
-echo
-echo "Show the initial set of roots"
-bml show-root
-
+# Note that @workspace will default to a native workspace path, which
+# could be different on each native file system.
 echo
 echo "Show all files, with roots displayed"
-bml show-files -r
+bml show-files -r | fgrep -v @workspace
 
 echo
-echo "Remove a root that doesn't exist (should fail)"
-set +e
-bml rm-root psmith_root
-echo Status is $?
-set -e
+echo "Set the @workspace root appropriately"
+bml set-workspace-root /home/psmith/t/cvs-1.11.23/
 
 echo
-echo "Add a root (psmith_root to /home/psmith), show the list"
-bml add-root psmith_root /home/psmith
+echo "Add a new package zlib, show the list of roots"
+bml add-pkg zlib
 bml show-root
 
 echo
-echo "Add another two roots (cvs_root at /home/psmith/t/cvs-1.11.23/ and zlib at cvs_root:/zlib), show the list"
-bml add-root cvs_root /home/psmith/t/cvs-1.11.23
-bml add-root zlib @cvs_root/zlib
+echo "Set the zlib_src root"
+bml set-pkg-root zlib_src /home/psmith/t/cvs-1.11.23/zlib
 bml show-root
 
 echo
-echo "Show just psmith_root by itself"
-bml show-root psmith_root
+echo "Show just zlib_src root by itself"
+bml show-root zlib_src
 
 echo
 echo "Show an invalid root name (should fail)"
@@ -42,57 +36,20 @@ echo Status is $?
 set -e
 
 echo
-echo "Try to double-add cvs_root at the same location (should fail)"
-set +e
-bml add-root cvs_root /home/psmith/t/cvs-1.11.23
-echo Status is $?
-set -e
-
-echo
-echo "Try to double-add cvs_root at a different location (should succeed)"
-bml add-root cvs_root /home/psmith/t
-
-echo
-echo "Try to add a new root at a location that already has a root (should fail)"
-set +e
-bml add-root new_root /home/psmith
-echo Status is $?
-set -e
-
-echo
-echo "Remove zlib, show the list"
-bml rm-root zlib
+echo "Remove the zlib package, show the list"
+bml rm-pkg zlib
 bml show-root
-
-echo
-echo "Remove zlib again (should fail)"
-set +e
-bml rm-root zlib
-echo Status is $?
-set -e
 
 echo
 echo "Add the zlib back again, show the list"
-bml add-root zlib @cvs_root/cvs-1.11.23/zlib
+bml add-pkg zlib
 bml show-root
 
 echo
-echo "Show all the files, with the roots showing"
-bml show-files -r
+echo "Show only the files within zlib_src"
+bml show-files -r -f @zlib_src
 
 echo
-echo "Show only the files within psmith_root"
-bml show-files -r -f @psmith_root
-
-echo
-echo "Show only the files within cvs_root"
-bml show-files -r -f @cvs_root
-
-echo
-echo "Show only the files within zlib"
-bml show-files -r -f @zlib
-
-echo
-echo "Show only the files within zlib, without showing root names"
-bml show-files -f @zlib
+echo "Show only the files within zlib_gen"
+bml show-files -r -f @zlib_gen
 

@@ -133,6 +133,8 @@ public class CliCommandSetWorkspaceRoot implements ICliCommand {
 			}
 			CliUtils.reportErrorAndExit("Unable to set workspace root. " + msg);
 		}
+		
+		System.out.println("Workspace root set to " + fileMgr.getPathName(pathId) + ".");
 	}
 
 	/*-------------------------------------------------------------------------------------*/

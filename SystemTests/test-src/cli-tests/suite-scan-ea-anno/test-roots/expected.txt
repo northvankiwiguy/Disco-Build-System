@@ -1,7 +1,4 @@
 
-Show the initial set of roots
-root /
-
 Show all files, with roots displayed
 @root/home/psmith/t/cvs-1.11.23/config.h
 @root/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
@@ -338,1157 +335,713 @@ Show all files, with roots displayed
 @root/home/psmith/t/cvs-1.11.23/zlib/zutil.h
 @root/home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
-Remove a root that doesn't exist (should fail)
-Error: Error removing root. psmith_root doesn't exist.
-       Use bml -h for more help.
-Status is 1
+Set the @workspace root appropriately
+Workspace root set to /home/psmith/t/cvs-1.11.23.
 
-Add a root (psmith_root to /home/psmith), show the list
-psmith_root /home/psmith
+Add a new package zlib, show the list of roots
+New package zlib added.
 root /
+workspace /home/psmith/t/cvs-1.11.23
+zlib_gen /home/psmith/t/cvs-1.11.23
+zlib_src /home/psmith/t/cvs-1.11.23
 
-Add another two roots (cvs_root at /home/psmith/t/cvs-1.11.23/ and zlib at cvs_root:/zlib), show the list
-cvs_root /home/psmith/t/cvs-1.11.23
-psmith_root /home/psmith
+Set the zlib_src root
+Package root: zlib_src set to /home/psmith/t/cvs-1.11.23/zlib.
 root /
-zlib /home/psmith/t/cvs-1.11.23/zlib
+workspace /home/psmith/t/cvs-1.11.23
+zlib_gen /home/psmith/t/cvs-1.11.23
+zlib_src /home/psmith/t/cvs-1.11.23/zlib
 
-Show just psmith_root by itself
-/home/psmith
+Show just zlib_src root by itself
+/home/psmith/t/cvs-1.11.23/zlib
 
 Show an invalid root name (should fail)
 Error: Root name not found - bad_root.
        Use bml -h for more help.
 Status is 1
 
-Try to double-add cvs_root at the same location (should fail)
-Error: Unable to set root. /home/psmith/t/cvs-1.11.23 already has a root associated with it.
-       Use bml -h for more help.
-Status is 1
-
-Try to double-add cvs_root at a different location (should succeed)
-
-Try to add a new root at a location that already has a root (should fail)
-Error: Unable to set root. /home/psmith already has a root associated with it.
-       Use bml -h for more help.
-Status is 1
-
-Remove zlib, show the list
-cvs_root /home/psmith/t
-psmith_root /home/psmith
+Remove the zlib package, show the list
+Package zlib removed.
 root /
-
-Remove zlib again (should fail)
-Error: Error removing root. zlib doesn't exist.
-       Use bml -h for more help.
-Status is 1
+workspace /home/psmith/t/cvs-1.11.23
 
 Add the zlib back again, show the list
-cvs_root /home/psmith/t
-psmith_root /home/psmith
+New package zlib added.
 root /
-zlib /home/psmith/t/cvs-1.11.23/zlib
+workspace /home/psmith/t/cvs-1.11.23
+zlib_gen /home/psmith/t/cvs-1.11.23
+zlib_src /home/psmith/t/cvs-1.11.23
 
-Show all the files, with the roots showing
-@psmith_root (/home/psmith) 
-@cvs_root (/home/psmith/t) 
-@cvs_root/cvs-1.11.23/config.h
-@cvs_root/cvs-1.11.23/contrib/cvs2vendor
-@cvs_root/cvs-1.11.23/contrib/cvs2vendor.sh
-@cvs_root/cvs-1.11.23/contrib/cvscheck
-@cvs_root/cvs-1.11.23/contrib/cvscheck.sh
-@cvs_root/cvs-1.11.23/contrib/debug_check_log
-@cvs_root/cvs-1.11.23/contrib/debug_check_log.sh
-@cvs_root/cvs-1.11.23/contrib/rcs-to-cvs
-@cvs_root/cvs-1.11.23/contrib/rcs-to-cvs.sh
-@cvs_root/cvs-1.11.23/diff/.deps/analyze.Po
-@cvs_root/cvs-1.11.23/diff/.deps/cmpbuf.Po
-@cvs_root/cvs-1.11.23/diff/.deps/context.Po
-@cvs_root/cvs-1.11.23/diff/.deps/diff.Po
-@cvs_root/cvs-1.11.23/diff/.deps/diff3.Po
-@cvs_root/cvs-1.11.23/diff/.deps/dir.Po
-@cvs_root/cvs-1.11.23/diff/.deps/ed.Po
-@cvs_root/cvs-1.11.23/diff/.deps/ifdef.Po
-@cvs_root/cvs-1.11.23/diff/.deps/io.Po
-@cvs_root/cvs-1.11.23/diff/.deps/normal.Po
-@cvs_root/cvs-1.11.23/diff/.deps/side.Po
-@cvs_root/cvs-1.11.23/diff/.deps/util.Po
-@cvs_root/cvs-1.11.23/diff/.deps/version.Po
-@cvs_root/cvs-1.11.23/diff/analyze.c
-@cvs_root/cvs-1.11.23/diff/analyze.o
-@cvs_root/cvs-1.11.23/diff/cmpbuf.c
-@cvs_root/cvs-1.11.23/diff/cmpbuf.h
-@cvs_root/cvs-1.11.23/diff/cmpbuf.o
-@cvs_root/cvs-1.11.23/diff/context.c
-@cvs_root/cvs-1.11.23/diff/context.o
-@cvs_root/cvs-1.11.23/diff/diff.c
-@cvs_root/cvs-1.11.23/diff/diff.h
-@cvs_root/cvs-1.11.23/diff/diff.o
-@cvs_root/cvs-1.11.23/diff/diff3.c
-@cvs_root/cvs-1.11.23/diff/diff3.o
-@cvs_root/cvs-1.11.23/diff/diffrun.h
-@cvs_root/cvs-1.11.23/diff/dir.c
-@cvs_root/cvs-1.11.23/diff/dir.o
-@cvs_root/cvs-1.11.23/diff/ed.c
-@cvs_root/cvs-1.11.23/diff/ed.o
-@cvs_root/cvs-1.11.23/diff/ifdef.c
-@cvs_root/cvs-1.11.23/diff/ifdef.o
-@cvs_root/cvs-1.11.23/diff/io.c
-@cvs_root/cvs-1.11.23/diff/io.o
-@cvs_root/cvs-1.11.23/diff/libdiff.a
-@cvs_root/cvs-1.11.23/diff/normal.c
-@cvs_root/cvs-1.11.23/diff/normal.o
-@cvs_root/cvs-1.11.23/diff/side.c
-@cvs_root/cvs-1.11.23/diff/side.o
-@cvs_root/cvs-1.11.23/diff/system.h
-@cvs_root/cvs-1.11.23/diff/util.c
-@cvs_root/cvs-1.11.23/diff/util.o
-@cvs_root/cvs-1.11.23/diff/version.c
-@cvs_root/cvs-1.11.23/diff/version.o
-@cvs_root/cvs-1.11.23/doc
-@cvs_root/cvs-1.11.23/emx
-@cvs_root/cvs-1.11.23/lib/.deps/argmatch.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getdate.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getline.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getopt.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getopt1.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getpass.Po
-@cvs_root/cvs-1.11.23/lib/.deps/md5.Po
-@cvs_root/cvs-1.11.23/lib/.deps/regex.Po
-@cvs_root/cvs-1.11.23/lib/.deps/savecwd.Po
-@cvs_root/cvs-1.11.23/lib/.deps/sighandle.Po
-@cvs_root/cvs-1.11.23/lib/.deps/stripslash.Po
-@cvs_root/cvs-1.11.23/lib/.deps/xgetwd.Po
-@cvs_root/cvs-1.11.23/lib/.deps/yesno.Po
-@cvs_root/cvs-1.11.23/lib/argmatch.c
-@cvs_root/cvs-1.11.23/lib/argmatch.o
-@cvs_root/cvs-1.11.23/lib/getdate.c
-@cvs_root/cvs-1.11.23/lib/getdate.o
-@cvs_root/cvs-1.11.23/lib/getline.c
-@cvs_root/cvs-1.11.23/lib/getline.h
-@cvs_root/cvs-1.11.23/lib/getline.o
-@cvs_root/cvs-1.11.23/lib/getopt.c
-@cvs_root/cvs-1.11.23/lib/getopt.h
-@cvs_root/cvs-1.11.23/lib/getopt.o
-@cvs_root/cvs-1.11.23/lib/getopt1.c
-@cvs_root/cvs-1.11.23/lib/getopt1.o
-@cvs_root/cvs-1.11.23/lib/getpass.c
-@cvs_root/cvs-1.11.23/lib/getpass.o
-@cvs_root/cvs-1.11.23/lib/libcvs.a
-@cvs_root/cvs-1.11.23/lib/md5.c
-@cvs_root/cvs-1.11.23/lib/md5.h
-@cvs_root/cvs-1.11.23/lib/md5.o
-@cvs_root/cvs-1.11.23/lib/regex.c
-@cvs_root/cvs-1.11.23/lib/regex.h
-@cvs_root/cvs-1.11.23/lib/regex.o
-@cvs_root/cvs-1.11.23/lib/savecwd.c
-@cvs_root/cvs-1.11.23/lib/savecwd.h
-@cvs_root/cvs-1.11.23/lib/savecwd.o
-@cvs_root/cvs-1.11.23/lib/sighandle.c
-@cvs_root/cvs-1.11.23/lib/sighandle.o
-@cvs_root/cvs-1.11.23/lib/stripslash.c
-@cvs_root/cvs-1.11.23/lib/stripslash.o
-@cvs_root/cvs-1.11.23/lib/system.h
-@cvs_root/cvs-1.11.23/lib/wait.h
-@cvs_root/cvs-1.11.23/lib/xgetwd.c
-@cvs_root/cvs-1.11.23/lib/xgetwd.o
-@cvs_root/cvs-1.11.23/lib/xselect.h
-@cvs_root/cvs-1.11.23/lib/xsize.h
-@cvs_root/cvs-1.11.23/lib/xtime.h
-@cvs_root/cvs-1.11.23/lib/yesno.c
-@cvs_root/cvs-1.11.23/lib/yesno.o
-@cvs_root/cvs-1.11.23/man
-@cvs_root/cvs-1.11.23/os2
-@cvs_root/cvs-1.11.23/src/.deps/add.Po
-@cvs_root/cvs-1.11.23/src/.deps/admin.Po
-@cvs_root/cvs-1.11.23/src/.deps/annotate.Po
-@cvs_root/cvs-1.11.23/src/.deps/buffer.Po
-@cvs_root/cvs-1.11.23/src/.deps/checkin.Po
-@cvs_root/cvs-1.11.23/src/.deps/checkout.Po
-@cvs_root/cvs-1.11.23/src/.deps/classify.Po
-@cvs_root/cvs-1.11.23/src/.deps/client.Po
-@cvs_root/cvs-1.11.23/src/.deps/commit.Po
-@cvs_root/cvs-1.11.23/src/.deps/create_adm.Po
-@cvs_root/cvs-1.11.23/src/.deps/cvsrc.Po
-@cvs_root/cvs-1.11.23/src/.deps/diff.Po
-@cvs_root/cvs-1.11.23/src/.deps/edit.Po
-@cvs_root/cvs-1.11.23/src/.deps/entries.Po
-@cvs_root/cvs-1.11.23/src/.deps/error.Po
-@cvs_root/cvs-1.11.23/src/.deps/expand_path.Po
-@cvs_root/cvs-1.11.23/src/.deps/fileattr.Po
-@cvs_root/cvs-1.11.23/src/.deps/filesubr.Po
-@cvs_root/cvs-1.11.23/src/.deps/find_names.Po
-@cvs_root/cvs-1.11.23/src/.deps/hardlink.Po
-@cvs_root/cvs-1.11.23/src/.deps/hash.Po
-@cvs_root/cvs-1.11.23/src/.deps/history.Po
-@cvs_root/cvs-1.11.23/src/.deps/ignore.Po
-@cvs_root/cvs-1.11.23/src/.deps/import.Po
-@cvs_root/cvs-1.11.23/src/.deps/lock.Po
-@cvs_root/cvs-1.11.23/src/.deps/log.Po
-@cvs_root/cvs-1.11.23/src/.deps/login.Po
-@cvs_root/cvs-1.11.23/src/.deps/logmsg.Po
-@cvs_root/cvs-1.11.23/src/.deps/main.Po
-@cvs_root/cvs-1.11.23/src/.deps/mkmodules.Po
-@cvs_root/cvs-1.11.23/src/.deps/modules.Po
-@cvs_root/cvs-1.11.23/src/.deps/myndbm.Po
-@cvs_root/cvs-1.11.23/src/.deps/no_diff.Po
-@cvs_root/cvs-1.11.23/src/.deps/parseinfo.Po
-@cvs_root/cvs-1.11.23/src/.deps/patch.Po
-@cvs_root/cvs-1.11.23/src/.deps/rcs.Po
-@cvs_root/cvs-1.11.23/src/.deps/rcscmds.Po
-@cvs_root/cvs-1.11.23/src/.deps/recurse.Po
-@cvs_root/cvs-1.11.23/src/.deps/release.Po
-@cvs_root/cvs-1.11.23/src/.deps/remove.Po
-@cvs_root/cvs-1.11.23/src/.deps/repos.Po
-@cvs_root/cvs-1.11.23/src/.deps/root.Po
-@cvs_root/cvs-1.11.23/src/.deps/run.Po
-@cvs_root/cvs-1.11.23/src/.deps/scramble.Po
-@cvs_root/cvs-1.11.23/src/.deps/server.Po
-@cvs_root/cvs-1.11.23/src/.deps/stack.Po
-@cvs_root/cvs-1.11.23/src/.deps/status.Po
-@cvs_root/cvs-1.11.23/src/.deps/subr.Po
-@cvs_root/cvs-1.11.23/src/.deps/tag.Po
-@cvs_root/cvs-1.11.23/src/.deps/update.Po
-@cvs_root/cvs-1.11.23/src/.deps/vers_ts.Po
-@cvs_root/cvs-1.11.23/src/.deps/version.Po
-@cvs_root/cvs-1.11.23/src/.deps/watch.Po
-@cvs_root/cvs-1.11.23/src/.deps/wrapper.Po
-@cvs_root/cvs-1.11.23/src/.deps/zlib.Po
-@cvs_root/cvs-1.11.23/src/add.c
-@cvs_root/cvs-1.11.23/src/add.o
-@cvs_root/cvs-1.11.23/src/admin.c
-@cvs_root/cvs-1.11.23/src/admin.o
-@cvs_root/cvs-1.11.23/src/annotate.c
-@cvs_root/cvs-1.11.23/src/annotate.o
-@cvs_root/cvs-1.11.23/src/buffer.c
-@cvs_root/cvs-1.11.23/src/buffer.h
-@cvs_root/cvs-1.11.23/src/buffer.o
-@cvs_root/cvs-1.11.23/src/checkin.c
-@cvs_root/cvs-1.11.23/src/checkin.o
-@cvs_root/cvs-1.11.23/src/checkout.c
-@cvs_root/cvs-1.11.23/src/checkout.o
-@cvs_root/cvs-1.11.23/src/classify.c
-@cvs_root/cvs-1.11.23/src/classify.o
-@cvs_root/cvs-1.11.23/src/client.c
-@cvs_root/cvs-1.11.23/src/client.h
-@cvs_root/cvs-1.11.23/src/client.o
-@cvs_root/cvs-1.11.23/src/commit.c
-@cvs_root/cvs-1.11.23/src/commit.o
-@cvs_root/cvs-1.11.23/src/create_adm.c
-@cvs_root/cvs-1.11.23/src/create_adm.o
-@cvs_root/cvs-1.11.23/src/cvs
-@cvs_root/cvs-1.11.23/src/cvs.h
-@cvs_root/cvs-1.11.23/src/cvsrc.c
-@cvs_root/cvs-1.11.23/src/cvsrc.o
-@cvs_root/cvs-1.11.23/src/diff.c
-@cvs_root/cvs-1.11.23/src/diff.o
-@cvs_root/cvs-1.11.23/src/edit.c
-@cvs_root/cvs-1.11.23/src/edit.h
-@cvs_root/cvs-1.11.23/src/edit.o
-@cvs_root/cvs-1.11.23/src/entries.c
-@cvs_root/cvs-1.11.23/src/entries.o
-@cvs_root/cvs-1.11.23/src/error.c
-@cvs_root/cvs-1.11.23/src/error.h
-@cvs_root/cvs-1.11.23/src/error.o
-@cvs_root/cvs-1.11.23/src/expand_path.c
-@cvs_root/cvs-1.11.23/src/expand_path.o
-@cvs_root/cvs-1.11.23/src/fileattr.c
-@cvs_root/cvs-1.11.23/src/fileattr.h
-@cvs_root/cvs-1.11.23/src/fileattr.o
-@cvs_root/cvs-1.11.23/src/filesubr.c
-@cvs_root/cvs-1.11.23/src/filesubr.o
-@cvs_root/cvs-1.11.23/src/find_names.c
-@cvs_root/cvs-1.11.23/src/find_names.o
-@cvs_root/cvs-1.11.23/src/hardlink.c
-@cvs_root/cvs-1.11.23/src/hardlink.h
-@cvs_root/cvs-1.11.23/src/hardlink.o
-@cvs_root/cvs-1.11.23/src/hash.c
-@cvs_root/cvs-1.11.23/src/hash.h
-@cvs_root/cvs-1.11.23/src/hash.o
-@cvs_root/cvs-1.11.23/src/history.c
-@cvs_root/cvs-1.11.23/src/history.h
-@cvs_root/cvs-1.11.23/src/history.o
-@cvs_root/cvs-1.11.23/src/ignore.c
-@cvs_root/cvs-1.11.23/src/ignore.o
-@cvs_root/cvs-1.11.23/src/import.c
-@cvs_root/cvs-1.11.23/src/import.o
-@cvs_root/cvs-1.11.23/src/lock.c
-@cvs_root/cvs-1.11.23/src/lock.o
-@cvs_root/cvs-1.11.23/src/log.c
-@cvs_root/cvs-1.11.23/src/log.o
-@cvs_root/cvs-1.11.23/src/login.c
-@cvs_root/cvs-1.11.23/src/login.o
-@cvs_root/cvs-1.11.23/src/logmsg.c
-@cvs_root/cvs-1.11.23/src/logmsg.o
-@cvs_root/cvs-1.11.23/src/main.c
-@cvs_root/cvs-1.11.23/src/main.o
-@cvs_root/cvs-1.11.23/src/mkmodules.c
-@cvs_root/cvs-1.11.23/src/mkmodules.o
-@cvs_root/cvs-1.11.23/src/modules.c
-@cvs_root/cvs-1.11.23/src/modules.o
-@cvs_root/cvs-1.11.23/src/myndbm.c
-@cvs_root/cvs-1.11.23/src/myndbm.h
-@cvs_root/cvs-1.11.23/src/myndbm.o
-@cvs_root/cvs-1.11.23/src/no_diff.c
-@cvs_root/cvs-1.11.23/src/no_diff.o
-@cvs_root/cvs-1.11.23/src/parseinfo.c
-@cvs_root/cvs-1.11.23/src/parseinfo.o
-@cvs_root/cvs-1.11.23/src/patch.c
-@cvs_root/cvs-1.11.23/src/patch.o
-@cvs_root/cvs-1.11.23/src/rcs.c
-@cvs_root/cvs-1.11.23/src/rcs.h
-@cvs_root/cvs-1.11.23/src/rcs.o
-@cvs_root/cvs-1.11.23/src/rcscmds.c
-@cvs_root/cvs-1.11.23/src/rcscmds.o
-@cvs_root/cvs-1.11.23/src/recurse.c
-@cvs_root/cvs-1.11.23/src/recurse.o
-@cvs_root/cvs-1.11.23/src/release.c
-@cvs_root/cvs-1.11.23/src/release.o
-@cvs_root/cvs-1.11.23/src/remove.c
-@cvs_root/cvs-1.11.23/src/remove.o
-@cvs_root/cvs-1.11.23/src/repos.c
-@cvs_root/cvs-1.11.23/src/repos.o
-@cvs_root/cvs-1.11.23/src/root.c
-@cvs_root/cvs-1.11.23/src/root.h
-@cvs_root/cvs-1.11.23/src/root.o
-@cvs_root/cvs-1.11.23/src/run.c
-@cvs_root/cvs-1.11.23/src/run.o
-@cvs_root/cvs-1.11.23/src/scramble.c
-@cvs_root/cvs-1.11.23/src/scramble.o
-@cvs_root/cvs-1.11.23/src/server.c
-@cvs_root/cvs-1.11.23/src/server.h
-@cvs_root/cvs-1.11.23/src/server.o
-@cvs_root/cvs-1.11.23/src/stack.c
-@cvs_root/cvs-1.11.23/src/stack.h
-@cvs_root/cvs-1.11.23/src/stack.o
-@cvs_root/cvs-1.11.23/src/status.c
-@cvs_root/cvs-1.11.23/src/status.o
-@cvs_root/cvs-1.11.23/src/subr.c
-@cvs_root/cvs-1.11.23/src/subr.o
-@cvs_root/cvs-1.11.23/src/tag.c
-@cvs_root/cvs-1.11.23/src/tag.o
-@cvs_root/cvs-1.11.23/src/update.c
-@cvs_root/cvs-1.11.23/src/update.h
-@cvs_root/cvs-1.11.23/src/update.o
-@cvs_root/cvs-1.11.23/src/vers_ts.c
-@cvs_root/cvs-1.11.23/src/vers_ts.o
-@cvs_root/cvs-1.11.23/src/version.c
-@cvs_root/cvs-1.11.23/src/version.o
-@cvs_root/cvs-1.11.23/src/watch.c
-@cvs_root/cvs-1.11.23/src/watch.h
-@cvs_root/cvs-1.11.23/src/watch.o
-@cvs_root/cvs-1.11.23/src/wrapper.c
-@cvs_root/cvs-1.11.23/src/wrapper.o
-@cvs_root/cvs-1.11.23/src/zlib.c
-@cvs_root/cvs-1.11.23/src/zlib.o
-@cvs_root/cvs-1.11.23/tools
-@cvs_root/cvs-1.11.23/vms/config.h
-@cvs_root/cvs-1.11.23/vms/config.h.in
-@cvs_root/cvs-1.11.23/vms/stamp-ch
-@cvs_root/cvs-1.11.23/windows-NT/SCC
-@zlib (/home/psmith/t/cvs-1.11.23/zlib) 
-@zlib/adler32.c
-@zlib/adler32.o
-@zlib/compress.c
-@zlib/compress.o
-@zlib/crc32.c
-@zlib/crc32.o
-@zlib/deflate.c
-@zlib/deflate.h
-@zlib/deflate.o
-@zlib/gzio.c
-@zlib/gzio.o
-@zlib/infblock.c
-@zlib/infblock.h
-@zlib/infblock.o
-@zlib/infcodes.c
-@zlib/infcodes.h
-@zlib/infcodes.o
-@zlib/inffast.c
-@zlib/inffast.h
-@zlib/inffast.o
-@zlib/inffixed.h
-@zlib/inflate.c
-@zlib/inflate.o
-@zlib/inftrees.c
-@zlib/inftrees.h
-@zlib/inftrees.o
-@zlib/infutil.c
-@zlib/infutil.h
-@zlib/infutil.o
-@zlib/libz.a
-@zlib/trees.c
-@zlib/trees.h
-@zlib/trees.o
-@zlib/uncompr.c
-@zlib/uncompr.o
-@zlib/zconf.h
-@zlib/zlib.h
-@zlib/zutil.c
-@zlib/zutil.h
-@zlib/zutil.o
+Show only the files within zlib_src
+@{workspace, zlib_gen, zlib_src} (/home/psmith/t/cvs-1.11.23) 
+@{workspace, zlib_gen, zlib_src}/config.h
+@{workspace, zlib_gen, zlib_src}/contrib/cvs2vendor
+@{workspace, zlib_gen, zlib_src}/contrib/cvs2vendor.sh
+@{workspace, zlib_gen, zlib_src}/contrib/cvscheck
+@{workspace, zlib_gen, zlib_src}/contrib/cvscheck.sh
+@{workspace, zlib_gen, zlib_src}/contrib/debug_check_log
+@{workspace, zlib_gen, zlib_src}/contrib/debug_check_log.sh
+@{workspace, zlib_gen, zlib_src}/contrib/rcs-to-cvs
+@{workspace, zlib_gen, zlib_src}/contrib/rcs-to-cvs.sh
+@{workspace, zlib_gen, zlib_src}/diff/.deps/analyze.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/cmpbuf.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/context.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/diff.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/diff3.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/dir.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/ed.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/ifdef.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/io.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/normal.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/side.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/util.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/version.Po
+@{workspace, zlib_gen, zlib_src}/diff/analyze.c
+@{workspace, zlib_gen, zlib_src}/diff/analyze.o
+@{workspace, zlib_gen, zlib_src}/diff/cmpbuf.c
+@{workspace, zlib_gen, zlib_src}/diff/cmpbuf.h
+@{workspace, zlib_gen, zlib_src}/diff/cmpbuf.o
+@{workspace, zlib_gen, zlib_src}/diff/context.c
+@{workspace, zlib_gen, zlib_src}/diff/context.o
+@{workspace, zlib_gen, zlib_src}/diff/diff.c
+@{workspace, zlib_gen, zlib_src}/diff/diff.h
+@{workspace, zlib_gen, zlib_src}/diff/diff.o
+@{workspace, zlib_gen, zlib_src}/diff/diff3.c
+@{workspace, zlib_gen, zlib_src}/diff/diff3.o
+@{workspace, zlib_gen, zlib_src}/diff/diffrun.h
+@{workspace, zlib_gen, zlib_src}/diff/dir.c
+@{workspace, zlib_gen, zlib_src}/diff/dir.o
+@{workspace, zlib_gen, zlib_src}/diff/ed.c
+@{workspace, zlib_gen, zlib_src}/diff/ed.o
+@{workspace, zlib_gen, zlib_src}/diff/ifdef.c
+@{workspace, zlib_gen, zlib_src}/diff/ifdef.o
+@{workspace, zlib_gen, zlib_src}/diff/io.c
+@{workspace, zlib_gen, zlib_src}/diff/io.o
+@{workspace, zlib_gen, zlib_src}/diff/libdiff.a
+@{workspace, zlib_gen, zlib_src}/diff/normal.c
+@{workspace, zlib_gen, zlib_src}/diff/normal.o
+@{workspace, zlib_gen, zlib_src}/diff/side.c
+@{workspace, zlib_gen, zlib_src}/diff/side.o
+@{workspace, zlib_gen, zlib_src}/diff/system.h
+@{workspace, zlib_gen, zlib_src}/diff/util.c
+@{workspace, zlib_gen, zlib_src}/diff/util.o
+@{workspace, zlib_gen, zlib_src}/diff/version.c
+@{workspace, zlib_gen, zlib_src}/diff/version.o
+@{workspace, zlib_gen, zlib_src}/doc
+@{workspace, zlib_gen, zlib_src}/emx
+@{workspace, zlib_gen, zlib_src}/lib/.deps/argmatch.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getdate.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getline.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getopt.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getopt1.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getpass.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/md5.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/regex.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/savecwd.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/sighandle.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/stripslash.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/xgetwd.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/yesno.Po
+@{workspace, zlib_gen, zlib_src}/lib/argmatch.c
+@{workspace, zlib_gen, zlib_src}/lib/argmatch.o
+@{workspace, zlib_gen, zlib_src}/lib/getdate.c
+@{workspace, zlib_gen, zlib_src}/lib/getdate.o
+@{workspace, zlib_gen, zlib_src}/lib/getline.c
+@{workspace, zlib_gen, zlib_src}/lib/getline.h
+@{workspace, zlib_gen, zlib_src}/lib/getline.o
+@{workspace, zlib_gen, zlib_src}/lib/getopt.c
+@{workspace, zlib_gen, zlib_src}/lib/getopt.h
+@{workspace, zlib_gen, zlib_src}/lib/getopt.o
+@{workspace, zlib_gen, zlib_src}/lib/getopt1.c
+@{workspace, zlib_gen, zlib_src}/lib/getopt1.o
+@{workspace, zlib_gen, zlib_src}/lib/getpass.c
+@{workspace, zlib_gen, zlib_src}/lib/getpass.o
+@{workspace, zlib_gen, zlib_src}/lib/libcvs.a
+@{workspace, zlib_gen, zlib_src}/lib/md5.c
+@{workspace, zlib_gen, zlib_src}/lib/md5.h
+@{workspace, zlib_gen, zlib_src}/lib/md5.o
+@{workspace, zlib_gen, zlib_src}/lib/regex.c
+@{workspace, zlib_gen, zlib_src}/lib/regex.h
+@{workspace, zlib_gen, zlib_src}/lib/regex.o
+@{workspace, zlib_gen, zlib_src}/lib/savecwd.c
+@{workspace, zlib_gen, zlib_src}/lib/savecwd.h
+@{workspace, zlib_gen, zlib_src}/lib/savecwd.o
+@{workspace, zlib_gen, zlib_src}/lib/sighandle.c
+@{workspace, zlib_gen, zlib_src}/lib/sighandle.o
+@{workspace, zlib_gen, zlib_src}/lib/stripslash.c
+@{workspace, zlib_gen, zlib_src}/lib/stripslash.o
+@{workspace, zlib_gen, zlib_src}/lib/system.h
+@{workspace, zlib_gen, zlib_src}/lib/wait.h
+@{workspace, zlib_gen, zlib_src}/lib/xgetwd.c
+@{workspace, zlib_gen, zlib_src}/lib/xgetwd.o
+@{workspace, zlib_gen, zlib_src}/lib/xselect.h
+@{workspace, zlib_gen, zlib_src}/lib/xsize.h
+@{workspace, zlib_gen, zlib_src}/lib/xtime.h
+@{workspace, zlib_gen, zlib_src}/lib/yesno.c
+@{workspace, zlib_gen, zlib_src}/lib/yesno.o
+@{workspace, zlib_gen, zlib_src}/man
+@{workspace, zlib_gen, zlib_src}/os2
+@{workspace, zlib_gen, zlib_src}/src/.deps/add.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/admin.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/annotate.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/buffer.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/checkin.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/checkout.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/classify.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/client.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/commit.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/create_adm.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/cvsrc.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/diff.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/edit.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/entries.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/error.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/expand_path.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/fileattr.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/filesubr.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/find_names.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/hardlink.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/hash.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/history.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/ignore.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/import.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/lock.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/log.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/login.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/logmsg.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/main.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/mkmodules.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/modules.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/myndbm.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/no_diff.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/parseinfo.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/patch.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/rcs.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/rcscmds.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/recurse.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/release.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/remove.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/repos.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/root.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/run.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/scramble.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/server.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/stack.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/status.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/subr.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/tag.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/update.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/vers_ts.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/version.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/watch.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/wrapper.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/zlib.Po
+@{workspace, zlib_gen, zlib_src}/src/add.c
+@{workspace, zlib_gen, zlib_src}/src/add.o
+@{workspace, zlib_gen, zlib_src}/src/admin.c
+@{workspace, zlib_gen, zlib_src}/src/admin.o
+@{workspace, zlib_gen, zlib_src}/src/annotate.c
+@{workspace, zlib_gen, zlib_src}/src/annotate.o
+@{workspace, zlib_gen, zlib_src}/src/buffer.c
+@{workspace, zlib_gen, zlib_src}/src/buffer.h
+@{workspace, zlib_gen, zlib_src}/src/buffer.o
+@{workspace, zlib_gen, zlib_src}/src/checkin.c
+@{workspace, zlib_gen, zlib_src}/src/checkin.o
+@{workspace, zlib_gen, zlib_src}/src/checkout.c
+@{workspace, zlib_gen, zlib_src}/src/checkout.o
+@{workspace, zlib_gen, zlib_src}/src/classify.c
+@{workspace, zlib_gen, zlib_src}/src/classify.o
+@{workspace, zlib_gen, zlib_src}/src/client.c
+@{workspace, zlib_gen, zlib_src}/src/client.h
+@{workspace, zlib_gen, zlib_src}/src/client.o
+@{workspace, zlib_gen, zlib_src}/src/commit.c
+@{workspace, zlib_gen, zlib_src}/src/commit.o
+@{workspace, zlib_gen, zlib_src}/src/create_adm.c
+@{workspace, zlib_gen, zlib_src}/src/create_adm.o
+@{workspace, zlib_gen, zlib_src}/src/cvs
+@{workspace, zlib_gen, zlib_src}/src/cvs.h
+@{workspace, zlib_gen, zlib_src}/src/cvsrc.c
+@{workspace, zlib_gen, zlib_src}/src/cvsrc.o
+@{workspace, zlib_gen, zlib_src}/src/diff.c
+@{workspace, zlib_gen, zlib_src}/src/diff.o
+@{workspace, zlib_gen, zlib_src}/src/edit.c
+@{workspace, zlib_gen, zlib_src}/src/edit.h
+@{workspace, zlib_gen, zlib_src}/src/edit.o
+@{workspace, zlib_gen, zlib_src}/src/entries.c
+@{workspace, zlib_gen, zlib_src}/src/entries.o
+@{workspace, zlib_gen, zlib_src}/src/error.c
+@{workspace, zlib_gen, zlib_src}/src/error.h
+@{workspace, zlib_gen, zlib_src}/src/error.o
+@{workspace, zlib_gen, zlib_src}/src/expand_path.c
+@{workspace, zlib_gen, zlib_src}/src/expand_path.o
+@{workspace, zlib_gen, zlib_src}/src/fileattr.c
+@{workspace, zlib_gen, zlib_src}/src/fileattr.h
+@{workspace, zlib_gen, zlib_src}/src/fileattr.o
+@{workspace, zlib_gen, zlib_src}/src/filesubr.c
+@{workspace, zlib_gen, zlib_src}/src/filesubr.o
+@{workspace, zlib_gen, zlib_src}/src/find_names.c
+@{workspace, zlib_gen, zlib_src}/src/find_names.o
+@{workspace, zlib_gen, zlib_src}/src/hardlink.c
+@{workspace, zlib_gen, zlib_src}/src/hardlink.h
+@{workspace, zlib_gen, zlib_src}/src/hardlink.o
+@{workspace, zlib_gen, zlib_src}/src/hash.c
+@{workspace, zlib_gen, zlib_src}/src/hash.h
+@{workspace, zlib_gen, zlib_src}/src/hash.o
+@{workspace, zlib_gen, zlib_src}/src/history.c
+@{workspace, zlib_gen, zlib_src}/src/history.h
+@{workspace, zlib_gen, zlib_src}/src/history.o
+@{workspace, zlib_gen, zlib_src}/src/ignore.c
+@{workspace, zlib_gen, zlib_src}/src/ignore.o
+@{workspace, zlib_gen, zlib_src}/src/import.c
+@{workspace, zlib_gen, zlib_src}/src/import.o
+@{workspace, zlib_gen, zlib_src}/src/lock.c
+@{workspace, zlib_gen, zlib_src}/src/lock.o
+@{workspace, zlib_gen, zlib_src}/src/log.c
+@{workspace, zlib_gen, zlib_src}/src/log.o
+@{workspace, zlib_gen, zlib_src}/src/login.c
+@{workspace, zlib_gen, zlib_src}/src/login.o
+@{workspace, zlib_gen, zlib_src}/src/logmsg.c
+@{workspace, zlib_gen, zlib_src}/src/logmsg.o
+@{workspace, zlib_gen, zlib_src}/src/main.c
+@{workspace, zlib_gen, zlib_src}/src/main.o
+@{workspace, zlib_gen, zlib_src}/src/mkmodules.c
+@{workspace, zlib_gen, zlib_src}/src/mkmodules.o
+@{workspace, zlib_gen, zlib_src}/src/modules.c
+@{workspace, zlib_gen, zlib_src}/src/modules.o
+@{workspace, zlib_gen, zlib_src}/src/myndbm.c
+@{workspace, zlib_gen, zlib_src}/src/myndbm.h
+@{workspace, zlib_gen, zlib_src}/src/myndbm.o
+@{workspace, zlib_gen, zlib_src}/src/no_diff.c
+@{workspace, zlib_gen, zlib_src}/src/no_diff.o
+@{workspace, zlib_gen, zlib_src}/src/parseinfo.c
+@{workspace, zlib_gen, zlib_src}/src/parseinfo.o
+@{workspace, zlib_gen, zlib_src}/src/patch.c
+@{workspace, zlib_gen, zlib_src}/src/patch.o
+@{workspace, zlib_gen, zlib_src}/src/rcs.c
+@{workspace, zlib_gen, zlib_src}/src/rcs.h
+@{workspace, zlib_gen, zlib_src}/src/rcs.o
+@{workspace, zlib_gen, zlib_src}/src/rcscmds.c
+@{workspace, zlib_gen, zlib_src}/src/rcscmds.o
+@{workspace, zlib_gen, zlib_src}/src/recurse.c
+@{workspace, zlib_gen, zlib_src}/src/recurse.o
+@{workspace, zlib_gen, zlib_src}/src/release.c
+@{workspace, zlib_gen, zlib_src}/src/release.o
+@{workspace, zlib_gen, zlib_src}/src/remove.c
+@{workspace, zlib_gen, zlib_src}/src/remove.o
+@{workspace, zlib_gen, zlib_src}/src/repos.c
+@{workspace, zlib_gen, zlib_src}/src/repos.o
+@{workspace, zlib_gen, zlib_src}/src/root.c
+@{workspace, zlib_gen, zlib_src}/src/root.h
+@{workspace, zlib_gen, zlib_src}/src/root.o
+@{workspace, zlib_gen, zlib_src}/src/run.c
+@{workspace, zlib_gen, zlib_src}/src/run.o
+@{workspace, zlib_gen, zlib_src}/src/scramble.c
+@{workspace, zlib_gen, zlib_src}/src/scramble.o
+@{workspace, zlib_gen, zlib_src}/src/server.c
+@{workspace, zlib_gen, zlib_src}/src/server.h
+@{workspace, zlib_gen, zlib_src}/src/server.o
+@{workspace, zlib_gen, zlib_src}/src/stack.c
+@{workspace, zlib_gen, zlib_src}/src/stack.h
+@{workspace, zlib_gen, zlib_src}/src/stack.o
+@{workspace, zlib_gen, zlib_src}/src/status.c
+@{workspace, zlib_gen, zlib_src}/src/status.o
+@{workspace, zlib_gen, zlib_src}/src/subr.c
+@{workspace, zlib_gen, zlib_src}/src/subr.o
+@{workspace, zlib_gen, zlib_src}/src/tag.c
+@{workspace, zlib_gen, zlib_src}/src/tag.o
+@{workspace, zlib_gen, zlib_src}/src/update.c
+@{workspace, zlib_gen, zlib_src}/src/update.h
+@{workspace, zlib_gen, zlib_src}/src/update.o
+@{workspace, zlib_gen, zlib_src}/src/vers_ts.c
+@{workspace, zlib_gen, zlib_src}/src/vers_ts.o
+@{workspace, zlib_gen, zlib_src}/src/version.c
+@{workspace, zlib_gen, zlib_src}/src/version.o
+@{workspace, zlib_gen, zlib_src}/src/watch.c
+@{workspace, zlib_gen, zlib_src}/src/watch.h
+@{workspace, zlib_gen, zlib_src}/src/watch.o
+@{workspace, zlib_gen, zlib_src}/src/wrapper.c
+@{workspace, zlib_gen, zlib_src}/src/wrapper.o
+@{workspace, zlib_gen, zlib_src}/src/zlib.c
+@{workspace, zlib_gen, zlib_src}/src/zlib.o
+@{workspace, zlib_gen, zlib_src}/tools
+@{workspace, zlib_gen, zlib_src}/vms/config.h
+@{workspace, zlib_gen, zlib_src}/vms/config.h.in
+@{workspace, zlib_gen, zlib_src}/vms/stamp-ch
+@{workspace, zlib_gen, zlib_src}/windows-NT/SCC
+@{workspace, zlib_gen, zlib_src}/zlib/adler32.c
+@{workspace, zlib_gen, zlib_src}/zlib/adler32.o
+@{workspace, zlib_gen, zlib_src}/zlib/compress.c
+@{workspace, zlib_gen, zlib_src}/zlib/compress.o
+@{workspace, zlib_gen, zlib_src}/zlib/crc32.c
+@{workspace, zlib_gen, zlib_src}/zlib/crc32.o
+@{workspace, zlib_gen, zlib_src}/zlib/deflate.c
+@{workspace, zlib_gen, zlib_src}/zlib/deflate.h
+@{workspace, zlib_gen, zlib_src}/zlib/deflate.o
+@{workspace, zlib_gen, zlib_src}/zlib/gzio.c
+@{workspace, zlib_gen, zlib_src}/zlib/gzio.o
+@{workspace, zlib_gen, zlib_src}/zlib/infblock.c
+@{workspace, zlib_gen, zlib_src}/zlib/infblock.h
+@{workspace, zlib_gen, zlib_src}/zlib/infblock.o
+@{workspace, zlib_gen, zlib_src}/zlib/infcodes.c
+@{workspace, zlib_gen, zlib_src}/zlib/infcodes.h
+@{workspace, zlib_gen, zlib_src}/zlib/infcodes.o
+@{workspace, zlib_gen, zlib_src}/zlib/inffast.c
+@{workspace, zlib_gen, zlib_src}/zlib/inffast.h
+@{workspace, zlib_gen, zlib_src}/zlib/inffast.o
+@{workspace, zlib_gen, zlib_src}/zlib/inffixed.h
+@{workspace, zlib_gen, zlib_src}/zlib/inflate.c
+@{workspace, zlib_gen, zlib_src}/zlib/inflate.o
+@{workspace, zlib_gen, zlib_src}/zlib/inftrees.c
+@{workspace, zlib_gen, zlib_src}/zlib/inftrees.h
+@{workspace, zlib_gen, zlib_src}/zlib/inftrees.o
+@{workspace, zlib_gen, zlib_src}/zlib/infutil.c
+@{workspace, zlib_gen, zlib_src}/zlib/infutil.h
+@{workspace, zlib_gen, zlib_src}/zlib/infutil.o
+@{workspace, zlib_gen, zlib_src}/zlib/libz.a
+@{workspace, zlib_gen, zlib_src}/zlib/trees.c
+@{workspace, zlib_gen, zlib_src}/zlib/trees.h
+@{workspace, zlib_gen, zlib_src}/zlib/trees.o
+@{workspace, zlib_gen, zlib_src}/zlib/uncompr.c
+@{workspace, zlib_gen, zlib_src}/zlib/uncompr.o
+@{workspace, zlib_gen, zlib_src}/zlib/zconf.h
+@{workspace, zlib_gen, zlib_src}/zlib/zlib.h
+@{workspace, zlib_gen, zlib_src}/zlib/zutil.c
+@{workspace, zlib_gen, zlib_src}/zlib/zutil.h
+@{workspace, zlib_gen, zlib_src}/zlib/zutil.o
 
-Show only the files within psmith_root
-@psmith_root (/home/psmith) 
-@cvs_root (/home/psmith/t) 
-@cvs_root/cvs-1.11.23/config.h
-@cvs_root/cvs-1.11.23/contrib/cvs2vendor
-@cvs_root/cvs-1.11.23/contrib/cvs2vendor.sh
-@cvs_root/cvs-1.11.23/contrib/cvscheck
-@cvs_root/cvs-1.11.23/contrib/cvscheck.sh
-@cvs_root/cvs-1.11.23/contrib/debug_check_log
-@cvs_root/cvs-1.11.23/contrib/debug_check_log.sh
-@cvs_root/cvs-1.11.23/contrib/rcs-to-cvs
-@cvs_root/cvs-1.11.23/contrib/rcs-to-cvs.sh
-@cvs_root/cvs-1.11.23/diff/.deps/analyze.Po
-@cvs_root/cvs-1.11.23/diff/.deps/cmpbuf.Po
-@cvs_root/cvs-1.11.23/diff/.deps/context.Po
-@cvs_root/cvs-1.11.23/diff/.deps/diff.Po
-@cvs_root/cvs-1.11.23/diff/.deps/diff3.Po
-@cvs_root/cvs-1.11.23/diff/.deps/dir.Po
-@cvs_root/cvs-1.11.23/diff/.deps/ed.Po
-@cvs_root/cvs-1.11.23/diff/.deps/ifdef.Po
-@cvs_root/cvs-1.11.23/diff/.deps/io.Po
-@cvs_root/cvs-1.11.23/diff/.deps/normal.Po
-@cvs_root/cvs-1.11.23/diff/.deps/side.Po
-@cvs_root/cvs-1.11.23/diff/.deps/util.Po
-@cvs_root/cvs-1.11.23/diff/.deps/version.Po
-@cvs_root/cvs-1.11.23/diff/analyze.c
-@cvs_root/cvs-1.11.23/diff/analyze.o
-@cvs_root/cvs-1.11.23/diff/cmpbuf.c
-@cvs_root/cvs-1.11.23/diff/cmpbuf.h
-@cvs_root/cvs-1.11.23/diff/cmpbuf.o
-@cvs_root/cvs-1.11.23/diff/context.c
-@cvs_root/cvs-1.11.23/diff/context.o
-@cvs_root/cvs-1.11.23/diff/diff.c
-@cvs_root/cvs-1.11.23/diff/diff.h
-@cvs_root/cvs-1.11.23/diff/diff.o
-@cvs_root/cvs-1.11.23/diff/diff3.c
-@cvs_root/cvs-1.11.23/diff/diff3.o
-@cvs_root/cvs-1.11.23/diff/diffrun.h
-@cvs_root/cvs-1.11.23/diff/dir.c
-@cvs_root/cvs-1.11.23/diff/dir.o
-@cvs_root/cvs-1.11.23/diff/ed.c
-@cvs_root/cvs-1.11.23/diff/ed.o
-@cvs_root/cvs-1.11.23/diff/ifdef.c
-@cvs_root/cvs-1.11.23/diff/ifdef.o
-@cvs_root/cvs-1.11.23/diff/io.c
-@cvs_root/cvs-1.11.23/diff/io.o
-@cvs_root/cvs-1.11.23/diff/libdiff.a
-@cvs_root/cvs-1.11.23/diff/normal.c
-@cvs_root/cvs-1.11.23/diff/normal.o
-@cvs_root/cvs-1.11.23/diff/side.c
-@cvs_root/cvs-1.11.23/diff/side.o
-@cvs_root/cvs-1.11.23/diff/system.h
-@cvs_root/cvs-1.11.23/diff/util.c
-@cvs_root/cvs-1.11.23/diff/util.o
-@cvs_root/cvs-1.11.23/diff/version.c
-@cvs_root/cvs-1.11.23/diff/version.o
-@cvs_root/cvs-1.11.23/doc
-@cvs_root/cvs-1.11.23/emx
-@cvs_root/cvs-1.11.23/lib/.deps/argmatch.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getdate.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getline.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getopt.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getopt1.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getpass.Po
-@cvs_root/cvs-1.11.23/lib/.deps/md5.Po
-@cvs_root/cvs-1.11.23/lib/.deps/regex.Po
-@cvs_root/cvs-1.11.23/lib/.deps/savecwd.Po
-@cvs_root/cvs-1.11.23/lib/.deps/sighandle.Po
-@cvs_root/cvs-1.11.23/lib/.deps/stripslash.Po
-@cvs_root/cvs-1.11.23/lib/.deps/xgetwd.Po
-@cvs_root/cvs-1.11.23/lib/.deps/yesno.Po
-@cvs_root/cvs-1.11.23/lib/argmatch.c
-@cvs_root/cvs-1.11.23/lib/argmatch.o
-@cvs_root/cvs-1.11.23/lib/getdate.c
-@cvs_root/cvs-1.11.23/lib/getdate.o
-@cvs_root/cvs-1.11.23/lib/getline.c
-@cvs_root/cvs-1.11.23/lib/getline.h
-@cvs_root/cvs-1.11.23/lib/getline.o
-@cvs_root/cvs-1.11.23/lib/getopt.c
-@cvs_root/cvs-1.11.23/lib/getopt.h
-@cvs_root/cvs-1.11.23/lib/getopt.o
-@cvs_root/cvs-1.11.23/lib/getopt1.c
-@cvs_root/cvs-1.11.23/lib/getopt1.o
-@cvs_root/cvs-1.11.23/lib/getpass.c
-@cvs_root/cvs-1.11.23/lib/getpass.o
-@cvs_root/cvs-1.11.23/lib/libcvs.a
-@cvs_root/cvs-1.11.23/lib/md5.c
-@cvs_root/cvs-1.11.23/lib/md5.h
-@cvs_root/cvs-1.11.23/lib/md5.o
-@cvs_root/cvs-1.11.23/lib/regex.c
-@cvs_root/cvs-1.11.23/lib/regex.h
-@cvs_root/cvs-1.11.23/lib/regex.o
-@cvs_root/cvs-1.11.23/lib/savecwd.c
-@cvs_root/cvs-1.11.23/lib/savecwd.h
-@cvs_root/cvs-1.11.23/lib/savecwd.o
-@cvs_root/cvs-1.11.23/lib/sighandle.c
-@cvs_root/cvs-1.11.23/lib/sighandle.o
-@cvs_root/cvs-1.11.23/lib/stripslash.c
-@cvs_root/cvs-1.11.23/lib/stripslash.o
-@cvs_root/cvs-1.11.23/lib/system.h
-@cvs_root/cvs-1.11.23/lib/wait.h
-@cvs_root/cvs-1.11.23/lib/xgetwd.c
-@cvs_root/cvs-1.11.23/lib/xgetwd.o
-@cvs_root/cvs-1.11.23/lib/xselect.h
-@cvs_root/cvs-1.11.23/lib/xsize.h
-@cvs_root/cvs-1.11.23/lib/xtime.h
-@cvs_root/cvs-1.11.23/lib/yesno.c
-@cvs_root/cvs-1.11.23/lib/yesno.o
-@cvs_root/cvs-1.11.23/man
-@cvs_root/cvs-1.11.23/os2
-@cvs_root/cvs-1.11.23/src/.deps/add.Po
-@cvs_root/cvs-1.11.23/src/.deps/admin.Po
-@cvs_root/cvs-1.11.23/src/.deps/annotate.Po
-@cvs_root/cvs-1.11.23/src/.deps/buffer.Po
-@cvs_root/cvs-1.11.23/src/.deps/checkin.Po
-@cvs_root/cvs-1.11.23/src/.deps/checkout.Po
-@cvs_root/cvs-1.11.23/src/.deps/classify.Po
-@cvs_root/cvs-1.11.23/src/.deps/client.Po
-@cvs_root/cvs-1.11.23/src/.deps/commit.Po
-@cvs_root/cvs-1.11.23/src/.deps/create_adm.Po
-@cvs_root/cvs-1.11.23/src/.deps/cvsrc.Po
-@cvs_root/cvs-1.11.23/src/.deps/diff.Po
-@cvs_root/cvs-1.11.23/src/.deps/edit.Po
-@cvs_root/cvs-1.11.23/src/.deps/entries.Po
-@cvs_root/cvs-1.11.23/src/.deps/error.Po
-@cvs_root/cvs-1.11.23/src/.deps/expand_path.Po
-@cvs_root/cvs-1.11.23/src/.deps/fileattr.Po
-@cvs_root/cvs-1.11.23/src/.deps/filesubr.Po
-@cvs_root/cvs-1.11.23/src/.deps/find_names.Po
-@cvs_root/cvs-1.11.23/src/.deps/hardlink.Po
-@cvs_root/cvs-1.11.23/src/.deps/hash.Po
-@cvs_root/cvs-1.11.23/src/.deps/history.Po
-@cvs_root/cvs-1.11.23/src/.deps/ignore.Po
-@cvs_root/cvs-1.11.23/src/.deps/import.Po
-@cvs_root/cvs-1.11.23/src/.deps/lock.Po
-@cvs_root/cvs-1.11.23/src/.deps/log.Po
-@cvs_root/cvs-1.11.23/src/.deps/login.Po
-@cvs_root/cvs-1.11.23/src/.deps/logmsg.Po
-@cvs_root/cvs-1.11.23/src/.deps/main.Po
-@cvs_root/cvs-1.11.23/src/.deps/mkmodules.Po
-@cvs_root/cvs-1.11.23/src/.deps/modules.Po
-@cvs_root/cvs-1.11.23/src/.deps/myndbm.Po
-@cvs_root/cvs-1.11.23/src/.deps/no_diff.Po
-@cvs_root/cvs-1.11.23/src/.deps/parseinfo.Po
-@cvs_root/cvs-1.11.23/src/.deps/patch.Po
-@cvs_root/cvs-1.11.23/src/.deps/rcs.Po
-@cvs_root/cvs-1.11.23/src/.deps/rcscmds.Po
-@cvs_root/cvs-1.11.23/src/.deps/recurse.Po
-@cvs_root/cvs-1.11.23/src/.deps/release.Po
-@cvs_root/cvs-1.11.23/src/.deps/remove.Po
-@cvs_root/cvs-1.11.23/src/.deps/repos.Po
-@cvs_root/cvs-1.11.23/src/.deps/root.Po
-@cvs_root/cvs-1.11.23/src/.deps/run.Po
-@cvs_root/cvs-1.11.23/src/.deps/scramble.Po
-@cvs_root/cvs-1.11.23/src/.deps/server.Po
-@cvs_root/cvs-1.11.23/src/.deps/stack.Po
-@cvs_root/cvs-1.11.23/src/.deps/status.Po
-@cvs_root/cvs-1.11.23/src/.deps/subr.Po
-@cvs_root/cvs-1.11.23/src/.deps/tag.Po
-@cvs_root/cvs-1.11.23/src/.deps/update.Po
-@cvs_root/cvs-1.11.23/src/.deps/vers_ts.Po
-@cvs_root/cvs-1.11.23/src/.deps/version.Po
-@cvs_root/cvs-1.11.23/src/.deps/watch.Po
-@cvs_root/cvs-1.11.23/src/.deps/wrapper.Po
-@cvs_root/cvs-1.11.23/src/.deps/zlib.Po
-@cvs_root/cvs-1.11.23/src/add.c
-@cvs_root/cvs-1.11.23/src/add.o
-@cvs_root/cvs-1.11.23/src/admin.c
-@cvs_root/cvs-1.11.23/src/admin.o
-@cvs_root/cvs-1.11.23/src/annotate.c
-@cvs_root/cvs-1.11.23/src/annotate.o
-@cvs_root/cvs-1.11.23/src/buffer.c
-@cvs_root/cvs-1.11.23/src/buffer.h
-@cvs_root/cvs-1.11.23/src/buffer.o
-@cvs_root/cvs-1.11.23/src/checkin.c
-@cvs_root/cvs-1.11.23/src/checkin.o
-@cvs_root/cvs-1.11.23/src/checkout.c
-@cvs_root/cvs-1.11.23/src/checkout.o
-@cvs_root/cvs-1.11.23/src/classify.c
-@cvs_root/cvs-1.11.23/src/classify.o
-@cvs_root/cvs-1.11.23/src/client.c
-@cvs_root/cvs-1.11.23/src/client.h
-@cvs_root/cvs-1.11.23/src/client.o
-@cvs_root/cvs-1.11.23/src/commit.c
-@cvs_root/cvs-1.11.23/src/commit.o
-@cvs_root/cvs-1.11.23/src/create_adm.c
-@cvs_root/cvs-1.11.23/src/create_adm.o
-@cvs_root/cvs-1.11.23/src/cvs
-@cvs_root/cvs-1.11.23/src/cvs.h
-@cvs_root/cvs-1.11.23/src/cvsrc.c
-@cvs_root/cvs-1.11.23/src/cvsrc.o
-@cvs_root/cvs-1.11.23/src/diff.c
-@cvs_root/cvs-1.11.23/src/diff.o
-@cvs_root/cvs-1.11.23/src/edit.c
-@cvs_root/cvs-1.11.23/src/edit.h
-@cvs_root/cvs-1.11.23/src/edit.o
-@cvs_root/cvs-1.11.23/src/entries.c
-@cvs_root/cvs-1.11.23/src/entries.o
-@cvs_root/cvs-1.11.23/src/error.c
-@cvs_root/cvs-1.11.23/src/error.h
-@cvs_root/cvs-1.11.23/src/error.o
-@cvs_root/cvs-1.11.23/src/expand_path.c
-@cvs_root/cvs-1.11.23/src/expand_path.o
-@cvs_root/cvs-1.11.23/src/fileattr.c
-@cvs_root/cvs-1.11.23/src/fileattr.h
-@cvs_root/cvs-1.11.23/src/fileattr.o
-@cvs_root/cvs-1.11.23/src/filesubr.c
-@cvs_root/cvs-1.11.23/src/filesubr.o
-@cvs_root/cvs-1.11.23/src/find_names.c
-@cvs_root/cvs-1.11.23/src/find_names.o
-@cvs_root/cvs-1.11.23/src/hardlink.c
-@cvs_root/cvs-1.11.23/src/hardlink.h
-@cvs_root/cvs-1.11.23/src/hardlink.o
-@cvs_root/cvs-1.11.23/src/hash.c
-@cvs_root/cvs-1.11.23/src/hash.h
-@cvs_root/cvs-1.11.23/src/hash.o
-@cvs_root/cvs-1.11.23/src/history.c
-@cvs_root/cvs-1.11.23/src/history.h
-@cvs_root/cvs-1.11.23/src/history.o
-@cvs_root/cvs-1.11.23/src/ignore.c
-@cvs_root/cvs-1.11.23/src/ignore.o
-@cvs_root/cvs-1.11.23/src/import.c
-@cvs_root/cvs-1.11.23/src/import.o
-@cvs_root/cvs-1.11.23/src/lock.c
-@cvs_root/cvs-1.11.23/src/lock.o
-@cvs_root/cvs-1.11.23/src/log.c
-@cvs_root/cvs-1.11.23/src/log.o
-@cvs_root/cvs-1.11.23/src/login.c
-@cvs_root/cvs-1.11.23/src/login.o
-@cvs_root/cvs-1.11.23/src/logmsg.c
-@cvs_root/cvs-1.11.23/src/logmsg.o
-@cvs_root/cvs-1.11.23/src/main.c
-@cvs_root/cvs-1.11.23/src/main.o
-@cvs_root/cvs-1.11.23/src/mkmodules.c
-@cvs_root/cvs-1.11.23/src/mkmodules.o
-@cvs_root/cvs-1.11.23/src/modules.c
-@cvs_root/cvs-1.11.23/src/modules.o
-@cvs_root/cvs-1.11.23/src/myndbm.c
-@cvs_root/cvs-1.11.23/src/myndbm.h
-@cvs_root/cvs-1.11.23/src/myndbm.o
-@cvs_root/cvs-1.11.23/src/no_diff.c
-@cvs_root/cvs-1.11.23/src/no_diff.o
-@cvs_root/cvs-1.11.23/src/parseinfo.c
-@cvs_root/cvs-1.11.23/src/parseinfo.o
-@cvs_root/cvs-1.11.23/src/patch.c
-@cvs_root/cvs-1.11.23/src/patch.o
-@cvs_root/cvs-1.11.23/src/rcs.c
-@cvs_root/cvs-1.11.23/src/rcs.h
-@cvs_root/cvs-1.11.23/src/rcs.o
-@cvs_root/cvs-1.11.23/src/rcscmds.c
-@cvs_root/cvs-1.11.23/src/rcscmds.o
-@cvs_root/cvs-1.11.23/src/recurse.c
-@cvs_root/cvs-1.11.23/src/recurse.o
-@cvs_root/cvs-1.11.23/src/release.c
-@cvs_root/cvs-1.11.23/src/release.o
-@cvs_root/cvs-1.11.23/src/remove.c
-@cvs_root/cvs-1.11.23/src/remove.o
-@cvs_root/cvs-1.11.23/src/repos.c
-@cvs_root/cvs-1.11.23/src/repos.o
-@cvs_root/cvs-1.11.23/src/root.c
-@cvs_root/cvs-1.11.23/src/root.h
-@cvs_root/cvs-1.11.23/src/root.o
-@cvs_root/cvs-1.11.23/src/run.c
-@cvs_root/cvs-1.11.23/src/run.o
-@cvs_root/cvs-1.11.23/src/scramble.c
-@cvs_root/cvs-1.11.23/src/scramble.o
-@cvs_root/cvs-1.11.23/src/server.c
-@cvs_root/cvs-1.11.23/src/server.h
-@cvs_root/cvs-1.11.23/src/server.o
-@cvs_root/cvs-1.11.23/src/stack.c
-@cvs_root/cvs-1.11.23/src/stack.h
-@cvs_root/cvs-1.11.23/src/stack.o
-@cvs_root/cvs-1.11.23/src/status.c
-@cvs_root/cvs-1.11.23/src/status.o
-@cvs_root/cvs-1.11.23/src/subr.c
-@cvs_root/cvs-1.11.23/src/subr.o
-@cvs_root/cvs-1.11.23/src/tag.c
-@cvs_root/cvs-1.11.23/src/tag.o
-@cvs_root/cvs-1.11.23/src/update.c
-@cvs_root/cvs-1.11.23/src/update.h
-@cvs_root/cvs-1.11.23/src/update.o
-@cvs_root/cvs-1.11.23/src/vers_ts.c
-@cvs_root/cvs-1.11.23/src/vers_ts.o
-@cvs_root/cvs-1.11.23/src/version.c
-@cvs_root/cvs-1.11.23/src/version.o
-@cvs_root/cvs-1.11.23/src/watch.c
-@cvs_root/cvs-1.11.23/src/watch.h
-@cvs_root/cvs-1.11.23/src/watch.o
-@cvs_root/cvs-1.11.23/src/wrapper.c
-@cvs_root/cvs-1.11.23/src/wrapper.o
-@cvs_root/cvs-1.11.23/src/zlib.c
-@cvs_root/cvs-1.11.23/src/zlib.o
-@cvs_root/cvs-1.11.23/tools
-@cvs_root/cvs-1.11.23/vms/config.h
-@cvs_root/cvs-1.11.23/vms/config.h.in
-@cvs_root/cvs-1.11.23/vms/stamp-ch
-@cvs_root/cvs-1.11.23/windows-NT/SCC
-@zlib (/home/psmith/t/cvs-1.11.23/zlib) 
-@zlib/adler32.c
-@zlib/adler32.o
-@zlib/compress.c
-@zlib/compress.o
-@zlib/crc32.c
-@zlib/crc32.o
-@zlib/deflate.c
-@zlib/deflate.h
-@zlib/deflate.o
-@zlib/gzio.c
-@zlib/gzio.o
-@zlib/infblock.c
-@zlib/infblock.h
-@zlib/infblock.o
-@zlib/infcodes.c
-@zlib/infcodes.h
-@zlib/infcodes.o
-@zlib/inffast.c
-@zlib/inffast.h
-@zlib/inffast.o
-@zlib/inffixed.h
-@zlib/inflate.c
-@zlib/inflate.o
-@zlib/inftrees.c
-@zlib/inftrees.h
-@zlib/inftrees.o
-@zlib/infutil.c
-@zlib/infutil.h
-@zlib/infutil.o
-@zlib/libz.a
-@zlib/trees.c
-@zlib/trees.h
-@zlib/trees.o
-@zlib/uncompr.c
-@zlib/uncompr.o
-@zlib/zconf.h
-@zlib/zlib.h
-@zlib/zutil.c
-@zlib/zutil.h
-@zlib/zutil.o
-
-Show only the files within cvs_root
-@psmith_root (/home/psmith) 
-@cvs_root (/home/psmith/t) 
-@cvs_root/cvs-1.11.23/config.h
-@cvs_root/cvs-1.11.23/contrib/cvs2vendor
-@cvs_root/cvs-1.11.23/contrib/cvs2vendor.sh
-@cvs_root/cvs-1.11.23/contrib/cvscheck
-@cvs_root/cvs-1.11.23/contrib/cvscheck.sh
-@cvs_root/cvs-1.11.23/contrib/debug_check_log
-@cvs_root/cvs-1.11.23/contrib/debug_check_log.sh
-@cvs_root/cvs-1.11.23/contrib/rcs-to-cvs
-@cvs_root/cvs-1.11.23/contrib/rcs-to-cvs.sh
-@cvs_root/cvs-1.11.23/diff/.deps/analyze.Po
-@cvs_root/cvs-1.11.23/diff/.deps/cmpbuf.Po
-@cvs_root/cvs-1.11.23/diff/.deps/context.Po
-@cvs_root/cvs-1.11.23/diff/.deps/diff.Po
-@cvs_root/cvs-1.11.23/diff/.deps/diff3.Po
-@cvs_root/cvs-1.11.23/diff/.deps/dir.Po
-@cvs_root/cvs-1.11.23/diff/.deps/ed.Po
-@cvs_root/cvs-1.11.23/diff/.deps/ifdef.Po
-@cvs_root/cvs-1.11.23/diff/.deps/io.Po
-@cvs_root/cvs-1.11.23/diff/.deps/normal.Po
-@cvs_root/cvs-1.11.23/diff/.deps/side.Po
-@cvs_root/cvs-1.11.23/diff/.deps/util.Po
-@cvs_root/cvs-1.11.23/diff/.deps/version.Po
-@cvs_root/cvs-1.11.23/diff/analyze.c
-@cvs_root/cvs-1.11.23/diff/analyze.o
-@cvs_root/cvs-1.11.23/diff/cmpbuf.c
-@cvs_root/cvs-1.11.23/diff/cmpbuf.h
-@cvs_root/cvs-1.11.23/diff/cmpbuf.o
-@cvs_root/cvs-1.11.23/diff/context.c
-@cvs_root/cvs-1.11.23/diff/context.o
-@cvs_root/cvs-1.11.23/diff/diff.c
-@cvs_root/cvs-1.11.23/diff/diff.h
-@cvs_root/cvs-1.11.23/diff/diff.o
-@cvs_root/cvs-1.11.23/diff/diff3.c
-@cvs_root/cvs-1.11.23/diff/diff3.o
-@cvs_root/cvs-1.11.23/diff/diffrun.h
-@cvs_root/cvs-1.11.23/diff/dir.c
-@cvs_root/cvs-1.11.23/diff/dir.o
-@cvs_root/cvs-1.11.23/diff/ed.c
-@cvs_root/cvs-1.11.23/diff/ed.o
-@cvs_root/cvs-1.11.23/diff/ifdef.c
-@cvs_root/cvs-1.11.23/diff/ifdef.o
-@cvs_root/cvs-1.11.23/diff/io.c
-@cvs_root/cvs-1.11.23/diff/io.o
-@cvs_root/cvs-1.11.23/diff/libdiff.a
-@cvs_root/cvs-1.11.23/diff/normal.c
-@cvs_root/cvs-1.11.23/diff/normal.o
-@cvs_root/cvs-1.11.23/diff/side.c
-@cvs_root/cvs-1.11.23/diff/side.o
-@cvs_root/cvs-1.11.23/diff/system.h
-@cvs_root/cvs-1.11.23/diff/util.c
-@cvs_root/cvs-1.11.23/diff/util.o
-@cvs_root/cvs-1.11.23/diff/version.c
-@cvs_root/cvs-1.11.23/diff/version.o
-@cvs_root/cvs-1.11.23/doc
-@cvs_root/cvs-1.11.23/emx
-@cvs_root/cvs-1.11.23/lib/.deps/argmatch.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getdate.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getline.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getopt.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getopt1.Po
-@cvs_root/cvs-1.11.23/lib/.deps/getpass.Po
-@cvs_root/cvs-1.11.23/lib/.deps/md5.Po
-@cvs_root/cvs-1.11.23/lib/.deps/regex.Po
-@cvs_root/cvs-1.11.23/lib/.deps/savecwd.Po
-@cvs_root/cvs-1.11.23/lib/.deps/sighandle.Po
-@cvs_root/cvs-1.11.23/lib/.deps/stripslash.Po
-@cvs_root/cvs-1.11.23/lib/.deps/xgetwd.Po
-@cvs_root/cvs-1.11.23/lib/.deps/yesno.Po
-@cvs_root/cvs-1.11.23/lib/argmatch.c
-@cvs_root/cvs-1.11.23/lib/argmatch.o
-@cvs_root/cvs-1.11.23/lib/getdate.c
-@cvs_root/cvs-1.11.23/lib/getdate.o
-@cvs_root/cvs-1.11.23/lib/getline.c
-@cvs_root/cvs-1.11.23/lib/getline.h
-@cvs_root/cvs-1.11.23/lib/getline.o
-@cvs_root/cvs-1.11.23/lib/getopt.c
-@cvs_root/cvs-1.11.23/lib/getopt.h
-@cvs_root/cvs-1.11.23/lib/getopt.o
-@cvs_root/cvs-1.11.23/lib/getopt1.c
-@cvs_root/cvs-1.11.23/lib/getopt1.o
-@cvs_root/cvs-1.11.23/lib/getpass.c
-@cvs_root/cvs-1.11.23/lib/getpass.o
-@cvs_root/cvs-1.11.23/lib/libcvs.a
-@cvs_root/cvs-1.11.23/lib/md5.c
-@cvs_root/cvs-1.11.23/lib/md5.h
-@cvs_root/cvs-1.11.23/lib/md5.o
-@cvs_root/cvs-1.11.23/lib/regex.c
-@cvs_root/cvs-1.11.23/lib/regex.h
-@cvs_root/cvs-1.11.23/lib/regex.o
-@cvs_root/cvs-1.11.23/lib/savecwd.c
-@cvs_root/cvs-1.11.23/lib/savecwd.h
-@cvs_root/cvs-1.11.23/lib/savecwd.o
-@cvs_root/cvs-1.11.23/lib/sighandle.c
-@cvs_root/cvs-1.11.23/lib/sighandle.o
-@cvs_root/cvs-1.11.23/lib/stripslash.c
-@cvs_root/cvs-1.11.23/lib/stripslash.o
-@cvs_root/cvs-1.11.23/lib/system.h
-@cvs_root/cvs-1.11.23/lib/wait.h
-@cvs_root/cvs-1.11.23/lib/xgetwd.c
-@cvs_root/cvs-1.11.23/lib/xgetwd.o
-@cvs_root/cvs-1.11.23/lib/xselect.h
-@cvs_root/cvs-1.11.23/lib/xsize.h
-@cvs_root/cvs-1.11.23/lib/xtime.h
-@cvs_root/cvs-1.11.23/lib/yesno.c
-@cvs_root/cvs-1.11.23/lib/yesno.o
-@cvs_root/cvs-1.11.23/man
-@cvs_root/cvs-1.11.23/os2
-@cvs_root/cvs-1.11.23/src/.deps/add.Po
-@cvs_root/cvs-1.11.23/src/.deps/admin.Po
-@cvs_root/cvs-1.11.23/src/.deps/annotate.Po
-@cvs_root/cvs-1.11.23/src/.deps/buffer.Po
-@cvs_root/cvs-1.11.23/src/.deps/checkin.Po
-@cvs_root/cvs-1.11.23/src/.deps/checkout.Po
-@cvs_root/cvs-1.11.23/src/.deps/classify.Po
-@cvs_root/cvs-1.11.23/src/.deps/client.Po
-@cvs_root/cvs-1.11.23/src/.deps/commit.Po
-@cvs_root/cvs-1.11.23/src/.deps/create_adm.Po
-@cvs_root/cvs-1.11.23/src/.deps/cvsrc.Po
-@cvs_root/cvs-1.11.23/src/.deps/diff.Po
-@cvs_root/cvs-1.11.23/src/.deps/edit.Po
-@cvs_root/cvs-1.11.23/src/.deps/entries.Po
-@cvs_root/cvs-1.11.23/src/.deps/error.Po
-@cvs_root/cvs-1.11.23/src/.deps/expand_path.Po
-@cvs_root/cvs-1.11.23/src/.deps/fileattr.Po
-@cvs_root/cvs-1.11.23/src/.deps/filesubr.Po
-@cvs_root/cvs-1.11.23/src/.deps/find_names.Po
-@cvs_root/cvs-1.11.23/src/.deps/hardlink.Po
-@cvs_root/cvs-1.11.23/src/.deps/hash.Po
-@cvs_root/cvs-1.11.23/src/.deps/history.Po
-@cvs_root/cvs-1.11.23/src/.deps/ignore.Po
-@cvs_root/cvs-1.11.23/src/.deps/import.Po
-@cvs_root/cvs-1.11.23/src/.deps/lock.Po
-@cvs_root/cvs-1.11.23/src/.deps/log.Po
-@cvs_root/cvs-1.11.23/src/.deps/login.Po
-@cvs_root/cvs-1.11.23/src/.deps/logmsg.Po
-@cvs_root/cvs-1.11.23/src/.deps/main.Po
-@cvs_root/cvs-1.11.23/src/.deps/mkmodules.Po
-@cvs_root/cvs-1.11.23/src/.deps/modules.Po
-@cvs_root/cvs-1.11.23/src/.deps/myndbm.Po
-@cvs_root/cvs-1.11.23/src/.deps/no_diff.Po
-@cvs_root/cvs-1.11.23/src/.deps/parseinfo.Po
-@cvs_root/cvs-1.11.23/src/.deps/patch.Po
-@cvs_root/cvs-1.11.23/src/.deps/rcs.Po
-@cvs_root/cvs-1.11.23/src/.deps/rcscmds.Po
-@cvs_root/cvs-1.11.23/src/.deps/recurse.Po
-@cvs_root/cvs-1.11.23/src/.deps/release.Po
-@cvs_root/cvs-1.11.23/src/.deps/remove.Po
-@cvs_root/cvs-1.11.23/src/.deps/repos.Po
-@cvs_root/cvs-1.11.23/src/.deps/root.Po
-@cvs_root/cvs-1.11.23/src/.deps/run.Po
-@cvs_root/cvs-1.11.23/src/.deps/scramble.Po
-@cvs_root/cvs-1.11.23/src/.deps/server.Po
-@cvs_root/cvs-1.11.23/src/.deps/stack.Po
-@cvs_root/cvs-1.11.23/src/.deps/status.Po
-@cvs_root/cvs-1.11.23/src/.deps/subr.Po
-@cvs_root/cvs-1.11.23/src/.deps/tag.Po
-@cvs_root/cvs-1.11.23/src/.deps/update.Po
-@cvs_root/cvs-1.11.23/src/.deps/vers_ts.Po
-@cvs_root/cvs-1.11.23/src/.deps/version.Po
-@cvs_root/cvs-1.11.23/src/.deps/watch.Po
-@cvs_root/cvs-1.11.23/src/.deps/wrapper.Po
-@cvs_root/cvs-1.11.23/src/.deps/zlib.Po
-@cvs_root/cvs-1.11.23/src/add.c
-@cvs_root/cvs-1.11.23/src/add.o
-@cvs_root/cvs-1.11.23/src/admin.c
-@cvs_root/cvs-1.11.23/src/admin.o
-@cvs_root/cvs-1.11.23/src/annotate.c
-@cvs_root/cvs-1.11.23/src/annotate.o
-@cvs_root/cvs-1.11.23/src/buffer.c
-@cvs_root/cvs-1.11.23/src/buffer.h
-@cvs_root/cvs-1.11.23/src/buffer.o
-@cvs_root/cvs-1.11.23/src/checkin.c
-@cvs_root/cvs-1.11.23/src/checkin.o
-@cvs_root/cvs-1.11.23/src/checkout.c
-@cvs_root/cvs-1.11.23/src/checkout.o
-@cvs_root/cvs-1.11.23/src/classify.c
-@cvs_root/cvs-1.11.23/src/classify.o
-@cvs_root/cvs-1.11.23/src/client.c
-@cvs_root/cvs-1.11.23/src/client.h
-@cvs_root/cvs-1.11.23/src/client.o
-@cvs_root/cvs-1.11.23/src/commit.c
-@cvs_root/cvs-1.11.23/src/commit.o
-@cvs_root/cvs-1.11.23/src/create_adm.c
-@cvs_root/cvs-1.11.23/src/create_adm.o
-@cvs_root/cvs-1.11.23/src/cvs
-@cvs_root/cvs-1.11.23/src/cvs.h
-@cvs_root/cvs-1.11.23/src/cvsrc.c
-@cvs_root/cvs-1.11.23/src/cvsrc.o
-@cvs_root/cvs-1.11.23/src/diff.c
-@cvs_root/cvs-1.11.23/src/diff.o
-@cvs_root/cvs-1.11.23/src/edit.c
-@cvs_root/cvs-1.11.23/src/edit.h
-@cvs_root/cvs-1.11.23/src/edit.o
-@cvs_root/cvs-1.11.23/src/entries.c
-@cvs_root/cvs-1.11.23/src/entries.o
-@cvs_root/cvs-1.11.23/src/error.c
-@cvs_root/cvs-1.11.23/src/error.h
-@cvs_root/cvs-1.11.23/src/error.o
-@cvs_root/cvs-1.11.23/src/expand_path.c
-@cvs_root/cvs-1.11.23/src/expand_path.o
-@cvs_root/cvs-1.11.23/src/fileattr.c
-@cvs_root/cvs-1.11.23/src/fileattr.h
-@cvs_root/cvs-1.11.23/src/fileattr.o
-@cvs_root/cvs-1.11.23/src/filesubr.c
-@cvs_root/cvs-1.11.23/src/filesubr.o
-@cvs_root/cvs-1.11.23/src/find_names.c
-@cvs_root/cvs-1.11.23/src/find_names.o
-@cvs_root/cvs-1.11.23/src/hardlink.c
-@cvs_root/cvs-1.11.23/src/hardlink.h
-@cvs_root/cvs-1.11.23/src/hardlink.o
-@cvs_root/cvs-1.11.23/src/hash.c
-@cvs_root/cvs-1.11.23/src/hash.h
-@cvs_root/cvs-1.11.23/src/hash.o
-@cvs_root/cvs-1.11.23/src/history.c
-@cvs_root/cvs-1.11.23/src/history.h
-@cvs_root/cvs-1.11.23/src/history.o
-@cvs_root/cvs-1.11.23/src/ignore.c
-@cvs_root/cvs-1.11.23/src/ignore.o
-@cvs_root/cvs-1.11.23/src/import.c
-@cvs_root/cvs-1.11.23/src/import.o
-@cvs_root/cvs-1.11.23/src/lock.c
-@cvs_root/cvs-1.11.23/src/lock.o
-@cvs_root/cvs-1.11.23/src/log.c
-@cvs_root/cvs-1.11.23/src/log.o
-@cvs_root/cvs-1.11.23/src/login.c
-@cvs_root/cvs-1.11.23/src/login.o
-@cvs_root/cvs-1.11.23/src/logmsg.c
-@cvs_root/cvs-1.11.23/src/logmsg.o
-@cvs_root/cvs-1.11.23/src/main.c
-@cvs_root/cvs-1.11.23/src/main.o
-@cvs_root/cvs-1.11.23/src/mkmodules.c
-@cvs_root/cvs-1.11.23/src/mkmodules.o
-@cvs_root/cvs-1.11.23/src/modules.c
-@cvs_root/cvs-1.11.23/src/modules.o
-@cvs_root/cvs-1.11.23/src/myndbm.c
-@cvs_root/cvs-1.11.23/src/myndbm.h
-@cvs_root/cvs-1.11.23/src/myndbm.o
-@cvs_root/cvs-1.11.23/src/no_diff.c
-@cvs_root/cvs-1.11.23/src/no_diff.o
-@cvs_root/cvs-1.11.23/src/parseinfo.c
-@cvs_root/cvs-1.11.23/src/parseinfo.o
-@cvs_root/cvs-1.11.23/src/patch.c
-@cvs_root/cvs-1.11.23/src/patch.o
-@cvs_root/cvs-1.11.23/src/rcs.c
-@cvs_root/cvs-1.11.23/src/rcs.h
-@cvs_root/cvs-1.11.23/src/rcs.o
-@cvs_root/cvs-1.11.23/src/rcscmds.c
-@cvs_root/cvs-1.11.23/src/rcscmds.o
-@cvs_root/cvs-1.11.23/src/recurse.c
-@cvs_root/cvs-1.11.23/src/recurse.o
-@cvs_root/cvs-1.11.23/src/release.c
-@cvs_root/cvs-1.11.23/src/release.o
-@cvs_root/cvs-1.11.23/src/remove.c
-@cvs_root/cvs-1.11.23/src/remove.o
-@cvs_root/cvs-1.11.23/src/repos.c
-@cvs_root/cvs-1.11.23/src/repos.o
-@cvs_root/cvs-1.11.23/src/root.c
-@cvs_root/cvs-1.11.23/src/root.h
-@cvs_root/cvs-1.11.23/src/root.o
-@cvs_root/cvs-1.11.23/src/run.c
-@cvs_root/cvs-1.11.23/src/run.o
-@cvs_root/cvs-1.11.23/src/scramble.c
-@cvs_root/cvs-1.11.23/src/scramble.o
-@cvs_root/cvs-1.11.23/src/server.c
-@cvs_root/cvs-1.11.23/src/server.h
-@cvs_root/cvs-1.11.23/src/server.o
-@cvs_root/cvs-1.11.23/src/stack.c
-@cvs_root/cvs-1.11.23/src/stack.h
-@cvs_root/cvs-1.11.23/src/stack.o
-@cvs_root/cvs-1.11.23/src/status.c
-@cvs_root/cvs-1.11.23/src/status.o
-@cvs_root/cvs-1.11.23/src/subr.c
-@cvs_root/cvs-1.11.23/src/subr.o
-@cvs_root/cvs-1.11.23/src/tag.c
-@cvs_root/cvs-1.11.23/src/tag.o
-@cvs_root/cvs-1.11.23/src/update.c
-@cvs_root/cvs-1.11.23/src/update.h
-@cvs_root/cvs-1.11.23/src/update.o
-@cvs_root/cvs-1.11.23/src/vers_ts.c
-@cvs_root/cvs-1.11.23/src/vers_ts.o
-@cvs_root/cvs-1.11.23/src/version.c
-@cvs_root/cvs-1.11.23/src/version.o
-@cvs_root/cvs-1.11.23/src/watch.c
-@cvs_root/cvs-1.11.23/src/watch.h
-@cvs_root/cvs-1.11.23/src/watch.o
-@cvs_root/cvs-1.11.23/src/wrapper.c
-@cvs_root/cvs-1.11.23/src/wrapper.o
-@cvs_root/cvs-1.11.23/src/zlib.c
-@cvs_root/cvs-1.11.23/src/zlib.o
-@cvs_root/cvs-1.11.23/tools
-@cvs_root/cvs-1.11.23/vms/config.h
-@cvs_root/cvs-1.11.23/vms/config.h.in
-@cvs_root/cvs-1.11.23/vms/stamp-ch
-@cvs_root/cvs-1.11.23/windows-NT/SCC
-@zlib (/home/psmith/t/cvs-1.11.23/zlib) 
-@zlib/adler32.c
-@zlib/adler32.o
-@zlib/compress.c
-@zlib/compress.o
-@zlib/crc32.c
-@zlib/crc32.o
-@zlib/deflate.c
-@zlib/deflate.h
-@zlib/deflate.o
-@zlib/gzio.c
-@zlib/gzio.o
-@zlib/infblock.c
-@zlib/infblock.h
-@zlib/infblock.o
-@zlib/infcodes.c
-@zlib/infcodes.h
-@zlib/infcodes.o
-@zlib/inffast.c
-@zlib/inffast.h
-@zlib/inffast.o
-@zlib/inffixed.h
-@zlib/inflate.c
-@zlib/inflate.o
-@zlib/inftrees.c
-@zlib/inftrees.h
-@zlib/inftrees.o
-@zlib/infutil.c
-@zlib/infutil.h
-@zlib/infutil.o
-@zlib/libz.a
-@zlib/trees.c
-@zlib/trees.h
-@zlib/trees.o
-@zlib/uncompr.c
-@zlib/uncompr.o
-@zlib/zconf.h
-@zlib/zlib.h
-@zlib/zutil.c
-@zlib/zutil.h
-@zlib/zutil.o
-
-Show only the files within zlib
-@psmith_root (/home/psmith) 
-@cvs_root (/home/psmith/t) 
-@zlib (/home/psmith/t/cvs-1.11.23/zlib) 
-@zlib/adler32.c
-@zlib/adler32.o
-@zlib/compress.c
-@zlib/compress.o
-@zlib/crc32.c
-@zlib/crc32.o
-@zlib/deflate.c
-@zlib/deflate.h
-@zlib/deflate.o
-@zlib/gzio.c
-@zlib/gzio.o
-@zlib/infblock.c
-@zlib/infblock.h
-@zlib/infblock.o
-@zlib/infcodes.c
-@zlib/infcodes.h
-@zlib/infcodes.o
-@zlib/inffast.c
-@zlib/inffast.h
-@zlib/inffast.o
-@zlib/inffixed.h
-@zlib/inflate.c
-@zlib/inflate.o
-@zlib/inftrees.c
-@zlib/inftrees.h
-@zlib/inftrees.o
-@zlib/infutil.c
-@zlib/infutil.h
-@zlib/infutil.o
-@zlib/libz.a
-@zlib/trees.c
-@zlib/trees.h
-@zlib/trees.o
-@zlib/uncompr.c
-@zlib/uncompr.o
-@zlib/zconf.h
-@zlib/zlib.h
-@zlib/zutil.c
-@zlib/zutil.h
-@zlib/zutil.o
-
-Show only the files within zlib, without showing root names
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o
-/home/psmith/t/cvs-1.11.23/zlib/compress.c
-/home/psmith/t/cvs-1.11.23/zlib/compress.o
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o
-/home/psmith/t/cvs-1.11.23/zlib/libz.a
-/home/psmith/t/cvs-1.11.23/zlib/trees.c
-/home/psmith/t/cvs-1.11.23/zlib/trees.h
-/home/psmith/t/cvs-1.11.23/zlib/trees.o
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o
+Show only the files within zlib_gen
+@{workspace, zlib_gen, zlib_src} (/home/psmith/t/cvs-1.11.23) 
+@{workspace, zlib_gen, zlib_src}/config.h
+@{workspace, zlib_gen, zlib_src}/contrib/cvs2vendor
+@{workspace, zlib_gen, zlib_src}/contrib/cvs2vendor.sh
+@{workspace, zlib_gen, zlib_src}/contrib/cvscheck
+@{workspace, zlib_gen, zlib_src}/contrib/cvscheck.sh
+@{workspace, zlib_gen, zlib_src}/contrib/debug_check_log
+@{workspace, zlib_gen, zlib_src}/contrib/debug_check_log.sh
+@{workspace, zlib_gen, zlib_src}/contrib/rcs-to-cvs
+@{workspace, zlib_gen, zlib_src}/contrib/rcs-to-cvs.sh
+@{workspace, zlib_gen, zlib_src}/diff/.deps/analyze.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/cmpbuf.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/context.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/diff.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/diff3.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/dir.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/ed.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/ifdef.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/io.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/normal.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/side.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/util.Po
+@{workspace, zlib_gen, zlib_src}/diff/.deps/version.Po
+@{workspace, zlib_gen, zlib_src}/diff/analyze.c
+@{workspace, zlib_gen, zlib_src}/diff/analyze.o
+@{workspace, zlib_gen, zlib_src}/diff/cmpbuf.c
+@{workspace, zlib_gen, zlib_src}/diff/cmpbuf.h
+@{workspace, zlib_gen, zlib_src}/diff/cmpbuf.o
+@{workspace, zlib_gen, zlib_src}/diff/context.c
+@{workspace, zlib_gen, zlib_src}/diff/context.o
+@{workspace, zlib_gen, zlib_src}/diff/diff.c
+@{workspace, zlib_gen, zlib_src}/diff/diff.h
+@{workspace, zlib_gen, zlib_src}/diff/diff.o
+@{workspace, zlib_gen, zlib_src}/diff/diff3.c
+@{workspace, zlib_gen, zlib_src}/diff/diff3.o
+@{workspace, zlib_gen, zlib_src}/diff/diffrun.h
+@{workspace, zlib_gen, zlib_src}/diff/dir.c
+@{workspace, zlib_gen, zlib_src}/diff/dir.o
+@{workspace, zlib_gen, zlib_src}/diff/ed.c
+@{workspace, zlib_gen, zlib_src}/diff/ed.o
+@{workspace, zlib_gen, zlib_src}/diff/ifdef.c
+@{workspace, zlib_gen, zlib_src}/diff/ifdef.o
+@{workspace, zlib_gen, zlib_src}/diff/io.c
+@{workspace, zlib_gen, zlib_src}/diff/io.o
+@{workspace, zlib_gen, zlib_src}/diff/libdiff.a
+@{workspace, zlib_gen, zlib_src}/diff/normal.c
+@{workspace, zlib_gen, zlib_src}/diff/normal.o
+@{workspace, zlib_gen, zlib_src}/diff/side.c
+@{workspace, zlib_gen, zlib_src}/diff/side.o
+@{workspace, zlib_gen, zlib_src}/diff/system.h
+@{workspace, zlib_gen, zlib_src}/diff/util.c
+@{workspace, zlib_gen, zlib_src}/diff/util.o
+@{workspace, zlib_gen, zlib_src}/diff/version.c
+@{workspace, zlib_gen, zlib_src}/diff/version.o
+@{workspace, zlib_gen, zlib_src}/doc
+@{workspace, zlib_gen, zlib_src}/emx
+@{workspace, zlib_gen, zlib_src}/lib/.deps/argmatch.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getdate.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getline.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getopt.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getopt1.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/getpass.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/md5.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/regex.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/savecwd.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/sighandle.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/stripslash.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/xgetwd.Po
+@{workspace, zlib_gen, zlib_src}/lib/.deps/yesno.Po
+@{workspace, zlib_gen, zlib_src}/lib/argmatch.c
+@{workspace, zlib_gen, zlib_src}/lib/argmatch.o
+@{workspace, zlib_gen, zlib_src}/lib/getdate.c
+@{workspace, zlib_gen, zlib_src}/lib/getdate.o
+@{workspace, zlib_gen, zlib_src}/lib/getline.c
+@{workspace, zlib_gen, zlib_src}/lib/getline.h
+@{workspace, zlib_gen, zlib_src}/lib/getline.o
+@{workspace, zlib_gen, zlib_src}/lib/getopt.c
+@{workspace, zlib_gen, zlib_src}/lib/getopt.h
+@{workspace, zlib_gen, zlib_src}/lib/getopt.o
+@{workspace, zlib_gen, zlib_src}/lib/getopt1.c
+@{workspace, zlib_gen, zlib_src}/lib/getopt1.o
+@{workspace, zlib_gen, zlib_src}/lib/getpass.c
+@{workspace, zlib_gen, zlib_src}/lib/getpass.o
+@{workspace, zlib_gen, zlib_src}/lib/libcvs.a
+@{workspace, zlib_gen, zlib_src}/lib/md5.c
+@{workspace, zlib_gen, zlib_src}/lib/md5.h
+@{workspace, zlib_gen, zlib_src}/lib/md5.o
+@{workspace, zlib_gen, zlib_src}/lib/regex.c
+@{workspace, zlib_gen, zlib_src}/lib/regex.h
+@{workspace, zlib_gen, zlib_src}/lib/regex.o
+@{workspace, zlib_gen, zlib_src}/lib/savecwd.c
+@{workspace, zlib_gen, zlib_src}/lib/savecwd.h
+@{workspace, zlib_gen, zlib_src}/lib/savecwd.o
+@{workspace, zlib_gen, zlib_src}/lib/sighandle.c
+@{workspace, zlib_gen, zlib_src}/lib/sighandle.o
+@{workspace, zlib_gen, zlib_src}/lib/stripslash.c
+@{workspace, zlib_gen, zlib_src}/lib/stripslash.o
+@{workspace, zlib_gen, zlib_src}/lib/system.h
+@{workspace, zlib_gen, zlib_src}/lib/wait.h
+@{workspace, zlib_gen, zlib_src}/lib/xgetwd.c
+@{workspace, zlib_gen, zlib_src}/lib/xgetwd.o
+@{workspace, zlib_gen, zlib_src}/lib/xselect.h
+@{workspace, zlib_gen, zlib_src}/lib/xsize.h
+@{workspace, zlib_gen, zlib_src}/lib/xtime.h
+@{workspace, zlib_gen, zlib_src}/lib/yesno.c
+@{workspace, zlib_gen, zlib_src}/lib/yesno.o
+@{workspace, zlib_gen, zlib_src}/man
+@{workspace, zlib_gen, zlib_src}/os2
+@{workspace, zlib_gen, zlib_src}/src/.deps/add.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/admin.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/annotate.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/buffer.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/checkin.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/checkout.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/classify.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/client.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/commit.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/create_adm.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/cvsrc.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/diff.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/edit.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/entries.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/error.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/expand_path.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/fileattr.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/filesubr.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/find_names.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/hardlink.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/hash.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/history.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/ignore.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/import.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/lock.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/log.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/login.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/logmsg.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/main.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/mkmodules.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/modules.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/myndbm.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/no_diff.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/parseinfo.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/patch.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/rcs.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/rcscmds.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/recurse.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/release.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/remove.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/repos.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/root.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/run.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/scramble.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/server.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/stack.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/status.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/subr.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/tag.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/update.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/vers_ts.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/version.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/watch.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/wrapper.Po
+@{workspace, zlib_gen, zlib_src}/src/.deps/zlib.Po
+@{workspace, zlib_gen, zlib_src}/src/add.c
+@{workspace, zlib_gen, zlib_src}/src/add.o
+@{workspace, zlib_gen, zlib_src}/src/admin.c
+@{workspace, zlib_gen, zlib_src}/src/admin.o
+@{workspace, zlib_gen, zlib_src}/src/annotate.c
+@{workspace, zlib_gen, zlib_src}/src/annotate.o
+@{workspace, zlib_gen, zlib_src}/src/buffer.c
+@{workspace, zlib_gen, zlib_src}/src/buffer.h
+@{workspace, zlib_gen, zlib_src}/src/buffer.o
+@{workspace, zlib_gen, zlib_src}/src/checkin.c
+@{workspace, zlib_gen, zlib_src}/src/checkin.o
+@{workspace, zlib_gen, zlib_src}/src/checkout.c
+@{workspace, zlib_gen, zlib_src}/src/checkout.o
+@{workspace, zlib_gen, zlib_src}/src/classify.c
+@{workspace, zlib_gen, zlib_src}/src/classify.o
+@{workspace, zlib_gen, zlib_src}/src/client.c
+@{workspace, zlib_gen, zlib_src}/src/client.h
+@{workspace, zlib_gen, zlib_src}/src/client.o
+@{workspace, zlib_gen, zlib_src}/src/commit.c
+@{workspace, zlib_gen, zlib_src}/src/commit.o
+@{workspace, zlib_gen, zlib_src}/src/create_adm.c
+@{workspace, zlib_gen, zlib_src}/src/create_adm.o
+@{workspace, zlib_gen, zlib_src}/src/cvs
+@{workspace, zlib_gen, zlib_src}/src/cvs.h
+@{workspace, zlib_gen, zlib_src}/src/cvsrc.c
+@{workspace, zlib_gen, zlib_src}/src/cvsrc.o
+@{workspace, zlib_gen, zlib_src}/src/diff.c
+@{workspace, zlib_gen, zlib_src}/src/diff.o
+@{workspace, zlib_gen, zlib_src}/src/edit.c
+@{workspace, zlib_gen, zlib_src}/src/edit.h
+@{workspace, zlib_gen, zlib_src}/src/edit.o
+@{workspace, zlib_gen, zlib_src}/src/entries.c
+@{workspace, zlib_gen, zlib_src}/src/entries.o
+@{workspace, zlib_gen, zlib_src}/src/error.c
+@{workspace, zlib_gen, zlib_src}/src/error.h
+@{workspace, zlib_gen, zlib_src}/src/error.o
+@{workspace, zlib_gen, zlib_src}/src/expand_path.c
+@{workspace, zlib_gen, zlib_src}/src/expand_path.o
+@{workspace, zlib_gen, zlib_src}/src/fileattr.c
+@{workspace, zlib_gen, zlib_src}/src/fileattr.h
+@{workspace, zlib_gen, zlib_src}/src/fileattr.o
+@{workspace, zlib_gen, zlib_src}/src/filesubr.c
+@{workspace, zlib_gen, zlib_src}/src/filesubr.o
+@{workspace, zlib_gen, zlib_src}/src/find_names.c
+@{workspace, zlib_gen, zlib_src}/src/find_names.o
+@{workspace, zlib_gen, zlib_src}/src/hardlink.c
+@{workspace, zlib_gen, zlib_src}/src/hardlink.h
+@{workspace, zlib_gen, zlib_src}/src/hardlink.o
+@{workspace, zlib_gen, zlib_src}/src/hash.c
+@{workspace, zlib_gen, zlib_src}/src/hash.h
+@{workspace, zlib_gen, zlib_src}/src/hash.o
+@{workspace, zlib_gen, zlib_src}/src/history.c
+@{workspace, zlib_gen, zlib_src}/src/history.h
+@{workspace, zlib_gen, zlib_src}/src/history.o
+@{workspace, zlib_gen, zlib_src}/src/ignore.c
+@{workspace, zlib_gen, zlib_src}/src/ignore.o
+@{workspace, zlib_gen, zlib_src}/src/import.c
+@{workspace, zlib_gen, zlib_src}/src/import.o
+@{workspace, zlib_gen, zlib_src}/src/lock.c
+@{workspace, zlib_gen, zlib_src}/src/lock.o
+@{workspace, zlib_gen, zlib_src}/src/log.c
+@{workspace, zlib_gen, zlib_src}/src/log.o
+@{workspace, zlib_gen, zlib_src}/src/login.c
+@{workspace, zlib_gen, zlib_src}/src/login.o
+@{workspace, zlib_gen, zlib_src}/src/logmsg.c
+@{workspace, zlib_gen, zlib_src}/src/logmsg.o
+@{workspace, zlib_gen, zlib_src}/src/main.c
+@{workspace, zlib_gen, zlib_src}/src/main.o
+@{workspace, zlib_gen, zlib_src}/src/mkmodules.c
+@{workspace, zlib_gen, zlib_src}/src/mkmodules.o
+@{workspace, zlib_gen, zlib_src}/src/modules.c
+@{workspace, zlib_gen, zlib_src}/src/modules.o
+@{workspace, zlib_gen, zlib_src}/src/myndbm.c
+@{workspace, zlib_gen, zlib_src}/src/myndbm.h
+@{workspace, zlib_gen, zlib_src}/src/myndbm.o
+@{workspace, zlib_gen, zlib_src}/src/no_diff.c
+@{workspace, zlib_gen, zlib_src}/src/no_diff.o
+@{workspace, zlib_gen, zlib_src}/src/parseinfo.c
+@{workspace, zlib_gen, zlib_src}/src/parseinfo.o
+@{workspace, zlib_gen, zlib_src}/src/patch.c
+@{workspace, zlib_gen, zlib_src}/src/patch.o
+@{workspace, zlib_gen, zlib_src}/src/rcs.c
+@{workspace, zlib_gen, zlib_src}/src/rcs.h
+@{workspace, zlib_gen, zlib_src}/src/rcs.o
+@{workspace, zlib_gen, zlib_src}/src/rcscmds.c
+@{workspace, zlib_gen, zlib_src}/src/rcscmds.o
+@{workspace, zlib_gen, zlib_src}/src/recurse.c
+@{workspace, zlib_gen, zlib_src}/src/recurse.o
+@{workspace, zlib_gen, zlib_src}/src/release.c
+@{workspace, zlib_gen, zlib_src}/src/release.o
+@{workspace, zlib_gen, zlib_src}/src/remove.c
+@{workspace, zlib_gen, zlib_src}/src/remove.o
+@{workspace, zlib_gen, zlib_src}/src/repos.c
+@{workspace, zlib_gen, zlib_src}/src/repos.o
+@{workspace, zlib_gen, zlib_src}/src/root.c
+@{workspace, zlib_gen, zlib_src}/src/root.h
+@{workspace, zlib_gen, zlib_src}/src/root.o
+@{workspace, zlib_gen, zlib_src}/src/run.c
+@{workspace, zlib_gen, zlib_src}/src/run.o
+@{workspace, zlib_gen, zlib_src}/src/scramble.c
+@{workspace, zlib_gen, zlib_src}/src/scramble.o
+@{workspace, zlib_gen, zlib_src}/src/server.c
+@{workspace, zlib_gen, zlib_src}/src/server.h
+@{workspace, zlib_gen, zlib_src}/src/server.o
+@{workspace, zlib_gen, zlib_src}/src/stack.c
+@{workspace, zlib_gen, zlib_src}/src/stack.h
+@{workspace, zlib_gen, zlib_src}/src/stack.o
+@{workspace, zlib_gen, zlib_src}/src/status.c
+@{workspace, zlib_gen, zlib_src}/src/status.o
+@{workspace, zlib_gen, zlib_src}/src/subr.c
+@{workspace, zlib_gen, zlib_src}/src/subr.o
+@{workspace, zlib_gen, zlib_src}/src/tag.c
+@{workspace, zlib_gen, zlib_src}/src/tag.o
+@{workspace, zlib_gen, zlib_src}/src/update.c
+@{workspace, zlib_gen, zlib_src}/src/update.h
+@{workspace, zlib_gen, zlib_src}/src/update.o
+@{workspace, zlib_gen, zlib_src}/src/vers_ts.c
+@{workspace, zlib_gen, zlib_src}/src/vers_ts.o
+@{workspace, zlib_gen, zlib_src}/src/version.c
+@{workspace, zlib_gen, zlib_src}/src/version.o
+@{workspace, zlib_gen, zlib_src}/src/watch.c
+@{workspace, zlib_gen, zlib_src}/src/watch.h
+@{workspace, zlib_gen, zlib_src}/src/watch.o
+@{workspace, zlib_gen, zlib_src}/src/wrapper.c
+@{workspace, zlib_gen, zlib_src}/src/wrapper.o
+@{workspace, zlib_gen, zlib_src}/src/zlib.c
+@{workspace, zlib_gen, zlib_src}/src/zlib.o
+@{workspace, zlib_gen, zlib_src}/tools
+@{workspace, zlib_gen, zlib_src}/vms/config.h
+@{workspace, zlib_gen, zlib_src}/vms/config.h.in
+@{workspace, zlib_gen, zlib_src}/vms/stamp-ch
+@{workspace, zlib_gen, zlib_src}/windows-NT/SCC
+@{workspace, zlib_gen, zlib_src}/zlib/adler32.c
+@{workspace, zlib_gen, zlib_src}/zlib/adler32.o
+@{workspace, zlib_gen, zlib_src}/zlib/compress.c
+@{workspace, zlib_gen, zlib_src}/zlib/compress.o
+@{workspace, zlib_gen, zlib_src}/zlib/crc32.c
+@{workspace, zlib_gen, zlib_src}/zlib/crc32.o
+@{workspace, zlib_gen, zlib_src}/zlib/deflate.c
+@{workspace, zlib_gen, zlib_src}/zlib/deflate.h
+@{workspace, zlib_gen, zlib_src}/zlib/deflate.o
+@{workspace, zlib_gen, zlib_src}/zlib/gzio.c
+@{workspace, zlib_gen, zlib_src}/zlib/gzio.o
+@{workspace, zlib_gen, zlib_src}/zlib/infblock.c
+@{workspace, zlib_gen, zlib_src}/zlib/infblock.h
+@{workspace, zlib_gen, zlib_src}/zlib/infblock.o
+@{workspace, zlib_gen, zlib_src}/zlib/infcodes.c
+@{workspace, zlib_gen, zlib_src}/zlib/infcodes.h
+@{workspace, zlib_gen, zlib_src}/zlib/infcodes.o
+@{workspace, zlib_gen, zlib_src}/zlib/inffast.c
+@{workspace, zlib_gen, zlib_src}/zlib/inffast.h
+@{workspace, zlib_gen, zlib_src}/zlib/inffast.o
+@{workspace, zlib_gen, zlib_src}/zlib/inffixed.h
+@{workspace, zlib_gen, zlib_src}/zlib/inflate.c
+@{workspace, zlib_gen, zlib_src}/zlib/inflate.o
+@{workspace, zlib_gen, zlib_src}/zlib/inftrees.c
+@{workspace, zlib_gen, zlib_src}/zlib/inftrees.h
+@{workspace, zlib_gen, zlib_src}/zlib/inftrees.o
+@{workspace, zlib_gen, zlib_src}/zlib/infutil.c
+@{workspace, zlib_gen, zlib_src}/zlib/infutil.h
+@{workspace, zlib_gen, zlib_src}/zlib/infutil.o
+@{workspace, zlib_gen, zlib_src}/zlib/libz.a
+@{workspace, zlib_gen, zlib_src}/zlib/trees.c
+@{workspace, zlib_gen, zlib_src}/zlib/trees.h
+@{workspace, zlib_gen, zlib_src}/zlib/trees.o
+@{workspace, zlib_gen, zlib_src}/zlib/uncompr.c
+@{workspace, zlib_gen, zlib_src}/zlib/uncompr.o
+@{workspace, zlib_gen, zlib_src}/zlib/zconf.h
+@{workspace, zlib_gen, zlib_src}/zlib/zlib.h
+@{workspace, zlib_gen, zlib_src}/zlib/zutil.c
+@{workspace, zlib_gen, zlib_src}/zlib/zutil.h
+@{workspace, zlib_gen, zlib_src}/zlib/zutil.o

@@ -115,6 +115,8 @@ public class CliCommandSetBuildMLFileDepth implements ICliCommand {
 		if (rc == ErrorCode.BAD_PATH) {
 			CliUtils.reportErrorAndExit("Invalid BuildML file depth: " + depth);
 		}
+		
+		System.out.println("BuildML file depth set to " + depth + ".");
 	}
 
 	/*-------------------------------------------------------------------------------------*/
