@@ -18,8 +18,24 @@ To create a new package and set the package's root, use the following:
     bml set-pkg-root zlib_src /home/joe/work/zlib
     bml set-pkg-root zlib_gen /home/joe/obj/zlib
     
-Note that these paths are internal to the BuildML file system, rather than
-on the native file system.
+Note that these paths are on the BuildML virtual file system (VFS), rather
+than on the native file system.
+
+Two important restrictions apply to the location of a package root on the VFS:
+
+  1) The new root must be at the same directory level, or lower, than the
+     @workspace root. By default, all package roots are set to the same
+     location as @workspace.
+     
+  2) All pre-existing files that belong to the package must remain inside
+     that package's root directory. That is, you may not move the root to
+     a lower directory so that some of the files in the package can no longer
+     be accessed relative to (within) the package root.
+     
+     Note the important distinction here between files that are members of
+     the package, versus files that appear in the VFS below the package root.
+     It is certainly possible for files from other packages (including
+     <import>) to appear below the package's root.
 
 The command arguments are:
 

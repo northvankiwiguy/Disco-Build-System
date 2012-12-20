@@ -1,0 +1,26 @@
+Set the path for the workspace root (@workspace) on the BuildML Virtual File
+System (VFS). This is the root path for all source code, so the product's
+entire source code (grouped into packages) must fall within the bounds of
+@workspace. The typical exception to this rule is native header files and
+libraries (/usr/include and /usr/lib).
+
+For example, to set the workspace root:
+
+    bml set-workspace-root /products/ping_pong
+    
+This VFS directory can now be accessed via the @workspace root, with all
+source files being accessed relative to this root (or relative to one of
+the package roots contained within the VFS).
+
+By default, when packages are created, their 'src' and 'gen' package roots
+default to the same location as @workspace. It's important to note that
+all package roots must remain at the same level, or below @workspace. It
+is therefore illegal to set @workspace below any existing package root.
+
+The command arguments are:
+
+<path>
+
+  The directory path (within the BuildML VFS) at which the root should be
+  placed. The <path> value would typically be an absolute path. 
+  
