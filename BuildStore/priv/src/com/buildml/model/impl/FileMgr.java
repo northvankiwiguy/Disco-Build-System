@@ -460,6 +460,30 @@ public class FileMgr implements IFileMgr {
 		/* if "trashed" field is 1, then the path is trashed */
 		return results[0] == 1;
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#isAncestorOf(int, int)
+	 */
+	@Override
+	public boolean isAncestorOf(int directoryId, int pathId) {
+
+		/* iterate upwards from pathId to @root, looking for directoryId */
+		while (true) {
+			int parentId = getParentPath(pathId);
+			if (parentId == directoryId) {
+				return true;
+			}
+
+			/* did we reach the @root without finding the ancestor? */
+			if (parentId == pathId) {
+				return false;
+			}
+			
+			pathId = parentId;
+		}
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 

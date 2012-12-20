@@ -213,6 +213,17 @@ public interface IFileMgr {
 	public abstract boolean isPathTrashed(int pathId);
 	
 	/**
+	 * Determine whether a directory is an ancestor of a path. That is, does the
+	 * path exist somewhere in the directory's hierarchy?
+	 * 
+	 * @param directoryId  The ancestor directory (that may contain the path).
+	 * @param pathId       The path (file or directory) that may be contained within
+	 *                     the directory.
+	 * @return True if the directory is an ancestor of the path.
+	 */
+	public abstract boolean isAncestorOf(int directoryId, int pathId);
+	
+	/**
 	 * Returns a reference to this FileMgr's BuildStore object. 
 	 * @return A reference to this FileMgr's BuildStore object.
 	 */

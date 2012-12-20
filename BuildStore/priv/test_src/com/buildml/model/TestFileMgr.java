@@ -14,6 +14,8 @@ package com.buildml.model;
 
 import static org.junit.Assert.*;
 import java.util.Random;
+
+import org.hamcrest.core.IsAnything;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -612,5 +614,30 @@ public class TestFileMgr {
 		bs.setFastAccessMode(false);
 	}
 
-	/*-------------------------------------------------------------------------------------*/	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the isAncestorOf() method.
+	 */
+	@Test
+	public void testAncestor() {
+		
+		int dirRoot = fileMgr.addDirectory("/");
+		int dirA = fileMgr.addDirectory("/a");
+		int dirB = fileMgr.addDirectory("/a/b");
+		int dogFile = fileMgr.addFile("/a/b/dog.h");
+		int catFile = fileMgr.addFile("/a/b/cat.h");
+		int rabbitFile = fileMgr.addFile("/a/c/rabbit.h");
+		
+		assertTrue(fileMgr.isAncestorOf(dirRoot, dogFile));
+		assertTrue(fileMgr.isAncestorOf(dirA, dogFile));
+		assertTrue(fileMgr.isAncestorOf(dirB, dogFile));
+		assertTrue(fileMgr.isAncestorOf(dirB, catFile));
+		assertFalse(fileMgr.isAncestorOf(dirB, rabbitFile));
+		assertTrue(fileMgr.isAncestorOf(dirA, dirB));
+		assertFalse(fileMgr.isAncestorOf(dirB, dirA));
+		assertFalse(fileMgr.isAncestorOf(dirA, dirA));		
+	}
+		
+	/*-------------------------------------------------------------------------------------*/
 }
