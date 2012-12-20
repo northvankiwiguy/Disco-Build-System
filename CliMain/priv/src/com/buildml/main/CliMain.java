@@ -352,7 +352,8 @@ public final class CliMain {
 			new ICliCommand[] {
 				new CliCommandShowRoot(),
 				new CliCommandSetPackageRoot(),
-				new CliCommandSetWorkspaceRoot()
+				new CliCommandSetWorkspaceRoot(),
+				new CliCommandSetBuildMLFileDepth()
 			});
 
 		registerCommandGroup("Commands for managing packages",

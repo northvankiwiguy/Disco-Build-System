@@ -1,0 +1,26 @@
+Specify the number of directory levels that exist between this build.bml file
+and the @workspace root. This is an administrative command only.
+
+To simplify the mapping of BuildML Virtual File System (VFS) files onto a
+native file system, the build.bml file depth value is used as the default.
+That is, when a BuildML build is invoked, the native file system mapping
+for @workspace must be determined, since all BuildML actions will access their
+files relative to @workspace (or to some package's root).
+
+By using the depth value, the native file system workspace root can be
+automatically derived from the location of the build.bml file. For example,
+if this build.bml file is located at:
+
+  /home/psmith/work/src/build/build.bml (on the native file system)
+  
+a depth value of 2 will associate the VFS @workspace root with the native file
+system path:
+
+  /home/psmith/work/ (on the native file system)
+
+The command arguments are:
+
+<depth>
+
+  The number of directory level between this build.bml file and the @workspace
+  root.
