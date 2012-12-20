@@ -1,0 +1,37 @@
+Set the 'source' or 'generated' path root for the specified package. Each
+BuildML package has two associated path roots, indicating the top-most
+directory for files that reside in that package. 
+
+For example, the package "zlib" has two associated path roots:
+
+  - zlib_src - The top-most directory for zlib's source files.
+  - zlib_gen - The top-most directory for zlib's generated files.
+
+All files within a package are accessed relative to these path roots,
+essentially creating a separate directory structure for each package.
+Packages can therefore be moved to an arbitrary location on the underlying
+native file system, without regard for where other packages might be located.
+
+To create a new package and set the package's root, use the following:
+
+    bml add-pkg zlib
+    bml set-pkg-root zlib_src /home/joe/work/zlib
+    bml set-pkg-root zlib_gen /home/joe/obj/zlib
+    
+Note that these paths are internal to the BuildML file system, rather than
+on the native file system.
+
+The command arguments are:
+
+<pkg-root-name>
+
+  An identifier representing a package root name. This is composed of the
+  package name followed by "_src" for the package's source root, or "_gen"
+  for the generated file root.
+
+<path>
+
+  The directory path (within the BuildML file system) at which the root
+  should be placed. The <path> can either be an absolute path (starting
+  with /), or be relative to an existing root (such as @workspace/).
+  

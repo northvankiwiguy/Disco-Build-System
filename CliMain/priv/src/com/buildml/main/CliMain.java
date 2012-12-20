@@ -351,6 +351,7 @@ public final class CliMain {
 		registerCommandGroup("Commands for managing file system roots",
 			new ICliCommand[] {
 				new CliCommandShowRoot(),
+				new CliCommandSetPackageRoot()
 			});
 
 		registerCommandGroup("Commands for managing packages",
