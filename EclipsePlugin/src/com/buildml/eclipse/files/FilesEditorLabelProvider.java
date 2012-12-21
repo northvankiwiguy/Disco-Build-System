@@ -158,34 +158,8 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 
 			/* select the text for the file tree column */
 			case 0:
-
-				/* for UIFile and UIDirectory, we return the path's base name */
-
-				/* case: show file path roots */
-				if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS)) {
-					String rootNames[] = pkgRootMgr.getRootsAtPath(pathId);
-					if (rootNames.length != 0) {
-						String fullPath = fileMgr.getPathName(pathId);
-						return "@" + rootNames[0] + " (" + fullPath + ")";
-					}
-				}
-
-				/* case: show the directory, but coalesce child directories */
-				if (editor.isOptionSet(EditorOptions.OPT_COALESCE_DIRS)) {
-					return getCoalescedText(pathId);
-
-					/* case: show the directory, with no coalescing */
-				} else {
-					String pathName;
-
-					if (fileMgr.getParentPath(pathId) == topRootId) {
-						pathName = "/" + fileMgr.getBaseName(pathId);
-					} else {
-						pathName = fileMgr.getBaseName(pathId);					
-					}
-					return pathName;
-				}
-
+				return getCoalescedText(pathId);
+				
 			/* select text for the package column */
 			case 1:
 				Integer pkgInfo[] = pkgMgr.getFilePackage(pathId);
@@ -231,47 +205,80 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	 */
 	public String getCoalescedText(int pathId) {	
 		StringBuffer sb = new StringBuffer();
-		boolean done = false;
 		Integer children[];
-		
+		String roots[] = null;
+		boolean showRoots = editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS);
+
 		/*
 		 * If we're at the top of the tree, we'll want to put "/"
 		 * at the start of the name.
 		 */
-		if (fileMgr.getParentPath(pathId) == topRootId) {
+		if (!showRoots && fileMgr.getParentPath(pathId) == topRootId) {
 			sb.append('/');
 		}
 		
-		/* loop, until we find a directory containing multiple entries */
-		while (!done) {
-			String pathName = fileMgr.getBaseName(pathId);
-			sb.append(pathName);
-		
-			children = fileMgr.getChildPaths(pathId);
+		/* should we try to coalesce the path? */
+		if (editor.isOptionSet(EditorOptions.OPT_COALESCE_DIRS)) {
 			
-			/* if there are no children or multiple children, we're done */
-			if (children.length != 1) {
-				done = true;
-			}
-			
-			else {
+			/* 
+			 * loop, until we find a directory containing multiple entries, a
+			 * file, or a package root.
+			 */
+			while (true) {
+				String pathName = fileMgr.getBaseName(pathId);
+				sb.append(pathName);
+
+				children = fileMgr.getChildPaths(pathId);
+
+				/* are there roots attached here? If so, stop coalescing */
+				if (showRoots) {
+					roots = pkgRootMgr.getRootsAtPath(pathId);
+					if (roots.length != 0) {
+						break;
+					}
+				}
+
+				/* if there are no children or multiple children, we're done */
+				if (children.length != 1) {
+					break;
+				}
+
 				/* or if the single child is not a directory, we're done */
 				int childId = children[0];
 				if (fileMgr.getPathType(childId) != PathType.TYPE_DIR) {
-					done = true;
+					break;
 				}
-				
+
 				/* else, we'll coalesce the next path too */
-				else {
-					sb.append('/');
-					pathId = childId;
-				}
+				sb.append('/');
+				pathId = childId;
 			}
+		}
+
+		/* don't coalesce the path */
+		else {
+			sb.append(fileMgr.getBaseName(pathId));
+			if (showRoots) {
+				roots = pkgRootMgr.getRootsAtPath(pathId);
+			}
+		}
+		
+		/* if there were roots at the end of the path chain, display them */
+		if ((roots != null) && (roots.length != 0)) {
+			sb.append(" (");
+			for (int i = 0; i < roots.length; i++) {
+				if (i != 0) {
+					sb.append(' ');
+				}
+				sb.append('@');
+				sb.append(roots[i]);
+			}
+			sb.append(')');
 		}
 		
 		return sb.toString();
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)

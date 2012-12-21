@@ -99,6 +99,13 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 						break;
 					}
 					
+					/* if there's a root here, we need to show this node (don't coalesce it) */
+					if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS)) {
+						if (pkgRootMgr.getRootsAtPath(pathId).length != 0) {
+							break;
+						}
+					}
+					
 					/* if the single child isn't a directory - exit */
 					pathId = childIds[0];
 					if (fileMgr.getPathType(pathId) != PathType.TYPE_DIR) {
@@ -186,24 +193,7 @@ public class FilesEditorContentProvider extends ArrayContentProvider
 		int topRootId = pkgRootMgr.getRootPath("root");
 		if (editor.isOptionSet(EditorOptions.OPT_SHOW_ROOTS))
 		{
-			String rootNames[] = pkgRootMgr.getRoots();
-			UIInteger uiIntegers[] = new UIInteger[rootNames.length];
-			for (int i = 0; i < rootNames.length; i++) {
-				int id = pkgRootMgr.getRootPath(rootNames[i]);
-				
-				/* 
-				 * if the name is missing, it's an internal error, but just
-				 * return "root:" instead.
-				 * TODO: throw an internal error.
-				 */
-				if (id == ErrorCode.NOT_FOUND) {
-					id = topRootId;
-				}
-				
-				/* create either a UIFile, or a UIDirectory object */
-				uiIntegers[i] = ConversionUtils.createUIIntegerWithType(fileMgr, id);
-			}
-			return uiIntegers;
+			return new UIDirectory[] { new UIDirectory(topRootId) };
 		}
 		
 		/* else, the directories at the / level are the top-level elements */
