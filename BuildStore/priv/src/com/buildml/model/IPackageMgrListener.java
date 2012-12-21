@@ -22,7 +22,10 @@ public interface IPackageMgrListener {
 
 	/** value of "how" if the package name has changed */
 	public static final int CHANGED_NAME = 1;
-	
+
+	/** value of "how" if the package roots have changed */
+	public static final int CHANGED_ROOTS = 2;
+
 	/**
 	 * Called to notify the listener that the specified package has changed.
 	 * 

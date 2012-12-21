@@ -15,12 +15,15 @@ package com.buildml.model.impl;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.FileSet;
@@ -74,6 +77,9 @@ public class PackageRootMgr implements IPackageRootMgr {
 		findRootNamesPrepStmt = null,
 		findRootNamesAtPathPrepStmt = null,
 		deleteFileRootPrepStmt = null;
+	
+	/** The event listeners who are registered to learn about package changes */
+	List<IPackageMgrListener> listeners = new ArrayList<IPackageMgrListener>();
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -304,7 +310,15 @@ public class PackageRootMgr implements IPackageRootMgr {
 			return ErrorCode.NOT_FOUND;
 		}
 		
-		return addRoot(rootName, rootPathId);
+		/* fetch the existing root - we need to know if it changes before we notify */
+		int existingRootPathId = getPackageRoot(packageId, type);
+		int rc = addRoot(rootName, rootPathId);
+		
+		/* if the root actually changed, notify listeners */
+		if (existingRootPathId != rootPathId) {
+			notifyListeners(packageId, IPackageMgrListener.CHANGED_ROOTS);
+		}
+		return rc;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -489,6 +503,26 @@ public class PackageRootMgr implements IPackageRootMgr {
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#addListener(com.buildml.model.IPackageMgrListener)
+	 */
+	@Override
+	public void addListener(IPackageMgrListener listener) {
+		listeners.add(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#removeListener(com.buildml.model.IPackageMgrListener)
+	 */
+	@Override
+	public void removeListener(IPackageMgrListener listener) {
+		listeners.remove(listener);
+	};
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -531,6 +565,19 @@ public class PackageRootMgr implements IPackageRootMgr {
 		}
 		
 		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Notify any registered listeners about our change in state.
+	 * @param pkgId   The package that has changed.
+	 * @param how     The way in which the package changed (see {@link IPackageMgrListener}).
+	 */
+	private void notifyListeners(int pkgId, int how) {
+		for (IPackageMgrListener listener : listeners) {
+			listener.packageChangeNotification(pkgId, how);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

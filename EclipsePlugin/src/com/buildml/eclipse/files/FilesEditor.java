@@ -54,6 +54,7 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.PackageSet;
@@ -64,7 +65,7 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FilesEditor extends ImportSubEditor {
+public class FilesEditor extends ImportSubEditor implements IPackageMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -123,6 +124,7 @@ public class FilesEditor extends ImportSubEditor {
 
 		fileMgr = buildStore.getFileMgr();
 		pkgRootMgr = buildStore.getPackageRootMgr();
+		pkgRootMgr.addListener(this);
 
 		/* initially, all paths are visible */
 		visiblePaths = buildStore.getReportMgr().reportAllFiles();
@@ -558,6 +560,33 @@ public class FilesEditor extends ImportSubEditor {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called by pkgMgr or pkgRootMgr when a package root changes.
+	 */
+	@Override
+	public void packageChangeNotification(int pkgId, int how) {
+
+		/* if this FilesEditor is displaying roots, refresh the tree */
+		if ((getOptions() & EditorOptions.OPT_SHOW_ROOTS) != 0) {
+			refreshView(true);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		super.dispose();
+	
+		/* we no longer want to hear about package changes */
+		pkgRootMgr.removeListener(this);
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE/PROTECTED METHODS
 	 *=====================================================================================*/

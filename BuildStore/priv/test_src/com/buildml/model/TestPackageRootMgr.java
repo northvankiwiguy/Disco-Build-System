@@ -350,6 +350,52 @@ public class TestPackageRootMgr {
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/** Our tests set these appropriately */
+	private int notifyPkgValue = 0;
+	private int notifyHowValue = 0;
+	
+	/**
+	 * Test that addition of two new packages makes new roots available, and set two of the
+	 * package roots to different directories.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetPackageRootWithListener() throws Exception {
+		getNewBuildStore(tmpTestDir);
+		
+		int pkgBId = pkgMgr.addPackage("pkgB");
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgAId > 0);
+		assertTrue(pkgBId > 0);
+		
+		/* set up a listener */
+		IPackageMgrListener listener = new IPackageMgrListener() {
+			@Override
+			public void packageChangeNotification(int pkgId, int how) {
+				TestPackageRootMgr.this.notifyPkgValue = pkgId;
+				TestPackageRootMgr.this.notifyHowValue = how;
+			}
+		};
+		pkgRootMgr.addListener(listener);
+		
+		int workspacePathId = fileMgr.getPath("@workspace");
+		int pathId = fileMgr.addDirectory("@workspace/a/b");
+		
+		/* no change to path == no notification */
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT, workspacePathId));
+		assertEquals(0, notifyHowValue);
+		assertEquals(0, notifyPkgValue);
+		
+		/* change to path == notification */
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT, pathId));
+		assertEquals(IPackageMgrListener.CHANGED_ROOTS, notifyHowValue);
+		assertEquals(pkgAId, notifyPkgValue);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Create and remove a package, checking that the roots have disappeared.
 	 * @throws Exception
