@@ -215,7 +215,9 @@ public interface IPackageMgr {
 	 * @param fileId The ID of the file whose package will be set.
 	 * @param pkgId The ID of the package to be associated with this file.
 	 * @param pkgScopeId The ID of the package's scope.
-	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this file doesn't exist
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if this file doesn't exist,
+	 *         or ErrorCode.OUT_OF_RANGE if the file is not encompassed by the
+	 *         package root.
 	 */
 	public abstract int setFilePackage(int fileId, int pkgId, int pkgScopeId);
 

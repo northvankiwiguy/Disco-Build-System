@@ -22,6 +22,7 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
@@ -627,6 +628,27 @@ import com.buildml.utils.errors.ErrorCode;
 		/* we can't assign files into folders (only into packages) */
 		if (isFolder(pkgId)) {
 			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* the path must be valid and not-trashed */
+		if ((fileMgr.getPathType(fileId) == PathType.TYPE_INVALID) ||
+			(fileMgr.isPathTrashed(fileId))) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* 
+		 * Check that the path falls under the package's root (except for <import> which
+		 * doesn't have root restrictions).
+		 */
+		if (pkgId != getImportPackage()) {
+			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+			int pkgRootPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT);
+			if (pkgRootPathId == ErrorCode.NOT_FOUND) {
+				return ErrorCode.NOT_FOUND;
+			}
+			if ((pkgRootPathId != fileId) && !fileMgr.isAncestorOf(pkgRootPathId, fileId)) {
+				return ErrorCode.OUT_OF_RANGE;
+			}
 		}
 		
 		try {

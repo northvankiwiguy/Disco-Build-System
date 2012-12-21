@@ -22,6 +22,7 @@ bml show-popular-files -f "*.h"
 
 echo
 echo "Show .h files by their popularity, with packages"
+bml set-workspace-root /home/psmith/t/cvs-1.11.23
 bml add-pkg src_files
 bml set-file-pkg src_files/private "*.c"
 bml set-file-pkg src_files/public "*.h"

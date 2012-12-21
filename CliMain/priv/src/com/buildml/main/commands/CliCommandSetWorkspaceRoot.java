@@ -128,7 +128,7 @@ public class CliCommandSetWorkspaceRoot implements ICliCommand {
 				msg = pathName + " is an invalid path.";
 				break;
 			case ErrorCode.OUT_OF_RANGE:
-				msg = "The proposed package must encompass all other package roots.";
+				msg = "The proposed root must encompass all other package roots.";
 				break;
 			}
 			CliUtils.reportErrorAndExit("Unable to set workspace root. " + msg);

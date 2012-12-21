@@ -416,6 +416,7 @@ public class TestFileSet {
 		int dirBCD = fileMgr.getPath("/b/c/d");
 		
 		/* add some file roots */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirRoot));
 		int pkgA = pkgMgr.addPackage("pkgA");
 		assertEquals(ErrorCode.OK, 
 				     pkgRootMgr.setPackageRoot(pkgA, IPackageRootMgr.SOURCE_ROOT, dirABC));

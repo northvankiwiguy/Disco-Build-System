@@ -335,6 +335,7 @@ Show all files, with only default packages
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o  (<import>/None)
 
 Add a package to the zlib files, and show all files again
+Workspace root set to /home/psmith/t/cvs-1.11.23.
 New package zlib added.
 /home/psmith/t/cvs-1.11.23/config.h  (<import>/None)
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (<import>/None)

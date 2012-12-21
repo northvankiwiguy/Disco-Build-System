@@ -1,0 +1,82 @@
+Set the workspace root appropriately
+Workspace root set to /home/psmith/t/cvs-1.11.23.
+Add a couple of packages
+New package lib added.
+New package zlib added.
+lib_gen /home/psmith/t/cvs-1.11.23
+lib_src /home/psmith/t/cvs-1.11.23
+root /
+workspace /home/psmith/t/cvs-1.11.23
+zlib_gen /home/psmith/t/cvs-1.11.23
+zlib_src /home/psmith/t/cvs-1.11.23
+Set roots appropriately
+Package root: zlib_src set to /home/psmith/t/cvs-1.11.23/zlib.
+Package root: zlib_gen set to /home/psmith/t/cvs-1.11.23/zlib.
+Package root: lib_src set to /home/psmith/t/cvs-1.11.23/lib.
+Package root: lib_gen set to /home/psmith/t/cvs-1.11.23/lib.
+lib_gen /home/psmith/t/cvs-1.11.23/lib
+lib_src /home/psmith/t/cvs-1.11.23/lib
+root /
+workspace /home/psmith/t/cvs-1.11.23
+zlib_gen /home/psmith/t/cvs-1.11.23/zlib
+zlib_src /home/psmith/t/cvs-1.11.23/zlib
+Try to set the workspace root lower that lib_src - error
+Error: Unable to set workspace root. The proposed root must encompass all other package roots.
+       Use bml -h for more help.
+Try to set the lib_src root above the workspace root - error
+Error: Unable to set root. The proposed root is either above the workspace root, or does not encompass all the package's files.
+       Use bml -h for more help.
+Add a file in the zlib directory into the zlib package
+/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/compress.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/compress.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
+/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/libz.a  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/trees.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/trees.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/trees.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (<import>/None)
+/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (<import>/None)
+Try to add a file from lib_src into zlib - error
+Unable to move file /home/psmith/t/cvs-1.11.23/lib/getdate.c into package zlib. It is not within the package root.
+Error: One or more errors occurred while changing packages.
+       Use bml -h for more help.
+Removing the lib package
+Package lib removed.
+root /
+workspace /home/psmith/t/cvs-1.11.23
+zlib_gen /home/psmith/t/cvs-1.11.23/zlib
+zlib_src /home/psmith/t/cvs-1.11.23/zlib
+Root/
+  <import>
+  zlib

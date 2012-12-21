@@ -409,6 +409,8 @@ public class TestFileMgr {
 	@Test
 	public void testRemovePath()
 	{
+		pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/"));
+		
 		/* remove a path that's not in use anywhere - should succeed. */
 		int path1 = fileMgr.addFile("/april/may/june");
 		int path2 = fileMgr.getPath("/april/may");

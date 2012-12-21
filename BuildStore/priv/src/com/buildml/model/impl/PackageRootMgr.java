@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
@@ -22,6 +23,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -115,17 +117,31 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 * @see com.buildml.model.IPackageRootMgr#setWorkspaceRoot(int)
 	 */
 	@Override
-	public int setWorkspaceRoot(int pathId) {
-		// TODO: make sure that it's above all other roots (except for "root") and the bml file.
-		// TODO: return ErrorCode.OUT_OF_RANGE in this case.
-
-		int rc = addRoot("workspace", pathId);
+	public int setWorkspaceRoot(int workspacePathId) {
+		
+		/* 
+		 * Verify that all existing package roots are at the same level, or below the
+		 * new proposed workspace root.
+		 */
+		String [] roots = getRoots();
+		for (int i = 0; i < roots.length; i++) {
+			String rootName = roots[i];
+			if (!rootName.equals("root") && !rootName.equals("workspace")) {
+				int rootPathId = getRootPath(rootName);
+				if ((rootPathId != workspacePathId) && 
+					 !fileMgr.isAncestorOf(workspacePathId, rootPathId)) {
+					return ErrorCode.OUT_OF_RANGE;
+				}
+			}
+		}
+		
+		int rc = addRoot("workspace", workspacePathId);
 		if (rc != ErrorCode.OK) {
 			return rc;
 		}
 		
 		/* cache the value for performance reasons */
-		cachedWorkspaceRootId = pathId;
+		cachedWorkspaceRootId = workspacePathId;
 		return ErrorCode.OK;
 	}
 
@@ -246,9 +262,41 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 * @see com.buildml.model.IPackageRootMgr#setPackageRoot(int, int, java.lang.String)
 	 */
 	@Override
-	public int setPackageRoot(int packageId, int type, int pathId) {
+	public int setPackageRoot(int packageId, int type, int rootPathId) {
 
-		// TODO: check that pathId is below "workspace". If not, return ErrorCode.OUT_OF_RANGE.
+		/* check that pathId is valid (not trashed) */
+		if (fileMgr.isPathTrashed(rootPathId)) {
+			return ErrorCode.BAD_PATH;
+		}
+		
+		/* check that pathId is a directory */
+		if (fileMgr.getPathType(rootPathId) != PathType.TYPE_DIR) {
+			return ErrorCode.NOT_A_DIRECTORY;
+		}
+
+		/* check that pathId is below @workspace */
+		int workspaceRootId = getWorkspaceRoot();
+		if (workspaceRootId == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if ((workspaceRootId != rootPathId) &&
+			(!fileMgr.isAncestorOf(workspaceRootId, rootPathId))) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/* we can't modify the <import> package */
+		if (packageId == pkgMgr.getImportPackage()) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		/* test that all paths in the package are below the new proposed package root */
+		FileSet memberPaths = pkgMgr.getFilesInPackage(packageId);
+		for (int memberPathId : memberPaths) {
+			if ((memberPathId != rootPathId) && 
+				(!fileMgr.isAncestorOf(rootPathId, memberPathId))) {
+				return ErrorCode.OUT_OF_RANGE;
+			}
+		}
 		
 		/* derive the root name, e.g <package>_src or <package>_gen */
 		String rootName = getPackageRootName(packageId, type);
@@ -256,7 +304,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 			return ErrorCode.NOT_FOUND;
 		}
 		
-		return addRoot(rootName, pathId);
+		return addRoot(rootName, rootPathId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

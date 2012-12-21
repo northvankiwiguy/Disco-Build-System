@@ -59,6 +59,7 @@ public class TestFileMgrRoots {
 	public void testPathAccessViaRoots() {
 	
 		/* a file added within a root should be accessible via many roots */
+		pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/"));
 		int path1 = fileMgr.addFile("/aardvark/bear/cat/dog/eel.c");
 		int path2 = fileMgr.addDirectory("/aardvark/bear");
 		int path3 = fileMgr.addDirectory("/aardvark/bear/cat/dog");

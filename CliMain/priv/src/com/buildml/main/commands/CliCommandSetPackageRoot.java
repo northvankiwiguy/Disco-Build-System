@@ -151,8 +151,8 @@ public class CliCommandSetPackageRoot implements ICliCommand {
 				msg = "Invalid package name or package type.";
 				break;
 			case ErrorCode.OUT_OF_RANGE:
-				msg = "The proposed package root is either above the workspace root, " +
-			          "or does not emcompass all the package's files.";
+				msg = "The proposed root is either above the workspace root, " +
+			          "or does not encompass all the package's files.";
 				break;
 			}
 			CliUtils.reportErrorAndExit("Unable to set root. " + msg);

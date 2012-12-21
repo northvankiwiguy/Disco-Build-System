@@ -9,6 +9,7 @@ bml show-files -p | fgrep -v SystemTests
 
 echo
 echo "Add a package to the zlib files, and show all files again"
+bml set-workspace-root /home/psmith/t/cvs-1.11.23
 bml add-pkg zlib
 bml set-file-pkg zlib /home/psmith/t/cvs-1.11.23/zlib
 bml show-files -p | fgrep -v SystemTests

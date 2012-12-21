@@ -30,8 +30,10 @@ public class TestPackageMgr {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The Packages object associated with this BuildStore */
+	/** The manager object associated with this BuildStore */
 	private IPackageMgr pkgMgr;
+	private IPackageRootMgr pkgRootMgr;
+	private IFileMgr fileMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -43,6 +45,11 @@ public class TestPackageMgr {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		pkgMgr = bs.getPackageMgr();
+		pkgRootMgr = bs.getPackageRootMgr();
+		fileMgr = bs.getFileMgr();
+		
+		/* set the workspace root to /, so packages can be added anywhere */
+		pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/"));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

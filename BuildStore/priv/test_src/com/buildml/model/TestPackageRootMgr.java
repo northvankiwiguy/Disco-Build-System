@@ -362,7 +362,7 @@ public class TestPackageRootMgr {
 		assertTrue(pkgAId > 0);
 		
 		int workspacePathId = pkgRootMgr.getWorkspaceRoot();
-		assertTrue(workspacePathId > 0);
+		assertTrue(workspacePathId >= 0);
 		
 		/* check that the source and generated roots both refer to "@workspace" */
 		int pkgSrcPathId = pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT);
@@ -424,9 +424,12 @@ public class TestPackageRootMgr {
 	@Test
 	public void testSetPackageRootError() throws Exception {
 		getNewBuildStore(tmpTestDir);
-				
-		int dirId = fileMgr.addDirectory("/valid-dir");
-		int fileId = fileMgr.addFile("/valid-file");
+		
+		/* set @workspace to @root so that we can create packages anywhere */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(pkgRootMgr.getRootPath("root")));
+
+		int dirId = fileMgr.addDirectory(tmpTestDir.toString() + "/valid-dir");
+		int fileId = fileMgr.addFile(tmpTestDir.toString() + "/valid-file");
 		int pkgId = pkgMgr.addPackage("validPkg");
 		int folderId = pkgMgr.addFolder("validFolder");
 		assertTrue(dirId > 0);
@@ -480,11 +483,135 @@ public class TestPackageRootMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	// TODO: try to move a package root above the workspace root - error.
-	// TODO: test trying to move workspace below a package root.
-	// TODO: test trying to move workspace below build.bml
-	// TODO: try to move a package below a file/dir that's in the package.
-	// TODO: try to add a file/dir to to package, at a path that's above the root.
+	/**
+	 * Try to move a package root above the workspace root - error.
+	 * @throws Exception
+	 */
+	@Test
+	public void testMovePackageAboveWorkspace() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		int dirA = fileMgr.addDirectory("/a");
+		int dirAB = fileMgr.addDirectory("/a/b");
+		int dirABC = fileMgr.addDirectory("/a/b/c");
+		
+		/* set @workspace to /a/b */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirAB));
+		
+		/* add a new package - roots will default to @workspace */
+		int pkg = pkgMgr.addPackage("pkg");
+		assertEquals(dirAB, pkgRootMgr.getPackageRoot(pkg, IPackageRootMgr.SOURCE_ROOT));
+		
+		/* moving to dirABC is acceptable */
+		assertEquals(ErrorCode.OK, 
+				     pkgRootMgr.setPackageRoot(pkg, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		assertEquals(dirABC, pkgRootMgr.getPackageRoot(pkg, IPackageRootMgr.SOURCE_ROOT));
+		
+		/* moving to dirA is not acceptable */
+		assertEquals(ErrorCode.OUT_OF_RANGE, 
+			     pkgRootMgr.setPackageRoot(pkg, IPackageRootMgr.SOURCE_ROOT, dirA));		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+  	 * Test trying to move workspace below a package root - error.
+	 * @throws Exception
+	 */
+	@Test
+	public void testMoveWorkspaceBelowPackage() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		int dirA = fileMgr.addDirectory("/a");
+		int dirAB = fileMgr.addDirectory("/a/b");
+		int dirABC = fileMgr.addDirectory("/a/b/c");
+		
+		/* set @workspace to /a */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirA));
+		
+		/* add a new package, setting source/generated root to /a/b */
+		int pkg = pkgMgr.addPackage("pkg");
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkg, IPackageRootMgr.SOURCE_ROOT, dirAB));
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkg, IPackageRootMgr.GENERATED_ROOT, dirAB));
+		
+		/* moving workspace root to dirAB is acceptable */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirAB));		
+
+		/* moving workspace root to dirABC is NOT acceptable */
+		assertEquals(ErrorCode.OUT_OF_RANGE, pkgRootMgr.setWorkspaceRoot(dirABC));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Try to move a package below a file/dir that's in the package.
+	 * @throws Exception
+	 */
+	@Test
+	public void testMovePackageBelowFile() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		int dirA = fileMgr.addDirectory("/a");
+		int dirAB = fileMgr.addDirectory("/a/b");
+		int dirABC = fileMgr.addDirectory("/a/b/c");
+		int fileABD = fileMgr.addFile("/a/b/d/file");
+		
+		/* set @workspace to /a */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirA));
+		
+		/* add a new package - roots will default to @workspace */
+		int pkgId = pkgMgr.addPackage("pkg");
+
+		/* add /a/b/d/file into the package (OK, since root is above it) */
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(fileABD, pkgId, IPackageMgr.SCOPE_PUBLIC));
+		
+		/* move package root to /a/b - acceptable */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirAB));
+		
+		/* move package root to /a/b/c - NOT acceptable since /a/b/d/file would be excluded */
+		assertEquals(ErrorCode.OUT_OF_RANGE, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		
+		/* remove file from package, and try again to change the root to /a/b/c */
+		assertEquals(ErrorCode.OK, 
+				pkgMgr.setFilePackage(fileABD, pkgMgr.getImportPackage(), IPackageMgr.SCOPE_PUBLIC));		
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Try to add a file/dir to to package, at a path that's outside the root.
+	 * @throws Exception
+	 */
+	@Test
+	public void testMoveFileOutsidePackage() throws Exception {
+
+		getNewBuildStore(tmpTestDir);
+
+		int dirA = fileMgr.addDirectory("/a");
+		int dirABC = fileMgr.addDirectory("/a/b/c");
+		int fileABD = fileMgr.addFile("/a/b/d/file");
+		
+		/* set @workspace to /a */
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirA));
+		
+		/* add a new package - roots will default to @workspace */
+		int pkgId = pkgMgr.addPackage("pkg");
+		
+		/* move package root to /a/b/c */
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		
+		/* add /a/b/d/file into the package - error, since it's not within /a/b/c */
+		assertEquals(ErrorCode.OUT_OF_RANGE, 
+				pkgMgr.setFilePackage(fileABD, pkgId, IPackageMgr.SCOPE_PUBLIC));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	// TODO: create a new package, set overrides for the root, then clear them.
 	// TODO: create a new package, set an override for the workspace root, then check the package root.

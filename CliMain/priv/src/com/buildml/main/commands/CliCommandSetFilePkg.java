@@ -21,6 +21,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.FileSet;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * BuildML CLI Command class that implements the "set-file-pkg" command.
@@ -111,7 +112,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 		 */
 		String pkgName = args[0];
 		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, true);
-		int pktId = pkgAndScopeIds[0];
+		int pkgId = pkgAndScopeIds[0];
 		int scopeId = pkgAndScopeIds[1];
 
 		/* find out which files the user wants to set */
@@ -119,11 +120,21 @@ public class CliCommandSetFilePkg implements ICliCommand {
 		FileSet filesToSet = CliUtils.getCmdLineFileSet(fileMgr, fileSpec);
 
 		/* now visit each file in the FileSet and set it's package/scope */
+		boolean errorOccurred = false;
 		buildStore.setFastAccessMode(true);
 		for (int file : filesToSet) {
-			pkgMgr.setFilePackage(file, pktId, scopeId);
+			int rc = pkgMgr.setFilePackage(file, pkgId, scopeId);
+			if (rc == ErrorCode.OUT_OF_RANGE) {
+				System.err.println("Unable to move file " + fileMgr.getPathName(file) + 
+									" into package " + pkgName + ". It is not within the package root.");
+				errorOccurred = true;
+			}
 		}
 		buildStore.setFastAccessMode(false);
+
+		if (errorOccurred) {
+			CliUtils.reportErrorAndExit("One or more errors occurred while changing packages.");
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/

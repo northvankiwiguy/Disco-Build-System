@@ -34,14 +34,11 @@ public class TestReportMgr2 {
 	/** Our test BuildStore object */
 	private IBuildStore bs;
 
-	/** Our test FileMgr object */
+	/** The associated manager objects */
 	private IFileMgr fileMgr;
-	
-	/** Our test ActionMgr object */
 	private IActionMgr actionMgr;
-	
-	/** Our test Reports object */
 	private IReportMgr reports;
+	private IPackageRootMgr pkgRootMgr;
 	
 	/** various file IDs and action IDs */
 	private int filePetH, fileHousePetH;
@@ -64,6 +61,7 @@ public class TestReportMgr2 {
 		fileMgr = bs.getFileMgr();
 		actionMgr = bs.getActionMgr();
 		reports = bs.getReportMgr();
+		pkgRootMgr = bs.getPackageRootMgr();
 		
 		/* add a realistic-looking set of files, including .h, .c, .o, .a and .exe files */
 		filePetH = fileMgr.addFile("/home/pets.h");
@@ -355,6 +353,8 @@ public class TestReportMgr2 {
 	 */
 	@Test
 	public void testReportFilesFromPackageSet() {
+		
+		pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/"));
 		
 		/* create a new package set and add some packages */
 		PackageSet cs = new PackageSet(bs);
