@@ -179,6 +179,11 @@
             id="com.buildml.eclipse.commands.renameOutlineContent"
             name="Rename Outline Content">
       </command>
+      <command
+            defaultHandler="com.buildml.eclipse.outline.handlers.HandlerChangeRootsOutlineContent"
+            id="com.buildml.eclipse.commands.changeRootOutlineContent"
+            name="Change Root Outline Content">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -812,6 +817,12 @@
                label="Remove"
                style="push"
                tooltip="Remove BuildML Package or Folder">
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.changeRootOutlineContent"
+               label="Change Roots"
+               style="push"
+               tooltip="Set Package Source and Generate Path Roots">
          </command>
       </menuContribution>
    </extension>

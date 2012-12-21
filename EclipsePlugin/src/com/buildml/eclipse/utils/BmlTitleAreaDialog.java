@@ -15,6 +15,7 @@ package com.buildml.eclipse.utils;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -83,6 +84,17 @@ public class BmlTitleAreaDialog extends TitleAreaDialog {
 		
 		/* our child class puts their content in mainBody */
 		return mainBody;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * Center the dialog on the screen.
+	 */
+	@Override
+	protected Point getInitialLocation(Point initialSize) {
+		return new Point((EclipsePartUtils.getScreenWidth() / 2) - (initialSize.x / 2),
+				(EclipsePartUtils.getScreenHeight() / 3) - (initialSize.y / 2));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

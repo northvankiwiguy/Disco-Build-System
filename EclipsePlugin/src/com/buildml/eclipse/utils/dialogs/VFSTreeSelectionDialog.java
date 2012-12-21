@@ -56,6 +56,9 @@ public class VFSTreeSelectionDialog extends ElementTreeSelectionDialog {
 		
 		/* by default, only one directory can be selected */
 		setAllowMultiple(false);
+		
+		/* select a default size in characters */
+		setSize(100, 30);
 	}
 
 	/*=====================================================================================*

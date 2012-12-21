@@ -40,10 +40,12 @@ import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.bobj.UIPackage;
 import com.buildml.eclipse.bobj.UIPackageFolder;
 import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
+import com.buildml.eclipse.outline.dialogs.ChangeRootsDialog;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -69,7 +71,10 @@ public class OutlinePage extends ContentOutlinePage {
 	
 	/** The IPackageMgr that we'll be displaying information from */
 	private IPackageMgr pkgMgr;
-	
+
+	/** The IPackageRootMgr that we'll be displaying information from */
+	private IPackageRootMgr pkgRootMgr;
+
 	/** The tree element that's currently selected */
 	private UIInteger selectedNode = null;
 	
@@ -79,6 +84,9 @@ public class OutlinePage extends ContentOutlinePage {
 	/** Based on the current tree selection, can the selected node be renamed? */
 	private boolean renameEnabled = false;
 
+	/** Based on the current tree selection, does the selected package have roots? */
+	private boolean changeRootsEnabled = false;	
+	
 	/** The undo handler from our main BuildML editor */
 	private UndoActionHandler undoAction;
 
@@ -113,6 +121,7 @@ public class OutlinePage extends ContentOutlinePage {
 		this.mainEditor = mainEditor;
 		buildStore = mainEditor.getBuildStore();
 		pkgMgr = buildStore.getPackageMgr();
+		pkgRootMgr = buildStore.getPackageRootMgr();
 	}
 	
 	/*=====================================================================================*
@@ -373,6 +382,46 @@ public class OutlinePage extends ContentOutlinePage {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Change the source/generated package roots for the selected package.
+	 */
+	public void changeRoots() {
+		int pkgId = selectedNode.getId();
+		boolean success = true;
+		
+		/* 
+		 * Show the dialog, repeating if one or more bad paths were provided. Note that we
+		 * assume the dialog only gives us 'existing' paths, but we still need to check that the
+		 * new roots are in range.
+		 */
+		do {
+			ChangeRootsDialog dialog = new ChangeRootsDialog(buildStore, pkgId);
+			if (dialog.open() == ChangeRootsDialog.OK) {
+				int srcRootPathId = dialog.getSourceRootPathId();
+				int genRootPathId = dialog.getGeneratedRootPathId();
+
+				String errMsg = "The root could not be moved to that location. It must not be above " +
+						"the @workspace root, and must encompass all the package's existing files.";
+
+				int srcRc = pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, srcRootPathId);
+				if (srcRc == ErrorCode.OUT_OF_RANGE) {
+					AlertDialog.displayErrorDialog("Failed to Change Source Root", errMsg);
+					success = false;
+				}
+
+				int genRc = pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.GENERATED_ROOT, genRootPathId);
+				if (genRc == ErrorCode.OUT_OF_RANGE) {
+					AlertDialog.displayErrorDialog("Failed to Change Generated Root", errMsg);
+					success = false;
+				}
+			} else {
+				success = true;
+			}
+		} while (!success);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * This method is called whenever the user clicks on a node in the tree viewer. We
@@ -389,9 +438,10 @@ public class OutlinePage extends ContentOutlinePage {
 			selectedNode = (UIInteger)node;
 			int nodeId = selectedNode.getId();
 			
-			/* start by assuming the remove and rename buttons will both be active */
+			/* start by assuming the remove, rename, change roots buttons will be active */
 			removeEnabled = true;			
 			renameEnabled = true;
+			changeRootsEnabled = true;
 			
 			/* 
 			 * Based on the selection, determine whether the "remove" or "rename" button 
@@ -400,18 +450,17 @@ public class OutlinePage extends ContentOutlinePage {
 			 */
 			if (selectedNode instanceof UIPackageFolder) {
 				if (nodeId == pkgMgr.getRootFolder()) {
-					removeEnabled = false;
-					renameEnabled = false;
+					removeEnabled = renameEnabled = false;
 				} else if (pkgMgr.getFolderChildren(nodeId).length != 0) {
 					removeEnabled = false;
 				}
+				changeRootsEnabled = false;
 			}
 			
 			/* else, for the UIPackage, the <import> package can't be touched. */
 			else {
 				if (nodeId == pkgMgr.getImportPackage()) {
-					removeEnabled = false;
-					renameEnabled = false;
+					removeEnabled = renameEnabled = changeRootsEnabled = false;
 				}
 			}
 		}
@@ -435,6 +484,16 @@ public class OutlinePage extends ContentOutlinePage {
 	 */
 	public boolean getRenameEnabled() {
 		return renameEnabled;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return true if the "change roots" command should be enabled, based on the current tree
+	 * selection.
+	 */
+	public boolean getChangeRootsEnabled() {
+		return changeRootsEnabled;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

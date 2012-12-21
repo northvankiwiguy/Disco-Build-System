@@ -31,6 +31,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -514,6 +516,26 @@ public class EclipsePartUtils {
 			pluginImageRegistry.put(imageDescr.toString(), iconImage);
 		}
 		return iconImage;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The width of the current display (in pixels).
+	 */
+	public static int getScreenWidth() {
+		Rectangle bounds = Display.getCurrent().getBounds();
+		return bounds.width;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The height of the current display (in pixels).
+	 */
+	public static int getScreenHeight() {
+		Rectangle bounds = Display.getCurrent().getBounds();
+		return bounds.height;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
