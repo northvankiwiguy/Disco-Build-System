@@ -389,6 +389,11 @@ public class OutlinePage extends ContentOutlinePage {
 	public void changeRoots() {
 		int pkgId = selectedNode.getId();
 		boolean success = true;
+		int srcRootPathId, genRootPathId;
+		
+		/* record the old root value, in case we need to undo */
+		int oldSrcRootPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT);
+		int oldGenRootPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.GENERATED_ROOT);
 		
 		/* 
 		 * Show the dialog, repeating if one or more bad paths were provided. Note that we
@@ -398,8 +403,8 @@ public class OutlinePage extends ContentOutlinePage {
 		do {
 			ChangeRootsDialog dialog = new ChangeRootsDialog(buildStore, pkgId);
 			if (dialog.open() == ChangeRootsDialog.OK) {
-				int srcRootPathId = dialog.getSourceRootPathId();
-				int genRootPathId = dialog.getGeneratedRootPathId();
+				srcRootPathId = dialog.getSourceRootPathId();
+				genRootPathId = dialog.getGeneratedRootPathId();
 
 				String errMsg = "The root could not be moved to that location. It must not be above " +
 						"the @workspace root, and must encompass all the package's existing files.";
@@ -416,9 +421,20 @@ public class OutlinePage extends ContentOutlinePage {
 					success = false;
 				}
 			} else {
-				success = true;
+				/* operation cancelled */
+				return;
 			}
 		} while (!success);
+		
+		/* if anything changed, create a history item so we can undo/redo */
+		if ((oldSrcRootPathId != srcRootPathId) || (oldGenRootPathId != genRootPathId)) {
+			OutlineUndoOperation op = 
+					new OutlineUndoOperation(this, "Change Package Root", OpType.OP_CHANGE_ROOT, 
+										 pkgId, oldSrcRootPathId, oldGenRootPathId,
+										 srcRootPathId, genRootPathId);
+			op.record(mainEditor);
+			mainEditor.markDirty();
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

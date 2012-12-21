@@ -22,9 +22,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 
 /**
  * An undo/redo operation for tracking changes to the outline content view. This
@@ -56,7 +58,10 @@ public class OutlineUndoOperation extends AbstractOperation {
 		OP_RENAME,
 		
 		/** A package or folder was moved */
-		OP_MOVE
+		OP_MOVE, 
+		
+		/** One or both package roots have been modified */
+		OP_CHANGE_ROOT
 	};
 	
 	/** The type of operation that this OutlineUndoOperation performs. */ 
@@ -77,6 +82,18 @@ public class OutlineUndoOperation extends AbstractOperation {
 	/** The new parent ID (in case of OP_MOVE) */
 	private int newParentId;
 	
+	/** The source path root, before the change */
+	private int oldSrcRootPathId;
+	
+	/** The generated path root, before the change */
+	private int oldGenRootPathId;
+	
+	/** The source path root, after the change */
+	private int newSrcRootPathId;
+	
+	/** The generated path root, after the change */
+	private int newGenRootPathId;
+	
 	/** Is this node a folder? */
 	private boolean isFolder;
 	
@@ -88,7 +105,10 @@ public class OutlineUndoOperation extends AbstractOperation {
 
 	/** The PackageMgr that we're manipulating */
 	private IPackageMgr pkgMgr;
-	
+
+	/** The PackageRootMgr that we're manipulating */
+	private IPackageRootMgr pkgRootMgr;
+
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -108,6 +128,7 @@ public class OutlineUndoOperation extends AbstractOperation {
 		this.mainEditor = page.getMainEditor();
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = buildStore.getPackageMgr();
+		this.pkgRootMgr = buildStore.getPackageRootMgr();
 		
 		/* what operation is being performed? */
 		this.operation = operation;
@@ -199,6 +220,32 @@ public class OutlineUndoOperation extends AbstractOperation {
 		this.newParentId = newParentId;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Constructor used when creating an OP_CHANGE_ROOT operation.
+	 * 
+	 * @param page		        The OutlinePage associated with this undo/redo operation.
+	 * @param label     	    The undo/redo menu label.
+	 * @param operation	        Must be OP_CHANGE_ROOT
+	 * @param pkgId             The package being modified.
+	 * @param oldSrcRootPathId  The source path root, before the change.
+	 * @param oldGenRootPathId  The generated path root, before the change.
+	 * @param newSrcRootPathId  The source path root, after the change.
+	 * @param newGenRootPathId  The generated path root, after the change.
+	 */
+	public OutlineUndoOperation(OutlinePage page, String label, OpType operation, int pkgId,
+			int oldSrcRootPathId, int oldGenRootPathId,
+			int newSrcRootPathId, int newGenRootPathId) {
+		this(page, label, operation);
+		
+		this.nodeId = pkgId;
+		this.oldSrcRootPathId = oldSrcRootPathId;
+		this.oldGenRootPathId = oldGenRootPathId;
+		this.newSrcRootPathId = newSrcRootPathId;
+		this.newGenRootPathId = newGenRootPathId;
+	}
+
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -252,6 +299,11 @@ public class OutlineUndoOperation extends AbstractOperation {
 		case OP_MOVE:
 			pkgMgr.setParent(nodeId, newParentId);
 			break;
+			
+		case OP_CHANGE_ROOT:
+			pkgRootMgr.setPackageRoot(nodeId, IPackageRootMgr.SOURCE_ROOT, newSrcRootPathId);
+			pkgRootMgr.setPackageRoot(nodeId, IPackageRootMgr.GENERATED_ROOT, newGenRootPathId);
+			break;
 
 		default:
 			throw new FatalBuildStoreError("Unhandled operation: " + operation);
@@ -302,6 +354,11 @@ public class OutlineUndoOperation extends AbstractOperation {
 			
 		case OP_MOVE:
 			pkgMgr.setParent(nodeId, parentId);
+			break;
+			
+		case OP_CHANGE_ROOT:
+			pkgRootMgr.setPackageRoot(nodeId, IPackageRootMgr.SOURCE_ROOT, oldSrcRootPathId);
+			pkgRootMgr.setPackageRoot(nodeId, IPackageRootMgr.GENERATED_ROOT, oldGenRootPathId);
 			break;
 
 		default:
