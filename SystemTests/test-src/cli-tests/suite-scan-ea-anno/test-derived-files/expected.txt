@@ -1,13 +1,33 @@
 
 Show files immediately derived from trees.c
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/trees.o
 
 Show all files derived from tree.c
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/libz.a
 /home/psmith/t/cvs-1.11.23/zlib/trees.o
 
 Show all files derived from config.h
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/diff
+/home/psmith/t/cvs-1.11.23/diff/.deps
 /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
@@ -35,6 +55,8 @@ Show all files derived from config.h
 /home/psmith/t/cvs-1.11.23/diff/side.o
 /home/psmith/t/cvs-1.11.23/diff/util.o
 /home/psmith/t/cvs-1.11.23/diff/version.o
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
@@ -62,6 +84,8 @@ Show all files derived from config.h
 /home/psmith/t/cvs-1.11.23/lib/stripslash.o
 /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
 /home/psmith/t/cvs-1.11.23/lib/yesno.o
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
@@ -173,18 +197,40 @@ Show all files derived from config.h
 /home/psmith/t/cvs-1.11.23/src/watch.o
 /home/psmith/t/cvs-1.11.23/src/wrapper.o
 /home/psmith/t/cvs-1.11.23/src/zlib.o
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/stamp-ch
 
 Show all .a files derived from config.h
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/diff
 /home/psmith/t/cvs-1.11.23/diff/libdiff.a
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/libcvs.a
 
 Show all files derived from zlib.c
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
 /home/psmith/t/cvs-1.11.23/src/cvs
 /home/psmith/t/cvs-1.11.23/src/zlib.o
 
 Show all files derived from zlib.c (using full path name)
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
 /home/psmith/t/cvs-1.11.23/src/cvs
 /home/psmith/t/cvs-1.11.23/src/zlib.o
@@ -192,13 +238,20 @@ Show all files derived from zlib.c (using full path name)
 Show files used to create zlib.h (none)
 
 Show files used to create zlib.o
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/getopt.h
 /home/psmith/t/cvs-1.11.23/lib/regex.h
 /home/psmith/t/cvs-1.11.23/lib/system.h
 /home/psmith/t/cvs-1.11.23/lib/wait.h
 /home/psmith/t/cvs-1.11.23/lib/xsize.h
 /home/psmith/t/cvs-1.11.23/lib/xtime.h
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/buffer.h
 /home/psmith/t/cvs-1.11.23/src/client.h
 /home/psmith/t/cvs-1.11.23/src/cvs.h
@@ -211,10 +264,17 @@ Show files used to create zlib.o
 /home/psmith/t/cvs-1.11.23/src/stack.h
 /home/psmith/t/cvs-1.11.23/src/update.h
 /home/psmith/t/cvs-1.11.23/src/zlib.c
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/zconf.h
 /home/psmith/t/cvs-1.11.23/zlib/zlib.h
 
 Show files directly used to create libz.a
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.o
 /home/psmith/t/cvs-1.11.23/zlib/crc32.o
@@ -231,6 +291,12 @@ Show files directly used to create libz.a
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Show all files used to create libz.a
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
@@ -272,6 +338,12 @@ Show all files used to create libz.a
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Show all .h files used to create libz.a
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/deflate.h
 /home/psmith/t/cvs-1.11.23/zlib/infblock.h
 /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
@@ -285,6 +357,12 @@ Show all .h files used to create libz.a
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
 Show all .h files used to create libz.a (using full path name)
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/deflate.h
 /home/psmith/t/cvs-1.11.23/zlib/infblock.h
 /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
@@ -626,21 +704,48 @@ Show actions that write libdiff.a
 Show files used by action 1 (none)
 
 Show files used by action 4
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/argmatch.c
 /home/psmith/t/cvs-1.11.23/lib/argmatch.o
 
 Show files read by action 4
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/argmatch.c
 
 Show files written by action 4
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/argmatch.o
 
 Show files used by action 4, 5 or 6
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
@@ -654,10 +759,18 @@ Show files used by action 4, 5 or 6
 /home/psmith/t/cvs-1.11.23/lib/xtime.h
 
 Show files written by action 2's children
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/contrib
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
 /home/psmith/t/cvs-1.11.23/contrib/cvscheck
 /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
 /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+/home/psmith/t/cvs-1.11.23/diff
+/home/psmith/t/cvs-1.11.23/diff/.deps
 /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
@@ -685,6 +798,8 @@ Show files written by action 2's children
 /home/psmith/t/cvs-1.11.23/diff/side.o
 /home/psmith/t/cvs-1.11.23/diff/util.o
 /home/psmith/t/cvs-1.11.23/diff/version.o
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
@@ -712,6 +827,8 @@ Show files written by action 2's children
 /home/psmith/t/cvs-1.11.23/lib/stripslash.o
 /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
 /home/psmith/t/cvs-1.11.23/lib/yesno.o
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
@@ -823,7 +940,9 @@ Show files written by action 2's children
 /home/psmith/t/cvs-1.11.23/src/watch.o
 /home/psmith/t/cvs-1.11.23/src/wrapper.o
 /home/psmith/t/cvs-1.11.23/src/zlib.o
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.o
 /home/psmith/t/cvs-1.11.23/zlib/crc32.o
@@ -841,11 +960,18 @@ Show files written by action 2's children
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Show .h files read by action 2's children
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/diff
 /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
 /home/psmith/t/cvs-1.11.23/diff/diff.h
 /home/psmith/t/cvs-1.11.23/diff/diffrun.h
 /home/psmith/t/cvs-1.11.23/diff/system.h
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/getline.h
 /home/psmith/t/cvs-1.11.23/lib/getopt.h
 /home/psmith/t/cvs-1.11.23/lib/md5.h
@@ -856,6 +982,7 @@ Show .h files read by action 2's children
 /home/psmith/t/cvs-1.11.23/lib/xselect.h
 /home/psmith/t/cvs-1.11.23/lib/xsize.h
 /home/psmith/t/cvs-1.11.23/lib/xtime.h
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/buffer.h
 /home/psmith/t/cvs-1.11.23/src/client.h
 /home/psmith/t/cvs-1.11.23/src/cvs.h
@@ -872,7 +999,9 @@ Show .h files read by action 2's children
 /home/psmith/t/cvs-1.11.23/src/stack.h
 /home/psmith/t/cvs-1.11.23/src/update.h
 /home/psmith/t/cvs-1.11.23/src/watch.h
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/config.h
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/deflate.h
 /home/psmith/t/cvs-1.11.23/zlib/infblock.h
 /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
@@ -886,6 +1015,14 @@ Show .h files read by action 2's children
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
 Show .o files read by action 102
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/diff
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/add.o
 /home/psmith/t/cvs-1.11.23/src/admin.o
 /home/psmith/t/cvs-1.11.23/src/annotate.o
@@ -941,60 +1078,70 @@ Show .o files read by action 102
 /home/psmith/t/cvs-1.11.23/src/watch.o
 /home/psmith/t/cvs-1.11.23/src/wrapper.o
 /home/psmith/t/cvs-1.11.23/src/zlib.o
+/home/psmith/t/cvs-1.11.23/zlib
 
 Show .o files read by action 102, with packages
-/home/psmith/t/cvs-1.11.23/src/add.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.o  (<import>/None)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+<import> - None          /home/psmith/t/cvs-1.11.23/diff
+<import> - None          /home/psmith/t/cvs-1.11.23/lib
+<import> - None          /home/psmith/t/cvs-1.11.23/src
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib

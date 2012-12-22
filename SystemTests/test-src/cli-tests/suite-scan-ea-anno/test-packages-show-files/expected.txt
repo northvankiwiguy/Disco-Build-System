@@ -1,1100 +1,1174 @@
 Show all files, with only default packages
-/home/psmith/t/cvs-1.11.23/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/context.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/io.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/side.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/util.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diffrun.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/libdiff.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/doc  (<import>/None)
-/home/psmith/t/cvs-1.11.23/emx  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/libcvs.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/wait.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xselect.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xsize.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xtime.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/man  (<import>/None)
-/home/psmith/t/cvs-1.11.23/os2  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/add.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/admin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/classify.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/client.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/commit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/edit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/entries.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/error.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/history.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/import.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/lock.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/log.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/login.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/main.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/modules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/patch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/release.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/remove.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/repos.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/root.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/run.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/server.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/stack.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/status.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/subr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/tag.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/update.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/watch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/tools  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h.in  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/stamp-ch  (<import>/None)
-/home/psmith/t/cvs-1.11.23/windows-NT/SCC  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/compress.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/trees.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (<import>/None)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+<import> - None          /home/psmith/t/cvs-1.11.23/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/diff
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/io.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diffrun.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/libdiff.a
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/doc
+<import> - None          /home/psmith/t/cvs-1.11.23/emx
+<import> - None          /home/psmith/t/cvs-1.11.23/lib
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/libcvs.a
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/wait.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xselect.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xsize.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xtime.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.o
+<import> - None          /home/psmith/t/cvs-1.11.23/man
+<import> - None          /home/psmith/t/cvs-1.11.23/os2
+<import> - None          /home/psmith/t/cvs-1.11.23/src
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/classify.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/client.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/commit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/edit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/entries.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/error.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/history.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/import.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/lock.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/log.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/login.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/main.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/modules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/patch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/release.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/remove.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/repos.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/root.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/run.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/server.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/stack.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/status.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/subr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/tag.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/update.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/watch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.o
+<import> - None          /home/psmith/t/cvs-1.11.23/tools
+<import> - None          /home/psmith/t/cvs-1.11.23/vms
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h.in
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT/SCC
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/adler32.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/compress.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/compress.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/crc32.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/deflate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/gzio.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infblock.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inffast.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inflate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/infutil.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/libz.a
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/trees.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/trees.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/trees.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/zutil.h
+<import> - None          /home/psmith/t/cvs-1.11.23/zlib/zutil.o
+<import> - None          /home/psmith/work
+<import> - None          /home/psmith/work/Disco-Build-System
 
 Add a package to the zlib files, and show all files again
 Workspace root set to /home/psmith/t/cvs-1.11.23.
 New package zlib added.
-/home/psmith/t/cvs-1.11.23/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/context.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/io.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/side.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/util.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diffrun.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/libdiff.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/doc  (<import>/None)
-/home/psmith/t/cvs-1.11.23/emx  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/libcvs.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/wait.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xselect.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xsize.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xtime.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/man  (<import>/None)
-/home/psmith/t/cvs-1.11.23/os2  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/add.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/admin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/classify.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/client.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/commit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/edit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/entries.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/error.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/history.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/import.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/lock.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/log.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/login.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/main.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/modules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/patch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/release.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/remove.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/repos.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/root.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/run.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/server.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/stack.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/status.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/subr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/tag.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/update.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/watch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/tools  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h.in  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/stamp-ch  (<import>/None)
-/home/psmith/t/cvs-1.11.23/windows-NT/SCC  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+<import> - None          /home/psmith/t/cvs-1.11.23/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/diff
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/io.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diffrun.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/libdiff.a
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/doc
+<import> - None          /home/psmith/t/cvs-1.11.23/emx
+<import> - None          /home/psmith/t/cvs-1.11.23/lib
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/libcvs.a
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/wait.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xselect.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xsize.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xtime.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.o
+<import> - None          /home/psmith/t/cvs-1.11.23/man
+<import> - None          /home/psmith/t/cvs-1.11.23/os2
+<import> - None          /home/psmith/t/cvs-1.11.23/src
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/classify.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/client.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/commit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/edit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/entries.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/error.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/history.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/import.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/lock.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/log.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/login.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/main.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/modules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/patch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/release.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/remove.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/repos.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/root.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/run.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/server.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/stack.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/status.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/subr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/tag.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/update.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/watch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.o
+<import> - None          /home/psmith/t/cvs-1.11.23/tools
+<import> - None          /home/psmith/t/cvs-1.11.23/vms
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h.in
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT/SCC
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/libz.a
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
+<import> - None          /home/psmith/work
+<import> - None          /home/psmith/work/Disco-Build-System
 
 Show only the files in the new package
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/libz.a
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Show the files that are outside the new package
-/home/psmith/t/cvs-1.11.23/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/context.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/io.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/side.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/util.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diffrun.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/libdiff.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/doc  (<import>/None)
-/home/psmith/t/cvs-1.11.23/emx  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/libcvs.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/wait.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xselect.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xsize.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xtime.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/man  (<import>/None)
-/home/psmith/t/cvs-1.11.23/os2  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/add.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/admin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/classify.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/client.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/commit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/edit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/entries.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/error.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/history.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/import.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/lock.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/log.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/login.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/main.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/modules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/patch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/release.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/remove.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/repos.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/root.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/run.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/server.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/stack.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/status.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/subr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/tag.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/update.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/watch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.o  (<import>/None)
-/home/psmith/t/cvs-1.11.23/tools  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h.in  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/stamp-ch  (<import>/None)
-/home/psmith/t/cvs-1.11.23/windows-NT/SCC  (<import>/None)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+<import> - None          /home/psmith/t/cvs-1.11.23/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/diff
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/io.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diffrun.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/libdiff.a
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/doc
+<import> - None          /home/psmith/t/cvs-1.11.23/emx
+<import> - None          /home/psmith/t/cvs-1.11.23/lib
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/libcvs.a
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/wait.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xselect.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xsize.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xtime.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.o
+<import> - None          /home/psmith/t/cvs-1.11.23/man
+<import> - None          /home/psmith/t/cvs-1.11.23/os2
+<import> - None          /home/psmith/t/cvs-1.11.23/src
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/classify.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/client.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/commit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/edit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/entries.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/error.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/history.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/import.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/lock.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/log.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/login.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/main.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/modules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/patch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/release.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/remove.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/repos.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/root.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/run.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/server.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/stack.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/status.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/subr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/tag.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/update.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/watch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.o
+<import> - None          /home/psmith/t/cvs-1.11.23/tools
+<import> - None          /home/psmith/t/cvs-1.11.23/vms
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h.in
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT/SCC
+<import> - None          /home/psmith/work
+<import> - None          /home/psmith/work/Disco-Build-System
 
 Add a single file to zlib/public, and show it
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Public            /home/psmith/t/cvs-1.11.23/zlib/libz.a
 
 Show only the private files in zlib
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Now show all the files in zlib
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (zlib/Private)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.o
+zlib - Public            /home/psmith/t/cvs-1.11.23/zlib/libz.a
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Try to remove zlib (should fail)
 Error: Package zlib can't be deleted. It may still contain files or actions.
@@ -1103,372 +1177,401 @@ Status is 1
 
 Add a new package, and set all .o files to that package
 New package objects added.
-/home/psmith/t/cvs-1.11.23/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/context.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/io.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/side.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/util.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/analyze.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/cmpbuf.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/context.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/context.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/diff3.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/diff3.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/diffrun.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/dir.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/ed.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ed.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/ifdef.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/io.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/io.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/libdiff.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/normal.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/side.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/side.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/util.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/diff/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/diff/version.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/doc  (<import>/None)
-/home/psmith/t/cvs-1.11.23/emx  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/argmatch.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/getdate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getdate.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/getline.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getline.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/getopt.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getopt1.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/getpass.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/getpass.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/libcvs.a  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/md5.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/regex.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/regex.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/savecwd.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/sighandle.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/stripslash.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/system.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/wait.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xgetwd.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/lib/xselect.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xsize.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/xtime.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/lib/yesno.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/man  (<import>/None)
-/home/psmith/t/cvs-1.11.23/os2  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/add.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/admin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/classify.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/client.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/commit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/edit.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/entries.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/error.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/hash.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/history.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/import.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/lock.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/log.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/login.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/main.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/modules.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/patch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/release.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/remove.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/repos.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/root.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/run.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/server.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/stack.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/status.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/subr.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/tag.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/update.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/version.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/watch.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/add.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/admin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/admin.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/annotate.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/annotate.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/buffer.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/buffer.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/checkin.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkin.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/checkout.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/checkout.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/classify.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/classify.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/client.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/client.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/commit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/commit.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/create_adm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/create_adm.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/cvs  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/cvsrc.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/diff.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/edit.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/edit.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/entries.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/entries.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/error.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/error.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/expand_path.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/expand_path.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/fileattr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/fileattr.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/filesubr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/filesubr.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/find_names.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/find_names.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/hardlink.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hardlink.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/hash.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/hash.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/history.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/history.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/ignore.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/ignore.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/import.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/import.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/lock.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/lock.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/log.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/log.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/login.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/login.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/logmsg.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/logmsg.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/main.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/main.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/mkmodules.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/modules.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/modules.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/myndbm.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/myndbm.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/no_diff.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/no_diff.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/parseinfo.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/patch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/patch.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/rcs.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcs.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/rcscmds.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/recurse.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/recurse.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/release.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/release.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/remove.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/remove.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/repos.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/repos.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/root.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/root.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/run.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/run.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/scramble.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/scramble.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/server.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/server.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/stack.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/stack.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/status.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/status.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/subr.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/subr.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/tag.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/tag.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/update.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/update.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/vers_ts.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/version.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/version.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/watch.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/watch.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/wrapper.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/wrapper.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/src/zlib.c  (<import>/None)
-/home/psmith/t/cvs-1.11.23/src/zlib.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/tools  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/config.h.in  (<import>/None)
-/home/psmith/t/cvs-1.11.23/vms/stamp-ch  (<import>/None)
-/home/psmith/t/cvs-1.11.23/windows-NT/SCC  (<import>/None)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/adler32.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.o  (objects/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.o  (objects/Private)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+<import> - None          /home/psmith/t/cvs-1.11.23/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/cvscheck.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh
+<import> - None          /home/psmith/t/cvs-1.11.23/diff
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/diff3.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/dir.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ed.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/ifdef.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/io.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/normal.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/analyze.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/analyze.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/context.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/context.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.c
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff.h
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diff3.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/diff3.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/diffrun.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/dir.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/dir.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ed.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/ed.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/ifdef.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/ifdef.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/io.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/io.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/libdiff.a
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/normal.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/normal.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/side.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/side.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/util.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/util.o
+<import> - None          /home/psmith/t/cvs-1.11.23/diff/version.c
+objects - Private        /home/psmith/t/cvs-1.11.23/diff/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/doc
+<import> - None          /home/psmith/t/cvs-1.11.23/emx
+<import> - None          /home/psmith/t/cvs-1.11.23/lib
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getopt1.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/getpass.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/md5.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/regex.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/savecwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/sighandle.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/argmatch.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/argmatch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getdate.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/getdate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getline.h
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/getline.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt.h
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/getopt.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getopt1.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/getopt1.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/getpass.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/getpass.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/libcvs.a
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/md5.h
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/md5.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/regex.h
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/regex.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.c
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/savecwd.h
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/savecwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/sighandle.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/sighandle.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/stripslash.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/stripslash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/system.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/wait.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xgetwd.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xselect.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xsize.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/xtime.h
+<import> - None          /home/psmith/t/cvs-1.11.23/lib/yesno.c
+objects - Private        /home/psmith/t/cvs-1.11.23/lib/yesno.o
+<import> - None          /home/psmith/t/cvs-1.11.23/man
+<import> - None          /home/psmith/t/cvs-1.11.23/os2
+<import> - None          /home/psmith/t/cvs-1.11.23/src
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/buffer.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkin.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/checkout.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/classify.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/client.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/commit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/create_adm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/cvsrc.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/edit.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/entries.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/error.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/expand_path.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/fileattr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/filesubr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/find_names.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hardlink.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/hash.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/history.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/ignore.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/import.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/lock.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/log.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/login.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/logmsg.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/main.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/mkmodules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/modules.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/myndbm.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/no_diff.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/parseinfo.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/patch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcs.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/rcscmds.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/recurse.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/release.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/remove.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/repos.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/root.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/run.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/scramble.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/server.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/stack.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/status.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/subr.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/tag.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/update.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/vers_ts.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/version.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/watch.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
+<import> - None          /home/psmith/t/cvs-1.11.23/src/add.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/add.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/admin.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/admin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/annotate.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/annotate.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/buffer.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/buffer.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkin.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/checkin.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/checkout.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/checkout.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/classify.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/classify.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/client.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/client.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/commit.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/commit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/create_adm.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/create_adm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvs.h
+<import> - None          /home/psmith/t/cvs-1.11.23/src/cvsrc.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/cvsrc.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/diff.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/edit.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/edit.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/entries.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/entries.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/error.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/error.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/expand_path.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/expand_path.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/fileattr.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/fileattr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/filesubr.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/filesubr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/find_names.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/find_names.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hardlink.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/hardlink.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/hash.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/hash.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/history.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/history.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/ignore.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/ignore.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/import.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/import.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/lock.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/lock.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/log.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/log.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/login.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/login.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/logmsg.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/logmsg.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/main.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/main.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/mkmodules.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/mkmodules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/modules.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/modules.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/myndbm.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/myndbm.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/no_diff.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/no_diff.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/parseinfo.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/parseinfo.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/patch.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/patch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcs.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/rcs.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/rcscmds.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/rcscmds.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/recurse.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/recurse.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/release.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/release.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/remove.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/remove.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/repos.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/repos.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/root.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/root.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/run.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/run.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/scramble.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/scramble.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/server.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/server.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/stack.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/stack.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/status.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/status.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/subr.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/subr.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/tag.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/tag.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/update.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/update.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/vers_ts.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/vers_ts.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/version.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/version.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.c
+<import> - None          /home/psmith/t/cvs-1.11.23/src/watch.h
+objects - Private        /home/psmith/t/cvs-1.11.23/src/watch.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/wrapper.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/wrapper.o
+<import> - None          /home/psmith/t/cvs-1.11.23/src/zlib.c
+objects - Private        /home/psmith/t/cvs-1.11.23/src/zlib.o
+<import> - None          /home/psmith/t/cvs-1.11.23/tools
+<import> - None          /home/psmith/t/cvs-1.11.23/vms
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/config.h.in
+<import> - None          /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT
+<import> - None          /home/psmith/t/cvs-1.11.23/windows-NT/SCC
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/adler32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.c
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/compress.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/crc32.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/deflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/gzio.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/infblock.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/infcodes.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/inffast.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/inflate.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/inftrees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/infutil.o
+zlib - Public            /home/psmith/t/cvs-1.11.23/zlib/libz.a
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/trees.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/uncompr.o
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
+objects - Private        /home/psmith/t/cvs-1.11.23/zlib/zutil.o
+<import> - None          /home/psmith/work
+<import> - None          /home/psmith/work/Disco-Build-System
 
 Show the files that are still in zlib
-/home/psmith/t/cvs-1.11.23/zlib/adler32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/compress.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/crc32.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/deflate.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/gzio.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infblock.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infcodes.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffast.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inffixed.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inflate.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/inftrees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/infutil.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
-/home/psmith/t/cvs-1.11.23/zlib/trees.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/trees.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/uncompr.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zconf.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zlib.h  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.c  (zlib/Private)
-/home/psmith/t/cvs-1.11.23/zlib/zutil.h  (zlib/Private)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/adler32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/compress.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/crc32.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/deflate.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/gzio.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infblock.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infcodes.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffast.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inffixed.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inflate.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/inftrees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/infutil.h
+zlib - Public            /home/psmith/t/cvs-1.11.23/zlib/libz.a
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/trees.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/uncompr.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zconf.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
 Create a source package, assign it to all .c and .h files, then show what's left
 New package source added.
-/home/psmith/t/cvs-1.11.23/zlib/libz.a  (zlib/Public)
+<import> - None          /
+<import> - None          /home
+<import> - None          /home/psmith
+<import> - None          /home/psmith/t
+<import> - None          /home/psmith/t/cvs-1.11.23
+zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
+zlib - Public            /home/psmith/t/cvs-1.11.23/zlib/libz.a
 
 Try to remove zlib (should fail)
 Error: Package zlib can't be deleted. It may still contain files or actions.

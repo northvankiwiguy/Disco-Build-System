@@ -1,9 +1,17 @@
 
 Show write-only files
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/contrib
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
 /home/psmith/t/cvs-1.11.23/contrib/cvscheck
 /home/psmith/t/cvs-1.11.23/contrib/debug_check_log
 /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
+/home/psmith/t/cvs-1.11.23/diff
+/home/psmith/t/cvs-1.11.23/diff/.deps
 /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
@@ -17,6 +25,8 @@ Show write-only files
 /home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
@@ -30,6 +40,8 @@ Show write-only files
 /home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
@@ -86,9 +98,17 @@ Show write-only files
 /home/psmith/t/cvs-1.11.23/src/.deps/wrapper.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/zlib.Po
 /home/psmith/t/cvs-1.11.23/src/cvs
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/stamp-ch
 
 Show write-only .Po files
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/diff
+/home/psmith/t/cvs-1.11.23/diff/.deps
 /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
@@ -102,6 +122,8 @@ Show write-only .Po files
 /home/psmith/t/cvs-1.11.23/diff/.deps/side.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/util.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/version.Po
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
@@ -115,6 +137,8 @@ Show write-only .Po files
 /home/psmith/t/cvs-1.11.23/lib/.deps/stripslash.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/xgetwd.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/yesno.Po
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po

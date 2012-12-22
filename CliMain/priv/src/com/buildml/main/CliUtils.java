@@ -82,6 +82,11 @@ public class CliUtils {
 	 */
 	public static final int ARGS_INFINITE = -1;
 	
+	/**
+	 * The number of characters to allow when printing the package details.
+	 */
+	public static final int PACKAGE_NAME_WIDTH = 25;
+	
 	/*=====================================================================================*
 	 * Public methods
 	 *=====================================================================================*/
@@ -163,25 +168,22 @@ public class CliUtils {
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet should be
 	 *         displayed (set to null to display everything).
-	 * @param showRoots Indicates whether path roots should be displayed (true), or whether 
-	 *         absolute paths should be used (false).
+	 * @param showRoots Indicates whether path roots should be displayed.
 	 * @param showPkgs Indicates whether the package names should be displayed.
 	 */
 	public static void printFileSet(
 			PrintStream outStream, IBuildStore buildStore, FileSet resultFileSet,
 			FileSet filterFileSet, boolean showRoots, boolean showPkgs) {
 		
-		IFileMgr fileMgr = buildStore.getFileMgr();
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		
 		/*
-		 * This method uses recursion to traverse the FileMgr from the root to the leaves 
-		 * of the tree. It maintains a StringBuffer with the path encountered so far. 
-		 * That is, if the StringBuffer contains "/a/b/c" and the path "d" is encountered, 
-		 * then append "/d" to the StringBuffer to get "/a/b/c/d". Once we've finished 
-		 * traversing directory "d", we pop it off the StringBuffer and return to 
-		 * "/a/b/c/". This allows us to do a depth-first traversal of the FileMgr tree 
+		 * This method uses recursion to traverse the VFS from the root to the leaves 
+		 * of the tree. It maintains a StringBuilder with the path encountered so far. 
+		 * That is, if the StringBuilder contains "/a/b/c" and the path "d" is encountered, 
+		 * then append "/d" to the StringBuilder to get "/a/b/c/d". Once we've finished 
+		 * traversing directory "d", we pop it off the StringBuilder and return to 
+		 * "/a/b/c/". This allows us to do a depth-first traversal of the VFS tree 
 		 * without doing more database access than we need to.
 		 * 
 		 * The resultFileSet and filterFileSet work together to determine which paths are
@@ -189,34 +191,12 @@ public class CliUtils {
 		 * query. On the other hand, filterFileSet is the list of files that have been
 		 * selected by the user's command line argument (e.g. selecting a subdirectory, or
 		 * selecting files that match a pattern, such as *.c).
-		 */
-		
-		/* 
-		 * We always start at the top root, even though we may only display a subset
-		 * of the paths underneath that root. Also, figure out the root's name
-		 * (it's '/' or '@root').
-		 */
-		int topRoot = pkgRootMgr.getRootPath("root");
-		String rootPathName = fileMgr.getPathName(topRoot, showRoots);
-	
-		/*
-		 * Create a StringBuffer that'll be used for tracking the path name. We'll
-		 * expand and contract this StringBuffer as we progress through the directory
-		 * listing. This saves us from recomputing the parent path each time we
-		 * visit a new directory.
-		 */
+		 */		
 		StringBuffer sb = new StringBuffer();					
-		sb.append(rootPathName);
-		if (!rootPathName.equals("/")) {
-			sb.append('/');
-		}
 		
 		/* call the helper function to display each of our children */
-		Integer children[] = fileMgr.getChildPaths(topRoot);
-		for (int i = 0; i < children.length; i++) {
-			printFileSetHelper(outStream, sb, buildStore, children[i], 
-					resultFileSet, filterFileSet, showRoots, showPkgs);
-		}
+		printFileSetHelper(outStream, sb, buildStore, pkgRootMgr.getRootPath("root"), 
+				resultFileSet, filterFileSet, showRoots, showPkgs);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -473,7 +453,7 @@ public class CliUtils {
 	 * @param resultFileSet The set of files to be displayed (if null, show them all).
 	 * @param filterFileSet If not-null, used to filter which paths from resultFileSet
 	 * 		   should be displayed (set to null to display everything).
-	 * @param showRoots Whether to show path roots (true) or absolute paths (false).
+	 * @param showRoots Whether to show path roots.
 	 * @param showPkgs Whether to show the package names.
 	 */
 	private static void printFileSetHelper(
@@ -485,41 +465,35 @@ public class CliUtils {
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		
-		/* a StringBuffer for forming the package name */
-		StringBuffer pkgString = new StringBuffer();
-		
+		/* StringBuilders for forming the package name and the root names */
+		StringBuilder pkgString = null;
+		StringBuilder rootString = null;
+
 		/* should this path be displayed? */
 		if (!shouldBeDisplayed(thisPathId, resultFileSet, filterFileSet)){
 			return;
 		}	
-		
+
+		/* fetch this path's name */
+		String baseName = fileMgr.getBaseName(thisPathId);
+
 		/* get this path's list of children */
 		Integer children[] = fileMgr.getChildPaths(thisPathId);
-	
-		/* we'll use this to record the current path's name */
-		String baseName;
 		
 		/*
-		 * There are two cases to handle:
-		 * 	1) Roots should be displayed, and this path is a root.
-		 *  2) Roots shouldn't be displayed, OR this isn't a root.
+		 * Figure out whether this path has attached roots.
 		 */
 		String rootNames[] = null;
 		if (showRoots) {
 			rootNames = pkgRootMgr.getRootsAtPath(thisPathId);
 		}
 		
-		/* what is this path? A directory or something else? */
-		boolean isDirectory = (fileMgr.getPathType(thisPathId) == PathType.TYPE_DIR);
-		boolean isNonEmptyDirectory = isDirectory && (children.length != 0);
-		
 		/* 
 		 * If we've been asked to display file packages, prepare the string to be printed.
 		 */
 		if (showPkgs) {
-
-			/* to start, empty the StringBuffer */
-			pkgString.delete(0, pkgString.length());
+			
+			pkgString = new StringBuilder();
 			
 			/* fetch the file's package and scope */
 			Integer pkgAndScopeId[] = pkgMgr.getFilePackage(thisPathId);
@@ -542,87 +516,61 @@ public class CliUtils {
 			
 				/* else, both names are valid, append them to the string */
 				else {
-					pkgString.append("  (");
 					pkgString.append(pkgName);
-					pkgString.append('/');
+					pkgString.append(" - ");
 					pkgString.append(scopeName);
-					pkgString.append(")");
 				}
 			}
 		}
 		
-		/* this path isn't a root, or we're not interested in displaying roots */
-		if ((rootNames == null) || (rootNames.length == 0)) {
-			
-			/* get the name of this path */
-			baseName = fileMgr.getBaseName(thisPathId);
-		
-			/* 
-			 * Display this path, prefixed by the absolute pathSoFar. Don't show non-empty
-			 * directories, since they'll be displayed when the file they contain is
-			 * displayed.
-			 */
-			if (!isNonEmptyDirectory) {
-
-				outStream.print(pathSoFar);		
-				outStream.print(baseName);
-				
-				/* show packages, if requested */
-				if (showPkgs) {
-					outStream.println(pkgString);
-				} else {
-					outStream.println();
-				}
-			}
-		}
-			
-		/* else, this is a root and we need to display it */
-		else {
-			
-			/* 
-			 * Start a new pathSoFar with the name of the root, ignoring the previous
-			 * value of pathSoFar (which incidentally isn't lost - our caller still
-			 * has a reference to it and will use it for displaying our sibling paths).
-			 */
-			pathSoFar = new StringBuffer();
+		/* 
+		 * Does this path have a root (and we were asked to show roots)?
+		 * If so, prepare the string to be printed.
+		 */
+		if ((rootNames != null) && (rootNames.length > 0)) {
+			rootString = new StringBuilder();
 			
 			/* display a root name, or comma-separated root names */
-			if (rootNames.length == 1) {
-				pathSoFar.append('@');
-				pathSoFar.append(rootNames[0]);
-			} else if (rootNames.length > 1) {
-				pathSoFar.append("@{");
-				for (int i = 0; i < rootNames.length; i++) {
-					if (i != 0) {
-						pathSoFar.append(", ");
-					}
-					pathSoFar.append(rootNames[i]);
+			rootString.append(" (");
+			for (int i = 0; i < rootNames.length; i++) {
+				if (i != 0) {
+					rootString.append(' ');
 				}
-				pathSoFar.append('}');
-			}				
-			
-			/* display information about this root. */
-			outStream.print(pathSoFar + " (" + fileMgr.getPathName(thisPathId) + ") ");
-			
-			/* show packages, if requested */
-			if (showPkgs) {
-				outStream.println(pkgString);
-			} else {
-				outStream.println();
+				rootString.append('@');
+				rootString.append(rootNames[i]);
 			}
-			
-			/* we don't display this path's name */
-			baseName = "";
+			rootString.append(')');
 		}
-			
+		
+		/* show packages, if requested. Truncate to a fixed column width. */
+		if (pkgString != null) {
+			if (pkgString.length() > PACKAGE_NAME_WIDTH - 1) {
+				pkgString.setLength(PACKAGE_NAME_WIDTH - 1);
+			}
+			outStream.print(pkgString);
+			PrintUtils.indent(outStream, PACKAGE_NAME_WIDTH - pkgString.length());
+		}
+		
+		/* Display this path, prefixed by the absolute pathSoFar */
+		outStream.print(pathSoFar);		
+		outStream.print(baseName);
+		
+		/* show roots, if requested */
+		if (rootString != null) {
+			outStream.print(rootString);
+		}
+		outStream.println();
+		
 		/* if there are children, call ourselves recursively to display them */
 		if (children.length != 0) {
 			
 			/* append this path onto the pathSoFar, since it'll become the pathSoFar for each child */
 			int pathSoFarLen = pathSoFar.length();
 			pathSoFar.append(baseName);
-			pathSoFar.append('/');
-		
+			if (baseName.charAt(0) != '/') {
+				pathSoFar.append('/');
+			}
+			
 			/* display each of the children */
 			for (int i = 0; i < children.length; i++) {
 				printFileSetHelper(outStream, pathSoFar, buildStore, children[i], 

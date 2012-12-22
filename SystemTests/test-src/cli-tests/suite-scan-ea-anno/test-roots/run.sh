@@ -36,6 +36,14 @@ echo Status is $?
 set -e
 
 echo
+echo "Show only the files within zlib_src"
+bml show-files -r -f @zlib_src
+
+echo
+echo "Show only the files within zlib_gen"
+bml show-files -r -f @zlib_gen
+
+echo
 echo "Remove the zlib package, show the list"
 bml rm-pkg zlib
 bml show-root
@@ -44,14 +52,6 @@ echo
 echo "Add the zlib back again, show the list"
 bml add-pkg zlib
 bml show-root
-
-echo
-echo "Show only the files within zlib_src"
-bml show-files -r -f @zlib_src
-
-echo
-echo "Show only the files within zlib_gen"
-bml show-files -r -f @zlib_gen
 
 echo
 echo "Rename the zlib package to compress"

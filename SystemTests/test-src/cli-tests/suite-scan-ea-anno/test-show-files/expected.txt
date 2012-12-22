@@ -1,5 +1,11 @@
 show-files - with default settings
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/contrib
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor.sh
 /home/psmith/t/cvs-1.11.23/contrib/cvscheck
@@ -8,6 +14,8 @@ show-files - with default settings
 /home/psmith/t/cvs-1.11.23/contrib/debug_check_log.sh
 /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs
 /home/psmith/t/cvs-1.11.23/contrib/rcs-to-cvs.sh
+/home/psmith/t/cvs-1.11.23/diff
+/home/psmith/t/cvs-1.11.23/diff/.deps
 /home/psmith/t/cvs-1.11.23/diff/.deps/analyze.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/cmpbuf.Po
 /home/psmith/t/cvs-1.11.23/diff/.deps/context.Po
@@ -54,6 +62,8 @@ show-files - with default settings
 /home/psmith/t/cvs-1.11.23/diff/version.o
 /home/psmith/t/cvs-1.11.23/doc
 /home/psmith/t/cvs-1.11.23/emx
+/home/psmith/t/cvs-1.11.23/lib
+/home/psmith/t/cvs-1.11.23/lib/.deps
 /home/psmith/t/cvs-1.11.23/lib/.deps/argmatch.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getdate.Po
 /home/psmith/t/cvs-1.11.23/lib/.deps/getline.Po
@@ -106,6 +116,8 @@ show-files - with default settings
 /home/psmith/t/cvs-1.11.23/lib/yesno.o
 /home/psmith/t/cvs-1.11.23/man
 /home/psmith/t/cvs-1.11.23/os2
+/home/psmith/t/cvs-1.11.23/src
+/home/psmith/t/cvs-1.11.23/src/.deps
 /home/psmith/t/cvs-1.11.23/src/.deps/add.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/admin.Po
 /home/psmith/t/cvs-1.11.23/src/.deps/annotate.Po
@@ -289,10 +301,13 @@ show-files - with default settings
 /home/psmith/t/cvs-1.11.23/src/zlib.c
 /home/psmith/t/cvs-1.11.23/src/zlib.o
 /home/psmith/t/cvs-1.11.23/tools
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/config.h
 /home/psmith/t/cvs-1.11.23/vms/config.h.in
 /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+/home/psmith/t/cvs-1.11.23/windows-NT
 /home/psmith/t/cvs-1.11.23/windows-NT/SCC
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
@@ -333,8 +348,16 @@ show-files - with default settings
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
+/home/psmith/work
+/home/psmith/work/Disco-Build-System
 
 show-files with a single path-spec to select .c files
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/diff
 /home/psmith/t/cvs-1.11.23/diff/analyze.c
 /home/psmith/t/cvs-1.11.23/diff/cmpbuf.c
 /home/psmith/t/cvs-1.11.23/diff/context.c
@@ -348,6 +371,7 @@ show-files with a single path-spec to select .c files
 /home/psmith/t/cvs-1.11.23/diff/side.c
 /home/psmith/t/cvs-1.11.23/diff/util.c
 /home/psmith/t/cvs-1.11.23/diff/version.c
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/argmatch.c
 /home/psmith/t/cvs-1.11.23/lib/getdate.c
 /home/psmith/t/cvs-1.11.23/lib/getline.c
@@ -361,6 +385,7 @@ show-files with a single path-spec to select .c files
 /home/psmith/t/cvs-1.11.23/lib/stripslash.c
 /home/psmith/t/cvs-1.11.23/lib/xgetwd.c
 /home/psmith/t/cvs-1.11.23/lib/yesno.c
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/add.c
 /home/psmith/t/cvs-1.11.23/src/admin.c
 /home/psmith/t/cvs-1.11.23/src/annotate.c
@@ -416,6 +441,7 @@ show-files with a single path-spec to select .c files
 /home/psmith/t/cvs-1.11.23/src/watch.c
 /home/psmith/t/cvs-1.11.23/src/wrapper.c
 /home/psmith/t/cvs-1.11.23/src/zlib.c
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
 /home/psmith/t/cvs-1.11.23/zlib/crc32.c
@@ -432,7 +458,13 @@ show-files with a single path-spec to select .c files
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 
 show-files with path-specs to select .c and .h files
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
+/home/psmith/t/cvs-1.11.23/diff
 /home/psmith/t/cvs-1.11.23/diff/analyze.c
 /home/psmith/t/cvs-1.11.23/diff/cmpbuf.c
 /home/psmith/t/cvs-1.11.23/diff/cmpbuf.h
@@ -450,6 +482,7 @@ show-files with path-specs to select .c and .h files
 /home/psmith/t/cvs-1.11.23/diff/system.h
 /home/psmith/t/cvs-1.11.23/diff/util.c
 /home/psmith/t/cvs-1.11.23/diff/version.c
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/argmatch.c
 /home/psmith/t/cvs-1.11.23/lib/getdate.c
 /home/psmith/t/cvs-1.11.23/lib/getline.c
@@ -473,6 +506,7 @@ show-files with path-specs to select .c and .h files
 /home/psmith/t/cvs-1.11.23/lib/xsize.h
 /home/psmith/t/cvs-1.11.23/lib/xtime.h
 /home/psmith/t/cvs-1.11.23/lib/yesno.c
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/add.c
 /home/psmith/t/cvs-1.11.23/src/admin.c
 /home/psmith/t/cvs-1.11.23/src/annotate.c
@@ -544,7 +578,9 @@ show-files with path-specs to select .c and .h files
 /home/psmith/t/cvs-1.11.23/src/watch.h
 /home/psmith/t/cvs-1.11.23/src/wrapper.c
 /home/psmith/t/cvs-1.11.23/src/zlib.c
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/config.h
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
 /home/psmith/t/cvs-1.11.23/zlib/crc32.c
@@ -572,6 +608,12 @@ show-files with path-specs to select .c and .h files
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
 show-files selecting a single subdirectory
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
@@ -614,9 +656,16 @@ show-files selecting a single subdirectory
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 show-files selecting two subdirectories
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/vms
 /home/psmith/t/cvs-1.11.23/vms/config.h
 /home/psmith/t/cvs-1.11.23/vms/config.h.in
 /home/psmith/t/cvs-1.11.23/vms/stamp-ch
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
@@ -659,6 +708,12 @@ show-files selecting two subdirectories
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 show-files selecting a subdirectory and a pattern
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/diff
 /home/psmith/t/cvs-1.11.23/diff/analyze.o
 /home/psmith/t/cvs-1.11.23/diff/cmpbuf.o
 /home/psmith/t/cvs-1.11.23/diff/context.o
@@ -672,6 +727,7 @@ show-files selecting a subdirectory and a pattern
 /home/psmith/t/cvs-1.11.23/diff/side.o
 /home/psmith/t/cvs-1.11.23/diff/util.o
 /home/psmith/t/cvs-1.11.23/diff/version.o
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/argmatch.o
 /home/psmith/t/cvs-1.11.23/lib/getdate.o
 /home/psmith/t/cvs-1.11.23/lib/getline.o
@@ -685,6 +741,7 @@ show-files selecting a subdirectory and a pattern
 /home/psmith/t/cvs-1.11.23/lib/stripslash.o
 /home/psmith/t/cvs-1.11.23/lib/xgetwd.o
 /home/psmith/t/cvs-1.11.23/lib/yesno.o
+/home/psmith/t/cvs-1.11.23/src
 /home/psmith/t/cvs-1.11.23/src/add.o
 /home/psmith/t/cvs-1.11.23/src/admin.o
 /home/psmith/t/cvs-1.11.23/src/annotate.o
@@ -740,6 +797,7 @@ show-files selecting a subdirectory and a pattern
 /home/psmith/t/cvs-1.11.23/src/watch.o
 /home/psmith/t/cvs-1.11.23/src/wrapper.o
 /home/psmith/t/cvs-1.11.23/src/zlib.o
+/home/psmith/t/cvs-1.11.23/zlib
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
 /home/psmith/t/cvs-1.11.23/zlib/compress.c
@@ -782,4 +840,10 @@ show-files selecting a subdirectory and a pattern
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 show-files selecting a specific file name
+/
+/home
+/home/psmith
+/home/psmith/t
+/home/psmith/t/cvs-1.11.23
+/home/psmith/t/cvs-1.11.23/lib
 /home/psmith/t/cvs-1.11.23/lib/wait.h
