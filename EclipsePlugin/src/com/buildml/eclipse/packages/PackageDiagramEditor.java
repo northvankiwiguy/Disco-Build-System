@@ -20,12 +20,15 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 
 import com.buildml.eclipse.ISubEditor;
+import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -35,7 +38,8 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
+public class PackageDiagramEditor extends DiagramEditor 
+									implements ISubEditor, IPackageMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -70,6 +74,9 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 		this.buildStore = buildStore;
 		this.pkgMgr = buildStore.getPackageMgr();
 		this.packageId = packageId;
+		
+		/* listen for changes to the packages */
+		pkgMgr.addListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -264,6 +271,9 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 	 */
 	@Override
 	public boolean hasFeature(String feature) {
+		if ("removable".equals(feature)) {
+			return true;
+		}
 		return false;
 	}
 
@@ -307,6 +317,38 @@ public class PackageDiagramEditor extends DiagramEditor implements ISubEditor {
 		return packageId;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Receive notifications if the BuildStore's packages change in some way.
+	 */
+	@Override
+	public void packageChangeNotification(int pkgId, int how) {
+		
+		/* was the package that we're displaying removed? */
+		if ((pkgId == this.packageId) && (how == IPackageMgrListener.REMOVED_PACKAGE)) {
+			MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
+			if (mainEditor != null) {
+				mainEditor.setActiveEditor(this);
+				int activeTab = mainEditor.getActivePage();
+				if (activeTab != -1) {
+					mainEditor.removePage(activeTab);
+				}
+			}
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * This editor is being closed/disposed.
+	 */
+	@Override
+	public void dispose() {
+		super.dispose();
+		pkgMgr.removeListener(this);
+	}
+	
 	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/

@@ -929,9 +929,7 @@ public class TestPackageMgr {
 	 */
 	@Test
 	public void testNotify() {
-		
-		int pkgA = pkgMgr.addPackage("PkgA");
-		
+
 		/* set up a listener */
 		IPackageMgrListener listener = new IPackageMgrListener() {
 			@Override
@@ -941,6 +939,12 @@ public class TestPackageMgr {
 			}
 		};
 		pkgMgr.addListener(listener);
+
+		notifyPkgValue = 0;
+		notifyHowValue = 0;
+		int pkgA = pkgMgr.addPackage("PkgA");
+		assertEquals(pkgA, notifyPkgValue);
+		assertEquals(IPackageMgrListener.ADDED_PACKAGE, notifyHowValue);		
 		
 		/* Changing a name to itself doesn't trigger the notification */
 		notifyPkgValue = 0;
@@ -960,7 +964,13 @@ public class TestPackageMgr {
 		notifyHowValue = 0;
 		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgC"));
 		assertEquals(0, notifyPkgValue);
-		assertEquals(0, notifyHowValue);		
+		assertEquals(0, notifyHowValue);
+		
+		/* add the listener back, then remove the package */
+		pkgMgr.addListener(listener);
+		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
+		assertEquals(pkgA, notifyPkgValue);
+		assertEquals(IPackageMgrListener.REMOVED_PACKAGE, notifyHowValue);		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

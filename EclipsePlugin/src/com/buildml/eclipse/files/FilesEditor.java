@@ -54,6 +54,7 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
@@ -86,9 +87,12 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 	/** The FileMgr object that contains all the file information for this BuildStore */
 	private IFileMgr fileMgr = null;
 	
+	/** The PackageMgr object that contains the package information */
+	private IPackageMgr pkgMgr = null;
+
 	/** The PackageRootMgr object that contains the package root information */
 	private IPackageRootMgr pkgRootMgr = null;
-	
+
 	/** The ArrayContentProvider object providing this editor's content */
 	private FilesEditorContentProvider contentProvider;
 
@@ -123,7 +127,9 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 		super(buildStore, tabTitle);
 
 		fileMgr = buildStore.getFileMgr();
+		pkgMgr = buildStore.getPackageMgr();
 		pkgRootMgr = buildStore.getPackageRootMgr();
+		pkgMgr.addListener(this);
 		pkgRootMgr.addListener(this);
 
 		/* initially, all paths are visible */
@@ -584,6 +590,7 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 		super.dispose();
 	
 		/* we no longer want to hear about package changes */
+		pkgMgr.removeListener(this);
 		pkgRootMgr.removeListener(this);
 	}
 	

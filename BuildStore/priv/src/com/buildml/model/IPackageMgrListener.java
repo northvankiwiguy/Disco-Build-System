@@ -25,7 +25,13 @@ public interface IPackageMgrListener {
 
 	/** value of "how" if the package roots have changed */
 	public static final int CHANGED_ROOTS = 2;
-
+	
+	/** value of "how" if a new package is created */
+	public static final int ADDED_PACKAGE = 3;
+	
+	/** value of "how" if a package is deleted */
+	public static final int REMOVED_PACKAGE = 4;
+	
 	/**
 	 * Called to notify the listener that the specified package has changed.
 	 * 

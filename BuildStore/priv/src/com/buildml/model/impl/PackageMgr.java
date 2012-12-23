@@ -392,6 +392,7 @@ import com.buildml.utils.errors.ErrorCode;
 			return ErrorCode.NOT_FOUND;
 		}
 		
+		notifyListeners(folderOrPackageId, IPackageMgrListener.REMOVED_PACKAGE);
 		return ErrorCode.OK;
 	};
 	
@@ -1057,7 +1058,9 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* return the new package's ID number */
-		return db.getLastRowID();
+		int pkgId = db.getLastRowID();
+		notifyListeners(pkgId, IPackageMgrListener.ADDED_PACKAGE);
+		return pkgId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -1068,8 +1071,15 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @param how     The way in which the package changed (see {@link IPackageMgrListener}).
 	 */
 	private void notifyListeners(int pkgId, int how) {
-		for (IPackageMgrListener listener : listeners) {
-			listener.packageChangeNotification(pkgId, how);
+		
+		/* 
+		 * Make a copy of the listeners list, otherwise a registered listener can't remove
+		 * itself from the list within the packageChangeNotification() method.
+		 */
+		IPackageMgrListener listenerCopy[] = 
+				listeners.toArray(new IPackageMgrListener[listeners.size()]);
+		for (int i = 0; i < listenerCopy.length; i++) {
+			listenerCopy[i].packageChangeNotification(pkgId, how);			
 		}
 	}
 	
