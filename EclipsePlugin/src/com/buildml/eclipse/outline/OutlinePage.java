@@ -86,6 +86,9 @@ public class OutlinePage extends ContentOutlinePage {
 
 	/** Based on the current tree selection, does the selected package have roots? */
 	private boolean changeRootsEnabled = false;	
+
+	/** Based on the current tree selection, can the package be opened? */
+	private boolean openEnabled = false;	
 	
 	/** The undo handler from our main BuildML editor */
 	private UndoActionHandler undoAction;
@@ -440,6 +443,18 @@ public class OutlinePage extends ContentOutlinePage {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Invoke the "open package" command on the currently selected node, opening the package's
+	 * diagram in the main editor.
+	 */
+	public void openPackage() {
+		if (selectedNode instanceof UIPackage) {
+			mainEditor.openPackageDiagram(selectedNode.getId());
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * This method is called whenever the user clicks on a node in the tree viewer. We
 	 * make note of the currently-selected node so that other operations (add, delete, etc)
 	 * know what they're operating on. Based on the selection, we also determine whether
@@ -454,13 +469,11 @@ public class OutlinePage extends ContentOutlinePage {
 			selectedNode = (UIInteger)node;
 			int nodeId = selectedNode.getId();
 			
-			/* start by assuming the remove, rename, change roots buttons will be active */
-			removeEnabled = true;			
-			renameEnabled = true;
-			changeRootsEnabled = true;
+			/* start by assuming the all buttons will be active */
+			removeEnabled = renameEnabled = changeRootsEnabled = openEnabled = true;
 			
 			/* 
-			 * Based on the selection, determine whether the "remove" or "rename" button 
+			 * Based on the selection, determine whether the buttons 
 			 * should be disabled. We can't remove/rename the root folder, and we can't
 			 * remove a folder that has children.
 			 */
@@ -470,13 +483,13 @@ public class OutlinePage extends ContentOutlinePage {
 				} else if (pkgMgr.getFolderChildren(nodeId).length != 0) {
 					removeEnabled = false;
 				}
-				changeRootsEnabled = false;
+				changeRootsEnabled = openEnabled = false;
 			}
 			
 			/* else, for the UIPackage, the <import> package can't be touched. */
 			else {
 				if (nodeId == pkgMgr.getImportPackage()) {
-					removeEnabled = renameEnabled = changeRootsEnabled = false;
+					removeEnabled = renameEnabled = changeRootsEnabled = openEnabled = false;
 				}
 			}
 		}
@@ -511,7 +524,17 @@ public class OutlinePage extends ContentOutlinePage {
 	public boolean getChangeRootsEnabled() {
 		return changeRootsEnabled;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return true if the "open" menu command should be enabled, based on the current tree
+	 * selection.
+	 */
+	public boolean getOpenEnabled() {
+		return openEnabled;
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

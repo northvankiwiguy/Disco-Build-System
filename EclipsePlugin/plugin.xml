@@ -184,6 +184,11 @@
             id="com.buildml.eclipse.commands.changeRootOutlineContent"
             name="Change Root Outline Content">
       </command>
+      <command
+            defaultHandler="com.buildml.eclipse.outline.handlers.HandlerOpenPackage"
+            id="com.buildml.eclipse.commands.openPackage"
+            name="Open Package">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -784,6 +789,12 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.views.ContentOutline?after=buildmladditions">
+         <command
+               commandId="com.buildml.eclipse.commands.openPackage"
+               label="Open Package"
+               style="push"
+               tooltip="Open BuildML Package Diagram">
+         </command>
          <command
                commandId="com.buildml.eclipse.commands.addOutlineContent"
                icon="images/add_package_icon.gif"
