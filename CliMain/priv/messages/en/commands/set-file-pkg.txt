@@ -4,9 +4,9 @@ allowing the set to be referred to by a single name.
 
 For example, to add a number of different files to a package, use:
 
-    bml set-file-pkg src_code *.c:*.h
-    bml set-file-pkg src_code /usr/include:/usr/local/include
-    bml set-file-pkg src_code /home/psmith/mysrc
+    bmladmin set-file-pkg src_code *.c:*.h
+    bmladmin set-file-pkg src_code /usr/include:/usr/local/include
+    bmladmin set-file-pkg src_code /home/psmith/mysrc
     
 This option adds all known files with the .c or .h suffix to the package,
 then continues by adding the complete content of /usr/include,
@@ -15,24 +15,24 @@ then continues by adding the complete content of /usr/include,
 It is now possible to reference this complete set of files by using the
 %pkg syntax. For example:
 
-    bml show-files -f %pkg/src_code
+    bmladmin show-files -f %pkg/src_code
     
 will show all the files that have been added to the "src_code" package, 
 whereas:
 
-    bml show-files -f %not-pkg/src_code
+    bmladmin show-files -f %not-pkg/src_code
     
 will show all the files that are NOT inside that package.
 
 Additionally, files can have a specific scope within a package. For
 example:
 
-   bml set-file-pkg src_code/public /usr/include
+   bmladmin set-file-pkg src_code/public /usr/include
    
 will indicate that the files in /usr/include have public scope within
 the src_code package. Whereas:
 
-   bml set-file-pkg src_code/private /home/psmith/mysrc
+   bmladmin set-file-pkg src_code/private /home/psmith/mysrc
    
 gives the files "private" scope. Scope names are predefined and
 can not be modified by the user.

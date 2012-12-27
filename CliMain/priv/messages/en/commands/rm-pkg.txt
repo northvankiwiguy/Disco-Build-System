@@ -4,7 +4,7 @@ Likewise, a folder must not contain any packages or sub-folders.
 
 For example:
 
-    bml rm-pkg src_code
+    bmladmin rm-pkg src_code
     
 will remove the "src_code" package, assuming it is no longer in use. It is
 not possible to remove the "<import>" package or the "Root" folder, even if

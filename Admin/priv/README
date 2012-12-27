@@ -111,17 +111,22 @@ Building BuildML in a Development Environment
 Given that the above procedure for compiling BuildML is rather time-consuming
 for BuildML developers, there's a faster way to get a runnable program. This 
 feature allows you to edit source code using Eclipse, then immediately run
-the "bml" command to test your changes.
+the "bml" or "bmladmin" commands to test your changes.
 
-To make this work, set your shell $PATH variable to include:
+To make this work, create a symlink called "bml" from your ~/bin directory to
 
-   .../CliMain/priv/scripts
+   .../CliMain/priv/scripts/bml
    
-   you'll then be able to run the "bml" shell script that's resident in that
-   directory (as opposed to extracting the buildml-W.Y.Z.tar.gz in order to run 
-   it). When used in this mode, the "bml" script picks up .class files and
-   .jar files directly from your source tree. Note however, changes to C-language
-   source files will require that you compile the full release package.
+Next, create a symlink called "bmladmin" from your ~/bin directory, also to
+the exact same "bml" file as the first symlink. That is, you're creating two
+symlinks that each refer to the same file.
+   
+You'll now be able to run the "bml" (or "bmladmin") shell script that's 
+resident in the source code tree (as opposed to extracting the 
+buildml-W.Y.Z.tar.gz in order to run them). When used in this mode, the 
+"bml" script picks up .class files and .jar files directly from your source
+tree. Note however, changes to C-language source files will require that you
+compile the full release package.
 
 To be able to run the EclipsePlugin project from within Eclipse, you must do
 the following two things:

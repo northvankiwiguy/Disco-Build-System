@@ -3,7 +3,7 @@ tool, importing the action and file access information. The result is
 a fully-populated BuildML database containing a complete view of how the
 legacy build system functions. For example:
 
-    bml scan-build gmake all
+    bmladmin scan-build gmake all
     
 will invoke the "gmake all" shell command, monitor everything that the command
 does (such as invoking compilers and other tools), and record the complete set
@@ -29,7 +29,7 @@ Command-specific options are:
   that would normally be parsed and interpreted by the user's current shell,
   rather than the scanner. For example:
   
-      bml scan-build -c "make clean && make"
+      bmladmin scan-build -c "make clean && make"
 
 -f | --trace-file <file-name>
 

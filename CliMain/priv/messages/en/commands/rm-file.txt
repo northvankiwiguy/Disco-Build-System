@@ -16,13 +16,13 @@ files:
   action), you must also delete the action. To perform this additional
   deletion, specify the -f option. For example:
     
-    bml -f /home/psmith/mysrc/foo.o
+    bmladmin -f /home/psmith/mysrc/foo.o
      
   will delete both foo.o and the action that generates foo.o.
     
 * The action that generates the path must be atomic. That is, the action must
   not have any child actions. If it does, first consider using the
-  "bml make-atomic" command.
+  "bmladmin make-atomic" command.
     
 * If a generating action is deleted (with -f), that action may also generate
   other output files. If any of those output files are still in use (used as
@@ -36,7 +36,7 @@ The command arguments are:
 
   The absolute path name of the file to be deleted.
         
-      bml rm-file /home/work/mysrc/file.c
-      bml rm-file -f /home/work/myobj/file.o
-      bml rm-file -r /home/work/unused
+      bmladmin rm-file /home/work/mysrc/file.c
+      bmladmin rm-file -f /home/work/myobj/file.o
+      bmladmin rm-file -r /home/work/unused
  

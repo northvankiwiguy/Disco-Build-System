@@ -1,7 +1,7 @@
 Show the list of packages currently defined in the build system. For
 example:
 
-    bml show-pkg
+    bmladmin show-pkg
     
 will list the names of all packages previously defined. There will always
 be a package named "<import>" that all files and actions belong to if they

@@ -1,14 +1,17 @@
 #!/bin/bash -e
 #
-# Simple launcher script for the "bml" command.
+# Simple launcher script for the "bml" and "bmladmin" commands.
 #
 
 # make sure that wildcards (* and ?) aren't expanded. If the user passes in "*.h", we want to
 # pass "*.h" onto the Java code.
 set -f
 
-# Figure out what this script was executed as - 
-export SCRIPT_DIR=`dirname $0`
+# Figure out what this script was executed as. It's either "bml" or "bmladmin", but both
+# may be a symlink that point to the "bml" inside the source tree.
+SCRIPT_NAME=`basename $0`
+symlink_target=`readlink -e $0`
+export SCRIPT_DIR=`dirname $symlink_target`
 
 # Figure out our current working directory (this may fail, so disable bash's -e for a while)
 set +e
@@ -21,7 +24,7 @@ then
 fi
 
 #
-# If SCRIPT_DIR is relative, that means the user executed the bml script as a relative
+# If SCRIPT_DIR is relative, that means the user executed the bml/bmladmin script as a relative
 # path (e.g. ./buildml-0.0.0/bin/bml) rather than as an absolute path or via $PATH. In this
 # case, we need to prepend our current directory to SCRIPT_DIR.
 #
@@ -76,8 +79,17 @@ then
 fi
 
 #
-# Now, invoke the bml command line tool, with all the command line arguments.
+# Now, invoke the bml/bmladmin command line tool, with all the command line arguments.
 #
-java com.buildml.main.CliMain "$@"
+if [ $SCRIPT_NAME == "bmladmin" ];
+then
+    java com.buildml.main.BMLAdminMain "$@"
+elif [ $SCRIPT_NAME == "bml" ]; then
+    java com.buildml.main.BMLMain "$@"
+else
+    echo "Error: This program may only be invoked as 'bml' or 'bmladmin'."
+    exit 1
+fi
+
 
 # Note: the return code from java is the return code for our whole script.

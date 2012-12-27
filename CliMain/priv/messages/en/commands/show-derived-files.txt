@@ -13,23 +13,23 @@ The input files are specified using the same style of colon-separated list
 that is used with the -f | --filter option (see below), although without
 specifying the -f or --filter. For example:
 
-    bml show-derived-files file1.c:file2.c
+    bmladmin show-derived-files file1.c:file2.c
     
 shows all files derived from file1.c and file2.c (such as file1.o and
 file2.o). Whereas
 
-    bml show-derived-files "*.o"
+    bmladmin show-derived-files "*.o"
     
 shows all the files that are derived from the complete collection of .o
 files. This will typically include archive libraries (.a files) and 
 executable files that link any of those .o files. Next,
 
-    bml show-derived-files /home/psmith/mysrc/libsrc/graphics/
+    bmladmin show-derived-files /home/psmith/mysrc/libsrc/graphics/
     
 will show all the files derived from files in the graphics/ subdirectory
 and it's contents. Also,
 
-    bml show-derived-files %p/src_files
+    bmladmin show-derived-files %p/src_files
     
 will show all the files derived from files in the "src_files" package.
 
@@ -38,7 +38,7 @@ That is, file.o is derived from file.c. However, in some cases you might
 be interested in all files that are derived from the input files, no
 matter how many actions are used. For example:
 
-    bml show-derived-files -a file.c
+    bmladmin show-derived-files -a file.c
     
 will show all files derived from file.c, which may include file.o, archive.a,
 and executable.exe.
@@ -48,7 +48,7 @@ can also take a set of files (via -f | --filter) to filter the result set.
 The two sets of files have different purposes, and should not be confused.
 For example:
   
-    bml show-derived-files -f "*.a" "*.o"
+    bmladmin show-derived-files -f "*.a" "*.o"
   
 will return the list of .a files that are derived from any of the .o files
 in the build tree.  

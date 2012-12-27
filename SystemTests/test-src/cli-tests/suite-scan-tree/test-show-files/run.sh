@@ -10,24 +10,24 @@ root=`dirname $TEST_SRC`
 FILTER="s#$root##g"
 
 echo "Show all files in the build tree"
-bml show-files | sed $FILTER | fgrep -v SystemTests
+bmladmin show-files | sed $FILTER | fgrep -v SystemTests
 
 echo
 echo "Show all files with suffix .c"
-bml show-files -f "*.c" | sed $FILTER | fgrep -v SystemTests
+bmladmin show-files -f "*.c" | sed $FILTER | fgrep -v SystemTests
 
 echo
 echo "Show all files with suffix .h"
-bml show-files -f "*.h" | sed $FILTER | fgrep -v SystemTests
+bmladmin show-files -f "*.h" | sed $FILTER | fgrep -v SystemTests
 
 echo
 echo "Show all files with name file3.*"
-bml show-files -f "file3.*" | sed $FILTER | fgrep -v SystemTests
+bmladmin show-files -f "file3.*" | sed $FILTER | fgrep -v SystemTests
 
 echo
 echo "Show all the files in the dirA subdirectory"
-bml show-files -f "$root/build-tree/dirA" | sed $FILTER | fgrep -v SystemTests
+bmladmin show-files -f "$root/build-tree/dirA" | sed $FILTER | fgrep -v SystemTests
 
 echo
 echo "Show all the files in the dirD subdirectory"
-bml show-files -f "$root/build-tree/dirA/dirD" | sed $FILTER | fgrep -v SystemTests
+bmladmin show-files -f "$root/build-tree/dirA/dirD" | sed $FILTER | fgrep -v SystemTests

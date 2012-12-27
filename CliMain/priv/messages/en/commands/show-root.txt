@@ -2,11 +2,11 @@ Show the list of file roots currently defined in the build system. If a root
 name is provided as an argument, only that root's definition will be shown.
 For example:
 
-    bml show-root
+    bmladmin show-root
     
 shows all roots defined in the build system, whereas
     
-    bml show-root src_root
+    bmladmin show-root src_root
     
 shows only the definition of "src_root".
     

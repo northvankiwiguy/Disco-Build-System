@@ -8,7 +8,7 @@ One or more directories may be provided to this command, with each of them
 being traversed and their information added to the BuildML database. For
 example:
 
-    bml scan-tree /home/psmith/myappsrc /usr/include /usr/lib
+    bmladmin scan-tree /home/psmith/myappsrc /usr/include /usr/lib
     
 will locate all files and directories in the "myappsrc" directory, as a means
 of importing the complete set of files in the source tree. Also, we import

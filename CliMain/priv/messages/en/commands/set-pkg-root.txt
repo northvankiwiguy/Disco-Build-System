@@ -14,9 +14,9 @@ native file system, without regard for where other packages might be located.
 
 To create a new package and set the package's root, use the following:
 
-    bml add-pkg zlib
-    bml set-pkg-root zlib_src /home/joe/work/zlib
-    bml set-pkg-root zlib_gen /home/joe/obj/zlib
+    bmladmin add-pkg zlib
+    bmladmin set-pkg-root zlib_src /home/joe/work/zlib
+    bmladmin set-pkg-root zlib_gen /home/joe/obj/zlib
     
 Note that these paths are on the BuildML virtual file system (VFS), rather
 than on the native file system.

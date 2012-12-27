@@ -2,7 +2,7 @@
        
       A full path name, relative to the root of the file system. For example:
            
-          bml show-files -f /home/psmith/mycode/src/file.c
+          bmladmin show-files -f /home/psmith/mycode/src/file.c
                 
       If the path is a directory, all files (and subdirectories) within that
       path will be included.
@@ -13,7 +13,7 @@
       This includes all files that match the name (or pattern), without
       concern for which directory the file is within. For example:
            
-          bml show-files -f "*.h"
+          bmladmin show-files -f "*.h"
                 
       This filter is useful for including a file by a shorter name, rather
       than providing the full directory path.
@@ -22,7 +22,7 @@
        
       A root name, and a path relative to that root. For example:
            
-          bml show-files -f @src/lib/graphics
+          bmladmin show-files -f @src/lib/graphics
                 
       Use the show-root, add-root and rm-root commands to manage file system
       roots.
@@ -32,14 +32,14 @@
       A package name, specifying the set of files to be shown. Only files
       that reside within that package will be shown. For example:
            
-          bml show-files -f %pkg/kernel_src
+          bmladmin show-files -f %pkg/kernel_src
                 
       Use the show-pkg, add-pkg, rm-pkg commands to define package names,
       and the set-file-pkg command to add files into a package. Package 
       names may also include a package scope name, such as 'public' or
       'private'. For example:
            
-          bml show-files -f %pkg/kernel_src/private
+          bmladmin show-files -f %pkg/kernel_src/private
                 
       This will limit the output to only those files within the specific
       package scope.
@@ -49,6 +49,6 @@
       Similar to %p and %pkg, but only show the files that reside outside
       that package. For example:
            
-          bml show-files -f %pkg/kernel_src
+          bmladmin show-files -f %pkg/kernel_src
                 
       Package scope names (private, public) can also be used.

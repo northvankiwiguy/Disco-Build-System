@@ -24,7 +24,7 @@ The command arguments are:
 
   The number ID number of the parent action.
         
-      bml make-atomic 12
-      bml make-atomic 167
+      bmladmin make-atomic 12
+      bmladmin make-atomic 167
 
  

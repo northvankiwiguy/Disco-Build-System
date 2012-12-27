@@ -34,7 +34,7 @@ import com.buildml.utils.version.Version;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public final class CliMain {	
+public final class BMLAdminMain {	
 	
 	/*=====================================================================================*
 	 * TYPES/FIELDS
@@ -77,7 +77,7 @@ public final class CliMain {
 	 * Create a new CliMain instance. This should only be done once, from the standard
 	 * Java main() function.
 	 */
-	private CliMain() {
+	private BMLAdminMain() {
 		/* empty */
 	}
 	
@@ -525,7 +525,7 @@ public final class CliMain {
 		 * display a meaningful error message.
 		 */
 		try {
-			new CliMain().invokeCommand(args);
+			new BMLAdminMain().invokeCommand(args);
 			
 		} catch (Throwable e) {
 			System.err.println("\n============================================================\n");

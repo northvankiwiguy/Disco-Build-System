@@ -4,18 +4,18 @@ allowing the actions to be referred to by a single name.
 
 For example, to add a number of different actions to a package, use:
 
-    bml set-action-pkg src_code 100:23:2/:44/
-    bml set-action-pkg src_code 11:22
+    bmladmin set-action-pkg src_code 100:23:2/:44/
+    bmladmin set-action-pkg src_code 11:22
     
 It is now possible to reference this complete set of actions by using the
 %pkg syntax. For example:
 
-    bml show-actions -f %pkg/src_code
+    bmladmin show-actions -f %pkg/src_code
     
 will show all the actions that have been added to the "src_code" package, 
 whereas:
 
-    bml show-actions -f %not-pkg/src_code
+    bmladmin show-actions -f %not-pkg/src_code
     
 will show all the actions that are NOT inside that package.
 

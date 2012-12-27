@@ -6,5 +6,5 @@
 #
 
 rm -f build.bml
-bml scan-tree $TEST_SRC/../build-tree
+bmladmin scan-tree $TEST_SRC/../build-tree
 

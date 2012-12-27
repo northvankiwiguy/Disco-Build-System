@@ -6,7 +6,7 @@ libraries (/usr/include and /usr/lib).
 
 For example, to set the workspace root:
 
-    bml set-workspace-root /products/ping_pong
+    bmladmin set-workspace-root /products/ping_pong
     
 This VFS directory can now be accessed via the @workspace root, with all
 source files being accessed relative to this root (or relative to one of

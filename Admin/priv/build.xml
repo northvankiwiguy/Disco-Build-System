@@ -118,10 +118,14 @@ system. Otherwise use the targets in the individual project directories.
 		<!-- now create a single jar file, placing it in the release package -->
 		<jar basedir="${tmp-dir}" destfile="${pkg-dir}/lib/buildml.jar" />
 		
-		<!-- copy the "bml" shell script -->
-		<copy file="${workspace-root}/CliMain/priv/scripts/bml" todir="${pkg-dir}/bin" />
-		<chmod file="${pkg-dir}/bin/bml" perm="755" />
-		
+		<!-- copy the "bmladmin" shell script -->
+		<copy file="${workspace-root}/CliMain/priv/scripts/bml" tofile="${pkg-dir}/bin/bmladmin" />
+		<chmod file="${pkg-dir}/bin/bmladmin" perm="755" />
+
+	    <!-- copy the "bml" shell script -->
+	    <copy file="${workspace-root}/CliMain/priv/scripts/bml" tofile="${pkg-dir}/bin/bml" />
+	    <chmod file="${pkg-dir}/bin/bml" perm="755" />
+
 		<!-- copy the native Utilities library -->
 		<copy file="${workspace-root}/Utilities/pub/libnativeLib.so" todir="${pkg-dir}/lib" />
 		
@@ -335,7 +339,7 @@ system. Otherwise use the targets in the individual project directories.
 	<!--================================================================================-->
 
 	<!--
-	   - Run the CLI-based system tests. This means we invoking the "bml" script, rather
+	   - Run the CLI-based system tests. This means we invoking the "bmladmin" script, rather
 	   - than invoking individual classes.
 	  -->
 	<target name="cli-test" depends="cli" description="Run all CLI-based tests.">

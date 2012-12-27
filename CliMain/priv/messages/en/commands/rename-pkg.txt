@@ -4,12 +4,12 @@ change its parent folder.
 
 For example:
 
-    bml rename-pkg packageA compressLib
+    bmladmin rename-pkg packageA compressLib
 
 will rename the package named "packageA" with a more suitable name,
 "compressLib". Also,
 
-	bml rename-pkg Folder2 LibFolder
+	bmladmin rename-pkg Folder2 LibFolder
 	
 will rename the folder named "Folder2" to "LibFolder". The content of the
 folder is unchanged.    

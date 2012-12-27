@@ -10,4 +10,4 @@ The command arguments are:
   
 <action>
 
-      bml rm-action 8
+      bmladmin rm-action 8
