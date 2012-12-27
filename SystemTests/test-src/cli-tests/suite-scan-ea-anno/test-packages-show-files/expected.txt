@@ -1,7 +1,4 @@
 Show all files, with only default packages
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 <import> - None          /home/psmith/t/cvs-1.11.23/config.h
@@ -348,15 +345,10 @@ Show all files, with only default packages
 <import> - None          /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 <import> - None          /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 <import> - None          /home/psmith/t/cvs-1.11.23/zlib/zutil.o
-<import> - None          /home/psmith/work
-<import> - None          /home/psmith/work/Disco-Build-System
 
 Add a package to the zlib files, and show all files again
 Workspace root set to /home/psmith/t/cvs-1.11.23.
 New package zlib added.
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 <import> - None          /home/psmith/t/cvs-1.11.23/config.h
@@ -703,13 +695,8 @@ zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
-<import> - None          /home/psmith/work
-<import> - None          /home/psmith/work/Disco-Build-System
 
 Show only the files in the new package
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
@@ -755,9 +742,6 @@ zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Show the files that are outside the new package
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 <import> - None          /home/psmith/t/cvs-1.11.23/config.h
@@ -1063,22 +1047,14 @@ Show the files that are outside the new package
 <import> - None          /home/psmith/t/cvs-1.11.23/vms/stamp-ch
 <import> - None          /home/psmith/t/cvs-1.11.23/windows-NT
 <import> - None          /home/psmith/t/cvs-1.11.23/windows-NT/SCC
-<import> - None          /home/psmith/work
-<import> - None          /home/psmith/work/Disco-Build-System
 
 Add a single file to zlib/public, and show it
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
 zlib - Public            /home/psmith/t/cvs-1.11.23/zlib/libz.a
 
 Show only the private files in zlib
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
@@ -1123,9 +1099,6 @@ zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Now show all the files in zlib
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
@@ -1177,9 +1150,6 @@ Status is 1
 
 Add a new package, and set all .o files to that package
 New package objects added.
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 <import> - None          /home/psmith/t/cvs-1.11.23/config.h
@@ -1526,13 +1496,8 @@ zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zlib.h
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 objects - Private        /home/psmith/t/cvs-1.11.23/zlib/zutil.o
-<import> - None          /home/psmith/work
-<import> - None          /home/psmith/work/Disco-Build-System
 
 Show the files that are still in zlib
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib
@@ -1565,9 +1530,6 @@ zlib - Private           /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
 Create a source package, assign it to all .c and .h files, then show what's left
 New package source added.
-<import> - None          /
-<import> - None          /home
-<import> - None          /home/psmith
 <import> - None          /home/psmith/t
 <import> - None          /home/psmith/t/cvs-1.11.23
 zlib - Private           /home/psmith/t/cvs-1.11.23/zlib

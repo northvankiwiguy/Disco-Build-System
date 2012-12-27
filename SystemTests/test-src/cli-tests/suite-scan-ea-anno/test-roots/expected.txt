@@ -1,8 +1,5 @@
 
 Show all files, with roots displayed
-/ (@root)
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
@@ -349,11 +346,6 @@ Show all files, with roots displayed
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
-/home/psmith/work/Disco-Build-System/SystemTests
-/home/psmith/work/Disco-Build-System/SystemTests/test-output
-/home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno
 
 Set the @workspace root appropriately
 Workspace root set to /home/psmith/t/cvs-1.11.23.

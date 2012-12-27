@@ -8,7 +8,7 @@
 # could be different on each native file system.
 echo
 echo "Show all files, with roots displayed"
-bmladmin show-files -r | fgrep -v @workspace
+bmladmin show-files -r | fgrep /home/psmith/t
 
 echo
 echo "Set the @workspace root appropriately"

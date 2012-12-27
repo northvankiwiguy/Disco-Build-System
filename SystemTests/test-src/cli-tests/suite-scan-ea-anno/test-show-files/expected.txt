@@ -1,7 +1,4 @@
 show-files - with default settings
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
@@ -348,13 +345,8 @@ show-files - with default settings
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 show-files with a single path-spec to select .c files
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/diff
@@ -458,9 +450,6 @@ show-files with a single path-spec to select .c files
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 
 show-files with path-specs to select .c and .h files
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
@@ -608,9 +597,6 @@ show-files with path-specs to select .c and .h files
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 
 show-files selecting a single subdirectory
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/zlib
@@ -656,9 +642,6 @@ show-files selecting a single subdirectory
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 show-files selecting two subdirectories
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/vms
@@ -708,9 +691,6 @@ show-files selecting two subdirectories
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 show-files selecting a subdirectory and a pattern
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/diff
@@ -840,9 +820,6 @@ show-files selecting a subdirectory and a pattern
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 show-files selecting a specific file name
-/
-/home
-/home/psmith
 /home/psmith/t
 /home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/lib

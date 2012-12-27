@@ -1,9 +1,4 @@
 Show all files in the build tree
-/
-/home
-/home/psmith
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 /build-tree
 /build-tree/dirA
@@ -28,11 +23,6 @@ Show all files in the build tree
 /build-tree/file4.h
 
 Show all files with suffix .c
-/
-/home
-/home/psmith
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 /build-tree
 /build-tree/file1.c
@@ -40,11 +30,6 @@ Show all files with suffix .c
 /build-tree/file3.c
 
 Show all files with suffix .h
-/
-/home
-/home/psmith
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 /build-tree
 /build-tree/dirB
@@ -52,11 +37,6 @@ Show all files with suffix .h
 /build-tree/file4.h
 
 Show all files with name file3.*
-/
-/home
-/home/psmith
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 /build-tree
 /build-tree/dirA
@@ -68,11 +48,6 @@ Show all files with name file3.*
 /build-tree/file3.c
 
 Show all the files in the dirA subdirectory
-/
-/home
-/home/psmith
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 /build-tree
 /build-tree/dirA
@@ -84,11 +59,6 @@ Show all the files in the dirA subdirectory
 /build-tree/dirA/file3.java
 
 Show all the files in the dirD subdirectory
-/
-/home
-/home/psmith
-/home/psmith/work
-/home/psmith/work/Disco-Build-System
 
 /build-tree
 /build-tree/dirA

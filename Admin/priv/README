@@ -30,7 +30,9 @@ hold of them.
 * make (build tool) - Not used in BuildML, but useful for testing build imports.
 * jdk (Java Development Kit) version 1.5 or higher. Although OpenJDK is installed
   by default on many Linux distributions, it's recommended that you use Sun/Oracle
-  JDK (from java.oracle.com).
+  JDK (from java.oracle.com). Make sure that you define JAVA_HOME to reference
+  this Java distribution, and also add $JAVA_HOME/bin into your path, before any
+  other Java distribution.
 * latex (document formatter) - You may also need to installed the related "tex"
   packages.
 * git (source code management) - Although you probably have this already if you've
