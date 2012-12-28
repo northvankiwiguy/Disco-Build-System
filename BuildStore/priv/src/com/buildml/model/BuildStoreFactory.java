@@ -77,6 +77,29 @@ public class BuildStoreFactory {
 		 */
 		return new BuildStore(buildStoreName, false);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Open an existing BuildStore database. If the database is not correctly initialized,
+	 * and error will be given.
+	 * 
+	 * @param buildStoreName Name of the database to open or create.
+	 * @return The new BuildStore object.
+	 * @throws FileNotFoundException The database file can't be found.
+	 * @throws IOException An I/O problem occurred while opening the database file.
+	 * @throws BuildStoreVersionException The database schema of an existing database is the 
+	 *         wrong version.
+	 */
+	public static IBuildStore openBuildStoreReadOnly(String buildStoreName)
+			throws FileNotFoundException, IOException, BuildStoreVersionException 
+	{
+		/*
+		 * For now, there is only one implementation of the IBuildStore interface,
+		 * but in future we might have more options.
+		 */
+		return new BuildStore(buildStoreName, false, false);
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 }

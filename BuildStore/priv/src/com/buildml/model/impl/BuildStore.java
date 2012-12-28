@@ -85,16 +85,17 @@ public class BuildStore implements IBuildStore {
 	
 	/**
 	 * Open or create a new BuildStore database. Clients should not invoke this
-	 * constructor directly. Instead, use BuildStoreFactory instead.
+	 * constructor directly. Instead, use BuildStoreFactory.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
 	 * @param saveRequired True if BuildStore must explicitly be "saved" before
 	 *        it's closed (otherwise the changes will be discarded).
+	 * @param createIfNeeded True if the database should be initialized if it's not already.
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
 	 * @throws IOException An I/O problem occurred while opening the database file.
 	 * @throws BuildStoreVersionException The database schema of an existing database is the wrong version.
 	 */
-	public BuildStore(String buildStoreName, boolean saveRequired)
+	public BuildStore(String buildStoreName, boolean saveRequired, boolean createIfNeeded)
 			throws FileNotFoundException, IOException, BuildStoreVersionException {
 		
 		boolean freshDatabase = false;
@@ -105,10 +106,15 @@ public class BuildStore implements IBuildStore {
 		/* if necessary, initialize the database with required tables */
 		int buildStoreVersion = getBuildStoreVersion();
 		if (buildStoreVersion == -1){
-			/* changes must be committed promptly */
-			db.setFastAccessMode(false); 
-			db.initDatabase();
-			freshDatabase = true;
+			if (createIfNeeded) {
+				/* changes must be committed promptly */
+				db.setFastAccessMode(false); 
+				db.initDatabase();
+				freshDatabase = true;
+			} else {
+				throw new BuildStoreVersionException("File \"" + buildStoreName + "\" does not " +
+						"appear to be a valid BuildML database file.");
+			}
 		}
 		
 		/* 
@@ -159,6 +165,24 @@ public class BuildStore implements IBuildStore {
 
 	/**
 	 * Open or create a new BuildStore database. Clients should not invoke this
+	 * constructor directly. Instead, use BuildStoreFactory.
+	 * 
+	 * @param buildStoreName Name of the database to open or create.
+	 * @param saveRequired True if BuildStore must explicitly be "saved" before
+	 *        it's closed (otherwise the changes will be discarded).
+	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
+	 * @throws IOException An I/O problem occurred while opening the database file.
+	 * @throws BuildStoreVersionException The database schema of an existing database is the wrong version.
+	 */
+	public BuildStore(String buildStoreName, boolean saveRequired)
+			throws FileNotFoundException, IOException, BuildStoreVersionException {
+		this(buildStoreName, saveRequired, true);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Open or create a new BuildStore database. Clients should not invoke this
 	 * constructor directly. Instead, use BuildStoreFactory instead.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
@@ -169,7 +193,7 @@ public class BuildStore implements IBuildStore {
 	 */
 	public BuildStore(String buildStoreName)
 			throws FileNotFoundException, IOException, BuildStoreVersionException {
-		this(buildStoreName, false);
+		this(buildStoreName, false, true);
 	}
 	
 	/*=====================================================================================*
