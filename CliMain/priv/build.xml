@@ -17,6 +17,7 @@
 		<pathelement location="${workspace-root}/Utilities/pub/utilities.jar" />
 		<pathelement location="${workspace-root}/BuildStore/pub/build-store.jar" />
 		<pathelement location="${workspace-root}/BuildTreeScanner/pub/build-tree-scanner.jar" />
+	    <pathelement location="${workspace-root}/ConfigurationFiles/pub/config-files.jar" />
 		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-cli-1.2.jar" />
 		<pathelement location="${workspace-root}/Utilities/priv/lib/commons-io-2.1.jar" />
 	</path>
@@ -29,6 +30,7 @@
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="jars" inheritall="false"/>
 		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="jars" inheritall="false"/>
 		<ant antfile="${workspace-root}/BuildRefactor/priv/build.xml" target="jars" inheritall="false"/>
+	    <ant antfile="${workspace-root}/ConfigurationFiles/priv/build.xml" target="jars" inheritall="false"/>
 	</target>
 	
 	<!-- specific cleaning operation for this project only -->

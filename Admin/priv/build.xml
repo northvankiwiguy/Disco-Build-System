@@ -38,6 +38,7 @@ system. Otherwise use the targets in the individual project directories.
 		<pathelement location="${workspace-root}/BuildStore/priv/src" />
 		<pathelement location="${workspace-root}/BuildTreeScanner/priv/src" />
 		<pathelement location="${workspace-root}/Utilities/priv/src" />
+        <pathelement location="${workspace-root}/ConfigurationFiles/priv/src" />
 		<pathelement location="${workspace-root}/CliMain/priv/src" />
 	</path>
 	
@@ -103,6 +104,7 @@ system. Otherwise use the targets in the individual project directories.
 		<unjar src="${workspace-root}/BuildScanners/pub/build-scanners.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/BuildRefactor/pub/refactoring.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/BuildTreeScanner/pub/build-tree-scanner.jar" dest="${tmp-dir}" />
+	    <unjar src="${workspace-root}/ConfigurationFiles/pub/config-files.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/CliMain/pub/cli-main.jar" dest="${tmp-dir}" />		
 		<unjar src="${workspace-root}/Utilities/priv/lib/commons-cli-1.2.jar" dest="${tmp-dir}" />
 		<unjar src="${workspace-root}/Utilities/priv/lib/commons-io-2.1.jar" dest="${tmp-dir}" />
@@ -306,6 +308,7 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildRefactor/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="clean" inheritall="false" />
+	    <ant antfile="${workspace-root}/ConfigurationFiles/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/CliMain/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/CaptureFS/priv/build.xml" target="clean" inheritall="false" />
@@ -331,6 +334,7 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/BuildScanners/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildRefactor/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/BuildTreeScanner/priv/build.xml" target="unit-test" inheritall="false" />
+	    <ant antfile="${workspace-root}/ConfigurationFiles/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/CliMain/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="unit-test" inheritall="false" />
 		<ant antfile="${workspace-root}/CaptureFS/priv/build.xml" target="unit-test" inheritall="false" />
