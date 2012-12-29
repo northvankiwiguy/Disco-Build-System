@@ -84,12 +84,15 @@ How to Compile BuildML
 To compile the BuildML release from source code, execute the following commands
 in this directory (Admin/priv).
 
-  % ant all
+  % ant all -Declipse-root=<path-to-eclipse-install-dir>
   
 This generates a release "tar-ball", the Eclipse plug-in, and various
 documentation files, placing them in the Admin/pub/ directory. The release
 image is named buildml-W.X.Y.tar.gz, where W.X.Y is the version number of the
 current code base.
+
+If you don't wish to build the Eclipse plugin, you can leave off the -Declipse-root
+option. This is useful for a CLI-only build.
 
 To build with a different version number, use:
 

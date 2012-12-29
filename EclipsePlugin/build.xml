@@ -1,0 +1,42 @@
+<!--
+   - Build steps for compiling the Eclipse plugin. The caller must use -Declipse-root=
+   - to specify the location of their Eclipse installation (this build is done in a headless
+   - environment).
+  -->
+<project name="EclipsePlugin" basedir="." >
+
+	<!-- location of the source and generated files -->
+    <property name="bin-dir" location="./bin" />
+    <property name="src-dir" location="./src" />
+	
+	<!-- 
+	   - Pull in all the Eclipse jars, rather than figuring out which is needed. This would
+	   - be extremely complex given all the possible jar files (and version numbers).
+	  -->
+	<path id="project-classpath">
+	    <fileset dir="${eclipse-root}/plugins/">
+	        <include name="org.eclipse.*.jar" />
+	    </fileset>
+		<pathelement location="../Admin/priv/pkg/buildml-current/lib/buildml.jar" />
+	</path>
+	
+	<!--
+	   - Build the Java class files.
+	  -->
+	<target name="jars">
+	    <mkdir dir="${bin-dir}" />
+	    <depend srcdir="${src-dir}" destdir="${bin-dir}" />
+	    <javac srcdir="${src-dir}" destdir="${bin-dir}" debug="true" 
+	    	   classpathref="project-classpath" includeantruntime="false">
+	    	   <exclude name="**/package-info.java" />
+	    </javac>
+	</target>
+
+	<!--
+	   - Clean the generated class files.
+	  -->
+	<target name="clean">
+	    <delete dir="bin" />
+    </target>
+
+</project>

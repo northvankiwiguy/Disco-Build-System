@@ -70,7 +70,7 @@ system. Otherwise use the targets in the individual project directories.
 	   - API, and the PDF user guide.
 	   -->
 	<target name="all" description="Build the complete release package."
-		depends="cli, plugin, javadoc, userdoc, update-site" />
+		depends="cli, javadoc, userdoc, plugin, update-site" />
 	
 	<!--================================================================================-->
 
@@ -155,7 +155,7 @@ system. Otherwise use the targets in the individual project directories.
 	   - Build the Eclipse plugin - a jar file that can be dropped into an Eclipse
 	   - installation, or installed via an update site
 	  -->
-	<target name="plugin" description="Build the Eclipse plugin." depends="cli">
+	<target name="plugin" description="Build the Eclipse plugin." depends="cli" if="eclipse-root">
 		
 		<property name="pkg-dir" location="${priv-dir}/pkg/buildml-${version}" />
 		<property name="plugin-tmp-dir" location="${priv-dir}/pkg/plugin-tmp" />
@@ -163,6 +163,8 @@ system. Otherwise use the targets in the individual project directories.
 		
 		<!-- create a temporary directory where the plugin content will be gathered -->
 		<mkdir dir="${plugin-dir}" />
+		
+		<ant antfile="${workspace-root}/EclipsePlugin/build.xml" target="jars" inheritall="false"/>
 		
 		<!-- copy plugin classes -->
 		<copy failonerror="true" todir="${plugin-dir}">
@@ -205,7 +207,7 @@ system. Otherwise use the targets in the individual project directories.
 	   - Build the Eclipse feature and update site, in preparation for posting to the
 	   - public web site.
 	  -->
-	<target name="update-site" description="Build the Eclipse update-site">
+	<target name="update-site" description="Build the Eclipse update-site" if="eclipse-root">
 		
 		<!-- delete old content from update directory -->
 		<delete dir="${pub-dir}/update" />
@@ -313,6 +315,7 @@ system. Otherwise use the targets in the individual project directories.
 		<ant antfile="${workspace-root}/Utilities/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/CaptureFS/priv/build.xml" target="clean" inheritall="false" />
 		<ant antfile="${workspace-root}/SystemTests/build.xml" target="clean" inheritall="false" />
+        <ant antfile="${workspace-root}/EclipsePlugin/build.xml" target="clean" inheritall="false" />
 		<antcall target="clean-javadoc" />
 		<antcall target="clean-userdoc" />
 		
