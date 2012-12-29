@@ -1,0 +1,11 @@
+Create a new empty build.bml database file in the current directory, in 
+preparation for performing other administrative commands. If the database
+file already exists, this command has no effect.
+
+To create build.bml in the current directory, use:
+
+    bmladmin create
+    
+To create a database file with a non-standard name, use the global -f option:
+
+    bmladmin -f test.bml create

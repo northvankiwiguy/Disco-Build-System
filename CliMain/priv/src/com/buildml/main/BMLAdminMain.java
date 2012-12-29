@@ -324,6 +324,11 @@ public final class BMLAdminMain {
 		/* we'll record all the command groups in a list */
 		commandGroups = new ArrayList<CommandGroup>();
 		
+		registerCommandGroup("Commands for managing the build.bml database file",
+			new ICliCommand[] {
+				new CliCommandCreate()
+			});
+		
 		registerCommandGroup("Commands for scanning builds and build trees",
 			new ICliCommand[] {
 				new CliCommandScanTree(),
@@ -456,11 +461,15 @@ public final class BMLAdminMain {
 		}
 		
 		/*
-		 * Open the build store file, or create a new file.
+		 * Open the build store file, or for the "create" command, we create it.
 		 */
 		IBuildStore buildStore = null;
 		try {
-			buildStore = BuildStoreFactory.openBuildStore(buildStoreFileName);
+			if (cmd.getName().equals("create")) {
+				buildStore = BuildStoreFactory.createBuildStore(buildStoreFileName);
+			} else {
+				buildStore = BuildStoreFactory.openBuildStore(buildStoreFileName);
+			}
 		} catch (FileNotFoundException ex) {
 			CliUtils.reportErrorAndExit(ex.getMessage());
 		} catch (IOException ex) {

@@ -6,5 +6,6 @@
 #
 
 rm -f build.bml
+bmladmin create
 bmladmin scan-ea-anno $TEST_SRC/../emake.xml
 

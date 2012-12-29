@@ -70,7 +70,7 @@ public class CommonTestUtils {
 		try {
 			File bsFile = new File(tmpDir, "testBuildStore.bml");
 			bsFile.delete();
-			bs = BuildStoreFactory.openBuildStore(bsFile.toString(), saveRequired);
+			bs = BuildStoreFactory.createBuildStore(bsFile.toString(), saveRequired);
 		} catch (BuildStoreVersionException e) {
 			/* we can't handle schema version problems - make it a fatal error */
 			throw new FatalBuildStoreError(e.getMessage());

@@ -30,11 +30,9 @@ public class BuildStoreFactory {
 	 *=====================================================================================*/
 	
 	/**
-	 * Open or create a new BuildStore database. If the database already
-	 * exists, open it for updating. If there's no database by this name,
-	 * create a fresh database.
+	 * Open an existing BuildStore database. The database file must already exist.
 	 * 
-	 * @param buildStoreName Name of the database to open or create.
+	 * @param buildStoreName Name of the database to open.
 	 * @param saveRequired True if BuildStore must explicitly be "saved" before
 	 *        it's closed (otherwise the changes will be discarded).
 	 * @return The new BuildStore object.
@@ -56,12 +54,11 @@ public class BuildStoreFactory {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Open or create a new BuildStore database. If the database already
-	 * exists, open it for updating. If there's no database by this name,
-	 * create a fresh database. Changes to this BuildStore will automatically
-	 * be saved to the original BuildML file (no "save" operation required).
+	 * Open an existing BuildStore database. The database file must already exist.
+	 * Changes to this BuildStore will automatically be saved to the original BuildML file
+	 * (no "save" operation required).
 	 * 
-	 * @param buildStoreName Name of the database to open or create.
+	 * @param buildStoreName Name of the database to open.
 	 * @return The new BuildStore object.
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
 	 * @throws IOException An I/O problem occurred while opening the database file.
@@ -77,28 +74,47 @@ public class BuildStoreFactory {
 		 */
 		return new BuildStore(buildStoreName, false);
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
-
+	
 	/**
-	 * Open an existing BuildStore database. If the database is not correctly initialized,
-	 * and error will be given.
+	 * Create a new BuildStore database. If the database already exists, this operation
+	 * simply opens the existing database.
 	 * 
-	 * @param buildStoreName Name of the database to open or create.
+	 * @param buildStoreName Name of the database to open.
 	 * @return The new BuildStore object.
-	 * @throws FileNotFoundException The database file can't be found.
+	 * 
+	 * @throws FileNotFoundException The database file isn't writable.
 	 * @throws IOException An I/O problem occurred while opening the database file.
 	 * @throws BuildStoreVersionException The database schema of an existing database is the 
 	 *         wrong version.
 	 */
-	public static IBuildStore openBuildStoreReadOnly(String buildStoreName)
+	public static IBuildStore createBuildStore(String buildStoreName)
 			throws FileNotFoundException, IOException, BuildStoreVersionException 
 	{
-		/*
-		 * For now, there is only one implementation of the IBuildStore interface,
-		 * but in future we might have more options.
-		 */
-		return new BuildStore(buildStoreName, false, false);
+		return new BuildStore(buildStoreName, false, true);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a new BuildStore database. If the database already exists, this operation
+	 * simply opens the existing database.
+	 * 
+	 * @param buildStoreName Name of the database to open.
+	 * @param saveRequired True if BuildStore must explicitly be "saved" before
+	 *        it's closed (otherwise the changes will be discarded).
+	 * @return The new BuildStore object.
+	 * 
+	 * @throws FileNotFoundException The database file isn't writable.
+	 * @throws IOException An I/O problem occurred while opening the database file.
+	 * @throws BuildStoreVersionException The database schema of an existing database is the 
+	 *         wrong version.
+	 */
+	public static IBuildStore createBuildStore(String buildStoreName, boolean saveRequired)
+			throws FileNotFoundException, IOException, BuildStoreVersionException 
+	{
+		return new BuildStore(buildStoreName, saveRequired, true);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

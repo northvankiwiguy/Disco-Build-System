@@ -204,7 +204,7 @@ public class BMLMain {
 		
 		/* attempt to open the build.bml file */
 		try {
-			buildStore = BuildStoreFactory.openBuildStoreReadOnly(pathToDatabase.toString());
+			buildStore = BuildStoreFactory.openBuildStore(pathToDatabase.toString());
 		} catch (FileNotFoundException e) {
 			fatal("File \"" + pathToDatabase + "\" can't be opened as a BuildML database.");
 		} catch (IOException e) {

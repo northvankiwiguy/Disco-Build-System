@@ -112,7 +112,7 @@ public class BuildStore implements IBuildStore {
 				freshDatabase = true;
 			} else {
 				throw new BuildStoreVersionException("File \"" + buildStoreName + "\" does not " +
-						"appear to be a valid BuildML database file.");
+						"exist, or isn't a valid BuildML database file.");
 			}
 		}
 		
@@ -168,8 +168,8 @@ public class BuildStore implements IBuildStore {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Open or create a new BuildStore database. Clients should not invoke this
-	 * constructor directly. Instead, use BuildStoreFactory.
+	 * Open an existing BuildStore database. Clients should not invoke this constructor
+	 * directly. Instead, use BuildStoreFactory.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
 	 * @param saveRequired True if BuildStore must explicitly be "saved" before
@@ -180,14 +180,14 @@ public class BuildStore implements IBuildStore {
 	 */
 	public BuildStore(String buildStoreName, boolean saveRequired)
 			throws FileNotFoundException, IOException, BuildStoreVersionException {
-		this(buildStoreName, saveRequired, true);
+		this(buildStoreName, saveRequired, false);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Open or create a new BuildStore database. Clients should not invoke this
-	 * constructor directly. Instead, use BuildStoreFactory instead.
+	 * Open an existing BuildStore database. Clients should not invoke this constructor
+	 * directly. Instead, use BuildStoreFactory instead.
 	 * 
 	 * @param buildStoreName Name of the database to open or create.
 	 * @throws FileNotFoundException The database file can't be found, or isn't writable.
@@ -197,7 +197,7 @@ public class BuildStore implements IBuildStore {
 	 */
 	public BuildStore(String buildStoreName)
 			throws FileNotFoundException, IOException, BuildStoreVersionException {
-		this(buildStoreName, false, true);
+		this(buildStoreName, false, false);
 	}
 	
 	/*=====================================================================================*

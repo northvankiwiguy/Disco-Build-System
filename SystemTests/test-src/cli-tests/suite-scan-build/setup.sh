@@ -6,5 +6,6 @@
 #
 
 rm -f build.bml
+bmladmin create
 
 
