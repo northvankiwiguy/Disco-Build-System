@@ -138,7 +138,7 @@ public class CliCommandShowFiles implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(org.apache.commons.cli.CommandLine)
 	 */
 	@Override
-	public void invoke(IBuildStore buildStore, String [] args) {
+	public void invoke(IBuildStore buildStore, String buildStorePath, String [] args) {
 		
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 

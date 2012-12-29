@@ -98,7 +98,7 @@ public class CliCommandSetWorkspaceRoot implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(IBuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String buildStorePath, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 1, 1, "You must specify a new root path.");
 

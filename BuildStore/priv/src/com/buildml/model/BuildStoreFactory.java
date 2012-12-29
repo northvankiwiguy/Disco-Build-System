@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.buildml.model.impl.BuildStore;
+import com.buildml.model.impl.UpgradeDB;
 
 /**
  * A factory for opening and creating new BuildML BuildStore objects. A BuildStore
@@ -115,6 +116,20 @@ public class BuildStoreFactory {
 			throws FileNotFoundException, IOException, BuildStoreVersionException 
 	{
 		return new BuildStore(buildStoreName, saveRequired, true);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Upgrade a BuildStore database to the current schema version.
+	 * @param buildStoreName Name of the database to upgrade.
+	 * @throws BuildStoreVersionException We couldn't upgrade from the database file's schema.
+	 * @throws FileNotFoundException The database file doesn't exist.
+	 * 
+	 */
+	public static void upgradeBuildStore(String buildStoreName) 
+			throws BuildStoreVersionException, FileNotFoundException {
+		UpgradeDB.upgrade(buildStoreName);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

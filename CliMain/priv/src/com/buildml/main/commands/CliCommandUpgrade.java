@@ -12,19 +12,23 @@
 
 package com.buildml.main.commands;
 
+import java.io.FileNotFoundException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
+import com.buildml.model.BuildStoreFactory;
+import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IBuildStore;
 
 /**
- * BuildML CLI Command class that implements the "create" command.
+ * BuildML CLI Command class that implements the "upgrade" command.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class CliCommandCreate implements ICliCommand {
+public class CliCommandUpgrade implements ICliCommand {
 
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -35,7 +39,7 @@ public class CliCommandCreate implements ICliCommand {
 	 */
 	@Override
 	public String getLongDescription() {
-		return CliUtils.genLocalizedMessage("#include commands/create.txt");
+		return CliUtils.genLocalizedMessage("#include commands/upgrade.txt");
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -45,7 +49,7 @@ public class CliCommandCreate implements ICliCommand {
 	 */
 	@Override
 	public String getName() {
-		return "create";
+		return "upgrade";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -75,7 +79,7 @@ public class CliCommandCreate implements ICliCommand {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "Add a new (empty) build.bml database file.";
+		return "Upgrade an existing build.bml to the current schema version.";
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -99,8 +103,16 @@ public class CliCommandCreate implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 0, 0, 
 				"No arguments required. Use -f global option to specify database name.");
 
-		/* all is good - the database was already created before we were called. */
-		System.out.println("New database file created.");		
+		/* all is good */
+		try {
+			BuildStoreFactory.upgradeBuildStore(buildStorePath);
+		} catch (FileNotFoundException e) {
+			CliUtils.reportErrorAndExit(e.getMessage());
+		} catch (BuildStoreVersionException e) {
+			CliUtils.reportErrorAndExit(e.getMessage());
+		}
+		
+		System.out.println("Database is now at correct schema version.");		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

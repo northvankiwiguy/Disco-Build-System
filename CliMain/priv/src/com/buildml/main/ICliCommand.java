@@ -74,8 +74,9 @@ public interface ICliCommand {
 	 * It can be assumed that processOptions() has already been called to configure 
 	 * the command's options.
 	 * @param buildStore The BuildStore to perform the command on.
+	 * @param buildStorePath The path to the BuildStore file.
 	 * @param args The command line arguments (normal "non-option" arguments only).
 	 */
-	public void invoke(IBuildStore buildStore, String [] args);
+	public void invoke(IBuildStore buildStore, String buildStorePath, String [] args);
 	
 }

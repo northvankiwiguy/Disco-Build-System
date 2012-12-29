@@ -72,7 +72,7 @@ public class CliCommandShowUnusedFiles extends CliCommandShowFiles {
 	 * @see com.buildml.main.commands.CliCommandShowFiles#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(IBuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String buildStorePath, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
 

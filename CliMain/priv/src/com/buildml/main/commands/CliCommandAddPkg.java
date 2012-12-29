@@ -111,7 +111,7 @@ public class CliCommandAddPkg implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(IBuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String buildStorePath, String[] args) {
 
 		String objName = optionAddFolder ? "folder" : "package";
 		

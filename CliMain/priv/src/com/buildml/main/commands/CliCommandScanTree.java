@@ -99,7 +99,7 @@ public class CliCommandScanTree implements ICliCommand {
 	 * @see com.buildml.main.ICliCommand#invoke(com.buildml.model.BuildStore, java.lang.String[])
 	 */
 	@Override
-	public void invoke(IBuildStore buildStore, String[] args) {
+	public void invoke(IBuildStore buildStore, String buildStorePath, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 1, CliUtils.ARGS_INFINITE, 
 				"one or more directory names required.");

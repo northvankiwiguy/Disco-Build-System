@@ -326,7 +326,8 @@ public final class BMLAdminMain {
 		
 		registerCommandGroup("Commands for managing the build.bml database file",
 			new ICliCommand[] {
-				new CliCommandCreate()
+				new CliCommandCreate(),
+				new CliCommandUpgrade()
 			});
 		
 		registerCommandGroup("Commands for scanning builds and build trees",
@@ -461,13 +462,14 @@ public final class BMLAdminMain {
 		}
 		
 		/*
-		 * Open the build store file, or for the "create" command, we create it.
+		 * Open the build store file, or for the "create" command, we create it. For
+		 * "upgrade" we do neither.
 		 */
 		IBuildStore buildStore = null;
 		try {
 			if (cmd.getName().equals("create")) {
 				buildStore = BuildStoreFactory.createBuildStore(buildStoreFileName);
-			} else {
+			} else if (!cmd.getName().equals("upgrade")) {
 				buildStore = BuildStoreFactory.openBuildStore(buildStoreFileName);
 			}
 		} catch (FileNotFoundException ex) {
@@ -510,11 +512,12 @@ public final class BMLAdminMain {
 		 * exit from the program. This is the typical case when an error is reported
 		 * via the CliUtils.reportErrorAndExit() method.
 		 */
-		cmd.invoke(buildStore, remainingArgs);
+		cmd.invoke(buildStore, buildStoreFileName, remainingArgs);
 
 		/* release resources */
-		buildStore.close();
-
+		if (buildStore != null) {
+			buildStore.close();
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
