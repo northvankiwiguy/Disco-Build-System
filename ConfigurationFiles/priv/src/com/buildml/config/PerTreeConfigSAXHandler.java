@@ -75,7 +75,7 @@ import com.buildml.utils.errors.ErrorCode;
 			if (localName.equals("bmlconfig")) {
 				startSeen = true;
 			} else {
-				throw new SAXException("Invalid file content. Must start with <bmlconfig>");
+				throw new SAXException("Invalid file content. Must start with <bmlconfig>.");
 			}
 		}
 

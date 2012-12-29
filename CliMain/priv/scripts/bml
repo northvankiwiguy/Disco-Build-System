@@ -48,7 +48,7 @@ then
     WORK="$SCRIPT_DIR/../../../"
     
 	export CLASSPATH="$WORK/BuildStore/priv/bin:$WORK/CliMain/priv/bin:$WORK/BuildTreeScanner/priv/bin:$WORK/Utilities/priv/bin"
-	export CLASSPATH="$WORK/BuildScanners/priv/bin:$WORK/BuildRefactor/priv/bin:$CLASSPATH"
+	export CLASSPATH="$WORK/BuildScanners/priv/bin:$WORK/BuildRefactor/priv/bin:$WORK/ConfigurationFiles/priv/bin:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-cli-1.2.jar:$WORK/BuildStore/priv/lib/sqlitejdbc-v056.jar:$CLASSPATH"
 	export CLASSPATH="$WORK/Utilities/priv/lib/commons-io-2.1.jar:$WORK/CliMain/priv:$CLASSPATH"
 	export BUILDML_HOME=$WORK/Admin/priv/pkg/buildml-current/
