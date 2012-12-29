@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 
 import com.buildml.model.FatalBuildStoreError;
-import com.buildml.utils.version.Version;
 
 /**
  * A helper class to manage and simplify all the database access performed
@@ -52,7 +51,7 @@ import com.buildml.utils.version.Version;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	private static final int SCHEMA_VERSION = 1;
+	public static final int SCHEMA_VERSION = 400;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -245,7 +244,7 @@ import com.buildml.utils.version.Version;
 			 * use this field to detect older versions of the database.
 			 */
 			stat.executeUpdate("create table schemaVersion ( version integer )");
-			stat.executeUpdate("insert into schemaVersion values ( " + Version.getVersionNumberAsInt() + ")");
+			stat.executeUpdate("insert into schemaVersion values ( " + SCHEMA_VERSION + ")");
 
 			/* Create the "files" table. */
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, trashed integer, " +

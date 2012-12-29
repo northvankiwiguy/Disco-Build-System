@@ -28,7 +28,6 @@ import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.utils.errors.ErrorCode;
-import com.buildml.utils.version.Version;
 
 
 /**
@@ -122,11 +121,16 @@ public class BuildStore implements IBuildStore {
 		 * correct version.
 		 */
 		else {
-			int actualVersion = Version.getVersionNumberAsInt();
-			if (buildStoreVersion != actualVersion){
+			if (buildStoreVersion < BuildStoreDB.SCHEMA_VERSION){
 				throw new BuildStoreVersionException(
-						"Database \"" + buildStoreName + "\" has schema version " + buildStoreVersion +
-						". Expected version " + actualVersion + ".");
+						"Database \"" + buildStoreName + "\" has an older schema version (" 
+								+ buildStoreVersion + "). Please run \"bmladmin upgrade\" to upgrade " +
+								"the database content.");
+			}
+			if (buildStoreVersion > BuildStoreDB.SCHEMA_VERSION){
+				throw new BuildStoreVersionException(
+						"Database \"" + buildStoreName + "\" has an unrecognized schema version (" + 
+								buildStoreVersion + "). It can only be read by a newer version of BuildML.");
 			}
 		}
 
