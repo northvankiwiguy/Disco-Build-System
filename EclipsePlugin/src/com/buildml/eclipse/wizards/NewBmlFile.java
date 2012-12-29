@@ -138,7 +138,7 @@ public class NewBmlFile extends Wizard implements INewWizard {
 		if (location != null) {
 			try {
 				String fullPath = location.toOSString();
-				IBuildStore bs = BuildStoreFactory.openBuildStore(fullPath);
+				IBuildStore bs = BuildStoreFactory.createBuildStore(fullPath);
 				configureWorkspace(bs, fullPath);
 				bs.close();
 			} catch (FileNotFoundException e) {
