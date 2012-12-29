@@ -46,6 +46,9 @@ public class PerTreeConfigFile {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** version of the XML file schema */
+	public static final int SCHEMA_VERSION = 1;
+	
 	/** The native path to the configuration file */
 	private File configFile = null;
 	
@@ -103,7 +106,7 @@ public class PerTreeConfigFile {
 	public void save() throws IOException {
 		
 		PrintWriter out = new PrintWriter(new FileWriter(configFile));
-		out.println("<bmlconfig>");
+		out.println("<bmlconfig version=\"" + SCHEMA_VERSION + "\">");
 		
 		for (Iterator<String> iter = aliasMap.keySet().iterator(); iter.hasNext();) {
 			String aliasName = (String) iter.next();

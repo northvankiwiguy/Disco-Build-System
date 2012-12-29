@@ -74,6 +74,23 @@ import com.buildml.utils.errors.ErrorCode;
 		if (!startSeen) {
 			if (localName.equals("bmlconfig")) {
 				startSeen = true;
+				
+				/* validate the schema version number */
+				String versionString = atts.getValue("version");
+				if (versionString == null){
+					throw new SAXException("Invalid file content. Schema version missing.");
+				}
+				try {
+					int versionNum = Integer.valueOf(versionString);
+					if (versionNum != PerTreeConfigFile.SCHEMA_VERSION) {
+						throw new SAXException("Invalid file content. Expected schema " + 
+								PerTreeConfigFile.SCHEMA_VERSION + " but file has version " + 
+								versionNum + ".");
+					}
+					
+				} catch (NumberFormatException e) {
+					throw new SAXException("Invalid file content. Schema version is not numeric.");
+				}
 			} else {
 				throw new SAXException("Invalid file content. Must start with <bmlconfig>.");
 			}
