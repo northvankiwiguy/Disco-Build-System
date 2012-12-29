@@ -67,4 +67,27 @@ public class StringArray {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given an array of strings, return the length of the longest string in the array. This
+	 * is useful for formatting the list into columns.
+	 * 
+	 * @param input The input array of Strings.
+	 * @return The length of the longest string.
+	 */
+	public static int maxStringLength(String [] input) {
+		int maxLengthSoFar = 0;
+		
+		for (int i = 0; i < input.length; i++) {
+			int thisLength = input[i].length();
+			if (thisLength > maxLengthSoFar) {
+				maxLengthSoFar = thisLength;
+			}
+		}
+		
+		return maxLengthSoFar;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 }
