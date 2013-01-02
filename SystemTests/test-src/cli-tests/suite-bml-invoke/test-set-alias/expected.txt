@@ -1,0 +1,62 @@
+Show the package definitions.
+
+Valid package names:
+
+  diff
+  src
+  zlib
+
+No aliases defined.
+
+To build a package, use: "bml <pkg-name>" or "bml <alias>"
+
+Define two package aliases
+
+Valid package names:
+
+  diff
+  src
+  zlib
+
+Aliases defined:
+
+  all       diff src zlib 
+  default   src 
+
+To build a package, use: "bml <pkg-name>" or "bml <alias>"
+
+Redefine a package alias
+
+Valid package names:
+
+  diff
+  src
+  zlib
+
+Aliases defined:
+
+  all       diff src zlib 
+  default   diff 
+
+To build a package, use: "bml <pkg-name>" or "bml <alias>"
+
+Remove a package alias
+
+Valid package names:
+
+  diff
+  src
+  zlib
+
+Aliases defined:
+
+  all   diff src zlib 
+
+To build a package, use: "bml <pkg-name>" or "bml <alias>"
+
+Create an alias to invalid packages.
+One or more of the package names is invalid.
+Status 255
+Try to remove an alias that doesn't exist
+Alias not defined: badaliasname
+Status 255
