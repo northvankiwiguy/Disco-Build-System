@@ -115,6 +115,10 @@ public class BMLMain {
 
 		int argPos = 0;
 
+		if ((args.length > 0) && (args[0].equals("-h"))) {
+			showUsageAndExit(null);			
+		}
+		
 		/* open the BuildStore and the per-tree configuration */
 		argPos = openDatabases(args, argPos);
 		
@@ -128,10 +132,6 @@ public class BMLMain {
 					argPos++;
 
 					switch (option.charAt(1)) {
-
-					case 'h':
-						showUsageAndExit(null);
-						break;
 
 					case 'l':
 						listPackages(args, argPos);
@@ -338,7 +338,7 @@ public class BMLMain {
 				int pkgId = pkgMgr.getId(expPkgs[j]);
 				if ((pkgId == ErrorCode.NOT_FOUND) || pkgMgr.isFolder(pkgId)) {
 					fatal("Invalid package or alias name: \"" + expPkgs[j] + 
-							"\". Use \"bml -l\" to see valid choices.");
+							"\". Use \"bml -l\" to see valid choices, or \"bml -h\" for more help.");
 				}
 			}
 			
