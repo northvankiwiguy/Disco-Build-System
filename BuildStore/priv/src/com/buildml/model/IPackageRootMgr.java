@@ -145,22 +145,15 @@ public interface IPackageRootMgr {
 	
 	/**
 	 * Set the temporary source or generated root for a particular package. This method
-	 * is similar to setDefaultPackageRoot but is specified as a native file system
+	 * is similar to setPackageRoot() but is specified as a native file system
 	 * path and is not persisted in the database. It is therefore used for overriding
 	 * the default package root in a particular BuildStore instance (but not in the 
-	 * build.bml file).
-	 * 
-	 * The path may either be absolute or relative to the workspace root. Given that
-	 * this root is temporary (non-persistent), the use of absolute paths is expected
-	 * to be quite common.
+	 * build.bml file). The path must be specified as an absolute path.
 	 * 
 	 * @param packageId  The ID of the package to be modified. 
 	 * @param type		 Either IPackageRootMgr.SOURCE_ROOT or 
 	 *                   IPackageRootMgr.GENERATED_ROOT.
-	 * @param path       The path to the package root. If this is an absolute path,
-	 *                   it maps to the absolute path on the native file system. If
-	 *                   it's relative (not starting with /), it'll be relative to
-	 *                   the workspace root.
+	 * @param path       The absolute path to the package root.
 	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if the packageId is not
 	 *         valid, ErrorCode.BAD_VALUE if type is invalid, or ErrorCode.BAD_PATH
 	 *         if the path does not exist on the native file system.
@@ -168,7 +161,7 @@ public interface IPackageRootMgr {
 	public int setPackageRootNative(int packageId, int type, String path);
 	
 	/**
-	 * Remove the previous root, as set by overridePackageRoot(). This only affects
+	 * Remove the previous root, as set by setPackageRootNative(). This only affects
 	 * the temporary root setting and therefore does not remove the persistent
 	 * value that was set by setPackageRoot().
 	 * 
@@ -184,31 +177,30 @@ public interface IPackageRootMgr {
 	 * Retrieve the source or generate root for the specified package, as a
 	 * native path. 
 	 * 
-	 * This will return the value last set by the overridePackageRoot()
+	 * This will return the value last set by the setPackageRootNative()
 	 * method, although if no such root has been set in the current instance of the
-	 * BuildStore, the persistent value from setPackageRoot() will instead be
-	 * returned. Finally, if no root has been set, the current workspace root will be
-	 * returned.
+	 * BuildStore, the persistent value from setPackageRoot(), relative to the
+     * native workspace root, will instead be returned.
 	 * 
 	 * @param packageId  The ID of the package whose root should be retrieved.
 	 * @param type       Either IPackageRootMgr.SOURCE_ROOT or 
 	 *                   IPackageRootMgr.GENERATED_ROOT.
-	 * @return The native path to the package's root.
+	 * @return The native path to the package's root, or null if the packageId or
+	 * type is invalid.
 	 */
 	public String getPackageRootNative(int packageId, int type);
 
 	/**
 	 * Retrieve the specified root, as a native path. This will return the value last
-	 * set by the overridePackageRoot() method, although if no such root has been set
+	 * set by the setPackageRootNative() method, although if no such root has been set
 	 * in the current instance of the BuildStore, the persistent value from
-	 * setPackageRoot() will instead be returned. Finally, if no root has been set,
-	 * the current workspace root will be returned.
+	 * setPackageRoot(), relative to the native workspace root, will instead be returned.
 	 * 
 	 * In addition to package-specific roots, this method can also be used to retrieve
 	 * the default "root" and "workspace" roots.
 	 * 
 	 * @param rootName The textual name of the root.
-	 * @return The path to the package's root.
+	 * @return The path to the package's root, or null if the root name is invalid.
 	 */
 	public String getRootNative(String rootName);
 

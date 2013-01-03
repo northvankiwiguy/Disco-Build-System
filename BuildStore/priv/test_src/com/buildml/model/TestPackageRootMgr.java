@@ -530,6 +530,137 @@ public class TestPackageRootMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test the setting and clearing of native roots.
+	 * @throws Exception 
+	 */
+	@Test
+	public void testSetNativeRoot() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		/* add packages and their roots */
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgAId > 0);
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT, 
+						fileMgr.addDirectory(tmpTestDir.toString() + "/src/dirA")));
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgAId, IPackageRootMgr.GENERATED_ROOT, 
+						fileMgr.addDirectory(tmpTestDir.toString() + "/obj/dirA")));
+		
+		String wsNative = pkgRootMgr.getWorkspaceRootNative();
+		
+		/* Check that roots are initially computed relative to the workspace root */
+		assertEquals(wsNative + "/src/dirA", 
+				pkgRootMgr.getPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(wsNative + "/obj/dirA", 
+			    pkgRootMgr.getPackageRootNative(pkgAId, IPackageRootMgr.GENERATED_ROOT));
+		assertEquals(wsNative + "/src/dirA", pkgRootMgr.getRootNative("pkgA_src"));
+		assertEquals(wsNative + "/obj/dirA", pkgRootMgr.getRootNative("pkgA_gen"));
+
+		/* override the source root for pkgA, using an absolute path */
+		String cwd = System.getProperty("user.dir");
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT, cwd));
+		assertEquals(cwd, 
+				pkgRootMgr.getPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(wsNative + "/obj/dirA", 
+				pkgRootMgr.getPackageRootNative(pkgAId, IPackageRootMgr.GENERATED_ROOT));
+		assertEquals(cwd, 
+				pkgRootMgr.getRootNative("pkgA_src"));
+		assertEquals(wsNative + "/obj/dirA", pkgRootMgr.getRootNative("pkgA_gen"));
+		
+		/* clear the source root for pkgA */
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.clearPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(wsNative + "/src/dirA", 
+			     pkgRootMgr.getPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT));
+		assertEquals(wsNative + "/src/dirA", pkgRootMgr.getRootNative("pkgA_src"));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test native paths. By setting native roots, compute the true native location of a file.
+	 * 
+	 * @throws Exception 
+	 */
+	@Test
+	public void testNativePaths() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		/* add a package, with the source root in the 'dir' subdirectory */
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgAId > 0);
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT, 
+											fileMgr.addDirectory("@workspace/dir")));
+		
+		/* add some paths, but only put one of them within the package */
+		int file1 = fileMgr.addFile("@workspace/dir/dir/file1");
+		int file2 = fileMgr.addFile("@workspace/dir/dir/file2");
+		assertTrue(file1 > 0);
+		assertTrue(file2 > 0);		
+		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(file1, pkgAId, IPackageMgr.SCOPE_PUBLIC));
+		
+		/* compute a native path of a path within the root, and the path without a root */
+		String wsRootNative = pkgRootMgr.getWorkspaceRootNative();
+		assertEquals(wsRootNative + "/dir/dir/file1", fileMgr.getNativePathName(file1));
+		assertEquals(wsRootNative + "/dir/dir/file2", fileMgr.getNativePathName(file2));
+		
+		/* set the package root to a new absolute path */
+		String cwd = System.getProperty("user.dir");
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT, cwd));
+
+		/* re-compute a native path of a path within the root */
+		assertEquals(cwd + "/dir/file1", fileMgr.getNativePathName(file1));
+		assertEquals(wsRootNative + "/dir/dir/file2", fileMgr.getNativePathName(file2));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the setting and clearing of native roots, with errored parameters.
+	 * @throws Exception 
+	 */
+	@Test
+	public void testSetNativeRootErrors() throws Exception {
+		getNewBuildStore(tmpTestDir);
+
+		/* add packages and their roots */
+		int pkgAId = pkgMgr.addPackage("pkgA");
+		assertTrue(pkgAId > 0);
+		
+		/* test setPackageRootNative() with errors */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				     pkgRootMgr.setPackageRootNative(100, IPackageRootMgr.SOURCE_ROOT, "/"));
+		assertEquals(ErrorCode.BAD_VALUE, 
+			     pkgRootMgr.setPackageRootNative(pkgAId, 27, "/"));
+		assertEquals(ErrorCode.BAD_PATH, 
+			     pkgRootMgr.setPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT, "/bad-path"));
+		assertEquals(ErrorCode.BAD_PATH, 
+			     pkgRootMgr.setPackageRootNative(pkgAId, IPackageRootMgr.SOURCE_ROOT, "/etc/passwd"));
+		
+		/* test getPackageRootNative() with errors */
+		assertNull(pkgRootMgr.getPackageRootNative(100, IPackageRootMgr.SOURCE_ROOT));
+		assertNull(pkgRootMgr.getPackageRootNative(pkgAId, 34));
+		
+		/* test clearPackageRootNative() with errors */
+		assertEquals(ErrorCode.NOT_FOUND, 
+				   pkgRootMgr.clearPackageRootNative(200, IPackageRootMgr.GENERATED_ROOT));
+		assertEquals(ErrorCode.BAD_VALUE,
+			       pkgRootMgr.clearPackageRootNative(pkgAId, 123));
+
+		/* test getRootNative() with errors */
+		assertNull(pkgRootMgr.getRootNative("bad-value"));
+		assertNull(pkgRootMgr.getRootNative(""));
+		assertNull(pkgRootMgr.getRootNative("_src"));
+		assertNull(pkgRootMgr.getRootNative("pkgA_gon"));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Try to move a package root above the workspace root - error.
 	 * @throws Exception
 	 */

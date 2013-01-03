@@ -254,8 +254,24 @@ public class FileMgr implements IFileMgr {
 	 */
 	@Override
 	public String getNativePathName(int pathId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		/* get the path, relative to its root */
+		String pathWithRoot = getPathName(pathId, true);
+		int slashIndex = pathWithRoot.indexOf('/');
+		if (slashIndex == -1){
+			return null;
+		}
+		String rootName = pathWithRoot.substring(1, slashIndex);
+		
+		/* get the native path of the root (possibly with overrides) */
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		String nativeRootPath = pkgRootMgr.getRootNative(rootName);
+		if (nativeRootPath == null) {
+			return null;
+		}
+		
+		/* return the concatenation of the two */
+		return nativeRootPath + pathWithRoot.substring(slashIndex);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

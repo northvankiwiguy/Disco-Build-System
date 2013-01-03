@@ -16,7 +16,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
@@ -66,6 +66,12 @@ public class PackageRootMgr implements IPackageRootMgr {
 	private String cachedWorkspaceRootNative = null;
 	
 	/**
+	 * The map of root names to native paths. The format of the key is "<pkgId>_<rootType>".
+     * For example, "34_1".
+	 */
+	private HashMap<String, String> nativeRootMap = null;
+	
+	/**
 	 * Various prepared statements for database access.
 	 */
 	private PreparedStatement 
@@ -95,6 +101,9 @@ public class PackageRootMgr implements IPackageRootMgr {
 		this.fileMgr = buildStore.getFileMgr();
 		this.pkgMgr = buildStore.getPackageMgr();
 		this.db = buildStore.getBuildStoreDB();
+		
+		/* initialize map of root -> native path mappings */
+		nativeRootMap = new HashMap<String, String>();
 		
 		/* initialize prepared database statements */
 		getWorkspaceDistancePrepStmt = 
@@ -423,8 +432,32 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 */
 	@Override
 	public int setPackageRootNative(int packageId, int type, String path) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		/* validate the package ID */
+		String pkgName = pkgMgr.getName(packageId);
+		if (pkgName == null){
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* validate the package type */
+		if ((type != IPackageRootMgr.SOURCE_ROOT) &&
+				(type != IPackageRootMgr.GENERATED_ROOT)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* paths must be absolute */
+		if (!path.startsWith("/")) {
+			return ErrorCode.BAD_PATH;
+		}
+		
+		/* validate that paths refer to a real native directory */
+		File nativePath = new File(path);
+		if (!nativePath.exists() || !nativePath.isDirectory()) {
+			return ErrorCode.BAD_PATH;
+		}
+		
+		nativeRootMap.put(packageId + "_" + type, path);
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -434,8 +467,22 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 */
 	@Override
 	public int clearPackageRootNative(int packageId, int type) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		/* validate the package ID */
+		String pkgName = pkgMgr.getName(packageId);
+		if (pkgName == null){
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* validate the package type */
+		if ((type != IPackageRootMgr.SOURCE_ROOT) &&
+				(type != IPackageRootMgr.GENERATED_ROOT)) {
+			return ErrorCode.BAD_VALUE;
+		}
+
+		/* remove the native path mapping (which may or may not already exist) */
+		nativeRootMap.remove(packageId + "_" + type);
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -445,13 +492,26 @@ public class PackageRootMgr implements IPackageRootMgr {
 	 */
 	@Override
 	public String getPackageRootNative(int packageId, int type) {
-		// TODO: if there's an override of this root.
-		// TODO:    if override is absolute, return that path.
-		// TODO:    if override is relative, append to workspace root.
-		// TODO: else:
-		// TODO     compute relative path from workspace to root.
-		// TODO:    append to native path of workspace.
-		return "none";
+
+		/* is there a native path override? */
+		String override = nativeRootMap.get(packageId + "_" + type);
+		if (override != null) {
+			return override;
+		}
+
+		/* 
+		 * No override - compute relative path from workspace to root, and append to
+		 * the native path of the workspace.
+		 */
+		int wsRootId = getWorkspaceRoot();
+		int rootId = getPackageRoot(packageId, type);
+		if (rootId == ErrorCode.NOT_FOUND) {
+			return null;
+		}
+		String wsRootPath = fileMgr.getPathName(wsRootId);
+		String rootPath = fileMgr.getPathName(rootId);
+		String relativePath = rootPath.substring(wsRootPath.length(), rootPath.length());
+		return getWorkspaceRootNative() + relativePath;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -471,9 +531,25 @@ public class PackageRootMgr implements IPackageRootMgr {
 		}
 		
 		else {
-			// TODO: compute packageId/type and call getRootNativePath(int, int).
+			
+			/* determine type of root, based on suffix */
+			int packageType;
+			if (rootName.endsWith("_src")) {
+				packageType = IPackageRootMgr.SOURCE_ROOT;
+			} else if (rootName.endsWith("_gen")) {
+				packageType = IPackageRootMgr.GENERATED_ROOT;				
+			} else {
+				return null;
+			}
+			
+			/* find package ID number */
+			String packageName = rootName.substring(0, rootName.length() - 4);
+			int pkgId = pkgMgr.getId(packageName);
+			if (pkgId == ErrorCode.NOT_FOUND) {
+				return null;
+			}			
+			return getPackageRootNative(pkgId, packageType);
 		}
-		return "none";	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
