@@ -105,6 +105,26 @@ import com.buildml.utils.errors.ErrorCode;
 			currentAliasList = new ArrayList<String>();
 		}
 		
+		/* process the <rootmap> tag by recording the "name" and "path" attributes */
+		else if (localName.equals("rootmap")) {
+			String rootName = atts.getValue("name");
+			if (rootName == null) {
+				throw new SAXException("Invalid file content. <rootmap> tag must have a 'name' attribute.");
+			}
+			String nativePath = atts.getValue("path");
+			if (nativePath == null) {
+				throw new SAXException("Invalid file content. <rootmap> tag must have a 'path' attribute.");
+			}
+			
+			/* add, and report errors */
+			int rc = configFile.addNativeRootMapping(rootName, nativePath);
+			if (rc == ErrorCode.NOT_FOUND) {
+				throw new SAXException("Invalid file content. <rootmap> has invalid 'name' attribute.");
+			} else if (rc == ErrorCode.BAD_PATH) {
+				throw new SAXException("Invalid file content. <rootmap> has invalid 'path' attribute.");				
+			}
+		}
+		
 		/* process the <package> tag by adding the package name to our list. */
 		else if (localName.equals("package")) {
 			String pkgName = atts.getValue("name");
@@ -154,8 +174,8 @@ import com.buildml.utils.errors.ErrorCode;
 			currentAliasList = null;
 		}
 		
-		/* else, if we see </package>, do nothing */
-		else if (localName.equals("package")) {
+		/* else, if we see </package> or </rootmap>, do nothing */
+		else if (localName.equals("package") || localName.equals("rootmap")) {
 			/* nothing to do - all done when <alias> is seen */
 		}
 		

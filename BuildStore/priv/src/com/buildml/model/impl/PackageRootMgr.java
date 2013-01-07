@@ -266,8 +266,16 @@ public class PackageRootMgr implements IPackageRootMgr {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
-		/* refresh the cache with a new copy of the native workspace root */
+		/* 
+		 * Refresh the cache with a new copy of the native workspace root. Note that
+		 * often the suffix /. is added to the file name (probably because of the getParentFile()
+		 * operation above. We strip this off, since it's unattractive.
+		 */
 		cachedWorkspaceRootNative = dbFile.toString();
+		if (cachedWorkspaceRootNative.endsWith("/.")) {
+			cachedWorkspaceRootNative = 
+					cachedWorkspaceRootNative.substring(0, cachedWorkspaceRootNative.length() - 2);
+		}
 		return ErrorCode.OK;
 	}
 

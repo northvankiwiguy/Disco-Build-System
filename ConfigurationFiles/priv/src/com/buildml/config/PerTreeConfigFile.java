@@ -30,6 +30,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -54,6 +55,9 @@ public class PerTreeConfigFile {
 	
 	/** A mapping from alias names to the list of packages the alias represents */
 	private HashMap<String, String[]> aliasMap;
+	
+	/** A mapping from root names to native file system paths */
+	private HashMap<String, String> rootMap;
 
 	/** The BuildStore that this config file augments */
 	private IBuildStore buildStore;
@@ -79,6 +83,7 @@ public class PerTreeConfigFile {
 		
 		/* create empty data structures - to be populated from the file, or programmatically */
 		aliasMap = new HashMap<String, String[]>();
+		rootMap = new HashMap<String, String>();
 		
 		/* parse the content of the file into memory, if it exists, else create it. */
 		if (configFile.exists()) {
@@ -108,6 +113,7 @@ public class PerTreeConfigFile {
 		PrintWriter out = new PrintWriter(new FileWriter(configFile));
 		out.println("<bmlconfig version=\"" + SCHEMA_VERSION + "\">");
 		
+		/* write out alias information */
 		for (Iterator<String> iter = aliasMap.keySet().iterator(); iter.hasNext();) {
 			String aliasName = (String) iter.next();
 			out.println(" <alias name=\"" + aliasName + "\">");
@@ -117,6 +123,14 @@ public class PerTreeConfigFile {
 			}
 			out.println(" </alias>");
 		}
+		
+		/* write out root mapping information */
+		for (Iterator<String> iter = rootMap.keySet().iterator(); iter.hasNext();) {
+			String rootName = (String) iter.next();
+			String nativePath = getNativeRootMapping(rootName);
+			out.println(" <rootmap name=\"" + rootName + "\" path=\"" + nativePath + "\"/>");
+		}
+		
 		out.println("</bmlconfig>");
 		out.close();		
 	}
@@ -200,6 +214,76 @@ public class PerTreeConfigFile {
 		return result;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add a mapping between a package root (such as "pkg_src" or "pkg_gen") to a native
+	 * file system path. This is used when specifying where on the native file system the
+	 * package's file can actually be found.
+	 * 
+	 * @param rootName 	  Name of the root to be mapped (e.g. "pkg_src").
+	 * @param nativePath  The native file system path to map to the root.
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if the root name is invalid,
+	 * or ErrorCode.BAD_PATH if the native path is not a valid directory.
+	 */
+	public int addNativeRootMapping(String rootName, String nativePath) {
+		
+		int type = getRootType(rootName);
+		int pkgId = getRootPathId(rootName);
+		if ((type == ErrorCode.INVALID_NAME) || (pkgId == ErrorCode.NOT_FOUND)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* validate that the native path is a valid directory */
+		File nativeFile = new File(nativePath);
+		if (!nativeFile.exists() || !nativeFile.isDirectory()) {
+			return ErrorCode.BAD_PATH;
+		}
+		
+		/*
+		 * Now write the native root information into our internal data structure, so
+		 * the information will be persisted to disk when a save() is invoked.
+		 */
+		rootMap.put(rootName, nativePath);
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove a previously added mapping between a package root and a native file system
+	 * directory. This is the opposite of addNativeRootMapping().
+	 * 
+	 * @param rootName 	  Name of the root to be mapped (e.g. "pkg_src").
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if the root name is invalid.
+	 */
+	public int clearNativeRootMapping(String rootName) {
+		
+		/* validate the root name */
+		int type = getRootType(rootName);
+		int pkgId = getRootPathId(rootName);
+		if ((type == ErrorCode.INVALID_NAME) || (pkgId == ErrorCode.NOT_FOUND)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* remove it from our internal data structure */
+		rootMap.remove(rootName);
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the native path associated with a specified package root.
+	 * 
+	 * @param rootName 	  Name of the root to be queried.
+	 * @return	The native path that this root is mapped to, or null if there's no mapping
+     * or the package name is invalid.
+	 */
+	public String getNativeRootMapping(String rootName) {
+		return rootMap.get(rootName);
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -267,5 +351,48 @@ public class PerTreeConfigFile {
 		return pkgMgr.getId(pkgName) != ErrorCode.NOT_FOUND;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper function for determining the package ID associated with the provided root name.
+	 * 
+	 * @param rootName	The name of the root.
+	 * @return			The package ID, or ErrorCode.NOT_FOUND if the package name is invalid.
+	 */
+	private int getRootPathId(String rootName) {
+		if ((rootName == null) || (rootName.length() < "_src".length())) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		String pkgName = rootName.substring(0, rootName.length() - "_src".length());
+		return pkgMgr.getId(pkgName);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper function for determining the type (SOURCE_ROOT or GENERATED_ROOT) of a root
+	 * name. This method exits with an error message if the root name is invalid.
+	 *
+	 * @param rootName	The name of the root.
+	 * @return			Either SOURCE_ROOT or GENERATED_ROOT, or ErrorCode.INVALID_NAME if
+	 * 					the root name doesn't end with _src or _gen.
+	 */
+	private int getRootType(String rootName) {
+		if (rootName == null) {
+			return ErrorCode.INVALID_NAME;
+		}
+		int type = 0;
+		if (rootName.endsWith("_src")) {
+			type = IPackageRootMgr.SOURCE_ROOT;
+		} else if (rootName.endsWith("_gen")) {
+			type = IPackageRootMgr.GENERATED_ROOT;			
+		} else {
+			type = ErrorCode.INVALID_NAME;
+		}
+		return type;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
