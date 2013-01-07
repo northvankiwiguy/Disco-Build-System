@@ -1,0 +1,287 @@
+Show the package definitions.
+
+Valid package names:
+
+  diff
+  src
+  zlib
+
+No aliases defined.
+
+To build a package, use: "bml <pkg-name>" or "bml <alias>"
+
+Show the default package root mappings
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Override one of the roots with a new native path
+Root "diff_src" now refers to native path: /tmp
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Override a second root with another native path
+Root "zlib_gen" now refers to native path: /etc
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : /etc
+
+Delete the second root mapping
+Root "zlib_gen" has been unmapped.
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Try to set an invalid root name (invalid suffix)
+Invalid root name: zlib_gon
+Status 255
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Try to set another invalid root name (invalid package name)
+Invalid root name: foo_src
+Status 255
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Try to set an invalid native path (non existent)
+Native path is not a valid directory: /bad/path
+Status 255
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Try to set an invalid native path (not a directory)
+Native path is not a valid directory: /etc/passwd
+Status 255
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Try to delete a mapping that wasn't set
+Root is not currently mapped: src_src
+Status 255
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
+Try to delete the mapping for a non-existent root.
+Invalid root name: foo_src
+Status 255
+@workspace root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
+@diff_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : /tmp
+@diff_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@src_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+@src_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
+
+@zlib_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+@zlib_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/zlib
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/zlib
+
