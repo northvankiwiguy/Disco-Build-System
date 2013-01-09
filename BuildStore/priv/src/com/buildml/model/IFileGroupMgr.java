@@ -136,7 +136,7 @@ public interface IFileGroupMgr {
 	 * 
 	 * @param groupId The ID of the group to append to.
 	 * @param pathId  The ID of the path to append to the group.
-	 * @return        The index of the new entry (within the file group), or 
+	 * @return        The 0-based index of the new entry (within the file group), or 
 	 *                ErrorCode.NOT_FOUND if the group ID is invalid, 
 	 *                ErrorCode.BAD_VALUE if the pathId is invalid, or
 	 *                ErrorCode.INVALID_OP if the file group is not a source group.
@@ -151,7 +151,7 @@ public interface IFileGroupMgr {
 	 * @param pathId  The ID of the path to append to the group.
 	 * @param index   Index within the file group at which the new path
 	 *                will be inserted.
-	 * @return        The index of the new entry (within the file group), 
+	 * @return        The 0-based index of the new entry (within the file group), 
 	 *                ErrorCode.NOT_FOUND if the group ID is invalid,
 	 *                ErrorCode.BAD_VALUE if the pathId is invalid,
 	 *                ErrorCode.OUT_OF_RANGE if the index is invalid, or
@@ -160,7 +160,7 @@ public interface IFileGroupMgr {
 	int addSourcePath(int groupId, int pathId, int index);
 
 	/**
-	 * Return the Path ID of the source file at the specified index.
+	 * Return the Path ID of the source file at the specified 0-based index.
 	 * 
 	 * @param groupId The ID of the group to retrieve from.
 	 * @param index	  The index of the entry to be retrieved.
@@ -252,7 +252,7 @@ public interface IFileGroupMgr {
 	 * @param groupId The ID of the group from which to remove an entry.
 	 * @param index   The index (within the group) of the entry to remove.
 	 * @return        ErrorCode.OK on success, ErrorCode.NOT_FOUND if the group
-	 *                ID is not valid, or ErrorCode.BAD_VALUE if the index
+	 *                ID is not valid, or ErrorCode.OUT_OF_RANGE if the index
 	 *                is out of range.
 	 */
 	int removeEntry(int groupId, int index);

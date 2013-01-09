@@ -296,6 +296,8 @@ import com.buildml.model.FatalBuildStoreError;
 			/* Create the file group tables */
 			stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
 								"type integer)");
+			stat.executeUpdate("create table fileGroupSourcePaths (groupId integer, pathId integer, " +
+								"pos integer)");
 		
 			stat.close();
 						

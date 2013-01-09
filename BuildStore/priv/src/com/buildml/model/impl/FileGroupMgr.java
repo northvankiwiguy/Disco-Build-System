@@ -18,6 +18,8 @@ import java.sql.SQLException;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -34,7 +36,10 @@ public class FileGroupMgr implements IFileGroupMgr {
 
 	/** The BuildStore that delegates work to this FileGroupMgr */
 	private IBuildStore buildStore;
-		
+	
+	/** This BuildStore's file mgr */
+	private IFileMgr fileMgr = null;
+	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
 	 * to us when the FileGroupMgr is first instantiated.
@@ -49,7 +54,14 @@ public class FileGroupMgr implements IFileGroupMgr {
 		findGroupTypePrepStmt = null,
 		findGroupPkgPrepStmt = null,
 		updateGroupPkgPrepStmt = null,
-		removeGroupPrepStmt = null;
+		removeGroupPrepStmt = null,
+		shiftUpSourcePathsAtPrepStmt = null,
+		insertSourcePathAtPrepStmt = null,
+		findSourceGroupSizePrepStmt = null,
+		findSourcePathAtPrepStmt = null,
+		findSourceGroupMembersPrepStmt = null,
+		removeSourceGroupPathPrepStmt = null,
+		shiftDownSourcePathsAtPrepStmt = null;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -63,13 +75,33 @@ public class FileGroupMgr implements IFileGroupMgr {
 	public FileGroupMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
+		this.fileMgr = buildStore.getFileMgr();
 		
 		/* initialize prepared database statements */
-		insertNewGroupPrepStmt = db.prepareStatement("insert into fileGroups values (null, ?, ?)");
-		findGroupTypePrepStmt = db.prepareStatement("select type from fileGroups where id = ?");
-		findGroupPkgPrepStmt = db.prepareStatement("select pkgId from fileGroups where id = ?");
-		updateGroupPkgPrepStmt = db.prepareStatement("update fileGroups set pkgId = ? where id = ?");
-		removeGroupPrepStmt = db.prepareStatement("delete from fileGroups where id = ?");
+		insertNewGroupPrepStmt = db.prepareStatement(
+				"insert into fileGroups values (null, ?, ?)");
+		findGroupTypePrepStmt = db.prepareStatement(
+				"select type from fileGroups where id = ?");
+		findGroupPkgPrepStmt = db.prepareStatement(
+				"select pkgId from fileGroups where id = ?");
+		updateGroupPkgPrepStmt = db.prepareStatement(
+				"update fileGroups set pkgId = ? where id = ?");
+		removeGroupPrepStmt = db.prepareStatement(
+				"delete from fileGroups where id = ?");
+		shiftUpSourcePathsAtPrepStmt = db.prepareStatement(
+				"update fileGroupSourcePaths set pos = pos + 1 where groupId = ? and pos >= ?");
+		insertSourcePathAtPrepStmt = db.prepareStatement(
+				"insert into fileGroupSourcePaths values (?, ?, ?)");
+		findSourceGroupSizePrepStmt = db.prepareStatement(
+				"select count(*) from fileGroupSourcePaths where groupId = ?");
+		findSourcePathAtPrepStmt = db.prepareStatement(
+				"select pathId from fileGroupSourcePaths where groupId = ? and pos = ?");
+		findSourceGroupMembersPrepStmt = db.prepareStatement(
+				"select pathId from fileGroupSourcePaths where groupId = ? order by pos");
+		removeSourceGroupPathPrepStmt = db.prepareStatement(
+				"delete from fileGroupSourcePaths where groupId = ? and pos = ?");
+		shiftDownSourcePathsAtPrepStmt = db.prepareStatement(
+				"update fileGroupSourcePaths set pos = pos - 1 where groupId = ? and pos >= ?");
 	}
 	
 	/*=====================================================================================*
@@ -249,8 +281,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int addSourcePath(int groupId, int pathId) {
-		// TODO Auto-generated method stub
-		return 0;
+		return addSourcePath(groupId, pathId, -1);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -260,8 +291,31 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int addSourcePath(int groupId, int pathId, int index) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		/* by fetching the size, we check if the group is valid */
+		int initialSize = getGroupSize(groupId);
+		if (initialSize == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* only applicable for source file groups */
+		if (getGroupType(groupId) != SOURCE_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		/* validate that the pathId is valid */
+		if (fileMgr.getPathType(pathId) == PathType.TYPE_INVALID) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		if (index == -1) {
+			index = initialSize;
+		} else if ((index < 0) || (index > initialSize)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		addSourcePathHelper(groupId, pathId, index, initialSize);
+		return index;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -271,8 +325,17 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int getSourcePathAt(int groupId, int index) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		if ((index < 0) || (index >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		return getSourcePathAtHelper(groupId, index);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -338,8 +401,31 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int moveEntry(int groupId, int fromIndex, int toIndex) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		/* validate inputs */
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if ((fromIndex < 0) || (fromIndex >= size) || (toIndex < 0) || (toIndex >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/* moving to the same position is pointless */
+		if (fromIndex == toIndex) {
+			return ErrorCode.OK;
+		}
+		
+		/* determine the ID of the path we're moving */
+		int pathId = getSourcePathAtHelper(groupId, fromIndex);
+		
+		/* delete the old entry */
+		removeSourcePathEntry(groupId, fromIndex);
+		
+		/* insert the same path at the new location */
+		addSourcePathHelper(groupId, pathId, toIndex, size);
+		
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -349,8 +435,19 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int removeEntry(int groupId, int index) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		/* validate inputs */
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if ((index < 0) || (index >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/* update the database */
+		removeSourcePathEntry(groupId, index);
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -365,9 +462,16 @@ public class FileGroupMgr implements IFileGroupMgr {
 		if (type == ErrorCode.NOT_FOUND) {
 			return ErrorCode.NOT_FOUND;
 		}
-		
-		// TODO: calculate the size correctly.
-		return 0;
+
+		Integer results[] = null;
+		try {
+			findSourceGroupSizePrepStmt.setInt(1, groupId);
+			results = db.executePrepSelectIntegerColumn(findSourceGroupSizePrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+	
+		return results[0];
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -377,8 +481,28 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public String[] getExpandedGroupFiles(int groupId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return null;
+		}
+	
+		/* fetch the members from the database */
+		Integer results[] = null;
+		try {
+			findSourceGroupMembersPrepStmt.setInt(1, groupId);
+			results = db.executePrepSelectIntegerColumn(findSourceGroupMembersPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* convert from path IDs to path strings (in @root/path) format */
+		String paths[] = new String[size];
+		for (int i = 0; i < results.length; i++) {
+			int pathId = results[i];
+			paths[i] = fileMgr.getPathName(pathId, true);
+		}
+		return paths;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -390,6 +514,99 @@ public class FileGroupMgr implements IFileGroupMgr {
 	public IBuildStore getBuildStore() {
 		return buildStore;
 	}
-	
+
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Similar to getSourcePathAt(), but without any error checking.
+	 * 
+	 * @param groupId	The ID of the group to query.
+	 * @param index		The index of the path within the group.
+	 * @return			The ID of the path at the specified index in the group.
+	 */
+	private int getSourcePathAtHelper(int groupId, int index) {
+		Integer results[] = null;
+		try {
+			findSourcePathAtPrepStmt.setInt(1, groupId);
+			findSourcePathAtPrepStmt.setInt(2, index);
+			results = db.executePrepSelectIntegerColumn(findSourcePathAtPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+
+		/* this shouldn't happen (groups should be complete), but just in case... */
+		if (results.length == 0) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		return results[0];
+	}
+
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Similar to removeEntry, but only for source file groups, and no error checking is done.
+	 * 
+	 * @param groupId	The ID of the group to remove the entry from.
+	 * @param index		The index of the entry to remove.
+	 */
+	private void removeSourcePathEntry(int groupId, int index) {
+		
+		/* first, delete the specified entry */
+		try {
+			removeSourceGroupPathPrepStmt.setInt(1, groupId);
+			removeSourceGroupPathPrepStmt.setInt(2, index);
+			db.executePrepUpdate(removeSourceGroupPathPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* if necessary, move the higher-numbers entries down one index number */
+		try {
+			shiftDownSourcePathsAtPrepStmt.setInt(1, groupId);
+			shiftDownSourcePathsAtPrepStmt.setInt(2, index);
+			db.executePrepUpdate(shiftDownSourcePathsAtPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Similar to addSourcePath, but without any error checking.
+	 * 
+	 * @param groupId		The ID of the group we're modifying.
+	 * @param pathId		The path ID to be added.
+	 * @param index			The index at which the path will be added.
+	 * @param size			The size of the group.	
+	 */
+	private void addSourcePathHelper(int groupId, int pathId, int index, int size) {
+		
+		/* if necessary, move existing entries up one index level */
+		if (index < size) {
+			try {
+				shiftUpSourcePathsAtPrepStmt.setInt(1, groupId);
+				shiftUpSourcePathsAtPrepStmt.setInt(2, index);
+				db.executePrepUpdate(shiftUpSourcePathsAtPrepStmt);
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Error in SQL: " + e);
+			}
+		}
+		
+		/* now insert the new record at the required index */
+		try {
+			insertSourcePathAtPrepStmt.setInt(1, groupId);
+			insertSourcePathAtPrepStmt.setInt(2, pathId);
+			insertSourcePathAtPrepStmt.setInt(3, index);
+			db.executePrepUpdate(insertSourcePathAtPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 }

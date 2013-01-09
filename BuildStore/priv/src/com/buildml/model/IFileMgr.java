@@ -148,7 +148,7 @@ public interface IFileMgr {
 	 * enum, such as TYPE_DIR, TYPE_FILE, or TYPE_SYMLINK.
 	 * 
 	 * @param pathId ID of the path to query.
-	 * @return The type of this path.
+	 * @return The type of this path, or PathType.TYPE_INVALID if pathId is not valid.
 	 */
 	public abstract PathType getPathType(int pathId);
 
