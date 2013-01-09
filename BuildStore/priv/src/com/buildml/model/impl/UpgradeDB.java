@@ -128,7 +128,11 @@ public class UpgradeDB {
 		try {
 			Statement stat = dbConn.createStatement();
 			
-			// TODO: add upgrade steps, as required.
+			/* upgrade from 400 to 401 */
+			if (dbVersion == 400) {
+				stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
+						"type integer)");
+			}
 
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);
