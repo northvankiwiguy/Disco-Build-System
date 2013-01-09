@@ -57,6 +57,9 @@ public class ErrorCode {
 	/** This item is out of range */
 	public static final int OUT_OF_RANGE		= -10;
 	
+	/** This operation is not valid for this object */
+	public static final int INVALID_OP          = -11;
+	
 	/**
 	 * This class can't be instantiated.
 	 */

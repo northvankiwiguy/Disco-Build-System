@@ -51,7 +51,7 @@ import com.buildml.model.FatalBuildStoreError;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 400;
+	public static final int SCHEMA_VERSION = 401;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -293,6 +293,10 @@ import com.buildml.model.FatalBuildStoreError;
 			stat.executeUpdate("insert into packages values (0, 0, 1, '<import>')");
 			stat.executeUpdate("insert into packages values (1, 1, 1, 'Root')");
 			
+			/* Create the file group tables */
+			stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
+								"type integer)");
+		
 			stat.close();
 						
 		} catch (SQLException e) {

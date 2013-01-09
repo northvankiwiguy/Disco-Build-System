@@ -20,9 +20,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.buildml.model.FatalBuildStoreError;
 import com.buildml.utils.errors.ErrorCode;
-import com.buildml.utils.version.Version;
 
 
 /**
@@ -52,25 +50,6 @@ public class TestBuildStore {
 		
 		/* fetch the associated FileSpace */
 		fileMgr = bs.getFileMgr();
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test method for {@link com.buildml.model.impl.BuildStore#getBuildStoreVersion()}.
-	 */
-	@Test
-	public void testGetBuildStoreVersion() {
-		
-		/*
-		 * Test that a new BuildStore has the correct schema version.
-		 */
-		try {
-			assertEquals(Version.getVersionNumberAsInt(), bs.getBuildStoreVersion());
-		} catch (FatalBuildStoreError e) {
-			e.printStackTrace();
-			fail("Unexpected BuildStoreException");
-		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
