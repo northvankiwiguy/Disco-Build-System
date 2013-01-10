@@ -81,7 +81,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 		findPathsAtPrepStmt = null,
 		findGroupMembersPrepStmt = null,
 		removePathPrepStmt = null,
-		shiftDownPathsPrepStmt = null;
+		shiftDownPathsPrepStmt = null,
+		findGroupByPackagePrepStmt = null;
 
 	/**
 	 * A mapping from group ID to the list of transient path entries.
@@ -127,6 +128,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 				"delete from fileGroupPaths where groupId = ? and pos = ?");
 		shiftDownPathsPrepStmt = db.prepareStatement(
 				"update fileGroupPaths set pos = pos - 1 where groupId = ? and pos >= ?");
+		findGroupByPackagePrepStmt = db.prepareStatement(
+				"select id from fileGroups where pkgId = ?");
 		
 		/* initialize the mapping of group IDs to list of transient entries */
 		transientEntryMap = new HashMap<Integer, ArrayList<TransientEntry>>();
@@ -302,6 +305,31 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return ErrorCode.OK;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getGroupsInPackage(int)
+	 */
+	@Override
+	public Integer[] getGroupsInPackage(int pkgId) {
+		
+		/* we only support valid packages (not folders) */
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		if (!pkgMgr.isValid(pkgId) || pkgMgr.isFolder(pkgId)) {
+			return null;
+		}
+		
+		Integer results[] = null;
+		try {
+			findGroupByPackagePrepStmt.setInt(1, pkgId);
+			results = db.executePrepSelectIntegerColumn(findGroupByPackagePrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		return results;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)

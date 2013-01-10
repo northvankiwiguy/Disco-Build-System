@@ -129,6 +129,16 @@ public interface IFileGroupMgr {
 	 * or ErrorCode.BAD_VALUE if the pkgId is invalid.
 	 */
 	int setGroupPkg(int groupId, int pkgId);
+
+	/**
+	 * Return the complete list of all file groups that reside in the specified package.
+	 * 
+	 * @param pkgId	The ID of the package.
+	 * 
+	 * @return An Integer[] containing the IDs of all the file groups, or null if the
+	 * package ID is invalid.
+	 */
+	Integer [] getGroupsInPackage(int pkgId);
 		
 	/**
 	 * Append the specified path to the end of the file group. The new file group entry

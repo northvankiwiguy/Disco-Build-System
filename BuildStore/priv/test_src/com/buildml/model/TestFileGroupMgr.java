@@ -630,4 +630,36 @@ public class TestFileGroupMgr {
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add groups into packages, and query for those groups.
+	 */
+	@Test
+	public void testGetGroupsInPackage() {
+		
+		/* test empty group */
+		Integer [] results = fileGroupMgr.getGroupsInPackage(pkg1Id);
+		assertEquals(0, results.length);
+		
+		/* add a group, and test again */
+		int group1 = fileGroupMgr.newSourceGroup(pkg1Id);
+		results = fileGroupMgr.getGroupsInPackage(pkg1Id);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { group1 }, results));
+
+		/* add a second group, and test again */
+		int group2 = fileGroupMgr.newSourceGroup(pkg1Id);
+		results = fileGroupMgr.getGroupsInPackage(pkg1Id);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { group1, group2 }, results));
+
+		/* add a third group, in a different package. */
+		int group3 = fileGroupMgr.newSourceGroup(pkg2Id);
+		results = fileGroupMgr.getGroupsInPackage(pkg1Id);
+		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { group1, group2 }, results));
+
+		/* invalid package ID */
+		assertNull(fileGroupMgr.getGroupsInPackage(1000));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }
