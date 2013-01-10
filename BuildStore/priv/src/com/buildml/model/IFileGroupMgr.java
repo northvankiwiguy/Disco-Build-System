@@ -131,8 +131,8 @@ public interface IFileGroupMgr {
 	int setGroupPkg(int groupId, int pkgId);
 		
 	/**
-	 * Append the specified source path to the end of the source file group. The
-	 * new file group entry is persisted into the BuildStore.
+	 * Append the specified path to the end of the file group. The new file group entry
+	 * is persisted into the BuildStore.
 	 * 
 	 * @param groupId The ID of the group to append to.
 	 * @param pathId  The ID of the path to append to the group.
@@ -141,10 +141,10 @@ public interface IFileGroupMgr {
 	 *                ErrorCode.BAD_VALUE if the pathId is invalid, or
 	 *                ErrorCode.INVALID_OP if the file group is not a source group.
 	 */
-	int addSourcePath(int groupId, int pathId);
+	int addPathId(int groupId, int pathId);
 	
 	/**
-	 * A variant of addSourcePath that takes an index at which the pathId will be
+	 * A variant of addPathId that takes an index at which the pathId will be
 	 * inserted (as opposed to appending to the end of the group).
 	 * 
 	 * @param groupId The ID of the group to insert into.
@@ -157,7 +157,7 @@ public interface IFileGroupMgr {
 	 *                ErrorCode.OUT_OF_RANGE if the index is invalid, or
 	 *                ErrorCode.INVALID_OP if the file group is not a source group.
 	 */
-	int addSourcePath(int groupId, int pathId, int index);
+	int addPathId(int groupId, int pathId, int index);
 
 	/**
 	 * Return the Path ID of the source file at the specified 0-based index.
@@ -169,10 +169,10 @@ public interface IFileGroupMgr {
 	 * 				  ErrorCode.OUT_OF_RANGE if index is out of range for this group, or
 	 * 				  ErrorCode.INVALID_OP if the file group is not a source group.
 	 */
-	int getSourcePathAt(int groupId, int index);
+	int getPathId(int groupId, int index);
 	
 	/**
-	 * Append a new path into a generated file group. The path is expressed as being relative
+	 * Append a new path string into the file group. The path is expressed as being relative
 	 * to the root of a package (such as \@pkg_gen/output.o). The path can either be temporary
 	 * (dynamically generated) or permanent (persisted to the database).
 	 * 
@@ -184,10 +184,10 @@ public interface IFileGroupMgr {
 	 * 						ErrorCode.BAD_VALUE if the path string is malformed, or
 	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
 	 */
-	int addGeneratedPath(int groupId, String path, boolean isPermanent);
+	int addPathString(int groupId, String path, boolean isPermanent);
 
 	/**
-	 * A variant of addGeneratedPath that adds the new path at the specified index (within the group)
+	 * A variant of addPathString that adds the new path at the specified index (within the group)
 	 * rather than appending to the end of the group. All existing entries at higher index positions
 	 * will be shifted up one position.
 	 * 
@@ -201,10 +201,10 @@ public interface IFileGroupMgr {
 	 * 						ErrorCode.BAD_VALUE if the path string is malformed, or
 	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
 	 */
-	int addGeneratedPath(int groupId, String path, boolean isPermanent, int index);
+	int addPathString(int groupId, String path, boolean isPermanent, int index);
 	
 	/**
-	 * Return the generated path at the specified index within the file group.
+	 * Return the path string at the specified index within the file group.
 	 * 
 	 * @param groupId		The ID of the group to query.
 	 * @param index			The index within the group to query.
@@ -212,7 +212,7 @@ public interface IFileGroupMgr {
 	 * @return The string path at the specified index within the group, or null if the
 	 * groupId or index are invalid.
 	 */
-	String getGeneratedPathAt(int groupId, int index);
+	String getPathString(int groupId, int index);
 
 	/**
 	 * Append a new sub group to the end of an existing merge file group. This
@@ -244,6 +244,16 @@ public interface IFileGroupMgr {
 	 * 						ErrorCode.BAD_PATH if the addition would create a cycle. 
 	 */
 	int addSubGroup(int groupId, int subGroupId, int index);
+	
+	/**
+	 * Return the ID of the sub-file group at the specified index.
+	 * 
+	 * @param groupId  	The merge file group being queried.
+	 * @param index    	The index of the sub-group, within the main group.
+	 * @return			The group ID of the sub-group, or ErrorCode.NOT_FOUND if groupID
+	 * 					is invalid, or ErrorCode.OUT_OF_RANGE if index is not valid.
+	 */
+	int getSubGroup(int groupId, int index);
 	
 	/**
 	 * Remove an entry from within a file group. This command can be used for all types

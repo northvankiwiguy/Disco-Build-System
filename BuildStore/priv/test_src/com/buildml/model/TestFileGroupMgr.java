@@ -190,27 +190,27 @@ public class TestFileGroupMgr {
 		assertTrue(groupId >= 0);
 		
 		/* append some files to the end of the group - test size and positions */
-		assertEquals(0, fileGroupMgr.addSourcePath(groupId, file1));
-		assertEquals(1, fileGroupMgr.addSourcePath(groupId, file2));
-		assertEquals(2, fileGroupMgr.addSourcePath(groupId, file3));
+		assertEquals(0, fileGroupMgr.addPathId(groupId, file1));
+		assertEquals(1, fileGroupMgr.addPathId(groupId, file2));
+		assertEquals(2, fileGroupMgr.addPathId(groupId, file3));
 		assertEquals(3, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file3, fileGroupMgr.getSourcePathAt(groupId, 2));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 0));
+		assertEquals(file3, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 0));
 		
 		/* insert some files at specific indices within the group - test size and positions */
-		assertEquals(2, fileGroupMgr.addSourcePath(groupId, file4, 2));
-		assertEquals(0, fileGroupMgr.addSourcePath(groupId, file5, 0));
-		assertEquals(2, fileGroupMgr.addSourcePath(groupId, file6, 2));
+		assertEquals(2, fileGroupMgr.addPathId(groupId, file4, 2));
+		assertEquals(0, fileGroupMgr.addPathId(groupId, file5, 0));
+		assertEquals(2, fileGroupMgr.addPathId(groupId, file6, 2));
 		assertEquals(6, fileGroupMgr.getGroupSize(groupId));
 		
 		/* confirm ordering is now: file5, file1, file6, file2, file4, file3 */
-		assertEquals(file5, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file6, fileGroupMgr.getSourcePathAt(groupId, 2));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 3));
-		assertEquals(file4, fileGroupMgr.getSourcePathAt(groupId, 4));
-		assertEquals(file3, fileGroupMgr.getSourcePathAt(groupId, 5));
+		assertEquals(file5, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file6, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 3));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 4));
+		assertEquals(file3, fileGroupMgr.getPathId(groupId, 5));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -226,29 +226,29 @@ public class TestFileGroupMgr {
 		assertTrue(groupId >= 0);
 		
 		/* test addition of files at invalid locations */
-		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addSourcePath(groupId, file1, -2));
-		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addSourcePath(groupId, file1, 1));
+		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addPathId(groupId, file1, -2));
+		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addPathId(groupId, file1, 1));
 		
 		/* these are valid */
-		assertEquals(0, fileGroupMgr.addSourcePath(groupId, file1, 0));
-		assertEquals(1, fileGroupMgr.addSourcePath(groupId, file2, -1));
+		assertEquals(0, fileGroupMgr.addPathId(groupId, file1, 0));
+		assertEquals(1, fileGroupMgr.addPathId(groupId, file2, -1));
 		
 		/* test addition source files into non-source group */
 		int generatedGroupId = fileGroupMgr.newGeneratedGroup(pkg1Id);
 		int mergeGroupId = fileGroupMgr.newMergeGroup(pkg1Id);
-		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addSourcePath(generatedGroupId, file1));
-		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addSourcePath(mergeGroupId, file1));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addPathId(generatedGroupId, file1));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addPathId(mergeGroupId, file1));
 		
 		/* test addition of invalid path into source group */
-		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addSourcePath(groupId, 100));
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addPathId(groupId, 100));
 		
 		/* test getting of paths with invalid group */
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getSourcePathAt(-1, 0));
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getSourcePathAt(123, 0));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getPathId(-1, 0));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getPathId(123, 0));
 		
 		/* test getting of paths with invalid index */
-		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.getSourcePathAt(generatedGroupId, -1));
-		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.getSourcePathAt(generatedGroupId, 3));
+		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.getPathId(groupId, -1));
+		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.getPathId(groupId, 3));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -262,13 +262,13 @@ public class TestFileGroupMgr {
 		/* create a new group and populate it with paths */
 		int groupId = fileGroupMgr.newSourceGroup(pkg1Id);
 		assertTrue(groupId >= 0);
-		assertEquals(0, fileGroupMgr.addSourcePath(groupId, file1));
-		assertEquals(1, fileGroupMgr.addSourcePath(groupId, file6));
-		assertEquals(2, fileGroupMgr.addSourcePath(groupId, file3));
-		assertEquals(3, fileGroupMgr.addSourcePath(groupId, file5));
-		assertEquals(4, fileGroupMgr.addSourcePath(groupId, file4));
-		assertEquals(5, fileGroupMgr.addSourcePath(groupId, file2));
-		assertEquals(6, fileGroupMgr.addSourcePath(groupId, file3));
+		assertEquals(0, fileGroupMgr.addPathId(groupId, file1));
+		assertEquals(1, fileGroupMgr.addPathId(groupId, file6));
+		assertEquals(2, fileGroupMgr.addPathId(groupId, file3));
+		assertEquals(3, fileGroupMgr.addPathId(groupId, file5));
+		assertEquals(4, fileGroupMgr.addPathId(groupId, file4));
+		assertEquals(5, fileGroupMgr.addPathId(groupId, file2));
+		assertEquals(6, fileGroupMgr.addPathId(groupId, file3));
 
 		/* expand the content into path strings, and validate the entries */
 		String results[] = fileGroupMgr.getExpandedGroupFiles(groupId);
@@ -297,10 +297,10 @@ public class TestFileGroupMgr {
 		/* create a new group and populate it with paths */
 		int groupId = fileGroupMgr.newSourceGroup(pkg1Id);
 		assertTrue(groupId >= 0);
-		assertEquals(0, fileGroupMgr.addSourcePath(groupId, file1));
-		assertEquals(1, fileGroupMgr.addSourcePath(groupId, file2));
-		assertEquals(2, fileGroupMgr.addSourcePath(groupId, file3));
-		assertEquals(3, fileGroupMgr.addSourcePath(groupId, file4));
+		assertEquals(0, fileGroupMgr.addPathId(groupId, file1));
+		assertEquals(1, fileGroupMgr.addPathId(groupId, file2));
+		assertEquals(2, fileGroupMgr.addPathId(groupId, file3));
+		assertEquals(3, fileGroupMgr.addPathId(groupId, file4));
 		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
 		assertEquals(ErrorCode.CANT_REMOVE, fileGroupMgr.removeGroup(groupId));
 		
@@ -311,16 +311,16 @@ public class TestFileGroupMgr {
 		/* remove file3, group now has file1, file2, file4 */
 		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(groupId, 2));
 		assertEquals(3, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file4, fileGroupMgr.getSourcePathAt(groupId, 2));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 2));
 		assertEquals(ErrorCode.CANT_REMOVE, fileGroupMgr.removeGroup(groupId));
 				
 		/* remove file4, group now has file1, file2 */
 		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(groupId, 2));
 		assertEquals(2, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 1));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 1));
 		assertEquals(ErrorCode.CANT_REMOVE, fileGroupMgr.removeGroup(groupId));
 
 		/* remove file1, group now has file2 */
@@ -349,10 +349,10 @@ public class TestFileGroupMgr {
 		/* create a new group and populate it with paths */
 		int groupId = fileGroupMgr.newSourceGroup(pkg1Id);
 		assertTrue(groupId >= 0);
-		assertEquals(0, fileGroupMgr.addSourcePath(groupId, file1));
-		assertEquals(1, fileGroupMgr.addSourcePath(groupId, file2));
-		assertEquals(2, fileGroupMgr.addSourcePath(groupId, file3));
-		assertEquals(3, fileGroupMgr.addSourcePath(groupId, file4));
+		assertEquals(0, fileGroupMgr.addPathId(groupId, file1));
+		assertEquals(1, fileGroupMgr.addPathId(groupId, file2));
+		assertEquals(2, fileGroupMgr.addPathId(groupId, file3));
+		assertEquals(3, fileGroupMgr.addPathId(groupId, file4));
 		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
 
 		/* attempt to move paths within an invalid group */
@@ -365,34 +365,34 @@ public class TestFileGroupMgr {
 		/* move index 1 to index 1 - no effect */
 		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(groupId, 1, 1));
 		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file3, fileGroupMgr.getSourcePathAt(groupId, 2));
-		assertEquals(file4, fileGroupMgr.getSourcePathAt(groupId, 3));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file3, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 3));
 		
 		/* move index 0 to index 3 */
 		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(groupId, 0, 3));
 		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file3, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file4, fileGroupMgr.getSourcePathAt(groupId, 2));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 3));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file3, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 3));
 		
 		/* move index 3 to index 1 */
 		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(groupId, 3, 1));
 		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file3, fileGroupMgr.getSourcePathAt(groupId, 2));
-		assertEquals(file4, fileGroupMgr.getSourcePathAt(groupId, 3));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file3, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 3));
 		
 		/* move index 2 to index 1 */
 		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(groupId, 2, 1));
 		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
-		assertEquals(file2, fileGroupMgr.getSourcePathAt(groupId, 0));
-		assertEquals(file3, fileGroupMgr.getSourcePathAt(groupId, 1));
-		assertEquals(file1, fileGroupMgr.getSourcePathAt(groupId, 2));
-		assertEquals(file4, fileGroupMgr.getSourcePathAt(groupId, 3));
+		assertEquals(file2, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file3, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 3));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

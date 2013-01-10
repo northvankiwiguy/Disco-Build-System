@@ -132,8 +132,8 @@ public class UpgradeDB {
 			if (dbVersion == 400) {
 				stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
 						"type integer)");
-				stat.executeUpdate("create table fileGroupSourcePaths (groupId integer, pathId integer, " +
-						"pos integer)");
+				stat.executeUpdate("create table fileGroupPaths (groupId integer, pathId integer, " +
+						"pathString text, pos integer)");
 			}
 
 			/* finish by setting the new version number */
