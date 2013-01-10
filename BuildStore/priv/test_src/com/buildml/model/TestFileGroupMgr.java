@@ -505,4 +505,129 @@ public class TestFileGroupMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a merge file group containing two source groups and a generated group.
+	 */
+	@Test
+	public void testNewMergeGroup() {
+		
+		/* create a top-level merge group, to be populated by other groups */
+		int mergeGroup = fileGroupMgr.newMergeGroup(pkg1Id);
+		
+		/* create and populate sub groups */
+		int sourceGroup1 = fileGroupMgr.newSourceGroup(pkg2Id);
+		int sourceGroup2 = fileGroupMgr.newSourceGroup(pkg2Id);
+		int generatedGroup = fileGroupMgr.newGeneratedGroup(pkg3Id);
+
+		assertEquals(0, fileGroupMgr.addPathId(sourceGroup1, file1));
+		assertEquals(1, fileGroupMgr.addPathId(sourceGroup1, file2));
+		assertEquals(2, fileGroupMgr.addPathId(sourceGroup1, file3));
+		assertEquals(0, fileGroupMgr.addPathId(sourceGroup2, file4));
+		assertEquals(1, fileGroupMgr.addPathId(sourceGroup2, file5));
+		assertEquals(2, fileGroupMgr.addPathId(sourceGroup2, file6));
+		assertEquals(0, fileGroupMgr.addPathString(generatedGroup, "@root/path1"));
+		assertEquals(1, fileGroupMgr.addPathString(generatedGroup, "@root/path2"));
+		assertEquals(ErrorCode.OK, fileGroupMgr.addTransientPathString(generatedGroup, "@root/path3"));
+		assertEquals(ErrorCode.OK, fileGroupMgr.addTransientPathString(generatedGroup, "@root/path4"));
+		
+		/* add the sub-groups into the merge group */
+		assertEquals(0, fileGroupMgr.addSubGroup(mergeGroup, sourceGroup1));
+		assertEquals(1, fileGroupMgr.addSubGroup(mergeGroup, generatedGroup));
+		assertEquals(2, fileGroupMgr.addSubGroup(mergeGroup, sourceGroup2));
+		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(mergeGroup, 2, 1));
+		
+		/* validate the sub-groups of the merge group */
+		assertEquals(sourceGroup1, fileGroupMgr.getSubGroup(mergeGroup, 0));
+		assertEquals(sourceGroup2, fileGroupMgr.getSubGroup(mergeGroup, 1));
+		assertEquals(generatedGroup, fileGroupMgr.getSubGroup(mergeGroup, 2));
+		
+		/* validate the expanded content */
+		String results[] = fileGroupMgr.getExpandedGroupFiles(mergeGroup);
+		assertEquals("@root/a/b/file1",        results[0]);
+		assertEquals("@root/a/b/c/file2",      results[1]);
+		assertEquals("@root/a/b/d/file3",      results[2]);
+		assertEquals("@root/a/b/c/d/e/file4",  results[3]);
+		assertEquals("@root/a/b/c/file5",      results[4]);
+		assertEquals("@root/a/b/z/file6",      results[5]);
+		assertEquals("@root/path1",            results[6]);
+		assertEquals("@root/path2",            results[7]);
+		assertEquals("@root/path3",            results[8]);
+		assertEquals("@root/path4",            results[9]);
+		
+		/* remove one of the entries, and re-check the content */
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(mergeGroup, 1));
+		results = fileGroupMgr.getExpandedGroupFiles(mergeGroup);
+		assertEquals("@root/a/b/file1",        results[0]);
+		assertEquals("@root/a/b/c/file2",      results[1]);
+		assertEquals("@root/a/b/d/file3",      results[2]);
+		assertEquals("@root/path1",            results[3]);
+		assertEquals("@root/path2",            results[4]);
+		assertEquals("@root/path3",            results[5]);
+		assertEquals("@root/path4",            results[6]);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a merge file group containing an embedded merge group.
+	 */
+	@Test
+	public void testNewNestedMergeGroup() {
+		
+		/* create a top-level merge group, to be populated by other groups */
+		int mergeGroup = fileGroupMgr.newMergeGroup(pkg1Id);
+		
+		/* create and populate sub groups */
+		int sourceGroup = fileGroupMgr.newSourceGroup(pkg2Id);
+		int subMergeGroup = fileGroupMgr.newMergeGroup(pkg2Id);
+		int generatedGroup = fileGroupMgr.newGeneratedGroup(pkg3Id);
+		
+		assertEquals(0, fileGroupMgr.addPathId(sourceGroup, file1));
+		assertEquals(0, fileGroupMgr.addPathString(generatedGroup, "@root/path1"));
+		
+		/* add the sourceGroup and the subMergeGroup into the top-level group */
+		assertEquals(0, fileGroupMgr.addSubGroup(mergeGroup, sourceGroup));
+		assertEquals(1, fileGroupMgr.addSubGroup(mergeGroup, subMergeGroup));
+		
+		/* add the sourceGroup (again) and the generatedGroup into the subMergeGroup */
+		assertEquals(0, fileGroupMgr.addSubGroup(subMergeGroup, sourceGroup));
+		assertEquals(1, fileGroupMgr.addSubGroup(subMergeGroup, generatedGroup));
+		
+		/* validate the content */
+		String results[] = fileGroupMgr.getExpandedGroupFiles(mergeGroup);
+		assertEquals(3, results.length);
+		assertEquals("@root/a/b/file1", results[0]);
+		assertEquals("@root/a/b/file1", results[1]);
+		assertEquals("@root/path1", results[2]);
+		
+		/* try to add the main group into the subMergeGroup - should fail */
+		assertEquals(ErrorCode.BAD_PATH, fileGroupMgr.addSubGroup(subMergeGroup, mergeGroup));	
+
+		/* try to add the main group into itself - should fail */
+		assertEquals(ErrorCode.BAD_PATH, fileGroupMgr.addSubGroup(mergeGroup, mergeGroup));	
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Create a merge file group containing two source groups and a generated group.
+	 */
+	@Test
+	public void testNewMergeGroupErrors() {
+
+		int sourceGroup = fileGroupMgr.newSourceGroup(pkg2Id);
+		int mergeGroup = fileGroupMgr.newMergeGroup(pkg2Id);
+		int generatedGroup = fileGroupMgr.newGeneratedGroup(pkg3Id);
+		
+		/* try to add sub-groups to non-merge groups */
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addSubGroup(sourceGroup, generatedGroup));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addSubGroup(generatedGroup, sourceGroup));
+
+		/* try to add to an invalid group ID, and to add an invalid subgroup */
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.addSubGroup(1000, generatedGroup));
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addSubGroup(mergeGroup, 2000));
+	}
+		
+	/*-------------------------------------------------------------------------------------*/
 }

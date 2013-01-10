@@ -517,8 +517,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int addSubGroup(int groupId, int subGroupId) {
-		// TODO Auto-generated method stub
-		return 0;
+		return addSubGroup(groupId, subGroupId, -1);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -528,8 +527,38 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int addSubGroup(int groupId, int subGroupId, int index) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		/* by fetching the size, we check if the group is valid */
+		int initialSize = getGroupSize(groupId);
+		if (initialSize == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* only applicable for merge file groups */
+		if (getGroupType(groupId) != MERGE_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		/* validate that the sub group ID is valid */
+		if (getGroupSize(subGroupId) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		if (index == -1) {
+			index = initialSize;
+		} else if ((index < 0) || (index > initialSize)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/* if the subGroupId is itself a merge group, we need to check for cycles */
+		if (getGroupType(subGroupId) == MERGE_GROUP) {
+			if (groupContainsGroup(subGroupId, groupId)) {
+				return ErrorCode.BAD_PATH;
+			}
+		}
+		
+		addEntryHelper(groupId, subGroupId, null, index, initialSize);
+		return index;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -539,8 +568,26 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int getSubGroup(int groupId, int index) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		/* only applicable for merge file groups */
+		if (getGroupType(groupId) != MERGE_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		if ((index < 0) || (index >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		Object output[] = new Object[2];
+		if (getPathsAtHelper(groupId, index, output) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		return (Integer)output[0];
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -636,55 +683,12 @@ public class FileGroupMgr implements IFileGroupMgr {
 	@Override
 	public String[] getExpandedGroupFiles(int groupId) {
 
-		/* must be source, generated or merge group */
-		int type = getGroupType(groupId);		
-		if (type == ErrorCode.NOT_FOUND) {
-			return null;
-		}
-
 		/* all group types provide us with an array of string paths */
 		ArrayList<String> outputPaths = new ArrayList<String>();
-		
-		if ((type == SOURCE_GROUP) || (type == GENERATED_GROUP)) {
 
-			/* fetch the individual members from the database */
-			ResultSet rs = null;
-			try {
-				findGroupMembersPrepStmt.setInt(1, groupId);
-				rs = db.executePrepSelectResultSet(findGroupMembersPrepStmt);
-				while (rs.next()) {
-					if (type == SOURCE_GROUP) {
-						int pathId = rs.getInt(1);
-						outputPaths.add(fileMgr.getPathName(pathId, true));
-					} else {
-						outputPaths.add(rs.getString(2));
-					}
-				}
-				rs.close();
-				
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Error in SQL: " + e);
-			}
-		}
-		
-		else if (type == MERGE_GROUP) {
-			// TODO: complete this.
-		}
-		
-		/* else, it's an error - unsupported group type */
-		else {
-			throw new FatalBuildStoreError("Unsupported file group type: " + type);
-		}
-		
-		/* if there are transient entries for this group, append them to the list */
-		if (type == GENERATED_GROUP) {
-			ArrayList<TransientEntry> entries = transientEntryMap.get(Integer.valueOf(groupId));
-			if (entries != null) {
-				for (Iterator<TransientEntry> iterator = entries.iterator(); iterator.hasNext();) {
-					TransientEntry transientEntry = (TransientEntry) iterator.next();
-					outputPaths.add(transientEntry.pathString);
-				}
-			}
+		/* since merge groups can be recursive, we need a recursion helper */
+		if (getExpandedGroupFilesHelper(groupId, outputPaths) != ErrorCode.OK) {
+			return null;
 		}
 		
 		/* final results as a String[] */
@@ -834,5 +838,116 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return pkgRootMgr.getRootNative(rootName) != null;
 	}
 	
-	/*-------------------------------------------------------------------------------------*/	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for getExpandedGroupFiles(). This method handles the recursion that's
+	 * possible when merge groups contain sub-groups. It's also possible that merge groups
+	 * contain other merge groups.
+	 * 
+	 * @param groupId		The ID of the top-level group.
+	 * @param outputPaths	An input/output list that we'll append output paths to.
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if a sub group is invalid. 
+	 */
+	private int getExpandedGroupFilesHelper(int groupId, ArrayList<String> outputPaths) {
+		
+		/* must be source, generated or merge group */
+		int type = getGroupType(groupId);		
+		if (type == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		/* source and generate groups are simple - just expand their content */
+		if ((type == SOURCE_GROUP) || (type == GENERATED_GROUP)) {
+
+			/* fetch the individual members from the database */
+			ResultSet rs = null;
+			try {
+				findGroupMembersPrepStmt.setInt(1, groupId);
+				rs = db.executePrepSelectResultSet(findGroupMembersPrepStmt);
+				while (rs.next()) {
+					if (type == SOURCE_GROUP) {
+						int pathId = rs.getInt(1);
+						outputPaths.add(fileMgr.getPathName(pathId, true));
+					} else {
+						outputPaths.add(rs.getString(2));
+					}
+				}
+				rs.close();
+				
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Error in SQL: " + e);
+			}
+		}
+		
+		/* merge groups involve using recursion to expand children */
+		else if (type == MERGE_GROUP) {
+			
+			int size = getGroupSize(groupId);
+			int index = 0;
+			while (index != size) {
+				int subGroupId = getSubGroup(groupId, index);
+				int rc = getExpandedGroupFilesHelper(subGroupId, outputPaths);
+				if (rc != ErrorCode.OK) {
+					return rc;
+				}
+				index++;
+			}
+		}
+		
+		/* else, it's an error - unsupported group type */
+		else {
+			throw new FatalBuildStoreError("Unsupported file group type: " + type);
+		}
+		
+		/* if there are transient entries for this group, append them to the list */
+		if (type == GENERATED_GROUP) {
+			ArrayList<TransientEntry> entries = transientEntryMap.get(Integer.valueOf(groupId));
+			if (entries != null) {
+				for (Iterator<TransientEntry> iterator = entries.iterator(); iterator.hasNext();) {
+					TransientEntry transientEntry = (TransientEntry) iterator.next();
+					outputPaths.add(transientEntry.pathString);
+				}
+			}
+		}
+		
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper method for determining whether a merge file group contains (somewhere in the
+	 * hierarchy) a second group.
+	 * 
+	 * @param parentGroupId		The ID of the file group that may contain the child group.
+	 * @param childGroupId		The ID of the file group that may be contained by the parent group.
+	 * @return True if the parent group contains the child group.
+	 */
+	private boolean groupContainsGroup(int parentGroupId, int childGroupId) {
+
+		/* recursion termination */
+		if (parentGroupId == childGroupId) {
+			return true;
+		}
+		
+		/* if parent is a merge group, traverse recursively */
+		int parentType = getGroupType(parentGroupId);
+		if (parentType != MERGE_GROUP) {
+			return false;
+		}
+		int size = getGroupSize(parentGroupId);
+		int index = 0;
+		while (index != size) {
+			int memberGroup = getSubGroup(parentGroupId, index);
+			if (groupContainsGroup(memberGroup, childGroupId)) {
+				return true;
+			}
+			index++;
+		}
+	
+		return false;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
