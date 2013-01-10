@@ -249,6 +249,10 @@ public class TestFileGroupMgr {
 		/* test getting of paths with invalid index */
 		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.getPathId(groupId, -1));
 		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.getPathId(groupId, 3));
+		
+		/* test getting from non-source file groups - error */
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.getPathId(generatedGroupId, 0));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.getPathId(mergeGroupId, 0));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -393,6 +397,111 @@ public class TestFileGroupMgr {
 		assertEquals(file3, fileGroupMgr.getPathId(groupId, 1));
 		assertEquals(file1, fileGroupMgr.getPathId(groupId, 2));
 		assertEquals(file4, fileGroupMgr.getPathId(groupId, 3));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add paths to a generated file group.
+	 */
+	@Test
+	public void testAddGeneratedPaths() {
+		
+		/* create a new source file group */
+		int groupId = fileGroupMgr.newGeneratedGroup(pkg1Id);
+		assertTrue(groupId >= 0);
+		
+		/* append some permanent paths to the end of the group - test size and positions */
+		assertEquals(0, fileGroupMgr.addPathString(groupId, "@pkg1_src/src/path1"));
+		assertEquals(1, fileGroupMgr.addPathString(groupId, "@pkg1_gen/obj/path1"));
+		assertEquals(2, fileGroupMgr.addPathString(groupId, "@pkg2_src/src/path2"));
+		assertEquals(3, fileGroupMgr.addPathString(groupId, "@pkg2_gen/obj/path2"));
+		assertEquals(2, fileGroupMgr.addPathString(groupId, "@pkg3_src/src/path3", 2));
+		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(groupId, 2, 0));
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(groupId, 1));
+		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
+		
+		/* 
+		 * Check ordering - @pkg3_src/src/path3, @pkg1_gen/obj/path1, @pkg2_src/src/path2, 
+		 * @pkg2_gen/obj/path2.
+		 */
+		assertEquals("@pkg3_src/src/path3", fileGroupMgr.getPathString(groupId, 0));
+		assertEquals("@pkg1_gen/obj/path1", fileGroupMgr.getPathString(groupId, 1));
+		assertEquals("@pkg2_src/src/path2", fileGroupMgr.getPathString(groupId, 2));
+		assertEquals("@pkg2_gen/obj/path2", fileGroupMgr.getPathString(groupId, 3));
+		
+		/* expand the group into paths */
+		String results[] = fileGroupMgr.getExpandedGroupFiles(groupId);
+		assertEquals("@pkg3_src/src/path3", results[0]);
+		assertEquals("@pkg1_gen/obj/path1", results[1]);
+		assertEquals("@pkg2_src/src/path2", results[2]);
+		assertEquals("@pkg2_gen/obj/path2", results[3]);
+		
+		/* append some transient paths to end of the group */
+		assertEquals(ErrorCode.OK, fileGroupMgr.addTransientPathString(groupId, "@pkg1_src/my/path"));
+		assertEquals(ErrorCode.OK, fileGroupMgr.addTransientPathString(groupId, "@pkg2_src/my/2ndpath"));
+		assertEquals(ErrorCode.OK, fileGroupMgr.addTransientPathString(groupId, "@pkg2_gen/my/3rdpath"));
+				
+		/* confirm ordering */
+		results = fileGroupMgr.getExpandedGroupFiles(groupId);
+		assertEquals("@pkg3_src/src/path3",  results[0]);
+		assertEquals("@pkg1_gen/obj/path1",  results[1]);
+		assertEquals("@pkg2_src/src/path2",  results[2]);
+		assertEquals("@pkg2_gen/obj/path2",  results[3]);
+		assertEquals("@pkg1_src/my/path",    results[4]);
+		assertEquals("@pkg2_src/my/2ndpath", results[5]);
+		assertEquals("@pkg2_gen/my/3rdpath", results[6]);
+				
+		/* clear the transient members and test again */
+		assertEquals(ErrorCode.OK, fileGroupMgr.clearTransientPathStrings(groupId));
+		results = fileGroupMgr.getExpandedGroupFiles(groupId);
+		assertEquals("@pkg3_src/src/path3", results[0]);
+		assertEquals("@pkg1_gen/obj/path1", results[1]);
+		assertEquals("@pkg2_src/src/path2", results[2]);
+		assertEquals("@pkg2_gen/obj/path2", results[3]);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Add paths to a generated file group, but with errors.
+	 */
+	@Test
+	public void testAddGeneratedPathErrors() {
+
+		int sourceGroupId = fileGroupMgr.newSourceGroup(pkg1Id);
+		int genGroupId = fileGroupMgr.newGeneratedGroup(pkg1Id);
+		int mergeGroupId = fileGroupMgr.newMergeGroup(pkg1Id);
+		
+		/* try to add/get path strings in source or merge file groups - fail */
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addPathString(sourceGroupId, "@root/path"));
+		assertEquals(null, fileGroupMgr.getPathString(sourceGroupId, 0));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addTransientPathString(sourceGroupId, "@root/path"));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addPathString(mergeGroupId, "@root/path"));
+		assertEquals(null, fileGroupMgr.getPathString(mergeGroupId, 0));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.addTransientPathString(mergeGroupId, "@root/path"));
+		
+		/* try to add permanent and transient with invalid group ID - fail */
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.addPathString(1234, "@root/path"));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.addTransientPathString(1234, "@root/path"));
+		
+		/* add invalid path strings - missing a valid root name - fail */
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addPathString(genGroupId, "@bad_root/path"));
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addTransientPathString(genGroupId, "@pkg1_gon/"));		
+		
+		/* add some valid path strings to the generated group */
+		assertEquals(0, fileGroupMgr.addPathString(genGroupId, "@root/path1"));
+		assertEquals(1, fileGroupMgr.addPathString(genGroupId, "@root/path2"));
+		assertEquals("@root/path1", fileGroupMgr.getPathString(genGroupId, 0));
+		assertEquals("@root/path2", fileGroupMgr.getPathString(genGroupId, 1));
+		
+		/* add path strings at invalid locations */
+		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addPathString(genGroupId, "@root/path1", -2));
+		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addPathString(genGroupId, "@root/path1", 3));
+		
+		/* get path string for invalid group ID, or invalid index */
+		assertEquals(null, fileGroupMgr.getPathString(genGroupId, -1));
+		assertEquals(null, fileGroupMgr.getPathString(genGroupId, 2));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

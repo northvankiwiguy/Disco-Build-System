@@ -173,18 +173,18 @@ public interface IFileGroupMgr {
 	
 	/**
 	 * Append a new path string into the file group. The path is expressed as being relative
-	 * to the root of a package (such as \@pkg_gen/output.o). The path can either be temporary
-	 * (dynamically generated) or permanent (persisted to the database).
+	 * to the root of a package (such as \@pkg_gen/output.o). The path will be persisted to
+	 * the database. This method is intended for use when hard-coding the output of an action,
+	 * rather than requiring the action to auto-generate the names of its output files.
 	 * 
 	 * @param groupId 		The ID of the group to append to.
 	 * @param path    		The package-relative path to the generated file (e.g. \@pkg_gen/output.o)
-	 * @param isPermanent	True if this entry should be persisted to the BuildStore.
 	 * @return				The index of the newly added entry, or
 	 * 						ErrorCode.NOT_FOUND if the groupId is invalid,
 	 * 						ErrorCode.BAD_VALUE if the path string is malformed, or
 	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
 	 */
-	int addPathString(int groupId, String path, boolean isPermanent);
+	int addPathString(int groupId, String path);
 
 	/**
 	 * A variant of addPathString that adds the new path at the specified index (within the group)
@@ -193,7 +193,6 @@ public interface IFileGroupMgr {
 	 * 
 	 * @param groupId 		The ID of the group to append to.
 	 * @param path    		The package-relative path to the generated file (e.g. \@pkg_gen/output.o)
-	 * @param isPermanent	True if this entry should be persisted to the BuildStore.
 	 * @param index         The index within the group, at which the new entry will be added.
 	 * @return				The index of the newly added entry, or
 	 * 						ErrorCode.NOT_FOUND if the groupId is invalid,
@@ -201,7 +200,7 @@ public interface IFileGroupMgr {
 	 * 						ErrorCode.BAD_VALUE if the path string is malformed, or
 	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
 	 */
-	int addPathString(int groupId, String path, boolean isPermanent, int index);
+	int addPathString(int groupId, String path, int index);
 	
 	/**
 	 * Return the path string at the specified index within the file group.
@@ -213,6 +212,32 @@ public interface IFileGroupMgr {
 	 * groupId or index are invalid.
 	 */
 	String getPathString(int groupId, int index);
+	
+	/**
+	 * Add a transient path string to the specified file group. This path is not persisted
+	 * to the database, so will only exist while the current BuildStore is open. This method
+	 * is intended for use when a generated file group is populated by the action that 
+     * generates the group. All paths will be appended to the end of the file in the order
+     * in which they're added. Since paths are not persisted, they aren't accessible via
+     * getPathString(), removeEntry(), or moveEntry() and don't contribute to
+	 * the size of the group via getGroupSize(). They will however appear at the end of
+	 * the list returned by getExpandedGroupFiles().
+	 * 
+	 * @param groupId		The ID of the group to append to.
+	 * @param path			The path string (e.g. \@root/path/to/file) to be appended.
+	 * @return				ErrorCode.OK on success, ErrorCode.NOT_FOUND if the groupId is
+	 * 						invalid, ErrorCode.BAD_VALUE if the path string is malformed, or
+	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
+	 */
+	int addTransientPathString(int groupId, String path);
+	
+	/**
+	 * Clear any transient path strings that have been added for this file group.
+	 * 
+	 * @param groupId The ID of the group containing the transient paths.
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if the group ID is invalid.
+	 */
+	int clearTransientPathStrings(int groupId);
 
 	/**
 	 * Append a new sub group to the end of an existing merge file group. This
@@ -280,8 +305,8 @@ public interface IFileGroupMgr {
 	int moveEntry(int groupId, int fromIndex, int toIndex);
 	
 	/**
-	 * Return the number of entries in this file group (include both temporary
-	 * and persistent entries).
+	 * Return the number of persistent entries in this file group (that is, paths
+	 * added by addTransientPathString() are not counted).
 	 * 
 	 * @param groupId The ID of the file group to query.
 	 * @return        The number of elements in this group, or 

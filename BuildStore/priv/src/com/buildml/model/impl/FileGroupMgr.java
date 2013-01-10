@@ -15,6 +15,9 @@ package com.buildml.model.impl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
@@ -22,6 +25,7 @@ import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -31,6 +35,21 @@ import com.buildml.utils.errors.ErrorCode;
  */
 public class FileGroupMgr implements IFileGroupMgr {
 
+	/*=====================================================================================*
+	 * NESTED CLASSES
+	 *=====================================================================================*/
+	
+	/**
+	 * Represents a single transient member of a file group. A file group has zero or more
+	 * entries of this type that are only stored in memory, and are never persisted to the
+	 * database.
+	 */
+	private class TransientEntry {
+				
+		/** The String path that this entry represents */
+		String pathString;
+	}
+	
 	/*=====================================================================================*
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
@@ -60,10 +79,15 @@ public class FileGroupMgr implements IFileGroupMgr {
 		insertPathAtPrepStmt = null,
 		findGroupSizePrepStmt = null,
 		findPathsAtPrepStmt = null,
-		findSourceGroupMembersPrepStmt = null,
+		findGroupMembersPrepStmt = null,
 		removePathPrepStmt = null,
 		shiftDownPathsPrepStmt = null;
-		
+
+	/**
+	 * A mapping from group ID to the list of transient path entries.
+	 */
+	private HashMap<Integer, ArrayList<TransientEntry>> transientEntryMap = null;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -97,12 +121,15 @@ public class FileGroupMgr implements IFileGroupMgr {
 				"select count(*) from fileGroupPaths where groupId = ?");
 		findPathsAtPrepStmt = db.prepareStatement(
 				"select pathId, pathString from fileGroupPaths where groupId = ? and pos = ?");
-		findSourceGroupMembersPrepStmt = db.prepareStatement(
-				"select pathId from fileGroupPaths where groupId = ? order by pos");
+		findGroupMembersPrepStmt = db.prepareStatement(
+				"select pathId, pathString from fileGroupPaths where groupId = ? order by pos");
 		removePathPrepStmt = db.prepareStatement(
 				"delete from fileGroupPaths where groupId = ? and pos = ?");
 		shiftDownPathsPrepStmt = db.prepareStatement(
 				"update fileGroupPaths set pos = pos - 1 where groupId = ? and pos >= ?");
+		
+		/* initialize the mapping of group IDs to list of transient entries */
+		transientEntryMap = new HashMap<Integer, ArrayList<TransientEntry>>();
 	}
 	
 	/*=====================================================================================*
@@ -354,9 +381,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * @see com.buildml.model.IFileGroupMgr#addGeneratedPath(int, java.lang.String, boolean)
 	 */
 	@Override
-	public int addPathString(int groupId, String path, boolean isPermanent) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int addPathString(int groupId, String path) {
+		return addPathString(groupId, path, -1);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -365,10 +391,32 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * @see com.buildml.model.IFileGroupMgr#addGeneratedPath(int, java.lang.String, boolean, int)
 	 */
 	@Override
-	public int addPathString(int groupId, String path, boolean isPermanent,
-			int index) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int addPathString(int groupId, String path, int index) {
+		
+		/* by fetching the size, we check if the group is valid */
+		int initialSize = getGroupSize(groupId);
+		if (initialSize == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* only applicable for generated file groups */
+		if (getGroupType(groupId) != GENERATED_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		/* validate that the path string is valid */
+		if (!isValidPathString(path)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		if (index == -1) {
+			index = initialSize;
+		} else if ((index < 0) || (index > initialSize)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		addEntryHelper(groupId, 0, path, index, initialSize);
+		return index;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -378,8 +426,88 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public String getPathString(int groupId, int index) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return null;
+		}
+
+		/* only applicable for generated file groups */
+		if (getGroupType(groupId) != GENERATED_GROUP) {
+			return null;
+		}
+		
+		if ((index < 0) || (index >= size)) {
+			return null;
+		}
+		
+		Object output[] = new Object[2];
+		if (getPathsAtHelper(groupId, index, output) == ErrorCode.NOT_FOUND) {
+			return null;
+		}
+		return (String)output[1];
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#addTransientPathString(int, java.lang.String)
+	 */
+	@Override
+	public int addTransientPathString(int groupId, String path) {
+
+		/* only generated groups are supported */
+		int type = getGroupType(groupId);
+		if (type == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if (type != GENERATED_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		/* validate that the path string is valid */
+		if (!isValidPathString(path)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		Integer groupIdInt = Integer.valueOf(groupId);
+		
+		/* 
+		 * Check if there are already transient paths for this group. If not, create
+		 * a new entry for this group.
+		 */
+		ArrayList<TransientEntry> entries = transientEntryMap.get(groupIdInt);
+		if (entries == null) {
+			entries = new ArrayList<FileGroupMgr.TransientEntry>();
+			transientEntryMap.put(groupIdInt, entries);
+		}
+				
+		/* append the new path to the entry list */
+		TransientEntry newEntry = new TransientEntry();
+		newEntry.pathString = path;
+		entries.add(newEntry);
+		
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#clearTransientPathStrings(int)
+	 */
+	@Override
+	public int clearTransientPathStrings(int groupId) {
+
+		/* only generated groups are supported */
+		int type = getGroupType(groupId);
+		if (type == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if (type != GENERATED_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		transientEntryMap.remove(Integer.valueOf(groupId));		
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -508,27 +636,59 @@ public class FileGroupMgr implements IFileGroupMgr {
 	@Override
 	public String[] getExpandedGroupFiles(int groupId) {
 
-		int size = getGroupSize(groupId);
-		if (size == ErrorCode.NOT_FOUND) {
+		/* must be source, generated or merge group */
+		int type = getGroupType(groupId);		
+		if (type == ErrorCode.NOT_FOUND) {
 			return null;
 		}
-	
-		/* fetch the members from the database */
-		Integer results[] = null;
-		try {
-			findSourceGroupMembersPrepStmt.setInt(1, groupId);
-			results = db.executePrepSelectIntegerColumn(findSourceGroupMembersPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
+
+		/* all group types provide us with an array of string paths */
+		ArrayList<String> outputPaths = new ArrayList<String>();
+		
+		if ((type == SOURCE_GROUP) || (type == GENERATED_GROUP)) {
+
+			/* fetch the individual members from the database */
+			ResultSet rs = null;
+			try {
+				findGroupMembersPrepStmt.setInt(1, groupId);
+				rs = db.executePrepSelectResultSet(findGroupMembersPrepStmt);
+				while (rs.next()) {
+					if (type == SOURCE_GROUP) {
+						int pathId = rs.getInt(1);
+						outputPaths.add(fileMgr.getPathName(pathId, true));
+					} else {
+						outputPaths.add(rs.getString(2));
+					}
+				}
+				rs.close();
+				
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Error in SQL: " + e);
+			}
 		}
 		
-		/* convert from path IDs to path strings (in @root/path) format */
-		String paths[] = new String[size];
-		for (int i = 0; i < results.length; i++) {
-			int pathId = results[i];
-			paths[i] = fileMgr.getPathName(pathId, true);
+		else if (type == MERGE_GROUP) {
+			// TODO: complete this.
 		}
-		return paths;
+		
+		/* else, it's an error - unsupported group type */
+		else {
+			throw new FatalBuildStoreError("Unsupported file group type: " + type);
+		}
+		
+		/* if there are transient entries for this group, append them to the list */
+		if (type == GENERATED_GROUP) {
+			ArrayList<TransientEntry> entries = transientEntryMap.get(Integer.valueOf(groupId));
+			if (entries != null) {
+				for (Iterator<TransientEntry> iterator = entries.iterator(); iterator.hasNext();) {
+					TransientEntry transientEntry = (TransientEntry) iterator.next();
+					outputPaths.add(transientEntry.pathString);
+				}
+			}
+		}
+		
+		/* final results as a String[] */
+		return outputPaths.toArray(new String[0]);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -573,6 +733,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 			}
 			output[0] = rs.getInt(1);
 			output[1] = rs.getString(2);
+			rs.close();
 			return ErrorCode.OK;
 			
 		} catch (SQLException e) {
@@ -650,4 +811,28 @@ public class FileGroupMgr implements IFileGroupMgr {
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Determine whether a path string is valid (that is, does it start with a valid root
+	 * name).
+	 * 
+	 * @param path	The path string to validate.
+	 * @return True if the path is valid, else false.
+	 */
+	private boolean isValidPathString(String path) {
+		
+		/* syntax must be "@<root-name>/.*" where <root-name> must be at least 4 characters */
+		if (!path.startsWith("@")) {
+			return false;
+		}
+		int slashIndex = path.indexOf('/');
+		if (slashIndex < "@root".length()) {
+			return false;
+		}
+		String rootName = path.substring(1, slashIndex);
+		
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		return pkgRootMgr.getRootNative(rootName) != null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/	
 }
