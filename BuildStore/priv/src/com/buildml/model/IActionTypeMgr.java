@@ -72,14 +72,15 @@ public interface IActionTypeMgr {
 	public abstract String getDescription(int typeId);
 
 	/**
-	 * Delete the specified action type. This is only possible if the type is
-	 * not used by any actions, and it's not the parent of any action types.
+	 * Delete the specified action type or folder. This is only possible if the type is
+	 * not used by any actions, and it's not the parent of any action types. In the
+	 * case of a folder, it must not contain any child entries.
 	 * 
 	 * @param typeId The action type to be deleted.
 	 * @return ErrorCode.OK on success or ErrorCode.CANT_REMOVE if the action
 	 * 		   type is still in use.
 	 */
-	public abstract int deleteActionType(int typeId);
+	public abstract int remove(int typeId);
 
 	/**
 	 * Return the ID of the actionType with the specified name.
@@ -99,9 +100,11 @@ public interface IActionTypeMgr {
 	public abstract Integer[] getFolderChildren(int folderId);
 	
 	/**
-	 * Retrieve the parent folder of the specified folder or actionType.
+	 * Retrieve the parent folder of the specified folder or actionType. The parent
+	 * of the root folder is itself.
+	 * 
 	 * @param folderOrActionTypeId The folder or actionType whose parent we want.
-	 * @return The parent
+	 * @return The parent, or ErrorCode.NOT_FOUND if folderOrActionTypeId is invalid.
 	 */
 	public abstract int getParent(int folderOrActionTypeId);
 
@@ -159,7 +162,7 @@ public interface IActionTypeMgr {
 	 * Retrieve the body of the commandlet that's associated with an action type.
 	 * 
 	 * @param typeId	The action type that owns the commandlet.
-	 * @return The commandlet body, or null if typeId is invalid.
+	 * @return The commandlet body, or null if typeId is invalid, or relates to a folder.
 	 */
 	public abstract String getCommandlet(int typeId);	
 	
@@ -193,7 +196,8 @@ public interface IActionTypeMgr {
 	 * 
 	 * @param typeId	The ID of the actionType containing the slots.
 	 * @param slotPos	The position (within the actionType) of the slot (SLOT_POS_INPUT, etc).
-	 * @return An array of slot details, or null if typeId or slotPos is invalid.
+	 * @return An array of slot details, or null if typeId or slotPos is invalid, or typeId
+	 *         relates to a folder.
 	 */
 	public abstract SlotDetails[] getSlots(int typeId, int slotPos);
 

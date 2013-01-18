@@ -15,6 +15,7 @@ package com.buildml.model.impl;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * An implementation of IActionTypeMgr, to manage the various action types available
@@ -33,6 +34,25 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** The hard-coded ID for the root folder */
+	private static final int BUILTIN_ROOT_FOLDER_ID = 0;
+	
+	/** The hard-coded name for the root folder */	
+	private static final String BUILTIN_ROOT_FOLDER_NAME = "All Action Types";
+
+	/** The hard-coded description for the root folder */	
+	private static final String BUILTIN_ROOT_FOLDER_DESCR = "Root folder for all action types.";
+
+	/** The hard-coded ID for the "Shell Command" action type */
+	private static final int BUILTIN_SHELL_COMMAND_ID = 1;
+	
+	/** The hard-coded name for the shell command action type */	
+	private static final String BUILTIN_SHELL_COMMAND_NAME = "Shell Command";
+
+	/** The hard-coded description for the shell command action type */	
+	private static final String BUILTIN_SHELL_COMMAND_DESCR = 
+									"Simple shell command, typically used when importing actions.";
+	
 	/** The BuildStore that owns this ActionTypeMgr */
 	private BuildStore buildStore;
 	
@@ -60,8 +80,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int getRootFolder() {
-		// TODO Auto-generated method stub
-		return 0;
+		return BUILTIN_ROOT_FOLDER_ID;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -71,8 +90,8 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int newActionType(int parentTypeId, String actionTypeName) {
-		// TODO Auto-generated method stub
-		return 0;
+		/* for now, this operation is not implemented */
+		return ErrorCode.INVALID_OP;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -82,8 +101,8 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int addFolder(String folderName) {
-		// TODO Auto-generated method stub
-		return 0;
+		/* for now, this operation is not implemented */
+		return ErrorCode.INVALID_OP;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -93,7 +112,14 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public String getName(int typeId) {
-		// TODO Auto-generated method stub
+		
+		if (typeId == BUILTIN_ROOT_FOLDER_ID) {
+			return BUILTIN_ROOT_FOLDER_NAME;
+		} else if (typeId == BUILTIN_SHELL_COMMAND_ID) {
+			return BUILTIN_SHELL_COMMAND_NAME;
+		}
+		
+		/* for now, no other action types are supported */
 		return null;
 	}
 
@@ -104,7 +130,14 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public String getDescription(int typeId) {
-		// TODO Auto-generated method stub
+		
+		if (typeId == BUILTIN_ROOT_FOLDER_ID) {
+			return BUILTIN_ROOT_FOLDER_DESCR;
+		} else if (typeId == BUILTIN_SHELL_COMMAND_ID) {
+			return BUILTIN_SHELL_COMMAND_DESCR;
+		}
+
+		/* for now, no other action types are supported */
 		return null;
 	}
 
@@ -114,9 +147,15 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 * @see com.buildml.model.IActionTypeMgr#deleteActionType(int)
 	 */
 	@Override
-	public int deleteActionType(int typeId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int remove(int typeId) {
+		
+		/* we can't remove built-in types */
+		if ((typeId == BUILTIN_ROOT_FOLDER_ID) || (typeId == BUILTIN_SHELL_COMMAND_ID)) {
+			return ErrorCode.CANT_REMOVE;			
+		}
+		
+		/* for now, no other action types or folders can be created */
+		return ErrorCode.NOT_FOUND;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -126,8 +165,14 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int getActionTypeByName(String typeName) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (typeName.equals(BUILTIN_SHELL_COMMAND_NAME)) {
+			return BUILTIN_SHELL_COMMAND_ID;
+		} else if (typeName.equals(BUILTIN_ROOT_FOLDER_NAME)) {
+			return ErrorCode.INVALID_NAME;
+		}
+		
+		/* for now, no other action types can be defined */
+		return ErrorCode.NOT_FOUND;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -137,7 +182,13 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public Integer[] getFolderChildren(int folderId) {
-		// TODO Auto-generated method stub
+		
+		/* for now, root folder has only one child */
+		if (folderId == BUILTIN_ROOT_FOLDER_ID) {
+			return new Integer[] { BUILTIN_SHELL_COMMAND_ID };
+		}
+		
+		/* nothing else has children */
 		return null;
 	}
 
@@ -148,8 +199,13 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int getParent(int folderOrActionTypeId) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (folderOrActionTypeId == BUILTIN_ROOT_FOLDER_ID) {
+			return BUILTIN_ROOT_FOLDER_ID;
+		} else if (folderOrActionTypeId == BUILTIN_SHELL_COMMAND_ID) {
+			return BUILTIN_ROOT_FOLDER_ID;
+		}
+		
+		return ErrorCode.NOT_FOUND;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -159,8 +215,9 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int setParent(int folderOrActionTypeId, int parentId) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		/* For now, we can't change the parent of anything */
+		return ErrorCode.INVALID_OP;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -170,8 +227,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public boolean isFolder(int folderOrActionTypeId) {
-		// TODO Auto-generated method stub
-		return false;
+		return (folderOrActionTypeId == BUILTIN_ROOT_FOLDER_ID);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -181,7 +237,12 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public boolean isValid(int folderOrActionTypeId) {
-		// TODO Auto-generated method stub
+		if ((folderOrActionTypeId == BUILTIN_ROOT_FOLDER_ID) ||
+				(folderOrActionTypeId == BUILTIN_SHELL_COMMAND_ID)){
+			return true;
+		}
+		
+		/* no other implemented yet */
 		return false;
 	}
 
@@ -203,7 +264,18 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public String getCommandlet(int typeId) {
-		// TODO Auto-generated method stub
+		
+		/* folders don't have commandlets */
+		if (isFolder(typeId)) {
+			return null;
+		}
+		
+		/* the shell action has a hard-coded commandlet */
+		if (typeId == BUILTIN_SHELL_COMMAND_ID) {
+			return "!Shell\n${CommandString}";
+		}
+		
+		/* for now, nothing else is defined */
 		return null;
 	}
 
@@ -226,7 +298,11 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public SlotDetails[] getSlots(int typeId, int slotPos) {
-		// TODO Auto-generated method stub
+		
+		/* folder don't have slots */
+		if (isFolder(typeId)) {
+			return null;
+		}
 		return null;
 	}
 
@@ -248,8 +324,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int removeSlot(int typeId, int slotId) {
-		// TODO Auto-generated method stub
-		return 0;
+		return ErrorCode.CANT_REMOVE;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
