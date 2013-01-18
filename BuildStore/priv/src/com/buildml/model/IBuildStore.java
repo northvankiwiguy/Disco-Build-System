@@ -103,6 +103,14 @@ public interface IBuildStore {
 	public abstract IPackageRootMgr getPackageRootMgr();
 
 	/**
+	 * Fetch the ActionTypeMgr associated with this BuildStore. This object
+	 * encapsulates the various types of actions that can be created.
+	 * 
+	 * @return An ActionTypeMgr manager object.
+	 */
+	public abstract IActionTypeMgr getActionTypeMgr();	
+	
+	/**
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
 	 * changes are written to the disk. Only use fast access for long-running

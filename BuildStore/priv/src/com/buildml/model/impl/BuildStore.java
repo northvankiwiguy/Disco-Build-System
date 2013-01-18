@@ -19,6 +19,7 @@ import java.io.IOException;
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileGroupMgr;
@@ -65,7 +66,10 @@ public class BuildStore implements IBuildStore {
 
 	/** The ActionMgr manager object we'll delegate work to. */
 	private IActionMgr actionMgr;
-	
+
+	/** The ActionTypeMgr manager object we'll delegate work to. */
+	private IActionTypeMgr actionTypeMgr;
+
 	/** The Reports manager object we'll delegate work to. */
 	private IReportMgr reportMgr;
 	
@@ -141,6 +145,7 @@ public class BuildStore implements IBuildStore {
 		fileGroupMgr = new FileGroupMgr(this);
 		fileIncludeMgr = new FileIncludeMgr(this);
 		actionMgr = new ActionMgr(this);
+		actionTypeMgr = new ActionTypeMgr(this);
 		reportMgr = new ReportMgr(this);
 		fileAttrMgr = new FileAttributeMgr(this, fileMgr);
 		packages = new PackageMgr(this);
@@ -290,6 +295,16 @@ public class BuildStore implements IBuildStore {
 	@Override
 	public IPackageRootMgr getPackageRootMgr() {
 		return pkgRootMgr;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getActionTypeMgr()
+	 */
+	@Override
+	public IActionTypeMgr getActionTypeMgr() {
+		return actionTypeMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
