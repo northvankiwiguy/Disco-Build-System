@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.impl.ActionTypeMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -77,6 +78,13 @@ public class TestActionMgr {
 		assertNotSame(action1, action2);
 		assertNotSame(action1, action3);
 		assertNotSame(action2, action3);
+		
+		/* validate that the action's type is "Shell Command" */
+		IActionTypeMgr actionTypeMgr = bs.getActionTypeMgr();
+		int shellActionType = actionTypeMgr.getActionTypeByName("Shell Command");
+		assertEquals(shellActionType, actionMgr.getActionType(action1));
+		assertEquals(shellActionType, actionMgr.getActionType(action2));
+		assertEquals(shellActionType, actionMgr.getActionType(action3));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

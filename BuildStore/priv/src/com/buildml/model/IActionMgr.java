@@ -66,6 +66,16 @@ public interface IActionMgr {
 	}
 	
 	/**
+	 * Add a new action, of the specified type, returning the new action ID number.
+	 * 
+	 * @param actionTypeId The ID of the action's type.
+	 * @param actionDirId  The ID of the path (a directory) in which this action
+	 *                     should be executed.
+	 * @return The new action's ID, or ErrorCode.NOT_FOUND if actionTypeId is invalid.
+	 */
+	public abstract int addAction(int actionTypeId, int actionDirId);
+	
+	/**
 	 * Add a new build action of the "Shell Command" type, returning the new 
 	 * action ID number. This method is most commonly used when importing a
 	 * legacy build, rather than when manually creating an action.
@@ -152,6 +162,14 @@ public interface IActionMgr {
 	 */
 	public abstract void removeFileAccess(int actionId, int pathId);
 
+	/**
+	 * Return the ID of this action's type (these ID are managed by ActionTypeMgr).
+	 * 
+	 * @param actionId The ID of the action to find the type of.
+	 * @return The action's type, or ErrorCode.NOT_FOUND if actionId is invalid.
+	 */
+	public int getActionType(int actionId);
+	
 	/**
 	 * Return the list of all actions that execute within the file system directory 
 	 * specified by pathId.
@@ -273,6 +291,29 @@ public interface IActionMgr {
 	 * @return true if the action has been marked as trash, else false.
 	 */
 	public abstract boolean isActionTrashed(int actionId);
+	
+	/**
+	 * For the specified action, set the specified slot to the given value.
+	 * 
+	 * @param actionId The action that the slot is attached to.
+	 * @param slotId   The slot that's connected to the action.
+	 * @param value	   The new value to be set (typically an Integer or String).
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if actionId is invalid, slotId
+	 *         is invalid, or slotId isn't attached to actionId, or ErrorCode.BAD_VALUE if
+	 *         the value can't be assigned to the specified slot.
+	 */
+	public abstract int setSlotValue(int actionId, int slotId, Object value);
+	
+	/**
+	 * For the specified action, retrieve the specified slot's value. If the value
+	 * has not been explicitly set for this action, the slot default value will be returned.
+	 * 
+	 * @param actionId	The action that the slot is attached to.
+	 * @param slotId	The slot that's connected to the action.
+	 * @return The slot's value (typically Integer or String), or null if actionId/slotId can't
+	 * be mapped to a valid slot.
+	 */
+	public abstract Object getSlotValue(int actionId, int slotId);	
 	
 	/**
 	 * Return the BuildStore object that owns this IActionMgr object.

@@ -53,6 +53,9 @@ public class ActionMgr implements IActionMgr {
 	/** The FileMgr object associated with this ActionMgr */
 	private IFileMgr fileMgr = null;
 	
+	/** The SlotMgr object associated with this ActionMgr */
+	private SlotMgr slotMgr = null;	
+	
 	/** Various prepared statement for database access. */
 	private PreparedStatement 
 		insertActionPrepStmt = null,
@@ -74,7 +77,8 @@ public class ActionMgr implements IActionMgr {
 		findActionsByFileInActionFilesPrepStmt = null,
 		findActionsByFileAndOperationInActionFilesPrepStmt = null,
 		trashActionPrepStmt = null,
-		actionIsTrashPrepStmt = null;
+		actionIsTrashPrepStmt = null,
+		findActionTypePrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -90,9 +94,10 @@ public class ActionMgr implements IActionMgr {
 		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
+		this.slotMgr = buildStore.getSlotMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?)");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, ?, 0, ?, 0, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
@@ -123,12 +128,25 @@ public class ActionMgr implements IActionMgr {
 			db.prepareStatement("update buildActions set trashed = ? where actionId = ?");
 		actionIsTrashPrepStmt =
 			db.prepareStatement("select trashed from buildActions where actionId = ?");
+		findActionTypePrepStmt =
+			db.prepareStatement("select actionType from buildActions where actionId = ?");
 	}
 	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
-	 *=====================================================================================*/
-	
+	 *=====================================================================================*/	
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#addAction(int, int)
+	 */
+	@Override
+	public int addAction(int actionTypeId, int actionDirId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#addAction(int, int, java.lang.String)
 	 */
@@ -136,9 +154,10 @@ public class ActionMgr implements IActionMgr {
 	public int addShellCommandAction(int parentActionId, int actionDirId, String command) {
 		
 		try {
-			insertActionPrepStmt.setInt(1, parentActionId);
-			insertActionPrepStmt.setInt(2, actionDirId);
-			insertActionPrepStmt.setString(3, command);
+			insertActionPrepStmt.setInt(1, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+			insertActionPrepStmt.setInt(2, parentActionId);
+			insertActionPrepStmt.setInt(3, actionDirId);
+			insertActionPrepStmt.setString(4, command);
 			db.executePrepUpdate(insertActionPrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
@@ -381,6 +400,30 @@ public class ActionMgr implements IActionMgr {
 		}		
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getActionType(int)
+	 */
+	@Override
+	public int getActionType(int actionId) {
+				
+		Integer intResults[] = null;
+		try {
+			findActionTypePrepStmt.setInt(1, actionId);
+			intResults = db.executePrepSelectIntegerColumn(findActionTypePrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		if (intResults.length == 0) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		return intResults[0];
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -752,6 +795,30 @@ public class ActionMgr implements IActionMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#setSlotValue(int, int, java.lang.Object)
+	 */
+	@Override
+	public int setSlotValue(int actionId, int slotId, Object value) {
+
+		/* delegate all slot assignments to SlotMgr */
+		return slotMgr.setSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId, value);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getSlotValue(int, int)
+	 */
+	@Override
+	public Object getSlotValue(int actionId, int slotId) {
+		
+		/* delegate all slot assignments to SlotMgr */
+		return slotMgr.getSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getBuildStore()
@@ -894,4 +961,6 @@ public class ActionMgr implements IActionMgr {
 					+ actionId + " and fileId = " + fileId);
 		}
 	}
+
+	/*-------------------------------------------------------------------------------------*/
 }

@@ -129,11 +129,17 @@ public class UpgradeDB {
 			Statement stat = dbConn.createStatement();
 			
 			/* upgrade from 400 to 401 */
-			if (dbVersion == 400) {
+			if (dbVersion < 401) {
 				stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
 						"type integer)");
 				stat.executeUpdate("create table fileGroupPaths (groupId integer, pathId integer, " +
 						"pathString text, pos integer)");
+			}
+			
+			/* upgrade to 402 */
+			if (dbVersion < 402) {
+				stat.executeUpdate("alter table buildActions add column actionType integer");
+				stat.executeUpdate("update buildActions set actionType = 1");
 			}
 
 			/* finish by setting the new version number */

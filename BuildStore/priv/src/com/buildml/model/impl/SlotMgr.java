@@ -207,11 +207,45 @@ class SlotMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * For the specified action/sub-package, set a slot to the given value.
+	 * 
+	 * @param ownerType Either SLOT_OWNER_ACTION or SLOT_OWNER_PACKAGE.
+	 * @param actionId  The action that the slot is attached to.
+	 * @param slotId    The slot that's connected to the action.
+	 * @param value	    The new value to be set (typically an Integer or String).
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if actionId is invalid, slotId
+	 *         is invalid, or slotId isn't attached to actionId, or ErrorCode.BAD_VALUE if
+	 *         the value can't be assigned to the specified slot.
+	 */
+	public int setSlotValue(int ownerType, int actionId, int slotId,
+			Object value) {
+		return ErrorCode.INVALID_OP;		
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * For the specified action/sub-package, retrieve the specified slot's value. If the value
+	 * has not been explicitly set for this action, the slot default value will be returned.
+	 * 
+	 * @param ownerType Either SLOT_OWNER_ACTION or SLOT_OWNER_PACKAGE.
+	 * @param actionId	The action that the slot is attached to.
+	 * @param slotId	The slot that's connected to the action.
+	 * @return The slot's value (typically Integer or String), or null if actionId/slotId can't
+	 * be mapped to a valid slot.
+	 */
+	public Object getSlotValue(int ownerType, int actionId, int slotId) {
+		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * @return The BuildStore that owns this SlotMgr object.
 	 */
 	IBuildStore getBuildStore() {
 		return buildStore;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }
