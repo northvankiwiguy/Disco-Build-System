@@ -154,12 +154,12 @@ public class TestActionSet {
 	public void testPopulateWithParents() {
 		
 		/* create a bunch of actions in a tree structure */
-		int action1 = actionMgr.addAction(actionMgr.getRootAction(""), 0, "top command");
-		int action2 = actionMgr.addAction(action1, 0, "second command");
-		int action3 = actionMgr.addAction(action1, 0, "second command as well");
-		int action4 = actionMgr.addAction(action3, 0, "third command");
-		actionMgr.addAction(action4, 0, "fourth command");
-		int action6 = actionMgr.addAction(action2, 0, "second command's child");
+		int action1 = actionMgr.addShellCommandAction(actionMgr.getRootAction(""), 0, "top command");
+		int action2 = actionMgr.addShellCommandAction(action1, 0, "second command");
+		int action3 = actionMgr.addShellCommandAction(action1, 0, "second command as well");
+		int action4 = actionMgr.addShellCommandAction(action3, 0, "third command");
+		actionMgr.addShellCommandAction(action4, 0, "fourth command");
+		int action6 = actionMgr.addShellCommandAction(action2, 0, "second command's child");
 
 		/* add only one of them to the ActionSet */
 		ts.add(action6);		
@@ -238,9 +238,9 @@ public class TestActionSet {
 		
 		/* create a bunch of actions */
 		int root = actionMgr.getRootAction("");
-		int action1 = actionMgr.addAction(root, 0, "");
-		int action2 = actionMgr.addAction(root, 0, "");
-		int action3 = actionMgr.addAction(root, 0, "");
+		int action1 = actionMgr.addShellCommandAction(root, 0, "");
+		int action2 = actionMgr.addShellCommandAction(root, 0, "");
+		int action3 = actionMgr.addShellCommandAction(root, 0, "");
 		
 		/* add them to the ActionSet, testing the size as we go along */ 
 		assertEquals(0, ts.size());
@@ -270,16 +270,16 @@ public class TestActionSet {
 		
 		/* add some actions in a tree hierarchy */
 		int root = actionMgr.getRootAction("");
-		int actionA = actionMgr.addAction(root, 0, "top-level-action-A");
-		int actionA1 = actionMgr.addAction(actionA, 0, "second-level-action-under-A");
-		int actionA2 = actionMgr.addAction(actionA, 0, "second-level-action-under-A");
-		int actionA3 = actionMgr.addAction(actionA, 0, "second-level-action-under-A");
-		int actionA31 = actionMgr.addAction(actionA3, 0, "third-level-action-under-A3");
-		int actionA32 = actionMgr.addAction(actionA3, 0, "third-level-action-under-A3");
-		int actionA321 = actionMgr.addAction(actionA32, 0, "fourth-level-action-under-A32");
-		actionMgr.addAction(actionA, 0, "second-level-action-under-A");
-		int actionB = actionMgr.addAction(root, 0, "top-level-action-B");
-		actionMgr.addAction(root, 0, "top-level-action-C");
+		int actionA = actionMgr.addShellCommandAction(root, 0, "top-level-action-A");
+		int actionA1 = actionMgr.addShellCommandAction(actionA, 0, "second-level-action-under-A");
+		int actionA2 = actionMgr.addShellCommandAction(actionA, 0, "second-level-action-under-A");
+		int actionA3 = actionMgr.addShellCommandAction(actionA, 0, "second-level-action-under-A");
+		int actionA31 = actionMgr.addShellCommandAction(actionA3, 0, "third-level-action-under-A3");
+		int actionA32 = actionMgr.addShellCommandAction(actionA3, 0, "third-level-action-under-A3");
+		int actionA321 = actionMgr.addShellCommandAction(actionA32, 0, "fourth-level-action-under-A32");
+		actionMgr.addShellCommandAction(actionA, 0, "second-level-action-under-A");
+		int actionB = actionMgr.addShellCommandAction(root, 0, "top-level-action-B");
+		actionMgr.addShellCommandAction(root, 0, "top-level-action-C");
 	
 		/* populate with an empty specification string array*/
 		ts.populateWithActions(new String[0]);
@@ -380,11 +380,11 @@ public class TestActionSet {
 	@Test
 	public void testMatchingCommandNames() {
 
-		int action1 = actionMgr.addAction(0, 0, "a action is a action, of : course, of course");
-		int action2 = actionMgr.addAction(0, 0, "another action");
-		int action3 = actionMgr.addAction(0, 0, "gcc -c -o foo.o foo.c");
-		int action4 = actionMgr.addAction(0, 0, "gcc -c -o bah.o bah.c");
-		int action5 = actionMgr.addAction(0, 0, "gcc -c -o bling.o bling.c");
+		int action1 = actionMgr.addShellCommandAction(0, 0, "a action is a action, of : course, of course");
+		int action2 = actionMgr.addShellCommandAction(0, 0, "another action");
+		int action3 = actionMgr.addShellCommandAction(0, 0, "gcc -c -o foo.o foo.c");
+		int action4 = actionMgr.addShellCommandAction(0, 0, "gcc -c -o bah.o bah.c");
+		int action5 = actionMgr.addShellCommandAction(0, 0, "gcc -c -o bling.o bling.c");
 
 		/* look for gcc commands */
 		ActionSet results = new ActionSet(actionMgr);

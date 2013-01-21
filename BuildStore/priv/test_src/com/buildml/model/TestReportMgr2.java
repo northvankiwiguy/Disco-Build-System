@@ -87,54 +87,54 @@ public class TestReportMgr2 {
 		int rootAction = actionMgr.getRootAction("");
 		
 		/* compile cat.c -> cat.o */
-		int actionPkgCat = actionMgr.addAction(rootAction, dirHome, "gcc -c cat.c");
+		int actionPkgCat = actionMgr.addShellCommandAction(rootAction, dirHome, "gcc -c cat.c");
 		actionMgr.addFileAccess(actionPkgCat, filePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgCat, fileHousePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgCat, fileCatC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgCat, fileCatO, OperationType.OP_WRITE);
 
 		/* compile dog.c -> dog.o */
-		int actionPkgDog = actionMgr.addAction(rootAction, dirHome, "gcc -c dog.c");
+		int actionPkgDog = actionMgr.addShellCommandAction(rootAction, dirHome, "gcc -c dog.c");
 		actionMgr.addFileAccess(actionPkgDog, filePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgDog, fileHousePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgDog, fileDogC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgDog, fileDogO, OperationType.OP_WRITE);
 		
 		/* compile bunny.c -> bunny.o */
-		int actionPkgBunny = actionMgr.addAction(rootAction, dirHome, "gcc -c bunny.c");
+		int actionPkgBunny = actionMgr.addShellCommandAction(rootAction, dirHome, "gcc -c bunny.c");
 		actionMgr.addFileAccess(actionPkgBunny, filePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgBunny, fileHousePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgBunny, fileBunnyC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgBunny, fileBunnyO, OperationType.OP_WRITE);
 		
 		/* compile giraffe.c -> giraffe.o */
-		int actionPkgGiraffe = actionMgr.addAction(rootAction, dirHome, "gcc -c giraffe.c");
+		int actionPkgGiraffe = actionMgr.addShellCommandAction(rootAction, dirHome, "gcc -c giraffe.c");
 		actionMgr.addFileAccess(actionPkgGiraffe, filePetH, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgGiraffe, fileGiraffeC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionPkgGiraffe, fileGiraffeO, OperationType.OP_WRITE);
 		
 		/* archive cat.o -> cat.a */
-		int actionArchCat = actionMgr.addAction(rootAction, dirHome, "ar c cat.a cat.o");
+		int actionArchCat = actionMgr.addShellCommandAction(rootAction, dirHome, "ar c cat.a cat.o");
 		actionMgr.addFileAccess(actionArchCat, fileCatO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionArchCat, fileCatA, OperationType.OP_WRITE);
 
 		/* archive dog.o -> dog.a */
-		int actionArchDog = actionMgr.addAction(rootAction, dirHome, "ar c dog.a dog.o");
+		int actionArchDog = actionMgr.addShellCommandAction(rootAction, dirHome, "ar c dog.a dog.o");
 		actionMgr.addFileAccess(actionArchDog, fileDogO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionArchDog, fileDogA, OperationType.OP_WRITE);
 		
 		/* archive bunny.o -> bunny.a */
-		int actionArchBunny = actionMgr.addAction(rootAction, dirHome, "ar c bunny.a bunny.o");
+		int actionArchBunny = actionMgr.addShellCommandAction(rootAction, dirHome, "ar c bunny.a bunny.o");
 		actionMgr.addFileAccess(actionArchBunny, fileBunnyO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionArchBunny, fileBunnyA, OperationType.OP_WRITE);
 		
 		/* archive giraffe.o -> giraffe.a */
-		int actionArchGiraffe = actionMgr.addAction(rootAction, dirHome, "ar c giraffe.a giraffe.o");
+		int actionArchGiraffe = actionMgr.addShellCommandAction(rootAction, dirHome, "ar c giraffe.a giraffe.o");
 		actionMgr.addFileAccess(actionArchGiraffe, fileGiraffeO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionArchGiraffe, fileGiraffeA, OperationType.OP_WRITE);
 
 		/* link cat.a, dog.a, giraffe.a and bunny.a -> animals.exe */
-		int actionLinkAnimals = actionMgr.addAction(rootAction, dirHome, "ln -o animals.exe cat.a dog.a bunny.a giraffe.a");
+		int actionLinkAnimals = actionMgr.addShellCommandAction(rootAction, dirHome, "ln -o animals.exe cat.a dog.a bunny.a giraffe.a");
 		actionMgr.addFileAccess(actionLinkAnimals, fileCatA, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionLinkAnimals, fileDogA, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionLinkAnimals, fileBunnyA, OperationType.OP_READ);
@@ -460,14 +460,14 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* add a bunch of actions - they should all be in the <import> package */
-		int action1 = actionMgr.addAction(0, 0, "command 1");
-		int action2 = actionMgr.addAction(0, 0, "command 2");
-		int action3 = actionMgr.addAction(0, 0, "command 3");
-		int action4 = actionMgr.addAction(0, 0, "command 4");
-		int action5 = actionMgr.addAction(0, 0, "command 5");
-		int action6 = actionMgr.addAction(0, 0, "command 6");
-		int action7 = actionMgr.addAction(0, 0, "command 7");
-		int action8 = actionMgr.addAction(0, 0, "command 8");
+		int action1 = actionMgr.addShellCommandAction(0, 0, "command 1");
+		int action2 = actionMgr.addShellCommandAction(0, 0, "command 2");
+		int action3 = actionMgr.addShellCommandAction(0, 0, "command 3");
+		int action4 = actionMgr.addShellCommandAction(0, 0, "command 4");
+		int action5 = actionMgr.addShellCommandAction(0, 0, "command 5");
+		int action6 = actionMgr.addShellCommandAction(0, 0, "command 6");
+		int action7 = actionMgr.addShellCommandAction(0, 0, "command 7");
+		int action8 = actionMgr.addShellCommandAction(0, 0, "command 8");
 		
 		/* empty package set still gives an empty ActionSet */
 		tset = reports.reportActionsFromPackageSet(cs);

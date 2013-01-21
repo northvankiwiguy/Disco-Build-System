@@ -81,10 +81,10 @@ public class TestReportMgr {
 		int dir = fileMgr.addDirectory("myEmptydir");
 
 		/* create three different actions */
-		int action1 = actionMgr.addAction(rootActionId, 0, "command");
-		int action2 = actionMgr.addAction(rootActionId, 0, "command");		
-		int action3 = actionMgr.addAction(rootActionId, 0, "command");
-		int action4 = actionMgr.addAction(rootActionId, 0, "command");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "command");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "command");		
+		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "command");
+		int action4 = actionMgr.addShellCommandAction(rootActionId, 0, "command");
 		
 		/* add references from the actions to the files - action1 uses three of them */
 		actionMgr.addFileAccess(action1, foxFile, OperationType.OP_READ);
@@ -169,7 +169,7 @@ public class TestReportMgr {
 		
 		/* add a (small) bunch of actions, and associate files with them. */
 		for (int i = 0; i != numActions; i++) {
-			int actionId = actionMgr.addAction(rootActionId, 0, "command");
+			int actionId = actionMgr.addShellCommandAction(rootActionId, 0, "command");
 			
 			for (int j = 0; j != filesPerAction; j++) {
 				actionMgr.addFileAccess(actionId, r.nextInt(numFiles), OperationType.OP_READ);
@@ -278,8 +278,8 @@ public class TestReportMgr {
 		int file3 = fileMgr.addFile("/home/psmith/myfile3");
 		int file4 = fileMgr.addFile("/home/psmith/myfile4");
 		
-		int action1 = actionMgr.addAction(rootActionId, 0, "action1");
-		int action2 = actionMgr.addAction(rootActionId, 0, "action2");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "action1");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "action2");
 
 		/* access some */
 		actionMgr.addFileAccess(action1, file1, OperationType.OP_READ);
@@ -368,11 +368,11 @@ public class TestReportMgr {
 	@Test
 	public void testReportActionsThatMatchName() {
 	
-		int action1 = actionMgr.addAction(0, 0, "My command number 1");
-		int action2 = actionMgr.addAction(0, 0, "My command number 2");
-		int action3 = actionMgr.addAction(0, 0, "Another with number 1 in it");
-		int action4 = actionMgr.addAction(0, 0, "A completely different action");
-		int action5 = actionMgr.addAction(0, 0, "A final command with 1 in it");
+		int action1 = actionMgr.addShellCommandAction(0, 0, "My command number 1");
+		int action2 = actionMgr.addShellCommandAction(0, 0, "My command number 2");
+		int action3 = actionMgr.addShellCommandAction(0, 0, "Another with number 1 in it");
+		int action4 = actionMgr.addShellCommandAction(0, 0, "A completely different action");
+		int action5 = actionMgr.addShellCommandAction(0, 0, "A final command with 1 in it");
 	
 		/* match commands that contain "command" */
 		ActionSet results = reports.reportActionsThatMatchName("%command%");
@@ -418,20 +418,20 @@ public class TestReportMgr {
 		int rootAction = actionMgr.getRootAction("");
 		
 		/* action 1 reads/writes file1a and file1b */
-		int action1a = actionMgr.addAction(rootAction, 0, "action1 command reads file1a");
-		int action1b = actionMgr.addAction(rootAction, 0, "action1 command writes file1b");
+		int action1a = actionMgr.addShellCommandAction(rootAction, 0, "action1 command reads file1a");
+		int action1b = actionMgr.addShellCommandAction(rootAction, 0, "action1 command writes file1b");
 		actionMgr.addFileAccess(action1a, file1a, OperationType.OP_READ);
 		actionMgr.addFileAccess(action1b, file1b, OperationType.OP_WRITE);
 
 		/* action 2 reads/writes file2a and file2b */
-		int action2a = actionMgr.addAction(rootAction, 0, "action2 command reads file2a");
-		int action2b = actionMgr.addAction(rootAction, 0, "action2 command writes file2b");
+		int action2a = actionMgr.addShellCommandAction(rootAction, 0, "action2 command reads file2a");
+		int action2b = actionMgr.addShellCommandAction(rootAction, 0, "action2 command writes file2b");
 		actionMgr.addFileAccess(action2a, file2a, OperationType.OP_READ);
 		actionMgr.addFileAccess(action2b, file2b, OperationType.OP_WRITE);
 
 		/* action 3 reads/writes file3a and file3b */
-		int action3a = actionMgr.addAction(rootAction, 0, "action3 command reads file3a");
-		int action3b = actionMgr.addAction(rootAction, 0, "action3 command writes file3b");
+		int action3a = actionMgr.addShellCommandAction(rootAction, 0, "action3 command reads file3a");
+		int action3b = actionMgr.addShellCommandAction(rootAction, 0, "action3 command writes file3b");
 		actionMgr.addFileAccess(action3a, file3a, OperationType.OP_READ);
 		actionMgr.addFileAccess(action3b, file3b, OperationType.OP_WRITE);
 
@@ -531,15 +531,15 @@ public class TestReportMgr {
 		int file3 = fileMgr.addFile("/a/b/e.java");
 
 		int root = actionMgr.getRootAction("");
-		int action1 = actionMgr.addAction(root, 0, "");
+		int action1 = actionMgr.addShellCommandAction(root, 0, "");
 		actionMgr.addFileAccess(action1, file1, OperationType.OP_WRITE);
 		actionMgr.addFileAccess(action1, file2, OperationType.OP_READ);
 
-		int action2 = actionMgr.addAction(root, 0, "");
+		int action2 = actionMgr.addShellCommandAction(root, 0, "");
 		actionMgr.addFileAccess(action2, file1, OperationType.OP_READ);
 		actionMgr.addFileAccess(action2, file3, OperationType.OP_READ);
 
-		int action3 = actionMgr.addAction(root, 0, "");
+		int action3 = actionMgr.addShellCommandAction(root, 0, "");
 		actionMgr.addFileAccess(action3, file3, OperationType.OP_WRITE);
 		actionMgr.addFileAccess(action3, file3, OperationType.OP_WRITE);
 
@@ -608,10 +608,10 @@ public class TestReportMgr {
 		int dirIdB = fileMgr.addDirectory("/dirB");
 		int fileIdC = fileMgr.addFile("/file");
 		int rootAction = actionMgr.getRootAction("root");
-		int action1 = actionMgr.addAction(rootAction, dirIdA, "");
-		int action2 = actionMgr.addAction(rootAction, dirIdA, "");
-		int action3 = actionMgr.addAction(rootAction, dirIdB, "");
-		int action4 = actionMgr.addAction(rootAction, dirIdB, "");
+		int action1 = actionMgr.addShellCommandAction(rootAction, dirIdA, "");
+		int action2 = actionMgr.addShellCommandAction(rootAction, dirIdA, "");
+		int action3 = actionMgr.addShellCommandAction(rootAction, dirIdB, "");
+		int action4 = actionMgr.addShellCommandAction(rootAction, dirIdB, "");
 	
 		FileSet dirs = new FileSet(fileMgr);
 		
@@ -654,7 +654,7 @@ public class TestReportMgr {
 		/* a.java will be compiled into a.class, which goes into prog.jar (see later) */
 		int fileAJava = fileMgr.addFile("/a.java");
 		int fileAClass = fileMgr.addFile("/a.class");
-		int actionA = actionMgr.addAction(0, 0, "javac a.java");
+		int actionA = actionMgr.addShellCommandAction(0, 0, "javac a.java");
 		actionMgr.addFileAccess(actionA, fileAJava, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA, fileAClass, OperationType.OP_WRITE);
 
@@ -666,7 +666,7 @@ public class TestReportMgr {
 		/* b.java will be compiled into b.class, which goes into prog.jar (see later) */		
 		int fileBJava = fileMgr.addFile("/b.java");
 		int fileBClass = fileMgr.addFile("/b.class");
-		int actionB = actionMgr.addAction(0, 0, "javac b.java");
+		int actionB = actionMgr.addShellCommandAction(0, 0, "javac b.java");
 		actionMgr.addFileAccess(actionB, fileBJava, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionB, fileBClass, OperationType.OP_WRITE);
 		
@@ -679,7 +679,7 @@ public class TestReportMgr {
 		/* c.java will be compiled into c.class, but no further */
 		int fileCJava = fileMgr.addFile("/c.java");
 		int fileCClass = fileMgr.addFile("/c.class");
-		int actionC = actionMgr.addAction(0, 0, "javac c.java");
+		int actionC = actionMgr.addShellCommandAction(0, 0, "javac c.java");
 		actionMgr.addFileAccess(actionC, fileCJava, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionC, fileCClass, OperationType.OP_WRITE);
 		
@@ -695,7 +695,7 @@ public class TestReportMgr {
 		
 		/* now put A.class and B.class into prog.jar */
 		int fileProgJar = fileMgr.addFile("/prog.jar");
-		int actionProg = actionMgr.addAction(0, 0, "jar cf prog.jar a.class b.class");
+		int actionProg = actionMgr.addShellCommandAction(0, 0, "jar cf prog.jar a.class b.class");
 		actionMgr.addFileAccess(actionProg, fileAClass, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionProg, fileBClass, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionProg, fileProgJar, OperationType.OP_WRITE);

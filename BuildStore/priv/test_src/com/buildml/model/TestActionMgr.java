@@ -65,15 +65,15 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#addAction(int, int, String)}.
+	 * Test method for {@link com.buildml.model.impl.ActionMgr#addShellCommandAction(int, int, String)}.
 	 */
 	@Test
 	public void testAddBuildAction() {
 		
 		/* test that each new build action is assigned a unique ID number */
-		int action1 = actionMgr.addAction(rootActionId, 0, "gcc -o test.o test.c");
-		int action2 = actionMgr.addAction(rootActionId, 0, "gcc -o main.o main.c");
-		int action3 = actionMgr.addAction(rootActionId, 0, "gcc -o tree.o tree.c");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o test.o test.c");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o tree.o tree.c");
 		assertNotSame(action1, action2);
 		assertNotSame(action1, action3);
 		assertNotSame(action2, action3);
@@ -86,9 +86,9 @@ public class TestActionMgr {
 	 */
 	@Test
 	public void testGetCommand() {
-		int action1 = actionMgr.addAction(rootActionId, 0, "gcc -o test.o test.c");
-		int action2 = actionMgr.addAction(rootActionId, 0, "gcc -o main.o main.c");
-		int action3 = actionMgr.addAction(rootActionId, 0, "gcc -o tree.o tree.c");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o test.o test.c");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o tree.o tree.c");
 		assertEquals("gcc -o tree.o tree.c", actionMgr.getCommand(action3));
 		assertEquals("gcc -o main.o main.c", actionMgr.getCommand(action2));
 		assertEquals("gcc -o test.o test.c", actionMgr.getCommand(action1));
@@ -104,9 +104,9 @@ public class TestActionMgr {
 	 */
 	@Test
 	public void testSetCommand() {
-		int action1 = actionMgr.addAction(rootActionId, 0, "A");
-		int action2 = actionMgr.addAction(rootActionId, 0, "B");
-		int action3 = actionMgr.addAction(rootActionId, 0, "C");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "A");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "B");
+		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "C");
 		
 		assertEquals(ErrorCode.OK, actionMgr.setCommand(action2, "Bprime"));
 		assertEquals(ErrorCode.OK, actionMgr.setCommand(action3, "Cprime"));
@@ -128,7 +128,7 @@ public class TestActionMgr {
 	public void testGetCommandSummary() {
 	
 		/* create a single action, with a long command string */
-		int myaction = actionMgr.addAction(actionMgr.getRootAction(""), 0,
+		int myaction = actionMgr.addShellCommandAction(actionMgr.getRootAction(""), 0,
 				"gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
 				"-o myfile.o -c myfile.c");
 		
@@ -152,11 +152,11 @@ public class TestActionMgr {
 	public void testGetParent() throws Exception {
 		
 		/* add a bunch of actions in a hierarchy */
-		int action1 = actionMgr.addAction(rootActionId, 0, "/bin/sh");
-		int action2 = actionMgr.addAction(action1, 0, "gcc -o main.o main.c");
-		int action3 = actionMgr.addAction(action1, 0, "/bin/sh");
-		int action4 = actionMgr.addAction(action3, 0, "gcc -o tree.o tree.c");
-		int action5 = actionMgr.addAction(action3, 0, "gcc -o bark.o bark.c");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "/bin/sh");
+		int action2 = actionMgr.addShellCommandAction(action1, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addShellCommandAction(action1, 0, "/bin/sh");
+		int action4 = actionMgr.addShellCommandAction(action3, 0, "gcc -o tree.o tree.c");
+		int action5 = actionMgr.addShellCommandAction(action3, 0, "gcc -o bark.o bark.c");
 		
 		/* the parent of the root is ErrorCode.NOT_FOUND */
 		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getParent(rootActionId));
@@ -193,13 +193,13 @@ public class TestActionMgr {
 		 */
 		int rootAction = actionMgr.getRootAction("root");
 		int rootDir = fileMgr.getPath("/");
-		int actionA = actionMgr.addAction(rootAction, rootDir, "A");
-		int actionA1 = actionMgr.addAction(actionA, rootDir, "A1");
-		int actionA1a = actionMgr.addAction(actionA1, rootDir, "A1a");
-		int actionA1b = actionMgr.addAction(actionA1, rootDir, "A1b");
-		int actionA2 = actionMgr.addAction(actionA, rootDir, "A1");
-		int actionA2a = actionMgr.addAction(actionA2, rootDir, "A2a");
-		int actionA2b = actionMgr.addAction(actionA2, rootDir, "A2b");
+		int actionA = actionMgr.addShellCommandAction(rootAction, rootDir, "A");
+		int actionA1 = actionMgr.addShellCommandAction(actionA, rootDir, "A1");
+		int actionA1a = actionMgr.addShellCommandAction(actionA1, rootDir, "A1a");
+		int actionA1b = actionMgr.addShellCommandAction(actionA1, rootDir, "A1b");
+		int actionA2 = actionMgr.addShellCommandAction(actionA, rootDir, "A1");
+		int actionA2a = actionMgr.addShellCommandAction(actionA2, rootDir, "A2a");
+		int actionA2b = actionMgr.addShellCommandAction(actionA2, rootDir, "A2b");
 		
 		/* try to change the parent of the root action - illegal */
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setParent(rootAction, actionA2a));
@@ -247,11 +247,11 @@ public class TestActionMgr {
 	public void testGetDirectory() throws Exception {
 		
 		/* add a bunch of actions in a hierarchy, each with a different directory */
-		int action1 = actionMgr.addAction(rootActionId, 0, "/bin/sh");
-		int action2 = actionMgr.addAction(action1, 10, "gcc -o main.o main.c");
-		int action3 = actionMgr.addAction(action1, 20, "/bin/sh");
-		int action4 = actionMgr.addAction(action3, 25, "gcc -o tree.o tree.c");
-		int action5 = actionMgr.addAction(action3, 30, "gcc -o bark.o bark.c");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "/bin/sh");
+		int action2 = actionMgr.addShellCommandAction(action1, 10, "gcc -o main.o main.c");
+		int action3 = actionMgr.addShellCommandAction(action1, 20, "/bin/sh");
+		int action4 = actionMgr.addShellCommandAction(action3, 25, "gcc -o tree.o tree.c");
+		int action5 = actionMgr.addShellCommandAction(action3, 30, "gcc -o bark.o bark.c");
 		
 		/* check that the directories are stored correctly */
 		assertEquals(0, actionMgr.getDirectory(action1));
@@ -274,12 +274,12 @@ public class TestActionMgr {
 	public void testGetChildren() throws Exception {
 
 		/* add a bunch of actions in a hierarchy */
-		int action1 = actionMgr.addAction(rootActionId, 0, "/bin/sh");
-		int action2 = actionMgr.addAction(action1, 0, "gcc -o main.o main.c");
-		int action3 = actionMgr.addAction(action1, 0, "/bin/sh");
-		int action4 = actionMgr.addAction(action3, 0, "gcc -o tree.o tree.c");
-		int action5 = actionMgr.addAction(action3, 0, "gcc -o bark.o bark.c");
-		int action6 = actionMgr.addAction(action3, 0, "gcc -o woof.o woof.c");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "/bin/sh");
+		int action2 = actionMgr.addShellCommandAction(action1, 0, "gcc -o main.o main.c");
+		int action3 = actionMgr.addShellCommandAction(action1, 0, "/bin/sh");
+		int action4 = actionMgr.addShellCommandAction(action3, 0, "gcc -o tree.o tree.c");
+		int action5 = actionMgr.addShellCommandAction(action3, 0, "gcc -o bark.o bark.c");
+		int action6 = actionMgr.addShellCommandAction(action3, 0, "gcc -o woof.o woof.c");
 		
 		/* test valid parent/child relationships */
 		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getChildren(rootActionId), new Integer[] {action1}));
@@ -302,7 +302,7 @@ public class TestActionMgr {
 	@Test
 	public void testAddGetFileAccess() {
 		/* create a new action */
-		int action = actionMgr.addAction(rootActionId, 0, "gcc -o foo foo.c");
+		int action = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o foo foo.c");
 		
 		/* create a number of new files */
 		int fileFooC = fileMgr.addFile("/a/b/c/foo.c");
@@ -329,7 +329,7 @@ public class TestActionMgr {
 		assertTrue(CommonTestUtils.sortedArraysEqual(writeAccesses, new Integer[] { fileFooO, fileFoo }));
 
 		/* check an empty action - should return no results */
-		int emptyAction = actionMgr.addAction(rootActionId, 0, "echo Hi");
+		int emptyAction = actionMgr.addShellCommandAction(rootActionId, 0, "echo Hi");
 		Integer emptyAccesses[] = actionMgr.getFilesAccessed(emptyAction, OperationType.OP_UNSPECIFIED);
 		assertEquals(0, emptyAccesses.length);
 		
@@ -347,8 +347,8 @@ public class TestActionMgr {
 	public void testRemoveFileAccess() {
 		
 		/* create a new action */
-		int actionFoo = actionMgr.addAction(rootActionId, 0, "gcc -o foo foo.c");
-		int actionBar = actionMgr.addAction(rootActionId, 0, "gcc -o bar bar.c");
+		int actionFoo = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o foo foo.c");
+		int actionBar = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o bar bar.c");
 		
 		/* create some new files */
 		int fileFooC = fileMgr.addFile("/a/b/c/foo.c");
@@ -394,10 +394,10 @@ public class TestActionMgr {
 		int dirId = fileMgr.getPath("/");
 		int fileId = fileMgr.addFile("/test");
 		
-		int actionId0 = actionMgr.addAction(parentActionId, dirId, "");
-		int actionId1 = actionMgr.addAction(parentActionId, dirId, "");
-		int actionId2 = actionMgr.addAction(actionId0, dirId, "");
-		int actionId3 = actionMgr.addAction(actionId1, dirId, "");
+		int actionId0 = actionMgr.addShellCommandAction(parentActionId, dirId, "");
+		int actionId1 = actionMgr.addShellCommandAction(parentActionId, dirId, "");
+		int actionId2 = actionMgr.addShellCommandAction(actionId0, dirId, "");
+		int actionId3 = actionMgr.addShellCommandAction(actionId1, dirId, "");
 		Integer actions[] = new Integer[] { actionId0, actionId1, actionId2, actionId3 };
 		
 		/* Initially, there are no file accesses */
@@ -473,7 +473,7 @@ public class TestActionMgr {
 	public void testMultipleFilesAccesses() {
 		Integer result[];
 		
-		int action = actionMgr.addAction(rootActionId, 0, "my mystery action");
+		int action = actionMgr.addShellCommandAction(rootActionId, 0, "my mystery action");
 		
 		/* create a number of new files */
 		int file1 = fileMgr.addFile("/file1");
@@ -565,9 +565,9 @@ public class TestActionMgr {
 	public void testGetActionsThatAccess() {
 
 		/* create some actions */
-		int action1 = actionMgr.addAction(rootActionId, 0, "gcc -o clock.o clock.c");
-		int action2 = actionMgr.addAction(rootActionId, 0, "gcc -o banner.o banner.c");
-		int action3 = actionMgr.addAction(rootActionId, 0, "gcc -o mult.o mult.c");
+		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o clock.o clock.c");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o banner.o banner.c");
+		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o mult.o mult.c");
 
 		/* and a bunch of files that access those actions */
 		int file1 = fileMgr.addFile("/clock.o");
@@ -649,13 +649,13 @@ public class TestActionMgr {
 		
 		/* create a number of actions, each executing in one of those directories */
 		int rootAction = actionMgr.getRootAction("root");
-		int action11 = actionMgr.addAction(rootAction, dir1, "true");
-		int action12 = actionMgr.addAction(rootAction, dir1, "true");
-		int action21 = actionMgr.addAction(rootAction, dir2, "true");
-		int action22 = actionMgr.addAction(rootAction, dir2, "true");
-		int action23 = actionMgr.addAction(rootAction, dir2, "true");
-		int action24 = actionMgr.addAction(rootAction, dir2, "true");
-		int action13 = actionMgr.addAction(rootAction, dir1, "true");
+		int action11 = actionMgr.addShellCommandAction(rootAction, dir1, "true");
+		int action12 = actionMgr.addShellCommandAction(rootAction, dir1, "true");
+		int action21 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
+		int action22 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
+		int action23 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
+		int action24 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
+		int action13 = actionMgr.addShellCommandAction(rootAction, dir1, "true");
 	
 		/* fetch the list of actions that execute in the first directory */
 		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getActionsInDirectory(dir1),
@@ -700,7 +700,7 @@ public class TestActionMgr {
 			//System.out.println("Adding " + sb);
 
 			/* add the file name to the FileSpace */
-			int actionId = actionMgr.addAction(rootActionId, 0, sb.toString());
+			int actionId = actionMgr.addShellCommandAction(rootActionId, 0, sb.toString());
 			
 			/* now add files to this actions */
 			for (int k = 0; k != 200; k++) {
@@ -729,8 +729,8 @@ public class TestActionMgr {
 		/* add a new action, a sub-action, and a file. The sub-action references the file */
 		int rootDir = fileMgr.getPath("/home");
 		int fileId = fileMgr.addFile("/home/joe");
-		int parentAction = actionMgr.addAction(rootAction, rootDir, "parent");
-		int childAction = actionMgr.addAction(parentAction, rootDir, "child");		
+		int parentAction = actionMgr.addShellCommandAction(rootAction, rootDir, "parent");
+		int childAction = actionMgr.addShellCommandAction(parentAction, rootDir, "child");		
 		actionMgr.addFileAccess(childAction, fileId, OperationType.OP_READ);
 		
 		/* check that the parent has the child and that the child is in the directory */

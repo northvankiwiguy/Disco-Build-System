@@ -126,47 +126,47 @@ public class TestImportRefactorMergeActions {
 
 		action = actionMgr.getRootAction("root");
 
-		actionA = actionMgr.addAction(action, dirWork, "make all");
+		actionA = actionMgr.addShellCommandAction(action, dirWork, "make all");
 		actionMgr.addFileAccess(actionA, fileWorkMakefile, OperationType.OP_READ);
 
-		actionA1 = actionMgr.addAction(actionA, dirWork, "gcc -c foo.o foo.c");
+		actionA1 = actionMgr.addShellCommandAction(actionA, dirWork, "gcc -c foo.o foo.c");
 		
-		actionA1a = actionMgr.addAction(actionA1, dirWork, "cc1 -o /tmp/aaa.s foo.c");
+		actionA1a = actionMgr.addShellCommandAction(actionA1, dirWork, "cc1 -o /tmp/aaa.s foo.c");
 		actionMgr.addFileAccess(actionA1a, fileWorkFooC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA1a, fileTmpAaaS, OperationType.OP_WRITE);
 
-		actionA1b = actionMgr.addAction(actionA1, dirWork, "as -o foo.o /tmp/aaa.s");
+		actionA1b = actionMgr.addShellCommandAction(actionA1, dirWork, "as -o foo.o /tmp/aaa.s");
 		actionMgr.addFileAccess(actionA1b, fileTmpAaaS, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA1b, fileWorkFooO, OperationType.OP_WRITE);
 		actionMgr.addFileAccess(actionA1,  fileTmpAaaS, OperationType.OP_DELETE);
 	
-		actionA2 = actionMgr.addAction(actionA, dirWork, "gcc -c bar.o bar.c");
+		actionA2 = actionMgr.addShellCommandAction(actionA, dirWork, "gcc -c bar.o bar.c");
 	
-		actionA2a = actionMgr.addAction(actionA2, dirWork, "cc1 -o /tmp/bbb.s bar.c");
+		actionA2a = actionMgr.addShellCommandAction(actionA2, dirWork, "cc1 -o /tmp/bbb.s bar.c");
 		actionMgr.addFileAccess(actionA2a, fileWorkBarC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA2a, fileTmpBbbS, OperationType.OP_WRITE);
 
-		actionA2b = actionMgr.addAction(actionA2, dirWork, "as -o bar.o /tmp/bbb.s");
+		actionA2b = actionMgr.addShellCommandAction(actionA2, dirWork, "as -o bar.o /tmp/bbb.s");
 		actionMgr.addFileAccess(actionA2b, fileTmpBbbS, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA2b, fileWorkBarO, OperationType.OP_WRITE);
 		
-		actionA3 = actionMgr.addAction(actionA, dirWork, "ar c lib.a foo.o bar.o");
+		actionA3 = actionMgr.addShellCommandAction(actionA, dirWork, "ar c lib.a foo.o bar.o");
 		actionMgr.addFileAccess(actionA3, fileWorkFooO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA3, fileWorkBarO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA3, fileWorkLibA, OperationType.OP_WRITE);
 		actionMgr.addFileAccess(actionA3,  fileTmpBbbS, OperationType.OP_DELETE);
 
-		actionA4 = actionMgr.addAction(actionA, dirWork, "gcc -o main main.c lib.a");
+		actionA4 = actionMgr.addShellCommandAction(actionA, dirWork, "gcc -o main main.c lib.a");
 		
-		actionA4a = actionMgr.addAction(actionA4, dirWork, "cc1 -o /tmp/ccc.s main.c");
+		actionA4a = actionMgr.addShellCommandAction(actionA4, dirWork, "cc1 -o /tmp/ccc.s main.c");
 		actionMgr.addFileAccess(actionA4a, fileWorkMainC, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4a, fileTmpCccS, OperationType.OP_WRITE);
 		
-		actionA4b = actionMgr.addAction(actionA4, dirWork, "as -o main.o /tmp/ccc.s");
+		actionA4b = actionMgr.addShellCommandAction(actionA4, dirWork, "as -o main.o /tmp/ccc.s");
 		actionMgr.addFileAccess(actionA4b, fileTmpCccS, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4b, fileWorkMainO, OperationType.OP_WRITE);
 		
-		actionA4c = actionMgr.addAction(actionA4, dirWork, "ld -o main /usr/crt0.o main.o lib.a /usr/crtend.o");
+		actionA4c = actionMgr.addShellCommandAction(actionA4, dirWork, "ld -o main /usr/crt0.o main.o lib.a /usr/crtend.o");
 		actionMgr.addFileAccess(actionA4c, fileUsrCrt0O, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4c, fileWorkMainO, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4c, fileWorkLibA, OperationType.OP_READ);

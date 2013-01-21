@@ -429,7 +429,7 @@ public class TestFileMgr {
 
 		/* test that we can't remove a directory that an action was executed in */
 		int path4 = fileMgr.addFile("/april/may/september");
-		int myBuildAction = actionMgr.addAction(actionMgr.getRootAction("root"), path4, "/bin/true");
+		int myBuildAction = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), path4, "/bin/true");
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(path4));
 		
 		/* test that we can't remove a path that's referenced by an action */
@@ -487,7 +487,7 @@ public class TestFileMgr {
 		int pathMay = fileMgr.getPath("/april/may");
 		
 		/* add an action that writes to (generates) "june" */
-		int action1 = actionMgr.addAction(actionMgr.getRootAction("root"), 
+		int action1 = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), 
 											fileMgr.getPath("/"), "");
 		actionMgr.addFileAccess(action1, pathJune, OperationType.OP_WRITE);
 		

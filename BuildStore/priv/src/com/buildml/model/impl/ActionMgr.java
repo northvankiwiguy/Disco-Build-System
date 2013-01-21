@@ -133,7 +133,7 @@ public class ActionMgr implements IActionMgr {
 	 * @see com.buildml.model.IActionMgr#addAction(int, int, java.lang.String)
 	 */
 	@Override
-	public int addAction(int parentActionId, int actionDirId, String command) {
+	public int addShellCommandAction(int parentActionId, int actionDirId, String command) {
 		
 		try {
 			insertActionPrepStmt.setInt(1, parentActionId);

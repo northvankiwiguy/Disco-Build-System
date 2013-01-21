@@ -251,7 +251,7 @@ import com.buildml.utils.string.PathUtils;
 				String argvString = commandArgv.toString();
 				commandArgv = null;	
 				
-				int newActionId = actionMgr.addAction(currentParentAction, currentDirId, argvString);
+				int newActionId = actionMgr.addShellCommandAction(currentParentAction, currentDirId, argvString);
 				
 				/* record the ID of this action, since it might be the new parent action soon */
 				mostRecentAction = newActionId;

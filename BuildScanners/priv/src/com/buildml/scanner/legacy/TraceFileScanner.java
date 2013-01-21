@@ -336,7 +336,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 			}
 			
 			/* add the new action to the build store */
-			int newActionId = actionMgr.addAction(parentActionId, actionDirId, command);
+			int newActionId = actionMgr.addShellCommandAction(parentActionId, actionDirId, command);
 			
 			/* associate CFS's process number with BuildStore's actionID */
 			setActionId(processNum, newActionId);

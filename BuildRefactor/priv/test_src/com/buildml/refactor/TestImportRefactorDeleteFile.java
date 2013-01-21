@@ -124,33 +124,33 @@ public class TestImportRefactorDeleteFile {
 		
 		action = actionMgr.getRootAction("root");
 		
-		actionA = actionMgr.addAction(action, dirWork, "make all");
+		actionA = actionMgr.addShellCommandAction(action, dirWork, "make all");
 		actionMgr.addFileAccess(actionA, fileWorkMakefile, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA, fileWorkLog, OperationType.OP_WRITE);
 		
-		actionA1 = actionMgr.addAction(actionA, dirWork, "cp fileA.in fileB.out");
+		actionA1 = actionMgr.addShellCommandAction(actionA, dirWork, "cp fileA.in fileB.out");
 		actionMgr.addFileAccess(actionA1, fileWorkAIn, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA1, fileWorkBOut, OperationType.OP_WRITE);
 		
-		actionA2 = actionMgr.addAction(actionA, dirWork, "cp fileA.in fileC.out");
+		actionA2 = actionMgr.addShellCommandAction(actionA, dirWork, "cp fileA.in fileC.out");
 		actionMgr.addFileAccess(actionA2, fileWorkAIn, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA2, fileWorkCOut, OperationType.OP_WRITE);
 		
-		actionA3 = actionMgr.addAction(actionA, dirWork, "cp fileB.out fileD.out");
+		actionA3 = actionMgr.addShellCommandAction(actionA, dirWork, "cp fileB.out fileD.out");
 		actionMgr.addFileAccess(actionA3, fileWorkBOut, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA3, fileWorkDOut, OperationType.OP_WRITE);
 
-		actionA4 = actionMgr.addAction(actionA, dirWork, "cp fileE.in fileF.out > fileG.out");
+		actionA4 = actionMgr.addShellCommandAction(actionA, dirWork, "cp fileE.in fileF.out > fileG.out");
 		actionMgr.addFileAccess(actionA4, fileWorkEIn, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA4, fileWorkFOut, OperationType.OP_WRITE);
 		actionMgr.addFileAccess(actionA4, fileWorkGOut, OperationType.OP_WRITE);
 
-		actionA5 = actionMgr.addAction(actionA, dirWork, "cp fileH.in fileI.out > fileJ.out");
+		actionA5 = actionMgr.addShellCommandAction(actionA, dirWork, "cp fileH.in fileI.out > fileJ.out");
 		actionMgr.addFileAccess(actionA5, fileWorkHIn, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA5, fileWorkIOut, OperationType.OP_WRITE);
 		actionMgr.addFileAccess(actionA5, fileWorkJOut, OperationType.OP_WRITE);
 		
-		actionA6 = actionMgr.addAction(actionA, dirWork, "cp fileI.out fileK.out");
+		actionA6 = actionMgr.addShellCommandAction(actionA, dirWork, "cp fileI.out fileK.out");
 		actionMgr.addFileAccess(actionA6, fileWorkIOut, OperationType.OP_READ);
 		actionMgr.addFileAccess(actionA6, fileWorkKOut, OperationType.OP_WRITE);
 	}

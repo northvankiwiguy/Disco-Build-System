@@ -278,7 +278,7 @@ public class TestPackageMgr {
 		
 		/* assign them to actions, then try to remove the name */
 		int my_pkg = pkgMgr.getId("my_package");
-		int action1 = actionMgr.addAction(0, 0, "action1");
+		int action1 = actionMgr.addShellCommandAction(0, 0, "action1");
 		pkgMgr.setActionPackage(action1, my_pkg);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(my_pkg));
 		
@@ -790,9 +790,9 @@ public class TestPackageMgr {
 		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* create a few actions */
-		int action1 = actionMgr.addAction(0, 0, "action1");
-		int action2 = actionMgr.addAction(0, 0, "action2");
-		int action3 = actionMgr.addAction(0, 0, "action3");
+		int action1 = actionMgr.addShellCommandAction(0, 0, "action1");
+		int action2 = actionMgr.addShellCommandAction(0, 0, "action2");
+		int action3 = actionMgr.addShellCommandAction(0, 0, "action3");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");
@@ -842,9 +842,9 @@ public class TestPackageMgr {
 		IActionMgr actionMgr = bs.getActionMgr();
 		
 		/* create a few actions */
-		int action1 = actionMgr.addAction(0, 0, "action1");
-		int action2 = actionMgr.addAction(0, 0, "action2");
-		int action3 = actionMgr.addAction(0, 0, "action3");
+		int action1 = actionMgr.addShellCommandAction(0, 0, "action1");
+		int action2 = actionMgr.addShellCommandAction(0, 0, "action2");
+		int action3 = actionMgr.addShellCommandAction(0, 0, "action3");
 		
 		/* create a couple of new packages */
 		int pkgA = pkgMgr.addPackage("PkgA");

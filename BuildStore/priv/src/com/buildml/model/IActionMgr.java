@@ -66,7 +66,9 @@ public interface IActionMgr {
 	}
 	
 	/**
-	 * Add a new build action, returning the new action ID number.
+	 * Add a new build action of the "Shell Command" type, returning the new 
+	 * action ID number. This method is most commonly used when importing a
+	 * legacy build, rather than when manually creating an action.
 	 * 
 	 * @param parentActionId The ID of the new action's parent.
 	 * @param actionDirId The ID of the path (a directory) in which this 
@@ -74,7 +76,7 @@ public interface IActionMgr {
 	 * @param command The shell command associated with this action.
 	 * @return The new action's ID.
 	 */
-	public abstract int addAction(int parentActionId, int actionDirId,
+	public abstract int addShellCommandAction(int parentActionId, int actionDirId,
 			String command);
 
 	/**
