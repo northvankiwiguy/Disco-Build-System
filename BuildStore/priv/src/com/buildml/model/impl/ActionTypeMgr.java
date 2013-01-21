@@ -35,26 +35,29 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 *=====================================================================================*/
 
 	/** The hard-coded ID for the root folder */
-	private static final int BUILTIN_ROOT_FOLDER_ID = 0;
+	static final int BUILTIN_ROOT_FOLDER_ID = 0;
 	
 	/** The hard-coded name for the root folder */	
-	private static final String BUILTIN_ROOT_FOLDER_NAME = "All Action Types";
+	static final String BUILTIN_ROOT_FOLDER_NAME = "All Action Types";
 
 	/** The hard-coded description for the root folder */	
-	private static final String BUILTIN_ROOT_FOLDER_DESCR = "Root folder for all action types.";
+	static final String BUILTIN_ROOT_FOLDER_DESCR = "Root folder for all action types.";
 
 	/** The hard-coded ID for the "Shell Command" action type */
-	private static final int BUILTIN_SHELL_COMMAND_ID = 1;
+	static final int BUILTIN_SHELL_COMMAND_ID = 1;
 	
 	/** The hard-coded name for the shell command action type */	
-	private static final String BUILTIN_SHELL_COMMAND_NAME = "Shell Command";
+	static final String BUILTIN_SHELL_COMMAND_NAME = "Shell Command";
 
 	/** The hard-coded description for the shell command action type */	
-	private static final String BUILTIN_SHELL_COMMAND_DESCR = 
+	static final String BUILTIN_SHELL_COMMAND_DESCR = 
 									"Simple shell command, typically used when importing actions.";
 	
 	/** The BuildStore that owns this ActionTypeMgr */
 	private BuildStore buildStore;
+	
+	/** The SlotMgr we delegate work to */
+	private SlotMgr slotMgr;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -67,8 +70,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	public ActionTypeMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
-		
-		// TODO: add built-in action types.
+		slotMgr = buildStore.getSlotMgr();		
 	}
 	
 	/*=====================================================================================*
@@ -287,8 +289,15 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	@Override
 	public int newSlot(int typeId, int slotName, int slotType, int slotPos,
 			boolean isRequired, Object defaultValue, String[] enumValues) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		/* check for invalid typeId, since SlotMgr can't determine this */
+		if (isFolder(typeId) || !isValid(typeId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* delegate the rest of the work to SlotMgr */
+		return slotMgr.newSlot(SlotMgr.SLOT_OWNER_ACTION, typeId, slotName, slotType, slotPos,
+								isRequired, defaultValue, enumValues);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -303,7 +312,9 @@ public class ActionTypeMgr implements IActionTypeMgr {
 		if (isFolder(typeId)) {
 			return null;
 		}
-		return null;
+		
+		/* delegate to SlotMgr */
+		return slotMgr.getSlots(SlotMgr.SLOT_OWNER_ACTION, typeId, slotPos);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -313,8 +324,9 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public SlotDetails getSlotByName(int typeId, String slotName) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		/* all work can be delegated */
+		return slotMgr.getSlotByName(SlotMgr.SLOT_OWNER_ACTION, typeId, slotName);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -324,7 +336,9 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 */
 	@Override
 	public int removeSlot(int typeId, int slotId) {
-		return ErrorCode.CANT_REMOVE;
+
+		/* all work can be delegated */
+		return slotMgr.removeSlot(SlotMgr.SLOT_OWNER_ACTION, typeId, slotId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -181,10 +181,10 @@ public interface IActionTypeMgr {
 	 * @param defaultValue	If not required, a default value.
 	 * @param enumValues	For SLOT_TYPE_ENUMERATION, an array of valid values.
 	 * @return The newly-added slot ID, or:
-	 * 			ErrorCode.NOT_FOUND if typeId is invalid.
+	 * 			ErrorCode.NOT_FOUND if typeId is invalid, or is a folder.
 	 * 			ErrorCode.INVALID_NAME if slotName is not a valid slot identifier.
 	 * 			ErrorCode.ALREADY_USED if slotName is already in use (for this actionType).
-	 * 			ErrorCode.INVALID_OP if slotType or slotType are not valid/relevant, or
+	 * 			ErrorCode.INVALID_OP if slotType or slotPos are not valid/relevant, or
 	 *                    if enumValues does not contain a valid enumeration.
 	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
 	 */

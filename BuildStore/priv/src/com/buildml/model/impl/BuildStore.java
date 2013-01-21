@@ -82,6 +82,9 @@ public class BuildStore implements IBuildStore {
 	/** The PackageRootMgr object we'll delegate work to */
 	private IPackageRootMgr pkgRootMgr;
 	
+	/** The SlotMgr associated with this BuildStore */
+	private SlotMgr slotMgr;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -144,6 +147,7 @@ public class BuildStore implements IBuildStore {
 		fileMgr = new FileMgr(this);
 		fileGroupMgr = new FileGroupMgr(this);
 		fileIncludeMgr = new FileIncludeMgr(this);
+		slotMgr = new SlotMgr(this);
 		actionMgr = new ActionMgr(this);
 		actionTypeMgr = new ActionTypeMgr(this);
 		reportMgr = new ReportMgr(this);
@@ -305,6 +309,15 @@ public class BuildStore implements IBuildStore {
 	@Override
 	public IActionTypeMgr getActionTypeMgr() {
 		return actionTypeMgr;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The SlotMgr associated with this BuildStore.
+	 */
+	public SlotMgr getSlotMgr() {
+		return slotMgr;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

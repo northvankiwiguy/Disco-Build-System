@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.CommonTestUtils;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -118,6 +119,72 @@ public class TestActionTypeMgr {
 		/* TODO: validate the slots */
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Tests for the default slots (Input, Command, OutputN).
+	 */
+	@Test
+	public void testDefaultSlots() {
+		
+		int shellActionId = actionTypeMgr.getActionTypeByName("Shell Command");
+		
+		/* test the input slots */
+		SlotDetails[] results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_INPUT);
+		assertEquals(1, results.length);
+		assertEquals("Input", results[0].slotName);
+		assertEquals(ISlotTypes.SLOT_POS_INPUT, results[0].slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, results[0].slotType);
+
+		/* test the parameter slots */
+		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_PARAMETER);
+		assertEquals(1, results.length);
+		assertEquals("Command", results[0].slotName);
+		assertEquals(ISlotTypes.SLOT_POS_PARAMETER, results[0].slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_TEXT, results[0].slotType);
+
+		/* test the local slots - there aren't any */
+		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_LOCAL);
+		assertEquals(0, results.length);
+
+		/* test the output slots */
+		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_OUTPUT);
+		assertEquals(10, results.length);
+		assertEquals("Output5", results[5].slotName);
+		assertEquals(ISlotTypes.SLOT_POS_OUTPUT, results[5].slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, results[5].slotType);
+
+		/* test fetching all slot types at once */
+		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_ANY);
+		assertEquals(12, results.length);
+		
+		/* fetch by name - "Input" */
+		SlotDetails result = actionTypeMgr.getSlotByName(shellActionId, "Input");
+		assertEquals("Input", result.slotName);
+		assertEquals(ISlotTypes.SLOT_POS_INPUT, result.slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, result.slotType);
+		
+		/* fetch by name - "Output3" */
+		result = actionTypeMgr.getSlotByName(shellActionId, "Output3");
+		assertEquals("Output3", result.slotName);
+		assertEquals(ISlotTypes.SLOT_POS_OUTPUT, result.slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, result.slotType);
+		
+		/* fetch by name - "Command" */
+		result = actionTypeMgr.getSlotByName(shellActionId, "Command");
+		assertEquals("Command", result.slotName);
+		assertEquals(ISlotTypes.SLOT_POS_PARAMETER, result.slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_TEXT, result.slotType);
+		
+		/* fetch an invalid name */
+		result = actionTypeMgr.getSlotByName(shellActionId, "BADNAME");
+		assertNull(result);
+		
+		/* test that folders don't have slots */
+		results = actionTypeMgr.getSlots(actionTypeMgr.getRootFolder(), ISlotTypes.SLOT_POS_ANY);
+		assertNull(results);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 }

@@ -105,6 +105,18 @@ public interface ISlotTypes {
 		
 		/** For slotType == SLOT_TYPE_ENUMERATION, what are the legal values */
 		public String [] enumValues;
+		
+		@SuppressWarnings("javadoc")
+		public SlotDetails(int slotId, String slotName, int slotType, int slotPos, 
+							boolean isRequired, Object defaultValue, String [] enumValues) {
+			this.slotId = slotId;
+			this.slotName = slotName;
+			this.slotType = slotType;
+			this.slotPos = slotPos;
+			this.isRequired = isRequired;
+			this.defaultValue = defaultValue;
+			this.enumValues = enumValues;
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
