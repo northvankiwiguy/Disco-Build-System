@@ -259,10 +259,10 @@ import com.buildml.model.FatalBuildStoreError;
 			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
 			/* Create the "buildActions" table. */
-			stat.executeUpdate("create table buildActions ( actionId integer primary key, actionType integer, " +
+			stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
 							   "parentActionId integer, trashed integer, actionDirId integer, pkgId integer, " +
-							   "command text)");
-			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, 0, null)");
+							   "command text, actionType integer)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null, 0)");
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */

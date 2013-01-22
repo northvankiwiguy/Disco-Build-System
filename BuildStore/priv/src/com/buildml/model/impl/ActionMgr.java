@@ -97,7 +97,7 @@ public class ActionMgr implements IActionMgr {
 		this.slotMgr = buildStore.getSlotMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, ?, 0, ?, 0, ?)");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?, ?)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
@@ -154,10 +154,10 @@ public class ActionMgr implements IActionMgr {
 	public int addShellCommandAction(int parentActionId, int actionDirId, String command) {
 		
 		try {
-			insertActionPrepStmt.setInt(1, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
-			insertActionPrepStmt.setInt(2, parentActionId);
-			insertActionPrepStmt.setInt(3, actionDirId);
-			insertActionPrepStmt.setString(4, command);
+			insertActionPrepStmt.setInt(1, parentActionId);
+			insertActionPrepStmt.setInt(2, actionDirId);
+			insertActionPrepStmt.setString(3, command);
+			insertActionPrepStmt.setInt(4, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
 			db.executePrepUpdate(insertActionPrepStmt);
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
