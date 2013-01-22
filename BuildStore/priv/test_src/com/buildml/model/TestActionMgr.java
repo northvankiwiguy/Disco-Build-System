@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.impl.ActionTypeMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -789,4 +790,80 @@ public class TestActionMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test action slots.
+	 */
+	@Test
+	public void testActionSlots() {
+		
+		/* 
+		 * Add a new action, which has "Shell Command" type. This will have "Input", "OutputN"
+		 * and "Command" slots.
+		 */
+		IActionTypeMgr actionTypeMgr = bs.getActionTypeMgr();
+		
+		/* create an action, and determine its actionType */
+		int myActionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"),
+															fileMgr.getPath("/"), "gcc -o test.c");
+		assertTrue(myActionId >= 0);
+		int shellActionTypeId = actionMgr.getActionType(myActionId);
+		assertTrue(shellActionTypeId >= 0);
+		
+		/* fetch the slot details for Input, Output0 and Command */
+		SlotDetails inputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Input");
+		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Output0");
+		SlotDetails commandSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Command");
+		assertNotNull(inputSlotDetails);
+		assertNotNull(outputSlotDetails);
+		assertNotNull(commandSlotDetails);
+		
+		/* Try to assign/get to/from a slot with an invalid action ID */
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.setSlotValue(-1, inputSlotDetails.slotId, 100));
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.setSlotValue(1234, inputSlotDetails.slotId, 100));
+		assertNull(actionMgr.getSlotValue(-1, inputSlotDetails.slotId));
+		assertNull(actionMgr.getSlotValue(1234, inputSlotDetails.slotId));
+		
+		/* Try to assign/get to/from an invalid slot ID */
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.setSlotValue(myActionId, -2, 100));
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.setSlotValue(myActionId, 1234, 100));
+		assertNull(actionMgr.getSlotValue(myActionId, -2));
+		assertNull(actionMgr.getSlotValue(myActionId, 1234));		
+		
+		/* Assign an Integer FileGroup to "Input" slot */
+		assertNull(actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, 10));
+		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
+		
+		/* Assign a new Integer value to the "Input" slot - it will be updated */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, 12));
+		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
+		
+		/* Assign a FileGroup to "Output5" slot */
+		assertNull(actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, 123));
+		assertEquals(Integer.valueOf(123), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
+
+		/* Recheck the "Input" slot - it shouldn't have changed. */
+		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
+		
+		/* Assign a command string to "Command" parameter slot - returned as String */
+		assertNull(actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, "My command"));
+		assertEquals("My command", actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
+		
+		/* Assign a numeric string to "Output5" - should be returned as Integer */
+		assertEquals(Integer.valueOf(123), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, "456"));
+		assertEquals(Integer.valueOf(456), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
+		
+		/* Assign an integer to "Command" - should be returned as String */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, 1313));
+		assertEquals("1313", actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
+
+		/* Assign a non-numeric string to "Input" - should fail */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, "invalid-num"));
+		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

@@ -299,7 +299,11 @@ import com.buildml.model.FatalBuildStoreError;
 								"type integer)");
 			stat.executeUpdate("create table fileGroupPaths (groupId integer, pathId integer, " +
 								"pathString text, pos integer)");
-		
+			
+			/* Create the slotValues table */
+			stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
+							   "slotId integer, value text)");
+			
 			stat.close();
 						
 		} catch (SQLException e) {

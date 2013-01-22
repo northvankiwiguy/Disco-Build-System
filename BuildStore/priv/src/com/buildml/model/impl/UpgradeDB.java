@@ -140,6 +140,8 @@ public class UpgradeDB {
 			if (dbVersion < 402) {
 				stat.executeUpdate("alter table buildActions add column actionType integer");
 				stat.executeUpdate("update buildActions set actionType = 1");
+				stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
+						   		   "slotId integer, value text)");
 			}
 
 			/* finish by setting the new version number */

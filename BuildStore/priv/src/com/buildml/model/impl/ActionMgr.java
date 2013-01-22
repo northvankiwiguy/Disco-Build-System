@@ -802,6 +802,11 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public int setSlotValue(int actionId, int slotId, Object value) {
 
+		/* validate actionId */
+		if (!isActionValid(actionId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
 		/* delegate all slot assignments to SlotMgr */
 		return slotMgr.setSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId, value);
 	}
@@ -814,6 +819,11 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public Object getSlotValue(int actionId, int slotId) {
 		
+		/* validate actionId */
+		if (!isActionValid(actionId)) {
+			return null;
+		}
+
 		/* delegate all slot assignments to SlotMgr */
 		return slotMgr.getSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
 	}

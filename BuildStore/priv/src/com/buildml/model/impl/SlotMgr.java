@@ -12,9 +12,12 @@
 
 package com.buildml.model.impl;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
@@ -51,9 +54,24 @@ class SlotMgr {
 	/** The slot is owned by a package, or sub-package */
 	final static int SLOT_OWNER_PACKAGE = 2;
 	
+	/** Cached-copies of the SlotDetails for the default slots */
+	SlotDetails defaultSlots[] = null;
+	
 	/** The BuildStore that owns this SlotMgr */
 	private BuildStore buildStore;
 	
+	/**
+	 * Our database manager object, used to access the database content. This is provided 
+	 * to us when the SlotMgr object is first instantiated.
+	 */
+	private BuildStoreDB db = null;
+	
+	/** Various prepared statement for database access. */
+	private PreparedStatement 
+				insertValuePrepStmt = null,
+				updateValuePrepStmt = null,
+				findValuePrepStmt = null;
+		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -65,6 +83,27 @@ class SlotMgr {
 	 */
 	SlotMgr(BuildStore buildStore) {
 		this.buildStore = buildStore;
+		this.db = buildStore.getBuildStoreDB();
+	
+		/* prepare the database statements */
+		insertValuePrepStmt = db.prepareStatement("insert into slotValues values (?, ?, ?, ?)");
+		updateValuePrepStmt = db.prepareStatement("update slotValues set value = ? where ownerType = ? " +
+													" and ownerId = ? and slotId = ?");
+		findValuePrepStmt = db.prepareStatement("select value from slotValues where ownerType = ? " +
+													" and ownerId = ? and slotId = ?");
+				
+		/* define the default slots */
+		defaultSlots = new SlotDetails[13];
+		defaultSlots[1] = new SlotDetails(1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_INPUT, false, null, null);
+		defaultSlots[2] = new SlotDetails(2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
+				ISlotTypes.SLOT_POS_PARAMETER, true, null, null);
+		for (int id = 0; id < 10; id++) {
+			defaultSlots[3 + id] = new SlotDetails(3 + id, "Output" + id, 
+					ISlotTypes.SLOT_TYPE_FILEGROUP, 
+					ISlotTypes.SLOT_POS_OUTPUT, false, null, null);
+		}
+	
 	}
 	
 	/*=====================================================================================*
@@ -96,6 +135,25 @@ class SlotMgr {
 		/* for now, no new slots can be added */
 		return ErrorCode.INVALID_OP;
 	}
+		
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return a slot's detailed information.
+	 * 
+	 * @param slotId The slot to query.
+	 * @return A SlotDetails structure containing the specified slot's details, or null if
+	 * slotId does not refer to a valid slot.
+	 */
+	SlotDetails getSlotByID(int slotId) {
+		
+		/* return a default slot? */
+		if ((slotId >= 1) && (slotId < defaultSlots.length)) {
+			return defaultSlots[slotId];
+		}
+		
+		return null;
+	}
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -116,25 +174,16 @@ class SlotMgr {
 			
 			List<SlotDetails> results = new ArrayList<SlotDetails>();
 			if ((slotPos == ISlotTypes.SLOT_POS_INPUT) || (slotPos == ISlotTypes.SLOT_POS_ANY)) {
-				SlotDetails output = 
-						new SlotDetails(1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
-										ISlotTypes.SLOT_POS_INPUT, false, null, null);
-				results.add(output);
+				results.add(getSlotByID(1));
 			}
 			
 			if ((slotPos == ISlotTypes.SLOT_POS_PARAMETER) || (slotPos == ISlotTypes.SLOT_POS_ANY)) {
-				SlotDetails output = 
-						new SlotDetails(2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
-										ISlotTypes.SLOT_POS_PARAMETER, true, null, null);
-				results.add(output);
+				results.add(getSlotByID(2));
 			}
 					
 			if ((slotPos == ISlotTypes.SLOT_POS_OUTPUT) || (slotPos == ISlotTypes.SLOT_POS_ANY)) {
 				for (int id = 0; id < 10; id++) {
-					SlotDetails output = 
-						new SlotDetails(3 + id, "Output" + id, ISlotTypes.SLOT_TYPE_FILEGROUP, 
-										ISlotTypes.SLOT_POS_OUTPUT, false, null, null);
-					results.add(output);
+					results.add(getSlotByID(id + 3));
 				}
 			}
 		
@@ -160,24 +209,12 @@ class SlotMgr {
 		
 		if ((ownerType == SLOT_OWNER_ACTION) && (ownerId == ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID)) {
 			
-			if (slotName.equals("Input")) {
-				return new SlotDetails(1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
-										ISlotTypes.SLOT_POS_INPUT, false, null, null);
-				
-			} else if (slotName.equals("Command")) {
-				return new SlotDetails(2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
-						ISlotTypes.SLOT_POS_PARAMETER, true, null, null);
-				
-			} else if (slotName.startsWith("Output") && (slotName.length() == 7)) {
-
-				char which = slotName.charAt(6);
-				if ((which >= '0') && (which <= '9')) {
-					return new SlotDetails(3 + (which - '0'), slotName, ISlotTypes.SLOT_TYPE_FILEGROUP, 
-							ISlotTypes.SLOT_POS_OUTPUT, false, null, null);
-
-				} else {
-					/* invalid digit in "OutputN" */
-					return null;
+			/* check all the default slots */
+			for (SlotDetails detail : defaultSlots) {
+				if (detail != null) {
+					if (slotName.equals(detail.slotName)) {
+						return detail;
+					}
 				}
 			}
 		}
@@ -210,16 +247,92 @@ class SlotMgr {
 	 * For the specified action/sub-package, set a slot to the given value.
 	 * 
 	 * @param ownerType Either SLOT_OWNER_ACTION or SLOT_OWNER_PACKAGE.
-	 * @param actionId  The action that the slot is attached to.
+	 * @param ownerId   The action/sub-package that the slot is attached to.
 	 * @param slotId    The slot that's connected to the action.
 	 * @param value	    The new value to be set (typically an Integer or String).
-	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if actionId is invalid, slotId
-	 *         is invalid, or slotId isn't attached to actionId, or ErrorCode.BAD_VALUE if
-	 *         the value can't be assigned to the specified slot.
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if slotId isn't relevant for
+	 *         actionType/package, or ErrorCode.BAD_VALUE if the value can't be assigned to
+	 *         the specified slot.
 	 */
-	public int setSlotValue(int ownerType, int actionId, int slotId,
-			Object value) {
-		return ErrorCode.INVALID_OP;		
+	public int setSlotValue(int ownerType, int ownerId, int slotId, Object value) {
+		
+		/* 
+		 * Assume that ownerType and ownerId was validated by our caller, but we need
+		 * to check that slotId is relevant for ownerType/ownerId. If not, return NOT_FOUND.
+		 * Note: for now, actionType can only be "Shell Command", so we only need to validate
+		 * that slotId is a valid default slot ID.
+		 */
+		SlotDetails details = getSlotByID(slotId);
+		if (details == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/*
+		 * We store all data in string format, but based on the slot's type, we first need
+		 * to check whether the value is appropriate.
+		 */
+		String stringToSet = null;
+		if (value == null) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		switch (details.slotType) {
+		
+		/* The input value must be an Integer (or String representing a positive int) */
+		case ISlotTypes.SLOT_TYPE_FILEGROUP:
+			
+			/* integers must be positive */
+			if (value instanceof Integer) {
+				stringToSet = value.toString();
+			} 
+			
+			/* strings must contain a positive integer */
+			else if (value instanceof String) {
+				int intVal = 0;
+				try {
+					intVal = Integer.parseInt((String) value);
+				} catch (NumberFormatException ex) {
+					return ErrorCode.BAD_VALUE;
+				}
+				stringToSet = Integer.toString(intVal);
+			}
+			break;
+		
+		/* For SLOT_TYPE_TEXT, the input must be an Integer or String. */
+		case ISlotTypes.SLOT_TYPE_TEXT:
+			stringToSet = value.toString();
+			break;
+		
+		/* all other slotTypes are BAD_VALUE */
+		default:
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/*
+		 * The value is now valid, so let's insert it into the database. First, try to update
+		 * an existing value, but if that fails, add a new entry.
+		 */
+		try {
+			updateValuePrepStmt.setString(1, stringToSet);
+			updateValuePrepStmt.setInt(2, ownerType);
+			updateValuePrepStmt.setInt(3, ownerId);
+			updateValuePrepStmt.setInt(4, slotId);
+			int count = db.executePrepUpdate(updateValuePrepStmt);
+			
+			/* no existing record, insert instead */
+			if (count == 0) {
+				insertValuePrepStmt.setInt(1, ownerType);
+				insertValuePrepStmt.setInt(2, ownerId);
+				insertValuePrepStmt.setInt(3, slotId);
+				insertValuePrepStmt.setString(4, stringToSet);
+				db.executePrepUpdate(insertValuePrepStmt);
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -229,13 +342,61 @@ class SlotMgr {
 	 * has not been explicitly set for this action, the slot default value will be returned.
 	 * 
 	 * @param ownerType Either SLOT_OWNER_ACTION or SLOT_OWNER_PACKAGE.
-	 * @param actionId	The action that the slot is attached to.
+	 * @param ownerId	The action that the slot is attached to.
 	 * @param slotId	The slot that's connected to the action.
 	 * @return The slot's value (typically Integer or String), or null if actionId/slotId can't
 	 * be mapped to a valid slot.
 	 */
-	public Object getSlotValue(int ownerType, int actionId, int slotId) {
-		return null;
+	public Object getSlotValue(int ownerType, int ownerId, int slotId) {
+
+		/* get details about this slot (default value, type, etc) */
+		SlotDetails slotDetails = getSlotByID(slotId);
+		if (slotDetails == null) {
+			return null;
+		}
+		
+		/*
+		 * Check if there's already a value set of ownerType/actionId/slotId.
+		 */
+		String results[] = null;
+		try {
+			findValuePrepStmt.setInt(1, ownerType);
+			findValuePrepStmt.setInt(2, ownerId);
+			findValuePrepStmt.setInt(3, slotId);
+			results = db.executePrepSelectStringColumn(findValuePrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/*
+		 * We found a result, so convert it to appropriate type.
+		 */
+		if (results.length == 1) {
+			String value = results[0];
+			
+			switch (slotDetails.slotType) {
+			
+			/* FileGroups are returned as Integer */
+			case ISlotTypes.SLOT_TYPE_FILEGROUP:
+				try {
+					return Integer.parseInt(value);
+				} catch (NumberFormatException e) {
+					return null;
+				}
+				
+			/* Text slots are returned as String */
+			case ISlotTypes.SLOT_TYPE_TEXT:
+				return value;
+				
+			default:
+				return null;
+			}
+		}
+		
+		/*
+		 * If there's no value set, use the default value for slotId.
+		 */
+		return slotDetails.defaultValue;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
