@@ -13,6 +13,7 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
+import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 
 /**
  * A "Diagram Type Provider" that provides customization information for the
@@ -22,6 +23,13 @@ import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
  * @author Peter Smith <psmith@arapiki.com>
  */
 public class DiagramTypeProvider extends AbstractDiagramTypeProvider {
+
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+
+	/** The additional tool behaviors supported by this diagram */
+    private IToolBehaviorProvider[] toolBehaviorProviders;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -54,4 +62,21 @@ public class DiagramTypeProvider extends AbstractDiagramTypeProvider {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the list of "tool behavior providers" for this diagram. This allows customization
+	 * of tool tips, and other extended behavior.
+	 */
+    @Override
+    public IToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
+    	
+    	/* Only create the providers once. Return the same list of providers each time */
+        if (toolBehaviorProviders == null) {
+            toolBehaviorProviders =
+                new IToolBehaviorProvider[] { new PackageToolBehaviorProvider(this) };
+        }
+        return toolBehaviorProviders;
+    }
+
+    /*-------------------------------------------------------------------------------------*/
 }

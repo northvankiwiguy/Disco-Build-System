@@ -17,6 +17,8 @@ import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
+import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -29,6 +31,10 @@ import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionTypeMgr;
+import com.buildml.model.IBuildStore;
 
 /**
  * A Graphiti pattern for managing the "Action" graphical element in a BuildML diagram.
@@ -40,6 +46,18 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
+
+	/** The PackageDiagramEditor we're part of */
+	private PackageDiagramEditor editor;
+	
+	/** The IBuildStore that this diagram represents */
+	private IBuildStore buildStore;
+	
+	/** The IActionMgr owned by this BuildStore */
+	private IActionMgr actionMgr;
+
+	/** The IActionTypeMgr owned by this BuildStore */
+	private IActionTypeMgr actionTypeMgr;
 
 	/*
 	 * Various colour constants used in displaying this element.
@@ -70,13 +88,23 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 *=====================================================================================*/
 
 	/**
-	 * Return the name of this element, as will appears in the Diagram's palette.
+	 * Return the name of this element.
 	 */
 	@Override
 	public String getCreateName() {
 		return "Action";
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* 
+	 * We do not want "Action" to appear in the palette.
+	 */
+	@Override
+	public boolean isPaletteApplicable() {
+		return false;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -137,12 +165,22 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 */
 	@Override
 	public PictogramElement add(IAddContext context) {
-				
+		
+		/* determine our editor and BuildStore */
+		editor = (PackageDiagramEditor)getDiagramEditor();
+		buildStore = editor.getBuildStore();
+		actionMgr = buildStore.getActionMgr();
+		actionTypeMgr = buildStore.getActionTypeMgr();
+		
 		/* 
 		 * What are we adding, and where are we adding it?
 		 */
 		UIAction addedAction = (UIAction) context.getNewObject();
+		int actionId = addedAction.getId();
 		Diagram targetDiagram = (Diagram) context.getTargetContainer();
+		
+		int actionTypeId = actionMgr.getActionType(actionId);
+		String actionTypeName = actionTypeMgr.getName(actionTypeId);
 
 		/*
 		 * How many ellipses will be shown? This illustrate whether it's
@@ -165,22 +203,36 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 				context.getX(), context.getY(), ACTION_WIDTH, ACTION_HEIGHT);
 
 		/*
-		 * Create the required number of ellipse(s) within the overall shape.
+		 * Create the required number of ellipse(s) within the overall shape. When
+		 * multiple ovals are drawn, we need to position them (and the inner text)
+		 * carefully.
 		 */
+		int xOverlap = 3;
+		int yOverlap = 4;
+		int xAdjust = (numEllipses - 1) * xOverlap;
+		int yAdjust = (numEllipses - 1) * yOverlap;
 		for (int i = 0; i != numEllipses; i++) {
 			
 			Ellipse ellipse = gaService.createEllipse(invisibleRectangle);
 			ellipse.setForeground(manageColor(FOREGROUND_COLOUR));
 			ellipse.setBackground(manageColor(BACKGROUND_COLOUR));
 			ellipse.setLineWidth(2);
-			gaService.setLocationAndSize(ellipse, i * 3, i * 4,
-											ACTION_WIDTH - (numEllipses - 1) * 5, 
-											ACTION_HEIGHT - (numEllipses - 1) * 5);
+			gaService.setLocationAndSize(ellipse, i * xOverlap, i * yOverlap, 
+										 ACTION_WIDTH - xAdjust, ACTION_HEIGHT - yAdjust);
 		}
-
+		
+		/* draw the action type's name inside the oval(s) */
+		Text actionTypeNameText = gaService.createPlainText(invisibleRectangle, actionTypeName);
+		actionTypeNameText.setFilled(false);
+		actionTypeNameText.setForeground(manageColor(TEXT_FOREGROUND));
+		actionTypeNameText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+		gaService.setLocationAndSize(actionTypeNameText, xAdjust, yAdjust,
+										ACTION_WIDTH - xAdjust, ACTION_HEIGHT - yAdjust);
+		
 		/* add a chopbox anchor to the shape */
 		peCreateService.createChopboxAnchor(containerShape);
-
+		
+		
 		/* create a link between the shape and the business object, and display it. */
 		link(containerShape, addedAction);
 		layoutPictogramElement(containerShape);
@@ -189,12 +241,12 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canCreate(org.eclipse.graphiti.features.context.ICreateContext)
+	/**
+	 * No, we can't create new actions via the diagram editor.
 	 */
 	@Override
 	public boolean canCreate(ICreateContext context) {
-        return context.getTargetContainer() instanceof Diagram;
+        return false;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -203,6 +255,8 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 * Determine whether a business object can be added to the diagram.
 	 */
 	public Object[] create(ICreateContext context) {
+		
+		// TODO: is this method necessary?
 		
 		/* create new UIAction object */
 		UIAction newAction = new UIAction(0);

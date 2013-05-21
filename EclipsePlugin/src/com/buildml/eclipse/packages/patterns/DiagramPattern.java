@@ -24,6 +24,10 @@ import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMgr;
+import com.buildml.model.types.ActionSet;
 
 /**
  * A Graphiti pattern for managing the top-level "Diagram" graphical element in a
@@ -37,6 +41,18 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** The PackageDiagramEditor we're part of */
+	private PackageDiagramEditor editor;
+	
+	/** The IBuildStore that this diagram represents */
+	private IBuildStore buildStore;
+	
+	/** The IPackageMgr in this BuildStore */
+	private IPackageMgr pkgMgr;
+	
+	/** The pkgMgr ID of the package we're displaying */
+	private int pkgId;
+	
 	/** We should only update the Diagram from the model once */
 	private boolean alreadyUpdated = false;
 	
@@ -118,6 +134,12 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	@Override
 	public boolean update(final IUpdateContext context) {
 		
+		/* determine our editor and BuildStore */
+		editor = (PackageDiagramEditor)getDiagramEditor();
+		buildStore = editor.getBuildStore();
+		pkgMgr = buildStore.getPackageMgr();
+		pkgId = editor.getPackageId();
+		
 		final ContainerShape container = (ContainerShape)context.getPictogramElement();
         TransactionalEditingDomain editingDomain = getDiagramEditor().getEditingDomain();
 
@@ -128,13 +150,20 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		commandStack.execute(new RecordingCommand(editingDomain) {
 			@Override
 			protected void doExecute() {
-				UIAction newAction = new UIAction(0);
-				container.eResource().getContents().add(newAction);
-				AddContext context2 = new AddContext();
-				context2.setNewObject(newAction);
-				context2.setLocation(50, 50);
-				context2.setTargetContainer(container);
-				getFeatureProvider().addIfPossible(context2);
+				
+				/* fetch the complete list of actions in this package */
+				ActionSet actions = pkgMgr.getActionsInPackage(pkgId);
+				for (int actionId : actions) {
+					UIAction newAction = new UIAction(actionId);
+
+					container.eResource().getContents().add(newAction);
+					AddContext context2 = new AddContext();
+					context2.setNewObject(newAction);
+					context2.setLocation(50 * actionId, 50 * actionId);
+					context2.setTargetContainer(container);
+					getFeatureProvider().addIfPossible(context2);
+										
+				}
 			}
 			
 		});
