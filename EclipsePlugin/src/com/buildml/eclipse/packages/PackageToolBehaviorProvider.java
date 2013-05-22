@@ -16,9 +16,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
+import org.eclipse.graphiti.tb.IContextButtonPadData;
 
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.model.IActionMgr;
@@ -112,6 +114,24 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
     @Override
     public boolean isShowFlyoutPalette() {
     	return false;
+    }
+
+    /*-------------------------------------------------------------------------------------*/
+
+    /**
+     * Determine which context buttons are displayed around the UI icons.
+     */
+    @Override
+    public IContextButtonPadData getContextButtonPad(
+    		IPictogramElementContext context) {
+    	
+    	IContextButtonPadData data = super.getContextButtonPad(context);
+        PictogramElement pe = context.getPictogramElement();
+     
+        /* for now, disable all context buttons */
+        setGenericContextButtons(data, pe, 0);
+        
+        return data;
     }
     
     /*-------------------------------------------------------------------------------------*/
