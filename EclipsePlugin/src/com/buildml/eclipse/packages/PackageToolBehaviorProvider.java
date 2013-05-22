@@ -106,4 +106,13 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     /*-------------------------------------------------------------------------------------*/
 
+    /**
+     * We don't want to show the fly-in palette, since the user can't use it anyway.
+     */
+    @Override
+    public boolean isShowFlyoutPalette() {
+    	return false;
+    }
+    
+    /*-------------------------------------------------------------------------------------*/
 }
