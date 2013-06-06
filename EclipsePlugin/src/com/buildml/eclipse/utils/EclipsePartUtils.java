@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,6 +37,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -75,6 +77,24 @@ public class EclipsePartUtils {
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * General use method for retrieving the currently selected object in the Eclipse UI.
+	 * This method does not required any input arguments (such as an "event"), so it's usable
+	 * in a wider range of scenarios.
+	 * 
+	 * @return The selected objects in the Eclipse UI, or null if nothing is selected.
+	 */
+	public static IStructuredSelection getSelection() {
+		
+		IWorkbenchWindow windows[] = PlatformUI.getWorkbench().getWorkbenchWindows();
+		if ((windows == null) || (windows.length == 0)) {
+			return null;
+		}
+		return (IStructuredSelection)(windows[0].getSelectionService().getSelection());
+	}
+	
+	/*-------------------------------------------------------------------------------------*/	
 
 	/**
 	 * Given an Eclipse command handler's selection, such as when a user selects a bunch of UIInteger
@@ -539,4 +559,22 @@ public class EclipsePartUtils {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Return the Eclipse handler for the specific service.
+	 * @param serviceType The class of the service to locate.
+	 * @return The service, or null if it couldn't be found.
+	 */
+	public static Object getService(Class<?> serviceType) {
+		MainEditor editor = EclipsePartUtils.getActiveMainEditor();
+		if (editor != null) {
+			IWorkbenchPartSite site = editor.getSite();
+			if (site != null) {
+				return site.getService(serviceType);
+			}
+		}
+		return null;
+	}
+
+	/*-------------------------------------------------------------------------------------*/	
 }

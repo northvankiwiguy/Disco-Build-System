@@ -1168,6 +1168,13 @@
             properties="hasAttachedRoot"
             type="java.lang.Object">
       </propertyTester>
+      <propertyTester
+            class="com.buildml.eclipse.packages.handlers.GraphitiBusinessObjectTester"
+            id="com.buildml.eclipse.propertyTester.graphitiObjectHasType"
+            namespace="com.buildml.eclipse"
+            properties="isGraphitiBusinessObjectType"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
@@ -1236,5 +1243,30 @@
             id="com.buildml.eclipse.diagram.package.provider"
             name="BuildML Package Diagram Provider">
       </diagramTypeProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.buildml.eclipse.packages.properties.ActionPropertyPage"
+            id="com.buildml.eclipse.properties.actionproperties"
+            name="Action Properties">
+         <enabledWhen>
+            <test
+                  args="com.buildml.eclipse.bobj.UIAction"
+                  property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+            </test>
+         </enabledWhen>
+      </page>
+      <page
+            class="com.buildml.eclipse.packages.properties.ActionShellCommandPage"
+            id="com.buildml.eclipse.properties.actionpshellcommand"
+            name="Shell Command">
+         <enabledWhen>
+            <test
+                  args="com.buildml.eclipse.bobj.UIAction"
+                  property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+            </test>
+         </enabledWhen>
+      </page>
    </extension>
 </plugin>

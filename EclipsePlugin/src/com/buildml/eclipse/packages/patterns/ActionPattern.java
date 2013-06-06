@@ -15,6 +15,7 @@ package com.buildml.eclipse.packages.patterns;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
+import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -282,4 +283,13 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * The UIAction business object may have changed. Update the pictogram from the model.
+	 */
+	@Override
+	public boolean update(IUpdateContext context) {
+		editor.refresh();
+		return super.update(context);
+	}
 }

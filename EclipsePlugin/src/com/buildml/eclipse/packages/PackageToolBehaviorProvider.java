@@ -16,13 +16,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.context.IDoubleClickContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.packages.features.PackageDiagramDoubleClickFeature;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.utils.print.PrintUtils;
@@ -48,6 +51,9 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	
 	/** The maximum number of characters wide that a tooltip should be */
 	private final int toolTipWrapWidth = 120;
+	
+	/** The custom graphiti feature for handling double-clicks */
+ 	private ICustomFeature doubleClickFeature = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -135,4 +141,28 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     
     /*-------------------------------------------------------------------------------------*/
+
+    /**
+     * Handle double-clicking on a UI icon.
+     */
+    @Override
+    public ICustomFeature getDoubleClickFeature(IDoubleClickContext context) {
+    	
+    	/* if we don't already have a custom feature for double-clicking, create one */
+    	if (doubleClickFeature == null) {
+    		doubleClickFeature = 
+    				new PackageDiagramDoubleClickFeature(getFeatureProvider(), buildStore);
+    	}
+
+    	/* can our custom feature handle this event? */
+    	if (doubleClickFeature.canExecute(context)) {
+    		return doubleClickFeature;
+    	}
+    	
+    	/* else, default to standard handler */
+        return super.getDoubleClickFeature(context);    	
+    }
+    
+    /*-------------------------------------------------------------------------------------*/
+    
 }
