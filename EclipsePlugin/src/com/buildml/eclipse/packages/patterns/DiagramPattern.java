@@ -153,16 +153,25 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 				
 				/* fetch the complete list of actions in this package */
 				ActionSet actions = pkgMgr.getActionsInPackage(pkgId);
+				int row = 0, column = 0;
 				for (int actionId : actions) {
 					UIAction newAction = new UIAction(actionId);
 
+					/*
+					 * TODO: Fix this layout algorithm. For now it simply lays out
+					 * actions in rows and columns.
+					 */
 					container.eResource().getContents().add(newAction);
 					AddContext context2 = new AddContext();
 					context2.setNewObject(newAction);
-					context2.setLocation(50 * actionId, 50 * actionId);
+					context2.setLocation(column * 150, row * 50);
 					context2.setTargetContainer(container);
 					getFeatureProvider().addIfPossible(context2);
-										
+					column++;
+					if (column == 5) {
+						column = 0;
+						row++;
+					}			
 				}
 			}
 			
