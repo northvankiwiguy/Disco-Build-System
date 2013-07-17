@@ -102,76 +102,166 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	/** 
 	 * A drag/drop operation has completed, and we must now update the model and the view
 	 * appropriately. At this point, we also do extra validation to make sure we're allowed
-	 * to drop the source onto the target.
+	 * to drop the source onto the target. The source is either a UIAction, a UIPackage
+	 * or UIPackageFolder, and the destination is a UIPackage or UIPackageFolder.
 	 */
 	@Override
 	public boolean performDrop(Object data) {
 
-		/* the target must be a package or folder */
+		/* do we need to refresh the outline view as a result of the drop? */
+		boolean outlineRefreshNeeded = false;
+		
+		/* is there anything about the editor that is now dirty? (to be saved) */
+		boolean editorDirty = false;
+		
+		/* the target must be a package or folder, regardless of the source. */
 		UIInteger target = (UIInteger)getCurrentTarget();
 		if (target == null) {
 			return false;
 		}
 		
-		/* we only support drops of BuildMLTransferType arrays of size 1 */
+		/* 
+		 * We only support drops of BuildMLTransferType arrays. We'll treat each
+		 * element of the array as a separate drop, and if one drop fails, we
+		 * silently continue with other drops.
+		 */
 		if (data instanceof BuildMLTransferType[]) {
-			
 			BuildMLTransferType myTypes[] = (BuildMLTransferType[])data;
-			if (myTypes.length == 1) {
-				
-				/* for now, we only support dropping of packages/folders */
-				if ((myTypes[0].type != BuildMLTransferType.TYPE_PACKAGE) &&
-					(myTypes[0].type != BuildMLTransferType.TYPE_PACKAGE_FOLDER)) {
-					return false;
-				}
-				
-				/* Require that the drop is from the same BuildStore */
-				if (!buildStore.toString().equals(myTypes[0].owner)){
-					return false;
-				}
-				
-				/* 
-				 * Determine the folder where the item will be dropped. If the target
-				 * is a package (not a folder), we'll drop the item into the target's 
-				 * parent folder.
-				 */
-				int targetId = target.getId();
-				if (!pkgMgr.isFolder(targetId)) {
-					targetId = pkgMgr.getParent(targetId);
-					if (targetId == ErrorCode.NOT_FOUND) {
-						return false;
+			for (int index = 0; index != myTypes.length; index++) {
+
+				/* Require that the drop is from the same BuildStore as the target */
+				if (buildStore.toString().equals(myTypes[index].owner)){
+					
+					/* 
+					 * If dropping a UIAction, we change the package that the action
+					 * resides in. 
+					 */
+					if (myTypes[index].type == BuildMLTransferType.TYPE_ACTION) {
+
+						/* perform the drop - on failure, skip to next element */
+						if (performDropUIAction(myTypes[index], target)) {
+							editorDirty = true;
+						}
 					}
-				}
+					
+					/*
+					 * If dropping a UIPackage or UIPackageFolder, we restructure
+					 * that package's hierarchy within the outline view.
+					 */
+					else if ((myTypes[index].type == BuildMLTransferType.TYPE_PACKAGE) ||
+							(myTypes[index].type == BuildMLTransferType.TYPE_PACKAGE_FOLDER)) {
+						
+						/* perform the drop - on failure, skip to next element */
+						if (performDropUIPackage(myTypes[index], target)) {
+							outlineRefreshNeeded = true;
+							editorDirty = true;
+						}
+					}
 				
-				/* If the parent won't actually be changing, we don't need to do anything. */
-				int nodeId = myTypes[0].id;
-				int parentId = pkgMgr.getParent(nodeId);
-				if (parentId == targetId) {
-					return false;
 				}
-				
-				/*
-				 * Attempt to move the incoming item to a new parent. On error,
-				 * we fail silently (aborting the drag).
-				 */
-				if (pkgMgr.setParent(nodeId, targetId) != ErrorCode.OK) {
-					return false;
-				}
-				
-				/* the drag worked, so refresh the tree */
-				treeViewer.refresh();
-				treeViewer.setExpandedState(new UIInteger(targetId), true);
-				mainEditor.markDirty();
-				OutlineUndoOperation op = 
-						new OutlineUndoOperation(outlinePage, "Move", OpType.OP_MOVE, 
-											     nodeId, parentId, targetId);
-				op.record(mainEditor);
-				return true;
 			}
 		}
 
-		/* transfer failed */
-		return false;
+		/* one or more drop operations impacted the outline tree view, so refresh the tree */
+		if (outlineRefreshNeeded) {
+			treeViewer.refresh();
+		}
+		if (editorDirty) {
+			mainEditor.markDirty();
+		}
+		
+		/* transfer probably succeeded (although individual drops may have failed) */
+		return true;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Perform a drop of a UIAction into a UIPackage. This has the effect of changing the
+	 * package that the actiobn is contained within.
+	 * 
+	 * @param droppedObj BuildStore actionId of the action being dropped.
+	 * @param targetObj BuildStore packageId of the package being dropped into.
+	 * @return True on success, or false if the drop failed for any reason.
+	 */
+	private boolean performDropUIAction(BuildMLTransferType droppedObj, UIInteger targetObj) {
+
+		int targetPackageId = targetObj.getId();
+		int droppedActionId = droppedObj.id;
+		
+		/* 
+		 * We can only drop UIAction into real packages (not folders), and not into the 
+		 * <import> package.
+		 */
+		if (!pkgMgr.isValid(targetPackageId) || pkgMgr.isFolder(targetPackageId) ||
+				(targetPackageId == pkgMgr.getImportPackage())) {
+			return false;
+		}
+		
+		/* 
+		 * Go ahead and move the action into the destination package. We have no refreshing or
+		 * updating to do, since the ActionMgr will notify any listeners of the change and they
+		 * can refresh themselves if needed.
+		 */
+		// TODO: handle "undo" operation.
+		return (pkgMgr.setActionPackage(droppedActionId, targetPackageId) == ErrorCode.OK);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Perform the drop of a UIPackage or UIPackageFolder onto a UIPackage or UIPackageFolder.
+	 * This restructures the hierarchy of packages as they appear in the Outline view. Dropping
+	 * onto a UIPackage will reparent at the same location in the tree as the target UIPackage.
+	 * 
+	 * @param droppedObj BuildStore packageId of the UIPackage/UIPackageFolder being dropped.
+	 * @param targetObj The BuildStore packageId of the UIPackage/UIPackageFolder being dropped into.
+	 * @return True on success, or false if the drop failed for any reason.
+	 */
+	private boolean performDropUIPackage(BuildMLTransferType droppedObj, UIInteger targetObj) {
+		/* 
+		 * Determine the folder where the item will be dropped. If the target
+		 * is a package (not a folder), we'll drop the item into the target's 
+		 * parent folder.
+		 */
+		int targetId = targetObj.getId();
+		if (!pkgMgr.isFolder(targetId)) {
+			targetId = pkgMgr.getParent(targetId);
+			if (targetId == ErrorCode.NOT_FOUND) {
+				return false;
+			}
+		}
+		
+		/* 
+		 * If the dropped object is being dropped onto its current parent (instead of a 
+		 * new parent), we don't need to do anything.
+		 */
+		int nodeId = droppedObj.id;
+		int parentId = pkgMgr.getParent(nodeId);
+		if (parentId == targetId) {
+			return false;
+		}
+		
+		/*
+		 * Attempt to move the incoming item to a new parent. On error,
+		 * we fail silently (aborting the drag).
+		 */
+		if (pkgMgr.setParent(nodeId, targetId) != ErrorCode.OK) {
+			return false;
+		}
+
+		/* set the parent folder's state to "expanded" to show the dropped element */
+		treeViewer.setExpandedState(new UIInteger(targetId), true);
+
+		/* 
+		 * Each drop of a package into a package folder is treated as an individual operation,
+		 * even if multiple were dropped at the same time.
+		 */
+		OutlineUndoOperation op = 
+				new OutlineUndoOperation(outlinePage, "Move", OpType.OP_MOVE, 
+									     nodeId, parentId, targetId);
+		op.record(mainEditor);
+		return true;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

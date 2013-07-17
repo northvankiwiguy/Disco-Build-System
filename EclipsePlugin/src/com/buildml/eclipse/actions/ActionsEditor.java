@@ -275,6 +275,11 @@ public class ActionsEditor extends ImportSubEditor {
 		setOptions(getOptions());
 		setFilterPackageSet(getFilterPackageSet());
 		setVisibilityFilterSet(getVisibilityFilterSet());
+		
+		/*
+		 * Add a "drag source" handler so that we can copy/move actions around.
+		 */
+		new ActionsEditorDragSource(actionsTreeViewer, buildStore);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
