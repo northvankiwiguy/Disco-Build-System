@@ -574,9 +574,11 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 	@Override
 	public void packageChangeNotification(int pkgId, int how) {
 
-		/* if this FilesEditor is displaying roots, refresh the tree */
-		if ((getOptions() & EditorOptions.OPT_SHOW_ROOTS) != 0) {
-			refreshView(true);
+		/* if this FilesEditor is displaying roots, and the roots have changed, refresh the tree */
+		if (how == IPackageMgrListener.CHANGED_ROOTS) {
+			if ((getOptions() & EditorOptions.OPT_SHOW_ROOTS) != 0) {
+				refreshView(true);
+			}
 		}
 	}
 	

@@ -858,6 +858,11 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 		
+		/* 
+		 * Notify listeners about the change in package content. TODO: if this action
+		 * is already in this package, no need to notify.
+		 */
+		notifyListeners(pkgId, IPackageMgrListener.CHANGED_MEMBERSHIP);
 		return ErrorCode.OK;
 	}
 	

@@ -55,6 +55,8 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -64,7 +66,7 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class ActionsEditor extends ImportSubEditor {
+public class ActionsEditor extends ImportSubEditor implements IPackageMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -126,6 +128,10 @@ public class ActionsEditor extends ImportSubEditor {
 		super(buildStore, tabTitle);
 		
 		actionMgr = buildStore.getActionMgr();
+		
+		/* listen to changes in package content (for all packages) */
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		pkgMgr.addListener(this);
 		
 		/* initially, all paths are visible */
 		visibleActions = buildStore.getReportMgr().reportAllActions();
@@ -547,6 +553,34 @@ public class ActionsEditor extends ImportSubEditor {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Called by pkgMgr when package membership changes. If we're currently showing packages,
+	 * we'll need to refresh (after all, we're showing all actions and their packages, so
+	 * there's a good chance our content changed).
+	 */
+	@Override
+	public void packageChangeNotification(int pkgId, int how) {
+
+		if (how == IPackageMgrListener.CHANGED_MEMBERSHIP) {
+
+			/*
+			 * Schedule the editor content (TreeViewer) to be refreshed with the new
+			 * content. Note that we deliberately schedule this to happen later,
+			 * since our current thread is quite possibly doing a number of updates
+			 * that will result in multiple notifications. We don't want to refresh
+			 * for each individual update.
+			 */
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					refreshView(true);
+				}
+			});
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
