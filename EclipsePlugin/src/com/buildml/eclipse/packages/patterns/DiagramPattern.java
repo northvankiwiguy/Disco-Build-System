@@ -53,9 +53,6 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	/** The pkgMgr ID of the package we're displaying */
 	private int pkgId;
 	
-	/** We should only update the Diagram from the model once */
-	private boolean alreadyUpdated = false;
-	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -118,22 +115,23 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A Diagram can be updated from the model only once.
+	 * We can only update Diagram objects.
 	 */
 	@Override
 	public boolean canUpdate(IUpdateContext context) {
-		return !alreadyUpdated;
+		return (context.getPictogramElement() instanceof Diagram);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Update the Diagram from the model. This will create all of the FileGroups and Actions
-	 * that should appear on the canvas.
+	 * that should appear on the canvas. This method will only be called when the
+	 * PackageEditorUpdateBehavior.isResourceChanged() method returns true.
 	 */
 	@Override
 	public boolean update(final IUpdateContext context) {
-		
+				
 		/* determine our editor and BuildStore */
 		editor = (PackageDiagramEditor)getDiagramEditor();
 		buildStore = editor.getBuildStore();
@@ -177,10 +175,8 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 			
 		});
 		
-		alreadyUpdated = true;
 		return true;
 	}
-	
-	/*-------------------------------------------------------------------------------------*/
 
+	/*-------------------------------------------------------------------------------------*/
 }

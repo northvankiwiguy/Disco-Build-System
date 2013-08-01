@@ -14,13 +14,13 @@ package com.buildml.eclipse.packages;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
+import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 
 import com.buildml.eclipse.ISubEditor;
@@ -56,6 +56,9 @@ public class PackageDiagramEditor extends DiagramEditor
 	
 	/** The textual name of this package */
 	private String pkgName = null;
+
+	/** The delegate object that Graphiti queries to see if our underlying model has changed */
+	private PackageEditorUpdateBehavior updateBehavior;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -325,15 +328,23 @@ public class PackageDiagramEditor extends DiagramEditor
 	@Override
 	public void packageChangeNotification(int pkgId, int how) {
 		
-		/* was the package that we're displaying removed? */
-		if ((pkgId == this.packageId) && (how == IPackageMgrListener.REMOVED_PACKAGE)) {
-			MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
-			if (mainEditor != null) {
-				mainEditor.setActiveEditor(this);
-				int activeTab = mainEditor.getActivePage();
-				if (activeTab != -1) {
-					mainEditor.removePage(activeTab);
+		if (pkgId == this.packageId){
+			
+			/* was the package that we're displaying removed? */
+			if (how == IPackageMgrListener.REMOVED_PACKAGE) {
+				MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
+				if (mainEditor != null) {
+					mainEditor.setActiveEditor(this);
+					int activeTab = mainEditor.getActivePage();
+					if (activeTab != -1) {
+						mainEditor.removePage(activeTab);
+					}
 				}
+			}
+			
+			/* has the content of the package changed? Action/files added or removed? */
+			else if (how == IPackageMgrListener.CHANGED_MEMBERSHIP) {
+				updateBehavior.markChanged();
 			}
 		}
 	}
@@ -361,6 +372,18 @@ public class PackageDiagramEditor extends DiagramEditor
 	@Override
 	protected DefaultPersistencyBehavior createPersistencyBehavior() {
 		return new EditorPersistencyBehavior(this);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Override the default update behaviour for this editor. This allows us to update
+	 * the diagram (pictogram) when the underlying model changes.
+	 */
+	@Override
+	protected DefaultUpdateBehavior createUpdateBehavior() {
+		updateBehavior = new PackageEditorUpdateBehavior(this);
+		return updateBehavior;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
