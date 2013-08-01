@@ -847,6 +847,18 @@ import com.buildml.utils.errors.ErrorCode;
 			return ErrorCode.BAD_VALUE;
 		}
 
+		/* determine which package the action is currently in */
+		int oldPkgId = getActionPackage(actionId);
+		if (oldPkgId == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* if the package is unchanged, we're done */
+		if (oldPkgId == pkgId) {
+			return ErrorCode.OK;
+		}
+		
+		/* update the database */
 		try {
 			updateActionPackagePrepStmt.setInt(1, pkgId);
 			updateActionPackagePrepStmt.setInt(2, actionId);
@@ -859,10 +871,11 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* 
-		 * Notify listeners about the change in package content. TODO: if this action
-		 * is already in this package, no need to notify.
+		 * Notify listeners about the change in package content.
 		 */
+		notifyListeners(oldPkgId, IPackageMgrListener.CHANGED_MEMBERSHIP);
 		notifyListeners(pkgId, IPackageMgrListener.CHANGED_MEMBERSHIP);
+
 		return ErrorCode.OK;
 	}
 	

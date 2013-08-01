@@ -285,7 +285,9 @@ public interface IPackageMgr {
 	public abstract FileSet getFilesOutsidePackage(String pkgSpec);
 
 	/**
-	 * Set the package associated with this action.
+	 * Set the package associated with this action. Any listeners will receive the
+	 * IPackageMgrListener.CHANGED_MEMBERSHIP notification, first for the old package,
+	 * and then for the new package.
 	 * 
 	 * @param actionId The ID of the action whose package will be set.
 	 * @param pkgId The ID of the package to be associated with this action.

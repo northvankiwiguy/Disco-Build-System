@@ -34,6 +34,7 @@ public class TestPackageMgr {
 	private IPackageMgr pkgMgr;
 	private IPackageRootMgr pkgRootMgr;
 	private IFileMgr fileMgr;
+	private IActionMgr actionMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -47,6 +48,7 @@ public class TestPackageMgr {
 		pkgMgr = bs.getPackageMgr();
 		pkgRootMgr = bs.getPackageRootMgr();
 		fileMgr = bs.getFileMgr();
+		actionMgr = bs.getActionMgr();
 		
 		/* set the workspace root to /, so packages can be added anywhere */
 		pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/"));
@@ -957,6 +959,27 @@ public class TestPackageMgr {
 		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgB"));
 		assertEquals(pkgA, notifyPkgValue);
 		assertEquals(IPackageMgrListener.CHANGED_NAME, notifyHowValue);
+		
+		/* 
+		 * Changing an action's package should trigger a notification. We actually
+		 * see two notifications (for old, then new packages), but we only test
+		 * for the new package.
+		 */
+		notifyPkgValue = 0;
+		notifyHowValue = 0;
+		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
+		int pkgD = pkgMgr.addPackage("PkgD");
+		assert(actionId >= 0);
+		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(actionId, pkgD));
+		assertEquals(pkgD, notifyPkgValue);
+		assertEquals(IPackageMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
+		
+		/* Changing it to the same thing, will not */
+		notifyPkgValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(actionId, pkgD));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);		
 
 		/* remove the listener, and change the package again */
 		pkgMgr.removeListener(listener);
