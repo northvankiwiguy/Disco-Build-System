@@ -1,0 +1,136 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Arapiki Solutions Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    psmith - initial API and 
+ *        implementation and/or initial documentation
+ *******************************************************************************/ 
+
+package com.buildml.eclipse.actions;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
+import com.buildml.eclipse.utils.BmlAbstractOperation;
+import com.buildml.model.IPackageMgr;
+
+/**
+ * An undo/redo operation for any change that is made to an Action. This object records
+ * the change in the undo/redo stack, allowing changes to actionMgr to be made and unmade.
+ * 
+ * @author Peter Smith <psmith@arapiki.com>
+ */
+public class ActionChangeOperation extends BmlAbstractOperation {
+
+	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+
+	/**
+	 * Bitmap of all the parts of the action that have changed, and will need to be changed
+	 * back on an undo/redo operation.
+	 */
+	private final static int CHANGED_PACKAGE = 1;
+	
+	/** The ID of the action being changed */
+	private int actionId;
+	
+	/** The fields of this operation that have changed - see above bitmap */
+	private int changedFields = 0;
+	
+	/** if CHANGED_PACKAGE set, what is the original package ID? */
+	private int oldPackage;
+
+	/** if CHANGED_PACKAGE set, what is the new package ID? */
+	private int newPackage;
+	
+	/*=====================================================================================*
+	 * CONSTRUCTORS
+	 *=====================================================================================*/
+
+	/**
+	 * Create a new ActionChangeOperation object, representing a single entry on the
+	 * undo/redo stack.
+	 * 
+	 * @param label The text label to appear in the "Edit" menu, next to "Undo" or "Redo".
+	 * @param actionId The actionMgr ID of the action being changed.
+	 */
+	public ActionChangeOperation(String label, int actionId) {
+		super(label);
+		
+		this.actionId = actionId;
+	}
+
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Records the fact that the action's package has changed. If there is no change in the
+	 * packageId, this method does nothing.
+	 * 
+	 * @param prevPackageId The action's current package ID.
+	 * @param nextPackageId The action's future package ID.
+	 */
+	public void recordPackageChange(int prevPackageId, int nextPackageId) {
+		if (prevPackageId != nextPackageId) {
+			changedFields |= CHANGED_PACKAGE;
+			oldPackage = prevPackageId;
+			newPackage = nextPackageId;
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Records the operation in the undo/redo stack, but only if there's an actual change
+	 * in the action.
+	 */
+	@Override
+	public void recordAndInvoke() {
+		if (changedFields != 0) {
+			super.recordAndInvoke();
+		}
+	}
+	
+	/*=====================================================================================*
+	 * PROTECTED METHODS
+	 *=====================================================================================*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.utils.BmlAbstractOperation#undo()
+	 */
+	@Override
+	protected IStatus undo() throws ExecutionException {
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		
+		/* if the action's package needs to change... */
+		if ((changedFields & CHANGED_PACKAGE) != 0) {
+			pkgMgr.setActionPackage(actionId, oldPackage);
+		}
+		return Status.OK_STATUS;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.utils.BmlAbstractOperation#redo()
+	 */
+	@Override
+	protected IStatus redo() throws ExecutionException {
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+
+		/* if the action's package needs to change... */
+		if ((changedFields & CHANGED_PACKAGE) != 0) {
+			pkgMgr.setActionPackage(actionId, newPackage);
+		}
+		return Status.OK_STATUS;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+}

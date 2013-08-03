@@ -18,6 +18,7 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
@@ -198,13 +199,22 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 			return false;
 		}
 		
+		/* determine the action's current package */
+		int currentPackageId = pkgMgr.getActionPackage(droppedActionId);
+		if (currentPackageId == ErrorCode.NOT_FOUND) {
+			return false;
+		}
+				
 		/* 
-		 * Go ahead and move the action into the destination package. We have no refreshing or
-		 * updating to do, since the ActionMgr will notify any listeners of the change and they
-		 * can refresh themselves if needed.
+		 * Record the undo/redo information. This will also move the action into the destination
+		 * package. We have no refreshing or updating to do, since the ActionMgr will notify any
+		 * listeners of the change and they can refresh themselves if needed.
 		 */
-		// TODO: handle "undo" operation.
-		return (pkgMgr.setActionPackage(droppedActionId, targetPackageId) == ErrorCode.OK);
+		ActionChangeOperation operation = new ActionChangeOperation("change package", droppedActionId);
+		operation.recordPackageChange(currentPackageId, targetPackageId);
+		operation.recordAndInvoke();
+		
+		return true;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
