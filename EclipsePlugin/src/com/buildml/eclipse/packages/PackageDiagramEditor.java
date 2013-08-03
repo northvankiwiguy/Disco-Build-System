@@ -264,9 +264,16 @@ public class PackageDiagramEditor extends DiagramEditor
 	 */
 	@Override
 	public void pageChange() {
-		// TODO Auto-generated method stub
+		
+		/*
+		 * This call is necessary when somebody double-clicks on a package name in the
+		 * Outline view. If we don't call setFocus(), then the diagram won't be updated
+		 * from the model correctly. However, this call isn't necessary in the case
+		 * where we switch editor tabs (setFocus() gets called some other way).
+		 */
+		setFocus();
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
