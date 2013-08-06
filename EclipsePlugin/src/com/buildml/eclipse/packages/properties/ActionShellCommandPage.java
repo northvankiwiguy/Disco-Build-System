@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
@@ -108,22 +109,16 @@ public class ActionShellCommandPage extends PropertyPage implements
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Set the value of the shell command property.
-	 * @param newValue The new shell command to set.
-	 */
-	private void setShellCommandValue(String newValue) {
-		actionMgr.setCommand(actionId, newValue);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * The OK button has been pressed in the properties box. Save all the field values
-	 * into the database.
+	 * into the database. This is done via the undo/redo stack.
 	 */
 	@Override
 	public boolean performOk() {
-		setShellCommandValue(textField.getText());
+		
+		/* create an undo/redo operation that will invoke the underlying database changes */
+		ActionChangeOperation op = new ActionChangeOperation("change action", actionId);
+		op.recordCommandChange(getShellCommandValue(), textField.getText());
+		op.recordAndInvoke();
 		return super.performOk();
 	}
 	

@@ -16,7 +16,10 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
+import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IPackageMgr;
 
 /**
@@ -36,6 +39,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	 * back on an undo/redo operation.
 	 */
 	private final static int CHANGED_PACKAGE = 1;
+	private final static int CHANGED_COMMAND = 2;
 	
 	/** The ID of the action being changed */
 	private int actionId;
@@ -48,6 +52,12 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 
 	/** if CHANGED_PACKAGE set, what is the new package ID? */
 	private int newPackage;
+	
+	/** if CHANGED_COMMAND set, what is the original command string? */
+	private String oldCommand;
+
+	/** if CHANGED_COMMAND set, what is the new command string? */
+	private String newCommand;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -88,6 +98,23 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Records the fact that the action's shell command has changed. If there is no change,
+	 * this method does nothing.
+	 * 
+	 * @param oldCommandString The previous command string for this action.
+	 * @param newCommandString The new command string for this action.
+	 */
+	public void recordCommandChange(String oldCommandString, String newCommandString) {
+		if (!oldCommandString.equals(newCommandString)){
+			changedFields |= CHANGED_COMMAND;
+			oldCommand = oldCommandString;
+			newCommand = newCommandString;
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Records the operation in the undo/redo stack, but only if there's an actual change
 	 * in the action.
 	 */
@@ -108,10 +135,24 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	@Override
 	protected IStatus undo() throws ExecutionException {
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
 			pkgMgr.setActionPackage(actionId, oldPackage);
+		}
+
+		/* if the action's command needs to change... */
+		if ((changedFields & CHANGED_COMMAND) != 0) {
+			actionMgr.setCommand(actionId, oldCommand);			
+		}
+		
+		/* if there's a change, mark the editor as dirty */
+		if (changedFields != 0) {
+			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
+			if (editor != null) {
+				editor.markDirty();
+			}
 		}
 		return Status.OK_STATUS;
 	}
@@ -124,10 +165,24 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	@Override
 	protected IStatus redo() throws ExecutionException {
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IActionMgr actionMgr = buildStore.getActionMgr();
 
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
 			pkgMgr.setActionPackage(actionId, newPackage);
+		}
+		
+		/* if the action's command needs to change... */
+		if ((changedFields & CHANGED_COMMAND) != 0) {
+			actionMgr.setCommand(actionId, newCommand);
+		}
+		
+		/* if there's a change, mark the editor as dirty */
+		if (changedFields != 0) {
+			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
+			if (editor != null) {
+				editor.markDirty();
+			}
 		}
 		return Status.OK_STATUS;
 	}
