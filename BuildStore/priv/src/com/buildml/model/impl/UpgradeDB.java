@@ -143,6 +143,14 @@ public class UpgradeDB {
 				stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
 						   		   "slotId integer, value text)");
 			}
+			
+			/* upgrade to 403 */
+			if (dbVersion < 403) {
+				stat.executeUpdate("alter table buildActions add column x integer");
+				stat.executeUpdate("alter table buildActions add column y integer");
+				stat.executeUpdate("update buildActions set x = -1");
+				stat.executeUpdate("update buildActions set y = -1");
+			}
 
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);

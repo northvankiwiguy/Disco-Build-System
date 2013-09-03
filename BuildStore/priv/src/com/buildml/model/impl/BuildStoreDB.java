@@ -51,7 +51,7 @@ import com.buildml.model.FatalBuildStoreError;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 402;
+	public static final int SCHEMA_VERSION = 403;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -261,8 +261,8 @@ import com.buildml.model.FatalBuildStoreError;
 			/* Create the "buildActions" table. */
 			stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
 							   "parentActionId integer, trashed integer, actionDirId integer, pkgId integer, " +
-							   "command text, actionType integer)");
-			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null, 0)");
+							   "command text, actionType integer, x integer, y integer)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null, 0, -1, -1)");
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */

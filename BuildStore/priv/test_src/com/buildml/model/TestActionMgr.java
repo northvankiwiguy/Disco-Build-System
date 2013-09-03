@@ -249,6 +249,53 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Test method for {@link com.buildml.model.impl.ActionMgr#setLocation(int, int, int)}
+	 */
+	@Test
+	public void testSetLocation() {
+		
+		/* create some default actions */
+		int rootAction = actionMgr.getRootAction("root");
+		int rootDir = fileMgr.getPath("/");
+		int action1 = actionMgr.addShellCommandAction(rootAction, rootDir, "Action 1");
+		int action2 = actionMgr.addShellCommandAction(rootAction, rootDir, "Action 2");
+	
+		/* initially their x and y should be -1 */
+		Integer result[] = actionMgr.getLocation(action1);
+		assertEquals(2, result.length);
+		assertEquals(-1, result[0].intValue());
+		assertEquals(-1, result[1].intValue());
+		result = actionMgr.getLocation(action2);
+		assertEquals(2, result.length);
+		assertEquals(-1, result[0].intValue());
+		assertEquals(-1, result[1].intValue());
+		
+		/* set the coordinates for action 1 to (100, 200) */
+		assertEquals(ErrorCode.OK, actionMgr.setLocation(action1, 100, 200));
+		result = actionMgr.getLocation(action2);
+		assertEquals(-1, result[0].intValue());
+		assertEquals(-1, result[1].intValue());
+		result = actionMgr.getLocation(action1);
+		assertEquals(100, result[0].intValue());
+		assertEquals(200, result[1].intValue());
+		
+		/* set the coordinates for action 2 to (76, 34) */
+		assertEquals(ErrorCode.OK, actionMgr.setLocation(action2, 76, 34));
+		result = actionMgr.getLocation(action2);
+		assertEquals(76, result[0].intValue());
+		assertEquals(34, result[1].intValue());
+		result = actionMgr.getLocation(action1);
+		assertEquals(100, result[0].intValue());
+		assertEquals(200, result[1].intValue());
+		
+		/* test for invalid action Id */
+		assertNull(actionMgr.getLocation(1000));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setLocation(200, 100, 200));	
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Test method for {@link com.buildml.model.impl.ActionMgr#getDirectory(int)}
 	 * @throws Exception Something bad happened
 	 */

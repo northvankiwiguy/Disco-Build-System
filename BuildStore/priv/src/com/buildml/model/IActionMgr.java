@@ -229,6 +229,25 @@ public interface IActionMgr {
 	public abstract int setParent(int actionId, int newParentId);
 
 	/**
+	 * Specify the (x, y) location of this action on its package diagram.
+	 * @param actionId The ID of the action.
+	 * @param x The x coordinate.
+	 * @param y The y coordinate.
+	 * @return ErrorCODE.OK on success, or ErrorCode.BAD_VALUE if the actionID
+	 * is invalid.
+	 */
+	public abstract int setLocation(int actionId, int x, int y);
+	
+	/**
+	 * Retrieve the (x, y) location of this action on its package diagram.
+	 * @param actionId The ID of the action.
+	 * @return An array of two Integers. The first is the x coordinate, and the
+	 * second is the y. Return null if the actionID is invalid, or (-1, -1)
+     * if no previous location had been set.
+	 */
+	public abstract Integer[] getLocation(int actionId);
+	
+	/**
 	 * Return the path ID of the directory in which this action was executed.
 	 * 
 	 * @param actionId The ID of the action.

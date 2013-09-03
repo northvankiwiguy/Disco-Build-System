@@ -22,7 +22,6 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -63,6 +62,8 @@ public class ActionMgr implements IActionMgr {
 		updateCommandPrepStmt = null,
 		findParentPrepStmt = null,
 		updateParentPrepStmt = null,
+		findLocationPrepStmt = null,
+		updateLocationPrepStmt = null,
 		findDirectoryPrepStmt = null,
 		findChildrenPrepStmt = null,
 		insertActionFilesPrepStmt = null,
@@ -97,11 +98,13 @@ public class ActionMgr implements IActionMgr {
 		this.slotMgr = buildStore.getSlotMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?, ?)");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?, ?, -1, -1)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
 		updateParentPrepStmt = db.prepareStatement("update buildActions set parentActionId = ? where actionId = ?");
+		findLocationPrepStmt = db.prepareStatement("select x, y from buildActions where actionId = ?");
+		updateLocationPrepStmt = db.prepareStatement("update buildActions set x = ?, y = ? where actionId = ?");
 		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
 		findActionsInDirectoryPrepStmt =
 			db.prepareStatement("select actionId from buildActions where (actionDirId = ?) and (trashed = 0)");
@@ -625,6 +628,59 @@ public class ActionMgr implements IActionMgr {
 		}
 		
 		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#setLocation(int, int, int)
+	 */
+	@Override
+	public int setLocation(int actionId, int x, int y) {
+		int rowsChanged = 0;
+		try {
+			updateLocationPrepStmt.setInt(1, x);
+			updateLocationPrepStmt.setInt(2, y);
+			updateLocationPrepStmt.setInt(3, actionId);
+			rowsChanged = db.executePrepUpdate(updateLocationPrepStmt);
+			
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		/* if there were no results, return null */
+		if (rowsChanged == 0) {
+			return ErrorCode.BAD_VALUE;
+		}
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getLocation(int)
+	 */
+	@Override
+	public Integer[] getLocation(int actionId) {
+		ResultSet rs;
+		Integer [] intResults = null;
+		
+		try {
+			findLocationPrepStmt.setInt(1, actionId);
+			rs = db.executePrepSelectResultSet(findLocationPrepStmt);			
+
+			/* if actionID is valid, fetch the x and y fields */
+			if (rs.next()) {
+				intResults = new Integer[2];
+				intResults[0] = rs.getInt(1);
+				intResults[1] = rs.getInt(2);
+			}
+			rs.close();
+			
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return intResults;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
