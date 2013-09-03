@@ -178,6 +178,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		 */
 		UIAction addedAction = (UIAction) context.getNewObject();
 		int actionId = addedAction.getId();
+
 		Diagram targetDiagram = (Diagram) context.getTargetContainer();
 		
 		int actionTypeId = actionMgr.getActionType(actionId);
@@ -187,7 +188,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		 * How many ellipses will be shown? This illustrate whether it's
 		 * a regular action, or a multi-action.
 		 */
-		int numEllipses = 3;
+		int numEllipses = 1;
 		
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
@@ -222,8 +223,23 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 										 ACTION_WIDTH - xAdjust, ACTION_HEIGHT - yAdjust);
 		}
 		
+		/*
+		 * Provide a quick title for the command to be displayed within the oval. This
+		 * takes "Shell:" and appends the shell command's base name.
+		 * TODO: replace this with more generic code, but only after we support more than
+		 * shell commands.
+		 */
+		String actionCommand = actionMgr.getCommand(actionId);
+		String actionCommandSplit[] = actionCommand.split(" ", 2);
+		String actionCommandBase = actionCommandSplit[0];
+		int slashIndex = actionCommandBase.lastIndexOf('/');
+		if (slashIndex != -1){
+			actionCommandBase = actionCommandBase.substring(slashIndex + 1);
+		}
+		
 		/* draw the action type's name inside the oval(s) */
-		Text actionTypeNameText = gaService.createPlainText(invisibleRectangle, actionTypeName);
+		Text actionTypeNameText = gaService.createPlainText(invisibleRectangle, 
+				"Shell: " + actionCommandBase);
 		actionTypeNameText.setFilled(false);
 		actionTypeNameText.setForeground(manageColor(TEXT_FOREGROUND));
 		actionTypeNameText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
