@@ -109,6 +109,7 @@ public class PackageDiagramDoubleClickFeature extends AbstractCustomFeature {
 			}
         	
         	/* refresh the diagram to reflect the recent model change */
+        	// TODO: remove this when actionMgr does notification of changes.
         	getDiagramEditor().refresh();
         }
 	}

@@ -38,8 +38,9 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	 * Bitmap of all the parts of the action that have changed, and will need to be changed
 	 * back on an undo/redo operation.
 	 */
-	private final static int CHANGED_PACKAGE = 1;
-	private final static int CHANGED_COMMAND = 2;
+	private final static int CHANGED_PACKAGE  = 1;
+	private final static int CHANGED_COMMAND  = 2;
+	private final static int CHANGED_LOCATION = 4;
 	
 	/** The ID of the action being changed */
 	private int actionId;
@@ -58,6 +59,12 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 
 	/** if CHANGED_COMMAND set, what is the new command string? */
 	private String newCommand;
+	
+	/** if CHANGED_LOCATION, what is the old (x, y) location */
+	private int oldX, oldY;
+	
+	/** if CHANGED_LOCATION, what is the new (x, y) location */
+	private int newX, newY;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -115,6 +122,26 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Records the fact that the action's pictogram (icon) has been moved to a new location
+	 * on the diagram.
+	 * @param oldX The existing x location
+	 * @param oldY The existing y location
+	 * @param newX The new x location (must be >= 0)
+	 * @param newY The new y location (must be >= 0)
+	 */
+	public void recordLocationChange(int oldX, int oldY, int newX, int newY) {
+		if ((oldX != newX) || (oldY != newY)) {
+			changedFields |= CHANGED_LOCATION;
+			this.oldX = oldX;
+			this.oldY = oldY;
+			this.newX = newX;
+			this.newY = newY;
+		}		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
 	 * Records the operation in the undo/redo stack, but only if there's an actual change
 	 * in the action.
 	 */
@@ -146,7 +173,12 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		if ((changedFields & CHANGED_COMMAND) != 0) {
 			actionMgr.setCommand(actionId, oldCommand);			
 		}
-		
+
+		/* if the action's location needs to change... */
+		if ((changedFields & CHANGED_LOCATION) != 0){
+			actionMgr.setLocation(actionId, oldX, oldY);
+		}
+
 		/* if there's a change, mark the editor as dirty */
 		if (changedFields != 0) {
 			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
@@ -175,6 +207,11 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		/* if the action's command needs to change... */
 		if ((changedFields & CHANGED_COMMAND) != 0) {
 			actionMgr.setCommand(actionId, newCommand);
+		}
+
+		/* if the action's location needs to change... */
+		if ((changedFields & CHANGED_LOCATION) != 0){
+			actionMgr.setLocation(actionId, newX, newY);
 		}
 		
 		/* if there's a change, mark the editor as dirty */

@@ -25,6 +25,7 @@ import org.eclipse.graphiti.pattern.IPattern;
 
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
@@ -49,6 +50,9 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	
 	/** The IPackageMgr in this BuildStore */
 	private IPackageMgr pkgMgr;
+	
+	/** The IActionMgr in this BuildStore */
+	private IActionMgr actionMgr;	
 	
 	/** The pkgMgr ID of the package we're displaying */
 	private int pkgId;
@@ -136,6 +140,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		editor = (PackageDiagramEditor)getDiagramEditor();
 		buildStore = editor.getBuildStore();
 		pkgMgr = buildStore.getPackageMgr();
+		actionMgr = buildStore.getActionMgr();
 		pkgId = editor.getPackageId();
 		
 		final ContainerShape container = (ContainerShape)context.getPictogramElement();
@@ -156,13 +161,26 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					UIAction newAction = new UIAction(actionId);
 
 					/*
+					 * Determine the location for this pictogram. If the database
+					 * has a valid location, use it. If not, perform a very simple
+					 * placement algorithm.
+					 */
+					Integer location[] = actionMgr.getLocation(newAction.getId());
+					int x = column * 150, y = row * 50;
+					
+					if ((location != null) && (location[0] >= 0) && (location[1] >= 0)) {
+						x = location[0];
+						y = location[1];
+					}
+					
+					/*
 					 * TODO: Fix this layout algorithm. For now it simply lays out
 					 * actions in rows and columns.
 					 */
 					container.eResource().getContents().add(newAction);
 					AddContext context2 = new AddContext();
 					context2.setNewObject(newAction);
-					context2.setLocation(column * 150, row * 50);
+					context2.setLocation(x, y);
 					context2.setTargetContainer(container);
 					getFeatureProvider().addIfPossible(context2);
 					column++;

@@ -12,8 +12,11 @@
 
 package com.buildml.eclipse.packages.patterns;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
@@ -23,6 +26,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
@@ -31,6 +35,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
 
+import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.model.IActionMgr;
@@ -308,4 +313,71 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		editor.refresh();
 		return super.update(context);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canMoveShape(org.eclipse.graphiti.features.context.IMoveShapeContext)
+	 */
+	@Override
+	public boolean canMoveShape(IMoveShapeContext context) {
+		
+		/* 
+		 * Validate where the UIAction is moving to. We can't move UIActions 
+		 * off the left/top of the window.
+		 */
+		int x = context.getX();
+		int y = context.getY();		
+		if ((x < 0) || (y < 0)) {
+			return false;
+		}
+		
+		/* check that we've moved a single UIAction object */
+		PictogramElement pe = context.getPictogramElement();
+		PictogramLink pl = pe.getLink();
+		EList<EObject> bos = pl.getBusinessObjects();
+		if (bos.size() != 1) {
+			return false;
+		}
+		
+		/* 
+		 * Finally, check that this is a UIAction (although we probably wouldn't have
+		 * got here otherwise.
+		 */
+		Object bo = bos.get(0);
+		return (bo instanceof UIAction);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.pattern.AbstractPattern#moveShape(org.eclipse.graphiti.features.context.IMoveShapeContext)
+	 */
+	@Override
+	public void moveShape(IMoveShapeContext context) {
+		super.moveShape(context);
+
+		/*
+		 * Fetch the x, y and actionId. Note that all error checking was done by canMoveShape().
+		 */
+		int x = context.getX();
+		int y = context.getY();
+		PictogramLink pl = context.getPictogramElement().getLink();
+		UIAction action = (UIAction)(pl.getBusinessObjects().get(0));
+		int actionId = action.getId();
+		
+		/* determine the UIAction's old location */
+		Integer[] oldXY = actionMgr.getLocation(actionId);
+		if (oldXY == null){
+			/* default, in the case of an error */
+			oldXY = new Integer[] {0, 0};
+		}
+		
+		/* create an undo/redo operation that will invoke the underlying database changes */
+		ActionChangeOperation op = new ActionChangeOperation("move action", actionId);
+		op.recordLocationChange(oldXY[0], oldXY[1], x, y);
+		op.recordAndInvoke();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
