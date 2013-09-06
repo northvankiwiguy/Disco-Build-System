@@ -20,8 +20,10 @@ import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -80,6 +82,9 @@ public class ActionMgr implements IActionMgr {
 		trashActionPrepStmt = null,
 		actionIsTrashPrepStmt = null,
 		findActionTypePrepStmt = null;
+	
+	/** The event listeners who are registered to learn about action changes */
+	List<IActionMgrListener> listeners = new ArrayList<IActionMgrListener>();
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -486,20 +491,29 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public int setCommand(int actionId, String command) {
 
-		int rowsChanged = 0;
+		String currentCommand = getCommand(actionId);
+		if (currentCommand == null) {
+			return ErrorCode.BAD_VALUE;
+		}
+
+		/* if there's no change in the command string, there's no work to do */
+		if (currentCommand.equals(command)) {
+			return ErrorCode.OK;
+		}
+		
+		/* update the database */
 		try {
 			updateCommandPrepStmt.setString(1, command);
 			updateCommandPrepStmt.setInt(2, actionId);
-			rowsChanged = db.executePrepUpdate(updateCommandPrepStmt);
+			db.executePrepUpdate(updateCommandPrepStmt);
 			
 		} catch (SQLException e) {
 			new FatalBuildStoreError("Error in SQL: " + e);
 		}
 		
-		/* if there were no results, return null */
-		if (rowsChanged == 0) {
-			return ErrorCode.BAD_VALUE;
-		}
+		/* notify listeners about the change */
+		notifyListeners(actionId, IActionMgrListener.CHANGED_COMMAND);
+		
 		return ErrorCode.OK;
 	}
 	
@@ -637,21 +651,28 @@ public class ActionMgr implements IActionMgr {
 	 */
 	@Override
 	public int setLocation(int actionId, int x, int y) {
-		int rowsChanged = 0;
+		
+		/* If the actionId is invalid, or the (x, y) is unchanged, do nothing */
+		Integer currentLocation[] = getLocation(actionId);
+		if (currentLocation == null) {
+			return ErrorCode.BAD_VALUE;
+		}
+		if ((x == currentLocation[0]) && (y == currentLocation[1])) {
+			return ErrorCode.OK;
+		}
+
+		/* a database change is required */
 		try {
 			updateLocationPrepStmt.setInt(1, x);
 			updateLocationPrepStmt.setInt(2, y);
 			updateLocationPrepStmt.setInt(3, actionId);
-			rowsChanged = db.executePrepUpdate(updateLocationPrepStmt);
+			db.executePrepUpdate(updateLocationPrepStmt);
 			
 		} catch (SQLException e) {
 			new FatalBuildStoreError("Error in SQL: " + e);
 		}
-		
-		/* if there were no results, return null */
-		if (rowsChanged == 0) {
-			return ErrorCode.BAD_VALUE;
-		}
+
+		notifyListeners(actionId, IActionMgrListener.CHANGED_LOCATION);
 		return ErrorCode.OK;
 	}
 
@@ -894,6 +915,26 @@ public class ActionMgr implements IActionMgr {
 		return buildStore;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#addListener(com.buildml.model.IActionMgrListener)
+	 */
+	@Override
+	public void addListener(IActionMgrListener listener) {
+		listeners.add(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#removeListener(com.buildml.model.IActionMgrListener)
+	 */
+	@Override
+	public void removeListener(IActionMgrListener listener) {
+		listeners.remove(listener);
+	};
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -1028,5 +1069,25 @@ public class ActionMgr implements IActionMgr {
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Notify any registered listeners about our change in state.
+	 * @param actionId  The action that has changed.
+	 * @param how       The way in which the action changed (see {@link IActionMgrListener}).
+	 */
+	private void notifyListeners(int actionId, int how) {
+		
+		/* 
+		 * Make a copy of the listeners list, otherwise a registered listener can't remove
+		 * itself from the list within the actionChangeNotification() method.
+		 */
+		IActionMgrListener listenerCopy[] = 
+				listeners.toArray(new IActionMgrListener[listeners.size()]);
+		for (int i = 0; i < listenerCopy.length; i++) {
+			listenerCopy[i].actionChangeNotification(actionId, how);			
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

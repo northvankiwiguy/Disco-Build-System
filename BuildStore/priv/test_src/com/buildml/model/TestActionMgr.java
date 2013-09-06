@@ -913,4 +913,59 @@ public class TestActionMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/** Our tests set these appropriately */
+	private int notifyActionValue = 0;
+	private int notifyHowValue = 0;
+	
+	/**
+	 * Test listener notifications
+	 */
+	@Test
+	public void testNotify() {
+
+		/* set up a listener */
+		IActionMgrListener listener = new IActionMgrListener() {
+			@Override
+			public void actionChangeNotification(int pkgId, int how) {
+				TestActionMgr.this.notifyActionValue = pkgId;
+				TestActionMgr.this.notifyHowValue = how;
+			}
+		};
+		actionMgr.addListener(listener);
+		int rootActionId = actionMgr.getRootAction("root");
+		int dirId = fileMgr.getPath("/");
+
+		/* add two shell command actions */
+		int action1 = actionMgr.addShellCommandAction(rootActionId, dirId, "command string");
+		int action2 = actionMgr.addShellCommandAction(rootActionId, dirId, "command 2");
+		
+		/* change an action's command to it current value - no notification */
+		notifyActionValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, actionMgr.setCommand(action1, "command string"));
+		assertEquals(0, notifyActionValue);
+		assertEquals(0, notifyHowValue);
+		
+		/* change the command to a new value - notification given */
+		assertEquals(ErrorCode.OK, actionMgr.setCommand(action1, "new command string"));
+		assertEquals(action1, notifyActionValue);
+		assertEquals(IActionMgrListener.CHANGED_COMMAND, notifyHowValue);
+
+		/* change the location to something new - notification given */
+		notifyActionValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, actionMgr.setLocation(action2, 100, 200));
+		assertEquals(action2, notifyActionValue);
+		assertEquals(IActionMgrListener.CHANGED_LOCATION, notifyHowValue);
+		
+		/* change the location to its current value - no notification */
+		notifyActionValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, actionMgr.setLocation(action2, 100, 200));
+		assertEquals(0, notifyActionValue);
+		assertEquals(0, notifyHowValue);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

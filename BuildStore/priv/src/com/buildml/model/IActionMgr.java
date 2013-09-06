@@ -340,5 +340,21 @@ public interface IActionMgr {
 	 * @return The BuildStore object that owns this IActionMgr object.
 	 */
 	public abstract IBuildStore getBuildStore();
+	
+	/**
+	 * Add the specified listener to the list of objects that are notified when
+	 * an action changes in some way.
+	 * 
+	 * @param listener The object to be added as a listener.
+	 */
+	public void addListener(IActionMgrListener listener);
 
+	/**
+	 * Remove the specified listener from the list of objects to be notified when
+	 * an action changes in some way.
+	 * 
+	 * @param listener The object to be removed from the list of listeners.
+	 */
+	public void removeListener(IActionMgrListener listener);
+	
 }
