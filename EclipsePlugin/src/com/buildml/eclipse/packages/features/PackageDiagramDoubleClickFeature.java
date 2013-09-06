@@ -107,10 +107,6 @@ public class PackageDiagramDoubleClickFeature extends AbstractCustomFeature {
 			} catch (Exception e) {
 				throw new FatalError("Unable to open Properties Dialog.");
 			}
-        	
-        	/* refresh the diagram to reflect the recent model change */
-        	// TODO: remove this when actionMgr does notification of changes.
-        	getDiagramEditor().refresh();
         }
 	}
 

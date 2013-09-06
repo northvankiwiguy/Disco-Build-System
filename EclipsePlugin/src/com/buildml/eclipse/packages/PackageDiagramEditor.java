@@ -26,10 +26,13 @@ import org.eclipse.ui.PartInitException;
 import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.PackageSet;
+import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**
@@ -39,7 +42,7 @@ import com.buildml.utils.types.IntegerTreeSet;
  * @author Peter Smith <psmith@arapiki.com>
  */
 public class PackageDiagramEditor extends DiagramEditor 
-									implements ISubEditor, IPackageMgrListener {
+									implements ISubEditor, IPackageMgrListener, IActionMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -50,6 +53,9 @@ public class PackageDiagramEditor extends DiagramEditor
 
 	/** The PackageMgr we're using for package information */
 	private IPackageMgr pkgMgr = null;
+	
+	/** The ActionMgr we're using for action information */
+	private IActionMgr actionMgr = null;
 	
 	/** The ID of the package we're displaying */
 	private int packageId;
@@ -76,10 +82,12 @@ public class PackageDiagramEditor extends DiagramEditor
 		/* Save away our BuildStore information, for later use */
 		this.buildStore = buildStore;
 		this.pkgMgr = buildStore.getPackageMgr();
+		this.actionMgr = buildStore.getActionMgr();
 		this.packageId = packageId;
 		
-		/* listen for changes to the packages */
+		/* listen for changes to the packages and actions */
 		pkgMgr.addListener(this);
+		actionMgr.addListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -354,6 +362,21 @@ public class PackageDiagramEditor extends DiagramEditor
 				updateBehavior.markChanged();
 			}
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Receive notifications if an action (possibly on this package) changes in some way.
+	 */
+	@Override
+	public void actionChangeNotification(int actionId, int how) {
+		int pkgId = pkgMgr.getActionPackage(actionId);
+		if (pkgId != this.packageId) {
+			return;
+		}
+		updateBehavior.markChanged();
+		setFocus();		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
