@@ -15,6 +15,7 @@ package com.buildml.eclipse.utils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
@@ -53,7 +54,31 @@ public class GraphitiUtils {
 		}
 		return null;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a Graphiti pictogram, return the underlying business object. This is useful for
+	 * identifying the underlying UIAction, UIFileGroup etc. that a was selected on a Graphiti
+	 * diagram.
+	 * 
+	 * @param pictogram The Graphiti pictogram selected on the Graphiti diagram.
+	 * @return The underlying business object (UIAction, UIFileGroup etc), or null if the
+	 * pictogram is not a recognized type.
+	 */
+	public static Object getBusinessObject(Object pictogram) {
+		if (pictogram instanceof ContainerShape) {
+			ContainerShape cs = (ContainerShape)pictogram;
+			PictogramLink pl = cs.getLink();
+			if (pl != null) {
+				EList<EObject> bos = pl.getBusinessObjects();
+				if ((bos != null) && (bos.size() == 1)) {
+					return bos.get(0);
+				}
+			}			
+		}
+		return null;
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 }

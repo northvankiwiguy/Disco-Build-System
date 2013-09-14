@@ -24,9 +24,11 @@ import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 
@@ -188,6 +190,26 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 						column = 0;
 						row++;
 					}			
+				}
+				
+				IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+				Integer[] fileGroups = fileGroupMgr.getGroupsInPackage(pkgId);
+				for (int i = 0; i < fileGroups.length; i++) {
+					UIFileGroup fileGroup = new UIFileGroup(fileGroups[i]);
+					container.eResource().getContents().add(fileGroup);
+					AddContext context2 = new AddContext();
+					context2.setNewObject(fileGroup);
+					int x = column * 150, y = row * 50;
+
+					context2.setLocation(x, y);
+					context2.setTargetContainer(container);
+					getFeatureProvider().addIfPossible(context2);
+					
+					column++;
+					if (column == 5) {
+						column = 0;
+						row++;
+					}
 				}
 			}
 			

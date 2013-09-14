@@ -60,6 +60,7 @@ import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.files.FilesEditor;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.model.BuildStoreFactory;
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.IActionMgr;
@@ -234,7 +235,22 @@ public class EclipsePartUtils {
 		}
 		return null;
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Returns the currently active PackageDiagramEditor. If the current editor is not an
+	 * PackageDiagramEditor, return null;
+	 * @return The currently active PackageDiagramEditor instance, or null;
+	 */
+	public static PackageDiagramEditor getActivePackageDiagramEditor() {
+		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
+		if (subEditor instanceof PackageDiagramEditor) {
+			return (PackageDiagramEditor)subEditor;
+		}
+		return null;
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
