@@ -26,7 +26,6 @@ import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
-import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
@@ -123,7 +122,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 *=====================================================================================*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getScopeName(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getScopeName(int)
 	 */
 	@Override
 	public String getScopeName(int id) {
@@ -144,7 +143,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getScopeId(java.lang.String)
+	 * @see com.buildml.model.IPackageMemberMgr#getScopeId(java.lang.String)
 	 */
 	@Override
 	public int getScopeId(String name) {
@@ -165,7 +164,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#parsePkgSpec(java.lang.String)
+	 * @see com.buildml.model.IPackageMemberMgr#parsePkgSpec(java.lang.String)
 	 */
 	@Override
 	public Integer[] parsePkgSpec(String pkgSpec) {
@@ -199,7 +198,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#setFilePackage(int, int, int)
+	 * @see com.buildml.model.IPackageMemberMgr#setFilePackage(int, int, int)
 	 */
 	@Override
 	public int setFilePackage(int fileId, int pkgId, int pkgScopeId) {
@@ -248,7 +247,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilePackage(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilePackage(int)
 	 */
 	@Override
 	public Integer[] getFilePackage(int fileId) {
@@ -277,7 +276,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilesInPackage(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilesInPackage(int)
 	 */
 	@Override
 	public FileSet getFilesInPackage(int pkgId) {
@@ -296,7 +295,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilesInPackage(int, int)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilesInPackage(int, int)
 	 */
 	@Override
 	public FileSet getFilesInPackage(int pkgId, int pkgScopeId) {
@@ -317,7 +316,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilesInPackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilesInPackage(java.lang.String)
 	 */
 	@Override
 	public FileSet getFilesInPackage(String pkgSpec) {
@@ -347,7 +346,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilesOutsidePackage(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilesOutsidePackage(int)
 	 */
 	@Override
 	public FileSet getFilesOutsidePackage(int pkgId) {
@@ -366,7 +365,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilesOutsidePackage(int, int)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilesOutsidePackage(int, int)
 	 */
 	@Override
 	public FileSet getFilesOutsidePackage(int pkgId, int pkgScopeId) {
@@ -386,7 +385,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getFilesOutsidePackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMemberMgr#getFilesOutsidePackage(java.lang.String)
 	 */
 	@Override
 	public FileSet getFilesOutsidePackage(String pkgSpec) {
@@ -415,7 +414,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#setActionPackage(int, int)
+	 * @see com.buildml.model.IPackageMemberMgr#setActionPackage(int, int)
 	 */
 	@Override
 	public int setActionPackage(int actionId, int pkgId) {
@@ -451,8 +450,8 @@ import com.buildml.utils.errors.ErrorCode;
 		/* 
 		 * Notify listeners about the change in package content.
 		 */
-		notifyListeners(oldPkgId, IPackageMgrListener.CHANGED_MEMBERSHIP);
-		notifyListeners(pkgId, IPackageMgrListener.CHANGED_MEMBERSHIP);
+		notifyListeners(oldPkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
+		notifyListeners(pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
 
 		return ErrorCode.OK;
 	}
@@ -460,7 +459,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getActionPackage(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getActionPackage(int)
 	 */
 	@Override
 	public int getActionPackage(int actionId) {
@@ -488,7 +487,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getActionsInPackage(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getActionsInPackage(int)
 	 */
 	@Override
 	public ActionSet getActionsInPackage(int pkgId) {
@@ -505,7 +504,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getActionsInPackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMemberMgr#getActionsInPackage(java.lang.String)
 	 */
 	@Override
 	public ActionSet getActionsInPackage(String pkgSpec) {
@@ -522,7 +521,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getActionsOutsidePackage(int)
+	 * @see com.buildml.model.IPackageMemberMgr#getActionsOutsidePackage(int)
 	 */
 	@Override
 	public ActionSet getActionsOutsidePackage(int pkgId) {
@@ -539,7 +538,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#getActionsOutsidePackage(java.lang.String)
+	 * @see com.buildml.model.IPackageMemberMgr#getActionsOutsidePackage(java.lang.String)
 	 */
 	@Override
 	public ActionSet getActionsOutsidePackage(String pkgSpec) {
@@ -580,7 +579,7 @@ import com.buildml.utils.errors.ErrorCode;
 	/**
 	 * Notify any registered listeners about our change in state.
 	 * @param pkgId   The package that has changed.
-	 * @param how     The way in which the package changed (see {@link IPackageMgrListener}).
+	 * @param how     The way in which the package changed (see {@link IPackageMemberMgrListener}).
 	 */
 	private void notifyListeners(int pkgId, int how) {
 		

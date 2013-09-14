@@ -36,8 +36,11 @@ public class TestPackageRootMgr {
 	/** The FileMgr object associated with this BuildStore */
 	private IFileMgr fileMgr;
 
-	/** The Packages object associated with this BuildStore */
+	/** The Packages manager object associated with this BuildStore */
 	private IPackageMgr pkgMgr;
+
+	/** The IPackageMemberMgr object associated with this BuildStore */
+	private IPackageMemberMgr pkgMemberMgr;
 
 	/** The PackageRootMgr object associated with this BuildStore */
 	private IPackageRootMgr pkgRootMgr;
@@ -90,6 +93,7 @@ public class TestPackageRootMgr {
 		buildStore = CommonTestUtils.getEmptyBuildStore(dir, true);
 		fileMgr = buildStore.getFileMgr();
 		pkgMgr = buildStore.getPackageMgr();
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		pkgRootMgr = buildStore.getPackageRootMgr();
 	}
 	
@@ -600,7 +604,7 @@ public class TestPackageRootMgr {
 		int file2 = fileMgr.addFile("@workspace/dir/dir/file2");
 		assertTrue(file1 > 0);
 		assertTrue(file2 > 0);		
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(file1, pkgAId, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(file1, pkgAId, IPackageMgr.SCOPE_PUBLIC));
 		
 		/* compute a native path of a path within the root, and the path without a root */
 		String wsRootNative = pkgRootMgr.getWorkspaceRootNative();
@@ -742,7 +746,7 @@ public class TestPackageRootMgr {
 		int pkgId = pkgMgr.addPackage("pkg");
 
 		/* add /a/b/d/file into the package (OK, since root is above it) */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(fileABD, pkgId, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(fileABD, pkgId, IPackageMgr.SCOPE_PUBLIC));
 		
 		/* move package root to /a/b - acceptable */
 		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirAB));
@@ -753,7 +757,7 @@ public class TestPackageRootMgr {
 		
 		/* remove file from package, and try again to change the root to /a/b/c */
 		assertEquals(ErrorCode.OK, 
-				pkgMgr.setFilePackage(fileABD, pkgMgr.getImportPackage(), IPackageMgr.SCOPE_PUBLIC));		
+				pkgMemberMgr.setFilePackage(fileABD, pkgMgr.getImportPackage(), IPackageMgr.SCOPE_PUBLIC));		
 		assertEquals(ErrorCode.OK, 
 				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
 	}
@@ -785,7 +789,7 @@ public class TestPackageRootMgr {
 		
 		/* add /a/b/d/file into the package - error, since it's not within /a/b/c */
 		assertEquals(ErrorCode.OUT_OF_RANGE, 
-				pkgMgr.setFilePackage(fileABD, pkgId, IPackageMgr.SCOPE_PUBLIC));
+				pkgMemberMgr.setFilePackage(fileABD, pkgId, IPackageMgr.SCOPE_PUBLIC));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

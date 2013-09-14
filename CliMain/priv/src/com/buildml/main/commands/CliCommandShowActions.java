@@ -21,8 +21,6 @@ import com.buildml.main.ICliCommand;
 import com.buildml.main.CliUtils.DisplayWidth;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.IFileMgr;
-import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 
 /**
@@ -162,15 +160,11 @@ public class CliCommandShowActions implements ICliCommand {
 	public void invoke(IBuildStore buildStore, String buildStorePath, String[] args) {
 
 		CliUtils.validateArgs(getName(), args, 0, 0, "No arguments expected.");
-		
-		IActionMgr actionMgr = buildStore.getActionMgr();
-		IFileMgr fileMgr = buildStore.getFileMgr();		
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* 
 		 * Display the selected action set.
 		 */
-		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, null, 
+		CliUtils.printActionSet(System.out, buildStore, null, 
 									filterActionSet, outputFormat, optionShowPkgs);
 	}
 

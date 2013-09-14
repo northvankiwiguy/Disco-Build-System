@@ -23,6 +23,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.PathNameCache;
@@ -211,9 +212,10 @@ public class FileMgr implements IFileMgr {
 			
 			/* determine which package this file is in */
 			IPackageMgr pkgMgr = buildStore.getPackageMgr();
+			IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 			int workspaceRootPathId = pkgRootMgr.getWorkspaceRoot();
-			Integer pathPackage[] = pkgMgr.getFilePackage(pathId);
+			Integer pathPackage[] = pkgMemberMgr.getFilePackage(pathId);
 			int pkgRootPathId = 0;
 			String pkgRootName = null;
 			

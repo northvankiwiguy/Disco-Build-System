@@ -19,7 +19,7 @@ import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.types.ActionSet;
 
 /**
@@ -102,7 +102,7 @@ public class CliCommandSetActionPkg implements ICliCommand {
 		CliUtils.validateArgs(getName(), args, 2, 2, 
 				"You must specify a package name and a colon-separated list of action-specs.");
 		
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
 
 		/* 
@@ -110,7 +110,7 @@ public class CliCommandSetActionPkg implements ICliCommand {
 		 * for actions.
 		 */
 		String pkgName = args[0];
-		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, false);
+		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(buildStore, pkgName, false);
 		int pkgId = pkgAndScopeIds[0];
 		
 		/* compute the ActionSet from the user-supplied list of action-specs */
@@ -120,7 +120,7 @@ public class CliCommandSetActionPkg implements ICliCommand {
 		/* now visit each action in the ActionSet and set its package */
 		buildStore.setFastAccessMode(true);
 		for (int actionId : actionsToSet) {
-			pkgMgr.setActionPackage(actionId, pkgId);
+			pkgMemberMgr.setActionPackage(actionId, pkgId);
 		}
 		buildStore.setFastAccessMode(false);	
 	}

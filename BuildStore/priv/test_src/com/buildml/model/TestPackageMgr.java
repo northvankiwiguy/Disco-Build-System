@@ -32,6 +32,7 @@ public class TestPackageMgr {
 
 	/** The manager object associated with this BuildStore */
 	private IPackageMgr pkgMgr;
+	private IPackageMemberMgr pkgMemberMgr;
 	private IPackageRootMgr pkgRootMgr;
 	private IFileMgr fileMgr;
 	private IActionMgr actionMgr;
@@ -46,6 +47,7 @@ public class TestPackageMgr {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		pkgMgr = bs.getPackageMgr();
+		pkgMemberMgr = bs.getPackageMemberMgr();
 		pkgRootMgr = bs.getPackageRootMgr();
 		fileMgr = bs.getFileMgr();
 		actionMgr = bs.getActionMgr();
@@ -270,22 +272,22 @@ public class TestPackageMgr {
 		/* assign a package to files, then try to remove the name */
 		int pkgA = pkgMgr.getId("PkgA");
 		int file1 = fileMgr.addFile("/aardvark/bunny");
-		pkgMgr.setFilePackage(file1, pkgA, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setFilePackage(file1, pkgA, IPackageMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgA));
 		
 		/* remove the package from the file, then try again to remove the package name */
 		int pkgImport = pkgMgr.getId("<import>");
-		pkgMgr.setFilePackage(file1, pkgImport, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setFilePackage(file1, pkgImport, IPackageMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
 		
 		/* assign them to actions, then try to remove the name */
 		int my_pkg = pkgMgr.getId("my_package");
 		int action1 = actionMgr.addShellCommandAction(0, 0, "action1");
-		pkgMgr.setActionPackage(action1, my_pkg);
+		pkgMemberMgr.setActionPackage(action1, my_pkg);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(my_pkg));
 		
 		/* remove them from actions, then try again to remove the package name */
-		pkgMgr.setActionPackage(action1, pkgImport);
+		pkgMemberMgr.setActionPackage(action1, pkgImport);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(my_pkg));
 		
 		/* test removal of an empty folder */
@@ -424,49 +426,49 @@ public class TestPackageMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.IPackageMgr#getScopeName(int)}.
+	 * Test method for {@link com.buildml.model.IPackageMemberMgr#getScopeName(int)}.
 	 */
 	@Test
 	public void testGetScopeName() {
 		
 		/* Test valid section IDs */
-		assertEquals("None", pkgMgr.getScopeName(0));
-		assertEquals("Private", pkgMgr.getScopeName(1));
-		assertEquals("Public", pkgMgr.getScopeName(2));
+		assertEquals("None", pkgMemberMgr.getScopeName(0));
+		assertEquals("Private", pkgMemberMgr.getScopeName(1));
+		assertEquals("Public", pkgMemberMgr.getScopeName(2));
 
 		/* Test invalid section IDs */
-		assertNull(pkgMgr.getScopeName(3));
-		assertNull(pkgMgr.getScopeName(4));
-		assertNull(pkgMgr.getScopeName(100));
+		assertNull(pkgMemberMgr.getScopeName(3));
+		assertNull(pkgMemberMgr.getScopeName(4));
+		assertNull(pkgMemberMgr.getScopeName(100));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.IPackageMgr#getScopeId(String)}.
+	 * Test method for {@link com.buildml.model.IPackageMemberMgr#getScopeId(String)}.
 	 */
 	@Test
 	public void testGetScopeId() {
 		
 		/* Test valid section names */
-		assertEquals(0, pkgMgr.getScopeId("None"));
-		assertEquals(1, pkgMgr.getScopeId("priv"));
-		assertEquals(1, pkgMgr.getScopeId("private"));
-		assertEquals(1, pkgMgr.getScopeId("Private"));
-		assertEquals(2, pkgMgr.getScopeId("pub"));
-		assertEquals(2, pkgMgr.getScopeId("public"));
+		assertEquals(0, pkgMemberMgr.getScopeId("None"));
+		assertEquals(1, pkgMemberMgr.getScopeId("priv"));
+		assertEquals(1, pkgMemberMgr.getScopeId("private"));
+		assertEquals(1, pkgMemberMgr.getScopeId("Private"));
+		assertEquals(2, pkgMemberMgr.getScopeId("pub"));
+		assertEquals(2, pkgMemberMgr.getScopeId("public"));
 		
 		/* Test invalid section names */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getScopeId("object"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getScopeId("obj"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getScopeId("pretty"));
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getScopeId("shiny"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.getScopeId("object"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.getScopeId("obj"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.getScopeId("pretty"));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.getScopeId("shiny"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.IPackageMgr#parsePkgSpec(String)}.
+	 * Test method for {@link com.buildml.model.IPackageMemberMgr#parsePkgSpec(String)}.
 	 * @exception Exception Something bad happened
 	 */
 	@Test
@@ -477,37 +479,37 @@ public class TestPackageMgr {
 		int pkg2 = pkgMgr.addPackage("pkg2");
 		
 		/* test the pkgSpecs with only package names */
-		Integer results[] = pkgMgr.parsePkgSpec("pkg1");
+		Integer results[] = pkgMemberMgr.parsePkgSpec("pkg1");
 		assertEquals(pkg1, results[0].intValue());
 		assertEquals(0, results[1].intValue());
 		
-		results = pkgMgr.parsePkgSpec("pkg2");
+		results = pkgMemberMgr.parsePkgSpec("pkg2");
 		assertEquals(pkg2, results[0].intValue());
 		assertEquals(0, results[1].intValue());
 		
 		/* test pkgSpecs with both package and scope names */
-		results = pkgMgr.parsePkgSpec("pkg1/private");
+		results = pkgMemberMgr.parsePkgSpec("pkg1/private");
 		assertEquals(pkg1, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
 		
-		results = pkgMgr.parsePkgSpec("pkg2/public");
+		results = pkgMemberMgr.parsePkgSpec("pkg2/public");
 		assertEquals(pkg2, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 		
 		/* test invalid pkgSpecs */
-		results = pkgMgr.parsePkgSpec("badname");
+		results = pkgMemberMgr.parsePkgSpec("badname");
 		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
 		assertEquals(0, results[1].intValue());
 		
-		results = pkgMgr.parsePkgSpec("pkg1/missing");
+		results = pkgMemberMgr.parsePkgSpec("pkg1/missing");
 		assertEquals(pkg1, results[0].intValue());
 		assertEquals(ErrorCode.NOT_FOUND, results[1].intValue());
 		
-		results = pkgMgr.parsePkgSpec("badname/missing");
+		results = pkgMemberMgr.parsePkgSpec("badname/missing");
 		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
 		assertEquals(ErrorCode.NOT_FOUND, results[1].intValue());
 		
-		results = pkgMgr.parsePkgSpec("badname/public");
+		results = pkgMemberMgr.parsePkgSpec("badname/public");
 		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
 	}
@@ -536,55 +538,55 @@ public class TestPackageMgr {
 		int pkgImport = pkgMgr.getImportPackage();
 
 		/* by default, all files are in <import>/None */
-		Integer results[] = pkgMgr.getFilePackage(path1);
+		Integer results[] = pkgMemberMgr.getFilePackage(path1);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMgr.getFilePackage(path2);
+		results = pkgMemberMgr.getFilePackage(path2);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMgr.getFilePackage(path3);
+		results = pkgMemberMgr.getFilePackage(path3);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 
 		/* set one of the files into PkgA/public */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgA, IPackageMgr.SCOPE_PUBLIC));
-		results = pkgMgr.getFilePackage(path1);
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(path1, pkgA, IPackageMgr.SCOPE_PUBLIC));
+		results = pkgMemberMgr.getFilePackage(path1);
 		assertEquals(pkgA, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
-		results = pkgMgr.getFilePackage(path2);
+		results = pkgMemberMgr.getFilePackage(path2);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMgr.getFilePackage(path3);
+		results = pkgMemberMgr.getFilePackage(path3);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		
 		/* set another file to another package */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path3, pkgB, IPackageMgr.SCOPE_PRIVATE));
-		results = pkgMgr.getFilePackage(path1);
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(path3, pkgB, IPackageMgr.SCOPE_PRIVATE));
+		results = pkgMemberMgr.getFilePackage(path1);
 		assertEquals(pkgA, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
-		results = pkgMgr.getFilePackage(path2);
+		results = pkgMemberMgr.getFilePackage(path2);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMgr.getFilePackage(path3);
+		results = pkgMemberMgr.getFilePackage(path3);
 		assertEquals(pkgB, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
 		
 		/* set a file's package back to <import>/None */
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(path1, pkgImport, IPackageMgr.SCOPE_NONE));
-		results = pkgMgr.getFilePackage(path1);
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(path1, pkgImport, IPackageMgr.SCOPE_NONE));
+		results = pkgMemberMgr.getFilePackage(path1);
 		assertEquals(pkgImport, results[0].intValue());
 		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
 		
 		/* try to set a non-existent file */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.setFilePackage(1000, pkgA, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.setFilePackage(1000, pkgA, IPackageMgr.SCOPE_PUBLIC));
 		
 		/* try to get a non-existent file */
-		assertNull(pkgMgr.getFilePackage(2000));
+		assertNull(pkgMemberMgr.getFilePackage(2000));
 		
 		/* try to place a file into a folder - should fail */
 		int folder = pkgMgr.addFolder("Folder");
-		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.setFilePackage(path1, folder, IPackageMgr.SCOPE_NONE));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMemberMgr.setFilePackage(path1, folder, IPackageMgr.SCOPE_NONE));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -604,15 +606,15 @@ public class TestPackageMgr {
 		int pkgImport = pkgMgr.getImportPackage();
 		
 		/* what are the sections? */
-		int sectPub = pkgMgr.getScopeId("public");
-		int sectPriv = pkgMgr.getScopeId("private");
+		int sectPub = pkgMemberMgr.getScopeId("public");
+		int sectPriv = pkgMemberMgr.getScopeId("private");
 		
 		/* initially, there are no files in the package (public, private, or any) */
-		FileSet results = pkgMgr.getFilesInPackage(pkgA);
+		FileSet results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertEquals(0, results.size());
-		results = pkgMgr.getFilesInPackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
 		assertEquals(0, results.size());
-		results = pkgMgr.getFilesInPackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPriv);
 		assertEquals(0, results.size());
 		
 		/* 
@@ -620,86 +622,86 @@ public class TestPackageMgr {
 		 * is implicitly there all the time, so it'll be reported.
 		 */
 		int rootPathId = fileMgr.getPath("/");
-		results = pkgMgr.getFilesOutsidePackage(pkgA);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA);
 		assertEquals(2, results.size());		/* includes /tmp */
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPub);
 		assertEquals(2, results.size());		/* includes /tmp */
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPriv);
 		assertEquals(2, results.size());		/* includes /tmp */
 		
 		/* add a single file to the "private" section of pkgA */
 		int file1 = fileMgr.addFile("/myfile1");
-		pkgMgr.setFilePackage(file1, pkgA, sectPriv);
+		pkgMemberMgr.setFilePackage(file1, pkgA, sectPriv);
 		
 		/* check again - should be one file in pkgA and one in pkgA/priv */
-		results = pkgMgr.getFilesInPackage(pkgA);
+		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1}));
-		results = pkgMgr.getFilesInPackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
 		assertEquals(0, results.size());
-		results = pkgMgr.getFilesInPackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPriv);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1}));
 
 		/* now, we one file in pkgA/priv, we have some files outside the other packages */
-		results = pkgMgr.getFilesOutsidePackage(pkgA);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA);
 		assertEquals(2, results.size());	/* includes /tmp */
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPub);
 		assertTrue(results.isMember(rootPathId));
 		assertTrue(results.isMember(file1));
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPriv);
 		assertEquals(2, results.size());	/* includes /tmp */
 		
 		/* now add another to pkgA/priv and check again */
 		int file2 = fileMgr.addFile("/myfile2");
-		pkgMgr.setFilePackage(file2, pkgA, sectPriv);
-		results = pkgMgr.getFilesInPackage(pkgA);
+		pkgMemberMgr.setFilePackage(file2, pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));
-		results = pkgMgr.getFilesInPackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
 		assertEquals(0, results.size());
-		results = pkgMgr.getFilesInPackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPriv);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));
 		
 		/* now, we two files, we have some more files outside */
-		results = pkgMgr.getFilesOutsidePackage(pkgA);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA);
 		assertEquals(2, results.size());	/* includes /tmp */
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPub);
 		assertTrue(results.isMember(file1));
 		assertTrue(results.isMember(file2));
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPriv);
 		assertEquals(2, results.size());	/* include /tmp */
 		
 		/* finally, add one to pkgA/pub and check again */
 		int file3 = fileMgr.addFile("/myfile3");
-		pkgMgr.setFilePackage(file3, pkgA, sectPub);
-		results = pkgMgr.getFilesInPackage(pkgA);
+		pkgMemberMgr.setFilePackage(file3, pkgA, sectPub);
+		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2, file3}));
-		results = pkgMgr.getFilesInPackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file3}));
-		results = pkgMgr.getFilesInPackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPriv);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));		
-		results = pkgMgr.getFilesOutsidePackage(pkgA);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA);
 		assertEquals(2, results.size());	/* includes /tmp */
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPub);
 		assertTrue(results.isMember(file1));
 		assertTrue(results.isMember(file2));
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPriv);
 		assertTrue(results.isMember(file3));
 		
 		/* move file1 back into <import> */
-		pkgMgr.setFilePackage(file1, pkgImport, sectPriv);
-		results = pkgMgr.getFilesInPackage(pkgA);
+		pkgMemberMgr.setFilePackage(file1, pkgImport, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file2, file3}));
-		results = pkgMgr.getFilesInPackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file3}));
-		results = pkgMgr.getFilesInPackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPriv);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file2}));
 		
 		/* now we have a file outside of pkgA */
-		results = pkgMgr.getFilesOutsidePackage(pkgA);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA);
 		assertTrue(results.isMember(file1));
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPub);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPub);
 		assertTrue(results.isMember(file1));
 		assertTrue(results.isMember(file2));
-		results = pkgMgr.getFilesOutsidePackage(pkgA, sectPriv);
+		results = pkgMemberMgr.getFilesOutsidePackage(pkgA, sectPriv);
 		assertTrue(results.isMember(file1));
 		assertTrue(results.isMember(file3));
 	}
@@ -725,25 +727,25 @@ public class TestPackageMgr {
 		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkgFooId = pkgMgr.addPackage("foo");
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f1path, pkgFooId, IPackageMgr.SCOPE_PUBLIC));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f2path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f4path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f5path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f1path, pkgFooId, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f2path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f4path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f5path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
 
 		/* test @foo/public membership */
-		FileSet fs = pkgMgr.getFilesInPackage("foo/public");
+		FileSet fs = pkgMemberMgr.getFilesInPackage("foo/public");
 		assertEquals(1, fs.size());
 		assertTrue(fs.isMember(f1path));
 
 		/* test @foo/private membership */
-		fs = pkgMgr.getFilesInPackage("foo/private");
+		fs = pkgMemberMgr.getFilesInPackage("foo/private");
 		assertEquals(3, fs.size());
 		assertTrue(fs.isMember(f2path));
 		assertTrue(fs.isMember(f4path));
 		assertTrue(fs.isMember(f5path));
 
 		/* test @foo membership */
-		fs = pkgMgr.getFilesInPackage("foo");
+		fs = pkgMemberMgr.getFilesInPackage("foo");
 		assertEquals(4, fs.size());
 		assertTrue(fs.isMember(f1path));
 		assertTrue(fs.isMember(f2path));
@@ -754,7 +756,7 @@ public class TestPackageMgr {
 		 * Test ^@foo/public membership - will always include "/" and
 		 * have a bunch of directories too.
 		 */
-		fs = pkgMgr.getFilesOutsidePackage("foo/public");
+		fs = pkgMemberMgr.getFilesOutsidePackage("foo/public");
 		assertEquals(15, fs.size());		/* includes /tmp */
 		assertTrue(fs.isMember(f2path));
 		assertTrue(fs.isMember(f3path));
@@ -762,21 +764,21 @@ public class TestPackageMgr {
 		assertTrue(fs.isMember(f5path));
 
 		/* test ^@foo/private membership - which includes directories*/
-		fs = pkgMgr.getFilesOutsidePackage("foo/private");
+		fs = pkgMemberMgr.getFilesOutsidePackage("foo/private");
 		assertEquals(13, fs.size());	/* includes /tmp */
 		assertTrue(fs.isMember(f1path));
 		assertTrue(fs.isMember(f3path));
 
 		/* test ^@foo membership - which includes directories */
-		fs = pkgMgr.getFilesOutsidePackage("foo");
+		fs = pkgMemberMgr.getFilesOutsidePackage("foo");
 		assertEquals(12, fs.size());		/* includes /tmp */
 		assertTrue(fs.isMember(f3path));
 		
 		/* test bad names */
-		assertNull(pkgMgr.getFilesInPackage("foo/badsect"));
-		assertNull(pkgMgr.getFilesOutsidePackage("pkg"));
-		assertNull(pkgMgr.getFilesOutsidePackage("foo/badsect"));
-		assertNull(pkgMgr.getFilesOutsidePackage("foo/"));
+		assertNull(pkgMemberMgr.getFilesInPackage("foo/badsect"));
+		assertNull(pkgMemberMgr.getFilesOutsidePackage("pkg"));
+		assertNull(pkgMemberMgr.getFilesOutsidePackage("foo/badsect"));
+		assertNull(pkgMemberMgr.getFilesOutsidePackage("foo/"));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -802,34 +804,34 @@ public class TestPackageMgr {
 		int pkgImport = pkgMgr.getImportPackage();
 		
 		/* by default, all actions are in "<import>" */
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action1));
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action1));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action2));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
 		
 		/* add an action to PkgA and check the actions */
-		pkgMgr.setActionPackage(action1, pkgA);
-		assertEquals(pkgA, pkgMgr.getActionPackage(action1));
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
+		pkgMemberMgr.setActionPackage(action1, pkgA);
+		assertEquals(pkgA, pkgMemberMgr.getActionPackage(action1));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action2));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
 		
 		/* add a different action to PkgB and check the actions */
-		pkgMgr.setActionPackage(action2, pkgB);
-		assertEquals(pkgA, pkgMgr.getActionPackage(action1));
-		assertEquals(pkgB, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
+		pkgMemberMgr.setActionPackage(action2, pkgB);
+		assertEquals(pkgA, pkgMemberMgr.getActionPackage(action1));
+		assertEquals(pkgB, pkgMemberMgr.getActionPackage(action2));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
 		
 		/* revert one of the actions back to <import>, and check the actions */
-		pkgMgr.setActionPackage(action1, pkgImport);
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action1));
-		assertEquals(pkgB, pkgMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMgr.getActionPackage(action3));
+		pkgMemberMgr.setActionPackage(action1, pkgImport);
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action1));
+		assertEquals(pkgB, pkgMemberMgr.getActionPackage(action2));
+		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
 		
 		/* check an invalid action - should return ErrorCode.NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getActionPackage(1000));
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.getActionPackage(1000));
 		
 		/* try to place an action into a folder - should fail */
 		int folder = pkgMgr.addFolder("Folder");
-		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.setActionPackage(action1, folder));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMemberMgr.setActionPackage(action1, folder));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -853,71 +855,71 @@ public class TestPackageMgr {
 		int pkgB = pkgMgr.addPackage("PkgB");
 		
 		/* initially, pkgA is empty */
-		ActionSet results = pkgMgr.getActionsInPackage(pkgA);
+		ActionSet results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertEquals(0, results.size());
-		results = pkgMgr.getActionsInPackage("PkgA");
+		results = pkgMemberMgr.getActionsInPackage("PkgA");
 		assertEquals(0, results.size());
-		results = pkgMgr.getActionsOutsidePackage(pkgA);
+		results = pkgMemberMgr.getActionsOutsidePackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
-		results = pkgMgr.getActionsOutsidePackage("PkgA");
+		results = pkgMemberMgr.getActionsOutsidePackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));		
 		
 		/* add an action to pkgA */
-		pkgMgr.setActionPackage(action1, pkgA);
-		results = pkgMgr.getActionsInPackage(pkgA);
+		pkgMemberMgr.setActionPackage(action1, pkgA);
+		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1}));
-		results = pkgMgr.getActionsInPackage("PkgA");
+		results = pkgMemberMgr.getActionsInPackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1}));
-		results = pkgMgr.getActionsOutsidePackage(pkgA);
+		results = pkgMemberMgr.getActionsOutsidePackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2, action3}));
-		results = pkgMgr.getActionsOutsidePackage("PkgA");
+		results = pkgMemberMgr.getActionsOutsidePackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2, action3}));
 
 		/* add another action to pkgA */
-		pkgMgr.setActionPackage(action3, pkgA);
-		results = pkgMgr.getActionsInPackage(pkgA);
+		pkgMemberMgr.setActionPackage(action3, pkgA);
+		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
-		results = pkgMgr.getActionsInPackage("PkgA");
+		results = pkgMemberMgr.getActionsInPackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
-		results = pkgMgr.getActionsOutsidePackage(pkgA);
+		results = pkgMemberMgr.getActionsOutsidePackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
-		results = pkgMgr.getActionsOutsidePackage("PkgA");
+		results = pkgMemberMgr.getActionsOutsidePackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 
 		/* Add a third */
-		pkgMgr.setActionPackage(action2, pkgA);
-		results = pkgMgr.getActionsInPackage(pkgA);
+		pkgMemberMgr.setActionPackage(action2, pkgA);
+		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
-		results = pkgMgr.getActionsInPackage("PkgA");
+		results = pkgMemberMgr.getActionsInPackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
-		results = pkgMgr.getActionsOutsidePackage(pkgA);
+		results = pkgMemberMgr.getActionsOutsidePackage(pkgA);
 		assertEquals(0, results.size());
-		results = pkgMgr.getActionsOutsidePackage("PkgA");
+		results = pkgMemberMgr.getActionsOutsidePackage("PkgA");
 		assertEquals(0, results.size());
 
 		/* move the second action into pkgB */
-		pkgMgr.setActionPackage(action2, pkgB);
-		results = pkgMgr.getActionsInPackage(pkgA);
+		pkgMemberMgr.setActionPackage(action2, pkgB);
+		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
-		results = pkgMgr.getActionsInPackage("PkgA");
+		results = pkgMemberMgr.getActionsInPackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
-		results = pkgMgr.getActionsInPackage(pkgB);
+		results = pkgMemberMgr.getActionsInPackage(pkgB);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
-		results = pkgMgr.getActionsInPackage("PkgB");
+		results = pkgMemberMgr.getActionsInPackage("PkgB");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
-		results = pkgMgr.getActionsOutsidePackage(pkgA);
+		results = pkgMemberMgr.getActionsOutsidePackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
-		results = pkgMgr.getActionsOutsidePackage("PkgA");
+		results = pkgMemberMgr.getActionsOutsidePackage("PkgA");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
-		results = pkgMgr.getActionsOutsidePackage(pkgB);
+		results = pkgMemberMgr.getActionsOutsidePackage(pkgB);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
-		results = pkgMgr.getActionsOutsidePackage("PkgB");
+		results = pkgMemberMgr.getActionsOutsidePackage("PkgB");
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		
 		/* try some bad package names */
-		assertNull(pkgMgr.getActionsInPackage("badname"));
-		assertNull(pkgMgr.getActionsInPackage("PkgA/private"));
-		assertNull(pkgMgr.getActionsInPackage(""));		
+		assertNull(pkgMemberMgr.getActionsInPackage("badname"));
+		assertNull(pkgMemberMgr.getActionsInPackage("PkgA/private"));
+		assertNull(pkgMemberMgr.getActionsInPackage(""));		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -932,15 +934,25 @@ public class TestPackageMgr {
 	@Test
 	public void testNotify() {
 
-		/* set up a listener */
-		IPackageMgrListener listener = new IPackageMgrListener() {
+		/* set up a listener for the pkgMgr */
+		IPackageMgrListener pkgListener = new IPackageMgrListener() {
 			@Override
 			public void packageChangeNotification(int pkgId, int how) {
 				TestPackageMgr.this.notifyPkgValue = pkgId;
 				TestPackageMgr.this.notifyHowValue = how;
 			}
 		};
-		pkgMgr.addListener(listener);
+		pkgMgr.addListener(pkgListener);
+
+		/* set up a listener for the pkgMemberMgr */
+		IPackageMemberMgrListener pkgMemberListener = new IPackageMemberMgrListener() {
+			@Override
+			public void packageMemberChangeNotification(int pkgId, int how) {
+				TestPackageMgr.this.notifyPkgValue = pkgId;
+				TestPackageMgr.this.notifyHowValue = how;
+			}
+		};
+		pkgMemberMgr.addListener(pkgMemberListener);
 
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
@@ -970,19 +982,19 @@ public class TestPackageMgr {
 		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
 		int pkgD = pkgMgr.addPackage("PkgD");
 		assert(actionId >= 0);
-		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionId, pkgD));
 		assertEquals(pkgD, notifyPkgValue);
-		assertEquals(IPackageMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
+		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
 		
 		/* Changing it to the same thing, will not */
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionId, pkgD));
 		assertEquals(0, notifyPkgValue);
 		assertEquals(0, notifyHowValue);		
 
-		/* remove the listener, and change the package again */
-		pkgMgr.removeListener(listener);
+		/* remove the pkgListener, and change the package again */
+		pkgMgr.removeListener(pkgListener);
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
 		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgC"));
@@ -990,7 +1002,7 @@ public class TestPackageMgr {
 		assertEquals(0, notifyHowValue);
 		
 		/* add the listener back, then remove the package */
-		pkgMgr.addListener(listener);
+		pkgMgr.addListener(pkgListener);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
 		assertEquals(pkgA, notifyPkgValue);
 		assertEquals(IPackageMgrListener.REMOVED_PACKAGE, notifyHowValue);		

@@ -24,6 +24,7 @@ import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
 import com.buildml.eclipse.utils.dnd.BuildMLTransferType;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -53,7 +54,10 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	
 	/** The PackageMgr associated with the BuildStore */
 	private IPackageMgr pkgMgr;
-	
+
+	/** The PackageMemberMgr associated with the BuildStore */
+	private IPackageMemberMgr pkgMemberMgr;
+
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -72,6 +76,7 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		this.mainEditor = outlinePage.getMainEditor();
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = this.buildStore.getPackageMgr();
+		this.pkgMemberMgr = this.buildStore.getPackageMemberMgr();
 	
 		/* register ourselves with the drag/drop framework - we can receive drops */
 		treeViewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
@@ -200,7 +205,7 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		}
 		
 		/* determine the action's current package */
-		int currentPackageId = pkgMgr.getActionPackage(droppedActionId);
+		int currentPackageId = pkgMemberMgr.getActionPackage(droppedActionId);
 		if (currentPackageId == ErrorCode.NOT_FOUND) {
 			return false;
 		}

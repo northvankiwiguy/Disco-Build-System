@@ -14,6 +14,7 @@ package com.buildml.model.types;
 
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.utils.errors.ErrorCode;
@@ -95,6 +96,7 @@ public class FileSet extends IntegerTreeSet  {
 		
 		IBuildStore buildStore = fileMgr.getBuildStore();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 
 		/* for each path provided as input... */
@@ -119,14 +121,14 @@ public class FileSet extends IntegerTreeSet  {
 				String commandArgs = thisPath.substring(slashIndex + 1);
 				
 				if (commandName.equals("p") || commandName.equals("pkg")){
-					FileSet results = pkgMgr.getFilesInPackage(commandArgs);
+					FileSet results = pkgMemberMgr.getFilesInPackage(commandArgs);
 					if (results == null) {
 						return ErrorCode.BAD_PATH;
 					}
 					mergeSet(results);
 				}
 				else if (commandName.equals("np") || (commandName.equals("not-pkg"))){
-					FileSet results = pkgMgr.getFilesOutsidePackage(commandArgs);
+					FileSet results = pkgMemberMgr.getFilesOutsidePackage(commandArgs);
 					if (results == null) {
 						return ErrorCode.BAD_PATH;
 					}

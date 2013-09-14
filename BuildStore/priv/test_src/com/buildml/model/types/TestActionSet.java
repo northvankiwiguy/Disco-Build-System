@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -340,9 +341,10 @@ public class TestActionSet {
 		
 		/* create a package, add a couple of actions to it, then query the package */
 		IPackageMgr pkgMgr = bs.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = bs.getPackageMemberMgr();
 		int fooPkgId = pkgMgr.addPackage("foo");
-		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(actionA1, fooPkgId));
-		assertEquals(ErrorCode.OK, pkgMgr.setActionPackage(actionA2, fooPkgId));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionA1, fooPkgId));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionA2, fooPkgId));
 		
 		ts = new ActionSet(actionMgr);
 		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { "%pkg/foo" }));

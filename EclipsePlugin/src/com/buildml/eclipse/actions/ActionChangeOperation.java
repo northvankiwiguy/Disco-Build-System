@@ -20,7 +20,7 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IActionMgr;
-import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMemberMgr;
 
 /**
  * An undo/redo operation for any change that is made to an Action. This object records
@@ -161,12 +161,12 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	 */
 	@Override
 	protected IStatus undo() throws ExecutionException {
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
-			pkgMgr.setActionPackage(actionId, oldPackage);
+			pkgMemberMgr.setActionPackage(actionId, oldPackage);
 		}
 
 		/* if the action's command needs to change... */
@@ -196,12 +196,12 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	 */
 	@Override
 	protected IStatus redo() throws ExecutionException {
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
 
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
-			pkgMgr.setActionPackage(actionId, newPackage);
+			pkgMemberMgr.setActionPackage(actionId, newPackage);
 		}
 		
 		/* if the action's command needs to change... */

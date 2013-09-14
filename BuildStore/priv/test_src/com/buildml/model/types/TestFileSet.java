@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
@@ -42,6 +43,7 @@ public class TestFileSet {
 	/** Our test manager objects */
 	private IFileMgr fileMgr;
 	private IPackageMgr pkgMgr;
+	private IPackageMemberMgr pkgMemberMgr;
 	private IPackageRootMgr pkgRootMgr;
 
 	/*-------------------------------------------------------------------------------------*/
@@ -82,6 +84,7 @@ public class TestFileSet {
 		bs = CommonTestUtils.getEmptyBuildStore();
 		fileMgr = bs.getFileMgr();
 		pkgMgr = bs.getPackageMgr();
+		pkgMemberMgr = bs.getPackageMemberMgr();
 		pkgRootMgr = bs.getPackageRootMgr();
 		fs = new FileSet(fileMgr);
 	}
@@ -495,12 +498,12 @@ public class TestFileSet {
 		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkgFooId = pkgMgr.addPackage("foo");
-		int sectPublic = pkgMgr.getScopeId("public");
-		int sectPrivate = pkgMgr.getScopeId("private");
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f1path, pkgFooId, sectPublic));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f2path, pkgFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f4path, pkgFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, pkgMgr.setFilePackage(f5path, pkgFooId, sectPrivate));
+		int sectPublic = pkgMemberMgr.getScopeId("public");
+		int sectPrivate = pkgMemberMgr.getScopeId("private");
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f1path, pkgFooId, sectPublic));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f2path, pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f4path, pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f5path, pkgFooId, sectPrivate));
 		
 		/* test @foo/public membership */
 		FileSet fs10 = new FileSet(fileMgr);

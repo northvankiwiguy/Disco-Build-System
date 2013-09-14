@@ -359,6 +359,7 @@ public class TestReportMgr2 {
 		/* create a new package set and add some packages */
 		PackageSet cs = new PackageSet(bs);
 		IPackageMgr pkgMgr = bs.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = bs.getPackageMemberMgr();
 		int pkg1Id = pkgMgr.addPackage("Pkg1");
 		int pkg2Id = pkgMgr.addPackage("Pkg2");		
 		int pkg3Id = pkgMgr.addPackage("Pkg3");
@@ -383,14 +384,14 @@ public class TestReportMgr2 {
 		assertEquals(0, fs.size());
 		
 		/* map the files into packages */
-		pkgMgr.setFilePackage(file1, pkg1Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file2, pkg1Id, IPackageMgr.SCOPE_PUBLIC);
-		pkgMgr.setFilePackage(file3, pkg2Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file4, pkg2Id, IPackageMgr.SCOPE_PUBLIC);
-		pkgMgr.setFilePackage(file5, pkg3Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file6, pkg3Id, IPackageMgr.SCOPE_PUBLIC);
-		pkgMgr.setFilePackage(file7, pkg4Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMgr.setFilePackage(file8, pkg4Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setFilePackage(file1, pkg1Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setFilePackage(file2, pkg1Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setFilePackage(file3, pkg2Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setFilePackage(file4, pkg2Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setFilePackage(file5, pkg3Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setFilePackage(file6, pkg3Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setFilePackage(file7, pkg4Id, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setFilePackage(file8, pkg4Id, IPackageMgr.SCOPE_PUBLIC);
 	
 		/* empty package set still gives an empty FileSet */
 		fs = reports.reportFilesFromPackageSet(cs);
@@ -450,6 +451,7 @@ public class TestReportMgr2 {
 		/* create a new package set and add some packages */
 		PackageSet cs = new PackageSet(bs);
 		IPackageMgr pkgMgr = bs.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = bs.getPackageMemberMgr();
 		int pkg1Id = pkgMgr.addPackage("Pkg1");
 		int pkg2Id = pkgMgr.addPackage("Pkg2");		
 		int pkg3Id = pkgMgr.addPackage("Pkg3");
@@ -474,14 +476,14 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* map the actions into packages */
-		pkgMgr.setActionPackage(action1, pkg1Id);
-		pkgMgr.setActionPackage(action2, pkg2Id);
-		pkgMgr.setActionPackage(action3, pkg3Id);
-		pkgMgr.setActionPackage(action4, pkg4Id);
-		pkgMgr.setActionPackage(action5, pkg1Id);
-		pkgMgr.setActionPackage(action6, pkg2Id);
-		pkgMgr.setActionPackage(action7, pkg3Id);
-		pkgMgr.setActionPackage(action8, pkg4Id);
+		pkgMemberMgr.setActionPackage(action1, pkg1Id);
+		pkgMemberMgr.setActionPackage(action2, pkg2Id);
+		pkgMemberMgr.setActionPackage(action3, pkg3Id);
+		pkgMemberMgr.setActionPackage(action4, pkg4Id);
+		pkgMemberMgr.setActionPackage(action5, pkg1Id);
+		pkgMemberMgr.setActionPackage(action6, pkg2Id);
+		pkgMemberMgr.setActionPackage(action7, pkg3Id);
+		pkgMemberMgr.setActionPackage(action8, pkg4Id);
 
 		/* empty package set still gives an empty ActionSet */
 		tset = reports.reportActionsFromPackageSet(cs);

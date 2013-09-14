@@ -32,9 +32,6 @@ public interface IPackageMgrListener {
 	/** value of "how" if a package is deleted */
 	public static final int REMOVED_PACKAGE = 4;
 	
-	/** the package membership has changed in some way */
-	public static final int CHANGED_MEMBERSHIP = 5;
-	
 	/**
 	 * Called to notify the listener that the specified package has changed.
 	 * 

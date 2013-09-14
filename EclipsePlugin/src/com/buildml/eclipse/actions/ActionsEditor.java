@@ -55,6 +55,7 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.PackageSet;
@@ -210,7 +211,7 @@ public class ActionsEditor extends ImportSubEditor implements IPackageMgrListene
 		ActionsEditorLabelCol1Provider labelProviderCol1 = 
 				new ActionsEditorLabelCol1Provider(this, actionMgr);
 		ActionsEditorLabelCol2Provider labelProviderCol2 = 
-				new ActionsEditorLabelCol2Provider(this, buildStore.getPackageMgr());
+				new ActionsEditorLabelCol2Provider(this, buildStore);
 		actionsTreeViewer.setContentProvider(contentProvider);
 		treeColumn.setLabelProvider(labelProviderCol1);
 		pkgColumn.setLabelProvider(labelProviderCol2);
@@ -563,7 +564,7 @@ public class ActionsEditor extends ImportSubEditor implements IPackageMgrListene
 	@Override
 	public void packageChangeNotification(int pkgId, int how) {
 
-		if (how == IPackageMgrListener.CHANGED_MEMBERSHIP) {
+		if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
 
 			/*
 			 * Schedule the editor content (TreeViewer) to be refreshed with the new

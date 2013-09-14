@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.PackageSet;
 
@@ -100,6 +101,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 			super(parent, 0);
 			
 			final IPackageMgr pkgMgr = pkgSet.getBuildStore().getPackageMgr();
+			final IPackageMemberMgr pkgMemberMgr = pkgSet.getBuildStore().getPackageMemberMgr();
 			
 			/* get the scope name, and prepare for a checkbox for each */
 			checkBoxes = new Button[IPackageMgr.SCOPE_MAX];
@@ -135,7 +137,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 				/* the scope check boxes are on the right side */
 				final Button newButton = new Button(this, SWT.CHECK);
 				if (showScopes) {
-					newButton.setText(pkgMgr.getScopeName(i + 1));
+					newButton.setText(pkgMemberMgr.getScopeName(i + 1));
 				} else {
 					newButton.setText("Show");					
 				}
@@ -151,7 +153,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 						String buttonText = button.getText();
 						int scopeId;
 						if (showScopes) {
-							scopeId = pkgMgr.getScopeId(buttonText);
+							scopeId = pkgMemberMgr.getScopeId(buttonText);
 						} else {
 							scopeId = IPackageMgr.SCOPE_PUBLIC;
 						}

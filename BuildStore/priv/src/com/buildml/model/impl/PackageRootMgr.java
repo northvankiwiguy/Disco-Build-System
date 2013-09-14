@@ -22,6 +22,7 @@ import java.util.List;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
@@ -48,6 +49,9 @@ public class PackageRootMgr implements IPackageRootMgr {
 
 	/** The associated PackageMgr */
 	private IPackageMgr pkgMgr;
+
+	/** The associated PackageMemberMgr */
+	private IPackageMemberMgr pkgMemberMgr;
 
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
@@ -100,6 +104,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 		this.buildStore = buildStore;
 		this.fileMgr = buildStore.getFileMgr();
 		this.pkgMgr = buildStore.getPackageMgr();
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 		this.db = buildStore.getBuildStoreDB();
 		
 		/* initialize map of root -> native path mappings */
@@ -313,7 +318,7 @@ public class PackageRootMgr implements IPackageRootMgr {
 		}
 
 		/* test that all paths in the package are below the new proposed package root */
-		FileSet memberPaths = pkgMgr.getFilesInPackage(packageId);
+		FileSet memberPaths = pkgMemberMgr.getFilesInPackage(packageId);
 		for (int memberPathId : memberPaths) {
 			if ((memberPathId != rootPathId) && 
 				(!fileMgr.isAncestorOf(rootPathId, memberPathId))) {

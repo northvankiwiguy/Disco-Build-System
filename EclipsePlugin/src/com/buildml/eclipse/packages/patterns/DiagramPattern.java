@@ -29,6 +29,7 @@ import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 
@@ -50,8 +51,8 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	/** The IBuildStore that this diagram represents */
 	private IBuildStore buildStore;
 	
-	/** The IPackageMgr in this BuildStore */
-	private IPackageMgr pkgMgr;
+	/** The IPackageMemberMgr in this BuildStore */
+	private IPackageMemberMgr pkgMemberMgr;
 	
 	/** The IActionMgr in this BuildStore */
 	private IActionMgr actionMgr;	
@@ -141,7 +142,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		/* determine our editor and BuildStore */
 		editor = (PackageDiagramEditor)getDiagramEditor();
 		buildStore = editor.getBuildStore();
-		pkgMgr = buildStore.getPackageMgr();
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		actionMgr = buildStore.getActionMgr();
 		pkgId = editor.getPackageId();
 		
@@ -157,7 +158,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 			protected void doExecute() {
 				
 				/* fetch the complete list of actions in this package */
-				ActionSet actions = pkgMgr.getActionsInPackage(pkgId);
+				ActionSet actions = pkgMemberMgr.getActionsInPackage(pkgId);
 				int row = 0, column = 0;
 				for (int actionId : actions) {
 					UIAction newAction = new UIAction(actionId);

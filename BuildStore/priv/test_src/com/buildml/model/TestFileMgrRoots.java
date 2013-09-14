@@ -32,6 +32,7 @@ public class TestFileMgrRoots {
 	/** The managers associated with this BuildStore */
 	private IFileMgr fileMgr;
 	private IPackageMgr pkgMgr;
+	private IPackageMemberMgr pkgMemberMgr;
 	private IPackageRootMgr pkgRootMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -47,6 +48,7 @@ public class TestFileMgrRoots {
 		/* fetch the associated FileMgr, PackageMgr and PackageRootMgr */
 		fileMgr = bs.getFileMgr();
 		pkgMgr = bs.getPackageMgr();
+		pkgMemberMgr = bs.getPackageMemberMgr();
 		pkgRootMgr = bs.getPackageRootMgr();
 	}
 
@@ -136,19 +138,19 @@ public class TestFileMgrRoots {
 		
 		/* now add path1 (e.h) into this new package and test again */
 		assertEquals(ErrorCode.OK, 
-					 pkgMgr.setFilePackage(path1, pkgAId, IPackageMgr.SCOPE_PUBLIC));
+					 pkgMemberMgr.setFilePackage(path1, pkgAId, IPackageMgr.SCOPE_PUBLIC));
 		assertEquals("@pkgA_src/d/e.h", fileMgr.getPathName(path1, true));
 		assertEquals("@workspace/c/d/f.h", fileMgr.getPathName(path2, true));
 
 		/* now add path2 (f.h) into this new package and test again */
 		assertEquals(ErrorCode.OK, 
-					pkgMgr.setFilePackage(path2, pkgAId, IPackageMgr.SCOPE_PUBLIC));
+					pkgMemberMgr.setFilePackage(path2, pkgAId, IPackageMgr.SCOPE_PUBLIC));
 		assertEquals("@pkgA_src/d/e.h", fileMgr.getPathName(path1, true));
 		assertEquals("@pkgA_src/d/f.h", fileMgr.getPathName(path2, true));
 
 		/* remove path1 from the package */
 		assertEquals(ErrorCode.OK, 
-				 pkgMgr.setFilePackage(path1, pkgMgr.getImportPackage(), 
+				 pkgMemberMgr.setFilePackage(path1, pkgMgr.getImportPackage(), 
 						               IPackageMgr.SCOPE_PUBLIC));
 		assertEquals("@workspace/c/d/e.h", fileMgr.getPathName(path1, true));
 		assertEquals("@pkgA_src/d/f.h", fileMgr.getPathName(path2, true));

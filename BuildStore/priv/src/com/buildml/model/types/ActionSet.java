@@ -14,6 +14,7 @@ package com.buildml.model.types;
 
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.utils.errors.ErrorCode;
@@ -163,6 +164,7 @@ public class ActionSet extends IntegerTreeSet {
 	
 		IBuildStore bs = actionMgr.getBuildStore();
 		IPackageMgr pkgMgr = bs.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = bs.getPackageMemberMgr();
 		
 		/* 
 		 * Process each action spec in turn. They're mostly independent, although
@@ -193,14 +195,14 @@ public class ActionSet extends IntegerTreeSet {
 				String commandArgs = actionSpec.substring(slashIndex + 1);
 				
 				if (commandName.equals("p") || commandName.equals("pkg")){
-					ActionSet pkgActionSet = pkgMgr.getActionsInPackage(commandArgs);
+					ActionSet pkgActionSet = pkgMemberMgr.getActionsInPackage(commandArgs);
 					if (pkgActionSet == null) {
 						return ErrorCode.BAD_VALUE;
 					}
 					mergeSet(pkgActionSet);
 				}
 				else if (commandName.equals("np") || (commandName.equals("not-pkg"))){
-					ActionSet pkgActionSet = pkgMgr.getActionsOutsidePackage(commandArgs);
+					ActionSet pkgActionSet = pkgMemberMgr.getActionsOutsidePackage(commandArgs);
 					if (pkgActionSet == null) {
 						return ErrorCode.BAD_VALUE;
 					}

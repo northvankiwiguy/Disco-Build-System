@@ -22,10 +22,10 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
-import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.print.PrintUtils;
@@ -206,18 +206,18 @@ public class CliUtils {
 	 * that all actions are displayed, you should first call ActionSet.populateWithParents().
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param actionMgr The ActionMgr object containing the action information.
-	 * @param fileMgr The FileMgr object containing file name information.
-	 * @param pkgMgr The PackageMgr object containing package information.
+	 * @param buildStore The database containing the action information.
 	 * @param resultActionSet The set of actions to be displayed (the results of some previous query).
 	 * @param filterActionSet The set of actions to actually be displayed (for post-filtering the query results).
 	 * @param outputFormat Mode for formatting the command strings.
 	 * @param showPkgs Set to true if the package names should be shown.
 	 */
 	public static void printActionSet(
-			PrintStream outStream, IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr,
+			PrintStream outStream, IBuildStore buildStore,
 			ActionSet resultActionSet, ActionSet filterActionSet, DisplayWidth outputFormat,
 			boolean showPkgs) {
+		
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		
 		/* 
 		 * We always start at the top root, even though we may only display a subset
@@ -228,7 +228,7 @@ public class CliUtils {
 		/* call the helper function to display each of our children */
 		Integer children[] = actionMgr.getChildren(topRoot);
 		for (int i = 0; i < children.length; i++) {
-			printActionSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
+			printActionSetHelper(outStream, buildStore, children[i], 
 					resultActionSet, filterActionSet, outputFormat, showPkgs, 1);
 		}
 	}
@@ -269,17 +269,19 @@ public class CliUtils {
 	 * This method may abort the whole program (never returning) if the input string
 	 * is invalid.
 	 * 
-	 * @param pkgMgr The PackageMgr object containing the package information.
+	 * @param buildStore The IBuildStore containing the package information.
 	 * @param pkgString The user-supplied input string (could be anything).
 	 * @param scopeAllowed True if the input string is allowed to provide a scope name. 
 	 * @return An array of two integers. The first is the package's ID number,
 	 * and the second is the scope's ID number.
 	 */
 	public static int[] parsePackageAndScope(
-			IPackageMgr pkgMgr,
+			IBuildStore buildStore,
 			String pkgString, 
 			boolean scopeAllowed) {
 	
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		String pkgName = null;
 		String scopeName = null;
 		
@@ -301,7 +303,7 @@ public class CliUtils {
 
 		/* compute the IDs */
 		int pkgId = pkgMgr.getId(pkgName);
-		int scopeId = pkgMgr.getScopeId(scopeName);
+		int scopeId = pkgMemberMgr.getScopeId(scopeName);
 		
 		if (pkgId == ErrorCode.NOT_FOUND) {
 			CliUtils.reportErrorAndExit("Unknown package: " + pkgName);
@@ -463,6 +465,7 @@ public class CliUtils {
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		
 		/* StringBuilders for forming the package name and the root names */
@@ -496,7 +499,7 @@ public class CliUtils {
 			pkgString = new StringBuilder();
 			
 			/* fetch the file's package and scope */
-			Integer pkgAndScopeId[] = pkgMgr.getFilePackage(thisPathId);
+			Integer pkgAndScopeId[] = pkgMemberMgr.getFilePackage(thisPathId);
 			if (pkgAndScopeId == null) {
 				pkgString.append("Invalid file");
 			} 
@@ -507,7 +510,7 @@ public class CliUtils {
 				int scopeId = pkgAndScopeId[1];
 
 				String pkgName = pkgMgr.getName(pkgId);
-				String scopeName = pkgMgr.getScopeName(scopeId);
+				String scopeName = pkgMemberMgr.getScopeName(scopeId);
 			
 				/* if we can't fetch the text name of the package or scope... */
 				if (pkgName == null || scopeName == null) {
@@ -589,9 +592,7 @@ public class CliUtils {
 	 * as it traverses the ActionSet's tree structure.
 	 * 
 	 * @param outStream The PrintStream on which to display the output.
-	 * @param actionMgr The ActionMgr object containing the action information.
-	 * @param fileMgr The FileMgr object containing file name information.
-	 * @param pkgMgr The PackageMgr object containing the package information.
+	 * @param buildStore The database containing file, action and package information.
 	 * @param actionId The ID of the action we're currently displaying (at this level of recursion).
 	 * @param resultActionSet The full set of actions to be displayed (the result of some previous query).
 	 * @param filterActionSet The set of actions to actually be displayed (for post-filtering the query results).
@@ -599,11 +600,15 @@ public class CliUtils {
 	 * @param showPkgs Set to true if we should display package names.
 	 * @param indentLevel The number of spaces to indent this action by (at this recursion level).
 	 */
-	private static void printActionSetHelper(PrintStream outStream,
-			IActionMgr actionMgr, IFileMgr fileMgr, IPackageMgr pkgMgr, 
+	private static void printActionSetHelper(PrintStream outStream, IBuildStore buildStore, 
 			int actionId, ActionSet resultActionSet, ActionSet filterActionSet, 
 			DisplayWidth outputFormat, boolean showPkgs, int indentLevel) {
 	
+		IActionMgr actionMgr = buildStore.getActionMgr();
+		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
+		
 		/* 
 		 * Display the current action, at the appropriate indentation level. The format is:
 		 * 
@@ -648,7 +653,7 @@ public class CliUtils {
 		
 		/* if requested, display the action's package name */
 		if (showPkgs) {
-			int pkgId = pkgMgr.getActionPackage(actionId);
+			int pkgId = pkgMemberMgr.getActionPackage(actionId);
 			if (pkgId == ErrorCode.NOT_FOUND) {
 				outStream.print(" - Invalid action");
 			} else {
@@ -673,7 +678,7 @@ public class CliUtils {
 		/* recursively call ourselves to display each of our children */
 		Integer children[] = actionMgr.getChildren(actionId);
 		for (int i = 0; i < children.length; i++) {
-			printActionSetHelper(outStream, actionMgr, fileMgr, pkgMgr, children[i], 
+			printActionSetHelper(outStream, buildStore, children[i], 
 					resultActionSet, filterActionSet, outputFormat, showPkgs, indentLevel + 1);
 		}
 		

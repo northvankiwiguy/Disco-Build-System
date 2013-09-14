@@ -19,7 +19,7 @@ import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -104,14 +104,14 @@ public class CliCommandSetFilePkg implements ICliCommand {
 						"You must specify a package name and a path-spec.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 
 		/* 
 		 * The package can be of the form: "pkg" or "pkg/scope". If scope
 		 * isn't specified, "private" will be used.
 		 */
 		String pkgName = args[0];
-		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(pkgMgr, pkgName, true);
+		int pkgAndScopeIds[] = CliUtils.parsePackageAndScope(buildStore, pkgName, true);
 		int pkgId = pkgAndScopeIds[0];
 		int scopeId = pkgAndScopeIds[1];
 
@@ -123,7 +123,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 		boolean errorOccurred = false;
 		buildStore.setFastAccessMode(true);
 		for (int file : filesToSet) {
-			int rc = pkgMgr.setFilePackage(file, pkgId, scopeId);
+			int rc = pkgMemberMgr.setFilePackage(file, pkgId, scopeId);
 			if (rc == ErrorCode.OUT_OF_RANGE) {
 				System.err.println("Unable to move file " + fileMgr.getPathName(file) + 
 									" into package " + pkgName + ". It is not within the package root.");

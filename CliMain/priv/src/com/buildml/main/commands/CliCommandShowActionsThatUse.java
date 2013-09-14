@@ -17,11 +17,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.buildml.main.CliUtils;
-import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
-import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
@@ -151,9 +149,7 @@ public class CliCommandShowActionsThatUse extends CliCommandShowActions {
 						"A colon-separated list of path-specs must be provided.");
 
 		IFileMgr fileMgr = buildStore.getFileMgr();
-		IActionMgr actionMgr = buildStore.getActionMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
 
 		/* are we searching for reads, writes, or both? */
 		OperationType opType = CliUtils.getOperationType(optionRead, optionWrite, 
@@ -168,7 +164,7 @@ public class CliCommandShowActionsThatUse extends CliCommandShowActions {
 		actionSet.populateWithParents();
 
 		/* display the resulting set of actions */
-		CliUtils.printActionSet(System.out, actionMgr, fileMgr, pkgMgr, actionSet, 
+		CliUtils.printActionSet(System.out, buildStore, actionSet, 
 										filterActionSet, outputFormat, optionShowPkgs);
 	}
 

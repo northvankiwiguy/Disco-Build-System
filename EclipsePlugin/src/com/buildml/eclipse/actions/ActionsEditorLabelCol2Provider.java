@@ -18,6 +18,8 @@ import org.eclipse.swt.graphics.Image;
 
 import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -38,7 +40,13 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 	 * the BuildStore.
 	 */
 	private IPackageMgr pkgMgr;
-	
+
+	/** 
+	 * The Packages Member Manager object we'll use for querying file information from 
+	 * the BuildStore.
+	 */
+	private IPackageMemberMgr pkgMemberMgr;
+
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -47,10 +55,11 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 	 * Construct a new ActionsEditorLabelCol1Provider object, which provides text and image
 	 * labels for the FilesEditor class.
 	 * @param editor The editor that we're providing text/images for.
-	 * @param pkgMgr The Packages object containing path component information.
+	 * @param buildStore The buildStore containing path component information.
 	 */
-	public ActionsEditorLabelCol2Provider(ISubEditor editor, IPackageMgr pkgMgr) {
-		this.pkgMgr = pkgMgr;
+	public ActionsEditorLabelCol2Provider(ISubEditor editor, IBuildStore buildStore) {
+		this.pkgMgr = buildStore.getPackageMgr();
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 	}
 
 	/*=====================================================================================*
@@ -78,7 +87,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 		if (element instanceof UIAction) {
 			UIAction uiAction = (UIAction)element;
 			int actionId = uiAction.getId();
-			int pkgId = pkgMgr.getActionPackage(actionId);
+			int pkgId = pkgMemberMgr.getActionPackage(actionId);
 			if (pkgId == ErrorCode.NOT_FOUND) {
 				return "<invalid>";
 			}

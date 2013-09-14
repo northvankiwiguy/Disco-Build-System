@@ -15,6 +15,7 @@ package com.buildml.main.commands;
 import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileRecord;
@@ -81,6 +82,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 
 		/* fetch the list of most popular files */
 		FileRecord results[] = reportMgr.reportMostCommonlyAccessedFiles();
@@ -94,9 +96,9 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 				
 				/* should we show package names? */
 				if (optionShowPkgs) {
-					Integer cmptScopeIds[] = pkgMgr.getFilePackage(id);
+					Integer cmptScopeIds[] = pkgMemberMgr.getFilePackage(id);
 					String cmptName = pkgMgr.getName(cmptScopeIds[0]);
-					String sectName = pkgMgr.getScopeName(cmptScopeIds[1]);
+					String sectName = pkgMemberMgr.getScopeName(cmptScopeIds[1]);
 					System.out.println(count + "\t" + pathName + "  (" + cmptName + "/" + sectName + ")");
 				}
 				

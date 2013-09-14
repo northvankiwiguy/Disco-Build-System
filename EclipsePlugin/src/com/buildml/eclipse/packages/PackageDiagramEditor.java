@@ -29,10 +29,11 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.PackageSet;
-import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**
@@ -53,15 +54,15 @@ public class PackageDiagramEditor extends DiagramEditor
 
 	/** The PackageMgr we're using for package information */
 	private IPackageMgr pkgMgr = null;
-	
+
+	/** The PackageMgr we're using for package membership */
+	private IPackageMemberMgr pkgMemberMgr = null;
+
 	/** The ActionMgr we're using for action information */
 	private IActionMgr actionMgr = null;
 	
 	/** The ID of the package we're displaying */
 	private int packageId;
-	
-	/** The textual name of this package */
-	private String pkgName = null;
 
 	/** The delegate object that Graphiti queries to see if our underlying model has changed */
 	private PackageEditorUpdateBehavior updateBehavior;
@@ -82,6 +83,7 @@ public class PackageDiagramEditor extends DiagramEditor
 		/* Save away our BuildStore information, for later use */
 		this.buildStore = buildStore;
 		this.pkgMgr = buildStore.getPackageMgr();
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 		this.actionMgr = buildStore.getActionMgr();
 		this.packageId = packageId;
 		
@@ -358,7 +360,7 @@ public class PackageDiagramEditor extends DiagramEditor
 			}
 			
 			/* has the content of the package changed? Action/files added or removed? */
-			else if (how == IPackageMgrListener.CHANGED_MEMBERSHIP) {
+			else if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
 				updateBehavior.markChanged();
 			}
 		}
@@ -371,7 +373,7 @@ public class PackageDiagramEditor extends DiagramEditor
 	 */
 	@Override
 	public void actionChangeNotification(int actionId, int how) {
-		int pkgId = pkgMgr.getActionPackage(actionId);
+		int pkgId = pkgMemberMgr.getActionPackage(actionId);
 		if (pkgId != this.packageId) {
 			return;
 		}

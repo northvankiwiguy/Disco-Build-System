@@ -14,6 +14,7 @@ import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -45,6 +46,9 @@ public class ActionPropertyPage extends PropertyPage implements
 
 	/** The pkgMgr within the buildStore */
 	private IPackageMgr pkgMgr;
+	
+	/** The pkgMemberMgr within the buildStore */
+	private IPackageMemberMgr pkgMemberMgr;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -58,6 +62,7 @@ public class ActionPropertyPage extends PropertyPage implements
 		actionMgr = buildStore.getActionMgr();
 		actionTypeMgr = buildStore.getActionTypeMgr();
 		pkgMgr = buildStore.getPackageMgr();
+		pkgMemberMgr = buildStore.getPackageMemberMgr();		
 	}
  
 	/*=====================================================================================*
@@ -101,7 +106,7 @@ public class ActionPropertyPage extends PropertyPage implements
 		/* Display the package that the action belongs to */
 		Label actionPackageLabel = new Label(panel, SWT.NONE);
 		String packageName = "Invalid";
-		int pkgId = pkgMgr.getActionPackage(actionId);
+		int pkgId = pkgMemberMgr.getActionPackage(actionId);
 		if (pkgId != ErrorCode.NOT_FOUND) {
 			String packageNameString = pkgMgr.getName(pkgId);
 			if (packageNameString != null) {

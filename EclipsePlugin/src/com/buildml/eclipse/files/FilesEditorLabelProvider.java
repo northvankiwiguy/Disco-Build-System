@@ -29,6 +29,7 @@ import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 
@@ -48,6 +49,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 	/** The manager objects for this BuildStore */
 	private IFileMgr fileMgr;
 	private IPackageMgr pkgMgr;
+	private IPackageMemberMgr pkgMemberMgr;
 	private IPackageRootMgr pkgRootMgr;
 	
 	/** The ID of the top-root for our FileMgr object */
@@ -73,6 +75,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 		this.editor = editor;
 		this.fileMgr = buildStore.getFileMgr();
 		this.pkgMgr = buildStore.getPackageMgr();
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 		this.pkgRootMgr = buildStore.getPackageRootMgr();
 	
 		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
@@ -162,7 +165,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				
 			/* select text for the package column */
 			case 1:
-				Integer pkgInfo[] = pkgMgr.getFilePackage(pathId);
+				Integer pkgInfo[] = pkgMemberMgr.getFilePackage(pathId);
 				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
@@ -177,14 +180,14 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				
 			/* select text for the visibility column */
 			case 2:
-				pkgInfo = pkgMgr.getFilePackage(pathId);
+				pkgInfo = pkgMemberMgr.getFilePackage(pathId);
 				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
 				if (pkgInfo[1] == 0) {
 					return "";
 				}
-				String scopeName = pkgMgr.getScopeName(pkgInfo[1]);
+				String scopeName = pkgMemberMgr.getScopeName(pkgInfo[1]);
 				if (scopeName == null) {
 					break; /* return "invalid" */
 				}
