@@ -95,6 +95,15 @@ public interface IBuildStore {
 	public abstract IPackageMgr getPackageMgr();
 
 	/**
+	 * Fetch the PackagesMemberMgr associated with this BuildStore. This object
+	 * encapsulates knowledge of which actions, file groups and sub-packages
+	 * appear within each package.
+	 * 
+	 * @return A Packages member manager object.
+	 */
+	public abstract IPackageMemberMgr getPackageMemberMgr();
+
+	/**
 	 * Fetch the PackageRootMgr associated with this BuildStore. This object
 	 * encapsulates knowledge of the package roots and their location.
 	 * 

@@ -25,6 +25,7 @@ import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IReportMgr;
@@ -78,6 +79,9 @@ public class BuildStore implements IBuildStore {
 	
 	/** The Packages manager object we'll delegate work to. */
 	private IPackageMgr packages;
+	
+	/** The IPackageMemberMgr object we'll delegate work to. */
+	private IPackageMemberMgr pkgMemberMgr;
 	
 	/** The PackageRootMgr object we'll delegate work to */
 	private IPackageRootMgr pkgRootMgr;
@@ -153,6 +157,7 @@ public class BuildStore implements IBuildStore {
 		reportMgr = new ReportMgr(this);
 		fileAttrMgr = new FileAttributeMgr(this, fileMgr);
 		packages = new PackageMgr(this);
+		pkgMemberMgr = new PackageMemberMgr(this);
 		pkgRootMgr = new PackageRootMgr(this);
 		
 		/*
@@ -291,6 +296,16 @@ public class BuildStore implements IBuildStore {
 		return packages;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getPackageMemberMgr()
+	 */
+	@Override
+	public IPackageMemberMgr getPackageMemberMgr() {
+		return pkgMemberMgr;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
