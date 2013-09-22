@@ -17,6 +17,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -35,6 +37,7 @@ public class TestPackageMemberMgr {
 	private IPackageMemberMgr pkgMemberMgr;
 	private IPackageRootMgr pkgRootMgr;
 	private IFileMgr fileMgr;
+	private IFileGroupMgr fileGroupMgr;
 	private IActionMgr actionMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -50,6 +53,7 @@ public class TestPackageMemberMgr {
 		pkgMemberMgr = bs.getPackageMemberMgr();
 		pkgRootMgr = bs.getPackageRootMgr();
 		fileMgr = bs.getFileMgr();
+		fileGroupMgr = bs.getFileGroupMgr();
 		actionMgr = bs.getActionMgr();
 		
 		/* set the workspace root to /, so packages can be added anywhere */
@@ -149,6 +153,179 @@ public class TestPackageMemberMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test the setPackageOfMember() and getPackageOfMember() methods.
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetPackageOfMember() throws Exception {
+		
+		/* define some packages that members can belong to */
+		int pkgAId = pkgMgr.addPackage("PkgA");
+		assertTrue(pkgAId > 0);
+		int pkgBId = pkgMgr.addPackage("PkgB");
+		assertTrue(pkgBId > 0);
+		
+		/* add a new action, a new file, and a new file group */
+		int rootActionId = actionMgr.getRootAction("root");
+		int rootPathId = fileMgr.getPath("/");
+		int actionId = actionMgr.addShellCommandAction(rootActionId, rootPathId, "test");
+		assertTrue(actionId > 0);
+		int fileId = fileMgr.addFile("/a/b/c.java");
+		assertTrue(fileId > 0);
+		int fileGroupId = fileGroupMgr.newSourceGroup(pkgAId);
+		assertTrue(fileGroupId > 0);
+		
+		/* check that the action defaults to being in the <import> package, with scope "none" */
+		PackageDesc pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+		assertEquals(pkgMgr.getImportPackage(), pkgDesc.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, pkgDesc.pkgScopeId);
+
+		/* check that the file defaults to being in the <import> package, with scope "none" */
+		pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, fileId);
+		assertEquals(pkgMgr.getImportPackage(), pkgDesc.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, pkgDesc.pkgScopeId);
+		
+		/* check that the file group is in pkgA (where we initially put it) */		
+		pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, fileGroupId);
+		assertEquals(pkgAId, pkgDesc.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, pkgDesc.pkgScopeId);
+				
+		/* set/get the pkg/scope of the action */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, 
+						actionId, pkgAId, IPackageMemberMgr.SCOPE_NONE));
+		pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+		assertEquals(pkgAId, pkgDesc.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, pkgDesc.pkgScopeId);
+		
+		/* set/get the pkg/scope of the file */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, 
+						fileId, pkgBId, IPackageMemberMgr.SCOPE_PRIVATE));
+		pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, fileId);
+		assertEquals(pkgBId, pkgDesc.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PRIVATE, pkgDesc.pkgScopeId);
+		
+		/* set/get the pkg/scope of the file group */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, 
+						fileGroupId, pkgBId, IPackageMemberMgr.SCOPE_NONE));
+		pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, actionId);
+		assertEquals(pkgBId, pkgDesc.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, pkgDesc.pkgScopeId);
+
+		/* get/set package of invalid memberType (1000) */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.setPackageOfMember(1000, 
+						fileId, pkgBId, IPackageMemberMgr.SCOPE_PRIVATE));
+		pkgDesc = pkgMemberMgr.getPackageOfMember(1000, fileId);
+		assertNull(pkgDesc);
+		
+		/* 
+		 * get/set package of invalid memberId for memberType = file
+		 * (the same code is tested for other members)
+		 */
+		assertEquals(ErrorCode.NOT_FOUND, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, 
+								1000, pkgBId, IPackageMemberMgr.SCOPE_PRIVATE));
+		pkgDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, 1000);
+		assertNull(pkgDesc);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the getMembersInPackage() method
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetMembersInPackage() throws Exception {
+		
+		/* define some packages that members can belong to */
+		int pkgAId = pkgMgr.addPackage("PkgA");
+		assertTrue(pkgAId > 0);
+		int pkgBId = pkgMgr.addPackage("PkgB");
+		assertTrue(pkgBId > 0);
+		
+		int rootActionId = actionMgr.getRootAction("root");
+		int rootPathId = fileMgr.getPath("/");
+		int actionId = actionMgr.addShellCommandAction(rootActionId, rootPathId, "test");
+		assertTrue(actionId > 0);
+		int fileId = fileMgr.addFile("/a/b/c.java");
+		assertTrue(fileId > 0);
+		
+		/* initially there are no members, of any kind, in any scope, in either package */
+		MemberDesc[] members = pkgMemberMgr.getMembersInPackage(pkgAId, 
+				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertNull(members);
+		members = pkgMemberMgr.getMembersInPackage(pkgBId, 
+				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertNull(members);
+		
+		/* add a file to package A, private scope */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(
+										IPackageMemberMgr.MEMBER_TYPE_FILE, fileId, 
+										pkgAId, IPackageMemberMgr.SCOPE_PRIVATE));
+		
+		/* now there's one member in package A, and still none in package B */
+		members = pkgMemberMgr.getMembersInPackage(pkgAId, 
+								IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertEquals(1, members.length);
+		assertEquals(fileId, members[0].memberId);
+		assertEquals(IPackageMemberMgr.MEMBER_TYPE_FILE, members[0].memberType);
+		
+		members = pkgMemberMgr.getMembersInPackage(pkgBId, 
+								IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertNull(members);
+		
+		/* add an action into package A, and a file group in package B */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(
+				IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, 
+				pkgAId, IPackageMemberMgr.SCOPE_PUBLIC));
+		int fileGroupId = fileGroupMgr.newSourceGroup(pkgBId);
+		assertTrue(fileGroupId > 0);
+		
+		/* check package A membership, in any scope */
+		members = pkgMemberMgr.getMembersInPackage(pkgAId, 
+				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertEquals(2, members.length);
+		
+		/* check package A membership for public scope only */
+		members = pkgMemberMgr.getMembersInPackage(pkgAId, 
+				IPackageMemberMgr.SCOPE_PUBLIC, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertEquals(1, members.length);
+		assertEquals(actionId, members[0].memberId);
+		assertEquals(IPackageMemberMgr.MEMBER_TYPE_ACTION, members[0].memberType);
+
+		/* check package A for only files (not actions) */
+		members = pkgMemberMgr.getMembersInPackage(pkgAId, 
+				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_FILE);
+		assertEquals(1, members.length);
+		assertEquals(fileId, members[0].memberId);
+		assertEquals(IPackageMemberMgr.MEMBER_TYPE_FILE, members[0].memberType);
+		
+		/* check package B members, in any scope */
+		members = pkgMemberMgr.getMembersInPackage(pkgBId, 
+				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertEquals(1, members.length);
+		assertEquals(fileGroupId, members[0].memberId);
+		assertEquals(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, members[0].memberType);
+
+		/* check an undefined package */
+		members = pkgMemberMgr.getMembersInPackage(2345, 
+				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
+		assertNull(members);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the setMemberLocation() and getMemberLocation() methods
+	 * @throws Exception
+	 */
+	@Test
+	public void testSetMemberLocation() throws Exception {
+		//fail();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Test the setFilePackage and getFilePackage methods.

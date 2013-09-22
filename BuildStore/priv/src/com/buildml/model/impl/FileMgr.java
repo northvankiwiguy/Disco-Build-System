@@ -70,7 +70,8 @@ public class FileMgr implements IFileMgr {
 		findPathDetailsPrepStmt = null,
 		findPathIdFromParentPrepStmt = null,
 		trashPathPrepStmt = null,
-		pathIsTrashPrepStmt = null;
+		pathIsTrashPrepStmt = null,
+		insertPackageMemberPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -95,6 +96,7 @@ public class FileMgr implements IFileMgr {
 				"select id from files where parentId = ? and trashed = 0 and name != \"/\" order by name");
 		trashPathPrepStmt = db.prepareStatement("update files set trashed = ? where id = ?");
 		pathIsTrashPrepStmt = db.prepareStatement("select trashed from files where id = ?");
+		insertPackageMemberPrepStmt = db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
 		
 		/* 
 		 * Create an empty cache to record the most-recently accessed file name mapping, to save us from
@@ -798,6 +800,10 @@ public class FileMgr implements IFileMgr {
 	 * exists, but was of the wrong type.
 	 */
 	private int addChildOfPathHelper(int parentId, PathType pathType, String childName) {
+		
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		int lastRowId;
+		
 		/*
 		 * Search for the path ID and path type for a child of "parentId" that has
 		 * the name "childName". This is similar to the getChildOfPath() operation,
@@ -816,6 +822,21 @@ public class FileMgr implements IFileMgr {
 				insertChildPrepStmt.setInt(2, pathType.ordinal());
 				insertChildPrepStmt.setString(3, childName);
 				db.executePrepUpdate(insertChildPrepStmt);
+				
+				lastRowId = db.getLastRowID();
+				if (lastRowId >= MAX_FILES) {
+					throw new FatalBuildStoreError("Exceeded maximum file number: " + MAX_FILES);
+				}
+				
+				/* insert the default package membership values */
+				insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.MEMBER_TYPE_FILE);
+				insertPackageMemberPrepStmt.setInt(2, lastRowId);
+				insertPackageMemberPrepStmt.setInt(3, pkgMgr.getImportPackage());
+				insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
+				if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
+					throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
+				}
+				
 			} catch (SQLException e) {
 				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 			} catch (FatalBuildStoreError e) {
@@ -825,11 +846,7 @@ public class FileMgr implements IFileMgr {
 				 */
 				return ErrorCode.BAD_PATH;
 			}
-
-			int lastRowId = db.getLastRowID();
-			if (lastRowId >= MAX_FILES) {
-				throw new FatalBuildStoreError("Exceeded maximum file number: " + MAX_FILES);
-			}
+			
 			return lastRowId;
 		}
 		

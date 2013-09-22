@@ -28,6 +28,16 @@ import com.buildml.model.types.ActionSet;
 public interface IPackageMemberMgr {
 
 	/**
+	 * Numeric constants for type of package member.
+	 */
+	
+	public static final int MEMBER_TYPE_ANY 		= 0;
+	public static final int MEMBER_TYPE_FILE 		= 1;
+	public static final int MEMBER_TYPE_FILE_GROUP 	= 2;
+	public static final int MEMBER_TYPE_ACTION 		= 3;
+	public static final int MEMBER_TYPE_SUB_PACKAGE = 4;
+	
+	/**
 	 * Numeric constants for each of the scopes.
 	 */
 	public static final int SCOPE_NONE = 0;
@@ -35,6 +45,32 @@ public interface IPackageMemberMgr {
 	public static final int SCOPE_PUBLIC = 2;
 	public static final int SCOPE_MAX = 2;
 
+	/**
+	 * A helper class used to describe the package/scope that a member belongs to.
+	 */
+	public class PackageDesc {
+		public int pkgId;
+		public int pkgScopeId;
+	}
+	
+	/**
+	 * A helper class used to describe a package member's type, ID, and location.
+	 */
+	public class MemberDesc {
+		public int memberType;
+		public int memberId;
+		public int x;
+		public int y;
+	}
+	
+	/**
+	 * A helper class used to describe the location of a package's member.
+	 */
+	public class MemberLocation {
+		public int x;
+		public int y;
+	}
+	
 	/**
 	 * Given a scope's ID number, return the corresponding scope name.
 	 * 
@@ -72,6 +108,59 @@ public interface IPackageMemberMgr {
 	public abstract Integer[] parsePkgSpec(String pkgSpec);
 
 	/**
+	 * Set the package/scope for a specific package member (file, file group, action, sub-package).
+	 * 
+	 * @param memberType 	The type of the member (MEMBER_TYPE_FILE, etc).
+	 * @param memberId		The ID of the member (as defined in fileMgr, actionMgr, etc).
+	 * @param pkgId			The package to add the member into.
+	 * @param pkgScopeId	The scope (within the package) to add the member into. Only useful for MEMBER_TYPE_FILE.
+	 * @return 	ErrorCode.OK on success, ErrorCode.NOT_FOUND if the member isn't defined, ErrorCode.BAD_VALUE
+	 *          if the pkgId/pkgScopeId values are wrong, or ErrorCode.OUT_OF_RANGE if the member is not
+	 *          within an appropriate range (such as within a package root).
+	 */
+	public abstract int setPackageOfMember(int memberType, int memberId, int pkgId, int pkgScopeId);
+	
+	/**
+	 * Obtain the PackageDesc (package and scope) for the specified member. By default, members
+	 * will be in the &lt;import&gt; package.
+	 * 
+	 * @param memberType 	The type of the member to query (MEMBER_TYPE_FILE, etc).
+	 * @param memberId		The ID of the member (as defined in fileMgr, actionMgr, etc).
+	 * @return The PackageDesc, or null if any error occurs.
+	 */
+	public abstract PackageDesc getPackageOfMember(int memberType, int memberId);
+	
+	/**
+	 * Retrieve the list of members in a specific package.
+	 * 
+	 * @param pkgId				The package to query the members from.
+	 * @param pkgScopeId		The scope to search within (SCOPE_NONE for all scopes).
+	 * @param memberTypeFilter	The type of member to search for (MEMBER_TYPE_ANY to return all members).
+	 * @return An array of MemberDesc, describing the relevant package members, or null if there's an error.
+	 */
+	public abstract MemberDesc[] getMembersInPackage(int pkgId, int pkgScopeId, int memberTypeFilter);
+	
+	/**
+	 * Set the (x, y) location of a package member on the package diagram.
+	 * 
+	 * @param memberType	The type of the member (MEMBER_TYPE_FILE, etc).
+	 * @param memberId		The ID of the member (as defined in fileMgr, actionMgr, etc).
+	 * @param x				The member's new X coordinate on the package diagram.
+	 * @param y				The member's new Y coordinate on the package diagram.
+	 * @return				ErrorCode.OK on success, ErrorCode.NOT_FOUND if the member is not found,
+	 * 						or ErrorCode.OUT_OF_RANGE if the (x, y) coordinate is invalid.
+	 */
+	public abstract int setMemberLocation(int memberType, int memberId, int x, int y);
+	
+	/**
+	 * Retrieve the package member's (x, y) location.
+	 * @param memberType	The type of the member (MEMBER_TYPE_FILE, etc).
+	 * @param memberId		The ID of the member (as defined in fileMgr, actionMgr, etc).
+	 * @return				The member's (x, y) location, or null if memberType/memberId is invalid.
+	 */
+	public abstract MemberLocation getMemberLocation(int memberType, int memberId);
+	
+	/**
 	 * Set the package/scope associated with this path.
 	 * 
 	 * @param fileId The ID of the file whose package will be set.
@@ -81,6 +170,7 @@ public interface IPackageMemberMgr {
 	 *         or ErrorCode.OUT_OF_RANGE if the file is not encompassed by the
 	 *         package root.
 	 */
+	@Deprecated
 	public abstract int setFilePackage(int fileId, int pkgId, int pkgScopeId);
 
 	/**
@@ -90,6 +180,7 @@ public interface IPackageMemberMgr {
 	 * @return A Integer[2] array where [0] is the package ID, and [1] is the scope ID,
 	 * or null if the file doesn't exist.
 	 */
+	@Deprecated
 	public abstract Integer[] getFilePackage(int fileId);
 
 	/**
@@ -155,6 +246,7 @@ public interface IPackageMemberMgr {
 	 * @param pkgId The ID of the package to be associated with this action.
 	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this action doesn't exist
 	 */
+	@Deprecated
 	public abstract int setActionPackage(int actionId, int pkgId);
 
 	/**
@@ -163,6 +255,7 @@ public interface IPackageMemberMgr {
 	 * @param actionId The ID of the action whose package we're interested in.
 	 * @return The action's package, or ErrorCode.NOT_FOUND if the action doesn't exist.
 	 */
+	@Deprecated
 	public abstract int getActionPackage(int actionId);
 
 	/**

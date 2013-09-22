@@ -23,6 +23,8 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
@@ -54,12 +56,16 @@ public class ActionMgr implements IActionMgr {
 	/** The FileMgr object associated with this ActionMgr */
 	private IFileMgr fileMgr = null;
 	
+	/** The PackageMgr object associated with this ActionMgr */
+	private IPackageMgr pkgMgr = null;	
+	
 	/** The SlotMgr object associated with this ActionMgr */
 	private SlotMgr slotMgr = null;	
 	
 	/** Various prepared statement for database access. */
 	private PreparedStatement 
 		insertActionPrepStmt = null,
+		insertPackageMemberPrepStmt = null,
 		findCommandPrepStmt = null,
 		updateCommandPrepStmt = null,
 		findParentPrepStmt = null,
@@ -104,6 +110,7 @@ public class ActionMgr implements IActionMgr {
 
 		/* create prepared database statements */
 		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, 0, ?, ?, -1, -1)");
+		insertPackageMemberPrepStmt = db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
@@ -161,19 +168,32 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public int addShellCommandAction(int parentActionId, int actionDirId, String command) {
 		
+		this.pkgMgr = buildStore.getPackageMgr();
+
+		int lastRowId;
 		try {
 			insertActionPrepStmt.setInt(1, parentActionId);
 			insertActionPrepStmt.setInt(2, actionDirId);
 			insertActionPrepStmt.setString(3, command);
 			insertActionPrepStmt.setInt(4, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
 			db.executePrepUpdate(insertActionPrepStmt);
+		
+			lastRowId = db.getLastRowID();
+			if (lastRowId >= MAX_ACTIONS) {
+				throw new FatalBuildStoreError("Exceeded maximum action number: " + MAX_ACTIONS);
+			}
+
+			/* insert the default package membership values */
+			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.MEMBER_TYPE_ACTION);
+			insertPackageMemberPrepStmt.setInt(2, lastRowId);
+			insertPackageMemberPrepStmt.setInt(3, pkgMgr.getImportPackage());
+			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
+			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
+				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
+			}
+
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-
-		int lastRowId = db.getLastRowID();
-		if (lastRowId >= MAX_ACTIONS) {
-			throw new FatalBuildStoreError("Exceeded maximum action number: " + MAX_ACTIONS);
 		}
 		return lastRowId;
 	}

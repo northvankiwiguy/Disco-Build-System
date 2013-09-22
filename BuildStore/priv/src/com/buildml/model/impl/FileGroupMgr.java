@@ -23,6 +23,7 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
@@ -82,7 +83,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 		findGroupMembersPrepStmt = null,
 		removePathPrepStmt = null,
 		shiftDownPathsPrepStmt = null,
-		findGroupByPackagePrepStmt = null;
+		findGroupByPackagePrepStmt = null,
+		insertPackageMemberPrepStmt = null;
 
 	/**
 	 * A mapping from group ID to the list of transient path entries.
@@ -130,6 +132,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 				"update fileGroupPaths set pos = pos - 1 where groupId = ? and pos >= ?");
 		findGroupByPackagePrepStmt = db.prepareStatement(
 				"select id from fileGroups where pkgId = ?");
+		insertPackageMemberPrepStmt = 
+				db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
 		
 		/* initialize the mapping of group IDs to list of transient entries */
 		transientEntryMap = new HashMap<Integer, ArrayList<TransientEntry>>();
@@ -175,6 +179,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 	@Override
 	public int newGroup(int pkgId, int type) {
 		
+		int lastRowId;
+		
 		/* validate inputs */
 		if ((type < IFileGroupMgr.SOURCE_GROUP) ||
 			(type > IFileGroupMgr.MERGE_GROUP)) {
@@ -190,11 +196,22 @@ public class FileGroupMgr implements IFileGroupMgr {
 			insertNewGroupPrepStmt.setInt(1, pkgId);
 			insertNewGroupPrepStmt.setInt(2, type);
 			db.executePrepUpdate(insertNewGroupPrepStmt);
+			
+			lastRowId = db.getLastRowID();
+			
+			/* insert the default package membership values */
+			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+			insertPackageMemberPrepStmt.setInt(2, lastRowId);
+			insertPackageMemberPrepStmt.setInt(3, pkgId);
+			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
+			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
+				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
+			}
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}
 		
-		return db.getLastRowID();
+		return lastRowId; 
 	}
 
 	/*-------------------------------------------------------------------------------------*/

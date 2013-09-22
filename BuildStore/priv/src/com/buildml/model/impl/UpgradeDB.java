@@ -149,7 +149,9 @@ public class UpgradeDB {
 				stat.executeUpdate("alter table buildActions add column x integer");
 				stat.executeUpdate("alter table buildActions add column y integer");
 				stat.executeUpdate("update buildActions set x = -1");
-				stat.executeUpdate("update buildActions set y = -1");
+				stat.executeUpdate("update buildActions set y = -1");				
+				stat.executeUpdate("create table packageMembers (memberType integer, memberId integer, " +
+						   "pkgId integer, scopeId integer, x integer, y integer)");
 			}
 
 			/* finish by setting the new version number */

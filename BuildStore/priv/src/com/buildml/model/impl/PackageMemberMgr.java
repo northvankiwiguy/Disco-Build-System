@@ -68,6 +68,8 @@ import com.buildml.utils.errors.ErrorCode;
 	 * Various prepared statements for database access.
 	 */
 	private PreparedStatement 
+		findMemberPackagePrepStmt = null,
+		updatePackagePrepStmt = null,
 		updateFilePackagePrepStmt = null,
 		findFilePackagePrepStmt = null,
 		findFilesInPackage1PrepStmt = null,
@@ -99,6 +101,11 @@ import com.buildml.utils.errors.ErrorCode;
 		this.actionMgr = buildStore.getActionMgr();
 		this.pkgMgr = buildStore.getPackageMgr();
 		
+		findMemberPackagePrepStmt = db.prepareStatement(
+				"select pkgId, scopeId from packageMembers where memberType = ? and memberId = ?");
+		updatePackagePrepStmt = 
+				db.prepareStatement("update packageMembers set pkgId = ?, scopeId = ? " +
+									"where memberType = ? and memberId = ?");				
 		updateFilePackagePrepStmt = db.prepareStatement("update files set pkgId = ?, pkgScopeId = ? " +
 				"where id = ?");
 		findFilePackagePrepStmt = db.prepareStatement("select pkgId, pkgScopeId from files " +
@@ -195,6 +202,138 @@ import com.buildml.utils.errors.ErrorCode;
 		return new Integer[] {pkgId, scopeId};
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#setPackageOfMember(int, int, int, int)
+	 */
+	@Override
+	public int setPackageOfMember(int memberType, int memberId, int pkgId, int pkgScopeId) {
+
+		/* we can't assign files into folders (only into packages) */
+		if (pkgMgr.isFolder(pkgId)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* TODO: check pkgScopeId is a valid scope - else return BAD_VALUE */
+		
+		/* TODO: perform memberType-specific checks */
+		
+		/* update the database table with the new pkgId/pkgScopeId */
+		try {
+			updatePackagePrepStmt.setInt(1, pkgId);
+			updatePackagePrepStmt.setInt(2, pkgScopeId);
+			updatePackagePrepStmt.setInt(3, memberType);
+			updatePackagePrepStmt.setInt(4, memberId);
+			int rowCount = db.executePrepUpdate(updatePackagePrepStmt);
+			if (rowCount == 0) {
+				return ErrorCode.NOT_FOUND;
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}		
+		
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#getPackageOfMember(int, int)
+	 */
+	@Override
+	public PackageDesc getPackageOfMember(int memberType, int memberId) {
+		
+		try {
+			findMemberPackagePrepStmt.setInt(1, memberType);
+			findMemberPackagePrepStmt.setInt(2, memberId);
+			ResultSet rs = db.executePrepSelectResultSet(findMemberPackagePrepStmt);
+			if (!rs.next()){
+				return null;
+			}
+			PackageDesc result = new PackageDesc();
+			result.pkgId = rs.getInt(1);
+			result.pkgScopeId = rs.getInt(2);
+			rs.close();
+			return result;
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#getMembersInPackage(int, int, int)
+	 */
+	@Override
+	public MemberDesc[] getMembersInPackage(int pkgId, int pkgScopeId,
+			int memberTypeFilter) {
+		
+		List<MemberDesc> members;
+		
+		/*
+		 * There are multiple cases to handle in this query, depending on whether pkgScopeId
+		 * is defined (versus being SCOPE_NONE) and whether memberTypeFilter is defined
+		 * (versus being MEMBER_TYPE_ANY).
+		 */
+		String query = "select memberType, memberId, x, y from packageMembers where pkgId = " + pkgId;
+		if (pkgScopeId != SCOPE_NONE) {
+			query += " and scopeId = " + pkgScopeId;
+		}
+		if (memberTypeFilter != MEMBER_TYPE_ANY) {
+			query += " and memberType = " + memberTypeFilter;
+		}
+		
+		/* query the database to find the relevant package members */
+		try {
+			ResultSet rs = db.executeSelectResultSet(query);
+			if (!rs.next()){
+				return null;
+			}
+			
+			/* copy results into a MemberDesc[] */
+			members = new ArrayList<IPackageMemberMgr.MemberDesc>();
+			do {
+				MemberDesc newMember = new MemberDesc();
+				newMember.memberType = rs.getInt(1);
+				newMember.memberId = rs.getInt(2);
+				newMember.x = rs.getInt(3);
+				newMember.y = rs.getInt(4);
+				members.add(newMember);
+			} while (rs.next());
+			
+			rs.close();
+			return members.toArray(new MemberDesc[members.size()]);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#setMemberLocation(int, int, int, int)
+	 */
+	@Override
+	public int setMemberLocation(int memberType, int memberId, int x, int y) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#getMemberLocation(int, int)
+	 */
+	@Override
+	public MemberLocation getMemberLocation(int memberType, int memberId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IPackageMemberMgr;
 
 /**
  * A helper class to manage and simplify all the database access performed
@@ -247,6 +248,7 @@ import com.buildml.model.FatalBuildStoreError;
 			stat.executeUpdate("insert into schemaVersion values ( " + SCHEMA_VERSION + ")");
 
 			/* Create the "files" table. */
+			// TODO: remove pkgId and pkgScopeId fields.
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, trashed integer, " +
 							   "pathType integer, pkgId integer, pkgScopeId integer, name text not null)");
 			stat.executeUpdate("insert into files values (0, 0, 0, 1, 0, 0, \"/\")");
@@ -259,6 +261,7 @@ import com.buildml.model.FatalBuildStoreError;
 			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
 			/* Create the "buildActions" table. */
+			// TODO: remove pkgId, x and y fields.
 			stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
 							   "parentActionId integer, trashed integer, actionDirId integer, pkgId integer, " +
 							   "command text, actionType integer, x integer, y integer)");
@@ -295,6 +298,7 @@ import com.buildml.model.FatalBuildStoreError;
 			stat.executeUpdate("insert into packages values (1, 1, 1, 'Root')");
 			
 			/* Create the file group tables */
+			// TODO: remove the pkgId field
 			stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
 								"type integer)");
 			stat.executeUpdate("create table fileGroupPaths (groupId integer, pathId integer, " +
@@ -303,6 +307,10 @@ import com.buildml.model.FatalBuildStoreError;
 			/* Create the slotValues table */
 			stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
 							   "slotId integer, value text)");
+			
+			/* Create the packageMember table */
+			stat.executeUpdate("create table packageMembers (memberType integer, memberId integer, " +
+							   "pkgId integer, scopeId integer, x integer, y integer)");
 			
 			stat.close();
 						
@@ -690,6 +698,17 @@ import com.buildml.model.FatalBuildStoreError;
 	public void emptyTrash() throws FatalBuildStoreError {
 		try {
 			Statement stat = dbConn.createStatement();
+			
+			/* delete entries from packageMembers where the files or actions have been trashed */
+			stat.executeUpdate("delete from packageMembers where memberType = " + 
+									IPackageMemberMgr.MEMBER_TYPE_FILE + " and memberId in " + 
+									"(select id from files where trashed=1)");
+			stat.executeUpdate("delete from packageMembers where memberType = " + 
+									IPackageMemberMgr.MEMBER_TYPE_ACTION + " and memberId in " + 
+									"(select actionId from buildActions where trashed=1)");
+			// TODO: delete items from packageMembers where fileGroups are trashed.
+
+			/* now delete the files and actions themselves */
 			stat.executeUpdate("delete from fileAttrs where pathId in (select id from files where trashed=1);");
 			stat.executeUpdate("delete from files where trashed=1");
 			stat.executeUpdate("delete from buildActions where trashed=1;");
