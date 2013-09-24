@@ -172,7 +172,7 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @see com.buildml.model.IPackageMemberMgr#parsePkgSpec(java.lang.String)
 	 */
 	@Override
-	public Integer[] parsePkgSpec(String pkgSpec) {
+	public PackageDesc parsePkgSpec(String pkgSpec) {
 
 		/* parse the pkgSpec to separate it into "pkg" and "scope" portions */
 		String pkgName = pkgSpec;
@@ -197,7 +197,10 @@ import com.buildml.utils.errors.ErrorCode;
 			scopeId = getScopeId(scopeName);
 		}
 		
-		return new Integer[] {pkgId, scopeId};
+		PackageDesc result = new PackageDesc();
+		result.pkgId = pkgId;
+		result.pkgScopeId = scopeId;
+		return result;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -404,13 +407,10 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public FileSet getFilesInPackage(String pkgSpec) {
 
-		Integer pkgSpecParts[] = parsePkgSpec(pkgSpec);
-		
-		int pkgId = pkgSpecParts[0];
-		int scopeId = pkgSpecParts[1];
-		
+		PackageDesc spec = parsePkgSpec(pkgSpec);
+				
 		/* the ID must not be invalid, else that's an error */
-		if ((pkgId == ErrorCode.NOT_FOUND) || (scopeId == ErrorCode.NOT_FOUND)) {
+		if ((spec.pkgId == ErrorCode.NOT_FOUND) || (spec.pkgScopeId == ErrorCode.NOT_FOUND)) {
 			return null;
 		}
 		
@@ -419,10 +419,10 @@ import com.buildml.utils.errors.ErrorCode;
 		 * ID of the "None" scope). This indicates we should look for all paths
 		 * in the package, regardless of the scope.
 		 */
-		if (scopeId != 0) {
-			return getFilesInPackage(pkgId, scopeId);
+		if (spec.pkgScopeId != 0) {
+			return getFilesInPackage(spec.pkgId, spec.pkgScopeId);
 		} else {
-			return getFilesInPackage(pkgId);			
+			return getFilesInPackage(spec.pkgId);			
 		}
 	}
 	
@@ -473,12 +473,10 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public FileSet getFilesOutsidePackage(String pkgSpec) {
 		
-		Integer pkgSpecParts[] = parsePkgSpec(pkgSpec);
-		int pkgId = pkgSpecParts[0];
-		int scopeId = pkgSpecParts[1];
+		PackageDesc spec = parsePkgSpec(pkgSpec);
 		
 		/* the ID must not be invalid, else that's an error */
-		if ((pkgId == ErrorCode.NOT_FOUND) || (scopeId == ErrorCode.NOT_FOUND)) {
+		if ((spec.pkgId == ErrorCode.NOT_FOUND) || (spec.pkgScopeId == ErrorCode.NOT_FOUND)) {
 			return null;
 		}
 		
@@ -487,10 +485,10 @@ import com.buildml.utils.errors.ErrorCode;
 		 * get the package's files. Note that scopeId == 0 implies
 		 * that the user didn't specify a /scope value.
 		 */
-		if (scopeId != 0) {
-			return getFilesOutsidePackage(pkgId, scopeId);
+		if (spec.pkgScopeId != 0) {
+			return getFilesOutsidePackage(spec.pkgId, spec.pkgScopeId);
 		} else {
-			return getFilesOutsidePackage(pkgId);			
+			return getFilesOutsidePackage(spec.pkgId);			
 		}
 	}
 

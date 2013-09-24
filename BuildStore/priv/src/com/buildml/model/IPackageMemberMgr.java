@@ -105,8 +105,7 @@ public interface IPackageMemberMgr {
 	 * the ID for that portion will be ErrorCode.NOT_FOUND. If there was no scope name
 	 * specified, the scope ID will be 0, which represents the "None" scope.
 	 */
-	// TODO: change this to use PackageDesc class
-	public abstract Integer[] parsePkgSpec(String pkgSpec);
+	public abstract PackageDesc parsePkgSpec(String pkgSpec);
 
 	/**
 	 * Set the package/scope for a specific package member (file, file group, action, sub-package).

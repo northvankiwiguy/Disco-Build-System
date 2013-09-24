@@ -116,39 +116,39 @@ public class TestPackageMemberMgr {
 		int pkg2 = pkgMgr.addPackage("pkg2");
 		
 		/* test the pkgSpecs with only package names */
-		Integer results[] = pkgMemberMgr.parsePkgSpec("pkg1");
-		assertEquals(pkg1, results[0].intValue());
-		assertEquals(0, results[1].intValue());
+		PackageDesc r = pkgMemberMgr.parsePkgSpec("pkg1");
+		assertEquals(pkg1, r.pkgId);
+		assertEquals(0, r.pkgScopeId);
 		
-		results = pkgMemberMgr.parsePkgSpec("pkg2");
-		assertEquals(pkg2, results[0].intValue());
-		assertEquals(0, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("pkg2");
+		assertEquals(pkg2, r.pkgId);
+		assertEquals(0, r.pkgScopeId);
 		
 		/* test pkgSpecs with both package and scope names */
-		results = pkgMemberMgr.parsePkgSpec("pkg1/private");
-		assertEquals(pkg1, results[0].intValue());
-		assertEquals(IPackageMemberMgr.SCOPE_PRIVATE, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("pkg1/private");
+		assertEquals(pkg1, r.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PRIVATE, r.pkgScopeId);
 		
-		results = pkgMemberMgr.parsePkgSpec("pkg2/public");
-		assertEquals(pkg2, results[0].intValue());
-		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("pkg2/public");
+		assertEquals(pkg2, r.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, r.pkgScopeId);
 		
 		/* test invalid pkgSpecs */
-		results = pkgMemberMgr.parsePkgSpec("badname");
-		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
-		assertEquals(0, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("badname");
+		assertEquals(ErrorCode.NOT_FOUND, r.pkgId);
+		assertEquals(0, r.pkgScopeId);
 		
-		results = pkgMemberMgr.parsePkgSpec("pkg1/missing");
-		assertEquals(pkg1, results[0].intValue());
-		assertEquals(ErrorCode.NOT_FOUND, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("pkg1/missing");
+		assertEquals(pkg1, r.pkgId);
+		assertEquals(ErrorCode.NOT_FOUND, r.pkgScopeId);
 		
-		results = pkgMemberMgr.parsePkgSpec("badname/missing");
-		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
-		assertEquals(ErrorCode.NOT_FOUND, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("badname/missing");
+		assertEquals(ErrorCode.NOT_FOUND, r.pkgId);
+		assertEquals(ErrorCode.NOT_FOUND, r.pkgScopeId);
 		
-		results = pkgMemberMgr.parsePkgSpec("badname/public");
-		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
-		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, results[1].intValue());
+		r = pkgMemberMgr.parsePkgSpec("badname/public");
+		assertEquals(ErrorCode.NOT_FOUND, r.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, r.pkgScopeId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
