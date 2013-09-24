@@ -12,9 +12,6 @@
 
 package com.buildml.model;
 
-import com.buildml.model.types.FileSet;
-import com.buildml.model.types.ActionSet;
-
 /**
  * The interface conformed-to by any PackageMgr object, which represents a
  * subset of the functionality managed by a BuildStore object. A PackageMgr
@@ -27,14 +24,6 @@ import com.buildml.model.types.ActionSet;
  * @author Peter Smith <psmith@arapiki.com>
  */
 public interface IPackageMgr {
-
-	/**
-	 * Numeric constants for each of the scopes.
-	 */
-	public static final int SCOPE_NONE = 0;
-	public static final int SCOPE_PRIVATE = 1;
-	public static final int SCOPE_PUBLIC = 2;
-	public static final int SCOPE_MAX = 2;
 
 	/**
 	 * @return The ID of the root folder. This is the special folder that always exists

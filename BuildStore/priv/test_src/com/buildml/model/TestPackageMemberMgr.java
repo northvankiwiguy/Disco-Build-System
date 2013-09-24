@@ -127,11 +127,11 @@ public class TestPackageMemberMgr {
 		/* test pkgSpecs with both package and scope names */
 		results = pkgMemberMgr.parsePkgSpec("pkg1/private");
 		assertEquals(pkg1, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
+		assertEquals(IPackageMemberMgr.SCOPE_PRIVATE, results[1].intValue());
 		
 		results = pkgMemberMgr.parsePkgSpec("pkg2/public");
 		assertEquals(pkg2, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
+		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, results[1].intValue());
 		
 		/* test invalid pkgSpecs */
 		results = pkgMemberMgr.parsePkgSpec("badname");
@@ -148,7 +148,7 @@ public class TestPackageMemberMgr {
 		
 		results = pkgMemberMgr.parsePkgSpec("badname/public");
 		assertEquals(ErrorCode.NOT_FOUND, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
+		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, results[1].intValue());
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -348,55 +348,64 @@ public class TestPackageMemberMgr {
 		int pkgImport = pkgMgr.getImportPackage();
 
 		/* by default, all files are in <import>/None */
-		Integer results[] = pkgMemberMgr.getFilePackage(path1);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMemberMgr.getFilePackage(path2);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMemberMgr.getFilePackage(path3);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
+		PackageDesc results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path2);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path3);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
 
 		/* set one of the files into PkgA/public */
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(path1, pkgA, IPackageMgr.SCOPE_PUBLIC));
-		results = pkgMemberMgr.getFilePackage(path1);
-		assertEquals(pkgA, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
-		results = pkgMemberMgr.getFilePackage(path2);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMemberMgr.getFilePackage(path3);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1, 
+																	pkgA, IPackageMemberMgr.SCOPE_PUBLIC));
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1);
+		assertEquals(pkgA, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, results.pkgScopeId);
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path2);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path3);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
 		
 		/* set another file to another package */
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(path3, pkgB, IPackageMgr.SCOPE_PRIVATE));
-		results = pkgMemberMgr.getFilePackage(path1);
-		assertEquals(pkgA, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_PUBLIC, results[1].intValue());
-		results = pkgMemberMgr.getFilePackage(path2);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
-		results = pkgMemberMgr.getFilePackage(path3);
-		assertEquals(pkgB, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_PRIVATE, results[1].intValue());
+		assertEquals(ErrorCode.OK, 
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path3, 
+												pkgB, IPackageMemberMgr.SCOPE_PRIVATE));
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1);
+		assertEquals(pkgA, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PUBLIC, results.pkgScopeId);
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path2);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path3);
+		assertEquals(pkgB, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_PRIVATE, results.pkgScopeId);
 		
 		/* set a file's package back to <import>/None */
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(path1, pkgImport, IPackageMgr.SCOPE_NONE));
-		results = pkgMemberMgr.getFilePackage(path1);
-		assertEquals(pkgImport, results[0].intValue());
-		assertEquals(IPackageMgr.SCOPE_NONE, results[1].intValue());
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1, 
+														pkgImport, IPackageMemberMgr.SCOPE_NONE));
+		results = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1);
+		assertEquals(pkgImport, results.pkgId);
+		assertEquals(IPackageMemberMgr.SCOPE_NONE, results.pkgScopeId);
 		
 		/* try to set a non-existent file */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.setFilePackage(1000, pkgA, IPackageMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.NOT_FOUND, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, 1000, 
+														pkgA, IPackageMemberMgr.SCOPE_PUBLIC));
 		
 		/* try to get a non-existent file */
-		assertNull(pkgMemberMgr.getFilePackage(2000));
+		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, 2000));
 		
 		/* try to place a file into a folder - should fail */
 		int folder = pkgMgr.addFolder("Folder");
-		assertEquals(ErrorCode.BAD_VALUE, pkgMemberMgr.setFilePackage(path1, folder, IPackageMgr.SCOPE_NONE));
+		assertEquals(ErrorCode.BAD_VALUE, 
+					pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1, 
+													folder, IPackageMemberMgr.SCOPE_NONE));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -441,7 +450,7 @@ public class TestPackageMemberMgr {
 		
 		/* add a single file to the "private" section of pkgA */
 		int file1 = fileMgr.addFile("/myfile1");
-		pkgMemberMgr.setFilePackage(file1, pkgA, sectPriv);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkgA, sectPriv);
 		
 		/* check again - should be one file in pkgA and one in pkgA/priv */
 		results = pkgMemberMgr.getFilesInPackage(pkgA);
@@ -462,7 +471,7 @@ public class TestPackageMemberMgr {
 		
 		/* now add another to pkgA/priv and check again */
 		int file2 = fileMgr.addFile("/myfile2");
-		pkgMemberMgr.setFilePackage(file2, pkgA, sectPriv);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file2, pkgA, sectPriv);
 		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2}));
 		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
@@ -481,7 +490,7 @@ public class TestPackageMemberMgr {
 		
 		/* finally, add one to pkgA/pub and check again */
 		int file3 = fileMgr.addFile("/myfile3");
-		pkgMemberMgr.setFilePackage(file3, pkgA, sectPub);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file3, pkgA, sectPub);
 		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file1, file2, file3}));
 		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
@@ -497,7 +506,7 @@ public class TestPackageMemberMgr {
 		assertTrue(results.isMember(file3));
 		
 		/* move file1 back into <import> */
-		pkgMemberMgr.setFilePackage(file1, pkgImport, sectPriv);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkgImport, sectPriv);
 		results = pkgMemberMgr.getFilesInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {file2, file3}));
 		results = pkgMemberMgr.getFilesInPackage(pkgA, sectPub);
@@ -537,10 +546,18 @@ public class TestPackageMemberMgr {
 		/* create a new package, named "foo", with one item in foo/public and three in foo/private */
 		IPackageMgr pkgMgr = bs.getPackageMgr();
 		int pkgFooId = pkgMgr.addPackage("foo");
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f1path, pkgFooId, IPackageMgr.SCOPE_PUBLIC));
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f2path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f4path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f5path, pkgFooId, IPackageMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f1path, 
+														pkgFooId, IPackageMemberMgr.SCOPE_PUBLIC));
+		assertEquals(ErrorCode.OK,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f2path,
+														pkgFooId, IPackageMemberMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f4path,
+														pkgFooId, IPackageMemberMgr.SCOPE_PRIVATE));
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f5path,
+														pkgFooId, IPackageMemberMgr.SCOPE_PRIVATE));
 
 		/* test @foo/public membership */
 		FileSet fs = pkgMemberMgr.getFilesInPackage("foo/public");

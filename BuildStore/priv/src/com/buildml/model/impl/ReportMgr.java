@@ -23,6 +23,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileRecord;
@@ -508,7 +509,8 @@ import com.buildml.utils.errors.ErrorCode;
 		 * Form the (complex) query string, which considers each package/scope individually.
 		 */
 		StringBuffer sb = new StringBuffer(256);
-		sb.append("select id from files where ");
+		sb.append("select memberId from packageMembers where memberType = " + 
+						IPackageMemberMgr.MEMBER_TYPE_FILE + " and ");
 		int memberCount = 0;
 		
 		String pkgList[] = pkgMgr.getPackages();
@@ -517,8 +519,8 @@ import com.buildml.utils.errors.ErrorCode;
 			if (pkgId != ErrorCode.NOT_FOUND) {
 				
 				/* is this package in the set? */
-				boolean hasPrivate = pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PRIVATE);
-				boolean hasPublic = pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PUBLIC);
+				boolean hasPrivate = pkgSet.isMember(pkgId, IPackageMemberMgr.SCOPE_PRIVATE);
+				boolean hasPublic = pkgSet.isMember(pkgId, IPackageMemberMgr.SCOPE_PUBLIC);
 		
 				/* do we need a "or" between neighboring tests? */
 				if (hasPrivate || hasPublic) {
@@ -533,10 +535,10 @@ import com.buildml.utils.errors.ErrorCode;
 					sb.append("(pkgId == " + pkgId + ")");
 				} else if (hasPrivate) {
 					sb.append("((pkgId == " + pkgId + 
-								") and (pkgScopeId == " + IPackageMgr.SCOPE_PRIVATE + "))");
+								") and (scopeId == " + IPackageMemberMgr.SCOPE_PRIVATE + "))");
 				} else if (hasPublic) {
 					sb.append("((pkgId == " + pkgId + 
-								") and (pkgScopeId == " + IPackageMgr.SCOPE_PUBLIC + "))");
+								") and (scopeId == " + IPackageMemberMgr.SCOPE_PUBLIC + "))");
 				}
 				
 			}
@@ -583,7 +585,7 @@ import com.buildml.utils.errors.ErrorCode;
 			if (pkgId != ErrorCode.NOT_FOUND) {
 				
 				/* is this package in the set? */
-				boolean isMember = pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PUBLIC);
+				boolean isMember = pkgSet.isMember(pkgId, IPackageMemberMgr.SCOPE_PUBLIC);
 		
 				/* do we need a "or" between neighboring tests? */
 				if (isMember) {

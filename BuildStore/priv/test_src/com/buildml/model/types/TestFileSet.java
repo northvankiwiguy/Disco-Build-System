@@ -500,10 +500,18 @@ public class TestFileSet {
 		int pkgFooId = pkgMgr.addPackage("foo");
 		int sectPublic = pkgMemberMgr.getScopeId("public");
 		int sectPrivate = pkgMemberMgr.getScopeId("private");
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f1path, pkgFooId, sectPublic));
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f2path, pkgFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f4path, pkgFooId, sectPrivate));
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setFilePackage(f5path, pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f1path, 
+														pkgFooId, sectPublic));
+		assertEquals(ErrorCode.OK,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f2path,
+														pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f4path,
+														pkgFooId, sectPrivate));
+		assertEquals(ErrorCode.OK, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f5path,
+														pkgFooId, sectPrivate));
 		
 		/* test @foo/public membership */
 		FileSet fs10 = new FileSet(fileMgr);

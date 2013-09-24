@@ -30,6 +30,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 
@@ -165,14 +166,14 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				
 			/* select text for the package column */
 			case 1:
-				Integer pkgInfo[] = pkgMemberMgr.getFilePackage(pathId);
+				PackageDesc pkgInfo = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, pathId);
 				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
-				if (pkgInfo[0] == 0) {
+				if (pkgInfo.pkgId == 0) {
 					return "";
 				}
-				String pkgName = pkgMgr.getName(pkgInfo[0]);
+				String pkgName = pkgMgr.getName(pkgInfo.pkgId);
 				if (pkgName == null) {
 					break; /* return "invalid" */
 				}
@@ -180,14 +181,14 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				
 			/* select text for the visibility column */
 			case 2:
-				pkgInfo = pkgMemberMgr.getFilePackage(pathId);
+				pkgInfo = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, pathId);
 				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
-				if (pkgInfo[1] == 0) {
+				if (pkgInfo.pkgId == 0) {
 					return "";
 				}
-				String scopeName = pkgMemberMgr.getScopeName(pkgInfo[1]);
+				String scopeName = pkgMemberMgr.getScopeName(pkgInfo.pkgScopeId);
 				if (scopeName == null) {
 					break; /* return "invalid" */
 				}

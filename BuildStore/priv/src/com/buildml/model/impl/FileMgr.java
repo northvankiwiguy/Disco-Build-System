@@ -24,6 +24,7 @@ import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.PathNameCache;
@@ -89,7 +90,7 @@ public class FileMgr implements IFileMgr {
 		/* initialize prepared database statements */
 		findChildPrepStmt = db.prepareStatement("select id, pathType from files where parentId = ? and name = ? " +
 												"and trashed = 0");
-		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, 0, ?, 0, 0, ?)");
+		insertChildPrepStmt = db.prepareStatement("insert into files values (null, ?, 0, ?, ?)");
 		findPathDetailsPrepStmt = db.prepareStatement(
 				"select parentId, pathType, files.name from files where files.id = ?");
 		findPathIdFromParentPrepStmt = db.prepareStatement(
@@ -217,7 +218,7 @@ public class FileMgr implements IFileMgr {
 			IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 			int workspaceRootPathId = pkgRootMgr.getWorkspaceRoot();
-			Integer pathPackage[] = pkgMemberMgr.getFilePackage(pathId);
+			PackageDesc pathPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, pathId);
 			int pkgRootPathId = 0;
 			String pkgRootName = null;
 			
@@ -229,9 +230,9 @@ public class FileMgr implements IFileMgr {
 			
 			/* else, determine path of package root */
 			else {
-				pkgRootPathId = pkgRootMgr.getPackageRoot(pathPackage[0], 
+				pkgRootPathId = pkgRootMgr.getPackageRoot(pathPackage.pkgId, 
 													IPackageRootMgr.SOURCE_ROOT);
-				pkgRootName = pkgRootMgr.getPackageRootName(pathPackage[0],
+				pkgRootName = pkgRootMgr.getPackageRootName(pathPackage.pkgId,
 													IPackageRootMgr.SOURCE_ROOT);
 			}
 			

@@ -384,27 +384,27 @@ public class TestReportMgr2 {
 		assertEquals(0, fs.size());
 		
 		/* map the files into packages */
-		pkgMemberMgr.setFilePackage(file1, pkg1Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setFilePackage(file2, pkg1Id, IPackageMgr.SCOPE_PUBLIC);
-		pkgMemberMgr.setFilePackage(file3, pkg2Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setFilePackage(file4, pkg2Id, IPackageMgr.SCOPE_PUBLIC);
-		pkgMemberMgr.setFilePackage(file5, pkg3Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setFilePackage(file6, pkg3Id, IPackageMgr.SCOPE_PUBLIC);
-		pkgMemberMgr.setFilePackage(file7, pkg4Id, IPackageMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setFilePackage(file8, pkg4Id, IPackageMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkg1Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file2, pkg1Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file3, pkg2Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file4, pkg2Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file5, pkg3Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file6, pkg3Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file7, pkg4Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file8, pkg4Id, IPackageMemberMgr.SCOPE_PUBLIC);
 	
 		/* empty package set still gives an empty FileSet */
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(0, fs.size());
 		
 		/* add Pkg1/Private into the package set */
-		cs.add(pkg1Id, IPackageMgr.SCOPE_PRIVATE);
+		cs.add(pkg1Id, IPackageMemberMgr.SCOPE_PRIVATE);
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(1, fs.size());
 		assertTrue(fs.isMember(file1));
 
 		/* add Pkg1/Public into the package set */
-		cs.add(pkg1Id, IPackageMgr.SCOPE_PUBLIC);
+		cs.add(pkg1Id, IPackageMemberMgr.SCOPE_PUBLIC);
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(2, fs.size());
 		assertTrue(fs.isMember(file1));
@@ -420,7 +420,7 @@ public class TestReportMgr2 {
 		assertTrue(fs.isMember(file4));
 		
 		/* add Pkg8/Public into the package set */
-		cs.add(pkg4Id, IPackageMgr.SCOPE_PUBLIC);
+		cs.add(pkg4Id, IPackageMemberMgr.SCOPE_PUBLIC);
 		fs = reports.reportFilesFromPackageSet(cs);
 		assertEquals(5, fs.size());
 		assertTrue(fs.isMember(file1));
@@ -490,7 +490,7 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* add Pkg1 into the package set */
-		cs.add(pkg1Id, IPackageMgr.SCOPE_PUBLIC);
+		cs.add(pkg1Id, IPackageMemberMgr.SCOPE_PUBLIC);
 		tset = reports.reportActionsFromPackageSet(cs);
 		assertEquals(2, tset.size());
 		assertTrue(tset.isMember(action1));
@@ -506,7 +506,7 @@ public class TestReportMgr2 {
 		assertTrue(tset.isMember(action6));
 
 		/* add Pkg4 into the package set */
-		cs.add(pkg4Id, IPackageMgr.SCOPE_PUBLIC);
+		cs.add(pkg4Id, IPackageMemberMgr.SCOPE_PUBLIC);
 		tset = reports.reportActionsFromPackageSet(cs);
 		assertEquals(6, tset.size());
 		assertTrue(tset.isMember(action1));
@@ -519,7 +519,7 @@ public class TestReportMgr2 {
 		/* add a few hundred packages, and check scalability */
 		for (int i = 5; i != 200; i++) {
 			int id = pkgMgr.addPackage("Pkg" + i);
-			cs.add(id, IPackageMgr.SCOPE_PUBLIC);
+			cs.add(id, IPackageMemberMgr.SCOPE_PUBLIC);
 		}
 		
 		/* the simple fact that this doesn't crash is enough to pass the test */

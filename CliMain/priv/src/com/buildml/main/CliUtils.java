@@ -23,6 +23,7 @@ import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.types.FileSet;
@@ -499,18 +500,15 @@ public class CliUtils {
 			pkgString = new StringBuilder();
 			
 			/* fetch the file's package and scope */
-			Integer pkgAndScopeId[] = pkgMemberMgr.getFilePackage(thisPathId);
+			PackageDesc pkgAndScopeId = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, thisPathId);
 			if (pkgAndScopeId == null) {
 				pkgString.append("Invalid file");
 			} 
 			
 			/* if valid, fetch the human-readable names */
 			else {
-				int pkgId = pkgAndScopeId[0];
-				int scopeId = pkgAndScopeId[1];
-
-				String pkgName = pkgMgr.getName(pkgId);
-				String scopeName = pkgMemberMgr.getScopeName(scopeId);
+				String pkgName = pkgMgr.getName(pkgAndScopeId.pkgId);
+				String scopeName = pkgMemberMgr.getScopeName(pkgAndScopeId.pkgScopeId);
 			
 				/* if we can't fetch the text name of the package or scope... */
 				if (pkgName == null || scopeName == null) {

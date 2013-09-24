@@ -248,10 +248,9 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("insert into schemaVersion values ( " + SCHEMA_VERSION + ")");
 
 			/* Create the "files" table. */
-			// TODO: remove pkgId and pkgScopeId fields.
 			stat.executeUpdate("create table files ( id integer primary key, parentId integer, trashed integer, " +
-							   "pathType integer, pkgId integer, pkgScopeId integer, name text not null)");
-			stat.executeUpdate("insert into files values (0, 0, 0, 1, 0, 0, \"/\")");
+							   "pathType integer, name text not null)");
+			stat.executeUpdate("insert into files values (0, 0, 0, 1, \"/\")");
 			stat.executeUpdate("create unique index filesIdx on files (parentId, name)");
 			
 			/* Create the "fileIncludes" table */
@@ -308,10 +307,13 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
 							   "slotId integer, value text)");
 			
-			/* Create the packageMember table */
+			/* Create the packageMember table, and add default values */
 			stat.executeUpdate("create table packageMembers (memberType integer, memberId integer, " +
 							   "pkgId integer, scopeId integer, x integer, y integer)");
-			
+			stat.executeUpdate("create unique index packageMembersIdx on packageMembers (memberType, memberId)");
+			stat.executeUpdate("insert into packageMembers values (" + IPackageMemberMgr.MEMBER_TYPE_FILE + 
+							   ", 0, 0, 0, 0, 0)"); /* the "/" path */
+
 			stat.close();
 						
 		} catch (SQLException e) {

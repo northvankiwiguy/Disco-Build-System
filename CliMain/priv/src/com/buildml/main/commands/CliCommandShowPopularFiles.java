@@ -16,6 +16,7 @@ import com.buildml.main.CliUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileRecord;
@@ -96,9 +97,9 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 				
 				/* should we show package names? */
 				if (optionShowPkgs) {
-					Integer cmptScopeIds[] = pkgMemberMgr.getFilePackage(id);
-					String cmptName = pkgMgr.getName(cmptScopeIds[0]);
-					String sectName = pkgMemberMgr.getScopeName(cmptScopeIds[1]);
+					PackageDesc cmptScopeIds = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, id);
+					String cmptName = pkgMgr.getName(cmptScopeIds.pkgId);
+					String sectName = pkgMemberMgr.getScopeName(cmptScopeIds.pkgScopeId);
 					System.out.println(count + "\t" + pathName + "  (" + cmptName + "/" + sectName + ")");
 				}
 				

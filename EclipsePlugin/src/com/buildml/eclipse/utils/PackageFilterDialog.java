@@ -104,7 +104,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 			final IPackageMemberMgr pkgMemberMgr = pkgSet.getBuildStore().getPackageMemberMgr();
 			
 			/* get the scope name, and prepare for a checkbox for each */
-			checkBoxes = new Button[IPackageMgr.SCOPE_MAX];
+			checkBoxes = new Button[IPackageMemberMgr.SCOPE_MAX];
 			
 			/* we'll use the package's internal ID when accessing the package Set */
 			pkgId = pkgMgr.getId(pkgName);
@@ -155,7 +155,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 						if (showScopes) {
 							scopeId = pkgMemberMgr.getScopeId(buttonText);
 						} else {
-							scopeId = IPackageMgr.SCOPE_PUBLIC;
+							scopeId = IPackageMemberMgr.SCOPE_PUBLIC;
 						}
 						if (button.getSelection()) {
 							pkgSet.add(pkgId, scopeId);
@@ -184,7 +184,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 				if (showScopes) {
 					thisCheck.setSelection(pkgSet.isMember(pkgId, i + 1));
 				} else {
-					thisCheck.setSelection(pkgSet.isMember(pkgId, IPackageMgr.SCOPE_PUBLIC));
+					thisCheck.setSelection(pkgSet.isMember(pkgId, IPackageMemberMgr.SCOPE_PUBLIC));
 				}
 			}
 		}
@@ -197,7 +197,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 		 */
 		private int getNumScopes() {
 			if (showScopes) {
-				return IPackageMgr.SCOPE_MAX;
+				return IPackageMemberMgr.SCOPE_MAX;
 			} else {
 				return 1;
 			}

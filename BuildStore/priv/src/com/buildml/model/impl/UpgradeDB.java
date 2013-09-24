@@ -149,9 +149,22 @@ public class UpgradeDB {
 				stat.executeUpdate("alter table buildActions add column x integer");
 				stat.executeUpdate("alter table buildActions add column y integer");
 				stat.executeUpdate("update buildActions set x = -1");
-				stat.executeUpdate("update buildActions set y = -1");				
+				stat.executeUpdate("update buildActions set y = -1");
+				
+				/* 
+				 * Create the new packageMembers table - although ideally we should generate
+				 * the content from the files table. There are no production databases (yet), so this
+				 * would be a waste of time.
+				 */
 				stat.executeUpdate("create table packageMembers (memberType integer, memberId integer, " +
 						   "pkgId integer, scopeId integer, x integer, y integer)");
+				
+				/* drop the pkgId and pkgScopeId columns from the files table */
+				stat.executeUpdate("alter table files rename to filestmp");
+				stat.executeUpdate("create table files ( id integer primary key, parentId integer, trashed integer, " +
+						   "pathType integer, name text not null)");
+				stat.executeUpdate("insert into files select id, parentId, trashed, pathType, name from filestmp");
+				stat.executeUpdate("drop table filestmp");
 			}
 
 			/* finish by setting the new version number */

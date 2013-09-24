@@ -105,6 +105,7 @@ public interface IPackageMemberMgr {
 	 * the ID for that portion will be ErrorCode.NOT_FOUND. If there was no scope name
 	 * specified, the scope ID will be 0, which represents the "None" scope.
 	 */
+	// TODO: change this to use PackageDesc class
 	public abstract Integer[] parsePkgSpec(String pkgSpec);
 
 	/**
@@ -159,29 +160,6 @@ public interface IPackageMemberMgr {
 	 * @return				The member's (x, y) location, or null if memberType/memberId is invalid.
 	 */
 	public abstract MemberLocation getMemberLocation(int memberType, int memberId);
-	
-	/**
-	 * Set the package/scope associated with this path.
-	 * 
-	 * @param fileId The ID of the file whose package will be set.
-	 * @param pkgId The ID of the package to be associated with this file.
-	 * @param pkgScopeId The ID of the package's scope.
-	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if this file doesn't exist,
-	 *         or ErrorCode.OUT_OF_RANGE if the file is not encompassed by the
-	 *         package root.
-	 */
-	@Deprecated
-	public abstract int setFilePackage(int fileId, int pkgId, int pkgScopeId);
-
-	/**
-	 * Get the package/scope associated with this path.
-	 * 
-	 * @param fileId The ID of the path whose package we wish to know.
-	 * @return A Integer[2] array where [0] is the package ID, and [1] is the scope ID,
-	 * or null if the file doesn't exist.
-	 */
-	@Deprecated
-	public abstract Integer[] getFilePackage(int fileId);
 
 	/**
 	 * Return the set of files that are within the specified package (any scope).

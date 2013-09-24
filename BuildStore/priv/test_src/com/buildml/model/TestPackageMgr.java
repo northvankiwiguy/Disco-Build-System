@@ -270,12 +270,12 @@ public class TestPackageMgr {
 		/* assign a package to files, then try to remove the name */
 		int pkgA = pkgMgr.getId("PkgA");
 		int file1 = fileMgr.addFile("/aardvark/bunny");
-		pkgMemberMgr.setFilePackage(file1, pkgA, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkgA, IPackageMemberMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgA));
 		
 		/* remove the package from the file, then try again to remove the package name */
 		int pkgImport = pkgMgr.getId("<import>");
-		pkgMemberMgr.setFilePackage(file1, pkgImport, IPackageMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkgImport, IPackageMemberMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
 		
 		/* assign them to actions, then try to remove the name */

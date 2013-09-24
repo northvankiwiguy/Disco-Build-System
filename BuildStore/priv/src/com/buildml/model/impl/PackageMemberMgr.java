@@ -70,8 +70,6 @@ import com.buildml.utils.errors.ErrorCode;
 	private PreparedStatement 
 		findMemberPackagePrepStmt = null,
 		updatePackagePrepStmt = null,
-		updateFilePackagePrepStmt = null,
-		findFilePackagePrepStmt = null,
 		findFilesInPackage1PrepStmt = null,
 		findFilesInPackage2PrepStmt = null,
 		findFilesOutsidePackage1PrepStmt = null,
@@ -106,16 +104,16 @@ import com.buildml.utils.errors.ErrorCode;
 		updatePackagePrepStmt = 
 				db.prepareStatement("update packageMembers set pkgId = ?, scopeId = ? " +
 									"where memberType = ? and memberId = ?");				
-		updateFilePackagePrepStmt = db.prepareStatement("update files set pkgId = ?, pkgScopeId = ? " +
-				"where id = ?");
-		findFilePackagePrepStmt = db.prepareStatement("select pkgId, pkgScopeId from files " +
-				"where id = ?");
-		findFilesInPackage1PrepStmt = db.prepareStatement("select id from files where pkgId = ?");
-		findFilesInPackage2PrepStmt = db.prepareStatement("select id from files where " +
-				"pkgId = ? and pkgScopeId = ?");
-		findFilesOutsidePackage1PrepStmt = db.prepareStatement("select id from files where pkgId != ?");
-		findFilesOutsidePackage2PrepStmt = db.prepareStatement("select id from files where " +
-				"not (pkgId = ? and pkgScopeId = ?)");
+		findFilesInPackage1PrepStmt = db.prepareStatement(
+				"select memberId from packageMembers where pkgId = ? and memberType = " + MEMBER_TYPE_FILE);
+		findFilesInPackage2PrepStmt = db.prepareStatement(
+				"select memberId from packageMembers where pkgId = ? and memberType = " + 
+						MEMBER_TYPE_FILE + " and scopeId = ?");
+		findFilesOutsidePackage1PrepStmt = db.prepareStatement(
+				"select memberId from packageMembers where pkgId != ? and memberType = " + MEMBER_TYPE_FILE);
+		findFilesOutsidePackage2PrepStmt = db.prepareStatement(
+				"select memberId from packageMembers where memberType = " + MEMBER_TYPE_FILE +
+				" and not (pkgId = ? and scopeId = ?)");
 		updateActionPackagePrepStmt = db.prepareStatement("update buildActions set pkgId = ? " +
 				"where actionId = ?");
 		findActionPackagePrepStmt = db.prepareStatement("select pkgId from buildActions where actionId = ?");
@@ -216,9 +214,33 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* TODO: check pkgScopeId is a valid scope - else return BAD_VALUE */
-		
-		/* TODO: perform memberType-specific checks */
-		
+
+		/*
+		 * Perform MEMBER_TYPE_FILE-specific validation checks.
+		 */
+		if (memberType == MEMBER_TYPE_FILE) {
+			/* the path must be valid and not-trashed */
+			if ((fileMgr.getPathType(memberId) == PathType.TYPE_INVALID) ||
+					(fileMgr.isPathTrashed(memberId))) {
+				return ErrorCode.NOT_FOUND;
+			}	
+			
+			/* 
+			 * Check that the path falls under the package's root (except for <import> which
+			 * doesn't have root restrictions).
+			 */
+			if (pkgId != pkgMgr.getImportPackage()) {
+				IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+				int pkgRootPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT);
+				if (pkgRootPathId == ErrorCode.NOT_FOUND) {
+					return ErrorCode.NOT_FOUND;
+				}
+				if ((pkgRootPathId != memberId) && !fileMgr.isAncestorOf(pkgRootPathId, memberId)) {
+					return ErrorCode.OUT_OF_RANGE;
+				}
+			}
+		}
+				
 		/* update the database table with the new pkgId/pkgScopeId */
 		try {
 			updatePackagePrepStmt.setInt(1, pkgId);
@@ -333,85 +355,7 @@ import com.buildml.utils.errors.ErrorCode;
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMemberMgr#setFilePackage(int, int, int)
-	 */
-	@Override
-	public int setFilePackage(int fileId, int pkgId, int pkgScopeId) {
 		
-		/* we can't assign files into folders (only into packages) */
-		if (pkgMgr.isFolder(pkgId)) {
-			return ErrorCode.BAD_VALUE;
-		}
-		
-		/* the path must be valid and not-trashed */
-		if ((fileMgr.getPathType(fileId) == PathType.TYPE_INVALID) ||
-			(fileMgr.isPathTrashed(fileId))) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		/* 
-		 * Check that the path falls under the package's root (except for <import> which
-		 * doesn't have root restrictions).
-		 */
-		if (pkgId != pkgMgr.getImportPackage()) {
-			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
-			int pkgRootPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT);
-			if (pkgRootPathId == ErrorCode.NOT_FOUND) {
-				return ErrorCode.NOT_FOUND;
-			}
-			if ((pkgRootPathId != fileId) && !fileMgr.isAncestorOf(pkgRootPathId, fileId)) {
-				return ErrorCode.OUT_OF_RANGE;
-			}
-		}
-		
-		try {
-			updateFilePackagePrepStmt.setInt(1, pkgId);
-			updateFilePackagePrepStmt.setInt(2, pkgScopeId);
-			updateFilePackagePrepStmt.setInt(3, fileId);
-			int rowCount = db.executePrepUpdate(updateFilePackagePrepStmt);
-			if (rowCount == 0) {
-				return ErrorCode.NOT_FOUND;
-			}
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		return ErrorCode.OK;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMemberMgr#getFilePackage(int)
-	 */
-	@Override
-	public Integer[] getFilePackage(int fileId) {
-		
-		Integer result[] = new Integer[2];
-		
-		try {
-			findFilePackagePrepStmt.setInt(1, fileId);
-			ResultSet rs = db.executePrepSelectResultSet(findFilePackagePrepStmt);
-			if (rs.next()){
-				result[0] = rs.getInt(1);
-				result[1] = rs.getInt(2);
-				rs.close();
-			} else {
-				/* error - there was no record, so the fileId must be invalid */
-				return null;
-			}
-			
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("SQL error", e);
-		}
-				
-		return result;
-	}
-	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
