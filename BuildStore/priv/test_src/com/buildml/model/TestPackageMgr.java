@@ -481,16 +481,16 @@ public class TestPackageMgr {
 		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
 		int pkgD = pkgMgr.addPackage("PkgD");
 		assert(actionId >= 0);
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId,
-																	pkgD, IPackageMemberMgr.SCOPE_NONE));
+		assertEquals(ErrorCode.OK, 
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, pkgD));
 		assertEquals(pkgD, notifyPkgValue);
 		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
 		
 		/* Changing it to the same thing, will not */
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId,
-																		pkgD, IPackageMemberMgr.SCOPE_NONE));
+		assertEquals(ErrorCode.OK, 
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, pkgD));
 		assertEquals(0, notifyPkgValue);
 		assertEquals(0, notifyHowValue);		
 

@@ -166,7 +166,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
-			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, oldPackage, IPackageMemberMgr.SCOPE_NONE);
+			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, oldPackage);
 		}
 
 		/* if the action's command needs to change... */
@@ -201,7 +201,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
-			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, newPackage, IPackageMemberMgr.SCOPE_NONE);
+			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, newPackage);
 		}
 		
 		/* if the action's command needs to change... */

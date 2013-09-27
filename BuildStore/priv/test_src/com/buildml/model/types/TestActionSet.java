@@ -344,9 +344,9 @@ public class TestActionSet {
 		IPackageMemberMgr pkgMemberMgr = bs.getPackageMemberMgr();
 		int fooPkgId = pkgMgr.addPackage("foo");
 		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(
-				IPackageMemberMgr.MEMBER_TYPE_ACTION, actionA1, fooPkgId, IPackageMemberMgr.SCOPE_NONE));
+				IPackageMemberMgr.MEMBER_TYPE_ACTION, actionA1, fooPkgId));
 		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(
-				IPackageMemberMgr.MEMBER_TYPE_ACTION, actionA2, fooPkgId, IPackageMemberMgr.SCOPE_NONE));
+				IPackageMemberMgr.MEMBER_TYPE_ACTION, actionA2, fooPkgId));
 		
 		ts = new ActionSet(actionMgr);
 		assertEquals(ErrorCode.OK, ts.populateWithActions(new String[] { "%pkg/foo" }));

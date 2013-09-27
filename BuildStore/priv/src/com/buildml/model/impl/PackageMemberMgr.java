@@ -284,6 +284,16 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#setPackageOfMember(int, int, int)
+	 */
+	@Override
+	public int setPackageOfMember(int memberType, int memberId, int pkgId) {
+		return setPackageOfMember(memberType, memberId, pkgId, IPackageMemberMgr.SCOPE_NONE);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IPackageMemberMgr#getPackageOfMember(int, int)
 	 */
 	@Override

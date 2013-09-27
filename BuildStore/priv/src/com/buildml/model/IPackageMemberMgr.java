@@ -121,6 +121,19 @@ public interface IPackageMemberMgr {
 	public abstract int setPackageOfMember(int memberType, int memberId, int pkgId, int pkgScopeId);
 	
 	/**
+	 * Set the package/scope for a specific package member (file, file group, action, sub-package), using
+	 * the scope of SCOPE_NONE.
+	 * 
+	 * @param memberType 	The type of the member (MEMBER_TYPE_FILE, etc).
+	 * @param memberId		The ID of the member (as defined in fileMgr, actionMgr, etc).
+	 * @param pkgId			The package to add the member into.
+	 * @return 	ErrorCode.OK on success, ErrorCode.NOT_FOUND if the member isn't defined, ErrorCode.BAD_VALUE
+	 *          if the pkgId/pkgScopeId values are wrong, or ErrorCode.OUT_OF_RANGE if the member is not
+	 *          within an appropriate range (such as within a package root).
+	 */
+	public abstract int setPackageOfMember(int memberType, int memberId, int pkgId);
+	
+	/**
 	 * Obtain the PackageDesc (package and scope) for the specified member. By default, members
 	 * will be in the &lt;import&gt; package.
 	 * 
