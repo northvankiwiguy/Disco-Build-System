@@ -254,10 +254,10 @@ public class TestPackageMemberMgr {
 		/* initially there are no members, of any kind, in any scope, in either package */
 		MemberDesc[] members = pkgMemberMgr.getMembersInPackage(pkgAId, 
 				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
-		assertNull(members);
+		assertEquals(0, members.length);
 		members = pkgMemberMgr.getMembersInPackage(pkgBId, 
 				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
-		assertNull(members);
+		assertEquals(0, members.length);
 		
 		/* add a file to package A, private scope */
 		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(
@@ -273,7 +273,7 @@ public class TestPackageMemberMgr {
 		
 		members = pkgMemberMgr.getMembersInPackage(pkgBId, 
 								IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
-		assertNull(members);
+		assertEquals(0, members.length);
 		
 		/* add an action into package A, and a file group in package B */
 		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(
@@ -311,7 +311,7 @@ public class TestPackageMemberMgr {
 		/* check an undefined package */
 		members = pkgMemberMgr.getMembersInPackage(2345, 
 				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_ANY);
-		assertNull(members);
+		assertEquals(0, members.length);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

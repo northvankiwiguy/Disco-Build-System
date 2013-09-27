@@ -297,9 +297,7 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("insert into packages values (1, 1, 1, 'Root')");
 			
 			/* Create the file group tables */
-			// TODO: remove the pkgId field
-			stat.executeUpdate("create table fileGroups (id integer primary key, pkgId integer, " +
-								"type integer)");
+			stat.executeUpdate("create table fileGroups (id integer primary key, type integer)");
 			stat.executeUpdate("create table fileGroupPaths (groupId integer, pathId integer, " +
 								"pathString text, pos integer)");
 			

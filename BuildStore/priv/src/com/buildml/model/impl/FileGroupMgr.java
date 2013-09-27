@@ -73,8 +73,6 @@ public class FileGroupMgr implements IFileGroupMgr {
 	private PreparedStatement 
 		insertNewGroupPrepStmt = null, 
 		findGroupTypePrepStmt = null,
-		findGroupPkgPrepStmt = null,
-		updateGroupPkgPrepStmt = null,
 		removeGroupPrepStmt = null,
 		shiftUpPathsPrepStmt = null,
 		insertPathAtPrepStmt = null,
@@ -83,8 +81,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 		findGroupMembersPrepStmt = null,
 		removePathPrepStmt = null,
 		shiftDownPathsPrepStmt = null,
-		findGroupByPackagePrepStmt = null,
-		insertPackageMemberPrepStmt = null;
+		insertPackageMemberPrepStmt = null,
+		removePackageMemberPrepStmt = null;
 
 	/**
 	 * A mapping from group ID to the list of transient path entries.
@@ -107,13 +105,9 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		/* initialize prepared database statements */
 		insertNewGroupPrepStmt = db.prepareStatement(
-				"insert into fileGroups values (null, ?, ?)");
+				"insert into fileGroups values (null, ?)");
 		findGroupTypePrepStmt = db.prepareStatement(
 				"select type from fileGroups where id = ?");
-		findGroupPkgPrepStmt = db.prepareStatement(
-				"select pkgId from fileGroups where id = ?");
-		updateGroupPkgPrepStmt = db.prepareStatement(
-				"update fileGroups set pkgId = ? where id = ?");
 		removeGroupPrepStmt = db.prepareStatement(
 				"delete from fileGroups where id = ?");
 		shiftUpPathsPrepStmt = db.prepareStatement(
@@ -130,10 +124,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 				"delete from fileGroupPaths where groupId = ? and pos = ?");
 		shiftDownPathsPrepStmt = db.prepareStatement(
 				"update fileGroupPaths set pos = pos - 1 where groupId = ? and pos >= ?");
-		findGroupByPackagePrepStmt = db.prepareStatement(
-				"select id from fileGroups where pkgId = ?");
 		insertPackageMemberPrepStmt = 
 				db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
+		removePackageMemberPrepStmt =
+				db.prepareStatement("delete from packageMembers where memberId = ? and memberType = " +
+						IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
 		
 		/* initialize the mapping of group IDs to list of transient entries */
 		transientEntryMap = new HashMap<Integer, ArrayList<TransientEntry>>();
@@ -193,8 +188,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		/* insert the new group into the database, returning the new group ID */
 		try {
-			insertNewGroupPrepStmt.setInt(1, pkgId);
-			insertNewGroupPrepStmt.setInt(2, type);
+			insertNewGroupPrepStmt.setInt(1, type);
 			db.executePrepUpdate(insertNewGroupPrepStmt);
 			
 			lastRowId = db.getLastRowID();
@@ -255,96 +249,20 @@ public class FileGroupMgr implements IFileGroupMgr {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
-		/* update the database */
+		/* update the database to remove it from fileGroups and packageMembers tables*/
 		try {
 			removeGroupPrepStmt.setInt(1, groupId);
 			db.executePrepUpdate(removeGroupPrepStmt);
+			
+			removePackageMemberPrepStmt.setInt(1, groupId);
+			db.executePrepUpdate(removePackageMemberPrepStmt);
+			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}		
+		}
+		
 		
 		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getGroupPkg(int)
-	 */
-	@Override
-	public int getGroupPkg(int groupId) {
-		
-		/* fetch the package for this group */
-		Integer results[] = null;
-		try {
-			findGroupPkgPrepStmt.setInt(1, groupId);
-			results = db.executePrepSelectIntegerColumn(findGroupPkgPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		
-		if (results.length != 0) {
-			return results[0];
-		}
-		
-		return ErrorCode.NOT_FOUND;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#setGroupPkg(int, int)
-	 */
-	@Override
-	public int setGroupPkg(int groupId, int pkgId) {
-
-		/* validate pkgId */
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
-		if (!pkgMgr.isValid(pkgId)) {
-			return ErrorCode.BAD_VALUE;
-		}
-		
-		/* update the database */
-		int rowCount = 0;
-		try {
-			updateGroupPkgPrepStmt.setInt(1, pkgId);
-			updateGroupPkgPrepStmt.setInt(2, groupId);
-			rowCount = db.executePrepUpdate(updateGroupPkgPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}
-
-		/* validate groupId - if no update happened, assume bad groupId */
-		if (rowCount == 0) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getGroupsInPackage(int)
-	 */
-	@Override
-	public Integer[] getGroupsInPackage(int pkgId) {
-		
-		/* we only support valid packages (not folders) */
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
-		if (!pkgMgr.isValid(pkgId) || pkgMgr.isFolder(pkgId)) {
-			return null;
-		}
-		
-		Integer results[] = null;
-		try {
-			findGroupByPackagePrepStmt.setInt(1, pkgId);
-			results = db.executePrepSelectIntegerColumn(findGroupByPackagePrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		
-		return results;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

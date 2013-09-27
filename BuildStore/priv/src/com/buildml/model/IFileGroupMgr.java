@@ -110,35 +110,6 @@ public interface IFileGroupMgr {
 	 *                 if the group ID is invalid.
 	 */
 	int removeGroup(int groupId);
-	
-	/**
-	 * Return the ID for the package in which this file group resides.
-	 * 
-	 * @param groupId The ID of the group to be queried.
-	 * @return The ID of the package that the file group belongs to, or
-	 * ErrorCode.NOT_FOUND if groupId doesn't correspond to a valid group.
-	 */
-	int getGroupPkg(int groupId);
-	
-	/**
-	 * Move the file group into a new package.
-	 * 
-	 * @param groupId	The ID of the group being moved.
-	 * @param pkgId		The ID of the new package to move the group into.
-	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if the groupId is invalid,
-	 * or ErrorCode.BAD_VALUE if the pkgId is invalid.
-	 */
-	int setGroupPkg(int groupId, int pkgId);
-
-	/**
-	 * Return the complete list of all file groups that reside in the specified package.
-	 * 
-	 * @param pkgId	The ID of the package.
-	 * 
-	 * @return An Integer[] containing the IDs of all the file groups, or null if the
-	 * package ID is invalid.
-	 */
-	Integer [] getGroupsInPackage(int pkgId);
 		
 	/**
 	 * Append the specified path to the end of the file group. The new file group entry

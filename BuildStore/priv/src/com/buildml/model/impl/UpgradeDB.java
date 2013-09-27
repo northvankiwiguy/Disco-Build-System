@@ -165,6 +165,12 @@ public class UpgradeDB {
 						   "pathType integer, name text not null)");
 				stat.executeUpdate("insert into files select id, parentId, trashed, pathType, name from filestmp");
 				stat.executeUpdate("drop table filestmp");
+				
+				/* drop the pkgId column from the fileGroups table */
+				stat.executeUpdate("alter table fileGroups rename to fileGroupstmp");
+				stat.executeUpdate("create table fileGroups (id integer primary key, type integer)");
+				stat.executeUpdate("insert into fileGroups select id, type from fileGroupstmp");
+				stat.executeUpdate("drop table fileGroupstmp");
 			}
 
 			/* finish by setting the new version number */

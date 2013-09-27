@@ -214,7 +214,7 @@ import com.buildml.utils.errors.ErrorCode;
 	public int setPackageOfMember(int memberType, int memberId, int pkgId, int pkgScopeId) {
 
 		/* we can't assign files into folders (only into packages) */
-		if (pkgMgr.isFolder(pkgId)) {
+		if (!pkgMgr.isValid(pkgId) || pkgMgr.isFolder(pkgId)) {
 			return ErrorCode.BAD_VALUE;
 		}
 		
@@ -335,7 +335,7 @@ import com.buildml.utils.errors.ErrorCode;
 		try {
 			ResultSet rs = db.executeSelectResultSet(query);
 			if (!rs.next()){
-				return null;
+				return new MemberDesc[0];
 			}
 			
 			/* copy results into a MemberDesc[] */
