@@ -25,6 +25,7 @@ import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
 import com.buildml.eclipse.utils.dnd.BuildMLTransferType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -205,8 +206,8 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		}
 		
 		/* determine the action's current package */
-		int currentPackageId = pkgMemberMgr.getActionPackage(droppedActionId);
-		if (currentPackageId == ErrorCode.NOT_FOUND) {
+		PackageDesc currentPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, droppedActionId);
+		if (currentPackage == null) {
 			return false;
 		}
 				
@@ -216,7 +217,7 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		 * listeners of the change and they can refresh themselves if needed.
 		 */
 		ActionChangeOperation operation = new ActionChangeOperation("change package", droppedActionId);
-		operation.recordPackageChange(currentPackageId, targetPackageId);
+		operation.recordPackageChange(currentPackage.pkgId, targetPackageId);
 		operation.recordAndInvoke();
 		
 		return true;

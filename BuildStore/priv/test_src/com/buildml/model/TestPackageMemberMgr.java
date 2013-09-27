@@ -631,34 +631,35 @@ public class TestPackageMemberMgr {
 		int pkgImport = pkgMgr.getImportPackage();
 		
 		/* by default, all actions are in "<import>" */
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action1));
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1).pkgId);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2).pkgId);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3).pkgId);
 		
 		/* add an action to PkgA and check the actions */
-		pkgMemberMgr.setActionPackage(action1, pkgA);
-		assertEquals(pkgA, pkgMemberMgr.getActionPackage(action1));
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkgA, IPackageMemberMgr.SCOPE_NONE);
+		assertEquals(pkgA, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1).pkgId);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2).pkgId);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3).pkgId);
 		
 		/* add a different action to PkgB and check the actions */
-		pkgMemberMgr.setActionPackage(action2, pkgB);
-		assertEquals(pkgA, pkgMemberMgr.getActionPackage(action1));
-		assertEquals(pkgB, pkgMemberMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2, pkgB, IPackageMemberMgr.SCOPE_NONE);
+		assertEquals(pkgA, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1).pkgId);
+		assertEquals(pkgB, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2).pkgId);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3).pkgId);
 		
 		/* revert one of the actions back to <import>, and check the actions */
-		pkgMemberMgr.setActionPackage(action1, pkgImport);
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action1));
-		assertEquals(pkgB, pkgMemberMgr.getActionPackage(action2));
-		assertEquals(pkgImport, pkgMemberMgr.getActionPackage(action3));
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkgImport, IPackageMemberMgr.SCOPE_NONE);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1).pkgId);
+		assertEquals(pkgB, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2).pkgId);
+		assertEquals(pkgImport, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3).pkgId);
 		
 		/* check an invalid action - should return ErrorCode.NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, pkgMemberMgr.getActionPackage(1000));
+		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, 1000));
 		
 		/* try to place an action into a folder - should fail */
 		int folder = pkgMgr.addFolder("Folder");
-		assertEquals(ErrorCode.BAD_VALUE, pkgMemberMgr.setActionPackage(action1, folder));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, 
+																			folder, IPackageMemberMgr.SCOPE_NONE));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -692,7 +693,7 @@ public class TestPackageMemberMgr {
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));		
 		
 		/* add an action to pkgA */
-		pkgMemberMgr.setActionPackage(action1, pkgA);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkgA, IPackageMemberMgr.SCOPE_NONE);
 		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1}));
 		results = pkgMemberMgr.getActionsInPackage("PkgA");
@@ -703,7 +704,7 @@ public class TestPackageMemberMgr {
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2, action3}));
 
 		/* add another action to pkgA */
-		pkgMemberMgr.setActionPackage(action3, pkgA);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3, pkgA, IPackageMemberMgr.SCOPE_NONE);
 		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMemberMgr.getActionsInPackage("PkgA");
@@ -714,7 +715,7 @@ public class TestPackageMemberMgr {
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action2}));
 
 		/* Add a third */
-		pkgMemberMgr.setActionPackage(action2, pkgA);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2, pkgA, IPackageMemberMgr.SCOPE_NONE);
 		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action2, action3}));
 		results = pkgMemberMgr.getActionsInPackage("PkgA");
@@ -725,7 +726,7 @@ public class TestPackageMemberMgr {
 		assertEquals(0, results.size());
 
 		/* move the second action into pkgB */
-		pkgMemberMgr.setActionPackage(action2, pkgB);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2, pkgB, IPackageMemberMgr.SCOPE_NONE);
 		results = pkgMemberMgr.getActionsInPackage(pkgA);
 		assertTrue(CommonTestUtils.treeSetEqual(results, new Integer[] {action1, action3}));
 		results = pkgMemberMgr.getActionsInPackage("PkgA");
@@ -809,14 +810,16 @@ public class TestPackageMemberMgr {
 		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
 		int pkgD = pkgMgr.addPackage("PkgD");
 		assert(actionId >= 0);
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, 
+																	pkgD, IPackageMemberMgr.SCOPE_NONE));
 		assertEquals(pkgD, notifyPkgValue);
 		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
 		
 		/* Changing it to the same thing, will not */
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, 
+																		pkgD, IPackageMemberMgr.SCOPE_NONE));
 		assertEquals(0, notifyPkgValue);
 		assertEquals(0, notifyHowValue);		
 

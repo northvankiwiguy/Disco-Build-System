@@ -15,6 +15,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -106,9 +107,9 @@ public class ActionPropertyPage extends PropertyPage implements
 		/* Display the package that the action belongs to */
 		Label actionPackageLabel = new Label(panel, SWT.NONE);
 		String packageName = "Invalid";
-		int pkgId = pkgMemberMgr.getActionPackage(actionId);
-		if (pkgId != ErrorCode.NOT_FOUND) {
-			String packageNameString = pkgMgr.getName(pkgId);
+		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+		if (pkg != null) {
+			String packageNameString = pkgMgr.getName(pkg.pkgId);
 			if (packageNameString != null) {
 				packageName = packageNameString;
 			}

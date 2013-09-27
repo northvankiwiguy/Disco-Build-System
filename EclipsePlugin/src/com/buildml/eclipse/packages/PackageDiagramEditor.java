@@ -30,6 +30,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
@@ -43,7 +44,8 @@ import com.buildml.utils.types.IntegerTreeSet;
  * @author Peter Smith <psmith@arapiki.com>
  */
 public class PackageDiagramEditor extends DiagramEditor 
-									implements ISubEditor, IPackageMgrListener, IActionMgrListener {
+									implements ISubEditor, IPackageMgrListener, 
+												IActionMgrListener, IPackageMemberMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -89,6 +91,7 @@ public class PackageDiagramEditor extends DiagramEditor
 		
 		/* listen for changes to the packages and actions */
 		pkgMgr.addListener(this);
+		pkgMemberMgr.addListener(this);
 		actionMgr.addListener(this);
 	}
 	
@@ -358,14 +361,25 @@ public class PackageDiagramEditor extends DiagramEditor
 					}
 				}
 			}
-			
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgrListener#packageMemberChangeNotification(int, int)
+	 */
+	@Override
+	public void packageMemberChangeNotification(int pkgId, int how) {
+
+		if (pkgId == this.packageId){
 			/* has the content of the package changed? Action/files added or removed? */
-			else if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
+			if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
 				updateBehavior.markChanged();
 			}
 		}
 	}
-
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -373,8 +387,8 @@ public class PackageDiagramEditor extends DiagramEditor
 	 */
 	@Override
 	public void actionChangeNotification(int actionId, int how) {
-		int pkgId = pkgMemberMgr.getActionPackage(actionId);
-		if (pkgId != this.packageId) {
+		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+		if ((pkg == null) || (pkg.pkgId != this.packageId)) {
 			return;
 		}
 		updateBehavior.markChanged();

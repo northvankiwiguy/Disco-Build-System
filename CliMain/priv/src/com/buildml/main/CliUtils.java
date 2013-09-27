@@ -651,11 +651,11 @@ public class CliUtils {
 		
 		/* if requested, display the action's package name */
 		if (showPkgs) {
-			int pkgId = pkgMemberMgr.getActionPackage(actionId);
-			if (pkgId == ErrorCode.NOT_FOUND) {
+			PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+			if (pkg == null) {
 				outStream.print(" - Invalid action");
 			} else {
-				String pkgName = pkgMgr.getName(pkgId);
+				String pkgName = pkgMgr.getName(pkg.pkgId);
 				if (pkgName == null) {
 					outStream.print(" - Invalid package");
 				} else {

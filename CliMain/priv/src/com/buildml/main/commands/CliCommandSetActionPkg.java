@@ -120,7 +120,7 @@ public class CliCommandSetActionPkg implements ICliCommand {
 		/* now visit each action in the ActionSet and set its package */
 		buildStore.setFastAccessMode(true);
 		for (int actionId : actionsToSet) {
-			pkgMemberMgr.setActionPackage(actionId, pkgId);
+			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, pkgId, IPackageMemberMgr.SCOPE_NONE);
 		}
 		buildStore.setFastAccessMode(false);	
 	}

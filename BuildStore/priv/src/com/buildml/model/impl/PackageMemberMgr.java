@@ -116,10 +116,12 @@ import com.buildml.utils.errors.ErrorCode;
 				" and not (pkgId = ? and scopeId = ?)");
 		updateActionPackagePrepStmt = db.prepareStatement("update buildActions set pkgId = ? " +
 				"where actionId = ?");
-		findActionPackagePrepStmt = db.prepareStatement("select pkgId from buildActions where actionId = ?");
-		findActionsInPackagePrepStmt = db.prepareStatement("select actionId from buildActions where pkgId = ?");
-		findActionsOutsidePackagePrepStmt = db.prepareStatement("select actionId from buildActions " +
-				"where pkgId != ? and actionId != 0");
+		findActionPackagePrepStmt = db.prepareStatement("select pkgId from packageMembers where memberId = ?" +
+				" and memberType = " + MEMBER_TYPE_ACTION);
+		findActionsInPackagePrepStmt = db.prepareStatement(
+				"select memberId from packageMembers where pkgId = ? and memberType = " + MEMBER_TYPE_ACTION);
+		findActionsOutsidePackagePrepStmt = db.prepareStatement("select memberId from packageMembers " +
+				"where pkgId != ? and memberId != 0 and memberType = " + MEMBER_TYPE_ACTION);
 	}
 
 	/*=====================================================================================*
@@ -218,6 +220,15 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		/* TODO: check pkgScopeId is a valid scope - else return BAD_VALUE */
 
+		/* determine which package the member is currently in - if no change, we're done */
+		PackageDesc oldPkg = getPackageOfMember(memberType, memberId);
+		if (oldPkg == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if ((oldPkg.pkgId == pkgId) && (oldPkg.pkgScopeId == pkgScopeId)) {
+			return ErrorCode.OK;
+		}	
+				
 		/*
 		 * Perform MEMBER_TYPE_FILE-specific validation checks.
 		 */
@@ -243,7 +254,7 @@ import com.buildml.utils.errors.ErrorCode;
 				}
 			}
 		}
-				
+			
 		/* update the database table with the new pkgId/pkgScopeId */
 		try {
 			updatePackagePrepStmt.setInt(1, pkgId);
@@ -257,6 +268,15 @@ import com.buildml.utils.errors.ErrorCode;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}		
+		
+
+		/* 
+		 * Notify listeners about the change in package content.
+		 */
+		notifyListeners(oldPkg.pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
+		if (oldPkg.pkgId != pkgId) {
+			notifyListeners(pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
+		}
 		
 		return ErrorCode.OK;
 	}
@@ -490,79 +510,6 @@ import com.buildml.utils.errors.ErrorCode;
 		} else {
 			return getFilesOutsidePackage(spec.pkgId);			
 		}
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMemberMgr#setActionPackage(int, int)
-	 */
-	@Override
-	public int setActionPackage(int actionId, int pkgId) {
-		
-		/* we can't assign actions into folders (only into packages) */
-		if (pkgMgr.isFolder(pkgId)) {
-			return ErrorCode.BAD_VALUE;
-		}
-
-		/* determine which package the action is currently in */
-		int oldPkgId = getActionPackage(actionId);
-		if (oldPkgId == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		/* if the package is unchanged, we're done */
-		if (oldPkgId == pkgId) {
-			return ErrorCode.OK;
-		}
-		
-		/* update the database */
-		try {
-			updateActionPackagePrepStmt.setInt(1, pkgId);
-			updateActionPackagePrepStmt.setInt(2, actionId);
-			int rowCount = db.executePrepUpdate(updateActionPackagePrepStmt);
-			if (rowCount == 0) {
-				return ErrorCode.NOT_FOUND;
-			}
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		/* 
-		 * Notify listeners about the change in package content.
-		 */
-		notifyListeners(oldPkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
-		notifyListeners(pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
-
-		return ErrorCode.OK;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMemberMgr#getActionPackage(int)
-	 */
-	@Override
-	public int getActionPackage(int actionId) {
-		
-		Integer results[];
-		try {
-			findActionPackagePrepStmt.setInt(1, actionId);
-			results = db.executePrepSelectIntegerColumn(findActionPackagePrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		/* no result == no package by this name */
-		if (results.length == 0) {
-			return ErrorCode.NOT_FOUND;
-		} 
-		
-		/* 
-		 * One result == we have the correct ID (note: it's not possible to have
-		 * multiple results, since actionId is a unique key
-		 */
-		return results[0];
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

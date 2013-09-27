@@ -281,11 +281,11 @@ public class TestPackageMgr {
 		/* assign them to actions, then try to remove the name */
 		int my_pkg = pkgMgr.getId("my_package");
 		int action1 = actionMgr.addShellCommandAction(0, 0, "action1");
-		pkgMemberMgr.setActionPackage(action1, my_pkg);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, my_pkg, IPackageMemberMgr.SCOPE_NONE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(my_pkg));
 		
 		/* remove them from actions, then try again to remove the package name */
-		pkgMemberMgr.setActionPackage(action1, pkgImport);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkgImport, IPackageMemberMgr.SCOPE_NONE);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(my_pkg));
 		
 		/* test removal of an empty folder */
@@ -481,14 +481,16 @@ public class TestPackageMgr {
 		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
 		int pkgD = pkgMgr.addPackage("PkgD");
 		assert(actionId >= 0);
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId,
+																	pkgD, IPackageMemberMgr.SCOPE_NONE));
 		assertEquals(pkgD, notifyPkgValue);
 		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
 		
 		/* Changing it to the same thing, will not */
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, pkgMemberMgr.setActionPackage(actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId,
+																		pkgD, IPackageMemberMgr.SCOPE_NONE));
 		assertEquals(0, notifyPkgValue);
 		assertEquals(0, notifyHowValue);		
 

@@ -20,6 +20,7 @@ import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -87,14 +88,14 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 		if (element instanceof UIAction) {
 			UIAction uiAction = (UIAction)element;
 			int actionId = uiAction.getId();
-			int pkgId = pkgMemberMgr.getActionPackage(actionId);
-			if (pkgId == ErrorCode.NOT_FOUND) {
+			PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+			if (pkg == null) {
 				return "<invalid>";
 			}
-			if (pkgId == 0) {
+			if (pkg.pkgId == 0) {
 				return "";
 			}
-			String pkgName = pkgMgr.getName(pkgId);
+			String pkgName = pkgMgr.getName(pkg.pkgId);
 			if (pkgName == null) {
 				return "<invalid>";
 			}

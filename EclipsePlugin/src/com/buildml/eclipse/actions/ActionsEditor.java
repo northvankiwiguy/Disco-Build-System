@@ -55,9 +55,8 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgrListener;
-import com.buildml.model.IPackageMgr;
-import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -67,7 +66,8 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class ActionsEditor extends ImportSubEditor implements IPackageMgrListener {
+public class ActionsEditor extends ImportSubEditor 
+			implements IPackageMemberMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -131,8 +131,8 @@ public class ActionsEditor extends ImportSubEditor implements IPackageMgrListene
 		actionMgr = buildStore.getActionMgr();
 		
 		/* listen to changes in package content (for all packages) */
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
-		pkgMgr.addListener(this);
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
+		pkgMemberMgr.addListener(this);
 		
 		/* initially, all paths are visible */
 		visibleActions = buildStore.getReportMgr().reportAllActions();
@@ -562,7 +562,7 @@ public class ActionsEditor extends ImportSubEditor implements IPackageMgrListene
 	 * there's a good chance our content changed).
 	 */
 	@Override
-	public void packageChangeNotification(int pkgId, int how) {
+	public void packageMemberChangeNotification(int pkgId, int how) {
 
 		if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
 

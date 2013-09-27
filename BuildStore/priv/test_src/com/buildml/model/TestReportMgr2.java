@@ -476,14 +476,14 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* map the actions into packages */
-		pkgMemberMgr.setActionPackage(action1, pkg1Id);
-		pkgMemberMgr.setActionPackage(action2, pkg2Id);
-		pkgMemberMgr.setActionPackage(action3, pkg3Id);
-		pkgMemberMgr.setActionPackage(action4, pkg4Id);
-		pkgMemberMgr.setActionPackage(action5, pkg1Id);
-		pkgMemberMgr.setActionPackage(action6, pkg2Id);
-		pkgMemberMgr.setActionPackage(action7, pkg3Id);
-		pkgMemberMgr.setActionPackage(action8, pkg4Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkg1Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2, pkg2Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3, pkg3Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action4, pkg4Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action5, pkg1Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action6, pkg2Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action7, pkg3Id, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action8, pkg4Id, IPackageMemberMgr.SCOPE_NONE);
 
 		/* empty package set still gives an empty ActionSet */
 		tset = reports.reportActionsFromPackageSet(cs);

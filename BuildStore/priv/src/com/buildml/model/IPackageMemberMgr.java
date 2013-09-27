@@ -215,27 +215,6 @@ public interface IPackageMemberMgr {
 	public abstract FileSet getFilesOutsidePackage(String pkgSpec);
 
 	/**
-	 * Set the package associated with this action. Any listeners will receive the
-	 * IPackageMgrListener.CHANGED_MEMBERSHIP notification, first for the old package,
-	 * and then for the new package.
-	 * 
-	 * @param actionId The ID of the action whose package will be set.
-	 * @param pkgId The ID of the package to be associated with this action.
-	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if this action doesn't exist
-	 */
-	@Deprecated
-	public abstract int setActionPackage(int actionId, int pkgId);
-
-	/**
-	 * Get the package associated with this action.
-	 * 
-	 * @param actionId The ID of the action whose package we're interested in.
-	 * @return The action's package, or ErrorCode.NOT_FOUND if the action doesn't exist.
-	 */
-	@Deprecated
-	public abstract int getActionPackage(int actionId);
-
-	/**
 	 * Return the set of actions that are within the specified package.
 	 * 
 	 * @param pkgId The package we're examining.

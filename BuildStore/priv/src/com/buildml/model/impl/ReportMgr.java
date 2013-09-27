@@ -576,7 +576,8 @@ import com.buildml.utils.errors.ErrorCode;
 		 * Form the (complex) query string.
 		 */
 		StringBuffer sb = new StringBuffer(256);
-		sb.append("select actionId from buildActions where ");
+		sb.append("select memberId from packageMembers where memberType = " + 
+						IPackageMemberMgr.MEMBER_TYPE_ACTION + " and ");
 		int memberCount = 0;
 		
 		String pkgList[] = pkgMgr.getPackages();
