@@ -193,25 +193,25 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					}			
 				}
 				
-				IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
-				Integer[] fileGroups = fileGroupMgr.getGroupsInPackage(pkgId);
-				for (int i = 0; i < fileGroups.length; i++) {
-					UIFileGroup fileGroup = new UIFileGroup(fileGroups[i]);
-					container.eResource().getContents().add(fileGroup);
-					AddContext context2 = new AddContext();
-					context2.setNewObject(fileGroup);
-					int x = column * 150, y = row * 50;
-
-					context2.setLocation(x, y);
-					context2.setTargetContainer(container);
-					getFeatureProvider().addIfPossible(context2);
-					
-					column++;
-					if (column == 5) {
-						column = 0;
-						row++;
-					}
-				}
+//				IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+//				Integer[] fileGroups = fileGroupMgr.getGroupsInPackage(pkgId);
+//				for (int i = 0; i < fileGroups.length; i++) {
+//					UIFileGroup fileGroup = new UIFileGroup(fileGroups[i]);
+//					container.eResource().getContents().add(fileGroup);
+//					AddContext context2 = new AddContext();
+//					context2.setNewObject(fileGroup);
+//					int x = column * 150, y = row * 50;
+//
+//					context2.setLocation(x, y);
+//					context2.setTargetContainer(container);
+//					getFeatureProvider().addIfPossible(context2);
+//					
+//					column++;
+//					if (column == 5) {
+//						column = 0;
+//						row++;
+//					}
+//				}
 			}
 			
 		});
