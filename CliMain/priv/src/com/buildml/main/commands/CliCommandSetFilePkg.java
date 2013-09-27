@@ -123,7 +123,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 		boolean errorOccurred = false;
 		buildStore.setFastAccessMode(true);
 		for (int file : filesToSet) {
-			int rc = pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file, pkgId, scopeId);
+			int rc = pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file, pkgId, scopeId);
 			if (rc == ErrorCode.OUT_OF_RANGE) {
 				System.err.println("Unable to move file " + fileMgr.getPathName(file) + 
 									" into package " + pkgName + ". It is not within the package root.");

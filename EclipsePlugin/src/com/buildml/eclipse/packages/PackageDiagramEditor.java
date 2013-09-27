@@ -387,7 +387,7 @@ public class PackageDiagramEditor extends DiagramEditor
 	 */
 	@Override
 	public void actionChangeNotification(int actionId, int how) {
-		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId);
 		if ((pkg == null) || (pkg.pkgId != this.packageId)) {
 			return;
 		}

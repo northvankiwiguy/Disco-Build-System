@@ -605,7 +605,7 @@ public class TestPackageRootMgr {
 		assertTrue(file1 > 0);
 		assertTrue(file2 > 0);		
 		assertEquals(ErrorCode.OK, 
-						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file1,
 														pkgAId, IPackageMemberMgr.SCOPE_PUBLIC));
 		
 		/* compute a native path of a path within the root, and the path without a root */
@@ -749,7 +749,7 @@ public class TestPackageRootMgr {
 
 		/* add /a/b/d/file into the package (OK, since root is above it) */
 		assertEquals(ErrorCode.OK, 
-						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, fileABD,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, fileABD,
 														pkgId, IPackageMemberMgr.SCOPE_PUBLIC));
 		
 		/* move package root to /a/b - acceptable */
@@ -761,7 +761,7 @@ public class TestPackageRootMgr {
 		
 		/* remove file from package, and try again to change the root to /a/b/c */
 		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, fileABD,
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, fileABD,
 												pkgMgr.getImportPackage(), IPackageMemberMgr.SCOPE_PUBLIC));		
 		assertEquals(ErrorCode.OK, 
 				pkgRootMgr.setPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
@@ -794,7 +794,7 @@ public class TestPackageRootMgr {
 		
 		/* add /a/b/d/file into the package - error, since it's not within /a/b/c */
 		assertEquals(ErrorCode.OUT_OF_RANGE, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, fileABD, 
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, fileABD, 
 												pkgId, IPackageMemberMgr.SCOPE_PUBLIC));
 	}
 

@@ -218,7 +218,7 @@ public class FileMgr implements IFileMgr {
 			IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 			int workspaceRootPathId = pkgRootMgr.getWorkspaceRoot();
-			PackageDesc pathPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, pathId);
+			PackageDesc pathPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId);
 			int pkgRootPathId = 0;
 			String pkgRootName = null;
 			
@@ -830,7 +830,7 @@ public class FileMgr implements IFileMgr {
 				}
 				
 				/* insert the default package membership values */
-				insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.MEMBER_TYPE_FILE);
+				insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_FILE);
 				insertPackageMemberPrepStmt.setInt(2, lastRowId);
 				insertPackageMemberPrepStmt.setInt(3, pkgMgr.getImportPackage());
 				insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);

@@ -128,7 +128,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 				db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
 		removePackageMemberPrepStmt =
 				db.prepareStatement("delete from packageMembers where memberId = ? and memberType = " +
-						IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+						IPackageMemberMgr.TYPE_FILE_GROUP);
 		
 		/* initialize the mapping of group IDs to list of transient entries */
 		transientEntryMap = new HashMap<Integer, ArrayList<TransientEntry>>();
@@ -194,7 +194,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 			lastRowId = db.getLastRowID();
 			
 			/* insert the default package membership values */
-			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_FILE_GROUP);
 			insertPackageMemberPrepStmt.setInt(2, lastRowId);
 			insertPackageMemberPrepStmt.setInt(3, pkgId);
 			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);

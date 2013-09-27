@@ -500,7 +500,7 @@ public class CliUtils {
 			pkgString = new StringBuilder();
 			
 			/* fetch the file's package and scope */
-			PackageDesc pkgAndScopeId = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, thisPathId);
+			PackageDesc pkgAndScopeId = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, thisPathId);
 			if (pkgAndScopeId == null) {
 				pkgString.append("Invalid file");
 			} 
@@ -651,7 +651,7 @@ public class CliUtils {
 		
 		/* if requested, display the action's package name */
 		if (showPkgs) {
-			PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+			PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId);
 			if (pkg == null) {
 				outStream.print(" - Invalid action");
 			} else {

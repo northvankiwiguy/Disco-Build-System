@@ -105,23 +105,23 @@ import com.buildml.utils.errors.ErrorCode;
 				db.prepareStatement("update packageMembers set pkgId = ?, scopeId = ? " +
 									"where memberType = ? and memberId = ?");				
 		findFilesInPackage1PrepStmt = db.prepareStatement(
-				"select memberId from packageMembers where pkgId = ? and memberType = " + MEMBER_TYPE_FILE);
+				"select memberId from packageMembers where pkgId = ? and memberType = " + TYPE_FILE);
 		findFilesInPackage2PrepStmt = db.prepareStatement(
 				"select memberId from packageMembers where pkgId = ? and memberType = " + 
-						MEMBER_TYPE_FILE + " and scopeId = ?");
+						TYPE_FILE + " and scopeId = ?");
 		findFilesOutsidePackage1PrepStmt = db.prepareStatement(
-				"select memberId from packageMembers where pkgId != ? and memberType = " + MEMBER_TYPE_FILE);
+				"select memberId from packageMembers where pkgId != ? and memberType = " + TYPE_FILE);
 		findFilesOutsidePackage2PrepStmt = db.prepareStatement(
-				"select memberId from packageMembers where memberType = " + MEMBER_TYPE_FILE +
+				"select memberId from packageMembers where memberType = " + TYPE_FILE +
 				" and not (pkgId = ? and scopeId = ?)");
 		updateActionPackagePrepStmt = db.prepareStatement("update buildActions set pkgId = ? " +
 				"where actionId = ?");
 		findActionPackagePrepStmt = db.prepareStatement("select pkgId from packageMembers where memberId = ?" +
-				" and memberType = " + MEMBER_TYPE_ACTION);
+				" and memberType = " + TYPE_ACTION);
 		findActionsInPackagePrepStmt = db.prepareStatement(
-				"select memberId from packageMembers where pkgId = ? and memberType = " + MEMBER_TYPE_ACTION);
+				"select memberId from packageMembers where pkgId = ? and memberType = " + TYPE_ACTION);
 		findActionsOutsidePackagePrepStmt = db.prepareStatement("select memberId from packageMembers " +
-				"where pkgId != ? and memberId != 0 and memberType = " + MEMBER_TYPE_ACTION);
+				"where pkgId != ? and memberId != 0 and memberType = " + TYPE_ACTION);
 	}
 
 	/*=====================================================================================*
@@ -232,7 +232,7 @@ import com.buildml.utils.errors.ErrorCode;
 		/*
 		 * Perform MEMBER_TYPE_FILE-specific validation checks.
 		 */
-		if (memberType == MEMBER_TYPE_FILE) {
+		if (memberType == TYPE_FILE) {
 			/* the path must be valid and not-trashed */
 			if ((fileMgr.getPathType(memberId) == PathType.TYPE_INVALID) ||
 					(fileMgr.isPathTrashed(memberId))) {
@@ -337,7 +337,7 @@ import com.buildml.utils.errors.ErrorCode;
 		if (pkgScopeId != SCOPE_NONE) {
 			query += " and scopeId = " + pkgScopeId;
 		}
-		if (memberTypeFilter != MEMBER_TYPE_ANY) {
+		if (memberTypeFilter != TYPE_ANY) {
 			query += " and memberType = " + memberTypeFilter;
 		}
 		

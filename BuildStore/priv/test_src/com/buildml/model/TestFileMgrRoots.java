@@ -139,21 +139,21 @@ public class TestFileMgrRoots {
 		/* now add path1 (e.h) into this new package and test again */
 		assertEquals(ErrorCode.OK, 
 				 pkgMemberMgr.setPackageOfMember(
-						 IPackageMemberMgr.MEMBER_TYPE_FILE, path1, pkgAId, IPackageMemberMgr.SCOPE_PUBLIC));
+						 IPackageMemberMgr.TYPE_FILE, path1, pkgAId, IPackageMemberMgr.SCOPE_PUBLIC));
 		
 		assertEquals("@pkgA_src/d/e.h", fileMgr.getPathName(path1, true));
 		assertEquals("@workspace/c/d/f.h", fileMgr.getPathName(path2, true));
 
 		/* now add path2 (f.h) into this new package and test again */
 		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path2, 
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, path2, 
 												pkgAId, IPackageMemberMgr.SCOPE_PUBLIC));
 		assertEquals("@pkgA_src/d/e.h", fileMgr.getPathName(path1, true));
 		assertEquals("@pkgA_src/d/f.h", fileMgr.getPathName(path2, true));
 
 		/* remove path1 from the package */
 		assertEquals(ErrorCode.OK, 
-				 pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, path1, 
+				 pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, path1, 
 						 					pkgMgr.getImportPackage(), IPackageMemberMgr.SCOPE_PUBLIC));
 		assertEquals("@workspace/c/d/e.h", fileMgr.getPathName(path1, true));
 		assertEquals("@pkgA_src/d/f.h", fileMgr.getPathName(path2, true));

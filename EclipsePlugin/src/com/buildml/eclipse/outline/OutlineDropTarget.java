@@ -206,7 +206,7 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		}
 		
 		/* determine the action's current package */
-		PackageDesc currentPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, droppedActionId);
+		PackageDesc currentPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, droppedActionId);
 		if (currentPackage == null) {
 			return false;
 		}

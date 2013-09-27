@@ -510,7 +510,7 @@ import com.buildml.utils.errors.ErrorCode;
 		 */
 		StringBuffer sb = new StringBuffer(256);
 		sb.append("select memberId from packageMembers where memberType = " + 
-						IPackageMemberMgr.MEMBER_TYPE_FILE + " and ");
+						IPackageMemberMgr.TYPE_FILE + " and ");
 		int memberCount = 0;
 		
 		String pkgList[] = pkgMgr.getPackages();
@@ -577,7 +577,7 @@ import com.buildml.utils.errors.ErrorCode;
 		 */
 		StringBuffer sb = new StringBuffer(256);
 		sb.append("select memberId from packageMembers where memberType = " + 
-						IPackageMemberMgr.MEMBER_TYPE_ACTION + " and ");
+						IPackageMemberMgr.TYPE_ACTION + " and ");
 		int memberCount = 0;
 		
 		String pkgList[] = pkgMgr.getPackages();

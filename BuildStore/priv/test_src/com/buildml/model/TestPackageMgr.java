@@ -270,22 +270,22 @@ public class TestPackageMgr {
 		/* assign a package to files, then try to remove the name */
 		int pkgA = pkgMgr.getId("PkgA");
 		int file1 = fileMgr.addFile("/aardvark/bunny");
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkgA, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file1, pkgA, IPackageMemberMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgA));
 		
 		/* remove the package from the file, then try again to remove the package name */
 		int pkgImport = pkgMgr.getId("<import>");
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkgImport, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file1, pkgImport, IPackageMemberMgr.SCOPE_PRIVATE);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
 		
 		/* assign them to actions, then try to remove the name */
 		int my_pkg = pkgMgr.getId("my_package");
 		int action1 = actionMgr.addShellCommandAction(0, 0, "action1");
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, my_pkg, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action1, my_pkg, IPackageMemberMgr.SCOPE_NONE);
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(my_pkg));
 		
 		/* remove them from actions, then try again to remove the package name */
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkgImport, IPackageMemberMgr.SCOPE_NONE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action1, pkgImport, IPackageMemberMgr.SCOPE_NONE);
 		assertEquals(ErrorCode.OK, pkgMgr.remove(my_pkg));
 		
 		/* test removal of an empty folder */
@@ -482,7 +482,7 @@ public class TestPackageMgr {
 		int pkgD = pkgMgr.addPackage("PkgD");
 		assert(actionId >= 0);
 		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, pkgD));
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
 		assertEquals(pkgD, notifyPkgValue);
 		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
 		
@@ -490,7 +490,7 @@ public class TestPackageMgr {
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
 		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId, pkgD));
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
 		assertEquals(0, notifyPkgValue);
 		assertEquals(0, notifyHowValue);		
 

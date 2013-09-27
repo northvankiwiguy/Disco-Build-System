@@ -501,16 +501,16 @@ public class TestFileSet {
 		int sectPublic = pkgMemberMgr.getScopeId("public");
 		int sectPrivate = pkgMemberMgr.getScopeId("private");
 		assertEquals(ErrorCode.OK, 
-						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f1path, 
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, f1path, 
 														pkgFooId, sectPublic));
 		assertEquals(ErrorCode.OK,
-						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f2path,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, f2path,
 														pkgFooId, sectPrivate));
 		assertEquals(ErrorCode.OK, 
-						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f4path,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, f4path,
 														pkgFooId, sectPrivate));
 		assertEquals(ErrorCode.OK, 
-						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, f5path,
+						pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, f5path,
 														pkgFooId, sectPrivate));
 		
 		/* test @foo/public membership */

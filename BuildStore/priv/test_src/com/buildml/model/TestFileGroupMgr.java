@@ -97,9 +97,9 @@ public class TestFileGroupMgr {
 		assertEquals(IFileGroupMgr.MERGE_GROUP, fileGroupMgr.getGroupType(group3Id));
 		
 		/* test that the package IDs are correct */
-		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group1Id).pkgId);
-		assertEquals(pkg2Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group2Id).pkgId);
-		assertEquals(pkg3Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group3Id).pkgId);
+		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group1Id).pkgId);
+		assertEquals(pkg2Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group2Id).pkgId);
+		assertEquals(pkg3Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group3Id).pkgId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -122,7 +122,7 @@ public class TestFileGroupMgr {
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getGroupType(1000));
 		
 		/* test get of file group package with bad group Id. */
-		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, 1000));
+		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, 1000));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -137,22 +137,22 @@ public class TestFileGroupMgr {
 		/* create a couple of file groups in one package */
 		int group1Id = fileGroupMgr.newSourceGroup(pkg1Id);
 		int group2Id = fileGroupMgr.newSourceGroup(pkg1Id);
-		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group1Id).pkgId);
-		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group2Id).pkgId);
+		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group1Id).pkgId);
+		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group2Id).pkgId);
 		
 		/* change one of the groups to another package */
 		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group2Id, pkg2Id));
-		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group1Id).pkgId);
-		assertEquals(pkg2Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group2Id).pkgId);
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group2Id, pkg2Id));
+		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group1Id).pkgId);
+		assertEquals(pkg2Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group2Id).pkgId);
 		
 		/* try changing with an invalid group ID */
 		assertEquals(ErrorCode.NOT_FOUND, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, 100, pkg2Id));
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, 100, pkg2Id));
 		
 		/* try changing with an invalid package ID */
 		assertEquals(ErrorCode.BAD_VALUE, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, group2Id, 100));
+				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group2Id, 100));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -167,13 +167,13 @@ public class TestFileGroupMgr {
 		
 		/* test parameters of group, before it's deleted */
 		assertEquals(IFileGroupMgr.GENERATED_GROUP, fileGroupMgr.getGroupType(groupId));
-		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, groupId).pkgId);
+		assertEquals(pkg1Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, groupId).pkgId);
 		assertEquals(0, fileGroupMgr.getGroupSize(groupId));
 		
 		/* delete the group and test again */
 		assertEquals(ErrorCode.OK, fileGroupMgr.removeGroup(groupId));
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getGroupType(groupId));
-		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP, groupId));
+		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, groupId));
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getGroupSize(groupId));
 		
 		/* try to delete a second time - should fail */
@@ -645,20 +645,20 @@ public class TestFileGroupMgr {
 		
 		/* test empty group */
 		MemberDesc[] results = pkgMemberMgr.getMembersInPackage(
-				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_FILE_GROUP);
 		assertEquals(0, results.length);
 		
 		/* add a group, and test again */
 		int group1 = fileGroupMgr.newSourceGroup(pkg1Id);
 		results = pkgMemberMgr.getMembersInPackage(
-				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_FILE_GROUP);
 		assertEquals(1, results.length);
 		assertEquals(group1, results[0].memberId);
 
 		/* add a second group, and test again - ordering of result is undefined. */
 		int group2 = fileGroupMgr.newSourceGroup(pkg1Id);
 		results = pkgMemberMgr.getMembersInPackage(
-				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_FILE_GROUP);
 		assertEquals(2, results.length);
 		assertTrue(((results[0].memberId == group1) && (results[1].memberId == group2)) ||
 				((results[0].memberId == group2) && (results[1].memberId == group1)));
@@ -666,14 +666,14 @@ public class TestFileGroupMgr {
 		/* add a third group, in a different package. */
 		int group3 = fileGroupMgr.newSourceGroup(pkg2Id);
 		results = pkgMemberMgr.getMembersInPackage(
-				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP);
+				pkg1Id, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_FILE_GROUP);
 		assertEquals(2, results.length);
 		assertTrue(((results[0].memberId == group1) && (results[1].memberId == group2)) ||
 				((results[0].memberId == group2) && (results[1].memberId == group1)));
 
 		/* invalid package ID */
 		assertEquals(0, pkgMemberMgr.getMembersInPackage(
-				1000, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.MEMBER_TYPE_FILE_GROUP).length);
+				1000, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_FILE_GROUP).length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

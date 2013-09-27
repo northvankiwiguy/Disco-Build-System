@@ -384,14 +384,14 @@ public class TestReportMgr2 {
 		assertEquals(0, fs.size());
 		
 		/* map the files into packages */
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file1, pkg1Id, IPackageMemberMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file2, pkg1Id, IPackageMemberMgr.SCOPE_PUBLIC);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file3, pkg2Id, IPackageMemberMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file4, pkg2Id, IPackageMemberMgr.SCOPE_PUBLIC);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file5, pkg3Id, IPackageMemberMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file6, pkg3Id, IPackageMemberMgr.SCOPE_PUBLIC);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file7, pkg4Id, IPackageMemberMgr.SCOPE_PRIVATE);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, file8, pkg4Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file1, pkg1Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file2, pkg1Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file3, pkg2Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file4, pkg2Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file5, pkg3Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file6, pkg3Id, IPackageMemberMgr.SCOPE_PUBLIC);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file7, pkg4Id, IPackageMemberMgr.SCOPE_PRIVATE);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file8, pkg4Id, IPackageMemberMgr.SCOPE_PUBLIC);
 	
 		/* empty package set still gives an empty FileSet */
 		fs = reports.reportFilesFromPackageSet(cs);
@@ -476,14 +476,14 @@ public class TestReportMgr2 {
 		assertEquals(0, tset.size());
 		
 		/* map the actions into packages */
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action1, pkg1Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action2, pkg2Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action3, pkg3Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action4, pkg4Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action5, pkg1Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action6, pkg2Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action7, pkg3Id);
-		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, action8, pkg4Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action1, pkg1Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action2, pkg2Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action3, pkg3Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action4, pkg4Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action5, pkg1Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action6, pkg2Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action7, pkg3Id);
+		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, action8, pkg4Id);
 
 		/* empty package set still gives an empty ActionSet */
 		tset = reports.reportActionsFromPackageSet(cs);

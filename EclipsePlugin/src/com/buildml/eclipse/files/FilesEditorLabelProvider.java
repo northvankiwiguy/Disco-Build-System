@@ -166,7 +166,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				
 			/* select text for the package column */
 			case 1:
-				PackageDesc pkgInfo = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, pathId);
+				PackageDesc pkgInfo = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId);
 				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}
@@ -181,7 +181,7 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 				
 			/* select text for the visibility column */
 			case 2:
-				pkgInfo = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, pathId);
+				pkgInfo = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId);
 				if (pkgInfo == null) {
 					break;	/* return "invalid" */
 				}

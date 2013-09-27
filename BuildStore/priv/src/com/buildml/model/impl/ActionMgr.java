@@ -184,7 +184,7 @@ public class ActionMgr implements IActionMgr {
 			}
 
 			/* insert the default package membership values */
-			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.MEMBER_TYPE_ACTION);
+			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_ACTION);
 			insertPackageMemberPrepStmt.setInt(2, lastRowId);
 			insertPackageMemberPrepStmt.setInt(3, pkgMgr.getImportPackage());
 			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);

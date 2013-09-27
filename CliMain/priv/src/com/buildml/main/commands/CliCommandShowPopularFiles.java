@@ -97,7 +97,7 @@ public class CliCommandShowPopularFiles extends CliCommandShowFiles {
 				
 				/* should we show package names? */
 				if (optionShowPkgs) {
-					PackageDesc cmptScopeIds = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_FILE, id);
+					PackageDesc cmptScopeIds = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, id);
 					String cmptName = pkgMgr.getName(cmptScopeIds.pkgId);
 					String sectName = pkgMemberMgr.getScopeName(cmptScopeIds.pkgScopeId);
 					System.out.println(count + "\t" + pathName + "  (" + cmptName + "/" + sectName + ")");

@@ -309,7 +309,7 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("create table packageMembers (memberType integer, memberId integer, " +
 							   "pkgId integer, scopeId integer, x integer, y integer)");
 			stat.executeUpdate("create unique index packageMembersIdx on packageMembers (memberType, memberId)");
-			stat.executeUpdate("insert into packageMembers values (" + IPackageMemberMgr.MEMBER_TYPE_FILE + 
+			stat.executeUpdate("insert into packageMembers values (" + IPackageMemberMgr.TYPE_FILE + 
 							   ", 0, 0, 0, 0, 0)"); /* the "/" path */
 
 			stat.close();
@@ -701,10 +701,10 @@ import com.buildml.model.IPackageMemberMgr;
 			
 			/* delete entries from packageMembers where the files or actions have been trashed */
 			stat.executeUpdate("delete from packageMembers where memberType = " + 
-									IPackageMemberMgr.MEMBER_TYPE_FILE + " and memberId in " + 
+									IPackageMemberMgr.TYPE_FILE + " and memberId in " + 
 									"(select id from files where trashed=1)");
 			stat.executeUpdate("delete from packageMembers where memberType = " + 
-									IPackageMemberMgr.MEMBER_TYPE_ACTION + " and memberId in " + 
+									IPackageMemberMgr.TYPE_ACTION + " and memberId in " + 
 									"(select actionId from buildActions where trashed=1)");
 			// TODO: delete items from packageMembers where fileGroups are trashed.
 

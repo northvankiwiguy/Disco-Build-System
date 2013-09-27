@@ -107,7 +107,7 @@ public class ActionPropertyPage extends PropertyPage implements
 		/* Display the package that the action belongs to */
 		Label actionPackageLabel = new Label(panel, SWT.NONE);
 		String packageName = "Invalid";
-		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId);
 		if (pkg != null) {
 			String packageNameString = pkgMgr.getName(pkg.pkgId);
 			if (packageNameString != null) {

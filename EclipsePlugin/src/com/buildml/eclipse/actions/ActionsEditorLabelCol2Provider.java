@@ -88,7 +88,7 @@ public class ActionsEditorLabelCol2Provider extends ColumnLabelProvider implemen
 		if (element instanceof UIAction) {
 			UIAction uiAction = (UIAction)element;
 			int actionId = uiAction.getId();
-			PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.MEMBER_TYPE_ACTION, actionId);
+			PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId);
 			if (pkg == null) {
 				return "<invalid>";
 			}

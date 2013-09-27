@@ -31,19 +31,19 @@ public interface IPackageMemberMgr {
 	 * Numeric constants for type of package member.
 	 */
 	
-	public static final int MEMBER_TYPE_ANY 		= 0;
-	public static final int MEMBER_TYPE_FILE 		= 1;
-	public static final int MEMBER_TYPE_FILE_GROUP 	= 2;
-	public static final int MEMBER_TYPE_ACTION 		= 3;
-	public static final int MEMBER_TYPE_SUB_PACKAGE = 4;
+	public static final int TYPE_ANY 			= 0;
+	public static final int TYPE_FILE 			= 1;
+	public static final int TYPE_FILE_GROUP 	= 2;
+	public static final int TYPE_ACTION 		= 3;
+	public static final int TYPE_SUB_PACKAGE 	= 4;
 	
 	/**
 	 * Numeric constants for each of the scopes.
 	 */
-	public static final int SCOPE_NONE = 0;
-	public static final int SCOPE_PRIVATE = 1;
-	public static final int SCOPE_PUBLIC = 2;
-	public static final int SCOPE_MAX = 2;
+	public static final int SCOPE_NONE 			= 0;
+	public static final int SCOPE_PRIVATE 		= 1;
+	public static final int SCOPE_PUBLIC 		= 2;
+	public static final int SCOPE_MAX 			= 2;
 
 	/**
 	 * A helper class used to describe the package/scope that a member belongs to.
