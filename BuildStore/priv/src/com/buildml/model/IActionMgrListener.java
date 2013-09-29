@@ -23,9 +23,6 @@ public interface IActionMgrListener {
 	/** the action's command string has changed in some way */
 	public static final int CHANGED_COMMAND = 1;
 
-	/** the action's location has changed  */
-	public static final int CHANGED_LOCATION = 2;
-
 	/**
 	 * Called to notify the listener that the specified action has changed.
 	 * 

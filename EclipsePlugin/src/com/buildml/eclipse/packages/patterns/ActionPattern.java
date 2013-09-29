@@ -41,6 +41,8 @@ import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.MemberLocation;
 
 /**
  * A Graphiti pattern for managing the "Action" graphical element in a BuildML diagram.
@@ -59,11 +61,10 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	/** The IBuildStore that this diagram represents */
 	private IBuildStore buildStore;
 	
-	/** The IActionMgr owned by this BuildStore */
+	/** The managers owned by this BuildStore */
 	private IActionMgr actionMgr;
-
-	/** The IActionTypeMgr owned by this BuildStore */
 	private IActionTypeMgr actionTypeMgr;
+	private IPackageMemberMgr pkgMemberMgr;
 
 	/*
 	 * Various colour constants used in displaying this element.
@@ -177,6 +178,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		buildStore = editor.getBuildStore();
 		actionMgr = buildStore.getActionMgr();
 		actionTypeMgr = buildStore.getActionTypeMgr();
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		
 		/* 
 		 * What are we adding, and where are we adding it?
@@ -367,15 +369,17 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		int actionId = action.getId();
 		
 		/* determine the UIAction's old location */
-		Integer[] oldXY = actionMgr.getLocation(actionId);
+		MemberLocation oldXY = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId);
 		if (oldXY == null){
 			/* default, in the case of an error */
-			oldXY = new Integer[] {0, 0};
+			oldXY = new MemberLocation();
+			oldXY.x = 0;
+			oldXY.y = 0;
 		}
 		
 		/* create an undo/redo operation that will invoke the underlying database changes */
 		ActionChangeOperation op = new ActionChangeOperation("move action", actionId);
-		op.recordLocationChange(oldXY[0], oldXY[1], x, y);
+		op.recordLocationChange(oldXY.x, oldXY.y, x, y);
 		op.recordAndInvoke();
 	}
 	

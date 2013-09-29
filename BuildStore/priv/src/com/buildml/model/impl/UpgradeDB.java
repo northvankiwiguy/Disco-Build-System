@@ -145,12 +145,7 @@ public class UpgradeDB {
 			}
 			
 			/* upgrade to 403 */
-			if (dbVersion < 403) {
-				stat.executeUpdate("alter table buildActions add column x integer");
-				stat.executeUpdate("alter table buildActions add column y integer");
-				stat.executeUpdate("update buildActions set x = -1");
-				stat.executeUpdate("update buildActions set y = -1");
-				
+			if (dbVersion < 403) {				
 				/* 
 				 * Create the new packageMembers table - although ideally we should generate
 				 * the content from the files table. There are no production databases (yet), so this

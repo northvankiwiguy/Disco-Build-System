@@ -260,11 +260,10 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("create index buildFileIncludesIdx3 on fileIncludes (fileId2)");
 			
 			/* Create the "buildActions" table. */
-			// TODO: remove pkgId, x and y fields.
 			stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
 							   "parentActionId integer, trashed integer, actionDirId integer, pkgId integer, " +
-							   "command text, actionType integer, x integer, y integer)");
-			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null, 0, -1, -1)");
+							   "command text, actionType integer)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null, 0)");
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */

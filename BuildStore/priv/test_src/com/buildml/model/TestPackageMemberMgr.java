@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
@@ -753,53 +754,26 @@ public class TestPackageMemberMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/** Our tests set these appropriately */
-	private int notifyPkgValue = 0;
-	private int notifyHowValue = 0;
+	private int notifyPkgValue, notifyHowValue = 0, notifyType = 0, notifyId = 0;
 	
 	/**
 	 * Test listener notifications
 	 */
 	@Test
-	public void testNotify() {
-
-		/* set up a listener for the pkgMgr */
-		IPackageMgrListener pkgListener = new IPackageMgrListener() {
-			@Override
-			public void packageChangeNotification(int pkgId, int how) {
-				TestPackageMemberMgr.this.notifyPkgValue = pkgId;
-				TestPackageMemberMgr.this.notifyHowValue = how;
-			}
-		};
-		pkgMgr.addListener(pkgListener);
+	public void testNotifyPackageMembership() {
 
 		/* set up a listener for the pkgMemberMgr */
 		IPackageMemberMgrListener pkgMemberListener = new IPackageMemberMgrListener() {
 			@Override
-			public void packageMemberChangeNotification(int pkgId, int how) {
+			public void packageMemberChangeNotification(int pkgId, int how, int memberType, int memberId) {
 				TestPackageMemberMgr.this.notifyPkgValue = pkgId;
 				TestPackageMemberMgr.this.notifyHowValue = how;
+				TestPackageMemberMgr.this.notifyType = memberType;
+				TestPackageMemberMgr.this.notifyId = memberId;
 			}
 		};
 		pkgMemberMgr.addListener(pkgMemberListener);
 
-		notifyPkgValue = 0;
-		notifyHowValue = 0;
-		int pkgA = pkgMgr.addPackage("PkgA");
-		assertEquals(pkgA, notifyPkgValue);
-		assertEquals(IPackageMgrListener.ADDED_PACKAGE, notifyHowValue);		
-		
-		/* Changing a name to itself doesn't trigger the notification */
-		notifyPkgValue = 0;
-		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgA"));
-		assertEquals(0, notifyPkgValue);
-		assertEquals(0, notifyHowValue);
-
-		/* Changing a name to something new will trigger the notification */
-		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgB"));
-		assertEquals(pkgA, notifyPkgValue);
-		assertEquals(IPackageMgrListener.CHANGED_NAME, notifyHowValue);
-		
 		/* 
 		 * Changing an action's package should trigger a notification. We actually
 		 * see two notifications (for old, then new packages), but we only test
@@ -810,33 +784,128 @@ public class TestPackageMemberMgr {
 		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
 		int pkgD = pkgMgr.addPackage("PkgD");
 		assert(actionId >= 0);
-		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
 		assertEquals(pkgD, notifyPkgValue);
+		assertEquals(IPackageMemberMgr.TYPE_ACTION, notifyType);
+		assertEquals(actionId, notifyId);
 		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
 		
-		/* Changing it to the same thing, will not */
-		notifyPkgValue = 0;
-		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
+		/* Changing it to the same thing, will not trigger a notification */
+		notifyPkgValue = notifyHowValue = notifyType = notifyId = 0;
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
 		assertEquals(0, notifyPkgValue);
-		assertEquals(0, notifyHowValue);		
-
-		/* remove the pkgListener, and change the package again */
-		pkgMgr.removeListener(pkgListener);
-		notifyPkgValue = 0;
-		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgC"));
-		assertEquals(0, notifyPkgValue);
-		assertEquals(0, notifyHowValue);
+		assertEquals(0, notifyHowValue);	
+		assertEquals(0, notifyType);	
+		assertEquals(0, notifyId);
+	}
 		
-		/* add the listener back, then remove the package */
-		pkgMgr.addListener(pkgListener);
-		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
-		assertEquals(pkgA, notifyPkgValue);
-		assertEquals(IPackageMgrListener.REMOVED_PACKAGE, notifyHowValue);		
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for {@link com.buildml.model.IPackageMemberMgr#setMemberLocation(int, int, int, int)}
+	 */
+	@Test
+	public void testSetLocation() {
+		
+		/* create some default actions */
+		int rootAction = actionMgr.getRootAction("root");
+		int rootDir = fileMgr.getPath("/");
+		int action1 = actionMgr.addShellCommandAction(rootAction, rootDir, "Action 1");
+		int action2 = actionMgr.addShellCommandAction(rootAction, rootDir, "Action 2");
+	
+		/* initially their x and y should be -1 */
+		MemberLocation result = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, action1);
+		assertEquals(-1, result.x);
+		assertEquals(-1, result.y);
+		result = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, action2);
+		assertEquals(-1, result.x);
+		assertEquals(-1, result.y);
+		
+		/* set the coordinates for action 1 to (100, 200) */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, action1, 100, 200));
+		result = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, action2);
+		assertEquals(-1, result.x);
+		assertEquals(-1, result.y);
+		result = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, action1);
+		assertEquals(100, result.x);
+		assertEquals(200, result.y);
+		
+		/* set the coordinates for action 2 to (76, 34) */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, action2, 76, 34));
+		result = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, action2);
+		assertEquals(76, result.x);
+		assertEquals(34, result.y);
+		result = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, action1);
+		assertEquals(100, result.x);
+		assertEquals(200, result.y);
+		
+		/* test for invalid action Id */
+		assertNull(pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, 1000));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, 200, 100, 200));	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test listener notifications for changes in a member's location.
+	 */
+	@Test
+	public void testNotifyMemberLocation() {
+
+		/* set up a listener for the pkgMemberMgr */
+		IPackageMemberMgrListener pkgMemberListener = new IPackageMemberMgrListener() {
+			@Override
+			public void packageMemberChangeNotification(int pkgId, int how, int memberType, int memberId) {
+				TestPackageMemberMgr.this.notifyPkgValue = pkgId;
+				TestPackageMemberMgr.this.notifyHowValue = how;
+				TestPackageMemberMgr.this.notifyType = memberType;
+				TestPackageMemberMgr.this.notifyId = memberId;
+			}
+		};
+		pkgMemberMgr.addListener(pkgMemberListener);
+
+		/* Create a FileGroup that we'll move around the package */
+		int pkgA = pkgMgr.addPackage("PkgA");
+		int fileGroup1 = fileGroupMgr.newSourceGroup(pkgA);
+		
+		/* Changing an fileGroup's location will trigger a notification */
+		notifyPkgValue = notifyHowValue = notifyType = notifyId = 0;
+		assertEquals(ErrorCode.OK,
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup1, 100, 300));
+		assertEquals(pkgA, notifyPkgValue);
+		assertEquals(IPackageMemberMgr.TYPE_FILE_GROUP, notifyType);
+		assertEquals(fileGroup1, notifyId);
+		assertEquals(IPackageMemberMgrListener.CHANGED_LOCATION, notifyHowValue);
+		
+		/* Changing it to the same thing, will not trigger a notification */
+		notifyPkgValue = notifyHowValue = notifyType = notifyId = 0;
+		assertEquals(ErrorCode.OK,
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup1, 100, 300));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);	
+		assertEquals(0, notifyType);	
+		assertEquals(0, notifyId);
+		
+		/* change it again, to a different location */
+		notifyPkgValue = notifyHowValue = notifyType = notifyId = 0;
+		assertEquals(ErrorCode.OK,
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup1, 101, 300));
+		assertEquals(pkgA, notifyPkgValue);
+		assertEquals(IPackageMemberMgr.TYPE_FILE_GROUP, notifyType);
+		assertEquals(fileGroup1, notifyId);
+		assertEquals(IPackageMemberMgrListener.CHANGED_LOCATION, notifyHowValue);
+		
+		/* removing the listener causes the notification to stop */
+		pkgMemberMgr.removeListener(pkgMemberListener);
+		notifyPkgValue = notifyHowValue = notifyType = notifyId = 0;
+		assertEquals(ErrorCode.OK,
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup1, 101, 301));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);	
+		assertEquals(0, notifyType);	
+		assertEquals(0, notifyId);		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

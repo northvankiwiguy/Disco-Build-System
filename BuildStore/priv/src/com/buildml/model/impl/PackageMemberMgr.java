@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
@@ -77,7 +78,9 @@ import com.buildml.utils.errors.ErrorCode;
 		updateActionPackagePrepStmt = null,
 		findActionPackagePrepStmt = null,
 		findActionsInPackagePrepStmt = null,
-		findActionsOutsidePackagePrepStmt = null;
+		findActionsOutsidePackagePrepStmt = null,
+		findLocationPrepStmt = null,
+		updateLocationPrepStmt = null;
 	
 	/** The event listeners who are registered to learn about package membership changes */
 	List<IPackageMemberMgrListener> listeners = new ArrayList<IPackageMemberMgrListener>();
@@ -122,6 +125,10 @@ import com.buildml.utils.errors.ErrorCode;
 				"select memberId from packageMembers where pkgId = ? and memberType = " + TYPE_ACTION);
 		findActionsOutsidePackagePrepStmt = db.prepareStatement("select memberId from packageMembers " +
 				"where pkgId != ? and memberId != 0 and memberType = " + TYPE_ACTION);
+		findLocationPrepStmt = db.prepareStatement(
+				"select x, y from packageMembers where memberType = ? and memberId = ?");
+		updateLocationPrepStmt = db.prepareStatement(
+				"update packageMembers set x = ?, y = ? where memberType = ? and memberId = ?");
 	}
 
 	/*=====================================================================================*
@@ -273,9 +280,9 @@ import com.buildml.utils.errors.ErrorCode;
 		/* 
 		 * Notify listeners about the change in package content.
 		 */
-		notifyListeners(oldPkg.pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
+		notifyListeners(oldPkg.pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP, memberType, memberId);
 		if (oldPkg.pkgId != pkgId) {
-			notifyListeners(pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP);
+			notifyListeners(pkgId, IPackageMemberMgrListener.CHANGED_MEMBERSHIP, memberType, memberId);
 		}
 		
 		return ErrorCode.OK;
@@ -374,8 +381,34 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public int setMemberLocation(int memberType, int memberId, int x, int y) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		/* If the actionId is invalid, or the (x, y) is unchanged, do nothing */
+		MemberLocation currentLocation = getMemberLocation(memberType, memberId);
+		if (currentLocation == null) {
+			return ErrorCode.BAD_VALUE;
+		}
+		if ((x == currentLocation.x) && (y == currentLocation.y)) {
+			return ErrorCode.OK;
+		}
+
+		/* a database change is required */
+		try {
+			updateLocationPrepStmt.setInt(1, x);
+			updateLocationPrepStmt.setInt(2, y);
+			updateLocationPrepStmt.setInt(3, memberType);
+			updateLocationPrepStmt.setInt(4, memberId);
+			db.executePrepUpdate(updateLocationPrepStmt);
+			
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+
+		PackageDesc pkg = getPackageOfMember(memberType, memberId);
+		if (pkg != null) {
+			notifyListeners(pkg.pkgId, IPackageMemberMgrListener.CHANGED_LOCATION, memberType, memberId);
+		}
+		
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -385,10 +418,28 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public MemberLocation getMemberLocation(int memberType, int memberId) {
-		// TODO Auto-generated method stub
-		return null;
+		ResultSet rs;
+		MemberLocation result = null;
+			
+		try {
+			findLocationPrepStmt.setInt(1, memberType);
+			findLocationPrepStmt.setInt(2, memberId);
+			rs = db.executePrepSelectResultSet(findLocationPrepStmt);			
+			
+			/* if memberType/memberID is valid, fetch the x and y fields */
+			if (rs.next()) {
+				result = new MemberLocation();
+				result.x = rs.getInt(1);
+				result.y = rs.getInt(2);
+			}
+			rs.close();
+				
+		} catch (SQLException e) {
+			new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return result;
 	}
-		
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -616,10 +667,12 @@ import com.buildml.utils.errors.ErrorCode;
 	
 	/**
 	 * Notify any registered listeners about our change in state.
-	 * @param pkgId   The package that has changed.
-	 * @param how     The way in which the package changed (see {@link IPackageMemberMgrListener}).
+	 * @param pkgId   		The package that has changed.
+	 * @param how     		The way in which the package changed (see {@link IPackageMemberMgrListener}).
+	 * @param memberType	The type of the member that has changed (e.g. TYPE_ACTION)
+	 * @param memberId		The ID of the member (e.g. actionId or fileGroupId).
 	 */
-	private void notifyListeners(int pkgId, int how) {
+	private void notifyListeners(int pkgId, int how, int memberType, int memberId) {
 		
 		/* 
 		 * Make a copy of the listeners list, otherwise a registered listener can't remove
@@ -628,7 +681,7 @@ import com.buildml.utils.errors.ErrorCode;
 		IPackageMemberMgrListener listenerCopy[] = 
 				listeners.toArray(new IPackageMemberMgrListener[listeners.size()]);
 		for (int i = 0; i < listenerCopy.length; i++) {
-			listenerCopy[i].packageMemberChangeNotification(pkgId, how);			
+			listenerCopy[i].packageMemberChangeNotification(pkgId, how, memberType, memberId);			
 		}
 	}
 	

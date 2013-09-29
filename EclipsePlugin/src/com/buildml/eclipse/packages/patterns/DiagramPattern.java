@@ -30,6 +30,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 
@@ -168,12 +169,12 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					 * has a valid location, use it. If not, perform a very simple
 					 * placement algorithm.
 					 */
-					Integer location[] = actionMgr.getLocation(newAction.getId());
+					MemberLocation location = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, newAction.getId());
 					int x = column * 150, y = row * 50;
 					
-					if ((location != null) && (location[0] >= 0) && (location[1] >= 0)) {
-						x = location[0];
-						y = location[1];
+					if ((location != null) && (location.x >= 0) && (location.y >= 0)) {
+						x = location.x;
+						y = location.y;
 					}
 					
 					/*

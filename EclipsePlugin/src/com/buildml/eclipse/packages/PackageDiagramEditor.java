@@ -370,12 +370,14 @@ public class PackageDiagramEditor extends DiagramEditor
 	 * @see com.buildml.model.IPackageMemberMgrListener#packageMemberChangeNotification(int, int)
 	 */
 	@Override
-	public void packageMemberChangeNotification(int pkgId, int how) {
+	public void packageMemberChangeNotification(int pkgId, int how, int memberType, int memberId) {
 
 		if (pkgId == this.packageId){
 			/* has the content of the package changed? Action/files added or removed? */
-			if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
+			if ((how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) ||
+				(how == IPackageMemberMgrListener.CHANGED_LOCATION)) {
 				updateBehavior.markChanged();
+				setFocus();
 			}
 		}
 	}

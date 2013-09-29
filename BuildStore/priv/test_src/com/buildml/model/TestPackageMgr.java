@@ -443,16 +443,6 @@ public class TestPackageMgr {
 		};
 		pkgMgr.addListener(pkgListener);
 
-		/* set up a listener for the pkgMemberMgr */
-		IPackageMemberMgrListener pkgMemberListener = new IPackageMemberMgrListener() {
-			@Override
-			public void packageMemberChangeNotification(int pkgId, int how) {
-				TestPackageMgr.this.notifyPkgValue = pkgId;
-				TestPackageMgr.this.notifyHowValue = how;
-			}
-		};
-		pkgMemberMgr.addListener(pkgMemberListener);
-
 		notifyPkgValue = 0;
 		notifyHowValue = 0;
 		int pkgA = pkgMgr.addPackage("PkgA");
@@ -470,31 +460,8 @@ public class TestPackageMgr {
 		assertEquals(ErrorCode.OK, pkgMgr.setName(pkgA, "PkgB"));
 		assertEquals(pkgA, notifyPkgValue);
 		assertEquals(IPackageMgrListener.CHANGED_NAME, notifyHowValue);
-		
-		/* 
-		 * Changing an action's package should trigger a notification. We actually
-		 * see two notifications (for old, then new packages), but we only test
-		 * for the new package.
-		 */
-		notifyPkgValue = 0;
-		notifyHowValue = 0;
-		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), fileMgr.getPath("/"), "");
-		int pkgD = pkgMgr.addPackage("PkgD");
-		assert(actionId >= 0);
-		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
-		assertEquals(pkgD, notifyPkgValue);
-		assertEquals(IPackageMemberMgrListener.CHANGED_MEMBERSHIP, notifyHowValue);
-		
-		/* Changing it to the same thing, will not */
-		notifyPkgValue = 0;
-		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, 
-				pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgD));
-		assertEquals(0, notifyPkgValue);
-		assertEquals(0, notifyHowValue);		
 
-		/* remove the pkgListener, and change the package again */
+		/* remove the pkgListener, and change the package again - will trigger */
 		pkgMgr.removeListener(pkgListener);
 		notifyPkgValue = 0;
 		notifyHowValue = 0;

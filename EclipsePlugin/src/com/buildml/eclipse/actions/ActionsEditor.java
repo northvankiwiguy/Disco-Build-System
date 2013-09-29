@@ -562,7 +562,7 @@ public class ActionsEditor extends ImportSubEditor
 	 * there's a good chance our content changed).
 	 */
 	@Override
-	public void packageMemberChangeNotification(int pkgId, int how) {
+	public void packageMemberChangeNotification(int pkgId, int how, int memberType, int memberId) {
 
 		if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
 

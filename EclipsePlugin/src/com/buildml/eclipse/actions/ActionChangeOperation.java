@@ -176,7 +176,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 
 		/* if the action's location needs to change... */
 		if ((changedFields & CHANGED_LOCATION) != 0){
-			actionMgr.setLocation(actionId, oldX, oldY);
+			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, oldX, oldY);
 		}
 
 		/* if there's a change, mark the editor as dirty */
@@ -211,7 +211,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 
 		/* if the action's location needs to change... */
 		if ((changedFields & CHANGED_LOCATION) != 0){
-			actionMgr.setLocation(actionId, newX, newY);
+			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, newX, newY);
 		}
 		
 		/* if there's a change, mark the editor as dirty */

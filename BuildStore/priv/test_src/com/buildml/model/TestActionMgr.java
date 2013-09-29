@@ -23,7 +23,6 @@ import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.ISlotTypes.SlotDetails;
-import com.buildml.model.impl.ActionTypeMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -35,10 +34,8 @@ public class TestActionMgr {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The FileMgr object associated with this BuildStore */
+	/** The managers associated with this BuildStore */
 	IFileMgr fileMgr;
-	
-	/** The ActionMgr object associated with this BuildStore */
 	IActionMgr actionMgr;
 	
 	/** The root action ID */
@@ -54,10 +51,8 @@ public class TestActionMgr {
 		/* get a new empty BuildStore */
 		bs = CommonTestUtils.getEmptyBuildStore();
 		
-		/* fetch the associated FileNameSpace object */
+		/* fetch the associated manager objects */
 		fileMgr = bs.getFileMgr();
-		
-		/* fetch the associated ActionMgr object */
 		actionMgr = bs.getActionMgr();
 		
 		/* if we don't care about each new action's parents, we'll use the root action */
@@ -244,53 +239,6 @@ public class TestActionMgr {
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { actionA1, actionA2, actionA1a }, 
 				actionMgr.getChildren(actionA)));
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#setLocation(int, int, int)}
-	 */
-	@Test
-	public void testSetLocation() {
-		
-		/* create some default actions */
-		int rootAction = actionMgr.getRootAction("root");
-		int rootDir = fileMgr.getPath("/");
-		int action1 = actionMgr.addShellCommandAction(rootAction, rootDir, "Action 1");
-		int action2 = actionMgr.addShellCommandAction(rootAction, rootDir, "Action 2");
-	
-		/* initially their x and y should be -1 */
-		Integer result[] = actionMgr.getLocation(action1);
-		assertEquals(2, result.length);
-		assertEquals(-1, result[0].intValue());
-		assertEquals(-1, result[1].intValue());
-		result = actionMgr.getLocation(action2);
-		assertEquals(2, result.length);
-		assertEquals(-1, result[0].intValue());
-		assertEquals(-1, result[1].intValue());
-		
-		/* set the coordinates for action 1 to (100, 200) */
-		assertEquals(ErrorCode.OK, actionMgr.setLocation(action1, 100, 200));
-		result = actionMgr.getLocation(action2);
-		assertEquals(-1, result[0].intValue());
-		assertEquals(-1, result[1].intValue());
-		result = actionMgr.getLocation(action1);
-		assertEquals(100, result[0].intValue());
-		assertEquals(200, result[1].intValue());
-		
-		/* set the coordinates for action 2 to (76, 34) */
-		assertEquals(ErrorCode.OK, actionMgr.setLocation(action2, 76, 34));
-		result = actionMgr.getLocation(action2);
-		assertEquals(76, result[0].intValue());
-		assertEquals(34, result[1].intValue());
-		result = actionMgr.getLocation(action1);
-		assertEquals(100, result[0].intValue());
-		assertEquals(200, result[1].intValue());
-		
-		/* test for invalid action Id */
-		assertNull(actionMgr.getLocation(1000));
-		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setLocation(200, 100, 200));	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -951,20 +899,6 @@ public class TestActionMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setCommand(action1, "new command string"));
 		assertEquals(action1, notifyActionValue);
 		assertEquals(IActionMgrListener.CHANGED_COMMAND, notifyHowValue);
-
-		/* change the location to something new - notification given */
-		notifyActionValue = 0;
-		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, actionMgr.setLocation(action2, 100, 200));
-		assertEquals(action2, notifyActionValue);
-		assertEquals(IActionMgrListener.CHANGED_LOCATION, notifyHowValue);
-		
-		/* change the location to its current value - no notification */
-		notifyActionValue = 0;
-		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, actionMgr.setLocation(action2, 100, 200));
-		assertEquals(0, notifyActionValue);
-		assertEquals(0, notifyHowValue);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
