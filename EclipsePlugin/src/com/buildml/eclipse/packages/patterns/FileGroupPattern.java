@@ -13,13 +13,17 @@
 package com.buildml.eclipse.packages.patterns;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.services.Graphiti;
@@ -29,12 +33,14 @@ import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
 
 import com.buildml.eclipse.bobj.UIFileGroup;
+import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
-import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -48,6 +54,15 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** The PackageDiagramEditor we're part of */
+	private PackageDiagramEditor editor;
+	
+	/** The IBuildStore that this diagram represents */
+	private IBuildStore buildStore;
+	
+	/** The managers owned by this BuildStore */
+	private IPackageMemberMgr pkgMemberMgr;
+	
 	/*
 	 * Various colour constants used in displaying this element.
 	 */
@@ -131,6 +146,10 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 */
 	@Override
 	public PictogramElement add(IAddContext context) {
+
+		editor = (PackageDiagramEditor)getDiagramEditor();
+		buildStore = editor.getBuildStore();
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
 
 		/*
 		 * Case handled:
@@ -235,6 +254,73 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		return isMainBusinessObjectApplicable(domainObject);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canMoveShape(org.eclipse.graphiti.features.context.IMoveShapeContext)
+	 */
+	@Override
+	public boolean canMoveShape(IMoveShapeContext context) {
+		
+		/* 
+		 * Validate where the UIFileGroup is moving to. We can't move UIFileGroups 
+		 * off the left/top of the window.
+		 */
+		int x = context.getX();
+		int y = context.getY();		
+		if ((x < 0) || (y < 0)) {
+			return false;
+		}
+		
+		/* check that we've moved a single UIFileGroup object */
+		PictogramElement pe = context.getPictogramElement();
+		PictogramLink pl = pe.getLink();
+		EList<EObject> bos = pl.getBusinessObjects();
+		if (bos.size() != 1) {
+			return false;
+		}
+		
+		/* 
+		 * Finally, check that this is a UIFileGroup (although we probably wouldn't have
+		 * got here otherwise.
+		 */
+		Object bo = bos.get(0);
+		return (bo instanceof UIFileGroup);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.pattern.AbstractPattern#moveShape(org.eclipse.graphiti.features.context.IMoveShapeContext)
+	 */
+	@Override
+	public void moveShape(IMoveShapeContext context) {
+		super.moveShape(context);
+
+		/*
+		 * Fetch the x, y and fileGroupId. Note that all error checking was done by canMoveShape().
+		 */
+		int x = context.getX();
+		int y = context.getY();
+		PictogramLink pl = context.getPictogramElement().getLink();
+		UIFileGroup fileGroup = (UIFileGroup)(pl.getBusinessObjects().get(0));
+		int fileGroupId = fileGroup.getId();
+		
+		/* determine the UIFileGroups's old location */
+		MemberLocation oldXY = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
+		if (oldXY == null){
+			/* default, in the case of an error */
+			oldXY = new MemberLocation();
+			oldXY.x = 0;
+			oldXY.y = 0;
+		}
+		
+		/* create an undo/redo operation that will invoke the underlying database changes */
+		FileGroupChangeOperation op = new FileGroupChangeOperation("move file group", fileGroupId);
+		op.recordLocationChange(oldXY.x, oldXY.y, x, y);
+		op.recordAndInvoke();
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -249,9 +335,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 */
 	private UIFileGroup addToFileGroup(UIFileGroup fileGroup, String fullPath) {
 		
-		/* determine the currently active PackageDiagramEditor, IBuildStore, etc. */
-		PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
-		IBuildStore buildStore = pde.getBuildStore();
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		
@@ -259,7 +342,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * If necessary, create a brand new UIFileGroup in the database.
 		 */
 		if (fileGroup == null) {
-			int pkgId = pde.getPackageId();
+			int pkgId = editor.getPackageId();
 			int fileGroupId = fileGroupMgr.newSourceGroup(pkgId);
 			if (fileGroupId == ErrorCode.NOT_FOUND) {
 				return null; /* invalid pkgId */
@@ -296,9 +379,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	private PictogramElement renderPictogram(Diagram targetDiagram, UIFileGroup addedFileGroup,
 												int x, int y) {
 		
-		/* determine the IBuildStore etc. that owns this file group */
-		PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
-		IBuildStore buildStore = pde.getBuildStore();
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		
 		/*

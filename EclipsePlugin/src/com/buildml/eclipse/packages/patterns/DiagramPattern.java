@@ -25,14 +25,13 @@ import org.eclipse.graphiti.pattern.IPattern;
 
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileGroup;
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMemberMgr;
-import com.buildml.model.IPackageMemberMgr.MemberLocation;
-import com.buildml.model.IPackageMgr;
-import com.buildml.model.types.ActionSet;
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
 
 /**
  * A Graphiti pattern for managing the top-level "Diagram" graphical element in a
@@ -158,63 +157,53 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 			@Override
 			protected void doExecute() {
 				
-				/* fetch the complete list of actions in this package */
-				ActionSet actions = pkgMemberMgr.getActionsInPackage(pkgId);
+				/* fetch the complete list of members in the package */
+				MemberDesc members[] = pkgMemberMgr.getMembersInPackage(
+						pkgId, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_ANY);
 				int row = 0, column = 0;
-				for (int actionId : actions) {
-					UIAction newAction = new UIAction(actionId);
-
+				for (MemberDesc member : members) {
+					
 					/*
 					 * Determine the location for this pictogram. If the database
 					 * has a valid location, use it. If not, perform a very simple
 					 * placement algorithm.
 					 */
-					MemberLocation location = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_ACTION, newAction.getId());
-					int x = column * 150, y = row * 50;
+					if (member.x == -1) {
+						member.x = column * 150;
+						member.y = row * 50;
+						column++;
+						if (column == 5) {
+							column = 0;
+							row++;
+						}
+					}
 					
-					if ((location != null) && (location.x >= 0) && (location.y >= 0)) {
-						x = location.x;
-						y = location.y;
+					/* create a business object to represent this member */
+					UIInteger memberBo;
+					switch (member.memberType) {
+					case IPackageMemberMgr.TYPE_ACTION:
+						memberBo = new UIAction(member.memberId);
+						break;
+					case IPackageMemberMgr.TYPE_FILE_GROUP:
+						memberBo = new UIFileGroup(member.memberId);
+						break;
+					default:
+						throw new FatalError("Unrecognized package member type: " + member.memberType);
 					}
 					
 					/*
 					 * TODO: Fix this layout algorithm. For now it simply lays out
 					 * actions in rows and columns.
 					 */
-					container.eResource().getContents().add(newAction);
+					container.eResource().getContents().add(memberBo);
 					AddContext context2 = new AddContext();
-					context2.setNewObject(newAction);
-					context2.setLocation(x, y);
+					context2.setNewObject(memberBo);
+					context2.setLocation(member.x, member.y);
 					context2.setTargetContainer(container);
 					getFeatureProvider().addIfPossible(context2);
-					column++;
-					if (column == 5) {
-						column = 0;
-						row++;
-					}			
 				}
-				
-//				IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
-//				Integer[] fileGroups = fileGroupMgr.getGroupsInPackage(pkgId);
-//				for (int i = 0; i < fileGroups.length; i++) {
-//					UIFileGroup fileGroup = new UIFileGroup(fileGroups[i]);
-//					container.eResource().getContents().add(fileGroup);
-//					AddContext context2 = new AddContext();
-//					context2.setNewObject(fileGroup);
-//					int x = column * 150, y = row * 50;
-//
-//					context2.setLocation(x, y);
-//					context2.setTargetContainer(container);
-//					getFeatureProvider().addIfPossible(context2);
-//					
-//					column++;
-//					if (column == 5) {
-//						column = 0;
-//						row++;
-//					}
-//				}
 			}
-			
+				
 		});
 		
 		return true;
