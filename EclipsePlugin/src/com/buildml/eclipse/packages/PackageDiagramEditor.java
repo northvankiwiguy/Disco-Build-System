@@ -13,6 +13,7 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
@@ -448,5 +449,20 @@ public class PackageDiagramEditor extends DiagramEditor
 		return new DiagramEditorInput(pkgURI, "com.buildml.eclipse.diagram.package.provider");
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.ui.editor.DiagramEditor#createContextMenuProvider()
+	 */
+	@Override
+	protected ContextMenuProvider createContextMenuProvider() {
+		
+		/* 
+		 * for now, we don't need a context menu. In future, we can implement our own
+		 * class (derived from DiagramEditorContextMenuProvider) that provides the menu.
+		 */
+		return null;
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 }
