@@ -311,4 +311,20 @@ public interface IFileGroupMgr {
 	 * @return The BuildStore that delegates to this FileGroupMgr.
 	 */
 	IBuildStore getBuildStore();
+	
+	/**
+	 * Add the specified listener to the list of objects that are notified when
+	 * a file group changes in some way.
+	 * 
+	 * @param listener The object to be added as a listener.
+	 */
+	public void addListener(IFileGroupMgrListener listener);
+
+	/**
+	 * Remove the specified listener from the list of objects to be notified when
+	 * a file group changes in some way.
+	 * 
+	 * @param listener The object to be removed from the list of listeners.
+	 */
+	public void removeListener(IFileGroupMgrListener listener);
 }

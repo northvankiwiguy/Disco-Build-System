@@ -18,10 +18,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.IFileGroupMgrListener;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IFileMgr.PathType;
@@ -88,6 +90,9 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * A mapping from group ID to the list of transient path entries.
 	 */
 	private HashMap<Integer, ArrayList<TransientEntry>> transientEntryMap = null;
+	
+	/** The event listeners who are registered to learn about file group changes */
+	List<IFileGroupMgrListener> listeners = new ArrayList<IFileGroupMgrListener>();
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -450,6 +455,9 @@ public class FileGroupMgr implements IFileGroupMgr {
 		newEntry.pathString = path;
 		entries.add(newEntry);
 		
+		/* notify listeners about the change */
+		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
+		
 		return ErrorCode.OK;
 	}
 
@@ -469,7 +477,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 		if (type != GENERATED_GROUP) {
 			return ErrorCode.INVALID_OP;
 		}
-		transientEntryMap.remove(Integer.valueOf(groupId));		
+		transientEntryMap.remove(Integer.valueOf(groupId));	
+		
+		/* notify listeners about the change */
+		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
+		
 		return ErrorCode.OK;
 	}
 
@@ -611,6 +623,10 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		/* update the database */
 		removeEntryHelper(groupId, index);
+		
+		/* notify listeners about the change */
+		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
+		
 		return ErrorCode.OK;
 	}
 
@@ -668,6 +684,26 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return buildStore;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#addListener(com.buildml.model.IFileGroupMgrListener)
+	 */
+	@Override
+	public void addListener(IFileGroupMgrListener listener) {
+		listeners.add(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#removeListener(com.buildml.model.IFileGroupMgrListener)
+	 */
+	@Override
+	public void removeListener(IFileGroupMgrListener listener) {
+		listeners.remove(listener);
+	};
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -774,6 +810,9 @@ public class FileGroupMgr implements IFileGroupMgr {
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}
+		
+		/* notify listeners about the change */
+		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -912,5 +951,25 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return false;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Notify any registered listeners about our change in state.
+	 * @param fileGroupId   The file group that has changed.
+	 * @param how     		The way in which the file group changed (see {@link IFileGroupMgrListener}).
+	 */
+	private void notifyListeners(int fileGroupId, int how) {
+		
+		/* 
+		 * Make a copy of the listeners list, otherwise a registered listener can't remove
+		 * itself from the list within the fileGroupChangeNotification() method.
+		 */
+		IFileGroupMgrListener listenerCopy[] = 
+				listeners.toArray(new IFileGroupMgrListener[listeners.size()]);
+		for (int i = 0; i < listenerCopy.length; i++) {
+			listenerCopy[i].fileGroupChangeNotification(fileGroupId, how);			
+		}
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 }

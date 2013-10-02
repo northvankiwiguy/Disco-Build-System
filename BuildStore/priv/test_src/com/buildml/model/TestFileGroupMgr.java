@@ -677,5 +677,80 @@ public class TestFileGroupMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	private static int notifyId;
+	private static int notifyHow;
+	
+	/**
+	 * Test the various ways in which IFileGroupMgr can send notifications.
+	 */
+	@Test
+	public void testNotifications() {
+		
+		/* set up a listener for changes to the IFileGroupMgr */
+		IFileGroupMgrListener listener = new IFileGroupMgrListener() {
+			@Override
+			public void fileGroupChangeNotification(int fileGroupId, int how) {
+				TestFileGroupMgr.notifyId = fileGroupId;
+				TestFileGroupMgr.notifyHow = how;
+			}
+		};
+		fileGroupMgr.addListener(listener);
+		
+		int pkgId = pkgMgr.addPackage("MyPkg");
+		int srcGroup = fileGroupMgr.newSourceGroup(pkgId);
+		int genGroup = fileGroupMgr.newGeneratedGroup(pkgId);
+		int mergeGroup = fileGroupMgr.newMergeGroup(pkgId);
+		
+		int fileId1 = fileMgr.addFile("/file123");
+		
+		/* test addPathId */
+		assertEquals(ErrorCode.OK, fileGroupMgr.addPathId(srcGroup, fileId1));
+		assertEquals(srcGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+		
+		/* test addPathString */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileGroupMgr.addPathString(genGroup, "@root/file123"));
+		assertEquals(genGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+		
+		/* test addTransientPathString */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileGroupMgr.addTransientPathString(genGroup, "@root/file567"));
+		assertEquals(genGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+		
+		/* test clearTransientPathStrings */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileGroupMgr.clearTransientPathStrings(genGroup));
+		assertEquals(genGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+		
+		/* test addSubGroup */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileGroupMgr.addSubGroup(mergeGroup, srcGroup));
+		assertEquals(mergeGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+		
+		/* test moveEntry */
+		assertTrue(fileGroupMgr.addPathString(genGroup, "@root/file123") >= 0);
+		assertTrue(fileGroupMgr.addPathString(genGroup, "@root/file123") >= 0);
+		assertTrue(fileGroupMgr.addPathString(genGroup, "@root/file123") >= 0);
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(genGroup, 1, 2));
+		assertEquals(genGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+		
+		/* test removeEntry */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(genGroup, 1));
+		assertEquals(genGroup, notifyId);
+		assertEquals(IFileGroupMgrListener.CHANGED_MEMBERSHIP, notifyHow);
+				
+		fileGroupMgr.removeListener(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 }
