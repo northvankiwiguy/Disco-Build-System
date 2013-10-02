@@ -30,6 +30,8 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.IFileGroupMgrListener;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMemberMgrListener;
@@ -46,7 +48,8 @@ import com.buildml.utils.types.IntegerTreeSet;
  */
 public class PackageDiagramEditor extends DiagramEditor 
 									implements ISubEditor, IPackageMgrListener, 
-												IActionMgrListener, IPackageMemberMgrListener {
+												IActionMgrListener, IPackageMemberMgrListener,
+												IFileGroupMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -60,6 +63,9 @@ public class PackageDiagramEditor extends DiagramEditor
 
 	/** The PackageMgr we're using for package membership */
 	private IPackageMemberMgr pkgMemberMgr = null;
+
+	/** The FileGroupMgr we're using for file group content */
+	private IFileGroupMgr fileGroupMgr = null;
 
 	/** The ActionMgr we're using for action information */
 	private IActionMgr actionMgr = null;
@@ -87,6 +93,7 @@ public class PackageDiagramEditor extends DiagramEditor
 		this.buildStore = buildStore;
 		this.pkgMgr = buildStore.getPackageMgr();
 		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
+		this.fileGroupMgr = buildStore.getFileGroupMgr();
 		this.actionMgr = buildStore.getActionMgr();
 		this.packageId = packageId;
 		
@@ -94,6 +101,7 @@ public class PackageDiagramEditor extends DiagramEditor
 		pkgMgr.addListener(this);
 		pkgMemberMgr.addListener(this);
 		actionMgr.addListener(this);
+		fileGroupMgr.addListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -397,6 +405,21 @@ public class PackageDiagramEditor extends DiagramEditor
 		updateBehavior.markChanged();
 		setFocus();		
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Receive notifications if a file group (possibly on this package) changes in some way.
+	 */
+	@Override
+	public void fileGroupChangeNotification(int fileGroupId, int how) {
+		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
+		if ((pkg == null) || (pkg.pkgId != this.packageId)) {
+			return;
+		}
+		updateBehavior.markChanged();
+		setFocus();	
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -407,6 +430,9 @@ public class PackageDiagramEditor extends DiagramEditor
 	public void dispose() {
 		super.dispose();
 		pkgMgr.removeListener(this);
+		pkgMemberMgr.removeListener(this);
+		actionMgr.removeListener(this);
+		fileGroupMgr.removeListener(this);
 	}
 	
 	/*=====================================================================================*
