@@ -1268,5 +1268,16 @@
             </test>
          </enabledWhen>
       </page>
+      <page
+            class="com.buildml.eclipse.packages.properties.FileGroupContentPropertyPage"
+            id="com.buildml.eclipse.properties.filegroupcontent"
+            name="File Group Content">
+         <enabledWhen>
+            <test
+                  args="com.buildml.eclipse.bobj.UIFileGroup"
+                  property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+            </test>
+         </enabledWhen>
+      </page>
    </extension>
 </plugin>

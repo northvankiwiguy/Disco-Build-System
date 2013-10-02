@@ -5,18 +5,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkbenchPropertyPage;
-import org.eclipse.ui.dialogs.PropertyPage;
-
 import com.buildml.eclipse.bobj.UIAction;
-import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.GraphitiUtils;
-import com.buildml.model.IActionMgr;
-import com.buildml.model.IActionTypeMgr;
-import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
-import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -26,8 +19,7 @@ import com.buildml.utils.errors.ErrorCode;
  *
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class ActionPropertyPage extends PropertyPage implements
-		IWorkbenchPropertyPage {
+public class ActionPropertyPage extends BmlPropertyPage {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -35,21 +27,6 @@ public class ActionPropertyPage extends PropertyPage implements
 
 	/** The ID of the underlying action */
 	private int actionId;
-	
-	/** The IBuildStore that contains the action */
-	private IBuildStore buildStore;
-	
-	/** The actionMgr within the buildStore */
-	private IActionMgr actionMgr;
-	
-	/** The actionTypeMgr within the buildStore */
-	private IActionTypeMgr actionTypeMgr;
-
-	/** The pkgMgr within the buildStore */
-	private IPackageMgr pkgMgr;
-	
-	/** The pkgMemberMgr within the buildStore */
-	private IPackageMemberMgr pkgMemberMgr;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -59,11 +36,7 @@ public class ActionPropertyPage extends PropertyPage implements
 	 * Create a new ActionShellCommandPage object.
 	 */
 	public ActionPropertyPage() {
-		buildStore = EclipsePartUtils.getActiveBuildStore();
-		actionMgr = buildStore.getActionMgr();
-		actionTypeMgr = buildStore.getActionTypeMgr();
-		pkgMgr = buildStore.getPackageMgr();
-		pkgMemberMgr = buildStore.getPackageMemberMgr();		
+		/* nothing */
 	}
  
 	/*=====================================================================================*

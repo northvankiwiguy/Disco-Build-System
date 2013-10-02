@@ -35,6 +35,7 @@ import org.eclipse.graphiti.util.IColorConstant;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
@@ -337,6 +338,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		IFileMgr fileMgr = buildStore.getFileMgr();
+		
+		/* convert the path into an absolute path (not workspace-relative) */
+		fullPath = EclipsePartUtils.workspaceRelativeToAbsolutePath(fullPath);
 		
 		/* 
 		 * If necessary, create a brand new UIFileGroup in the database.

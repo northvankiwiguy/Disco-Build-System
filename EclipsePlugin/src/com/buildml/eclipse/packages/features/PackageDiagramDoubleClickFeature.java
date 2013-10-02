@@ -19,6 +19,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
@@ -75,7 +76,7 @@ public class PackageDiagramDoubleClickFeature extends AbstractCustomFeature {
         Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe[0]);
 		
         /* we support UIAction, but nothing else (yet) */
-        return (bo instanceof UIAction);
+        return ((bo instanceof UIAction) || (bo instanceof UIFileGroup));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -92,11 +93,11 @@ public class PackageDiagramDoubleClickFeature extends AbstractCustomFeature {
         Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe[0]);
 		
         /*
-         * For UIAction, we open a property editor that allows the user to change the
-         * action's properties. If anything changed (they pressed "OK"), we then update the
+         * For certain objects, we open a property editor that allows the user to change the
+         * object's properties. If anything changed (they pressed "OK"), we then update the
          * diagram to reflect any graphical changes.
          */
-        if (bo instanceof UIAction) {
+        if ((bo instanceof UIAction) || (bo instanceof UIFileGroup)) {
 
         	/* Open the standard "properties" dialog */
         	String commandId = "org.eclipse.ui.file.properties";

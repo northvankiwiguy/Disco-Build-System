@@ -25,9 +25,11 @@ import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.packages.features.PackageDiagramDoubleClickFeature;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.utils.print.PrintUtils;
 
 /**
@@ -48,7 +50,10 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	
 	/** The IActionMgr associated with this BuildStore */
 	private IActionMgr actionMgr;
-	
+
+	/** The IFileGroupMgr associated with this BuildStore */
+	private IFileGroupMgr fileGroupMgr;
+
 	/** The maximum number of characters wide that a tooltip should be */
 	private final int toolTipWrapWidth = 120;
 	
@@ -70,6 +75,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         PackageDiagramEditor pde = (PackageDiagramEditor)dtp.getDiagramEditor();
         buildStore = pde.getBuildStore();
     	actionMgr = buildStore.getActionMgr();
+    	fileGroupMgr = buildStore.getFileGroupMgr();
     }
     
 	/*=====================================================================================*
@@ -106,6 +112,24 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 				printStream.close();
 				return toolTip;
 			}
+        }
+        
+        /*
+         * For file groups, show the content of the file group.
+         */
+        else if (bo instanceof UIFileGroup) {
+        	UIFileGroup fileGroup = (UIFileGroup)bo;
+        	int fileGroupId = fileGroup.getId();
+        	String files[] = fileGroupMgr.getExpandedGroupFiles(fileGroupId);
+        	
+        	StringBuffer sb = new StringBuffer();
+        	sb.append("\n Source File Group: \n");
+        	for (int i = 0; i < files.length; i++) {
+				sb.append(' ');
+				sb.append(files[i]);
+				sb.append(" \n");
+			}
+        	return sb.toString();
         }
         
         /* else, return the default tooltip */

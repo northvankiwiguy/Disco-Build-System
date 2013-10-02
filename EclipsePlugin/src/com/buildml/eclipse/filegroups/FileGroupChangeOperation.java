@@ -12,6 +12,8 @@
 
 package com.buildml.eclipse.filegroups;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -19,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMemberMgr;
 
 /**
@@ -37,8 +40,9 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	 * Bitmap of all the parts of the fileGroup that have changed, and will need to be changed
 	 * back on an undo/redo operation.
 	 */
-	private final static int CHANGED_PACKAGE  = 1;
-	private final static int CHANGED_LOCATION = 2;
+	private final static int CHANGED_PACKAGE    	= 1;
+	private final static int CHANGED_LOCATION   	= 2;
+	private final static int CHANGED_MEMBERSHIP 	= 4;
 	
 	/** The ID of the fileGroup being changed */
 	private int fileGroupId;
@@ -57,6 +61,12 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	
 	/** if CHANGED_LOCATION, what is the new (x, y) location */
 	private int newX, newY;
+	
+	/** if CHANGED_MEMBERSHIP, what are the old members? */
+	private ArrayList<Integer> oldMembers;
+
+	/** if CHANGED_MEMBERSHIP, what are the new members? */
+	private ArrayList<Integer> newMembers;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -115,6 +125,21 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Record the fact that the file groups's membership (file IDs) has changed.
+	 * @param oldMembers The old members of this file group.
+	 * @param newMembers The new members of this file group.
+	 */
+	public void recordMembershipChange(ArrayList<Integer> oldMembers, ArrayList<Integer> newMembers) {
+		if (!oldMembers.equals(newMembers)){
+			changedFields |= CHANGED_MEMBERSHIP;
+			this.oldMembers = oldMembers;
+			this.newMembers = newMembers;
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 	
 	/**
 	 * Records the operation in the undo/redo stack, but only if there's an actual change
@@ -148,6 +173,10 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, oldX, oldY);
 		}
 
+		if ((changedFields & CHANGED_MEMBERSHIP) != 0){
+			setFileGroupMembers(fileGroupId, oldMembers);
+		}
+		
 		/* if there's a change, mark the editor as dirty */
 		if (changedFields != 0) {
 			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
@@ -167,15 +196,20 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	protected IStatus redo() throws ExecutionException {
 		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 
-		/* if the action's package needs to change... */
+		/* if the file group's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
 			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, newPackage);
 		}
 
-		/* if the action's location needs to change... */
+		/* if the file group's location needs to change... */
 		if ((changedFields & CHANGED_LOCATION) != 0){
 			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, newX, newY);
 		}
+		
+		/* if the file group's membership needs to change... */
+		if ((changedFields & CHANGED_MEMBERSHIP) != 0){
+			setFileGroupMembers(fileGroupId, newMembers);
+		}		
 		
 		/* if there's a change, mark the editor as dirty */
 		if (changedFields != 0) {
@@ -185,6 +219,31 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 			}
 		}
 		return Status.OK_STATUS;
+	}
+
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/	
+
+	/**
+	 * Set the membership of a file group to the contents of the specified ArrayList.
+	 * @param fileGroupId 	The ID of the file group to set membership of.
+	 * @param members		The ArrayList of members to populate the file group with.
+	 */
+	private void setFileGroupMembers(int fileGroupId, ArrayList<Integer> members) {
+		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		
+		/* clear out any existing members */
+		int groupSize = fileGroupMgr.getGroupSize(fileGroupId);
+		for (int i = groupSize - 1; i >= 0; i--) {
+			fileGroupMgr.removeEntry(fileGroupId, i);
+		}
+		
+		/* add the new members */
+		groupSize = members.size();
+		for (int i = 0; i != groupSize; i++) {
+			fileGroupMgr.addPathId(fileGroupId, members.get(i));
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
