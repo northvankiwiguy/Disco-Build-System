@@ -77,7 +77,7 @@ public class VFSDirSelectFieldEditor extends StringButtonFieldEditor {
 	@Override
 	protected String changePressed() {
 		VFSTreeSelectionDialog dialog = 
-				new VFSTreeSelectionDialog(getShell(), buildStore, message);
+				new VFSTreeSelectionDialog(getShell(), buildStore, message, false);
 		
 		if (dialog.open() == VFSTreeSelectionDialog.OK) {
 			Object[] result = dialog.getResult();

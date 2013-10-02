@@ -26,6 +26,7 @@ import com.buildml.eclipse.EditorOptions;
 import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIInteger;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
@@ -118,19 +119,9 @@ public class FilesEditorLabelProvider implements ITableLabelProvider {
 					 * (based on its file suffix). Rather than creating a large number
 					 * of images, we cache them in this plugin's image registry.
 					 */
-					IEditorRegistry editorImageRegistry = PlatformUI.getWorkbench().getEditorRegistry();
 					String name = fileMgr.getBaseName(uiInt.getId());
-					ImageDescriptor imageDescr = editorImageRegistry.getImageDescriptor(name);
-
-					/* can we get this image from the plugin's cache? */
-					ImageRegistry pluginImageRegistry = Activator.getDefault().getImageRegistry();
-					Image iconImage = pluginImageRegistry.get(imageDescr.toString());
-					if (iconImage == null) {
-						iconImage = imageDescr.createImage();
-						pluginImageRegistry.put(imageDescr.toString(), iconImage);
-					}
-					return iconImage;
-
+					return EclipsePartUtils.getImageFromFileType(name);
+					
 				case TYPE_SYMLINK:
 					return symlinkImage;
 				}

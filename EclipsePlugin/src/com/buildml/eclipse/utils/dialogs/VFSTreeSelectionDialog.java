@@ -39,9 +39,10 @@ public class VFSTreeSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parent		The shell that owns this dialog.
 	 * @param buildStore 	The IBuildStore containing the VFS.
 	 * @param message 		A custom message to display at the top of the dialog.
+	 * @param showFiles		true if we should show files as well as directories.
 	 */
-	public VFSTreeSelectionDialog(Shell parent, IBuildStore buildStore, String message) {
-		super(parent, new VFSLabelProvider(buildStore), new VFSTreeContentProvider(buildStore));
+	public VFSTreeSelectionDialog(Shell parent, IBuildStore buildStore, String message, boolean showFiles) {
+		super(parent, new VFSLabelProvider(buildStore), new VFSTreeContentProvider(buildStore, showFiles));
 		
 		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		

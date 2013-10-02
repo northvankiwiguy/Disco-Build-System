@@ -268,7 +268,8 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	 */
 	private void performAddOperation() {
 		VFSTreeSelectionDialog dialog = 
-				new VFSTreeSelectionDialog(getShell(), buildStore, "Select file to add to file group.");
+				new VFSTreeSelectionDialog(getShell(), buildStore, "Select file to add to file group.", true);
+		dialog.setAllowMultiple(true);
 		
 		/* invoke the dialog, allowing the user to select a directory/file */
 		if (dialog.open() == VFSTreeSelectionDialog.OK) {

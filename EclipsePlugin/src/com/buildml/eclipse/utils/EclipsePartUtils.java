@@ -36,6 +36,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -554,6 +555,29 @@ public class EclipsePartUtils {
 		return iconImage;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Choose a suitable icon, based on a file name's extension. For example, a foo.c file
+	 * will have a suitable graph image indicating that it's C language.
+	 * 
+	 * @param name The name of the file.
+	 * @return An Image that relates to this file.
+	 */
+	public static Image getImageFromFileType(String name) {
+		IEditorRegistry editorImageRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+		ImageDescriptor imageDescr = editorImageRegistry.getImageDescriptor(name);
+
+		/* can we get this image from the plugin's cache? */
+		ImageRegistry pluginImageRegistry = Activator.getDefault().getImageRegistry();
+		Image iconImage = pluginImageRegistry.get(imageDescr.toString());
+		if (iconImage == null) {
+			iconImage = imageDescr.createImage();
+			pluginImageRegistry.put(imageDescr.toString(), iconImage);
+		}
+		return iconImage;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

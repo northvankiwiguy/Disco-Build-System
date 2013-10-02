@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
 import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -39,6 +40,9 @@ import com.buildml.model.IFileMgr.PathType;
 	/** The FileMgr object we should query for file information */
 	private IFileMgr fileMgr = null;
 	
+	/** do we show files as well as directories? */
+	private boolean showFiles = true;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -48,9 +52,11 @@ import com.buildml.model.IFileMgr.PathType;
 	 * in the BuildStore into something that a TreeViewer can understand.
 	 * 
 	 * @param buildStore The IBuildStore containing the VFS to be displayed.
+	 * @param showFiles true if we should show files as well as directories.
 	 */
-	public VFSTreeContentProvider(IBuildStore buildStore) {
+	public VFSTreeContentProvider(IBuildStore buildStore, boolean showFiles) {
 		this.fileMgr = buildStore.getFileMgr();
+		this.showFiles = showFiles;
 		buildStore.getPackageRootMgr();
 	}
 	
@@ -67,7 +73,7 @@ import com.buildml.model.IFileMgr.PathType;
 		/* We only care about UIDirectory elements (ignore files) */
 		if (parentElement instanceof UIDirectory) {
 			UIDirectory uiInt = (UIDirectory)parentElement;
-			return getChildDirectories(uiInt.getId());
+			return getChildPaths(uiInt.getId());
 		}
 		return null;
 	}
@@ -80,10 +86,10 @@ import com.buildml.model.IFileMgr.PathType;
 	@Override
 	public Object getParent(Object element) {
 
-		if (element instanceof UIDirectory) {
+		if (element instanceof UIInteger) {
 			
 			/* query the BuildStore for this element's parent */
-			UIDirectory uiInt = (UIDirectory)element;
+			UIInteger uiInt = (UIInteger)element;
 			int parentId = fileMgr.getParentPath(uiInt.getId());
 
 			/* base case - parent of / is null */
@@ -115,7 +121,7 @@ import com.buildml.model.IFileMgr.PathType;
 			UIInteger uiInt = (UIInteger)element;
 			
 			/* query the BuildStore to see if there are any children */
-			UIDirectory childIds[] = getChildDirectories(uiInt.getId());
+			UIInteger childIds[] = getChildPaths(uiInt.getId());
 			if (childIds.length > 0) {
 				return true;
 			}
@@ -133,21 +139,25 @@ import com.buildml.model.IFileMgr.PathType;
 	 * Fetch the children of the specified FileMgr directory that themselves are directories.
 	 * 
 	 * @param dirId The path ID of the directory being queried.
-	 * @return An array of UIDirectory objects, representing the child directories.
+	 * @return An array of UIInteger objects, representing the child directories.
 	 */
-	private UIDirectory[] getChildDirectories(int dirId) {
+	private UIInteger[] getChildPaths(int dirId) {
 		
 		/* fetch all children of this directory */
 		Integer childPaths[] = fileMgr.getChildPaths(dirId);
 		
 		/* for those children that are directories, add them to result array */
-		List<UIDirectory> childDirs = new ArrayList<UIDirectory>();
+		List<UIInteger> childDirs = new ArrayList<UIInteger>();
 		for (int pathId : childPaths) {
-			if (fileMgr.getPathType(pathId) == PathType.TYPE_DIR) {
+			PathType pathType = fileMgr.getPathType(pathId);
+			if (pathType == PathType.TYPE_DIR) {
 				childDirs.add(new UIDirectory(pathId));
 			}
+			else if (showFiles && (pathType == PathType.TYPE_FILE)) {
+				childDirs.add(new UIFile(pathId));
+			}
 		}
-		return childDirs.toArray(new UIDirectory[childDirs.size()]);
+		return childDirs.toArray(new UIInteger[childDirs.size()]);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

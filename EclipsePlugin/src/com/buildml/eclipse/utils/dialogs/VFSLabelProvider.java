@@ -19,6 +19,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.buildml.eclipse.bobj.UIDirectory;
+import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageRootMgr;
@@ -78,8 +80,19 @@ import com.buildml.model.IPackageRootMgr;
 	 */
 	@Override
 	public Image getImage(Object element) {
-		/* we only show folders */
-		return folderImage;
+		
+		/* folders always have the folder icon */
+		if (element instanceof UIDirectory) {
+			return folderImage;
+		}
+		
+		/* files have an icon that illustrates their type */
+		else if (element instanceof UIFile) {
+			UIFile file = (UIFile)element;			
+			String name = fileMgr.getBaseName(file.getId());
+			return EclipsePartUtils.getImageFromFileType(name);
+		}
+		return null;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -89,6 +102,8 @@ import com.buildml.model.IPackageRootMgr;
 	 */
 	@Override
 	public String getText(Object element) {
+		
+		/* for directories, show the directory name, and possibly some file system roots */
 		if (element instanceof UIDirectory) {
 			UIDirectory node = (UIDirectory)element;
 			int pathId = node.getId();
@@ -123,6 +138,18 @@ import com.buildml.model.IPackageRootMgr;
 			}
 			
 		}
+		
+		/* for files, just show the file's base name */
+		else if (element instanceof UIFile) {
+			UIFile node = (UIFile)element;
+			int pathId = node.getId();
+			
+			String baseName = fileMgr.getBaseName(pathId);
+			if (baseName != null) {
+				return baseName;
+			}
+		}
+		
 		return "<Invalid>";
 	}
 	
