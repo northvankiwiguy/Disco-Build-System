@@ -21,6 +21,7 @@ import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 
@@ -386,7 +387,7 @@ public class PackageDiagramEditor extends DiagramEditor
 			if ((how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) ||
 				(how == IPackageMemberMgrListener.CHANGED_LOCATION)) {
 				updateBehavior.markChanged();
-				setFocus();
+				refreshDiagramLater();
 			}
 		}
 	}
@@ -403,7 +404,7 @@ public class PackageDiagramEditor extends DiagramEditor
 			return;
 		}
 		updateBehavior.markChanged();
-		setFocus();		
+		refreshDiagramLater();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -418,9 +419,9 @@ public class PackageDiagramEditor extends DiagramEditor
 			return;
 		}
 		updateBehavior.markChanged();
-		setFocus();	
+		refreshDiagramLater();
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -490,5 +491,23 @@ public class PackageDiagramEditor extends DiagramEditor
 		return null;
 	}
 
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Schedule the diagram to be refreshed at a later time (when the UI is not busy). This
+	 * is important because we might be in the middle of some other UI operation that we
+	 * can't interrupt at the moment.
+	 */
+	private void refreshDiagramLater() {
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				setFocus();	
+			}
+		});
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
