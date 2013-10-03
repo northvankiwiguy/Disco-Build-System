@@ -19,6 +19,7 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -68,14 +69,41 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * Various colour constants used in displaying this element.
 	 */
 	private static final IColorConstant TEXT_FOREGROUND = IColorConstant.BLACK;
-	private static final IColorConstant FOREGROUND_COLOUR = new ColorConstant(98, 131, 167);
-	private static final IColorConstant BACKGROUND_COLOUR = new ColorConstant(187, 218, 247);
+	private static final IColorConstant LINE_COLOUR = new ColorConstant(98, 131, 167);
+	private static final IColorConstant FILL_COLOUR = new ColorConstant(187, 218, 247);
+	private static final IColorConstant FILL_CORNER_COLOUR = new ColorConstant(160, 190, 220);
 
 	/*
 	 * Size of this element (in pixels).
 	 */
 	private static final int FILE_GROUP_WIDTH = 50;
 	private static final int FILE_GROUP_HEIGHT = 50;
+	private static final int FILE_GROUP_CORNER_SIZE = 20;
+	private static final int FILE_GROUP_OVERLAP = 3;
+	
+	/** Coordinates of the file's front page */
+	int coordsPage1[] = new int[] { 
+			0, 0, 
+			FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, 0,
+			FILE_GROUP_WIDTH, FILE_GROUP_CORNER_SIZE,
+			FILE_GROUP_WIDTH, FILE_GROUP_HEIGHT,
+			0, FILE_GROUP_HEIGHT 
+	};
+	
+	/** Coordinates of the bent corner */
+	int coordsCorner[] = new int[] {
+			FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, 0,
+			FILE_GROUP_WIDTH, FILE_GROUP_CORNER_SIZE,
+			FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, FILE_GROUP_CORNER_SIZE
+	};
+		
+	/** Coordinates for the file group's second page (if one is drawn) */
+	int coordsPage2[] = new int[] { 
+			FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP, 
+			FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP,
+			FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT,
+			FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT 
+	};
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -180,6 +208,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			if (newFileGroup == null) {
 				return null;
 			}
+			/* set the x and y coordinates correctly */
+			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, newFileGroup.getId(), x, y);
+			
 			/* render the new file group */
 			return renderPictogram((Diagram)targetObject, newFileGroup, x, y);			
 		}
@@ -196,8 +227,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					return null;
 				}
 				Diagram diagram = (Diagram) (existingPictogram.getContainer());
-				// TODO: this (x,y) is wrong - it's relative to the existing UIFileGroup's
-				// location, not the Diagram's origin.
 				return renderPictogram(diagram, fileGroup, x, y);			
 			}
 		}
@@ -389,12 +418,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * How many boxes will be shown? This helps us distinguish between file groups
 		 * containing a single file, versus multiple files.
 		 */
-		int numBoxes = 1;
 		int groupSize = fileGroupMgr.getGroupSize(addedFileGroup.getId());
 		if (groupSize < 0) {
 			return null; /* an error */
-		} else if (groupSize > 1) {
-			numBoxes = 3;
 		}
 		
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -409,21 +435,29 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		Rectangle invisibleRectangle =
 				gaService.createInvisibleRectangle(containerShape);
 		gaService.setLocationAndSize(invisibleRectangle, x, y, 
-										FILE_GROUP_WIDTH, FILE_GROUP_HEIGHT);
+										FILE_GROUP_WIDTH + ((groupSize < 2) ? 0 : FILE_GROUP_OVERLAP), 
+										FILE_GROUP_HEIGHT + ((groupSize < 2) ? 0 : FILE_GROUP_OVERLAP));
 
 		/*
-		 * Create the required number of (visible) boxes within the outer shape.
+		 * Create the visible file icon within the outer shape. First, consider whether
+		 * a second page (with no corner bend) should be shown in the background.
 		 */
-		for (int i = 0; i != numBoxes; i++) {
-			
-			Rectangle box = gaService.createRectangle(invisibleRectangle);
-			box.setForeground(manageColor(FOREGROUND_COLOUR));
-			box.setBackground(manageColor(BACKGROUND_COLOUR));
-			box.setLineWidth(2);
-			gaService.setLocationAndSize(box, i * 3, i * 4,
-				FILE_GROUP_WIDTH - (numBoxes - 1) * 5, 
-				FILE_GROUP_HEIGHT - (numBoxes - 1) * 5);
+		if (groupSize > 1) {
+			Polygon box = gaService.createPolygon(invisibleRectangle, coordsPage2);
+			box.setForeground(manageColor(LINE_COLOUR));
+			box.setBackground(manageColor(FILL_COLOUR));
+			box.setLineWidth(2);			
 		}
+		
+		/* now the front page, with the corner bent */
+		Polygon box = gaService.createPolygon(invisibleRectangle, coordsPage1);
+		box.setForeground(manageColor(LINE_COLOUR));
+		box.setBackground(manageColor(FILL_COLOUR));
+		box.setLineWidth(2);
+		Polygon boxCorner = gaService.createPolygon(invisibleRectangle, coordsCorner);
+		boxCorner.setForeground(manageColor(LINE_COLOUR));
+		boxCorner.setBackground(manageColor(FILL_CORNER_COLOUR));
+		boxCorner.setLineWidth(2);
 
 		/* add a chopbox anchor to the shape */
 		peCreateService.createChopboxAnchor(containerShape);
