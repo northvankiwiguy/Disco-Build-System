@@ -70,8 +70,8 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 * Various colour constants used in displaying this element.
 	 */
 	private static final IColorConstant TEXT_FOREGROUND = IColorConstant.BLACK;
-	private static final IColorConstant FOREGROUND_COLOUR = new ColorConstant(98, 131, 167);
-	private static final IColorConstant BACKGROUND_COLOUR = new ColorConstant(187, 218, 247);
+	private static final IColorConstant LINE_COLOUR = new ColorConstant(10, 10, 10);
+	private static final IColorConstant FILL_COLOUR = new ColorConstant(220, 220, 190);
 
 	/*
 	 * Size of this element (in pixels).
@@ -223,8 +223,8 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		for (int i = 0; i != numEllipses; i++) {
 			
 			Ellipse ellipse = gaService.createEllipse(invisibleRectangle);
-			ellipse.setForeground(manageColor(FOREGROUND_COLOUR));
-			ellipse.setBackground(manageColor(BACKGROUND_COLOUR));
+			ellipse.setForeground(manageColor(LINE_COLOUR));
+			ellipse.setBackground(manageColor(FILL_COLOUR));
 			ellipse.setLineWidth(2);
 			gaService.setLocationAndSize(ellipse, i * xOverlap, i * yOverlap, 
 										 ACTION_WIDTH - xAdjust, ACTION_HEIGHT - yAdjust);
