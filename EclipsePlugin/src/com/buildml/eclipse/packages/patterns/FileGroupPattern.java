@@ -254,10 +254,8 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 				
 				/* set the x and y coordinates correctly */
 				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, newFileGroup.getId(), x, y);
-			}
-			
-			/* render the new file group */
-			return renderPictogram((Diagram)targetObject, newFileGroup, x, y);			
+			}			
+			return null;
 		}
 		
 		/* Case #3 - drag IFile (or many) onto existing UIFileGroup */
@@ -267,11 +265,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			if (bo instanceof UIFileGroup) {
 				UIFileGroup fileGroup = (UIFileGroup)bo;
 				fileGroup = addToFileGroup(fileGroup, getPathOf(addedObject));
-				if (fileGroup == null) {
-					return null;
-				}
-				Diagram diagram = (Diagram) (existingPictogram.getContainer());
-				return renderPictogram(diagram, fileGroup, x, y);			
+				return null;
 			}
 		}
 
@@ -465,8 +459,8 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * draw a second page that appears behind the front page.
 		 */
 		int groupSize = fileGroupMgr.getGroupSize(addedFileGroup.getId());
-		if (groupSize < 0) {
-			return null; /* an error */
+		if (groupSize <= 0) {
+			return null; /* an empty file group (or an errored file group) shouldn't be shown */
 		}
 		
 		/* 

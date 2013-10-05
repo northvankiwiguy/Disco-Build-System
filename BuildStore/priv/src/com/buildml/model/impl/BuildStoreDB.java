@@ -705,8 +705,15 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("delete from packageMembers where memberType = " + 
 									IPackageMemberMgr.TYPE_ACTION + " and memberId in " + 
 									"(select actionId from buildActions where trashed=1)");
-			// TODO: delete items from packageMembers where fileGroups are trashed.
-
+			
+			/* delete empty file groups (and their package membership) */
+			stat.executeUpdate("delete from fileGroups where id not in " +
+								"(select groupId from fileGroupPaths group by groupId)");
+			stat.executeUpdate("delete from packageMembers where memberType = " +
+								IPackageMemberMgr.TYPE_FILE_GROUP + 
+								" and memberId not in " +
+									"(select groupId from fileGroupPaths group by groupId)");
+			
 			/* now delete the files and actions themselves */
 			stat.executeUpdate("delete from fileAttrs where pathId in (select id from files where trashed=1);");
 			stat.executeUpdate("delete from files where trashed=1");
