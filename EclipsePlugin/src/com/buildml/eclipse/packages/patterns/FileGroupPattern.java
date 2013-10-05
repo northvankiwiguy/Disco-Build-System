@@ -35,6 +35,8 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.swt.widgets.Display;
+
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
@@ -67,6 +69,12 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	/** The managers owned by this BuildStore */
 	private IPackageMemberMgr pkgMemberMgr;
 	private IFileMgr fileMgr;
+	
+	/** 
+	 * If we're adding multiple files in one drag operation, which file group
+	 * are we adding to?
+	 */
+	private UIFileGroup multiAddFileGroup = null;
 	
 	/*
 	 * Various colour constants used in displaying this element.
@@ -222,12 +230,31 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			String pathName = getPathOf(addedObject);
 			
 			/* create a totally new file group the database, and add the file to it */
-			UIFileGroup newFileGroup = addToFileGroup(null, pathName);
+			UIFileGroup newFileGroup = addToFileGroup(multiAddFileGroup, pathName);
 			if (newFileGroup == null) {
 				return null;
 			}
-			/* set the x and y coordinates correctly */
-			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, newFileGroup.getId(), x, y);
+			
+			/*
+			 * If the user is dragging multiple files onto the Diagram, then we need
+			 * to do some clever work to make sure they all end up in the same file group.
+			 * We end up seeing multiple add() calls from the graphiti framework, so record
+			 * the UIFileGroup that we added the first file to, and reuse it for each
+			 * successive call to add(). However, once the Eclipse UI is "idle" again, make
+			 * sure we stop using that file group.
+			 */
+			if (multiAddFileGroup == null) {
+				multiAddFileGroup = newFileGroup;
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						multiAddFileGroup = null;
+					}
+				});
+				
+				/* set the x and y coordinates correctly */
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, newFileGroup.getId(), x, y);
+			}
 			
 			/* render the new file group */
 			return renderPictogram((Diagram)targetObject, newFileGroup, x, y);			
