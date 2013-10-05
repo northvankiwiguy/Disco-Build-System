@@ -34,7 +34,7 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
-
+import org.eclipse.jdt.core.ICompilationUnit;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
@@ -152,8 +152,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 */
 	@Override
 	public boolean isMainBusinessObjectApplicable(Object mainBusinessObject) {
-		return (mainBusinessObject instanceof UIFileGroup) ||
-				(mainBusinessObject instanceof IFile);
+		return (mainBusinessObject instanceof UIFileGroup) || isFileClass(mainBusinessObject);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -170,7 +169,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * A UIFileGroup or an IFile can both be added to a Diagram (creating
 		 * a new UIFileGroup, or can be added to an existing UIFileGroup.
 		 */
-		if ((newObject instanceof UIFileGroup) || (newObject instanceof IFile)) {
+		if ((newObject instanceof UIFileGroup) || isFileClass(newObject)) {
 			
 			/* what are we adding it to? */
 			Object target = context.getTargetContainer();
@@ -218,11 +217,12 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		}
 		
 		/* Case #2 - drag IFile onto Diagram */
-		if ((addedObject instanceof IFile) && (targetObject instanceof Diagram)) {
+		if ((targetObject instanceof Diagram) && isFileClass(addedObject)) {
+			
+			String pathName = getPathOf(addedObject);
 			
 			/* create a totally new file group the database, and add the file to it */
-			IFile file = (IFile)addedObject;
-			UIFileGroup newFileGroup = addToFileGroup(null, file.getFullPath().toOSString());
+			UIFileGroup newFileGroup = addToFileGroup(null, pathName);
 			if (newFileGroup == null) {
 				return null;
 			}
@@ -234,13 +234,12 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		}
 		
 		/* Case #3 - drag IFile (or many) onto existing UIFileGroup */
-		if (addedObject instanceof IFile) {
+		if (isFileClass(addedObject)) {
 			ContainerShape existingPictogram = (ContainerShape)targetObject;
 			Object bo = GraphitiUtils.getBusinessObject(targetObject);
 			if (bo instanceof UIFileGroup) {
-				IFile file = (IFile)addedObject;
 				UIFileGroup fileGroup = (UIFileGroup)bo;
-				fileGroup = addToFileGroup(fileGroup, file.getFullPath().toOSString());
+				fileGroup = addToFileGroup(fileGroup, getPathOf(addedObject));
 				if (fileGroup == null) {
 					return null;
 				}
@@ -529,5 +528,38 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		return containerShape;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Determine whether the specified object is something in the Eclipse IDE that represents
+	 * a "disk file".
+	 * 
+	 * @param fileObject An object to be tested.
+	 * @return true if this object represents some type of disk file in the Eclipse IDE.
+	 */
+	private boolean isFileClass(Object fileObject) {
+		return (fileObject instanceof IFile) || (fileObject instanceof ICompilationUnit);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given something that represents a file within the Eclipse IDE, return the full OS-specific
+	 * path to that file.
+	 * 
+	 * @param fileObject The object that represents a file.
+	 * @return The full OS-specific path to the file.
+	 */
+	private String getPathOf(Object fileObject) {
+		if (fileObject instanceof IFile) {
+			IFile file = (IFile)fileObject;
+			return file.getFullPath().toOSString();
+		} else if (fileObject instanceof ICompilationUnit) {
+			ICompilationUnit file = (ICompilationUnit)fileObject;
+			return file.getPath().toOSString();
+		}
+		return null;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
