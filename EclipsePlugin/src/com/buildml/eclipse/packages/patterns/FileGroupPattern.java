@@ -21,6 +21,8 @@ import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
+import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -64,6 +66,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	
 	/** The managers owned by this BuildStore */
 	private IPackageMemberMgr pkgMemberMgr;
+	private IFileMgr fileMgr;
 	
 	/*
 	 * Various colour constants used in displaying this element.
@@ -81,28 +84,42 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	private static final int FILE_GROUP_CORNER_SIZE = 20;
 	private static final int FILE_GROUP_OVERLAP = 3;
 	
-	/** Coordinates of the file's front page */
+	/** Font type for labels */
+	private static final String LABEL_FONT = "courier";
+	
+	/** Font size */
+	private static final int LABEL_FONT_SIZE = 9;
+	
+	/** Gap between consecutive label lines */
+	private static final int LABEL_FONT_GAP = 2;
+	
+	/** The maximum number of file names to show under an icon */
+	private static final int MAX_LABELS_TO_SHOW = 4;
+	
+	/** Polygon coordinates for drawing the file's front page (the box with the bent corner) */
+	private static final int OFF_X = FILE_GROUP_WIDTH / 2;
+	
 	int coordsPage1[] = new int[] { 
-			0, 0, 
-			FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, 0,
-			FILE_GROUP_WIDTH, FILE_GROUP_CORNER_SIZE,
-			FILE_GROUP_WIDTH, FILE_GROUP_HEIGHT,
-			0, FILE_GROUP_HEIGHT 
+			OFF_X, 0, 
+			OFF_X + FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, 0,
+			OFF_X + FILE_GROUP_WIDTH, FILE_GROUP_CORNER_SIZE,
+			OFF_X + FILE_GROUP_WIDTH, FILE_GROUP_HEIGHT,
+			OFF_X, FILE_GROUP_HEIGHT 
 	};
 	
-	/** Coordinates of the bent corner */
+	/** Polygon coordinates for drawing the bent corner */
 	int coordsCorner[] = new int[] {
-			FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, 0,
-			FILE_GROUP_WIDTH, FILE_GROUP_CORNER_SIZE,
-			FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, FILE_GROUP_CORNER_SIZE
+			OFF_X + FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, 0,
+			OFF_X + FILE_GROUP_WIDTH, FILE_GROUP_CORNER_SIZE,
+			OFF_X + FILE_GROUP_WIDTH - FILE_GROUP_CORNER_SIZE, FILE_GROUP_CORNER_SIZE
 	};
 		
-	/** Coordinates for the file group's second page (if one is drawn) */
+	/** Polygon coordinates for drawing the file group's second page (if one is drawn) */
 	int coordsPage2[] = new int[] { 
-			FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP, 
-			FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP,
-			FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT,
-			FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT 
+			OFF_X + FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP, 
+			OFF_X + FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP,
+			OFF_X + FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT,
+			OFF_X + FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT 
 	};
 	
 	/*=====================================================================================*
@@ -179,6 +196,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		editor = (PackageDiagramEditor)getDiagramEditor();
 		buildStore = editor.getBuildStore();
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
+		fileMgr = buildStore.getFileMgr();
 
 		/*
 		 * Case handled:
@@ -413,30 +431,42 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 												int x, int y) {
 		
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		int fileGroupId = addedFileGroup.getId();
 		
 		/*
 		 * How many boxes will be shown? This helps us distinguish between file groups
-		 * containing a single file, versus multiple files.
+		 * containing a single file, versus multiple files. With multiple files, we
+		 * draw a second page that appears behind the front page.
 		 */
 		int groupSize = fileGroupMgr.getGroupSize(addedFileGroup.getId());
 		if (groupSize < 0) {
 			return null; /* an error */
 		}
 		
+		/* 
+		 * We can show a limited number of file names in the pictogram. If more than our
+		 * maximum, display the last name as "...".
+		 */
+		int fileNamesToShow = (groupSize <= MAX_LABELS_TO_SHOW) ? groupSize : MAX_LABELS_TO_SHOW;
+		
+		/* create a container that holds the pictogram */
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
 		ContainerShape containerShape =
 				peCreateService.createContainerShape(targetDiagram, true);
-
+		
 		/*
-		 * Create an invisible outer rectangle. The smaller file boxes will be placed
-		 * (or stacked) inside this.
+		 * Create an invisible outer rectangle. The smaller polygons and labels will be placed
+		 * inside this. The width is always twice that of the polygon, to allow for long file
+		 * names to be shown underneath the polygons. The height is carefully selected to allow
+		 * for enough labels, as well as for the possible "second page" polygon.
 		 */
 		Rectangle invisibleRectangle =
 				gaService.createInvisibleRectangle(containerShape);
 		gaService.setLocationAndSize(invisibleRectangle, x, y, 
-										FILE_GROUP_WIDTH + ((groupSize < 2) ? 0 : FILE_GROUP_OVERLAP), 
-										FILE_GROUP_HEIGHT + ((groupSize < 2) ? 0 : FILE_GROUP_OVERLAP));
+								2 * FILE_GROUP_WIDTH, 
+								FILE_GROUP_HEIGHT + ((groupSize < 2) ? 0 : FILE_GROUP_OVERLAP) +
+									((fileNamesToShow + 1) * (LABEL_FONT_SIZE + LABEL_FONT_GAP)));
 
 		/*
 		 * Create the visible file icon within the outer shape. First, consider whether
@@ -458,7 +488,38 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		boxCorner.setForeground(manageColor(LINE_COLOUR));
 		boxCorner.setBackground(manageColor(FILL_CORNER_COLOUR));
 		boxCorner.setLineWidth(2);
-
+		
+		/*
+		 * Display the file group's content (or at least part of it) under the file box.
+		 * We can only show a limited number of file names. If there are too many to
+		 * show, the last label must be "...".
+		 */
+		for (int i = 0; i != fileNamesToShow; i++) {
+	
+			String value;
+			if ((i == (MAX_LABELS_TO_SHOW - 1)) && (groupSize > MAX_LABELS_TO_SHOW)) {
+				value = "...";
+			} else {
+				/* fetch this particular file's base name */
+				int pathId = fileGroupMgr.getPathId(fileGroupId, i);
+				if (pathId < 0) {
+					value = "";
+				} else {
+					value = fileMgr.getBaseName(pathId);
+				}
+			}
+			
+			/* draw the label underneath the main "page" polygon */
+			Text fileNames = gaService.createText(getDiagram(), invisibleRectangle, 
+					value, LABEL_FONT, LABEL_FONT_SIZE);
+			fileNames.setFilled(false);
+			fileNames.setForeground(manageColor(TEXT_FOREGROUND));
+			fileNames.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+			gaService.setLocationAndSize(fileNames, 
+					0, FILE_GROUP_HEIGHT + ((1 + i) * (LABEL_FONT_SIZE + LABEL_FONT_GAP)), 
+					FILE_GROUP_WIDTH * 2, (LABEL_FONT_SIZE + LABEL_FONT_GAP));
+		}
+		
 		/* add a chopbox anchor to the shape */
 		peCreateService.createChopboxAnchor(containerShape);
 
