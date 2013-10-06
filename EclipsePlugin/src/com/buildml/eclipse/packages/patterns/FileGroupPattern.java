@@ -12,11 +12,14 @@
 
 package com.buildml.eclipse.packages.patterns;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
@@ -69,6 +72,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	/** The managers owned by this BuildStore */
 	private IPackageMemberMgr pkgMemberMgr;
 	private IFileMgr fileMgr;
+	private IFileGroupMgr fileGroupMgr;
 	
 	/** 
 	 * If we're adding multiple files in one drag operation, which file group
@@ -204,6 +208,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		buildStore = editor.getBuildStore();
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		fileMgr = buildStore.getFileMgr();
+		fileGroupMgr = buildStore.getFileGroupMgr();
 
 		/*
 		 * Case handled:
@@ -389,9 +394,64 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		op.recordAndInvoke();
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Yes, we can delete UIFileGroups.
+	 */
+	@Override
+	public boolean canDelete(IDeleteContext context) {
+		return true;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Invoked when the user initiates a "delete" operation on a UIFileGroup.
+	 */
+	@Override
+	public void delete(IDeleteContext context) {
+		
+		/* determine the business object that related to the pictogram being deleted */
+		PictogramLink pl = context.getPictogramElement().getLink();
+		UIFileGroup fileGroup = (UIFileGroup)(pl.getBusinessObjects().get(0));
+		int fileGroupId = fileGroup.getId();
+		
+		/* add the "delete" operation to our redo/undo stack */
+		FileGroupChangeOperation op = new FileGroupChangeOperation("Delete File Group", fileGroupId);
+		op.recordMembershipChange(getFileGroupAsArrayList(fileGroupId), new ArrayList<Integer>());
+		op.recordAndInvoke();	
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * Fetch the members of a file group (path IDs, or sub-group IDs) and return them as
+	 * an ArrayList. This is used for recording history changes.
+	 * 
+	 * @param fileGroupId The ID of the file group to get the content of.
+	 * @return An ArrayList<Integer> containing the members.
+	 */
+	private ArrayList<Integer> getFileGroupAsArrayList(int fileGroupId) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		int groupSize = fileGroupMgr.getGroupSize(fileGroupId);
+		if (groupSize < 0) {
+			return result;
+		}
+		for (int i = 0; i != groupSize; i++) {
+			int pathId = fileGroupMgr.getPathId(fileGroupId, i);
+			if (pathId < 0) {
+				return result;
+			}
+			result.add(pathId);
+		}
+		return result;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 
 	/**
 	 * Append a file path onto the end of a UIFileGroup. If the group doesn't yet exist
@@ -402,9 +462,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * @return The file group, with the new file appended to the end.
 	 */
 	private UIFileGroup addToFileGroup(UIFileGroup fileGroup, String fullPath) {
-		
-		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
-		IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* convert the path into an absolute path (not workspace-relative) */
 		fullPath = EclipsePartUtils.workspaceRelativeToAbsolutePath(fullPath);

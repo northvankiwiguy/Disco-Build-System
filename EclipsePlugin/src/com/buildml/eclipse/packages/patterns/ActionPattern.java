@@ -16,6 +16,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
@@ -384,4 +385,16 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canDelete(org.eclipse.graphiti.features.context.IDeleteContext)
+	 */
+	@Override
+	public boolean canDelete(IDeleteContext context) {
+		/* we can't delete actions */
+		return false;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

@@ -13,8 +13,10 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IDeleteFeature;
+import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
-
+import com.buildml.eclipse.packages.features.PackageDiagramDeleteFeature;
 import com.buildml.eclipse.packages.patterns.ActionPattern;
 import com.buildml.eclipse.packages.patterns.DiagramPattern;
 import com.buildml.eclipse.packages.patterns.FileGroupPattern;
@@ -25,8 +27,11 @@ import com.buildml.eclipse.packages.patterns.FileGroupPattern;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-/* package */ class DiagramFeatureProvider extends DefaultFeatureProviderWithPatterns {
+public class DiagramFeatureProvider extends DefaultFeatureProviderWithPatterns {
 
+	/** The one and only "delete" feature provider */
+	private PackageDiagramDeleteFeature deleteFeature = null;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -45,5 +50,21 @@ import com.buildml.eclipse.packages.patterns.FileGroupPattern;
 		addPattern(new DiagramPattern());
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return a feature for handling delete operations. The default feature doesn't behave
+	 * as we need it to, so we write our own simple version.
+	 */
+	@Override
+	public IDeleteFeature getDeleteFeature(IDeleteContext context) {
+		
+		/* we only need a single feature for all delete operations */
+		if (deleteFeature == null) {
+			deleteFeature = new PackageDiagramDeleteFeature(this);
+		}
+		return deleteFeature;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
