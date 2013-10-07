@@ -80,6 +80,17 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 */
 	private UIFileGroup multiAddFileGroup = null;
 	
+	/**
+	 * The initial set of members of this file group (possibly empty).
+	 */
+	private ArrayList<Integer> initialMembers = null;
+	
+	/**
+	 * The final set of members of this file group (after a drag
+	 * operation has completed).
+	 */
+	private ArrayList<Integer> currentMembers = null;
+	
 	/*
 	 * Various colour constants used in displaying this element.
 	 */
@@ -234,42 +245,101 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			
 			String pathName = getPathOf(addedObject);
 			
-			/* create a totally new file group the database, and add the file to it */
-			UIFileGroup newFileGroup = addToFileGroup(multiAddFileGroup, pathName);
-			if (newFileGroup == null) {
-				return null;
-			}
-			
-			/*
-			 * If the user is dragging multiple files onto the Diagram, then we need
-			 * to do some clever work to make sure they all end up in the same file group.
-			 * We end up seeing multiple add() calls from the graphiti framework, so record
-			 * the UIFileGroup that we added the first file to, and reuse it for each
-			 * successive call to add(). However, once the Eclipse UI is "idle" again, make
-			 * sure we stop using that file group.
+			/* 
+			 * If this is the first (of possibly many) files being added to this file
+			 * group, we start by recording the "initial" content. Given that we're
+			 * dragging directly onto the Diagram, there initial file group is empty.
+			 * The "current" set of members is also empty, but we'll shortly be
+			 * adding members to it.
 			 */
 			if (multiAddFileGroup == null) {
-				multiAddFileGroup = newFileGroup;
+				initialMembers = new ArrayList<Integer>();
+				currentMembers = new ArrayList<Integer>();
+				
+				/* 
+				 * Create a brand new UIFileGroup in the database - initially empty,
+				 * and won't be displayed.
+				 */
+				int pkgId = editor.getPackageId();
+				final int fileGroupId = fileGroupMgr.newSourceGroup(pkgId);
+				if (fileGroupId == ErrorCode.NOT_FOUND) {
+					return null; /* invalid pkgId */
+				}
+				multiAddFileGroup = new UIFileGroup(fileGroupId);
+				getDiagram().eResource().getContents().add(multiAddFileGroup);
+				
+				/*
+				 * If the user is dragging multiple files onto the Diagram, then we need
+				 * to do some clever work to make sure they all end up in the same file group.
+				 * We end up seeing multiple add() calls from the graphiti framework, so record
+				 * the UIFileGroup that we added the first file to, and reuse it for each
+				 * successive call to add(). However, once the Eclipse UI is "idle" again, make
+				 * sure we stop using that file group.
+				 */
 				Display.getCurrent().asyncExec(new Runnable() {
 					@Override
 					public void run() {
 						multiAddFileGroup = null;
+						FileGroupChangeOperation op = new FileGroupChangeOperation("Create New File Group", fileGroupId);
+						op.recordMembershipChange(initialMembers, currentMembers);
+						op.recordAndInvoke();
 					}
 				});
-				
+					
 				/* set the x and y coordinates correctly */
-				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, newFileGroup.getId(), x, y);
-			}			
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, x, y);		
+			}
+			
+			/* 
+			 * For all dragged files (not just the first), add the dragged file into our "currentMembers"
+			 * array. Once our drag operation is complete, we'll add them all to the file group itself.
+			 * Note: this might fail, but we'll silently ignore the error.
+			 */
+			addToFileGroup(pathName);
+			
+			/* 
+			 * Nothing to display as a result of this call - it'll be displayed when we refresh
+			 * the whole diagram.
+			 */
 			return null;
 		}
 		
 		/* Case #3 - drag IFile (or many) onto existing UIFileGroup */
 		if (isFileClass(addedObject)) {
-			ContainerShape existingPictogram = (ContainerShape)targetObject;
 			Object bo = GraphitiUtils.getBusinessObject(targetObject);
 			if (bo instanceof UIFileGroup) {
 				UIFileGroup fileGroup = (UIFileGroup)bo;
-				fileGroup = addToFileGroup(fileGroup, getPathOf(addedObject));
+				final int fileGroupId = fileGroup.getId();
+				
+				/*
+				 * We may have multiple files being added to an existing file group. If this is
+				 * the first file, then we need to record the "initialMembers" of the group
+				 * so that we can roll back after an "undo".
+				 */
+				if (multiAddFileGroup == null) {
+					multiAddFileGroup = fileGroup;
+					initialMembers = getFileGroupAsArrayList(fileGroupId);
+					currentMembers = (ArrayList<Integer>) initialMembers.clone();
+					
+					/* once the add operation is complete... */
+					Display.getCurrent().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							multiAddFileGroup = null;
+							FileGroupChangeOperation op = new FileGroupChangeOperation("Modify File Group", fileGroupId);
+							op.recordMembershipChange(initialMembers, currentMembers);
+							op.recordAndInvoke();
+						}
+					});
+				}
+				
+				/* for all invocations, not just the first, add the new path into currentMembers */
+				addToFileGroup(getPathOf(addedObject));
+				
+				/* 
+				 * Nothing to display as a result of this call - it'll be displayed when we refresh
+				 * the whole diagram.
+				 */
 				return null;
 			}
 		}
@@ -454,43 +524,26 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 
 
 	/**
-	 * Append a file path onto the end of a UIFileGroup. If the group doesn't yet exist
-	 * (is null), create a new UIFileGroup.
+	 * Append a file path onto the end of the "currentMembers" array. After the "drag"
+	 * operation is complete, we'll add all of these files into the file group.
 	 * 
-	 * @param fileGroup The UIFileGroup to append the path to, or null if no group yet exists.
 	 * @param fullPath The absolute path to add to the file group.
-	 * @return The file group, with the new file appended to the end.
+	 * @return ErrorCode.OK on success, or a relevant error code.
 	 */
-	private UIFileGroup addToFileGroup(UIFileGroup fileGroup, String fullPath) {
+	private int addToFileGroup(String fullPath) {
 		
 		/* convert the path into an absolute path (not workspace-relative) */
 		fullPath = EclipsePartUtils.workspaceRelativeToAbsolutePath(fullPath);
-		
-		/* 
-		 * If necessary, create a brand new UIFileGroup in the database.
-		 */
-		if (fileGroup == null) {
-			int pkgId = editor.getPackageId();
-			int fileGroupId = fileGroupMgr.newSourceGroup(pkgId);
-			if (fileGroupId == ErrorCode.NOT_FOUND) {
-				return null; /* invalid pkgId */
-			}
-			fileGroup = new UIFileGroup(fileGroupId);
-			getDiagram().eResource().getContents().add(fileGroup);
-		}
 
-		/* now append the path to the fileGroup */
+		/* now append the path to the array of members for this drag operation */
 		int newPathId = fileMgr.addFile(fullPath);
 		if (newPathId == ErrorCode.BAD_PATH) {
-			return fileGroup; /* couldn't add the path - return the unchanged filegroup */
+			return newPathId; /* couldn't add the path - return an error */
 		}
-		int index = fileGroupMgr.addPathId(fileGroup.getId(), newPathId);
-		if (index < 0) {
-			return fileGroup; /* couldn't add the path to the group - return unchanged filegroup */
-		}
+		currentMembers.add(newPathId);
 
-		/* all is good - return modified filegroup */
-		return fileGroup;
+		/* all is good */
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

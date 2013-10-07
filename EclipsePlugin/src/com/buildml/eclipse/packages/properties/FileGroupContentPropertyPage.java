@@ -202,7 +202,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	public boolean performOk() {
 		
 		/* create an undo/redo operation that will invoke the underlying database changes */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("change file group", fileGroupId);
+		FileGroupChangeOperation op = new FileGroupChangeOperation("Modify File Group", fileGroupId);
 		op.recordMembershipChange(initialMembers, currentMembers);
 		op.recordAndInvoke();
 		return super.performOk();
