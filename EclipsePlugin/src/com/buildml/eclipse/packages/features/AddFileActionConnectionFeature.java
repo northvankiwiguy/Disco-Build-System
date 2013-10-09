@@ -17,8 +17,10 @@ import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.Connection;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
@@ -65,17 +67,23 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 		UIFileActionConnection bo = (UIFileActionConnection) addConContext.getNewObject();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 
-		/* create a connection with a polyline */
+		/* create a connection between the two points */
 		Connection connection = peCreateService.createFreeFormConnection(getDiagram());
 		connection.setStart(addConContext.getSourceAnchor());
 		connection.setEnd(addConContext.getTargetAnchor());
 
+		/* draw the line */
 		IGaService gaService = Graphiti.getGaService();
 		Polyline polyline = gaService.createPolyline(connection);
 		polyline.setLineWidth(2);
-		polyline.setLineStyle(LineStyle.SOLID);
 		polyline.setForeground(manageColor(CONNECTION_COLOUR));
-
+		
+		/* draw the arrow */
+	    ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+	    Polyline arrow = gaService.createPolyline(cd, new int[] { -10, 5, 0, 0, -10, -5 });
+		arrow.setLineWidth(2);
+		arrow.setForeground(manageColor(CONNECTION_COLOUR));
+	    
 		/* link the connection pictogram to the business object */
 		link(connection, bo);
 

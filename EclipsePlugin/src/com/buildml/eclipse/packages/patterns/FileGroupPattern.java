@@ -26,8 +26,11 @@ import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
+import org.eclipse.graphiti.mm.algorithms.styles.Point;
+import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.pattern.AbstractPattern;
@@ -702,9 +705,12 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					FILE_GROUP_WIDTH * 2, (LABEL_FONT_SIZE + LABEL_FONT_GAP));
 		}
 		
-		/* add a chopbox anchor to the shape */
-		peCreateService.createChopboxAnchor(containerShape);
-
+		/* add an anchor that resides to the immediate right of the file group box */
+		FixPointAnchor anchor = peCreateService.createFixPointAnchor(containerShape);
+		anchor.setLocation(
+				gaService.createPoint(OFF_X + FILE_GROUP_WIDTH + (FILE_GROUP_OVERLAP * 2), FILE_GROUP_HEIGHT / 2));
+		gaService.createInvisibleRectangle(anchor);
+	   
 		/* create a link between the shape and the business object, and display it. */
 		link(containerShape, addedFileGroup);
 		layoutPictogramElement(containerShape);

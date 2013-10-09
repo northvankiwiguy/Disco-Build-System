@@ -267,6 +267,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 				/* create the new business object */
 				UIFileActionConnection newConnection = new UIFileActionConnection(
 						fileGroupId, actionId, slotId, UIFileActionConnection.INPUT_TO_ACTION);
+				getDiagram().eResource().getContents().add(newConnection);
 				
 				/*
 				 * Now we need to figure out which pictograms this connection goes between. We

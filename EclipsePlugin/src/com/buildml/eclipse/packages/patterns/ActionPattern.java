@@ -26,6 +26,7 @@ import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.pattern.AbstractPattern;
@@ -255,8 +256,9 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 										ACTION_WIDTH - xAdjust, ACTION_HEIGHT - yAdjust);
 		
 		/* add a chopbox anchor to the shape */
-		peCreateService.createChopboxAnchor(containerShape);
-		
+		FixPointAnchor anchor = peCreateService.createFixPointAnchor(containerShape);
+		anchor.setLocation(gaService.createPoint(-5, ACTION_HEIGHT / 2));
+		gaService.createInvisibleRectangle(anchor);
 		
 		/* create a link between the shape and the business object, and display it. */
 		link(containerShape, addedAction);
