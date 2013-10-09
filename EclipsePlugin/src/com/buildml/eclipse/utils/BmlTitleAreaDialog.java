@@ -98,4 +98,14 @@ public class BmlTitleAreaDialog extends TitleAreaDialog {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#getInitialSize()
+	 */
+	@Override
+	protected Point getInitialSize() {
+		return new Point(EclipsePartUtils.getScreenWidth() / 3, EclipsePartUtils.getScreenHeight() / 2);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

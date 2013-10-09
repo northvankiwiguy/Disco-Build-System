@@ -13,25 +13,34 @@
 package com.buildml.eclipse.packages.patterns;
 
 import org.eclipse.emf.common.command.CommandStack;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.pattern.AbstractPattern;
 import org.eclipse.graphiti.pattern.IPattern;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.model.ISlotTypes;
+import com.buildml.model.ISlotTypes.SlotDetails;
 
 /**
  * A Graphiti pattern for managing the top-level "Diagram" graphical element in a
@@ -55,7 +64,10 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	private IPackageMemberMgr pkgMemberMgr;
 	
 	/** The IActionMgr in this BuildStore */
-	private IActionMgr actionMgr;	
+	private IActionMgr actionMgr;
+	
+	/** The IActionTypeMgr in this BuildStore */
+	private IActionTypeMgr actionTypeMgr;
 	
 	/** The pkgMgr ID of the package we're displaying */
 	private int pkgId;
@@ -144,6 +156,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		buildStore = editor.getBuildStore();
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		actionMgr = buildStore.getActionMgr();
+		actionTypeMgr = buildStore.getActionTypeMgr();
 		pkgId = editor.getPackageId();
 		
 		final ContainerShape container = (ContainerShape)context.getPictogramElement();
@@ -202,6 +215,17 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					context2.setTargetContainer(container);
 					getFeatureProvider().addIfPossible(context2);
 				}
+				
+				/*
+				 * Now draw connections between file groups and actions.
+				 */
+				for (MemberDesc member : members) {
+					
+					/* for package members that are actions... */
+					if (member.memberType == IPackageMemberMgr.TYPE_ACTION) {
+						addFileActionConnections(member);
+					}
+				}
 			}
 				
 		});
@@ -210,4 +234,70 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * For each of an action's slots that have a file group connected to them, draw a connection
+	 * line.
+	 * @param member The UIAction's details.
+	 */
+	private void addFileActionConnections(MemberDesc member) {
+
+		/* get the complete list of input slots for this action - whether set, or not set */
+		int actionId = member.memberId;
+		int actionTypeId = actionMgr.getActionType(actionId);
+		if (actionTypeId < 0) {
+			return;
+		}
+		SlotDetails slots[] = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_INPUT);
+		if (slots == null) {
+			return;
+		}
+		
+		/*
+		 * For each slot within the action, see if there's a FileGroup in the slot.
+		 */
+		for (int i = 0; i < slots.length; i++) {
+			int slotId = slots[i].slotId;
+			Object slotValue = actionMgr.getSlotValue(actionId, slotId);
+			
+			/* yes, this slot has a file group in it */
+			if ((slotValue != null) && (slotValue instanceof Integer)) {
+				Integer fileGroupId = (Integer)slotValue;
+				
+				/* create the new business object */
+				UIFileActionConnection newConnection = new UIFileActionConnection(
+						fileGroupId, actionId, slotId, UIFileActionConnection.INPUT_TO_ACTION);
+				
+				/*
+				 * Now we need to figure out which pictograms this connection goes between. We
+				 * know the fileGroupId and actionId, but need to search for the pictogram.
+				 * Search for the UIFileGroup and UIAction end points, and retrieve their anchors
+				 */
+				Anchor fileGroupAnchor = null, actionAnchor = null;
+				EList<Shape> shapes = getDiagram().getChildren();
+				for (Shape shape : shapes) {
+					Object bo = GraphitiUtils.getBusinessObject(shape);
+					if (bo instanceof UIFileGroup) {
+						if (((UIFileGroup)bo).getId() == fileGroupId) {
+							fileGroupAnchor = shape.getAnchors().get(0);
+						}
+					} else if (bo instanceof UIAction) {
+						if (((UIAction)bo).getId() == actionId) {
+							actionAnchor = shape.getAnchors().get(0);
+						}
+					}
+				}
+				
+				/* We found both anchors, so now draw the connection between them */
+				if ((fileGroupAnchor != null) && (actionAnchor != null)) {
+					AddConnectionContext addContext = new AddConnectionContext(fileGroupAnchor, actionAnchor);
+					addContext.setNewObject(newConnection);
+					getFeatureProvider().addIfPossible(addContext);
+				}
+			}
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

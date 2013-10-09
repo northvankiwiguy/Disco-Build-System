@@ -13,9 +13,14 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IDeleteFeature;
+import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
+
+import com.buildml.eclipse.bobj.UIFileActionConnection;
+import com.buildml.eclipse.packages.features.AddFileActionConnectionFeature;
 import com.buildml.eclipse.packages.features.PackageDiagramDeleteFeature;
 import com.buildml.eclipse.packages.patterns.ActionPattern;
 import com.buildml.eclipse.packages.patterns.DiagramPattern;
@@ -48,6 +53,20 @@ public class DiagramFeatureProvider extends DefaultFeatureProviderWithPatterns {
 		addPattern(new FileGroupPattern());
 		addPattern(new ActionPattern());
 		addPattern(new DiagramPattern());
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return a feature for adding new "things". By default we default to using whatever
+	 * Patterns are defined, but we might also add features for types that don't have Patterns.
+	 */
+	@Override
+	public IAddFeature getAddFeature(IAddContext context) {
+	    if (context.getNewObject() instanceof UIFileActionConnection) {
+	        return new AddFileActionConnectionFeature(this);
+	    }
+	    return super.getAddFeature(context);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

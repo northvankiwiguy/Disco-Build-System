@@ -40,11 +40,15 @@ import org.eclipse.graphiti.util.IColorConstant;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.widgets.Display;
 
+import com.buildml.eclipse.actions.dialogs.SlotSelectionDialog;
+import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
@@ -73,6 +77,8 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	private IPackageMemberMgr pkgMemberMgr;
 	private IFileMgr fileMgr;
 	private IFileGroupMgr fileGroupMgr;
+	private IActionMgr actionMgr;
+	private IActionTypeMgr actionTypeMgr;
 	
 	/** 
 	 * If we're adding multiple files in one drag operation, which file group
@@ -220,6 +226,8 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		fileMgr = buildStore.getFileMgr();
 		fileGroupMgr = buildStore.getFileGroupMgr();
+		actionMgr = buildStore.getActionMgr();
+		actionTypeMgr = buildStore.getActionTypeMgr();
 
 		/*
 		 * Case handled:
@@ -404,6 +412,12 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 */
 	@Override
 	public boolean canMoveShape(IMoveShapeContext context) {
+
+		/* what object is being moved? It must be a UIFileGroup */
+		Object sourceBo = GraphitiUtils.getBusinessObject(context.getShape());
+		if (!(sourceBo instanceof UIFileGroup)) {
+			return false;
+		}		
 		
 		/* 
 		 * Validate where the UIFileGroup is moving to. We can't move UIFileGroups 
@@ -422,13 +436,22 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		if (bos.size() != 1) {
 			return false;
 		}
-		
+
 		/* 
-		 * Finally, check that this is a UIFileGroup (although we probably wouldn't have
-		 * got here otherwise.
+		 * Finally, what are we moving onto? Moving within the Diagram is allowed,
+		 * and moving onto a UIAction is allowed.
 		 */
-		Object bo = bos.get(0);
-		return (bo instanceof UIFileGroup);
+		Object targetContainer = context.getTargetContainer();
+		if (targetContainer instanceof Diagram) {
+			return true;
+		}
+		Object targetBo = GraphitiUtils.getBusinessObject(targetContainer);
+		if (targetBo instanceof UIAction) {
+			return true;
+		}
+		
+		/* all other moves are illegal */
+		return false;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -445,23 +468,52 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 */
 		int x = context.getX();
 		int y = context.getY();
-		PictogramLink pl = context.getPictogramElement().getLink();
-		UIFileGroup fileGroup = (UIFileGroup)(pl.getBusinessObjects().get(0));
+		UIFileGroup fileGroup = 
+				(UIFileGroup)GraphitiUtils.getBusinessObject(context.getPictogramElement());
 		int fileGroupId = fileGroup.getId();
 		
-		/* determine the UIFileGroups's old location */
-		MemberLocation oldXY = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
-		if (oldXY == null){
-			/* default, in the case of an error */
-			oldXY = new MemberLocation();
-			oldXY.x = 0;
-			oldXY.y = 0;
+		/*
+		 * Are we moving a UIFileGroup around the Diagram?
+		 */
+		Object targetObject = context.getTargetContainer();
+		if (targetObject instanceof Diagram) {
+		
+			/* determine the UIFileGroups's old location */
+			MemberLocation oldXY = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP,
+																	fileGroupId);
+			if (oldXY == null){
+				/* default, in the case of an error */
+				oldXY = new MemberLocation();
+				oldXY.x = 0;
+				oldXY.y = 0;
+			}
+		
+			/* create an undo/redo operation that will invoke the underlying database changes */
+			FileGroupChangeOperation op = new FileGroupChangeOperation("Move File Group", fileGroupId);
+			op.recordLocationChange(oldXY.x, oldXY.y, x, y);
+			op.recordAndInvoke();
 		}
 		
-		/* create an undo/redo operation that will invoke the underlying database changes */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("move file group", fileGroupId);
-		op.recordLocationChange(oldXY.x, oldXY.y, x, y);
-		op.recordAndInvoke();
+		else {
+			Object targetBo = GraphitiUtils.getBusinessObject(context.getTargetContainer());
+			if (targetBo instanceof UIAction) {
+				
+				/*
+				 * We're connecting a file group to an action's slot. First, pop up a dialog
+				 * to ask the user which slot, then proceed to set it.
+				 */
+				int actionId = ((UIAction)targetBo).getId();
+				SlotSelectionDialog dialog = new SlotSelectionDialog(buildStore, actionId);
+				int status = dialog.open();
+				if (status == SlotSelectionDialog.OK) {
+					int error = actionMgr.setSlotValue(actionId, dialog.getSlotId(), fileGroupId);
+					if (error != ErrorCode.OK) {
+						// TODO: display an error message in a dialog box.
+					}
+				}
+			}
+		}
+		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
