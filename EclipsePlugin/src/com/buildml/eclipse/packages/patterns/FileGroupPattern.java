@@ -43,6 +43,7 @@ import org.eclipse.graphiti.util.IColorConstant;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.widgets.Display;
 
+import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.actions.dialogs.SlotSelectionDialog;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileGroup;
@@ -509,10 +510,21 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 				SlotSelectionDialog dialog = new SlotSelectionDialog(buildStore, actionId);
 				int status = dialog.open();
 				if (status == SlotSelectionDialog.OK) {
-					int error = actionMgr.setSlotValue(actionId, dialog.getSlotId(), fileGroupId);
-					if (error != ErrorCode.OK) {
-						// TODO: display an error message in a dialog box.
-					}
+					int slotId = dialog.getSlotId();
+					
+					/* record an undo/redo operation that will actually change the slot value */
+					ActionChangeOperation op = new ActionChangeOperation("Connect File Group", actionId);
+					Object currentValue = actionMgr.getSlotValue(actionId, slotId);
+					op.recordSlotChange(actionId, slotId, currentValue, Integer.valueOf(fileGroupId));
+					op.recordAndInvoke();
+				} 
+				
+				/*
+				 * Cancel was pressed, so nothing changes on the diagram. However, the UIFileGroup needs
+				 * to be redrawn back in its original location.
+				 */
+				else {
+					((PackageDiagramEditor)getDiagramEditor()).refreshView(true);
 				}
 			}
 		}

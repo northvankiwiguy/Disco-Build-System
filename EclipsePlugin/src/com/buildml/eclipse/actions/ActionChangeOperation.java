@@ -41,7 +41,8 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	private final static int CHANGED_PACKAGE  = 1;
 	private final static int CHANGED_COMMAND  = 2;
 	private final static int CHANGED_LOCATION = 4;
-	
+	private final static int CHANGED_SLOT     = 8;
+		
 	/** The ID of the action being changed */
 	private int actionId;
 	
@@ -65,6 +66,15 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	
 	/** if CHANGED_LOCATION, what is the new (x, y) location */
 	private int newX, newY;
+	
+	/** if CHANGED_SLOT, what is the ID of the slot that's changing */
+	private int slotId;
+	
+	/** if CHANGED_SLOT, what is the old value in the slot */
+	private Object oldSlotValue;
+
+	/** if CHANGED_SLOT, what is the new value in the slot */
+	private Object newSlotValue;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -140,6 +150,27 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Records the fact that a file group has been inserted into an action's slot.
+	 * 
+	 * @param actionId The action that contains the slot.
+	 * @param slotId   The slot being modified.
+	 * @param oldValue The current value in the slot.
+	 * @param newValue The new value in the slot.
+	 */
+	public void recordSlotChange(int actionId, int slotId, Object oldValue, Object newValue) {
+		if (((oldValue == null) && (newValue != null)) ||
+			(!oldValue.equals(newValue))) {
+			changedFields |= CHANGED_SLOT;
+			this.actionId = actionId;
+			this.slotId = slotId;
+			this.oldSlotValue = oldValue;
+			this.newSlotValue = newValue;
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 	
 	/**
 	 * Records the operation in the undo/redo stack, but only if there's an actual change
@@ -178,6 +209,11 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		if ((changedFields & CHANGED_LOCATION) != 0){
 			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, oldX, oldY);
 		}
+		
+		/* if one of the action's slots needs to change... */
+		if ((changedFields & CHANGED_SLOT) != 0){
+			actionMgr.setSlotValue(actionId, slotId, oldSlotValue);
+		}
 
 		/* if there's a change, mark the editor as dirty */
 		if (changedFields != 0) {
@@ -212,6 +248,11 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		/* if the action's location needs to change... */
 		if ((changedFields & CHANGED_LOCATION) != 0){
 			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, newX, newY);
+		}
+		
+		/* if one of the action's slots needs to change... */
+		if ((changedFields & CHANGED_SLOT) != 0){
+			actionMgr.setSlotValue(actionId, slotId, newSlotValue);
 		}
 		
 		/* if there's a change, mark the editor as dirty */

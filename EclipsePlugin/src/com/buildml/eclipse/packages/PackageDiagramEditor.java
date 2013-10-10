@@ -244,8 +244,8 @@ public class PackageDiagramEditor extends DiagramEditor
 	 */
 	@Override
 	public void refreshView(boolean force) {
-		// TODO Auto-generated method stub
-		
+		updateBehavior.markChanged();
+		refreshDiagramLater();		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -398,7 +398,7 @@ public class PackageDiagramEditor extends DiagramEditor
 	 * Receive notifications if an action (possibly on this package) changes in some way.
 	 */
 	@Override
-	public void actionChangeNotification(int actionId, int how) {
+	public void actionChangeNotification(int actionId, int how, int changeId) {
 		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId);
 		if ((pkg == null) || (pkg.pkgId != this.packageId)) {
 			return;
