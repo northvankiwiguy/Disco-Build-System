@@ -526,7 +526,7 @@ public class ActionMgr implements IActionMgr {
 		}
 		
 		/* notify listeners about the change */
-		notifyListeners(actionId, IActionMgrListener.CHANGED_COMMAND);
+		notifyListeners(actionId, IActionMgrListener.CHANGED_COMMAND, 0);
 		
 		return ErrorCode.OK;
 	}
@@ -837,9 +837,22 @@ public class ActionMgr implements IActionMgr {
 		if (!isActionValid(actionId)) {
 			return ErrorCode.NOT_FOUND;
 		}
+				
+		/* what is the current slot value? */
+		Object oldValue = slotMgr.getSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
 		
+		/* if no change in value, do nothing */
+		if (((oldValue == null) && (value == null)) || 
+			((oldValue != null) && (oldValue.equals(value)))) {
+			return ErrorCode.OK;
+		}
+				
 		/* delegate all slot assignments to SlotMgr */
-		return slotMgr.setSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId, value);
+		int status = slotMgr.setSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId, value);
+		
+		/* notify listeners about the change */
+		notifyListeners(actionId, IActionMgrListener.CHANGED_SLOT, slotId);
+		return status;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -1029,8 +1042,9 @@ public class ActionMgr implements IActionMgr {
 	 * Notify any registered listeners about our change in state.
 	 * @param actionId  The action that has changed.
 	 * @param how       The way in which the action changed (see {@link IActionMgrListener}).
+	 * @param changeId  Which thing has changed (CHANGED_SLOT)
 	 */
-	private void notifyListeners(int actionId, int how) {
+	private void notifyListeners(int actionId, int how, int changeId) {
 		
 		/* 
 		 * Make a copy of the listeners list, otherwise a registered listener can't remove
@@ -1039,7 +1053,7 @@ public class ActionMgr implements IActionMgr {
 		IActionMgrListener listenerCopy[] = 
 				listeners.toArray(new IActionMgrListener[listeners.size()]);
 		for (int i = 0; i < listenerCopy.length; i++) {
-			listenerCopy[i].actionChangeNotification(actionId, how);			
+			listenerCopy[i].actionChangeNotification(actionId, how, changeId);			
 		}
 	}
 	

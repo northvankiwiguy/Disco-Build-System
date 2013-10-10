@@ -70,7 +70,8 @@ class SlotMgr {
 	private PreparedStatement 
 				insertValuePrepStmt = null,
 				updateValuePrepStmt = null,
-				findValuePrepStmt = null;
+				findValuePrepStmt = null,
+				deleteValuePrepStmt = null;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -91,7 +92,9 @@ class SlotMgr {
 													" and ownerId = ? and slotId = ?");
 		findValuePrepStmt = db.prepareStatement("select value from slotValues where ownerType = ? " +
 													" and ownerId = ? and slotId = ?");
-				
+		deleteValuePrepStmt = db.prepareStatement("delete from slotValues where ownerType = ? and ownerId = ? " +
+													"and slotId = ?");
+		
 		/* define the default slots */
 		defaultSlots = new SlotDetails[13];
 		defaultSlots[1] = new SlotDetails(1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
@@ -272,8 +275,18 @@ class SlotMgr {
 		 * to check whether the value is appropriate.
 		 */
 		String stringToSet = null;
+		
+		/* setting a null value will delete the slot record */
 		if (value == null) {
-			return ErrorCode.BAD_VALUE;
+			try {
+				deleteValuePrepStmt.setInt(1, ownerType);
+				deleteValuePrepStmt.setInt(2, ownerId);
+				deleteValuePrepStmt.setInt(3, slotId);
+				db.executePrepUpdate(deleteValuePrepStmt);				
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+			return ErrorCode.OK;
 		}
 		
 		switch (details.slotType) {

@@ -22,12 +22,16 @@ public interface IActionMgrListener {
 	
 	/** the action's command string has changed in some way */
 	public static final int CHANGED_COMMAND = 1;
+	
+	/** one of the action's slots has changed */
+	public static final int CHANGED_SLOT = 2;
 
 	/**
 	 * Called to notify the listener that the specified action has changed.
 	 * 
-	 * @param actionId The ActionMgr ID of the action that has changed.
-	 * @param how   An indication of how the action has changed (see above).
+	 * @param actionId  The ActionMgr ID of the action that has changed.
+	 * @param how       An indication of how the action has changed (see above).
+	 * @param changeId  Which thing has changed (CHANGED_SLOT).
 	 */
-	public void actionChangeNotification(int actionId, int how);
+	public void actionChangeNotification(int actionId, int how, int changeId);
 }

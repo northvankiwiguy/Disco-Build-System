@@ -37,6 +37,7 @@ public class TestActionMgr {
 	/** The managers associated with this BuildStore */
 	IFileMgr fileMgr;
 	IActionMgr actionMgr;
+	IActionTypeMgr actionTypeMgr;
 	
 	/** The root action ID */
 	int rootActionId;
@@ -54,6 +55,7 @@ public class TestActionMgr {
 		/* fetch the associated manager objects */
 		fileMgr = bs.getFileMgr();
 		actionMgr = bs.getActionMgr();
+		actionTypeMgr = bs.getActionTypeMgr();
 		
 		/* if we don't care about each new action's parents, we'll use the root action */
 		rootActionId = actionMgr.getRootAction("root");
@@ -832,7 +834,7 @@ public class TestActionMgr {
 		/* Assign a new Integer value to the "Input" slot - it will be updated */
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, 12));
 		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
-		
+
 		/* Assign a FileGroup to "Output5" slot */
 		assertNull(actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, 123));
@@ -858,6 +860,12 @@ public class TestActionMgr {
 		/* Assign a non-numeric string to "Input" - should fail */
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, "invalid-num"));
 		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
+		
+		/* Assign "null" to the "Input" slot, then reassign a numberic value. It should be allowed */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, null));
+		assertEquals(null, actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));		
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, Integer.valueOf(10)));
+		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -865,6 +873,7 @@ public class TestActionMgr {
 	/** Our tests set these appropriately */
 	private int notifyActionValue = 0;
 	private int notifyHowValue = 0;
+	private int notifySlotValue = 0;
 	
 	/**
 	 * Test listener notifications
@@ -875,9 +884,10 @@ public class TestActionMgr {
 		/* set up a listener */
 		IActionMgrListener listener = new IActionMgrListener() {
 			@Override
-			public void actionChangeNotification(int pkgId, int how) {
+			public void actionChangeNotification(int pkgId, int how, int changeId) {
 				TestActionMgr.this.notifyActionValue = pkgId;
 				TestActionMgr.this.notifyHowValue = how;
+				TestActionMgr.this.notifySlotValue = changeId;
 			}
 		};
 		actionMgr.addListener(listener);
@@ -899,6 +909,23 @@ public class TestActionMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setCommand(action1, "new command string"));
 		assertEquals(action1, notifyActionValue);
 		assertEquals(IActionMgrListener.CHANGED_COMMAND, notifyHowValue);
+		
+		/* change a slot value - check for notification */
+		notifyActionValue = notifyHowValue = notifySlotValue = 0;
+		int actionTypeId = actionMgr.getActionType(action1);
+		SlotDetails slotDetails = actionTypeMgr.getSlotByName(actionTypeId, "Input");
+		assertNotNull(slotDetails);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action1, slotDetails.slotId, Integer.valueOf(10)));
+		assertEquals(notifyActionValue, action1);
+		assertEquals(notifyHowValue, IActionMgrListener.CHANGED_SLOT);
+		assertEquals(notifySlotValue, slotDetails.slotId);
+		
+		/* change a slot to the same value - no notification */
+		notifyActionValue = notifyHowValue = notifySlotValue = 0;
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action1, slotDetails.slotId, Integer.valueOf(10)));
+		assertEquals(notifyActionValue, 0);
+		assertEquals(notifyHowValue, 0);
+		assertEquals(notifySlotValue, 0);		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
