@@ -427,9 +427,10 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * Validate where the UIFileGroup is moving to. We can't move UIFileGroups 
 		 * off the left/top of the window.
 		 */
+		Object targetContainer = context.getTargetContainer();
 		int x = context.getX();
-		int y = context.getY();		
-		if ((x < 0) || (y < 0)) {
+		int y = context.getY();
+		if ((targetContainer instanceof Diagram) && ((x < 0) || (y < 0))) {
 			return false;
 		}
 		
@@ -445,7 +446,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * Finally, what are we moving onto? Moving within the Diagram is allowed,
 		 * and moving onto a UIAction is allowed.
 		 */
-		Object targetContainer = context.getTargetContainer();
 		if (targetContainer instanceof Diagram) {
 			return true;
 		}
