@@ -22,12 +22,14 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.ISlotTypes;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -65,6 +67,9 @@ import com.buildml.utils.errors.ErrorCode;
 	/** The PackageMgr object that manages the list of packages. */
 	private IPackageMgr pkgMgr = null;
 	
+	/** The FileGroupMgr object that manages the file groups in our package. */
+	private IFileGroupMgr fileGroupMgr = null;	
+	
 	/**
 	 * Various prepared statements for database access.
 	 */
@@ -80,7 +85,11 @@ import com.buildml.utils.errors.ErrorCode;
 		findActionsInPackagePrepStmt = null,
 		findActionsOutsidePackagePrepStmt = null,
 		findLocationPrepStmt = null,
-		updateLocationPrepStmt = null;
+		updateLocationPrepStmt = null,
+		findActionNeighbourPrepStmt = null,
+		findActionNeighbourInDirectionPrepStmt = null,
+		findFileGroupNeighbourPrepStmt = null,
+		findFileGroupNeighbourInDirectionPrepStmt = null;
 	
 	/** The event listeners who are registered to learn about package membership changes */
 	List<IPackageMemberMgrListener> listeners = new ArrayList<IPackageMemberMgrListener>();
@@ -101,6 +110,7 @@ import com.buildml.utils.errors.ErrorCode;
 		this.fileMgr = buildStore.getFileMgr();
 		this.actionMgr = buildStore.getActionMgr();
 		this.pkgMgr = buildStore.getPackageMgr();
+		this.fileGroupMgr = buildStore.getFileGroupMgr();
 		
 		findMemberPackagePrepStmt = db.prepareStatement(
 				"select pkgId, scopeId from packageMembers where memberType = ? and memberId = ?");
@@ -129,6 +139,19 @@ import com.buildml.utils.errors.ErrorCode;
 				"select x, y from packageMembers where memberType = ? and memberId = ?");
 		updateLocationPrepStmt = db.prepareStatement(
 				"update packageMembers set x = ?, y = ? where memberType = ? and memberId = ?");
+		findActionNeighbourPrepStmt = db.prepareStatement(
+				"select value from slotValues where ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " and ownerId = ?");
+		findActionNeighbourInDirectionPrepStmt = db.prepareStatement(
+				"select value from slotValues where ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " and ownerId = ?");
+		findActionNeighbourInDirectionPrepStmt = db.prepareStatement(
+				"select value from slotValues, slotTypes where slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + 
+				" and slotValues.ownerId = ? and slotValues.slotId = slotTypes.slotId and slotTypes.slotPos = ?");
+		findFileGroupNeighbourPrepStmt = db.prepareStatement(
+				"select ownerId from slotValues where ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " and value = ?");
+		findFileGroupNeighbourInDirectionPrepStmt = db.prepareStatement(
+				"select slotValues.ownerId from slotValues, slotTypes where slotValues.ownerType = " + 
+						SlotMgr.SLOT_OWNER_ACTION + " and slotValues.value = ? and slotValues.slotId = slotTypes.slotId " +
+						"and slotTypes.slotPos = ?");
 	}
 
 	/*=====================================================================================*
@@ -438,6 +461,118 @@ import com.buildml.utils.errors.ErrorCode;
 			new FatalBuildStoreError("Error in SQL: " + e);
 		}
 		return result;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgr#getNeighboursOf(int, int, int)
+	 */
+	@Override
+	public MemberDesc[] getNeighboursOf(int memberType, int memberId, int direction) {
+		
+		/* valid the memberType */
+		if ((memberType != IPackageMemberMgr.TYPE_FILE_GROUP) &&
+				(memberType != IPackageMemberMgr.TYPE_ACTION)) {
+			return null;
+		}
+		
+		/* validate direction */
+		if ((direction < IPackageMemberMgr.NEIGHBOUR_ANY) || 
+				(direction > IPackageMemberMgr.NEIGHBOUR_RIGHT)) {
+			return null;
+		}
+		
+		ArrayList<MemberDesc> neighbours = new ArrayList<MemberDesc>();
+		
+		switch (memberType) {
+			/*
+			 * Find the neighbours of an action...
+			 */
+		case IPackageMemberMgr.TYPE_ACTION:
+			try {
+				
+				/* the action ID must be valid */
+				if (!actionMgr.isActionValid(memberId)) {
+					return null;
+				}
+				
+				/* 
+				 * Depending on whether direction is relevant (NEIGHBOUR_ANY versus LEFT or RIGHT),
+				 * we need to select an appropriate query.
+				 */
+				PreparedStatement stmt;
+				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
+					stmt = findActionNeighbourPrepStmt;
+				} else {
+					stmt = findActionNeighbourInDirectionPrepStmt;
+					stmt.setInt(2, (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
+										ISlotTypes.SLOT_POS_INPUT : ISlotTypes.SLOT_POS_OUTPUT);
+				}
+				stmt.setInt(1, memberId);
+				ResultSet rs = db.executePrepSelectResultSet(stmt);
+				
+				/* collect all the results into a single ArrayList */
+				while (rs.next()) {
+					MemberDesc member = new MemberDesc();
+					member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
+					member.memberId = Integer.valueOf(rs.getString(1));
+					neighbours.add(member);
+				}
+				rs.close();
+				
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+			break;
+		
+			/*
+			 * Find the neighbours of a file group. 
+			 */
+		case IPackageMemberMgr.TYPE_FILE_GROUP:
+			
+			/* file group ID must be valid */
+			if (fileGroupMgr.getGroupSize(memberId) == ErrorCode.NOT_FOUND) {
+				return null;
+			}
+			
+			/*
+			 * Search for slots in this package's actions that refer to our file group.
+			 * If necessary, also look at the direction (input versus output) of the slot.
+			 */
+			try {
+				PreparedStatement stmt;
+				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
+					stmt = findFileGroupNeighbourPrepStmt;
+				} else {
+					stmt = findFileGroupNeighbourInDirectionPrepStmt;
+					stmt.setInt(2, (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
+									ISlotTypes.SLOT_POS_OUTPUT : ISlotTypes.SLOT_POS_INPUT);
+				}
+				stmt.setInt(1, memberId);
+				ResultSet rs = db.executePrepSelectResultSet(stmt);
+				
+				while (rs.next()) {
+					MemberDesc member = new MemberDesc();
+					member.memberType = IPackageMemberMgr.TYPE_ACTION;
+					member.memberId = Integer.valueOf(rs.getString(1));
+					neighbours.add(member);
+				}
+				rs.close();
+				
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			}
+			break;
+			
+			/*
+			 * All other member types are invalid.
+			 */
+		default:
+			return null;
+		}
+		
+		return neighbours.toArray(new MemberDesc[neighbours.size()]);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

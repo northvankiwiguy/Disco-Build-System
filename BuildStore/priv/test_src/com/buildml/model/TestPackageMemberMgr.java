@@ -20,6 +20,7 @@ import org.junit.Test;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -33,13 +34,14 @@ public class TestPackageMemberMgr {
 	/** Our BuildStore object, used in many test cases */
 	private IBuildStore bs;
 
-	/** The manager object associated with this BuildStore */
+	/** The manager objects associated with this BuildStore */
 	private IPackageMgr pkgMgr;
 	private IPackageMemberMgr pkgMemberMgr;
 	private IPackageRootMgr pkgRootMgr;
 	private IFileMgr fileMgr;
 	private IFileGroupMgr fileGroupMgr;
 	private IActionMgr actionMgr;
+	private IActionTypeMgr actionTypeMgr;
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -56,6 +58,7 @@ public class TestPackageMemberMgr {
 		fileMgr = bs.getFileMgr();
 		fileGroupMgr = bs.getFileGroupMgr();
 		actionMgr = bs.getActionMgr();
+		actionTypeMgr = bs.getActionTypeMgr();
 		
 		/* set the workspace root to /, so packages can be added anywhere */
 		pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/"));
@@ -318,14 +321,202 @@ public class TestPackageMemberMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test the setMemberLocation() and getMemberLocation() methods
+	 * Test the getNeighboursOf() method.
 	 * @throws Exception
 	 */
 	@Test
-	public void testSetMemberLocation() throws Exception {
-		//fail();
+	public void testGetNeighboursOf() throws Exception {
+
+		/*
+		 * We create the following package diagram:
+		 * 
+		 *   fg1 --- a1 --- fg2 --- a2 --- fg3
+		 *   fg4 ----a3 --- fg5
+		 *             \--- fg6
+		 *   a4 --- fg7
+		 *   a5
+		 */
+		int pkgId = pkgMgr.addPackage("TestPkg");
+		int fg1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg2 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg3 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg4 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg5 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg6 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg7 = fileGroupMgr.newSourceGroup(pkgId);
+		int rootActionId = actionMgr.getRootAction("root");
+		int dirId = fileMgr.getPath("/");
+		int a1 = actionMgr.addShellCommandAction(rootActionId, dirId, "action1");
+		int a2 = actionMgr.addShellCommandAction(rootActionId, dirId, "action2");
+		int a3 = actionMgr.addShellCommandAction(rootActionId, dirId, "action3");
+		int a4 = actionMgr.addShellCommandAction(rootActionId, dirId, "action4");
+		int a5 = actionMgr.addShellCommandAction(rootActionId, dirId, "action5");
+		int actionTypeId = actionMgr.getActionType(a1);
+		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
+		SlotDetails output0Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output0");
+		SlotDetails output1Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output1");
+		
+		/* set up connections */
+		actionMgr.setSlotValue(a1, inputSlot.slotId, fg1);
+		actionMgr.setSlotValue(a1, output0Slot.slotId, fg2);
+		actionMgr.setSlotValue(a2, inputSlot.slotId, fg2);
+		actionMgr.setSlotValue(a2, output1Slot.slotId, fg3);
+		actionMgr.setSlotValue(a3, inputSlot.slotId, fg4);
+		actionMgr.setSlotValue(a3, output0Slot.slotId, fg5);
+		actionMgr.setSlotValue(a3, output1Slot.slotId, fg6);
+		actionMgr.setSlotValue(a4, output1Slot.slotId, fg7);
+		
+		/* test with bad parameters - should return null */
+		assertNull(pkgMemberMgr.getNeighboursOf(1000, a1, IPackageMemberMgr.NEIGHBOUR_ANY));
+		assertNull(pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, 1000, IPackageMemberMgr.NEIGHBOUR_ANY));
+		assertNull(pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, 10000, IPackageMemberMgr.NEIGHBOUR_ANY));
+		assertNull(pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, 1000));
+		
+		/* test fg1 neighbours */
+		MemberDesc results[];
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg1, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg1, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a1);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg1, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a1);
+			
+		/* test fg2 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg2, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a1);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg2, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a2);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg2, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectTwo(results, IPackageMemberMgr.TYPE_ACTION, a1, a2);
+
+		/* test fg3 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg3, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a2);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg3, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg3, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a2);
+
+		/* test fg4 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg4, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg4, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a3);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg4, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a3);
+
+		/* test fg5 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg5, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a3);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg5, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg5, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a3);
+
+		/* test fg6 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg6, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a3);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg6, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg6, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a3);
+
+		/* test fg7 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg7, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a4);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg7, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg7, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a4);
+
+		/* test a1 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg1);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg2);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectTwo(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg1, fg2);
+		
+		/* test a2 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a2, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg2);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a2, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg3);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a2, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectTwo(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg2, fg3);
+
+		/* test a3 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a3, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg4);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a3, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectTwo(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg5, fg6);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a3, IPackageMemberMgr.NEIGHBOUR_ANY);
+		assertEquals(3, results.length); /* short cut, to avoid testing all possible orderings */
+
+		/* test a4 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a4, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a4, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg7);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a4, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg7);
+
+		/* test a5 neighbours */
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a5, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a5, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectEmpty(results);
+		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a5, IPackageMemberMgr.NEIGHBOUR_ANY);
+		expectEmpty(results);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+
+	/**
+	 * Expect the provided results array to be empty.
+	 * @param results The results array.
+	 */
+	private void expectEmpty(MemberDesc[] results) {
+		assertNotNull(results);
+		assertEquals(0, results.length);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Expect the results array to have one value.
+	 * @param results 	The results array
+	 * @param type 		The type of the result.
+	 * @param id 		The result's ID.
+	 */
+	private void expectOne(MemberDesc[] results, int type, int id) {
+		assertNotNull(results);
+		assertEquals(1, results.length);
+		assertEquals(type, results[0].memberType);
+		assertEquals(id, results[0].memberId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Expect the results array to have two values (both of the same type), appearing in
+	 * either order.
+	 * @param results 	The results array
+	 * @param type 		The type of the result.
+	 * @param id1 		The result's first ID.
+	 * @param id2 		The result's second ID.
+	 * 
+	 */
+	private void expectTwo(MemberDesc[] results, int type, int id1, int id2) {
+		assertNotNull(results);
+		assertEquals(2, results.length);
+		assertEquals(type, results[0].memberType);
+		assertEquals(type, results[1].memberType);
+		assertTrue(((results[0].memberId == id1) && (results[1].memberId == id2)) ||
+				   ((results[0].memberId == id2) && (results[1].memberId == id1)));
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

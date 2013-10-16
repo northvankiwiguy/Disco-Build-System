@@ -177,7 +177,7 @@ public interface IActionTypeMgr {
 	 * @param slotName		The name of the slot (must be unique within this actionType).
 	 * @param slotType		The slot's type (SLOT_TYPE_FILEGROUP, etc).
 	 * @param slotPos		The slot's position (SLOT_POS_INPUT, etc).
-	 * @param isRequired	True if actions must provide a value for this slot.
+	 * @param slotCard  	Either SLOT_CARD_OPTIONAL, SLOT_CARD_REQUIRED, SLOT_CARD_MULTI.
 	 * @param defaultValue	If not required, a default value.
 	 * @param enumValues	For SLOT_TYPE_ENUMERATION, an array of valid values.
 	 * @return The newly-added slot ID, or:
@@ -188,8 +188,8 @@ public interface IActionTypeMgr {
 	 *                    if enumValues does not contain a valid enumeration.
 	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
 	 */
-	public abstract int newSlot(int typeId, int slotName, int slotType, int slotPos, 
-								boolean isRequired, Object defaultValue, String[] enumValues);
+	public abstract int newSlot(int typeId, String slotName, int slotType, int slotPos, 
+								int slotCard, Object defaultValue, String[] enumValues);
 
 	/**
 	 * Return all the slots associated with an actionType.
@@ -201,6 +201,15 @@ public interface IActionTypeMgr {
 	 */
 	public abstract SlotDetails[] getSlots(int typeId, int slotPos);
 
+	/**
+	 * Return a slot's detailed information.
+	 * 
+	 * @param slotId The slot to query.
+	 * @return A SlotDetails structure containing the specified slot's details, or null if
+	 * 		   slotId does not refer to a valid slot.
+	 */
+	public abstract SlotDetails getSlotByID(int slotId);
+	
 	/**
 	 * For the specified actionType, return details of the named slot.
 	 * 

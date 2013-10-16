@@ -58,6 +58,20 @@ public interface ISlotTypes {
 	
 	/** The slot holds a value from a specific enumeration */
 	public static final int SLOT_TYPE_ENUMERATION   = 6;
+
+	/*=====================================================================================*
+	 * SLOT CARD - Defines the cardinality of the slot. That is, how many values
+	 * can/should this slot contain.
+	 *=====================================================================================*/
+	
+	/** The slot is optional and is not required to contain a value */
+	final static int SLOT_CARD_OPTIONAL = 1;
+	
+	/** There must be a single value in this slot */
+	final static int SLOT_CARD_REQUIRED = 2;
+	
+	/** Each value in this slot will be passed to a unique instance of the action */
+	final static int SLOT_CARD_MULTI = 3;
 	
 	/*=====================================================================================*
 	 * SLOT INTERPRETER - Defines which language interpreters can be used to evaluate
@@ -97,8 +111,8 @@ public interface ISlotTypes {
 		/** The position of the slot (SLOT_POS_INPUT, etc) */
 		public int slotPos;
 		
-		/** True if the slot is mandatory (actions/sub-packages must define it) */
-		public boolean isRequired;
+		/** Cardinality of this slot (SLOT_CARD_OPTIONAL, SLOT_CARD_REQUIRED, SLOT_CARD_MULTI */
+		public int slotCard;
 		
 		/** If not mandatory, what is the default value */
 		public Object defaultValue;
@@ -108,12 +122,12 @@ public interface ISlotTypes {
 		
 		@SuppressWarnings("javadoc")
 		public SlotDetails(int slotId, String slotName, int slotType, int slotPos, 
-							boolean isRequired, Object defaultValue, String [] enumValues) {
+							int slotCard, Object defaultValue, String [] enumValues) {
 			this.slotId = slotId;
 			this.slotName = slotName;
 			this.slotType = slotType;
 			this.slotPos = slotPos;
-			this.isRequired = isRequired;
+			this.slotCard = slotCard;
 			this.defaultValue = defaultValue;
 			this.enumValues = enumValues;
 		}

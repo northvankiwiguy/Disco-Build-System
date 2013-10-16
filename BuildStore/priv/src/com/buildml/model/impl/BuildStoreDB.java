@@ -300,6 +300,11 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("create table fileGroupPaths (groupId integer, pathId integer, " +
 								"pathString text, pos integer)");
 			
+			/* Create the slotTypes table */
+			stat.executeUpdate("create table slotTypes (slotId integer primary key, ownerType integer, " +
+								"ownerId integer, slotName text, slotType integer, slotPos integer, " +
+								"slotCard integer, defaultValue text, enumId integer)");
+			
 			/* Create the slotValues table */
 			stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
 							   "slotId integer, value text)");

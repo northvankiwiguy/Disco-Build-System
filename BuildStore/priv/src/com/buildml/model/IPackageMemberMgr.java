@@ -46,6 +46,13 @@ public interface IPackageMemberMgr {
 	public static final int SCOPE_MAX 			= 2;
 
 	/**
+	 * Numeric constants describing the direction of neigbours
+	 */
+	public static final int NEIGHBOUR_ANY		= 0;
+	public static final int NEIGHBOUR_LEFT		= 1;
+	public static final int NEIGHBOUR_RIGHT		= 2;
+	
+	/**
 	 * A helper class used to describe the package/scope that a member belongs to.
 	 */
 	public class PackageDesc {
@@ -173,6 +180,19 @@ public interface IPackageMemberMgr {
 	 */
 	public abstract MemberLocation getMemberLocation(int memberType, int memberId);
 
+	/**
+	 * Return an array of neighbours for the specified package member. A neighbour is defined
+	 * as any package member that is connected to this member via a connection arrow. The order
+	 * in which neighbours are returned is unspecified.
+	 * 
+	 * @param memberType	The type of this member (e.g. TYPE_FILE).
+	 * @param memberId		The ID of this member.
+	 * @param direction		NEIGHBOUR_LEFT, NEIGHBOUR_RIGHT or NEIGHBOUR_EITHER.
+	 * @return A (possibly empty) array of MemberDesc, describing this member's connected
+	 * neighbours. Returns null if any of the input parameters are invalid.
+	 */
+	public abstract MemberDesc[] getNeighboursOf(int memberType, int memberId, int direction);
+	
 	/**
 	 * Return the set of files that are within the specified package (any scope).
 	 * 

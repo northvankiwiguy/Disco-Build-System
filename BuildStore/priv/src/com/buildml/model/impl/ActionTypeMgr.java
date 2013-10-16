@@ -287,8 +287,8 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	 * @see com.buildml.model.IActionTypeMgr#newSlot(int, int, int, int, boolean, java.lang.Object, java.lang.String[])
 	 */
 	@Override
-	public int newSlot(int typeId, int slotName, int slotType, int slotPos,
-			boolean isRequired, Object defaultValue, String[] enumValues) {
+	public int newSlot(int typeId, String slotName, int slotType, int slotPos,
+			int slotCard, Object defaultValue, String[] enumValues) {
 		
 		/* check for invalid typeId, since SlotMgr can't determine this */
 		if (isFolder(typeId) || !isValid(typeId)) {
@@ -297,7 +297,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 		
 		/* delegate the rest of the work to SlotMgr */
 		return slotMgr.newSlot(SlotMgr.SLOT_OWNER_ACTION, typeId, slotName, slotType, slotPos,
-								isRequired, defaultValue, enumValues);
+								slotCard, defaultValue, enumValues);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -309,7 +309,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	public SlotDetails[] getSlots(int typeId, int slotPos) {
 		
 		/* folder don't have slots */
-		if (isFolder(typeId)) {
+		if (isFolder(typeId) || !isValid(typeId)) {
 			return null;
 		}
 		
@@ -317,6 +317,16 @@ public class ActionTypeMgr implements IActionTypeMgr {
 		return slotMgr.getSlots(SlotMgr.SLOT_OWNER_ACTION, typeId, slotPos);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionTypeMgr#getSlotByID(int)
+	 */
+	@Override
+	public SlotDetails getSlotByID(int slotId) {
+		return slotMgr.getSlotByID(slotId);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)

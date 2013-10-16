@@ -25,6 +25,7 @@ import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -64,6 +65,9 @@ import com.buildml.utils.errors.ErrorCode;
 	
 	/** The ActionMgr object that manages the actions in our packages. */
 	private IActionMgr actionMgr = null;
+	
+	/** The SlotMgr object that manages the slots in our packages. */
+	private SlotMgr slotMgr = null;	
 
 	/**
 	 * Various prepared statements for database access.
@@ -98,6 +102,7 @@ import com.buildml.utils.errors.ErrorCode;
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
 		this.actionMgr = buildStore.getActionMgr();
+		this.slotMgr = buildStore.getSlotMgr();
 		
 		/* initialize prepared database statements */
 		addPackagePrepStmt = db.prepareStatement("insert into packages values (null, ?, " + 
@@ -515,6 +520,76 @@ import com.buildml.utils.errors.ErrorCode;
 	public boolean isValid(int folderOrPackageId) {
 		/* the ID is valid if we can find its parent */
 		return getParent(folderOrPackageId) != ErrorCode.NOT_FOUND;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionTypeMgr#newSlot(int, int, int, int, boolean, java.lang.Object, java.lang.String[])
+	 */
+	@Override
+	public int newSlot(int typeId, String slotName, int slotType, int slotPos,
+			int slotCard, Object defaultValue, String[] enumValues) {
+		
+		/* check for invalid typeId, since SlotMgr can't determine this */
+		if (isFolder(typeId) || !isValid(typeId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* delegate the rest of the work to SlotMgr */
+		return slotMgr.newSlot(SlotMgr.SLOT_OWNER_PACKAGE, typeId, slotName, slotType, slotPos,
+								slotCard, defaultValue, enumValues);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#getSlots(int, int)
+	 */
+	@Override
+	public SlotDetails[] getSlots(int pkgId, int slotPos) {
+		
+		/* folder don't have slots */
+		if (isFolder(pkgId) || !isValid(pkgId)) {
+			return null;
+		}
+		
+		/* delegate to SlotMgr */
+		return slotMgr.getSlots(SlotMgr.SLOT_OWNER_PACKAGE, pkgId, slotPos);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#getSlotByID(int)
+	 */
+	@Override
+	public SlotDetails getSlotByID(int slotId) {
+		return slotMgr.getSlotByID(slotId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#getSlotByName(int, java.lang.String)
+	 */
+	@Override
+	public SlotDetails getSlotByName(int pkgId, String slotName) {
+
+		/* all work can be delegated */
+		return slotMgr.getSlotByName(SlotMgr.SLOT_OWNER_PACKAGE, pkgId, slotName);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#removeSlot(int, int)
+	 */
+	@Override
+	public int removeSlot(int pkgId, int slotId) {
+		
+		/* all work can be delegated */
+		return slotMgr.removeSlot(SlotMgr.SLOT_OWNER_PACKAGE, pkgId, slotId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

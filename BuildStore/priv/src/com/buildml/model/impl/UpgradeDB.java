@@ -166,6 +166,11 @@ public class UpgradeDB {
 				stat.executeUpdate("create table fileGroups (id integer primary key, type integer)");
 				stat.executeUpdate("insert into fileGroups select id, type from fileGroupstmp");
 				stat.executeUpdate("drop table fileGroupstmp");
+				
+				/* add the new slotTypes table */
+				stat.executeUpdate("create table slotTypes (slotId integer primary key, ownerType integer, " +
+						"ownerId integer, slotName text, slotType integer, slotPos integer, " +
+						"slotCard integer, defaultValue text, enumId integer)");
 			}
 
 			/* finish by setting the new version number */

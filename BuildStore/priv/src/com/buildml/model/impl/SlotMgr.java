@@ -13,6 +13,7 @@
 package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,12 @@ class SlotMgr {
 	private BuildStoreDB db = null;
 	
 	/** Various prepared statement for database access. */
-	private PreparedStatement 
+	private PreparedStatement
+				insertTypePrepStmt = null,
+				findTypeByNamePrepStmt = null,
+				findTypeByIdPrepStmt = null,
+				findTypeByPosPrepStmt = null,
+				findTypeByAnyPosPrepStmt = null,
 				insertValuePrepStmt = null,
 				updateValuePrepStmt = null,
 				findValuePrepStmt = null,
@@ -87,6 +93,19 @@ class SlotMgr {
 		this.db = buildStore.getBuildStoreDB();
 	
 		/* prepare the database statements */
+		insertTypePrepStmt = db.prepareStatement("insert into slotTypes values (null, ?, ?, ?, ?, ?, ?, ?, ?)");
+		findTypeByNamePrepStmt = db.prepareStatement(
+				"select slotId, slotType, slotPos, slotCard, defaultValue from slotTypes " +
+						"where ownerType = ? and ownerId = ? and slotName = ?");
+		findTypeByIdPrepStmt = db.prepareStatement(
+				"select slotName, slotType, slotPos, slotCard, defaultValue from slotTypes " +
+						"where slotId = ?");
+		findTypeByPosPrepStmt = db.prepareStatement(
+				"select slotId, slotName, slotType, slotPos, slotCard, defaultValue from slotTypes " +
+				"where ownerType = ? and ownerId = ? and slotPos = ?");
+		findTypeByAnyPosPrepStmt = db.prepareStatement(
+				"select slotId, slotName, slotType, slotPos, slotCard, defaultValue from slotTypes " +
+				"where ownerType = ? and ownerId = ?");
 		insertValuePrepStmt = db.prepareStatement("insert into slotValues values (?, ?, ?, ?)");
 		updateValuePrepStmt = db.prepareStatement("update slotValues set value = ? where ownerType = ? " +
 													" and ownerId = ? and slotId = ?");
@@ -96,17 +115,17 @@ class SlotMgr {
 													"and slotId = ?");
 		
 		/* define the default slots */
-		defaultSlots = new SlotDetails[13];
-		defaultSlots[1] = new SlotDetails(1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
-				ISlotTypes.SLOT_POS_INPUT, false, null, null);
-		defaultSlots[2] = new SlotDetails(2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
-				ISlotTypes.SLOT_POS_PARAMETER, true, null, null);
+		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Input", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT,
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command", 
+				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_PARAMETER,
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);		
 		for (int id = 0; id < 10; id++) {
-			defaultSlots[3 + id] = new SlotDetails(3 + id, "Output" + id, 
-					ISlotTypes.SLOT_TYPE_FILEGROUP, 
-					ISlotTypes.SLOT_POS_OUTPUT, false, null, null);
+			newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Output" + id, 
+					ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT,
+					ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
 		}
-	
 	}
 	
 	/*=====================================================================================*
@@ -122,21 +141,56 @@ class SlotMgr {
 	 * @param slotName		The name of the slot (must be unique within this actionType).
 	 * @param slotType		The slot's type (SLOT_TYPE_FILEGROUP, etc).
 	 * @param slotPos		The slot's position (SLOT_POS_INPUT, etc).
-	 * @param isRequired	True if actions must provide a value for this slot.
+	 * @param newCard   	Either SLOT_CARD_OPTIONAL, SLOT_CARD_ONE, SLOT_CARD_MULTI.
 	 * @param defaultValue	If not required, a default value.
 	 * @param enumValues	For SLOT_TYPE_ENUMERATION, an array of valid values.
 	 * @return The newly-added slot ID, or:
 	 * 			ErrorCode.INVALID_NAME if slotName is not a valid slot identifier.
 	 * 			ErrorCode.ALREADY_USED if slotName is already in use (for this owner).
-	 * 			ErrorCode.INVALID_OP if slotType or slotType are not valid/relevant, or
+	 * 			ErrorCode.INVALID_OP if slotType or slotPos are not valid/relevant, or
 	 *                    if enumValues does not contain a valid enumeration.
+	 *          ErrorCode.OUT_OF_RANGE is the cardinality is invalid, or if a multi-slot
+	 *                    is selected and this is not an action slot, or there's already
+	 *                    a multi-slot for this action.
 	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
+	 * 			ErrorCode.NOT_FOUND if ownerType/ownerId are not valid.
 	 */
-	int newSlot(int ownerType, int ownerId, int slotName, int slotType, int slotPos,
-			boolean isRequired, Object defaultValue, String[] enumValues) {
+	int newSlot(int ownerType, int ownerId, String slotName, int slotType, int slotPos,
+				int newCard, Object defaultValue, String[] enumValues) {
 
-		/* for now, no new slots can be added */
-		return ErrorCode.INVALID_OP;
+		/* TODO: validate slotType and slotPos */
+		
+		/* TODO: validate that the slot name is well-formed */
+		
+		/* TODO: validate that the slot name is not already in use for this ownerType/ownerId */
+		
+		/* TODO: validate that the default value makes sense */
+		
+		/* All the inputs are valid, so add the new record to the database */
+		String defaultValueString = null;	
+		if (defaultValue != null) {
+			defaultValueString = defaultValue.toString();
+		}
+		
+		int newSlotId;
+		try {
+			insertTypePrepStmt.setInt(1, ownerType);
+			insertTypePrepStmt.setInt(2, ownerId);
+			insertTypePrepStmt.setString(3, slotName);
+			insertTypePrepStmt.setInt(4, slotType);
+			insertTypePrepStmt.setInt(5, slotPos);
+			insertTypePrepStmt.setInt(6, newCard);
+			insertTypePrepStmt.setString(7, defaultValueString);
+			insertTypePrepStmt.setInt(8, 0);
+			db.executePrepUpdate(insertTypePrepStmt);
+			
+			newSlotId = db.getLastRowID();
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+				
+		return newSlotId;
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
@@ -150,51 +204,77 @@ class SlotMgr {
 	 */
 	SlotDetails getSlotByID(int slotId) {
 		
-		/* return a default slot? */
-		if ((slotId >= 1) && (slotId < defaultSlots.length)) {
-			return defaultSlots[slotId];
+		ResultSet rs = null;
+		SlotDetails details = null;
+		try {
+			findTypeByIdPrepStmt.setInt(1, slotId);
+			rs = db.executePrepSelectResultSet(findTypeByIdPrepStmt);
+			
+			if (rs.next()) {
+				String slotName = rs.getString(1);
+				int slotType = rs.getInt(2);
+				int slotPos = rs.getInt(3);
+				int slotCard = rs.getInt(4);
+				String defaultValue = rs.getString(5);
+				details = new SlotDetails(slotId, slotName, slotType, slotPos, slotCard, defaultValue, null);
+			}
+			rs.close();
+			return details;
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-		
-		return null;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Return all the slots associated with an owner.
+	 * Return all the slots associated with an owner.  We assume that all input parameters 
+	 * have been validated by the caller (actionTypeMgr or packageMgr).
 	 * 
-	 * @param ownerType The type of thing to add this slot to (SLOT_OWNER_ACTION, 
+	 * @param ownerType The type of thing that owns this slots (SLOT_OWNER_ACTION, 
 	 *                  SLOT_OWNER_PACKAGE)
 	 * @param ownerId	The ID of the owner (actionType/package) containing the slots.
 	 * @param slotPos	The position (within the actionType) of the slot (SLOT_POS_INPUT, etc).
-	 * @return An array of slot details, or null if typeId or slotPos is invalid, or typeId
-	 *         relates to a folder.
+	 * @return An array of slot details.
 	 */
 	SlotDetails[] getSlots(int ownerType, int ownerId, int slotPos) {
 		
-		/* for now, we only have slots for the built-in "Shell Command" action type */
-		if ((ownerType == SLOT_OWNER_ACTION) && (ownerId == ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID)) {
-			
-			List<SlotDetails> results = new ArrayList<SlotDetails>();
-			if ((slotPos == ISlotTypes.SLOT_POS_INPUT) || (slotPos == ISlotTypes.SLOT_POS_ANY)) {
-				results.add(getSlotByID(1));
-			}
-			
-			if ((slotPos == ISlotTypes.SLOT_POS_PARAMETER) || (slotPos == ISlotTypes.SLOT_POS_ANY)) {
-				results.add(getSlotByID(2));
-			}
-					
-			if ((slotPos == ISlotTypes.SLOT_POS_OUTPUT) || (slotPos == ISlotTypes.SLOT_POS_ANY)) {
-				for (int id = 0; id < 10; id++) {
-					results.add(getSlotByID(id + 3));
-				}
-			}
 		
+		PreparedStatement stmt;
+		try {
+			/* A slotPos of SLOT_POS_ANY requires a different database query */
+			if (slotPos == ISlotTypes.SLOT_POS_ANY) {
+				stmt = findTypeByAnyPosPrepStmt;
+			} else {
+				stmt = findTypeByPosPrepStmt;
+				stmt.setInt(3, slotPos);
+			}
+			stmt.setInt(1, ownerType);
+			stmt.setInt(2, ownerId);
+			
+			/*
+             * Fetch the results from the database, and form the SlotDetails[]
+             */
+			ResultSet rs = db.executePrepSelectResultSet(stmt);
+			List<SlotDetails> results = new ArrayList<SlotDetails>();
+			while (rs.next()) {
+				int slotId = rs.getInt(1);
+				String slotName = rs.getString(2);
+				int slotType = rs.getInt(3);
+				int actualSlotPos = rs.getInt(4);
+				int slotCard = rs.getInt(5);
+				String defaultValue = rs.getString(6);
+				SlotDetails details = 
+						new SlotDetails(slotId, slotName, slotType, actualSlotPos, slotCard, defaultValue, null);
+				results.add(details);
+			}
+			rs.close();
 			return results.toArray(new SlotDetails[results.size()]);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
-
-		/* invalid typeId/slotPos */
-		return null;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -210,20 +290,29 @@ class SlotMgr {
 	 */
 	SlotDetails getSlotByName(int ownerType, int ownerId, String slotName) {
 		
-		if ((ownerType == SLOT_OWNER_ACTION) && (ownerId == ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID)) {
+		ResultSet rs = null;
+		SlotDetails details = null;
+		try {
+			findTypeByNamePrepStmt.setInt(1, ownerType);
+			findTypeByNamePrepStmt.setInt(2, ownerId);
+			findTypeByNamePrepStmt.setString(3, slotName);
+			rs = db.executePrepSelectResultSet(findTypeByNamePrepStmt);
 			
-			/* check all the default slots */
-			for (SlotDetails detail : defaultSlots) {
-				if (detail != null) {
-					if (slotName.equals(detail.slotName)) {
-						return detail;
-					}
-				}
+			/* there should be only one result... */
+			if (rs.next()) {
+				int slotId = rs.getInt(1);
+				int slotType = rs.getInt(2);
+				int slotPos = rs.getInt(3);
+				int slotCard = rs.getInt(4);
+				String defaultValue = rs.getString(5);
+				details = new SlotDetails(slotId, slotName, slotType, slotPos, slotCard, defaultValue, null);
 			}
-		}
-		
-		/* we only handle the "Shell Command" action - others are an errors */
-		return null;
+			rs.close();
+			return details;
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}		
 	}
 
 	/*-------------------------------------------------------------------------------------*/

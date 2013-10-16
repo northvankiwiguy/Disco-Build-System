@@ -12,6 +12,8 @@
 
 package com.buildml.model;
 
+import com.buildml.model.ISlotTypes.SlotDetails;
+
 /**
  * The interface conformed-to by any PackageMgr object, which represents a
  * subset of the functionality managed by a BuildStore object. A PackageMgr
@@ -161,7 +163,69 @@ public interface IPackageMgr {
 	 * @return True if the ID refers to a valid package or folder.
 	 */
 	public boolean isValid(int folderOrPackageId);
+	
+	/**
+	 * Add a new slot to this package.
+	 * 
+	 * @param typeId		The package to add the slot to.
+	 * @param slotName		The name of the slot (must be unique within this package).
+	 * @param slotType		The slot's type (SLOT_TYPE_FILEGROUP, etc).
+	 * @param slotPos		The slot's position (SLOT_POS_OUTPUT, etc).
+	 * @param cardinality	Either SLOT_CARD_OPTIONAL or SLOT_CARD_REQUIRED.
+	 * @param defaultValue	A default value to be used when a SLOT_CARD_OPTIONAL slot is empty.
+	 * @param enumValues	For SLOT_TYPE_ENUMERATION, an array of valid values.
+	 * @return The newly-added slot ID, or:
+	 * 			ErrorCode.NOT_FOUND if typeId is invalid, or is a folder.
+	 * 			ErrorCode.INVALID_NAME if slotName is not a valid slot identifier.
+	 * 			ErrorCode.ALREADY_USED if slotName is already in use (for this package).
+	 * 			ErrorCode.INVALID_OP if slotType or slotPos are not valid/relevant, or
+	 *                    if enumValues does not contain a valid enumeration.
+	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
+	 */
+	public abstract int newSlot(int typeId, String slotName, int slotType, int slotPos, 
+								int cardinality, Object defaultValue, String[] enumValues);
 
+	/**
+	 * Return all the slots associated with a package.
+	 * 
+	 * @param pkgId		The ID of the package containing the slots.
+	 * @param slotPos	The position (within the package) of the slot (SLOT_POS_OUTPUT, etc).
+	 * @return An array of slot details, or null if typeId or slotPos is invalid, or typeId
+	 *         relates to a folder.
+	 */
+	public abstract SlotDetails[] getSlots(int pkgId, int slotPos);
+
+	/**
+	 * Return a slot's detailed information.
+	 * 
+	 * @param slotId The slot to query.
+	 * @return A SlotDetails structure containing the specified slot's details, or null if
+	 * 		   slotId does not refer to a valid slot.
+	 */
+	public abstract SlotDetails getSlotByID(int slotId);
+	
+	/**
+	 * For the specified package, return details of the named slot.
+	 * 
+	 * @param pkgId		The ID of the package containing the slot.
+	 * @param slotName	The name of the slot (within the scope of the package).
+	 * @return The slot details, or null if pkgId or slotName is invalid.
+	 */
+	public abstract SlotDetails getSlotByName(int pkgId, String slotName);
+	
+	/**
+	 * Remove a slot from the package. The slot can only be removed if there are no
+	 * package instances that define the slot value.
+	 * 
+	 * @param pkgId		The ID of the package containing the slot.
+	 * @param slotId	The ID of the slot to be removed.
+	 * @return ErrorCode.OK on success,
+	 * 		   ErrorCode.NOT_FOUND if pkgId is invalid,
+	 * 		   ErrorCode.BAD_VALUE if slotId is invalid, or
+	 * 		   ErrorCode.CANT_REMOVE if the slot is still in use by a package instance.
+	 */
+	public abstract int removeSlot(int pkgId, int slotId);	
+	
 	/**
 	 * Add the specified listener to the list of objects that are notified when
 	 * a package changes in some way.
