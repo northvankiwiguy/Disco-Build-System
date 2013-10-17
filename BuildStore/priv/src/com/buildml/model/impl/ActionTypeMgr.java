@@ -14,6 +14,7 @@ package com.buildml.model.impl;
 
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -308,8 +309,11 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	@Override
 	public SlotDetails[] getSlots(int typeId, int slotPos) {
 		
-		/* folder don't have slots */
+		/* Validate all inputs */
 		if (isFolder(typeId) || !isValid(typeId)) {
+			return null;
+		}
+		if ((slotPos < ISlotTypes.SLOT_POS_ANY) || (slotPos > ISlotTypes.SLOT_POS_LOCAL)){
 			return null;
 		}
 		

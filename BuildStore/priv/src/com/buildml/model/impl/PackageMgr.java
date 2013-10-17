@@ -25,6 +25,7 @@ import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
@@ -536,6 +537,11 @@ import com.buildml.utils.errors.ErrorCode;
 			return ErrorCode.NOT_FOUND;
 		}
 		
+		/* we can't add input slots to a package */
+		if (slotPos == ISlotTypes.SLOT_POS_INPUT) {
+			return ErrorCode.INVALID_OP;
+		}
+		
 		/* delegate the rest of the work to SlotMgr */
 		return slotMgr.newSlot(SlotMgr.SLOT_OWNER_PACKAGE, typeId, slotName, slotType, slotPos,
 								slotCard, defaultValue, enumValues);
@@ -549,8 +555,11 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public SlotDetails[] getSlots(int pkgId, int slotPos) {
 		
-		/* folder don't have slots */
+		/* validate all inputs */
 		if (isFolder(pkgId) || !isValid(pkgId)) {
+			return null;
+		}
+		if ((slotPos < ISlotTypes.SLOT_POS_ANY) || (slotPos > ISlotTypes.SLOT_POS_LOCAL)){
 			return null;
 		}
 		

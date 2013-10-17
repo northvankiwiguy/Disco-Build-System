@@ -186,6 +186,7 @@ public interface IActionTypeMgr {
 	 * 			ErrorCode.ALREADY_USED if slotName is already in use (for this actionType).
 	 * 			ErrorCode.INVALID_OP if slotType or slotPos are not valid/relevant, or
 	 *                    if enumValues does not contain a valid enumeration.
+	 *          ErrorCode.OUT_OF_RANGE if the slotCard doesn't make sense for the slot.
 	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
 	 */
 	public abstract int newSlot(int typeId, String slotName, int slotType, int slotPos, 

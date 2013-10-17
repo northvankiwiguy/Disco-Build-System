@@ -141,7 +141,7 @@ class SlotMgr {
 	 * @param slotName		The name of the slot (must be unique within this actionType).
 	 * @param slotType		The slot's type (SLOT_TYPE_FILEGROUP, etc).
 	 * @param slotPos		The slot's position (SLOT_POS_INPUT, etc).
-	 * @param newCard   	Either SLOT_CARD_OPTIONAL, SLOT_CARD_ONE, SLOT_CARD_MULTI.
+	 * @param slotCard   	Either SLOT_CARD_OPTIONAL, SLOT_CARD_ONE, SLOT_CARD_MULTI.
 	 * @param defaultValue	If not required, a default value.
 	 * @param enumValues	For SLOT_TYPE_ENUMERATION, an array of valid values.
 	 * @return The newly-added slot ID, or:
@@ -156,13 +156,62 @@ class SlotMgr {
 	 * 			ErrorCode.NOT_FOUND if ownerType/ownerId are not valid.
 	 */
 	int newSlot(int ownerType, int ownerId, String slotName, int slotType, int slotPos,
-				int newCard, Object defaultValue, String[] enumValues) {
+				int slotCard, Object defaultValue, String[] enumValues) {
 
-		/* TODO: validate slotType and slotPos */
+		/* validate that the slot name is well-formed */
+		if (!isValidSlotName(slotName)) {
+			return ErrorCode.INVALID_NAME;
+		}
 		
-		/* TODO: validate that the slot name is well-formed */
+		/* validate slotType and slotPos */
+		if ((slotType < ISlotTypes.SLOT_TYPE_FILEGROUP) || (slotType > ISlotTypes.SLOT_TYPE_ENUMERATION)) {
+			return ErrorCode.INVALID_OP;
+		}
+		if ((slotPos < ISlotTypes.SLOT_POS_INPUT) || (slotPos > ISlotTypes.SLOT_POS_LOCAL)) {
+			return ErrorCode.INVALID_OP;
+		}
 		
-		/* TODO: validate that the slot name is not already in use for this ownerType/ownerId */
+		/* validate that the slot name is not already in use for this ownerType/ownerId */
+		if (getSlotByName(ownerType, ownerId, slotName) != null) {
+			return ErrorCode.ALREADY_USED;
+		}
+		
+		/* 
+		 * Validate that file groups can only appear in input/output slots, and that no other types
+		 * can appear in these slots.
+		 */
+		if (slotType == ISlotTypes.SLOT_TYPE_FILEGROUP){
+			if ((slotPos != ISlotTypes.SLOT_POS_INPUT) && (slotPos != ISlotTypes.SLOT_POS_OUTPUT)) {
+				return ErrorCode.INVALID_OP;
+			}
+		}		
+		else {
+			if ((slotPos == ISlotTypes.SLOT_POS_INPUT) || (slotPos == ISlotTypes.SLOT_POS_OUTPUT)) {
+				return ErrorCode.INVALID_OP;
+			}
+		}
+		
+		/* validate slot cardinality */
+		if ((slotCard < ISlotTypes.SLOT_CARD_OPTIONAL) || (slotCard > ISlotTypes.SLOT_CARD_MULTI)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/* special rules apply for multi-slots */
+		if (slotCard == ISlotTypes.SLOT_CARD_MULTI) {
+
+			/* only input file groups can have multi cardinality */
+			if ((slotPos != ISlotTypes.SLOT_POS_INPUT) || (slotType != ISlotTypes.SLOT_TYPE_FILEGROUP)) {
+				return ErrorCode.OUT_OF_RANGE;
+			}
+	
+			/* only one input file group can have this cardinality - check all current slots first */
+			SlotDetails[] currentSlots = getSlots(ownerType, ownerId, ISlotTypes.SLOT_POS_INPUT);
+			for (int i = 0; i < currentSlots.length; i++) {
+				if (currentSlots[i].slotCard == ISlotTypes.SLOT_CARD_MULTI) {
+					return ErrorCode.OUT_OF_RANGE;
+				}
+			}
+		}
 		
 		/* TODO: validate that the default value makes sense */
 		
@@ -179,7 +228,7 @@ class SlotMgr {
 			insertTypePrepStmt.setString(3, slotName);
 			insertTypePrepStmt.setInt(4, slotType);
 			insertTypePrepStmt.setInt(5, slotPos);
-			insertTypePrepStmt.setInt(6, newCard);
+			insertTypePrepStmt.setInt(6, slotCard);
 			insertTypePrepStmt.setString(7, defaultValueString);
 			insertTypePrepStmt.setInt(8, 0);
 			db.executePrepUpdate(insertTypePrepStmt);
@@ -510,5 +559,41 @@ class SlotMgr {
 		return buildStore;
 	}
 
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Determine whether a potential slot name is valid (at least 3 characters, starts with
+	 * a letter, contains only letters, digits, underscore or dash).
+	 * @param slotName The proposed slot name.
+	 * @return True if the name is valid, else false.
+	 */
+	private boolean isValidSlotName(String slotName) {
+		int length;
+		
+		/* check minimum length requirements */
+		if ((slotName == null) || (length = slotName.length()) < 3) {
+			return false;
+		}
+		
+		/* first character must be a letter */
+		char firstCh = slotName.charAt(0);
+		if (!Character.isLetter(firstCh)) {
+			return false;
+		}
+		
+		/* remaining characters must be letters, digits, _ or - */
+		for (int i = 1; i != length - 1; i++) {
+			char ch = slotName.charAt(i);
+			boolean validChar = Character.isLetter(ch) || Character.isDigit(ch) ||
+										(ch == '-') || (ch == '_');
+			if (!validChar) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
