@@ -37,6 +37,7 @@ public class TestSlotMgr {
 
 	/** The managers associated with this BuildStore */
 	IActionTypeMgr actionTypeMgr;
+	IActionMgr actionMgr;
 	IPackageMgr pkgMgr;
 
 	/*-------------------------------------------------------------------------------------*/
@@ -51,6 +52,7 @@ public class TestSlotMgr {
 		
 		/* fetch the associated manager objects */
 		actionTypeMgr = bs.getActionTypeMgr();
+		actionMgr = bs.getActionMgr();
 		pkgMgr = bs.getPackageMgr();
 	}
 
@@ -468,6 +470,195 @@ public class TestSlotMgr {
 	@Test
 	public void testNewSlotValues() {
 	
+		/* 
+		 * Add two slots of each slot type to the shell action type. One will have null default, the other
+		 * will have a reasonable default value.
+		 */
+		int typeId = actionTypeMgr.getActionTypeByName("Shell Command");
+		int fg1SlotId = actionTypeMgr.newSlot(typeId, "FileGroup1", ISlotTypes.SLOT_TYPE_FILEGROUP,
+							ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int fg2SlotId = actionTypeMgr.newSlot(typeId, "FileGroup2", ISlotTypes.SLOT_TYPE_FILEGROUP,
+							ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(5), null);
+		int int1SlotId = actionTypeMgr.newSlot(typeId, "Integer1", ISlotTypes.SLOT_TYPE_INTEGER,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int int2SlotId = actionTypeMgr.newSlot(typeId, "Integer2", ISlotTypes.SLOT_TYPE_INTEGER,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(50), null);
+		int text1SlotId = actionTypeMgr.newSlot(typeId, "Text1", ISlotTypes.SLOT_TYPE_TEXT,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int text2SlotId = actionTypeMgr.newSlot(typeId, "Text2", ISlotTypes.SLOT_TYPE_TEXT,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "DefaultValue", null);
+		int bool1SlotId = actionTypeMgr.newSlot(typeId, "Bool1", ISlotTypes.SLOT_TYPE_BOOLEAN,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int bool2SlotId = actionTypeMgr.newSlot(typeId, "Bool2", ISlotTypes.SLOT_TYPE_BOOLEAN,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "true", null);
+		
+		/*
+		 * Test the default values of each slot.
+		 */
+		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), 0, "command");
+		assertNull(actionMgr.getSlotValue(actionId, fg1SlotId));
+		assertEquals(Integer.valueOf(5), actionMgr.getSlotValue(actionId, fg2SlotId));
+		assertNull(actionMgr.getSlotValue(actionId, int1SlotId));
+		assertEquals(Integer.valueOf(50), actionMgr.getSlotValue(actionId, int2SlotId));
+		assertNull(actionMgr.getSlotValue(actionId, text1SlotId));
+		assertEquals("DefaultValue", actionMgr.getSlotValue(actionId, text2SlotId));
+		assertNull(actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool2SlotId));
+		
+		/*
+		 * Set a range of valid values for each slot type.
+		 */
+		
+		/* SLOT_TYPE_FILEGROUP can have value null or Integer */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, fg1SlotId, null));
+		assertNull(actionMgr.getSlotValue(actionId, fg1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, fg1SlotId, Integer.valueOf(5)));
+		assertEquals(Integer.valueOf(5), actionMgr.getSlotValue(actionId, fg1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, fg1SlotId, Integer.valueOf(10)));
+		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(actionId, fg1SlotId));
+		
+		/* SLOT_TYPE_INTEGER can have value null, Integer or String, but will always return null/Integer */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, int1SlotId, null));
+		assertNull(actionMgr.getSlotValue(actionId, int1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, int1SlotId, Integer.valueOf(15)));
+		assertEquals(Integer.valueOf(15), actionMgr.getSlotValue(actionId, int1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, int1SlotId, "20"));
+		assertEquals(Integer.valueOf(20), actionMgr.getSlotValue(actionId, int1SlotId));
+		
+		/* SLOT_TYPE_TEXT can have value null or String */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, text1SlotId, null));
+		assertNull(actionMgr.getSlotValue(actionId, text1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, text1SlotId, "Hello"));
+		assertEquals("Hello", actionMgr.getSlotValue(actionId, text1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, text1SlotId, "Test"));
+		assertEquals("Test", actionMgr.getSlotValue(actionId, text1SlotId));
+
+		/* SLOT_TYPE_BOOLEAN can have value null, Integer, Boolean or String, but will always return null/Boolean */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, null));
+		assertNull(actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, 0));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, 100));
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, true));
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, false));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "true"));
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "False"));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "on"));
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "off"));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "yes"));
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "no"));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, bool1SlotId));
+		
+		/*
+		 * Test a range of invalid values.
+		 */
+		
+		/* SLOT_TYPE_FILEGROUP */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, fg1SlotId, "32x"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, fg1SlotId, "Hello"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, fg1SlotId, false));
+		
+		/* SLOT_TYPE_INTEGER */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, int1SlotId, "640+2"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, int1SlotId, Boolean.FALSE));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, int1SlotId, "hello"));
+		
+		/* SLOT_TYPE_TEXT */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, text1SlotId, 5));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, text1SlotId, 'a'));
+		
+		/* SLOT_TYPE_BOOLEAN */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, bool1SlotId, "maybe"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, bool1SlotId, 'b'));
+
+		/*
+		 * Set some invalid default values for each type of slot.
+		 */
+		
+		/* SLOT_TYPE_FILEGROUP */
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "FileGroup101", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED, "135", null));
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "FileGroup102", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED, true, null));
+		
+		/* SLOT_TYPE_INTEGER */
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Integer101", 
+				ISlotTypes.SLOT_TYPE_INTEGER, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, "Five", null));
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Integer102", 
+				ISlotTypes.SLOT_TYPE_INTEGER, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'c', null));
+		
+		/* SLOT_TYPE_TEXT */
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Text101", 
+				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 5, null));
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Text102", 
+				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'a', null));
+				
+		/* SLOT_TYPE_BOOLEAN */
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool101", 
+				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, "maybe", null));
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool102", 
+				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'c', null));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for isSlotSet() and clearSlotValue().
+	 */
+	@Test
+	public void testIsSlotSet() {
+		
+		/* create a couple of action slots */
+		int actionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
+		int slot1Id = actionTypeMgr.newSlot(actionTypeId, "Value1", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, true, null);
+		int slot2Id = actionTypeMgr.newSlot(actionTypeId, "Value2", ISlotTypes.SLOT_TYPE_INTEGER, 
+				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 5, null);
+		
+		/* test the default values */
+		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), 0, "command");
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, slot1Id));
+		assertEquals(Integer.valueOf(5), actionMgr.getSlotValue(actionId, slot2Id));
+		
+		/* confirm that the slots are currently NOT set */
+		assertFalse(actionMgr.isSlotSet(actionId, slot1Id));
+		assertFalse(actionMgr.isSlotSet(actionId, slot2Id));
+		
+		/* set slot1, but not slot 2 - repeat the same tests */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, slot1Id, false));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, slot1Id));
+		assertEquals(Integer.valueOf(5), actionMgr.getSlotValue(actionId, slot2Id));
+		assertTrue(actionMgr.isSlotSet(actionId, slot1Id));
+		assertFalse(actionMgr.isSlotSet(actionId, slot2Id));
+		
+		/* set slot 2, so both are now set */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, slot2Id, 10));
+		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, slot1Id));
+		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(actionId, slot2Id));
+		assertTrue(actionMgr.isSlotSet(actionId, slot1Id));
+		assertTrue(actionMgr.isSlotSet(actionId, slot2Id));
+		
+		/* now clear slot1, test it's no longer set, and that the value is back at the default */
+		actionMgr.clearSlotValue(actionId, slot1Id);
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, slot1Id));
+		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(actionId, slot2Id));
+		assertFalse(actionMgr.isSlotSet(actionId, slot1Id));
+		assertTrue(actionMgr.isSlotSet(actionId, slot2Id));
+				
+		/* now clear slot2, test it's no longer set, and that the value is back at the default */
+		actionMgr.clearSlotValue(actionId, slot2Id);
+		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, slot1Id));
+		assertEquals(Integer.valueOf(5), actionMgr.getSlotValue(actionId, slot2Id));
+		assertFalse(actionMgr.isSlotSet(actionId, slot1Id));
+		assertFalse(actionMgr.isSlotSet(actionId, slot2Id));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -477,7 +668,44 @@ public class TestSlotMgr {
 	 */
 	@Test
 	public void testRemoveSlot() {
-		/* TODO: implement this later - using both actionTypeMgr and packageMgr */
+		
+		/* add two new slots to the default shell command action type */
+		int actionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
+		int slot1Id = actionTypeMgr.newSlot(actionTypeId, "Value1", ISlotTypes.SLOT_TYPE_INTEGER, 
+				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 5, null);
+		int slot2Id = actionTypeMgr.newSlot(actionTypeId, "Value2", ISlotTypes.SLOT_TYPE_INTEGER, 
+				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 10, null);
+		
+		/* validate that the slots are defined - can be fetched by name */
+		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
+		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
+		
+		/* remove one of those slots - validate that it's no longer available */
+		assertEquals(ErrorCode.OK, actionTypeMgr.removeSlot(slot1Id));
+		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
+		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
+		
+		/* create an action and set a value for the slot */
+		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), 0, "command");
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, slot2Id, 20));
+		
+		/* try removing the slot - should fail */
+		assertEquals(ErrorCode.CANT_REMOVE, actionTypeMgr.removeSlot(slot2Id));
+		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
+		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
+
+		/* clear the action's slot value */
+		actionMgr.clearSlotValue(actionId, slot2Id);
+		
+		/* try removing the slot - should succeed */
+		assertEquals(ErrorCode.OK, actionTypeMgr.removeSlot(slot2Id));
+
+		/* confirm that the slots are not searchable any more */
+		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
+		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
+		
+		/* try removing a non-existent slot - returns ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, actionTypeMgr.removeSlot(1000));
 	}
 		
 	/*-------------------------------------------------------------------------------------*/

@@ -871,6 +871,26 @@ public class ActionMgr implements IActionMgr {
 		/* delegate all slot assignments to SlotMgr */
 		return slotMgr.getSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#isSlotSet(int, int)
+	 */
+	@Override
+	public boolean isSlotSet(int actionId, int slotId) {
+		return slotMgr.isSlotSet(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#clearSlotValue(int, int)
+	 */
+	@Override
+	public void clearSlotValue(int actionId, int slotId) {
+		slotMgr.clearSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	

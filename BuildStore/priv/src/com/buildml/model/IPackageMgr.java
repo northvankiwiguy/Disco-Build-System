@@ -217,14 +217,12 @@ public interface IPackageMgr {
 	 * Remove a slot from the package. The slot can only be removed if there are no
 	 * package instances that define the slot value.
 	 * 
-	 * @param pkgId		The ID of the package containing the slot.
 	 * @param slotId	The ID of the slot to be removed.
 	 * @return ErrorCode.OK on success,
-	 * 		   ErrorCode.NOT_FOUND if pkgId is invalid,
-	 * 		   ErrorCode.BAD_VALUE if slotId is invalid, or
+	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or
 	 * 		   ErrorCode.CANT_REMOVE if the slot is still in use by a package instance.
 	 */
-	public abstract int removeSlot(int pkgId, int slotId);	
+	public abstract int removeSlot(int slotId);	
 	
 	/**
 	 * Add the specified listener to the list of objects that are notified when

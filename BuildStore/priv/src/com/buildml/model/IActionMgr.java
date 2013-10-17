@@ -316,6 +316,23 @@ public interface IActionMgr {
 	public abstract Object getSlotValue(int actionId, int slotId);	
 	
 	/**
+	 * Determine whether the specified slot currently holds a value.
+	 * @param actionId	The action that the slot is attached to.
+	 * @param slotId	The slot that's connected to the action.
+	 * @return True if there's an explicit (non-default) value in this slot, else false.
+	 *		   Also return false if actionId/slotId are invalid.
+	 */
+	public abstract boolean isSlotSet(int actionId, int slotId);
+	
+	/**
+	 * Remove the value (if any) that has been inserted into this slot, therefore setting
+	 * this slot to its default value. If actionId or slotId is invalid, silently do nothing.
+	 * @param actionId	The action that the slot is attached to.
+	 * @param slotId	The slot that's connected to the action.
+	 */
+	public abstract void clearSlotValue(int actionId, int slotId);
+	
+	/**
 	 * Return the BuildStore object that owns this IActionMgr object.
 	 *
 	 * @return The BuildStore object that owns this IActionMgr object.

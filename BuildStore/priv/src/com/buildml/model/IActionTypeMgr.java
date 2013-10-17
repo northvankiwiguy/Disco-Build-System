@@ -224,14 +224,13 @@ public interface IActionTypeMgr {
 	 * Remove a slot from the actionType. The slot can only be removed if there are no
 	 * actions that define the slot value.
 	 * 
-	 * @param typeId	The ID of the actionType containing the slot.
 	 * @param slotId	The ID of the slot to be removed.
 	 * @return ErrorCode.OK on success,
 	 * 		   ErrorCode.NOT_FOUND if typeId is invalid,
-	 * 		   ErrorCode.BAD_VALUE if slotId is invalid, or
+	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or
 	 * 		   ErrorCode.CANT_REMOVE if the slot is still in use by an action.
 	 */
-	public abstract int removeSlot(int typeId, int slotId);
+	public abstract int removeSlot(int slotId);
 	
 	/**
 	 * Return the BuildStore object that owns this IActionTypeMgr object.

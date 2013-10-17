@@ -346,13 +346,13 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionTypeMgr#removeSlot(int, int)
+	 * @see com.buildml.model.IActionTypeMgr#removeSlot(int)
 	 */
 	@Override
-	public int removeSlot(int typeId, int slotId) {
+	public int removeSlot(int slotId) {
 
 		/* all work can be delegated */
-		return slotMgr.removeSlot(SlotMgr.SLOT_OWNER_ACTION, typeId, slotId);
+		return slotMgr.removeSlot(slotId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

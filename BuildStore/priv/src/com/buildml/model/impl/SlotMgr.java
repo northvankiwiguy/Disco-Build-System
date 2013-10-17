@@ -74,10 +74,12 @@ class SlotMgr {
 				findTypeByIdPrepStmt = null,
 				findTypeByPosPrepStmt = null,
 				findTypeByAnyPosPrepStmt = null,
+				deleteTypePrepStmt = null,
 				insertValuePrepStmt = null,
 				updateValuePrepStmt = null,
 				findValuePrepStmt = null,
-				deleteValuePrepStmt = null;
+				deleteValuePrepStmt = null,
+				countSlotUsage = null;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -106,6 +108,7 @@ class SlotMgr {
 		findTypeByAnyPosPrepStmt = db.prepareStatement(
 				"select slotId, slotName, slotType, slotPos, slotCard, defaultValue from slotTypes " +
 				"where ownerType = ? and ownerId = ?");
+		deleteTypePrepStmt = db.prepareStatement("delete from slotTypes where slotId = ?");
 		insertValuePrepStmt = db.prepareStatement("insert into slotValues values (?, ?, ?, ?)");
 		updateValuePrepStmt = db.prepareStatement("update slotValues set value = ? where ownerType = ? " +
 													" and ownerId = ? and slotId = ?");
@@ -113,6 +116,7 @@ class SlotMgr {
 													" and ownerId = ? and slotId = ?");
 		deleteValuePrepStmt = db.prepareStatement("delete from slotValues where ownerType = ? and ownerId = ? " +
 													"and slotId = ?");
+		countSlotUsage = db.prepareStatement("select count(*) from slotValues where slotId = ?");
 		
 		/* define the default slots */
 		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Input", 
@@ -212,13 +216,15 @@ class SlotMgr {
 				}
 			}
 		}
-		
-		/* TODO: validate that the default value makes sense */
-		
+				
 		/* All the inputs are valid, so add the new record to the database */
 		String defaultValueString = null;	
 		if (defaultValue != null) {
-			defaultValueString = defaultValue.toString();
+			try {
+				defaultValueString = convertObjectToString(slotType, defaultValue);
+			} catch (NumberFormatException ex) {
+				return ErrorCode.BAD_VALUE;
+			}
 		}
 		
 		int newSlotId;
@@ -264,7 +270,7 @@ class SlotMgr {
 				int slotType = rs.getInt(2);
 				int slotPos = rs.getInt(3);
 				int slotCard = rs.getInt(4);
-				String defaultValue = rs.getString(5);
+				Object defaultValue = convertStringToObject(slotType, rs.getString(5));
 				details = new SlotDetails(slotId, slotName, slotType, slotPos, slotCard, defaultValue, null);
 			}
 			rs.close();
@@ -370,16 +376,34 @@ class SlotMgr {
 	 * Remove a slot from the owner. The slot can only be removed if there are no
 	 * actions/packages that define the slot value.
 	 * 
-	 * @param ownerType The type of thing to add this slot to (SLOT_OWNER_ACTION, 
-	 *                  SLOT_OWNER_PACKAGE)
-	 * @param ownerId	The ID of the owner containing the slot.
 	 * @param slotId	The ID of the slot to be removed.
 	 * @return ErrorCode.OK on success,
-	 * 		   ErrorCode.BAD_VALUE if slotId is invalid, or
+	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or
 	 * 		   ErrorCode.CANT_REMOVE if the slot is still in use.
 	 */
-	int removeSlot(int ownerType, int ownerId, int slotId) {
-		return ErrorCode.CANT_REMOVE;
+	int removeSlot(int slotId) {
+		
+		try {
+			/* ensure that there are no action or package instances using this slot */
+			countSlotUsage.setInt(1, slotId);
+			ResultSet rs = db.executePrepSelectResultSet(countSlotUsage);
+			int usageCount = rs.getInt(1);
+			rs.close();
+			if (usageCount != 0) {
+				return ErrorCode.CANT_REMOVE;
+			}
+
+			/* proceed to delete the entry */
+			deleteTypePrepStmt.setInt(1, slotId);
+			int count = db.executePrepUpdate(deleteTypePrepStmt);
+			if (count != 1) {
+				return ErrorCode.NOT_FOUND;
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}	
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -412,55 +436,15 @@ class SlotMgr {
 		 * We store all data in string format, but based on the slot's type, we first need
 		 * to check whether the value is appropriate.
 		 */
-		String stringToSet = null;
-		
-		/* setting a null value will delete the slot record */
-		if (value == null) {
-			try {
-				deleteValuePrepStmt.setInt(1, ownerType);
-				deleteValuePrepStmt.setInt(2, ownerId);
-				deleteValuePrepStmt.setInt(3, slotId);
-				db.executePrepUpdate(deleteValuePrepStmt);				
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-			}
-			return ErrorCode.OK;
-		}
-		
-		switch (details.slotType) {
-		
-		/* The input value must be an Integer (or String representing a positive int) */
-		case ISlotTypes.SLOT_TYPE_FILEGROUP:
-			
-			/* integers must be positive */
-			if (value instanceof Integer) {
-				stringToSet = value.toString();
-			} 
-			
-			/* strings must contain a positive integer */
-			else if (value instanceof String) {
-				int intVal = 0;
-				try {
-					intVal = Integer.parseInt((String) value);
-				} catch (NumberFormatException ex) {
-					return ErrorCode.BAD_VALUE;
-				}
-				stringToSet = Integer.toString(intVal);
-			}
-			break;
-		
-		/* For SLOT_TYPE_TEXT, the input must be an Integer or String. */
-		case ISlotTypes.SLOT_TYPE_TEXT:
-			stringToSet = value.toString();
-			break;
-		
-		/* all other slotTypes are BAD_VALUE */
-		default:
+		String stringToSet;
+		try {
+			stringToSet = convertObjectToString(details.slotType, value);
+		} catch (NumberFormatException ex) {
 			return ErrorCode.BAD_VALUE;
 		}
 		
 		/*
-		 * The value is now valid, so let's insert it into the database. First, try to update
+		 * The value is known valid, so let's insert it into the database. First, try to update
 		 * an existing value, but if that fails, add a new entry.
 		 */
 		try {
@@ -520,36 +504,73 @@ class SlotMgr {
 		}
 		
 		/*
-		 * We found a result, so convert it to appropriate type.
+		 * We found a result, so convert it to appropriate type (Integer, Boolean, etc).
 		 */
 		if (results.length == 1) {
-			String value = results[0];
-			
-			switch (slotDetails.slotType) {
-			
-			/* FileGroups are returned as Integer */
-			case ISlotTypes.SLOT_TYPE_FILEGROUP:
-				try {
-					return Integer.parseInt(value);
-				} catch (NumberFormatException e) {
-					return null;
-				}
-				
-			/* Text slots are returned as String */
-			case ISlotTypes.SLOT_TYPE_TEXT:
-				return value;
-				
-			default:
-				return null;
-			}
+			return convertStringToObject(slotDetails.slotType, results[0]);
 		}
 		
 		/*
 		 * If there's no value set, use the default value for slotId.
 		 */
-		return slotDetails.defaultValue;
+		else {
+			return slotDetails.defaultValue;
+		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+
+	/**
+	 * Determine whether the specified slot currently holds a value.
+	 * @param ownerType Either SLOT_OWNER_ACTION or SLOT_OWNER_PACKAGE
+	 * @param ownerId	The action or package instance that the slot is attached to.
+	 * @param slotId	The slot that's connected to the action or package instance.
+	 * @return True if there's an explicit (non-default) value in this slot, else false.
+	 *		   Also return false if memberId/slotId are invalid.
+	 */
+	public boolean isSlotSet(int ownerType, int ownerId, int slotId) {
+		
+		boolean result;
+		try {
+			findValuePrepStmt.setInt(1, ownerType);
+			findValuePrepStmt.setInt(2, ownerId);
+			findValuePrepStmt.setInt(3, slotId);
+			ResultSet rs = db.executePrepSelectResultSet(findValuePrepStmt);
+			result = rs.next();
+			rs.close();
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return result;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Remove the value (if any) that has been inserted into this slot, therefore setting
+	 * this slot to its default value. If ownerId or slotId is invalid, silently do nothing.
+	 * @param ownerType Either SLOT_OWNER_ACTION or SLOT_OWNER_PACKAGE
+	 * @param ownerId	The action or package instance that the slot is attached to.
+	 * @param slotId	The slot that's connected to the action or package instance.
+	 */
+	public void clearSlotValue(int ownerType, int ownerId, int slotId) {
+
+		/*
+		 * Simply delete the record from the database, if it exists. If inputs to
+		 * this method are invalid, this query has no effect.
+		 */
+		try {
+			deleteValuePrepStmt.setInt(1, ownerType);
+			deleteValuePrepStmt.setInt(2, ownerId);
+			deleteValuePrepStmt.setInt(3, slotId);
+			db.executePrepUpdate(deleteValuePrepStmt);				
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}		
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -593,6 +614,155 @@ class SlotMgr {
 			}
 		}
 		return true;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Given a string representation of a value, as stored in the database, convert it to
+	 * the appropriate Java type.
+	 * @param slotType 		 Type of the slot (SLOT_TYPE_INTEGER, etc).
+	 * @param stringValue    The slot value, as a String.
+	 * @return The Java Object reflecting the slot value (e.g. String, Integer, Boolean, etc).
+	 */
+	private Object convertStringToObject(int slotType, String stringValue) {
+
+		/* null values don't have a type */
+		if (stringValue == null) {
+			return null;
+		}
+		
+		/*
+		 * For each slot type, convert from the normalize String value into an appropriate return type.
+		 */
+		switch (slotType) {
+		case ISlotTypes.SLOT_TYPE_FILEGROUP:
+			return Integer.valueOf(stringValue);
+			
+		case ISlotTypes.SLOT_TYPE_BOOLEAN:
+			if (stringValue.equals("true")) {
+				return Boolean.TRUE;
+			} else {
+				return Boolean.FALSE;
+			}
+			
+		case ISlotTypes.SLOT_TYPE_INTEGER:
+			return Integer.valueOf(stringValue);
+		
+		case ISlotTypes.SLOT_TYPE_TEXT:
+			return stringValue;
+		
+		default:
+			return null;
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Given a slot value, as passed by the caller, convert it into a String value that can
+	 * be stored in the database. The format/interpretation of this string will depend on
+	 * the slot's type.
+	 * @param slotType	SLOT_TYPE_FILEGROUP, etc.
+	 * @param value		The value (Integer, Boolean, String, etc) to be converted to a String.
+	 * @return			The value in its String format.
+	 * @throws NumberFormatException If the input value is off a non-convertible type.
+	 */
+	private String convertObjectToString(int slotType, Object value) {
+	
+		if (value == null) {
+			return null;
+		}
+		
+		switch (slotType) {
+		
+		/* SLOT_TYPE_FILEGROUP must have value Integer */
+		case ISlotTypes.SLOT_TYPE_FILEGROUP:
+			
+			/* integers must be positive */
+			if (value instanceof Integer) {
+				return value.toString();
+			} 
+						
+			/* other object types are illegal */
+			else {
+				throw new NumberFormatException("Illegal value type for SLOT_TYPE_FILEGROUP: " + value.getClass());
+			}
+			
+		/* For SLOT_TYPE_INTEGER, the input must be a String or Integer. */
+		case ISlotTypes.SLOT_TYPE_INTEGER:
+
+			/* integers easily convert to String */
+			if (value instanceof Integer) {
+				return value.toString();
+			} 
+			
+			/* strings must contain a valid integer */
+			else if (value instanceof String) {
+				int intVal = 0;
+				try {
+					intVal = Integer.parseInt((String) value);
+				} catch (NumberFormatException ex) {
+					throw new NumberFormatException("Illegal format for SLOT_TYPE_INTEGER: " + value);
+				}
+				return Integer.toString(intVal);
+			} 
+			
+			/* other object types are illegal */
+			else {
+				throw new NumberFormatException("Illegal value type for SLOT_TYPE_INTEGER: " + value.getClass());
+			}
+			
+		/* For SLOT_TYPE_TEXT, the input must be a String. */
+		case ISlotTypes.SLOT_TYPE_TEXT:
+			if (value instanceof String) {
+				return (String)value;
+			}
+
+			/* other object types are illegal */
+			else {
+				throw new NumberFormatException("Illegal value type for SLOT_TYPE_TEXT: " + value.getClass());
+			}
+			
+		case ISlotTypes.SLOT_TYPE_BOOLEAN:
+			
+			/* Boolean values easily convert to String */
+			if (value instanceof Boolean) {
+				return value.toString();
+			}
+			
+			/* Integer value: 0 is false, all other values are true */
+			else if (value instanceof Integer) {
+				if (((Integer)value).intValue() == 0) {
+					return "false";
+				} else {
+					return "true";
+				}
+			}
+			
+			/* String value: many legal English words for true/false */
+			else if (value instanceof String) {
+				String str = (String)value;
+				if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("yes") || str.equalsIgnoreCase("on")) {
+					return "true";
+				}
+				else if (str.equalsIgnoreCase("false") || str.equalsIgnoreCase("no") || str.equalsIgnoreCase("off")) {
+					return "false";
+				}
+				else {
+					throw new NumberFormatException("Illegal String value for SLOT_TYPE_BOOLEAN: " + str);
+				}
+			}
+			
+			/* other object types are illegal */
+			else {
+				throw new NumberFormatException("Illegal value type for SLOT_TYPE_TEXT: " + value.getClass());
+			}
+		
+		/* all other slotTypes are illegal */
+		default:
+			throw new NumberFormatException("Invalid slotType: " + slotType);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

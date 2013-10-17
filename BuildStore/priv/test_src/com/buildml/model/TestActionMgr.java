@@ -848,13 +848,13 @@ public class TestActionMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, "My command"));
 		assertEquals("My command", actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
 		
-		/* Assign a numeric string to "Output5" - should be returned as Integer */
+		/* Assign a number to "Output5" - should be returned as Integer */
 		assertEquals(Integer.valueOf(123), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, "456"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, 456));
 		assertEquals(Integer.valueOf(456), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
 		
-		/* Assign an integer to "Command" - should be returned as String */
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, 1313));
+		/* Assign a String to "Command" - should be returned as String */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, "1313"));
 		assertEquals("1313", actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
 
 		/* Assign a non-numeric string to "Input" - should fail */

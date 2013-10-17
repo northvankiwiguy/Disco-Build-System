@@ -592,13 +592,13 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#removeSlot(int, int)
+	 * @see com.buildml.model.IPackageMgr#removeSlot(int)
 	 */
 	@Override
-	public int removeSlot(int pkgId, int slotId) {
+	public int removeSlot(int slotId) {
 		
 		/* all work can be delegated */
-		return slotMgr.removeSlot(SlotMgr.SLOT_OWNER_PACKAGE, pkgId, slotId);
+		return slotMgr.removeSlot(slotId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
