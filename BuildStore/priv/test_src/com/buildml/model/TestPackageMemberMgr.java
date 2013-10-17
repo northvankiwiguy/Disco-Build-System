@@ -366,6 +366,22 @@ public class TestPackageMemberMgr {
 		actionMgr.setSlotValue(a3, output1Slot.slotId, fg6);
 		actionMgr.setSlotValue(a4, output1Slot.slotId, fg7);
 		
+		/* set some (x, y) locations, but only for fg1, a1 and fg2 */
+		pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, a1, 100, 101);
+		pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fg1, 200, 201);
+		pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fg2, 300, 301);
+		
+		/* 
+		 * Add an additional Integer slots, to make sure they're not queried as if they
+		 * were SLOT_POS_INPUT or SLOT_POS_OUTPUT.
+		 */
+		int parmSlot1Id = actionTypeMgr.newSlot(actionTypeId, "Int1", ISlotTypes.SLOT_TYPE_INTEGER, 
+								ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int parmSlot2Id = actionTypeMgr.newSlot(actionTypeId, "Int2", ISlotTypes.SLOT_TYPE_INTEGER, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		actionMgr.setSlotValue(a1, parmSlot1Id, fg1);
+		actionMgr.setSlotValue(a2, parmSlot2Id, fg2);
+		
 		/* test with bad parameters - should return null */
 		assertNull(pkgMemberMgr.getNeighboursOf(1000, a1, IPackageMemberMgr.NEIGHBOUR_ANY));
 		assertNull(pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, 1000, IPackageMemberMgr.NEIGHBOUR_ANY));
@@ -380,7 +396,9 @@ public class TestPackageMemberMgr {
 		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a1);
 		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg1, IPackageMemberMgr.NEIGHBOUR_ANY);
 		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a1);
-			
+		assertEquals(100, results[0].x);
+		assertEquals(101, results[0].y);
+		
 		/* test fg2 neighbours */
 		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_FILE_GROUP, fg2, IPackageMemberMgr.NEIGHBOUR_LEFT);
 		expectOne(results, IPackageMemberMgr.TYPE_ACTION, a1);
@@ -432,8 +450,12 @@ public class TestPackageMemberMgr {
 		/* test a1 neighbours */
 		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, IPackageMemberMgr.NEIGHBOUR_LEFT);
 		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg1);
+		assertEquals(200, results[0].x);
+		assertEquals(201, results[0].y);
 		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, IPackageMemberMgr.NEIGHBOUR_RIGHT);
 		expectOne(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg2);
+		assertEquals(300, results[0].x);
+		assertEquals(301, results[0].y);
 		results = pkgMemberMgr.getNeighboursOf(IPackageMemberMgr.TYPE_ACTION, a1, IPackageMemberMgr.NEIGHBOUR_ANY);
 		expectTwo(results, IPackageMemberMgr.TYPE_FILE_GROUP, fg1, fg2);
 		

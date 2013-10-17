@@ -87,9 +87,7 @@ import com.buildml.utils.errors.ErrorCode;
 		findLocationPrepStmt = null,
 		updateLocationPrepStmt = null,
 		findActionNeighbourPrepStmt = null,
-		findActionNeighbourInDirectionPrepStmt = null,
-		findFileGroupNeighbourPrepStmt = null,
-		findFileGroupNeighbourInDirectionPrepStmt = null;
+		findFileGroupNeighbourPrepStmt = null;
 	
 	/** The event listeners who are registered to learn about package membership changes */
 	List<IPackageMemberMgrListener> listeners = new ArrayList<IPackageMemberMgrListener>();
@@ -140,18 +138,21 @@ import com.buildml.utils.errors.ErrorCode;
 		updateLocationPrepStmt = db.prepareStatement(
 				"update packageMembers set x = ?, y = ? where memberType = ? and memberId = ?");
 		findActionNeighbourPrepStmt = db.prepareStatement(
-				"select value from slotValues where ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " and ownerId = ?");
-		findActionNeighbourInDirectionPrepStmt = db.prepareStatement(
-				"select value from slotValues where ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " and ownerId = ?");
-		findActionNeighbourInDirectionPrepStmt = db.prepareStatement(
-				"select value from slotValues, slotTypes where slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + 
-				" and slotValues.ownerId = ? and slotValues.slotId = slotTypes.slotId and slotTypes.slotPos = ?");
+				"select value, x, y from slotValues, slotTypes, packageMembers where " +
+						"slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " " + 
+						"and slotValues.ownerId = ? " +
+						"and slotValues.slotId = slotTypes.slotId " +
+						"and (slotTypes.slotPos = ? or slotTypes.slotPos = ?) " +
+						"and packageMembers.memberType = " + IPackageMemberMgr.TYPE_FILE_GROUP + " " +
+						"and packageMembers.memberId = value");
 		findFileGroupNeighbourPrepStmt = db.prepareStatement(
-				"select ownerId from slotValues where ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " and value = ?");
-		findFileGroupNeighbourInDirectionPrepStmt = db.prepareStatement(
-				"select slotValues.ownerId from slotValues, slotTypes where slotValues.ownerType = " + 
-						SlotMgr.SLOT_OWNER_ACTION + " and slotValues.value = ? and slotValues.slotId = slotTypes.slotId " +
-						"and slotTypes.slotPos = ?");
+				"select slotValues.ownerId, x, y from slotValues, slotTypes, packageMembers where " +
+						"slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " " +
+						"and slotValues.value = ? " +
+						"and slotValues.slotId = slotTypes.slotId " +
+						"and (slotTypes.slotPos = ? or slotTypes.slotPos = ?) " +
+						"and packageMembers.memberType = " + IPackageMemberMgr.TYPE_ACTION + " " +
+						"and packageMembers.memberId = slotValues.ownerId");
 	}
 
 	/*=====================================================================================*
@@ -501,22 +502,25 @@ import com.buildml.utils.errors.ErrorCode;
 				 * Depending on whether direction is relevant (NEIGHBOUR_ANY versus LEFT or RIGHT),
 				 * we need to select an appropriate query.
 				 */
-				PreparedStatement stmt;
+				findActionNeighbourPrepStmt.setInt(1, memberId);
 				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
-					stmt = findActionNeighbourPrepStmt;
+					findActionNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
+					findActionNeighbourPrepStmt.setInt(3, ISlotTypes.SLOT_POS_OUTPUT);
 				} else {
-					stmt = findActionNeighbourInDirectionPrepStmt;
-					stmt.setInt(2, (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
-										ISlotTypes.SLOT_POS_INPUT : ISlotTypes.SLOT_POS_OUTPUT);
+					int slotType = (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
+										ISlotTypes.SLOT_POS_INPUT : ISlotTypes.SLOT_POS_OUTPUT;
+					findActionNeighbourPrepStmt.setInt(2, slotType);
+					findActionNeighbourPrepStmt.setInt(3, slotType);
 				}
-				stmt.setInt(1, memberId);
-				ResultSet rs = db.executePrepSelectResultSet(stmt);
+				ResultSet rs = db.executePrepSelectResultSet(findActionNeighbourPrepStmt);
 				
 				/* collect all the results into a single ArrayList */
 				while (rs.next()) {
 					MemberDesc member = new MemberDesc();
 					member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
 					member.memberId = Integer.valueOf(rs.getString(1));
+					member.x = rs.getInt(2);
+					member.y = rs.getInt(3);
 					neighbours.add(member);
 				}
 				rs.close();
@@ -541,21 +545,24 @@ import com.buildml.utils.errors.ErrorCode;
 			 * If necessary, also look at the direction (input versus output) of the slot.
 			 */
 			try {
-				PreparedStatement stmt;
+				findFileGroupNeighbourPrepStmt.setInt(1, memberId);
 				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
-					stmt = findFileGroupNeighbourPrepStmt;
+					findFileGroupNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
+					findFileGroupNeighbourPrepStmt.setInt(3, ISlotTypes.SLOT_POS_OUTPUT);
 				} else {
-					stmt = findFileGroupNeighbourInDirectionPrepStmt;
-					stmt.setInt(2, (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
-									ISlotTypes.SLOT_POS_OUTPUT : ISlotTypes.SLOT_POS_INPUT);
+					int slotType = (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
+									ISlotTypes.SLOT_POS_OUTPUT : ISlotTypes.SLOT_POS_INPUT;
+					findFileGroupNeighbourPrepStmt.setInt(2, slotType);
+					findFileGroupNeighbourPrepStmt.setInt(3, slotType);
 				}
-				stmt.setInt(1, memberId);
-				ResultSet rs = db.executePrepSelectResultSet(stmt);
+				ResultSet rs = db.executePrepSelectResultSet(findFileGroupNeighbourPrepStmt);
 				
 				while (rs.next()) {
 					MemberDesc member = new MemberDesc();
 					member.memberType = IPackageMemberMgr.TYPE_ACTION;
 					member.memberId = Integer.valueOf(rs.getString(1));
+					member.x = rs.getInt(2);
+					member.y = rs.getInt(3);
 					neighbours.add(member);
 				}
 				rs.close();
