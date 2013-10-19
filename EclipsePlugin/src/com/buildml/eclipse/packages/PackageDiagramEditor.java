@@ -27,6 +27,7 @@ import org.eclipse.ui.PartInitException;
 
 import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
+import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
@@ -76,6 +77,9 @@ public class PackageDiagramEditor extends DiagramEditor
 
 	/** The delegate object that Graphiti queries to see if our underlying model has changed */
 	private PackageEditorUpdateBehavior updateBehavior;
+	
+	/** The layout algorithm for determining the location of members on the package */
+	private LayoutAlgorithm layoutAlgorithm;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -98,6 +102,9 @@ public class PackageDiagramEditor extends DiagramEditor
 		this.actionMgr = buildStore.getActionMgr();
 		this.packageId = packageId;
 		
+		/* we use a layout algorithm to help determine the location of things */
+		layoutAlgorithm = new LayoutAlgorithm(buildStore);
+		
 		/* listen for changes to the packages and actions */
 		pkgMgr.addListener(this);
 		pkgMemberMgr.addListener(this);
@@ -119,6 +126,15 @@ public class PackageDiagramEditor extends DiagramEditor
 
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * @return This package diagram editor's layout algorithm.
+	 */
+	public LayoutAlgorithm getLayoutAlgorithm() {
+		return layoutAlgorithm;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 	/* (non-Javadoc)
 	 * @see com.buildml.eclipse.ISubEditor#setOption(int, boolean)
 	 */

@@ -26,8 +26,6 @@ import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
-import org.eclipse.graphiti.mm.algorithms.styles.Point;
-import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
@@ -49,6 +47,9 @@ import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
+import com.buildml.eclipse.packages.layout.LeftRightBounds;
+import com.buildml.eclipse.packages.layout.PictogramSize;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IActionMgr;
@@ -100,6 +101,11 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * operation has completed).
 	 */
 	private ArrayList<Integer> currentMembers = null;
+	
+	/**
+	 * The layout algorithm we use for positioning pictograms.
+	 */
+	private LayoutAlgorithm layoutAlgorithm = null;
 	
 	/*
 	 * Various colour constants used in displaying this element.
@@ -155,6 +161,25 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			OFF_X + FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT 
 	};
 	
+	/** The (static) maximum size of a file group pictogram, in pixels */
+	private static PictogramSize FILE_GROUP_MAX_SIZE = 
+			new PictogramSize(2 * FILE_GROUP_WIDTH, 
+							  FILE_GROUP_HEIGHT + FILE_GROUP_OVERLAP +
+							  ((MAX_LABELS_TO_SHOW + 1) * (LABEL_FONT_SIZE + LABEL_FONT_GAP)));
+	
+	/*=====================================================================================*
+	 * STATIC METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * Return the (width, height) in pixel of the file group pictogram. This is used
+	 * for laying-out the package members.
+	 * @return The (width, height) in pixels.
+	 */
+	public static PictogramSize getSize() {
+		return FILE_GROUP_MAX_SIZE;
+	}
+		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -421,17 +446,34 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		Object sourceBo = GraphitiUtils.getBusinessObject(context.getShape());
 		if (!(sourceBo instanceof UIFileGroup)) {
 			return false;
-		}		
+		}
+		int fileGroupId = ((UIFileGroup)sourceBo).getId();
 		
 		/* 
 		 * Validate where the UIFileGroup is moving to. We can't move UIFileGroups 
-		 * off the left/top of the window.
+		 * off the left/top of the window, and they can't be moved left of their
+		 * left neighbours, or right of their right neighbours.
 		 */
 		Object targetContainer = context.getTargetContainer();
 		int x = context.getX();
 		int y = context.getY();
-		if ((targetContainer instanceof Diagram) && ((x < 0) || (y < 0))) {
-			return false;
+		if (targetContainer instanceof Diagram) {
+			
+			/* we can never move off the top of the canvas (Y-axis) */
+			if (y < 0) {
+				return false;
+			}
+			/* 
+			 * Determine the acceptable X-axis movement bounds for the object we're moving. This involves
+			 * a database query, which will happen roughly 10-20 times for an average mouse drag.
+			 */
+			if (layoutAlgorithm == null) {
+				layoutAlgorithm = ((PackageDiagramEditor)getDiagramEditor()).getLayoutAlgorithm();
+			}
+			LeftRightBounds bounds = layoutAlgorithm.getMemberMovementBounds(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
+			if ((x < bounds.leftBound) || (x > bounds.rightBound)) {
+				return false;
+			}
 		}
 		
 		/* check that we've moved a single UIFileGroup object */

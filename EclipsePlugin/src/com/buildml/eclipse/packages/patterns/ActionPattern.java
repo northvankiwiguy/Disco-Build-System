@@ -40,6 +40,10 @@ import org.eclipse.graphiti.util.IColorConstant;
 import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
+import com.buildml.eclipse.packages.layout.LeftRightBounds;
+import com.buildml.eclipse.packages.layout.PictogramSize;
+import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
@@ -67,6 +71,11 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	private IActionMgr actionMgr;
 	private IActionTypeMgr actionTypeMgr;
 	private IPackageMemberMgr pkgMemberMgr;
+	
+	/**
+	 * The layout algorithm we use for positioning pictograms.
+	 */
+	private LayoutAlgorithm layoutAlgorithm = null;
 
 	/*
 	 * Various colour constants used in displaying this element.
@@ -80,7 +89,24 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 */
 	private static final int ACTION_WIDTH = 150;
 	private static final int ACTION_HEIGHT = 50;
-
+	
+	/** The (static) maximum size of an action's pictogram, in pixels */
+	private static PictogramSize ACTION_MAX_SIZE = 
+			new PictogramSize(ACTION_WIDTH, ACTION_HEIGHT);
+	
+	/*=====================================================================================*
+	 * STATIC METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * Return the (width, height) in pixel of the file group pictogram. This is used
+	 * for laying-out the package members.
+	 * @return The (width, height) in pixels.
+	 */
+	public static PictogramSize getSize() {
+		return ACTION_MAX_SIZE;
+	}
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -327,14 +353,37 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	@Override
 	public boolean canMoveShape(IMoveShapeContext context) {
 		
+		/* what object is being moved? It must be a UIAction */
+		Object sourceBo = GraphitiUtils.getBusinessObject(context.getShape());
+		if (!(sourceBo instanceof UIAction)) {
+			return false;
+		}
+		int actionId = ((UIAction)sourceBo).getId();
+		
 		/* 
 		 * Validate where the UIAction is moving to. We can't move UIActions 
 		 * off the left/top of the window.
 		 */
+		Object targetContainer = context.getTargetContainer();
 		int x = context.getX();
 		int y = context.getY();		
-		if ((x < 0) || (y < 0)) {
-			return false;
+		if (targetContainer instanceof Diagram) {
+
+			/* we can never move off the top of the canvas (Y-axis) */
+			if (y < 0) {
+				return false;
+			}
+			/* 
+			 * Determine the acceptable X-axis movement bounds for the object we're moving. This involves
+			 * a database query, which will happen roughly 10-20 times for an average mouse drag.
+			 */
+			if (layoutAlgorithm == null) {
+				layoutAlgorithm = ((PackageDiagramEditor)getDiagramEditor()).getLayoutAlgorithm();
+			}
+			LeftRightBounds bounds = layoutAlgorithm.getMemberMovementBounds(IPackageMemberMgr.TYPE_ACTION, actionId);
+			if ((x < bounds.leftBound) || (x > bounds.rightBound)) {
+				return false;
+			}
 		}
 		
 		/* check that we've moved a single UIAction object */
