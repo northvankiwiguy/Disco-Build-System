@@ -362,28 +362,31 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		
 		/* 
 		 * Validate where the UIAction is moving to. We can't move UIActions 
-		 * off the left/top of the window.
+		 * off the left/top of the window, and they must be moved within the
+		 * Diagram (not onto other members).
 		 */
 		Object targetContainer = context.getTargetContainer();
+		if (!(targetContainer instanceof Diagram)) {
+			return false;
+		}
 		int x = context.getX();
 		int y = context.getY();		
-		if (targetContainer instanceof Diagram) {
 
-			/* we can never move off the top of the canvas (Y-axis) */
-			if (y < 0) {
-				return false;
-			}
-			/* 
-			 * Determine the acceptable X-axis movement bounds for the object we're moving. This involves
-			 * a database query, which will happen roughly 10-20 times for an average mouse drag.
-			 */
-			if (layoutAlgorithm == null) {
-				layoutAlgorithm = ((PackageDiagramEditor)getDiagramEditor()).getLayoutAlgorithm();
-			}
-			LeftRightBounds bounds = layoutAlgorithm.getMemberMovementBounds(IPackageMemberMgr.TYPE_ACTION, actionId);
-			if ((x < bounds.leftBound) || (x > bounds.rightBound)) {
-				return false;
-			}
+		/* we can never move off the top of the canvas (Y-axis) */
+		if (y < 0) {
+			return false;
+		}
+		
+		/*
+		 * Determine the acceptable X-axis movement bounds for the object we're moving. This involves
+		 * a database query, which will happen roughly 10-20 times for an average mouse drag.
+		 */
+		if (layoutAlgorithm == null) {
+			layoutAlgorithm = ((PackageDiagramEditor)getDiagramEditor()).getLayoutAlgorithm();
+		}
+		LeftRightBounds bounds = layoutAlgorithm.getMemberMovementBounds(IPackageMemberMgr.TYPE_ACTION, actionId);
+		if ((x < bounds.leftBound) || (x > bounds.rightBound)) {
+			return false;
 		}
 		
 		/* check that we've moved a single UIAction object */
