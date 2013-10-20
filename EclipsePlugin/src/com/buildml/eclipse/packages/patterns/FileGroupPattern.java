@@ -549,7 +549,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 				 * to ask the user which slot, then proceed to set it.
 				 */
 				int actionId = ((UIAction)targetBo).getId();
-				SlotSelectionDialog dialog = new SlotSelectionDialog(buildStore, actionId);
+				SlotSelectionDialog dialog = new SlotSelectionDialog(buildStore, actionId, true, true);
 				int status = dialog.open();
 				if (status == SlotSelectionDialog.OK) {
 					int slotId = dialog.getSlotId();
