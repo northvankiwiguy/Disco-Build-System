@@ -105,6 +105,9 @@ public class TestFileMgrRoots {
 	@Test
 	public void testGetPathName() {
 				
+		int mainPkgId = pkgMgr.getMainPackage();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/")));
+		
 		int path1 = fileMgr.addFile("/a/b/c/d/e.h");
 		int path2 = fileMgr.addFile("/a/b/c/d/f.h");
 		int path3 = fileMgr.addFile("/g/h/i.h");
@@ -115,7 +118,10 @@ public class TestFileMgrRoots {
 		/* now again, with the top level root */
 		assertEquals("@root/a/b/c/d/e.h", fileMgr.getPathName(path1, true));
 		
-		/* set the workspace root to /a/b */
+		/* set the workspace root to /a/b, but only after Main_src and Main_gen have moved below /a/b/ */
+		int newMainRootId = fileMgr.getPath("/a/b/c");
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.SOURCE_ROOT, newMainRootId));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.GENERATED_ROOT, newMainRootId));
 		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/a/b")));
 		
 		/* test again, but this time we should see @workspace, not @root */

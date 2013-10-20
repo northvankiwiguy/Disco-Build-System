@@ -348,20 +348,24 @@ Show all files, with roots displayed
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Set the @workspace root appropriately
-Workspace root set to /home/psmith/t/cvs-1.11.23.
+Workspace root set to /.
 
 Add a new package zlib, show the list of roots
 New package zlib added.
+Main_gen /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
+Main_src /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
 root /
-workspace /home/psmith/t/cvs-1.11.23
-zlib_gen /home/psmith/t/cvs-1.11.23
-zlib_src /home/psmith/t/cvs-1.11.23
+workspace /
+zlib_gen /
+zlib_src /
 
 Set the zlib_src root
 Package root: zlib_src set to /home/psmith/t/cvs-1.11.23/zlib.
+Main_gen /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
+Main_src /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
 root /
-workspace /home/psmith/t/cvs-1.11.23
-zlib_gen /home/psmith/t/cvs-1.11.23
+workspace /
+zlib_gen /
 zlib_src /home/psmith/t/cvs-1.11.23/zlib
 
 Show just zlib_src root by itself
@@ -373,11 +377,11 @@ Error: Root name not found - bad_root.
 Status is 1
 
 Show only the files within zlib_src
-/ (@root)
+/ (@root @workspace @zlib_gen)
 /home
 /home/psmith
 /home/psmith/t
-/home/psmith/t/cvs-1.11.23 (@workspace @zlib_gen)
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/zlib (@zlib_src)
 /home/psmith/t/cvs-1.11.23/zlib/adler32.c
 /home/psmith/t/cvs-1.11.23/zlib/adler32.o
@@ -421,11 +425,11 @@ Show only the files within zlib_src
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
 
 Show only the files within zlib_gen
-/ (@root)
+/ (@root @workspace @zlib_gen)
 /home
 /home/psmith
 /home/psmith/t
-/home/psmith/t/cvs-1.11.23 (@workspace @zlib_gen)
+/home/psmith/t/cvs-1.11.23
 /home/psmith/t/cvs-1.11.23/config.h
 /home/psmith/t/cvs-1.11.23/contrib
 /home/psmith/t/cvs-1.11.23/contrib/cvs2vendor
@@ -770,23 +774,35 @@ Show only the files within zlib_gen
 /home/psmith/t/cvs-1.11.23/zlib/zutil.c
 /home/psmith/t/cvs-1.11.23/zlib/zutil.h
 /home/psmith/t/cvs-1.11.23/zlib/zutil.o
+/home/psmith/work
+/home/psmith/work/Disco-Build-System
+/home/psmith/work/Disco-Build-System/SystemTests
+/home/psmith/work/Disco-Build-System/SystemTests/test-output
+/home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno
+/home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots (@Main_gen @Main_src)
 
 Remove the zlib package, show the list
 Package zlib removed.
+Main_gen /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
+Main_src /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
 root /
-workspace /home/psmith/t/cvs-1.11.23
+workspace /
 
 Add the zlib back again, show the list
 New package zlib added.
+Main_gen /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
+Main_src /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
 root /
-workspace /home/psmith/t/cvs-1.11.23
-zlib_gen /home/psmith/t/cvs-1.11.23
-zlib_src /home/psmith/t/cvs-1.11.23
+workspace /
+zlib_gen /
+zlib_src /
 
 Rename the zlib package to compress
 Package root: zlib_src set to /home/psmith/t/cvs-1.11.23/zlib.
 Package zlib renamed to compress.
-compress_gen /home/psmith/t/cvs-1.11.23
+Main_gen /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
+Main_src /home/psmith/work/Disco-Build-System/SystemTests/test-output/suite-scan-ea-anno/test-roots
+compress_gen /
 compress_src /home/psmith/t/cvs-1.11.23/zlib
 root /
-workspace /home/psmith/t/cvs-1.11.23
+workspace /

@@ -39,6 +39,11 @@ public interface IPackageMgr {
 	 * newly imported files. 
 	 */
 	public abstract int getImportPackage();
+	
+	/**
+	 * @return The ID of the "Main" package. This is the top level package diagram.
+	 */
+	public abstract int getMainPackage();
 
 	/**
 	 * Add a new package to the BuildStore. By default, packages are added immediately

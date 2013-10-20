@@ -108,6 +108,10 @@ public class TestPackageMgr {
 		/* try to add the <import> package, which exists by default */
 		int cImport = pkgMgr.addPackage("<import>");
 		assertEquals(ErrorCode.ALREADY_USED, cImport);
+
+		/* try to add the Main package, which exists by default */
+		int cMain = pkgMgr.addPackage("<import>");
+		assertEquals(ErrorCode.ALREADY_USED, cMain);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -250,6 +254,7 @@ public class TestPackageMgr {
 		/* try to remove the root folder or import package - should fail */
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgMgr.getRootFolder()));
 		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgMgr.getImportPackage()));
+		assertEquals(ErrorCode.CANT_REMOVE, pkgMgr.remove(pkgMgr.getId("Main")));
 
 		/* add package names, then remove them */
 		int pkgAId = pkgMgr.addPackage("PkgA"); 
@@ -309,33 +314,33 @@ public class TestPackageMgr {
 		
 		/* fetch the list of packages, before adding any. */
 		String results[] = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"<import>"}, results);
+		assertArrayEquals(new String[] {"<import>", "Main"}, results);
 		
 		/* add some packages, then check the list */
 		pkgMgr.addPackage("my_pkg1");
 		pkgMgr.addPackage("my_pkg2");
 		pkgMgr.addFolder("ignored");
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"<import>", "my_pkg1", "my_pkg2"}, results);		
+		assertArrayEquals(new String[] {"<import>", "Main", "my_pkg1", "my_pkg2"}, results);		
 		
 		/* add some more, then check again */
 		int linuxId = pkgMgr.addPackage("Linux");
 		int freebsdId = pkgMgr.addPackage("freeBSD");
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"<import>", "freeBSD", "Linux", "my_pkg1", 
+		assertArrayEquals(new String[] {"<import>", "freeBSD", "Linux", "Main", "my_pkg1", 
 				"my_pkg2"}, results);		
 		
 		/* remove some packages, then check the list again */
 		pkgMgr.remove(linuxId);
 		pkgMgr.remove(freebsdId);
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"<import>", "my_pkg1", "my_pkg2" }, results);		
+		assertArrayEquals(new String[] {"<import>", "Main", "my_pkg1", "my_pkg2" }, results);		
 		
 		/* add some names back, and re-check the list */
 		pkgMgr.addPackage("Linux");
 		pkgMgr.addPackage("MacOS");
 		results = pkgMgr.getPackages();
-		assertArrayEquals(new String[] {"<import>", "Linux", "MacOS", "my_pkg1", "my_pkg2"}, 
+		assertArrayEquals(new String[] {"<import>", "Linux", "MacOS", "Main", "my_pkg1", "my_pkg2"}, 
 				results);
 	}
 
@@ -351,6 +356,7 @@ public class TestPackageMgr {
 		/* add some packages are folders - add them in non-alphabetical order */
 		int fRoot = pkgMgr.getRootFolder();
 		int pImport = pkgMgr.getImportPackage();
+		int pMain = pkgMgr.getId("Main");
 		int p1 = pkgMgr.addPackage("Package_1");
 		int p3 = pkgMgr.addPackage("Package_3");
 		int p2 = pkgMgr.addPackage("Package_2");
@@ -368,7 +374,7 @@ public class TestPackageMgr {
 		assertEquals(fRoot, pkgMgr.getParent(f1));
 		assertEquals(fRoot, pkgMgr.getParent(f2));
 		assertEquals(fRoot, pkgMgr.getParent(f3));
-		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, p1, p2, p3 },
+		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, pMain, p1, p2, p3 },
 						  pkgMgr.getFolderChildren(fRoot));
 		assertEquals(0, pkgMgr.getFolderChildren(f1).length);
 		assertEquals(0, pkgMgr.getFolderChildren(f2).length);
@@ -383,14 +389,14 @@ public class TestPackageMgr {
 
 		/* Move package p1 underneath sub-folder f1 and verify structure */
 		assertEquals(ErrorCode.OK, pkgMgr.setParent(p1, f1));
-		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, p2, p3 },
+		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, pMain, p2, p3 },
 				  pkgMgr.getFolderChildren(fRoot));
 		assertArrayEquals(new Integer[] { p1 },
 				  pkgMgr.getFolderChildren(f1));
 		
 		/* Move the package to another sub-folder, then re-verify */
 		assertEquals(ErrorCode.OK, pkgMgr.setParent(p1, f2));
-		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, p2, p3 },
+		assertArrayEquals(new Integer[] { f1, f2, f3, pImport, pMain, p2, p3 },
 				  pkgMgr.getFolderChildren(fRoot));
 		assertArrayEquals(new Integer[] { },
 				  pkgMgr.getFolderChildren(f1));
@@ -399,14 +405,17 @@ public class TestPackageMgr {
 		
 		/* Move a folder underneath a sub-folder and verify structure */
 		assertEquals(ErrorCode.OK, pkgMgr.setParent(f3, f2));
-		assertArrayEquals(new Integer[] { f1, f2, pImport, p2, p3 },
+		assertArrayEquals(new Integer[] { f1, f2, pImport, pMain, p2, p3 },
 				  pkgMgr.getFolderChildren(fRoot));
 		assertArrayEquals(new Integer[] { f3, p1 },
 				  pkgMgr.getFolderChildren(f2));
 		
 		/* Try to move the <import> package to a sub-folder - fails */
 		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(pImport, f2));
-		
+
+		/* Try to move the Main package to a sub-folder - fails */
+		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(pkgMgr.getId("Main"), f2));
+
 		/* Try to move the root folder - fails */
 		assertEquals(ErrorCode.BAD_PATH, pkgMgr.setParent(fRoot, f2));
 

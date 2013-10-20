@@ -310,6 +310,9 @@ public class MainEditor extends MultiPageEditorPart
 		ActionsEditor editor2 = new ActionsEditor(buildStore, "Actions");
 		editor2.setRemovable(false);
 		newPage(editor2);
+		
+		/* open the "Main" package */
+		openPackageDiagram(pkgMgr.getId("Main"));
 
 		/* update the editor title with the name of the input file */
 		setPartName(editorInput.getName());

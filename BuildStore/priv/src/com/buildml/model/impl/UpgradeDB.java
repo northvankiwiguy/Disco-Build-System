@@ -172,6 +172,11 @@ public class UpgradeDB {
 						"ownerId integer, slotName text, slotType integer, slotPos integer, " +
 						"slotCard integer, defaultValue text, enumId integer)");
 			}
+			
+			/* update to 404 */
+			if (dbVersion < 404) {
+				/* note: create of the "Main" package is done within BuildStore */
+			}
 
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);

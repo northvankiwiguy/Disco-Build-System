@@ -5,6 +5,9 @@
 #
 
 echo "Set the workspace root appropriately"
+bmladmin set-workspace-root /
+bmladmin set-pkg-root Main_src /home/psmith/t/cvs-1.11.23
+bmladmin set-pkg-root Main_gen /home/psmith/t/cvs-1.11.23
 bmladmin set-workspace-root /home/psmith/t/cvs-1.11.23
 
 echo "Add a couple of packages"

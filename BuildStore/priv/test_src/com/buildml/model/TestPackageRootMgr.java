@@ -119,8 +119,8 @@ public class TestPackageRootMgr {
 		assertEquals("/", pkgRootMgr.getRootNative("root"));
 		assertEquals(tmpTestDir.toString(), pkgRootMgr.getRootNative("workspace"));
 
-		/* check for two roots - in alphabetical order */
-		assertArrayEquals(new String[] { "root", "workspace" }, pkgRootMgr.getRoots());
+		/* check for roots - in alphabetical order */
+		assertArrayEquals(new String[] { "Main_gen", "Main_src", "root", "workspace" }, pkgRootMgr.getRoots());
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -146,7 +146,7 @@ public class TestPackageRootMgr {
 		assertEquals(tmpTestDir.toString() + "/src", pkgRootMgr.getRootNative("workspace"));
 
 		/* check for two roots - in alphabetical order */
-		assertArrayEquals(new String[] { "root", "workspace" }, pkgRootMgr.getRoots());
+		assertArrayEquals(new String[] { "Main_gen", "Main_src", "root", "workspace" }, pkgRootMgr.getRoots());
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -258,6 +258,11 @@ public class TestPackageRootMgr {
 		/* can't trash a path that has a root attached */
 		int dir2Id = fileMgr.addDirectory("/a/b/dir2");
 		assertTrue(dir2Id >= 0);
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/")));
+		int mainPkgId = pkgMgr.getMainPackage();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.SOURCE_ROOT, dir2Id));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.GENERATED_ROOT, dir2Id));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/a/b")));
 		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dir2Id));
 		assertEquals(ErrorCode.CANT_REMOVE, fileMgr.movePathToTrash(dir2Id));
 	}
@@ -285,9 +290,9 @@ public class TestPackageRootMgr {
 		assertEquals(workspacePathId, pkgGenPathId);
 		
 		/* check that both roots show up in the list of roots */
-		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "root", "workspace"}, 
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgA_gen", "pkgA_src", "root", "workspace"}, 
 					      pkgRootMgr.getRoots());
-		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "workspace"},
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgA_gen", "pkgA_src", "workspace"},
 						  pkgRootMgr.getRootsAtPath(workspacePathId));
 	}	
 	
@@ -322,9 +327,9 @@ public class TestPackageRootMgr {
 		assertEquals(workspacePathId, pkgGenPathId);
 		
 		/* check that all roots show up in the list of roots */
-		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
 										"root", "workspace"}, pkgRootMgr.getRoots());
-		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
 										"workspace"}, pkgRootMgr.getRootsAtPath(workspacePathId));
 
 		/* create some new directories to move the roots to */
@@ -338,9 +343,9 @@ public class TestPackageRootMgr {
 										pkgAId, IPackageRootMgr.GENERATED_ROOT, objAPathId));
 
 		/* now test the roots again */
-		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgA_gen", "pkgA_src", "pkgB_gen", "pkgB_src", 
 				"root", "workspace"}, pkgRootMgr.getRoots());
-		assertArrayEquals(new String[] {"pkgB_gen", "pkgB_src", "workspace"}, 
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgB_gen", "pkgB_src", "workspace"}, 
 										pkgRootMgr.getRootsAtPath(workspacePathId));
 		assertArrayEquals(new String[] {"pkgA_gen"}, pkgRootMgr.getRootsAtPath(objAPathId));
 		assertArrayEquals(new String[] {"pkgA_src"}, pkgRootMgr.getRootsAtPath(srcAPathId));
@@ -421,14 +426,14 @@ public class TestPackageRootMgr {
 		assertEquals(workspacePathId, pkgGenPathId);
 		
 		/* check that all roots show up in the list of roots */
-		assertArrayEquals(new String[] {"pkgA_gen", "pkgA_src", "root", "workspace"}, 
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "pkgA_gen", "pkgA_src", "root", "workspace"}, 
 				                        pkgRootMgr.getRoots());
 		
 		/* remove the package */
 		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgAId));
 		
 		/* check that the roots have disappeared */
-		assertArrayEquals(new String[] {"root", "workspace"}, pkgRootMgr.getRoots());
+		assertArrayEquals(new String[] {"Main_gen", "Main_src", "root", "workspace"}, pkgRootMgr.getRoots());
 		assertEquals(ErrorCode.NOT_FOUND, pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.SOURCE_ROOT));
 		assertEquals(ErrorCode.NOT_FOUND, pkgRootMgr.getPackageRoot(pkgAId, IPackageRootMgr.GENERATED_ROOT));	
 	}
@@ -678,6 +683,12 @@ public class TestPackageRootMgr {
 		int dirAB = fileMgr.addDirectory("/a/b");
 		int dirABC = fileMgr.addDirectory("/a/b/c");
 		
+		/* first, get Main_gen and Main_src out of the way - set them both to /a/b/c */
+		int mainPkgId = pkgMgr.getMainPackage();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/")));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.GENERATED_ROOT, dirABC));
+		
 		/* set @workspace to /a/b */
 		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirAB));
 		
@@ -709,6 +720,12 @@ public class TestPackageRootMgr {
 		int dirAB = fileMgr.addDirectory("/a/b");
 		int dirABC = fileMgr.addDirectory("/a/b/c");
 		
+		/* first, get Main_gen and Main_src out of the way - set them both to /a/b/c */
+		int mainPkgId = pkgMgr.getMainPackage();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(fileMgr.getPath("/")));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.GENERATED_ROOT, dirABC));
+		
 		/* set @workspace to /a */
 		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirA));
 		
@@ -736,10 +753,17 @@ public class TestPackageRootMgr {
 	public void testMovePackageBelowFile() throws Exception {
 		getNewBuildStore(tmpTestDir);
 
+		int dirRoot = fileMgr.addDirectory("/");
 		int dirA = fileMgr.addDirectory("/a");
 		int dirAB = fileMgr.addDirectory("/a/b");
 		int dirABC = fileMgr.addDirectory("/a/b/c");
 		int fileABD = fileMgr.addFile("/a/b/d/file");
+		
+		/* get Main_gen and Main_src out of our way */
+		int mainPkgId = pkgMgr.getMainPackage();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirRoot));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.GENERATED_ROOT, dirABC));
 		
 		/* set @workspace to /a */
 		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirA));
@@ -778,9 +802,16 @@ public class TestPackageRootMgr {
 
 		getNewBuildStore(tmpTestDir);
 
+		int dirRoot = fileMgr.addDirectory("/");
 		int dirA = fileMgr.addDirectory("/a");
 		int dirABC = fileMgr.addDirectory("/a/b/c");
 		int fileABD = fileMgr.addFile("/a/b/d/file");
+		
+		/* get Main_gen and Main_src out of our way */
+		int mainPkgId = pkgMgr.getMainPackage();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirRoot));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.SOURCE_ROOT, dirABC));
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(mainPkgId, IPackageRootMgr.GENERATED_ROOT, dirABC));
 		
 		/* set @workspace to /a */
 		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(dirA));

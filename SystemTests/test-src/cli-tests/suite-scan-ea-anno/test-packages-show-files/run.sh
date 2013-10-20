@@ -9,7 +9,7 @@ bmladmin show-files -p | fgrep /home/psmith/t
 
 echo
 echo "Add a package to the zlib files, and show all files again"
-bmladmin set-workspace-root /home/psmith/t/cvs-1.11.23
+bmladmin set-workspace-root /
 bmladmin add-pkg zlib
 bmladmin set-file-pkg zlib /home/psmith/t/cvs-1.11.23/zlib
 bmladmin show-files -p | fgrep /home/psmith/t

@@ -491,6 +491,9 @@ public class OutlinePage extends ContentOutlinePage {
 				if (nodeId == pkgMgr.getImportPackage()) {
 					removeEnabled = renameEnabled = changeRootsEnabled = openEnabled = false;
 				}
+				else if (nodeId == pkgMgr.getMainPackage()) {
+					removeEnabled = renameEnabled = false;
+				}
 			}
 		}
 	}

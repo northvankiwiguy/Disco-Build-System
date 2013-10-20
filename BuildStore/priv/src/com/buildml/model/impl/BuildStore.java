@@ -177,6 +177,14 @@ public class BuildStore implements IBuildStore {
 			pkgRootMgr.setWorkspaceRoot(workspacePathId);
 			pkgRootMgr.setBuildMLFileDepth(0);
 		}
+		
+		/*
+		 * In schema version 404, we added the "Main" package by default. If this doesn't exist
+		 * yet, then add it.
+		 */
+		if (packages.getId("Main") == ErrorCode.NOT_FOUND) {
+			packages.addPackage("Main");
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

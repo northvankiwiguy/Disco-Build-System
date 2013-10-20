@@ -139,6 +139,14 @@ public class PackageRootMgr implements IPackageRootMgr {
 	@Override
 	public int setWorkspaceRoot(int workspacePathId) {
 		
+		/* first, validate that this root is valid */
+		PathType pathType = fileMgr.getPathType(workspacePathId);
+		if ((pathType == PathType.TYPE_INVALID) || (fileMgr.isPathTrashed(workspacePathId))) {
+			return ErrorCode.BAD_PATH;
+		} else if (pathType != PathType.TYPE_DIR) {
+			return ErrorCode.NOT_A_DIRECTORY;
+		}
+		
 		/* 
 		 * Verify that all existing package roots are at the same level, or below the
 		 * new proposed workspace root.

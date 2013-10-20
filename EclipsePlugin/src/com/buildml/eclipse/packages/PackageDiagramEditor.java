@@ -321,7 +321,7 @@ public class PackageDiagramEditor extends DiagramEditor
 	@Override
 	public boolean hasFeature(String feature) {
 		if ("removable".equals(feature)) {
-			return true;
+			return (packageId != pkgMgr.getMainPackage());
 		}
 		return false;
 	}

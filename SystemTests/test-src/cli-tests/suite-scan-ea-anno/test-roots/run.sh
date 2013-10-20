@@ -12,7 +12,7 @@ bmladmin show-files -r | fgrep /home/psmith/t
 
 echo
 echo "Set the @workspace root appropriately"
-bmladmin set-workspace-root /home/psmith/t/cvs-1.11.23/
+bmladmin set-workspace-root /
 
 echo
 echo "Add a new package zlib, show the list of roots"

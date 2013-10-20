@@ -1,8 +1,13 @@
 Set the workspace root appropriately
+Workspace root set to /.
+Package root: Main_src set to /home/psmith/t/cvs-1.11.23.
+Package root: Main_gen set to /home/psmith/t/cvs-1.11.23.
 Workspace root set to /home/psmith/t/cvs-1.11.23.
 Add a couple of packages
 New package lib added.
 New package zlib added.
+Main_gen /home/psmith/t/cvs-1.11.23
+Main_src /home/psmith/t/cvs-1.11.23
 lib_gen /home/psmith/t/cvs-1.11.23
 lib_src /home/psmith/t/cvs-1.11.23
 root /
@@ -14,6 +19,8 @@ Package root: zlib_src set to /home/psmith/t/cvs-1.11.23/zlib.
 Package root: zlib_gen set to /home/psmith/t/cvs-1.11.23/zlib.
 Package root: lib_src set to /home/psmith/t/cvs-1.11.23/lib.
 Package root: lib_gen set to /home/psmith/t/cvs-1.11.23/lib.
+Main_gen /home/psmith/t/cvs-1.11.23
+Main_src /home/psmith/t/cvs-1.11.23
 lib_gen /home/psmith/t/cvs-1.11.23/lib
 lib_src /home/psmith/t/cvs-1.11.23/lib
 root /
@@ -79,10 +86,13 @@ Error: One or more errors occurred while changing packages.
        Use bml -h for more help.
 Removing the lib package
 Package lib removed.
+Main_gen /home/psmith/t/cvs-1.11.23
+Main_src /home/psmith/t/cvs-1.11.23
 root /
 workspace /home/psmith/t/cvs-1.11.23
 zlib_gen /home/psmith/t/cvs-1.11.23/zlib
 zlib_src /home/psmith/t/cvs-1.11.23/zlib
 Root/
   <import>
+  Main
   zlib

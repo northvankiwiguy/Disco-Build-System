@@ -571,7 +571,7 @@ Show .h files by their popularity
 1	/home/psmith/t/cvs-1.11.23/vms/config.h
 
 Show .h files by their popularity, with packages
-Workspace root set to /home/psmith/t/cvs-1.11.23.
+Workspace root set to /.
 New package src_files added.
 81	/home/psmith/t/cvs-1.11.23/config.h  (src_files/Public)
 72	/home/psmith/t/cvs-1.11.23/lib/getopt.h  (src_files/Public)

@@ -52,7 +52,7 @@ import com.buildml.model.IPackageMemberMgr;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 403;
+	public static final int SCHEMA_VERSION = 404;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;

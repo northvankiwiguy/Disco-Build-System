@@ -3,6 +3,7 @@ Show the package definitions.
 Valid package names:
 
   diff
+  Main
   src
   zlib
 
@@ -21,6 +22,13 @@ Show the default package root mappings
 @diff_gen root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
 
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
@@ -49,6 +57,13 @@ Root "diff_src" now refers to native path: /tmp
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
 
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
@@ -76,6 +91,13 @@ Root "zlib_gen" now refers to native path: /etc
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
 
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
@@ -102,6 +124,13 @@ Root "zlib_gen" has been unmapped.
 @diff_gen root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
 
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
@@ -131,6 +160,13 @@ Status 255
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
 
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
@@ -158,6 +194,13 @@ Status 255
 @diff_gen root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
 
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
@@ -187,6 +230,13 @@ Status 255
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
 
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
@@ -214,6 +264,13 @@ Status 255
 @diff_gen root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
 
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
@@ -243,6 +300,13 @@ Status 255
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
 
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/src
@@ -270,6 +334,13 @@ Status 255
 @diff_gen root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/diff
   Native path : ROOT/test-output/suite-bml-invoke/test-native-root/cvs/diff
+
+@Main_src root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
+@Main_gen root:
+  VFS path    : /home/psmith/work/runtime-EclipseApplication
+  Native path : ROOT/test-output/suite-bml-invoke/test-native-root
 
 @src_src root:
   VFS path    : /home/psmith/work/runtime-EclipseApplication/cvs/src

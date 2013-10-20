@@ -88,6 +88,12 @@ import com.buildml.utils.errors.ErrorCode;
 	/** The event listeners who are registered to learn about package changes */
 	List<IPackageMgrListener> listeners = new ArrayList<IPackageMgrListener>();
 	
+	/** 
+	 * The package ID of "Main". This is a variable (not a constant), since it didn't
+	 * exist in databases < versions 404.
+	 */
+	private int mainPackageId = -1;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -142,6 +148,19 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public int getImportPackage() {
 		return IMPORT_PACKAGE_ID;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#getImportPackage()
+	 */
+	@Override
+	public int getMainPackage() {
+		if (mainPackageId == -1) {
+			mainPackageId = getId("Main");
+		}
+		return mainPackageId;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -326,7 +345,8 @@ import com.buildml.utils.errors.ErrorCode;
 		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 
 		/* we can't remove the "<import>" package or the "Root" folder */
-		if ((folderOrPackageId == ROOT_FOLDER_ID) || (folderOrPackageId == IMPORT_PACKAGE_ID)) {
+		if ((folderOrPackageId == ROOT_FOLDER_ID) || (folderOrPackageId == IMPORT_PACKAGE_ID) ||
+				(folderOrPackageId == getMainPackage())) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -447,8 +467,9 @@ import com.buildml.utils.errors.ErrorCode;
 			return ErrorCode.NOT_A_DIRECTORY;
 		}
 		
-		/* we can't move the root folder or the <import> package */
-		if ((folderOrPackageId == ROOT_FOLDER_ID) || (folderOrPackageId == IMPORT_PACKAGE_ID)) {
+		/* we can't move the root folder or the <import> or main packages */
+		if ((folderOrPackageId == ROOT_FOLDER_ID) || (folderOrPackageId == IMPORT_PACKAGE_ID) ||
+				(folderOrPackageId == getMainPackage())) {
 			return ErrorCode.BAD_PATH;
 		}
 				

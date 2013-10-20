@@ -22,7 +22,7 @@ bmladmin show-popular-files -f "*.h"
 
 echo
 echo "Show .h files by their popularity, with packages"
-bmladmin set-workspace-root /home/psmith/t/cvs-1.11.23
+bmladmin set-workspace-root /
 bmladmin add-pkg src_files
 bmladmin set-file-pkg src_files/private "*.c"
 bmladmin set-file-pkg src_files/public "*.h"

@@ -1,6 +1,7 @@
 Showing packages, before having defined any
 Root/
   <import>
+  Main
 Remove a package that doesn't exist yet - should fail
 Error: Package/folder pkg1 is not defined.
        Use bml -h for more help.
@@ -10,6 +11,7 @@ New package package2 added.
 New package my-pkg3 added.
 Root/
   <import>
+  Main
   my-pkg3
   package2
 Try to add the same package name twice
@@ -18,17 +20,20 @@ Error: The package my-pkg3 is already defined.
 Status is 1
 Root/
   <import>
+  Main
   my-pkg3
   package2
 Delete a package, making sure it no longer exists
 Package my-pkg3 removed.
 Root/
   <import>
+  Main
   package2
 Add a package name back, essentially reusing it
 New package my-pkg3 added.
 Root/
   <import>
+  Main
   my-pkg3
   package2
 Try to delete the default package
@@ -37,12 +42,14 @@ Error: Package <import> can't be deleted. It may still contain files or actions.
 Status is 1
 Root/
   <import>
+  Main
   my-pkg3
   package2
 Renaming a package
 Package my-pkg3 renamed to package3.
 Root/
   <import>
+  Main
   package2
   package3
 Rename a package to an existing name
@@ -51,6 +58,7 @@ Error: The name package2 is already in use.
 Status is 1
 Root/
   <import>
+  Main
   package2
   package3
 Adding a two new folders
@@ -60,6 +68,7 @@ Root/
   Folder1/
   Folder2/
   <import>
+  Main
   package2
   package3
 Adding a folder with a pre-existing name
@@ -70,6 +79,7 @@ Root/
   Folder1/
   Folder2/
   <import>
+  Main
   package2
   package3
 Moving a package into a sub-folder
@@ -79,6 +89,7 @@ Root/
   Folder2/
     package2
   <import>
+  Main
   package3
 Moving a folder into a sub-folder
 Package Folder1 moved.
@@ -87,6 +98,7 @@ Root/
     Folder1/
     package2
   <import>
+  Main
   package3
 Trying to create a folder-cycle
 Error: The package Folder2 can't be moved into the folder Folder1.
@@ -97,6 +109,7 @@ Root/
     Folder1/
     package2
   <import>
+  Main
   package3
 Try to remove a folder that has children
 Error: Folder Folder2 can't be deleted. It may still contain files or actions.
@@ -107,6 +120,7 @@ Root/
     Folder1/
     package2
   <import>
+  Main
   package3
 Remove a folder that doesn't have children
 Package Folder1 removed.
@@ -114,4 +128,5 @@ Root/
   Folder2/
     package2
   <import>
+  Main
   package3
