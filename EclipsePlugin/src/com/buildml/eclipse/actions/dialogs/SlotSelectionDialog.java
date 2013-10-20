@@ -14,8 +14,8 @@ package com.buildml.eclipse.actions.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import com.buildml.eclipse.utils.BmlTitleAreaDialog;
-import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
@@ -268,7 +267,6 @@ public class SlotSelectionDialog extends BmlTitleAreaDialog {
 		/* until something is selected, the OK button is greyed out */
 		getButton(IDialogConstants.OK_ID).setEnabled(false);
 		
-		
 		return result;
 	}
 	
@@ -303,10 +301,11 @@ public class SlotSelectionDialog extends BmlTitleAreaDialog {
 		 * Make sure that selecting an item in this list will deselect all items in
 		 * the other list. The only makes sense if both lists are shown.
 		 */
-		listBox.addSelectionListener(new SelectionAdapter() {
+		listBox.addSelectionListener(new SelectionListener() {
+			
+			/* a slot was single-clicked */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
 				/* deselect the other list box */
 				if (showInputSlots && showOutputSlots) {
 					if (e.getSource() == inputSlotListBox) {
@@ -318,6 +317,12 @@ public class SlotSelectionDialog extends BmlTitleAreaDialog {
 				
 				/* it's now OK to press "OK" */
 				getButton(IDialogConstants.OK_ID).setEnabled(true);
+			}
+			
+			/* a slot was double-clicked */
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				okPressed();
 			}
 		});
 		return listBox;
