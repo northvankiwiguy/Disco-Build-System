@@ -18,16 +18,20 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.util.IColorConstant;
 
 import com.buildml.eclipse.bobj.UIFileActionConnection;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.model.IActionTypeMgr;
+import com.buildml.model.IBuildStore;
+import com.buildml.model.ISlotTypes.SlotDetails;
 
 /**
  *
@@ -41,6 +45,9 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 
 	/** The colour of connection lines */
 	private static final IColorConstant CONNECTION_COLOUR = IColorConstant.BLACK;
+	
+	/** our IActionTypeMgr */
+	private IActionTypeMgr actionTypeMgr;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -52,6 +59,10 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 	 */
 	public AddFileActionConnectionFeature(IFeatureProvider fp) {
 		super(fp);
+		
+		PackageDiagramEditor diagramEditor = (PackageDiagramEditor)getDiagramEditor();
+		IBuildStore buildStore = diagramEditor.getBuildStore();
+		actionTypeMgr = buildStore.getActionTypeMgr();
 	}
 
 	/*=====================================================================================*
@@ -88,6 +99,21 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 	    Polyline arrow = gaService.createPolyline(cd, new int[] { -10, 5, 0, 0, -10, -5 });
 		arrow.setLineWidth(2);
 		arrow.setForeground(manageColor(CONNECTION_COLOUR));
+	    
+		/* 
+		 * Put the slot's name on the arrow. We position it near to the action's side of the arrow.
+		 */
+	    SlotDetails details = actionTypeMgr.getSlotByID(bo.getSlotId());
+	    if (details != null) {
+	    	double position = 
+	    			(bo.getDirection() == UIFileActionConnection.INPUT_TO_ACTION) ? 0.75 : 0.25;
+	    	ConnectionDecorator textDecorator = 
+	    			peCreateService.createConnectionDecorator(connection, true, position, true);
+	    	Text text = gaService.createDefaultText(getDiagram(), textDecorator);
+	    	text.setForeground(manageColor(IColorConstant.BLACK));
+	    	gaService.setLocation(text, -10, 5);
+	    	text.setValue(details.slotName);
+	    }
 	    
 		/* link the connection pictogram to the business object */
 		link(connection, bo);
