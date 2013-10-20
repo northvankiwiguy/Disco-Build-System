@@ -69,9 +69,14 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 
 		/* create a connection between the two points */
 		Connection connection = peCreateService.createFreeFormConnection(getDiagram());
-		connection.setStart(addConContext.getSourceAnchor());
-		connection.setEnd(addConContext.getTargetAnchor());
-
+		if (bo.getDirection() == UIFileActionConnection.INPUT_TO_ACTION) {
+			connection.setStart(addConContext.getSourceAnchor());
+			connection.setEnd(addConContext.getTargetAnchor());
+		} else {
+			connection.setStart(addConContext.getTargetAnchor());			
+			connection.setEnd(addConContext.getSourceAnchor());
+		}
+		
 		/* draw the line */
 		IGaService gaService = Graphiti.getGaService();
 		Polyline polyline = gaService.createPolyline(connection);

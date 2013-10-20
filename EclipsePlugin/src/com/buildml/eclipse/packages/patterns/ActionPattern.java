@@ -39,6 +39,7 @@ import org.eclipse.graphiti.util.IColorConstant;
 
 import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.packages.layout.LeftRightBounds;
@@ -281,10 +282,17 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		gaService.setLocationAndSize(actionTypeNameText, xAdjust, yAdjust,
 										ACTION_WIDTH - xAdjust, ACTION_HEIGHT - yAdjust);
 		
-		/* add a chopbox anchor to the shape */
-		FixPointAnchor anchor = peCreateService.createFixPointAnchor(containerShape);
-		anchor.setLocation(gaService.createPoint(-5, ACTION_HEIGHT / 2));
-		gaService.createInvisibleRectangle(anchor);
+		/*
+		 * Add a couple of anchors so we can draw connections to this shape.
+		 * 	UIFileActionConnection.INPUT_TO_ACTION (0) - left anchor
+		 *  UIFileActionConnection.OUTPUT_FROM_ACTION (1) - right anchor
+		 */
+		FixPointAnchor anchorLeft = peCreateService.createFixPointAnchor(containerShape);
+		anchorLeft.setLocation(gaService.createPoint(-5, ACTION_HEIGHT / 2));
+		gaService.createInvisibleRectangle(anchorLeft);
+		FixPointAnchor anchorRight = peCreateService.createFixPointAnchor(containerShape);
+		anchorRight.setLocation(gaService.createPoint(ACTION_WIDTH + 5, ACTION_HEIGHT / 2));
+		gaService.createInvisibleRectangle(anchorRight);
 		
 		/* create a link between the shape and the business object, and display it. */
 		link(containerShape, addedAction);

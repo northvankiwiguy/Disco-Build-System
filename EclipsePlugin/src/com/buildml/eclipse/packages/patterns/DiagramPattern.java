@@ -248,7 +248,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		if (actionTypeId < 0) {
 			return;
 		}
-		SlotDetails slots[] = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_INPUT);
+		SlotDetails slots[] = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_ANY);
 		if (slots == null) {
 			return;
 		}
@@ -258,42 +258,51 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		 */
 		for (int i = 0; i < slots.length; i++) {
 			int slotId = slots[i].slotId;
-			Object slotValue = actionMgr.getSlotValue(actionId, slotId);
+			int slotPos = slots[i].slotPos;
 			
-			/* yes, this slot has a file group in it */
-			if ((slotValue != null) && (slotValue instanceof Integer)) {
-				Integer fileGroupId = (Integer)slotValue;
-				
-				/* create the new business object */
-				UIFileActionConnection newConnection = new UIFileActionConnection(
-						fileGroupId, actionId, slotId, UIFileActionConnection.INPUT_TO_ACTION);
-				getDiagram().eResource().getContents().add(newConnection);
-				
-				/*
-				 * Now we need to figure out which pictograms this connection goes between. We
-				 * know the fileGroupId and actionId, but need to search for the pictogram.
-				 * Search for the UIFileGroup and UIAction end points, and retrieve their anchors
-				 */
-				Anchor fileGroupAnchor = null, actionAnchor = null;
-				EList<Shape> shapes = getDiagram().getChildren();
-				for (Shape shape : shapes) {
-					Object bo = GraphitiUtils.getBusinessObject(shape);
-					if (bo instanceof UIFileGroup) {
-						if (((UIFileGroup)bo).getId() == fileGroupId) {
-							fileGroupAnchor = shape.getAnchors().get(0);
-						}
-					} else if (bo instanceof UIAction) {
-						if (((UIAction)bo).getId() == actionId) {
-							actionAnchor = shape.getAnchors().get(0);
+			/* connections can only come from input or output slots... */
+			if ((slotPos == ISlotTypes.SLOT_POS_INPUT) || (slotPos == ISlotTypes.SLOT_POS_OUTPUT)){
+
+				Object slotValue = actionMgr.getSlotValue(actionId, slotId);
+
+				/* yes, this slot has a file group in it */
+				if ((slotValue != null) && (slotValue instanceof Integer)) {
+					Integer fileGroupId = (Integer)slotValue;
+					int connectionDirection = (slotPos == ISlotTypes.SLOT_POS_INPUT) ?
+							UIFileActionConnection.INPUT_TO_ACTION :
+							UIFileActionConnection.OUTPUT_FROM_ACTION;
+
+					/* create the new business object */
+					UIFileActionConnection newConnection = new UIFileActionConnection(
+							fileGroupId, actionId, slotId, connectionDirection);
+					getDiagram().eResource().getContents().add(newConnection);
+
+					/*
+					 * Now we need to figure out which pictograms this connection goes between. We
+					 * know the fileGroupId and actionId, but need to search for the pictogram.
+					 * Search for the UIFileGroup and UIAction end points, and retrieve their anchors
+					 */
+					Anchor fileGroupAnchor = null, actionAnchor = null;
+					EList<Shape> shapes = getDiagram().getChildren();
+					for (Shape shape : shapes) {
+						Object bo = GraphitiUtils.getBusinessObject(shape);
+						if (bo instanceof UIFileGroup) {
+							if (((UIFileGroup)bo).getId() == fileGroupId) {
+								fileGroupAnchor = shape.getAnchors().get(connectionDirection);
+							}
+						} else if (bo instanceof UIAction) {
+							if (((UIAction)bo).getId() == actionId) {
+								actionAnchor = shape.getAnchors().get(connectionDirection);
+							}
 						}
 					}
-				}
-				
-				/* We found both anchors, so now draw the connection between them */
-				if ((fileGroupAnchor != null) && (actionAnchor != null)) {
-					AddConnectionContext addContext = new AddConnectionContext(fileGroupAnchor, actionAnchor);
-					addContext.setNewObject(newConnection);
-					getFeatureProvider().addIfPossible(addContext);
+
+					/* We found both anchors, so now draw the connection between them */
+					if ((fileGroupAnchor != null) && (actionAnchor != null)) {
+						AddConnectionContext addContext = new AddConnectionContext(fileGroupAnchor, actionAnchor);
+						addContext.setNewObject(newConnection);
+						getFeatureProvider().addIfPossible(addContext);
+					}
 				}
 			}
 		}

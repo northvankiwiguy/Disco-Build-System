@@ -759,11 +759,20 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					FILE_GROUP_WIDTH * 2, (LABEL_FONT_SIZE + LABEL_FONT_GAP));
 		}
 		
-		/* add an anchor that resides to the immediate right of the file group box */
-		FixPointAnchor anchor = peCreateService.createFixPointAnchor(containerShape);
-		anchor.setLocation(
+		/* 
+		 * Add anchors that reside to the immediate left/right of the file group box.
+		 * There are for drawing connection arrows.
+		 * 	UIFileActionConnection.INPUT_TO_ACTION (0) - right anchor
+		 *  UIFileActionConnection.OUTPUT_FROM_ACTION (1) - left anchor
+		 */
+		FixPointAnchor rightAnchor = peCreateService.createFixPointAnchor(containerShape);
+		rightAnchor.setLocation(
 				gaService.createPoint(OFF_X + FILE_GROUP_WIDTH + (FILE_GROUP_OVERLAP * 2), FILE_GROUP_HEIGHT / 2));
-		gaService.createInvisibleRectangle(anchor);
+		gaService.createInvisibleRectangle(rightAnchor);
+		FixPointAnchor leftAnchor = peCreateService.createFixPointAnchor(containerShape);
+		leftAnchor.setLocation(
+				gaService.createPoint(OFF_X, FILE_GROUP_HEIGHT / 2));
+		gaService.createInvisibleRectangle(leftAnchor);
 	   
 		/* create a link between the shape and the business object, and display it. */
 		link(containerShape, addedFileGroup);
