@@ -17,6 +17,7 @@ import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.editor.DiagramEditorContextMenuProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.dnd.Clipboard;
@@ -80,6 +81,9 @@ public class PackageDiagramEditor extends DiagramEditor
 	
 	/** The layout algorithm for determining the location of members on the package */
 	private LayoutAlgorithm layoutAlgorithm;
+
+	/** Provider for our context menu */
+	private PackageDiagramEditorContextMenuProvider contextMenuProvider = null;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -500,11 +504,11 @@ public class PackageDiagramEditor extends DiagramEditor
 	@Override
 	protected ContextMenuProvider createContextMenuProvider() {
 		
-		/* 
-		 * for now, we don't need a context menu. In future, we can implement our own
-		 * class (derived from DiagramEditorContextMenuProvider) that provides the menu.
-		 */
-		return null;
+		if (contextMenuProvider == null) {
+			contextMenuProvider = new PackageDiagramEditorContextMenuProvider(
+				getGraphicalViewer(), getActionRegistry(), getDiagramTypeProvider());
+		}
+		return contextMenuProvider;
 	}
 
 	/*=====================================================================================*
