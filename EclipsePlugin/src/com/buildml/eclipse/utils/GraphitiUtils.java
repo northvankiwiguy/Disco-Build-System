@@ -67,8 +67,8 @@ public class GraphitiUtils {
 	 * pictogram is not a recognized type.
 	 */
 	public static Object getBusinessObject(Object pictogram) {
-		if (pictogram instanceof ContainerShape) {
-			ContainerShape cs = (ContainerShape)pictogram;
+		if (pictogram instanceof PictogramElement) {
+			PictogramElement cs = (PictogramElement)pictogram;
 			PictogramLink pl = cs.getLink();
 			if (pl != null) {
 				EList<EObject> bos = pl.getBusinessObjects();

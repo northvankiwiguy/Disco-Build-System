@@ -17,7 +17,11 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.pattern.IPattern;
+
+import com.buildml.eclipse.actions.ActionChangeOperation;
+import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.packages.DiagramFeatureProvider;
+import com.buildml.eclipse.utils.GraphitiUtils;
 
 /**
  * A customized "DeleteFeature" that calls upon the appropriate Pattern to do the work
@@ -75,11 +79,20 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	 */
 	@Override
 	public void execute(IContext context) {
+		
 		/* identify the pattern to be used */
 		IDeleteContext deleteContext = (IDeleteContext)context;
 		IPattern pattern = featureProvider.getPatternForPictogramElement(deleteContext.getPictogramElement());
 		if (pattern != null) {			
 			pattern.delete(deleteContext);
+		}
+		
+		/* connections don't have patterns, so we need a special method to delete them */
+		else {
+			Object bo = GraphitiUtils.getBusinessObject(deleteContext.getPictogramElement());
+			if (bo instanceof UIFileActionConnection) {
+				deleteConnection(deleteContext);
+			}
 		}
 	}
 
@@ -147,6 +160,11 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		if (pattern != null) {
 			return pattern.canDelete(context);
 		}
+
+		Object bo = GraphitiUtils.getBusinessObject(context.getPictogramElement());
+		if (bo instanceof UIFileActionConnection) {
+			return true;
+		}
 		return false;
 	}
 
@@ -179,6 +197,25 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	@Override
 	public void postDelete(IDeleteContext context) {
 		/* unused */
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * A special-purpose method for deleting a connection arrow.
+	 * @param context The Graphiti context of the delete operation.
+	 */
+	private void deleteConnection(IDeleteContext context) {
+		Object bo = GraphitiUtils.getBusinessObject(context.getPictogramElement());
+		if (!(bo instanceof UIFileActionConnection)) {
+			return;
+		}
+		UIFileActionConnection connection = (UIFileActionConnection)bo;
+		
+		/* create an undo/redo operation to set the slot value back to null */
+		ActionChangeOperation op = new ActionChangeOperation("Delete Connection", connection.getActionId());
+		op.recordSlotChange(connection.getActionId(), connection.getSlotId(), connection.getFileGroupId(), null);
+		op.recordAndInvoke();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
