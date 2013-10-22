@@ -25,6 +25,9 @@ public interface IActionMgrListener {
 	
 	/** one of the action's slots has changed */
 	public static final int CHANGED_SLOT = 2;
+	
+	/** one of the actions has been trashed (or revived) */
+	public static final int TRASHED_ACTION = 3;
 
 	/**
 	 * Called to notify the listener that the specified action has changed.

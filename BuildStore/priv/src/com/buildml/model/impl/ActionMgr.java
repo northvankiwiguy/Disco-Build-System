@@ -756,6 +756,10 @@ public class ActionMgr implements IActionMgr {
 		} catch (SQLException e) {
 			new FatalBuildStoreError("Error in SQL: " + e);
 		}
+		
+		/* notify listeners of the change */
+		notifyListeners(actionId, IActionMgrListener.TRASHED_ACTION, 0);
+		
 		return ErrorCode.OK;
 	}
 
@@ -784,6 +788,10 @@ public class ActionMgr implements IActionMgr {
 		} catch (SQLException e) {
 			new FatalBuildStoreError("Error in SQL: " + e);
 		}
+
+		/* notify listeners of the change */
+		notifyListeners(actionId, IActionMgrListener.TRASHED_ACTION, 0);
+
 		return ErrorCode.OK;
 	}
 

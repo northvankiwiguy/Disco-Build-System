@@ -925,7 +925,18 @@ public class TestActionMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action1, slotDetails.slotId, Integer.valueOf(10)));
 		assertEquals(notifyActionValue, 0);
 		assertEquals(notifyHowValue, 0);
-		assertEquals(notifySlotValue, 0);		
+		assertEquals(notifySlotValue, 0);
+		
+		/* trash an action - notification */
+		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(action1));
+		assertEquals(notifyActionValue, action1);
+		assertEquals(notifyHowValue, IActionMgrListener.TRASHED_ACTION);
+		
+		/* revive an action - notification */
+		notifyActionValue = notifyHowValue = notifySlotValue = 0;
+		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(action1));
+		assertEquals(notifyActionValue, action1);
+		assertEquals(notifyHowValue, IActionMgrListener.TRASHED_ACTION);		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

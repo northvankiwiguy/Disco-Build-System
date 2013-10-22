@@ -20,7 +20,6 @@ import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
-import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
@@ -387,7 +386,12 @@ import com.buildml.utils.errors.ErrorCode;
 				newMember.memberId = rs.getInt(2);
 				newMember.x = rs.getInt(3);
 				newMember.y = rs.getInt(4);
-				members.add(newMember);
+				
+				/* don't show trashed actions */
+				if ((newMember.memberType != IPackageMemberMgr.TYPE_ACTION) ||
+						!actionMgr.isActionTrashed(newMember.memberId)) {
+					members.add(newMember);
+				}
 			} while (rs.next());
 			
 			rs.close();
