@@ -12,6 +12,8 @@
 
 package com.buildml.eclipse.packages.patterns;
 
+import java.util.ArrayList;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -40,16 +42,25 @@ import org.eclipse.graphiti.util.IColorConstant;
 import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
+import com.buildml.eclipse.bobj.UIFileGroup;
+import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.packages.layout.LeftRightBounds;
 import com.buildml.eclipse.packages.layout.PictogramSize;
+import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.ISlotTypes;
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
+import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * A Graphiti pattern for managing the "Action" graphical element in a BuildML diagram.
@@ -448,15 +459,72 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.graphiti.pattern.AbstractPattern#canDelete(org.eclipse.graphiti.features.context.IDeleteContext)
+	/**
+	 * Yes, we can delete UIActions.
 	 */
 	@Override
 	public boolean canDelete(IDeleteContext context) {
-		/* we can't delete actions */
-		return false;
+		return true;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Invoked when the user initiates a "delete" operation on a UIAction.
+	 */
+	@Override
+	public void delete(IDeleteContext context) {
+		
+		/* determine the business object that related to the pictogram being deleted */
+		UIAction action = (UIAction)(GraphitiUtils.getBusinessObject(context.getPictogramElement()));
+		int actionId = action.getId();
+		
+		/*
+		 * Sanity checks.
+		 */
+		Integer[] children = actionMgr.getChildren(actionId);
+		if (children.length != 0) {
+			AlertDialog.displayErrorDialog("Can't Delete", "This action still has children (see the <import> package)");
+			return;
+		}
+		Integer filesAccessed[] = actionMgr.getFilesAccessed(actionId, OperationType.OP_UNSPECIFIED);
+		if (filesAccessed.length != 0) {
+			AlertDialog.displayErrorDialog("Can't Delete", 
+					"This action can't be deleted, as it still references files in the <import> package");
+			return;
+		}
+		
+		/* add the "delete" operation to our redo/undo stack */
+		BmlMultiOperation opMain = new BmlMultiOperation("Delete Action");
+		
+		/* 
+		 * first, delete all of this action's slots that refer to file groups.
+		 */
+		int actionTypeId = actionMgr.getActionType(actionId);
+		if (actionTypeId == ErrorCode.NOT_FOUND) {
+			return; 	/* invalid action type - ignore */
+		}
+		SlotDetails slots[] = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_ANY);
+		for (int i = 0; i < slots.length; i++) {
+			if (slots[i].slotType == ISlotTypes.SLOT_TYPE_FILEGROUP) {
+				int slotId = slots[i].slotId;
+				Object slotValue = actionMgr.getSlotValue(actionId, slotId);
+				if (slotValue instanceof Integer) {
+					ActionChangeOperation op = new ActionChangeOperation("Delete Connection", actionId);
+					op.recordSlotRemove(slotId, slotValue);
+					opMain.add(op);
+				}
+			}
+		}
+		
+		/* now delete the action itself */
+		ActionChangeOperation op = new ActionChangeOperation("Delete Action", actionId);
+		op.recordMoveToTrash();
+		opMain.add(op);
+		
+		/* invoke all changes in one step... */
+		opMain.recordAndInvoke();
+	}
 
+	/*-------------------------------------------------------------------------------------*/
 }
