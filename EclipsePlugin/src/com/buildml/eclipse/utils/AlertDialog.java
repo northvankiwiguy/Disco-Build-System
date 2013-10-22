@@ -15,6 +15,7 @@ package com.buildml.eclipse.utils;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -175,6 +176,16 @@ public class AlertDialog extends BmlTitleAreaDialog {
 		} else {
 			return super.createButton(parent, id, label, defaultButton);
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#getInitialSize()
+	 */
+	@Override
+	protected Point getInitialSize() {
+		return new Point(EclipsePartUtils.getScreenWidth() / 4, EclipsePartUtils.getScreenHeight() / 5);
 	}
 	
 	/*=====================================================================================*
