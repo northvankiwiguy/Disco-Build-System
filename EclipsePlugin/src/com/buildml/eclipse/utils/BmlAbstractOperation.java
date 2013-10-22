@@ -63,6 +63,11 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	 */
 	public BmlAbstractOperation(String label) {
 		super(label);
+		
+		buildStore = EclipsePartUtils.getActiveBuildStore();
+		if (buildStore == null) {
+			throw new FatalBuildStoreError("Couldn't determine active BuildStore");
+		}
 	}
 
 	/*=====================================================================================*
@@ -134,11 +139,7 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	 */
 	public void recordAndInvoke() {
 		
-		/* identify the PathMgr to be used */
-		buildStore = EclipsePartUtils.getActiveBuildStore();
-		if (buildStore == null) {
-			throw new FatalBuildStoreError("Couldn't determine active BuildStore");
-		}
+		/* identify the FileMgr to be used */
 		fileMgr = buildStore.getFileMgr();
 		
 		/* add the operation to the undo/redo stack */

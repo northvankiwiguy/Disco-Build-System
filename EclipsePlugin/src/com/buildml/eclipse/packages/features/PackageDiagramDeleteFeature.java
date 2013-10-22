@@ -214,7 +214,7 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		
 		/* create an undo/redo operation to set the slot value back to null */
 		ActionChangeOperation op = new ActionChangeOperation("Delete Connection", connection.getActionId());
-		op.recordSlotChange(connection.getActionId(), connection.getSlotId(), connection.getFileGroupId(), null);
+		op.recordSlotChange(connection.getSlotId(), connection.getFileGroupId(), null);
 		op.recordAndInvoke();
 	}
 

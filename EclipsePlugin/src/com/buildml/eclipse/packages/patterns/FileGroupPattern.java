@@ -50,15 +50,21 @@ import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.packages.layout.LeftRightBounds;
 import com.buildml.eclipse.packages.layout.PictogramSize;
+import com.buildml.eclipse.utils.BmlAbstractOperation;
+import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.ISlotTypes;
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -557,7 +563,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					/* record an undo/redo operation that will actually change the slot value */
 					ActionChangeOperation op = new ActionChangeOperation("Connect File Group", actionId);
 					Object currentValue = actionMgr.getSlotValue(actionId, slotId);
-					op.recordSlotChange(actionId, slotId, currentValue, Integer.valueOf(fileGroupId));
+					op.recordSlotChange(slotId, currentValue, Integer.valueOf(fileGroupId));
 					op.recordAndInvoke();
 				} 
 				
@@ -597,14 +603,77 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		int fileGroupId = fileGroup.getId();
 		
 		/* add the "delete" operation to our redo/undo stack */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("Delete File Group", fileGroupId);
+		BmlMultiOperation opMain = new BmlMultiOperation("Delete File Group");
+		
+		/* first, delete all slots that refer to this file group */
+		MemberDesc neighbours[] = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, IPackageMemberMgr.NEIGHBOUR_ANY);
+		for (int i = 0; i < neighbours.length; i++) {
+			removeReferenceFromNeighbour(opMain, fileGroupId, neighbours[i].memberType, neighbours[i].memberId);
+		}
+		
+		/* now delete the file group itself */
+		FileGroupChangeOperation op = new FileGroupChangeOperation("", fileGroupId);
 		op.recordMembershipChange(getFileGroupAsArrayList(fileGroupId), new ArrayList<Integer>());
-		op.recordAndInvoke();	
+		opMain.add(op);
+		
+		/* invoke all changes in one step... */
+		opMain.recordAndInvoke();
 	}
 	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * Given that a UIFileGroup is being deleted, we need to go through and first remove the
+	 * connection to any neighbours who reference this file group.
+	 * 
+	 * @param opMain		The undo/redo multi-operation to add our "delete connections" to.
+	 * @param fileGroupId	The ID of the file group that has been removed.
+	 * @param memberType	The type of neighbour (IPackageMemberMgr.TYPE_ACTION, etc).
+	 * @param memberId		The ID of the neighbour (e.g. actionId).
+	 */
+	private void removeReferenceFromNeighbour(BmlMultiOperation opMain,
+			int fileGroupId, int memberType, int memberId) {
+
+		/*
+		 * For actions...
+		 */
+		if (memberType == IPackageMemberMgr.TYPE_ACTION) {
+			
+			/* get the list of slots associated with this action */
+			int actionTypeId = actionMgr.getActionType(memberId);
+			if (actionTypeId == ErrorCode.NOT_FOUND) {
+				return; 	/* invalid action type - ignore */
+			}
+			SlotDetails slots[] = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_ANY);
+			
+			/* for each slot that's a file group, see if it references our file group */
+			for (int i = 0; i < slots.length; i++) {
+				if (slots[i].slotType == ISlotTypes.SLOT_TYPE_FILEGROUP) {
+					int slotId = slots[i].slotId;
+					Object slotValue = actionMgr.getSlotValue(memberId, slotId);
+					if (slotValue instanceof Integer) {
+						if (slotValue.equals(Integer.valueOf(fileGroupId))) {
+							ActionChangeOperation op = new ActionChangeOperation("Delete Connection", memberId);
+							op.recordSlotRemove(slotId, fileGroupId);
+							opMain.add(op);
+						}
+					}
+				}
+			}
+		}
+		
+		/*
+		 * For everything else...
+		 */
+		else {
+			throw new FatalError("Unhandled memberType");
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Fetch the members of a file group (path IDs, or sub-group IDs) and return them as

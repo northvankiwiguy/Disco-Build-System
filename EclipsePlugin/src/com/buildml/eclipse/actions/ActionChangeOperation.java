@@ -42,6 +42,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	private final static int CHANGED_COMMAND  = 2;
 	private final static int CHANGED_LOCATION = 4;
 	private final static int CHANGED_SLOT     = 8;
+	private final static int REMOVED_SLOT     = 16;
 		
 	/** The ID of the action being changed */
 	private int actionId;
@@ -67,10 +68,10 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	/** if CHANGED_LOCATION, what is the new (x, y) location */
 	private int newX, newY;
 	
-	/** if CHANGED_SLOT, what is the ID of the slot that's changing */
+	/** if CHANGED_SLOT | REMOVED_SLOT, what is the ID of the slot that's changing */
 	private int slotId;
 	
-	/** if CHANGED_SLOT, what is the old value in the slot */
+	/** if CHANGED_SLOT | REMOVED_SLOT, what is the old value in the slot */
 	private Object oldSlotValue;
 
 	/** if CHANGED_SLOT, what is the new value in the slot */
@@ -154,20 +155,32 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	/**
 	 * Records the fact that a file group has been inserted into an action's slot.
 	 * 
-	 * @param actionId The action that contains the slot.
 	 * @param slotId   The slot being modified.
 	 * @param oldValue The current value in the slot.
 	 * @param newValue The new value in the slot.
 	 */
-	public void recordSlotChange(int actionId, int slotId, Object oldValue, Object newValue) {
+	public void recordSlotChange(int slotId, Object oldValue, Object newValue) {
 		if (((oldValue == null) && (newValue != null)) ||
 			(!oldValue.equals(newValue))) {
 			changedFields |= CHANGED_SLOT;
-			this.actionId = actionId;
 			this.slotId = slotId;
 			this.oldSlotValue = oldValue;
 			this.newSlotValue = newValue;
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Records the fact that a slot value has been deleted (will revert to default value).
+	 * 
+	 * @param slotId   The slot being deleted.
+	 * @param oldValue The current value in the slot.
+	 */
+	public void recordSlotRemove(int slotId, Object oldValue) {
+		changedFields |= REMOVED_SLOT;
+		this.slotId = slotId;
+		this.oldSlotValue = oldValue;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -211,7 +224,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		}
 		
 		/* if one of the action's slots needs to change... */
-		if ((changedFields & CHANGED_SLOT) != 0){
+		if ((changedFields & (CHANGED_SLOT | REMOVED_SLOT)) != 0){
 			actionMgr.setSlotValue(actionId, slotId, oldSlotValue);
 		}
 
@@ -253,6 +266,11 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		/* if one of the action's slots needs to change... */
 		if ((changedFields & CHANGED_SLOT) != 0){
 			actionMgr.setSlotValue(actionId, slotId, newSlotValue);
+		}
+		
+		/* if one of the action's slots needs to be deleted... */
+		if ((changedFields & REMOVED_SLOT) != 0){
+			actionMgr.clearSlotValue(actionId, slotId);
 		}
 		
 		/* if there's a change, mark the editor as dirty */
