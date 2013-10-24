@@ -44,6 +44,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	private final static int CHANGED_SLOT     = 8;
 	private final static int REMOVED_SLOT     = 16;
 	private final static int MOVED_TO_TRASH   = 32;
+	private final static int NEW_ACTION       = 64;
 		
 	/** The ID of the action being changed */
 	private int actionId;
@@ -194,6 +195,15 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Records the fact that this action has been deleted
+	 */
+	public void recordNewAction() {
+		changedFields |= NEW_ACTION;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 	
 	/**
 	 * Records the operation in the undo/redo stack, but only if there's an actual change
@@ -256,6 +266,11 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		if ((changedFields & MOVED_TO_TRASH) != 0) {
 			actionMgr.reviveActionFromTrash(actionId);
 		}
+		
+		/* if the action has been newly created */
+		if ((changedFields & NEW_ACTION) != 0) {
+			actionMgr.moveActionToTrash(actionId);
+		}
 
 		/* if there's a change, mark the editor as dirty */
 		if (changedFields != 0) {
@@ -305,6 +320,11 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		/* if the action has been moved to the trash... */
 		if ((changedFields & MOVED_TO_TRASH) != 0) {
 			actionMgr.moveActionToTrash(actionId);
+		}
+		
+		/* if the action has been newly created */
+		if ((changedFields & NEW_ACTION) != 0) {
+			actionMgr.reviveActionFromTrash(actionId);
 		}
 		
 		/* if there's a change, mark the editor as dirty */

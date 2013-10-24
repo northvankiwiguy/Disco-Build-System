@@ -89,6 +89,12 @@ public class ActionPropertyPage extends BmlPropertyPage {
 		}
 		actionPackageLabel.setText("Action Package:   " + packageName);
 		
+		/* Display the action's directory */
+		int pathId = actionMgr.getDirectory(actionId);
+		String pathString = fileMgr.getPathName(pathId);
+		Label actionDirectoryLabel = new Label(panel, SWT.NONE);
+		actionDirectoryLabel.setText("Action Directory:  " + pathString);
+		
 		return panel;
 	}
 	
