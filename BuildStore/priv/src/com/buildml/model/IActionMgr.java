@@ -299,8 +299,9 @@ public interface IActionMgr {
 	 * @param slotId   The slot that's connected to the action.
 	 * @param value	   The new value to be set (typically an Integer or String).
 	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if actionId is invalid, slotId
-	 *         is invalid, or slotId isn't attached to actionId, or ErrorCode.BAD_VALUE if
-	 *         the value can't be assigned to the specified slot.
+	 *         is invalid, or slotId isn't attached to actionId, ErrorCode.BAD_VALUE if
+	 *         the value can't be assigned to the specified slot, or ErrorCode.LOOP_DETECTED
+	 *         if we're setting an input or output slot and a cycle would be created.
 	 */
 	public abstract int setSlotValue(int actionId, int slotId, Object value);
 	

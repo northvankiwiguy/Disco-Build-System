@@ -50,6 +50,7 @@ import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.packages.layout.LeftRightBounds;
 import com.buildml.eclipse.packages.layout.PictogramSize;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -560,11 +561,21 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 				if (status == SlotSelectionDialog.OK) {
 					int slotId = dialog.getSlotId();
 					
+					Object currentValue = actionMgr.getSlotValue(actionId, slotId);
+					
+					/* make the change - checking for cycles in the diagram */
+					int error = actionMgr.setSlotValue(actionId, slotId, fileGroupId);
+					if (error == ErrorCode.LOOP_DETECTED) {
+						AlertDialog.displayErrorDialog("Can't Connect File Group",
+								"Adding this connection would cause a cycle in the package diagram.");
+						((PackageDiagramEditor)getDiagramEditor()).refreshView(true);
+						return;
+					}
+					
 					/* record an undo/redo operation that will actually change the slot value */
 					ActionChangeOperation op = new ActionChangeOperation("Connect File Group", actionId);
-					Object currentValue = actionMgr.getSlotValue(actionId, slotId);
 					op.recordSlotChange(slotId, currentValue, Integer.valueOf(fileGroupId));
-					op.recordAndInvoke();
+					op.recordOnly();
 				} 
 				
 				/*

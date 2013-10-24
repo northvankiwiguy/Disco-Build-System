@@ -138,6 +138,27 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 	 * for the first time.
 	 */
 	public void recordAndInvoke() {
+		recordAndInvokeCommon(true);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Similar to recordAndInvoke, but don't execute the operation (until undo/redo is invoked).
+	 */
+	public void recordOnly() {
+		recordAndInvokeCommon(false);
+	}
+	
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Common functionality, shared between recordAndInvoke() and recordOnly().
+	 * @param executeIt True if the operation should be executed immediately.
+	 */
+	private void recordAndInvokeCommon(boolean executeIt) {
 		
 		/* identify the FileMgr to be used */
 		fileMgr = buildStore.getFileMgr();
@@ -150,12 +171,15 @@ public abstract class BmlAbstractOperation extends AbstractOperation {
 		/* make it so... */
 		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
 		try {
-			history.execute(this, null, null);
+			if (executeIt) {
+				history.execute(this, null, null);
+			} else {
+				history.add(this);
+			}
 		} catch (ExecutionException e) {
 			throw new FatalBuildStoreError("Exception occurred during execution of operation", e);
 		}
 	}
-	
 	/*=====================================================================================*
 	 * ABSTRACT METHODS
 	 *=====================================================================================*/

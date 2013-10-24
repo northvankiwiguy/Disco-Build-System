@@ -24,7 +24,10 @@ import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.ISlotTypes;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.string.ShellCommandUtils;
 
@@ -57,7 +60,10 @@ public class ActionMgr implements IActionMgr {
 	
 	/** The PackageMgr object associated with this ActionMgr */
 	private IPackageMgr pkgMgr = null;	
-	
+
+	/** The PackageMemberMgr object associated with this ActionMgr */
+	private IPackageMemberMgr pkgMemberMgr = null;	
+
 	/** The SlotMgr object associated with this ActionMgr */
 	private SlotMgr slotMgr = null;	
 	
@@ -854,7 +860,27 @@ public class ActionMgr implements IActionMgr {
 			((oldValue != null) && (oldValue.equals(value)))) {
 			return ErrorCode.OK;
 		}
-				
+		
+		/*
+		 * If the slot is an input or output, we first need to check for cycles in the graph.
+		 */
+		SlotDetails details = slotMgr.getSlotByID(slotId);
+		if (details == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if (((details.slotPos == ISlotTypes.SLOT_POS_INPUT) || 
+			 (details.slotPos == ISlotTypes.SLOT_POS_OUTPUT)) &&
+			(value instanceof Integer)) {
+
+				/* yes, we're inserting a file group into an action. Check for cycles */
+				int direction = 
+						(details.slotPos == ISlotTypes.SLOT_POS_OUTPUT) ?
+						    IPackageMemberMgr.NEIGHBOUR_LEFT : IPackageMemberMgr.NEIGHBOUR_RIGHT;
+				if (checkForCycles(IPackageMemberMgr.TYPE_ACTION, actionId, (Integer)value, direction)) {
+					return ErrorCode.LOOP_DETECTED;
+				}
+		}
+		
 		/* delegate all slot assignments to SlotMgr */
 		int status = slotMgr.setSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId, value);
 		
@@ -1083,6 +1109,50 @@ public class ActionMgr implements IActionMgr {
 		for (int i = 0; i < listenerCopy.length; i++) {
 			listenerCopy[i].actionChangeNotification(actionId, how, changeId);			
 		}
+	}
+	
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * If we're modifying an action's input or output slot, we could potentially be creating
+	 * a cycle in the dependency graph. Before allowing this addition, check whether it
+	 * would create a cycle. This is a recursive algorithm that searches to the left/right in search
+	 * of the file group to be added. For example, if we're insert a file group into an action's
+	 * output slot, search left (through the inputs) in search of that file group.
+	 * 
+	 * @param memberType  What are we currently looking at? (IPackageMemberMgr.TYPE_ACTION, etc).
+	 * @param memberId	  The ID of the member we're currently looking at (initially the action
+	 * 					  containing the slot to be changed).
+	 * @param fileGroupId The ID of the file group that's being inserted into the slot.
+	 * @param direction   The direction to search (IPackageMemberMgr.NEIGHBOUR_LEFT or
+	 *                    IPackageMemberMgr.NEIGHBOUR_RIGHT).
+	 * @return True if a cycle would be created, else false.
+	 */
+	private boolean checkForCycles(int memberType, int memberId, int fileGroupId, int direction) {
+
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
+
+		/* get neighbours of this member */
+		MemberDesc[] neighbours = pkgMemberMgr.getNeighboursOf(memberType, memberId, direction);
+		for (int i = 0; i < neighbours.length; i++) {
+			MemberDesc neighbour = neighbours[i];
+			
+			/* if we've hit the file group we're searching for - end the search */
+			if ((neighbour.memberType == IPackageMemberMgr.TYPE_FILE_GROUP) &&
+				(neighbour.memberId == fileGroupId)) {
+				return true;
+			}
+			
+			/* not found, recursively search our neighbours */
+			if (checkForCycles(neighbour.memberType, neighbour.memberId, fileGroupId, direction)) {
+				return true;
+			}
+			
+			/* now loop to the next neighbour */
+		}
+		
+		return false;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

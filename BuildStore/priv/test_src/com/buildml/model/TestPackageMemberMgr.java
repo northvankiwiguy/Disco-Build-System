@@ -1121,4 +1121,63 @@ public class TestPackageMemberMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Test that cycles can't be created
+	 */
+	@Test
+	public void testCycleAvoidance() {
+
+		/*
+		 * We first create the following package diagram:
+		 * 
+		 *   fg1 ----a1 --- fg2 --- a2
+		 *             \--- fg3 --- a3
+		 */
+		int pkgId = pkgMgr.addPackage("TestPkg");
+		int rootActionId = actionMgr.getRootAction("root");
+		int dirId = fileMgr.getPath("/");
+		int fg1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg2 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg3 = fileGroupMgr.newSourceGroup(pkgId);
+		int a1 = actionMgr.addShellCommandAction(rootActionId, dirId, "action1");
+		int a2 = actionMgr.addShellCommandAction(rootActionId, dirId, "action2");
+		int a3 = actionMgr.addShellCommandAction(rootActionId, dirId, "action3");
+		
+		int actionTypeId = actionMgr.getActionType(a1);
+		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
+		SlotDetails output3Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output3");
+		SlotDetails output6Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output6");
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a1, inputSlot.slotId, fg1));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a1, output3Slot.slotId, fg2));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a1, output6Slot.slotId, fg3));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a2, inputSlot.slotId, fg2));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a3, inputSlot.slotId, fg3));
+		
+		/* try to connect fg2 to a1 (input) - existing link should be unchanged */
+		assertEquals(fg1, actionMgr.getSlotValue(a1, inputSlot.slotId));
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a1, inputSlot.slotId, fg2));
+		assertEquals(fg1, actionMgr.getSlotValue(a1, inputSlot.slotId));
+
+		/* try to connect fg3 to a1 (input) */
+		assertEquals(fg1, actionMgr.getSlotValue(a1, inputSlot.slotId));
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a1, inputSlot.slotId, fg3));
+		assertEquals(fg1, actionMgr.getSlotValue(a1, inputSlot.slotId));
+		
+		/* try to connect a2 (output3) to fg1 */
+		assertNull(actionMgr.getSlotValue(a3, output3Slot.slotId));
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a3, output3Slot.slotId, fg1));
+		assertNull(actionMgr.getSlotValue(a3, output3Slot.slotId));
+		
+		/* try to connect a3 (output6) to fg1 */
+		assertNull(actionMgr.getSlotValue(a3, output6Slot.slotId));
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a3, output6Slot.slotId, fg1));
+		assertNull(actionMgr.getSlotValue(a3, output6Slot.slotId));
+
+		/* try to connect a1 (output3) to fg1 - existing link should be unchanged */
+		assertEquals(fg2, actionMgr.getSlotValue(a1, output3Slot.slotId));
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a3, output6Slot.slotId, fg1));
+		assertEquals(fg2, actionMgr.getSlotValue(a1, output3Slot.slotId));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

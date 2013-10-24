@@ -206,6 +206,20 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Records the operation in the undo/redo stack, but only if there's an actual change
+	 * in the action. Do not execute the operation, since it's assumed to have already been
+	 * performed.
+	 */
+	@Override
+	public void recordOnly() {
+		if (changedFields != 0) {
+			super.recordOnly();
+		}
+	}
+	
 	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/

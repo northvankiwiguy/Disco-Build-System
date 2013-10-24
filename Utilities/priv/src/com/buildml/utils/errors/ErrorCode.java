@@ -60,6 +60,9 @@ public class ErrorCode {
 	/** This operation is not valid for this object */
 	public static final int INVALID_OP          = -11;
 	
+	/** An illegal cycle/loop would be created */
+	public static final int LOOP_DETECTED		= -12;
+	
 	/**
 	 * This class can't be instantiated.
 	 */
