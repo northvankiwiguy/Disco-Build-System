@@ -497,7 +497,8 @@ public class ActionsEditor extends ImportSubEditor
 	public boolean hasFeature(String feature) {
 		if (feature.equals("removable")) {
 			return isRemovable();
-		} else if (feature.equals("actions")) {
+		} else if (feature.equals("actions") || feature.equals("package-names") || 
+				feature.equals("search-by-name")) {
 			return true;
 		}
 		return false;

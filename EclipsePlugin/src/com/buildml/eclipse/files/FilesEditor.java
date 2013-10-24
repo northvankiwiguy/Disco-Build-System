@@ -504,13 +504,11 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 	public boolean hasFeature(String feature) {
 		if (feature.equals("removable")) {
 			return isRemovable();
-		} else if (feature.equals("paths")) {
+		} else if (feature.equals("paths") || feature.equals("path-roots") ||
+				feature.equals("filter-packages-by-scope") || feature.equals("package-names") ||
+				feature.equals("search-by-name")) {
 			return true;
-		} else if (feature.equals("path-roots")) {
-			return true;
-		} else if (feature.equals("filter-packages-by-scope")) {
-			return true;
-		}
+		} 
 		return false;
 	}
 	

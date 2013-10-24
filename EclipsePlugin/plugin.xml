@@ -68,7 +68,6 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.handlers.HandlerShowDetail"
             id="com.buildml.eclipse.commands.showPackages"
             name="Show Packages">
          <commandParameter
@@ -78,7 +77,6 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.handlers.HandlerShowDetail"
             id="com.buildml.eclipse.commands.showHiddenPaths"
             name="Show hidden paths">
          <commandParameter
@@ -98,17 +96,14 @@
          </commandParameter>
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.handlers.HandlerFilterPackages"
             id="com.buildml.eclipse.commands.filterPackages"
             name="Filter Packages">
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.handlers.HandlerFilterByName"
             id="com.buildml.eclipse.commands.filterByName"
             name="Filter by Name">
       </command>
       <command
-            defaultHandler="com.buildml.eclipse.files.handlers.HandlerSearchByName"
             id="com.buildml.eclipse.commands.searchByName"
             name="Search by Name">
       </command>
@@ -941,6 +936,56 @@
             <count
                   value="+">
             </count>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerShowDetail"
+            commandId="com.buildml.eclipse.commands.showPackages">
+         <enabledWhen>
+            <test
+                  args="package-names"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerShowDetail"
+            commandId="com.buildml.eclipse.commands.showHiddenPaths">
+         <enabledWhen>
+            <test
+                  args="package-names"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerFilterPackages"
+            commandId="com.buildml.eclipse.commands.filterPackages">
+         <enabledWhen>
+            <test
+                  args="package-names"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.buildml.eclipse.handlers.HandlerFilterByName"
+            commandId="com.buildml.eclipse.commands.filterByName">
+         <enabledWhen>
+            <test
+                  args="search-by-name"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="com.buildml.eclipse.files.handlers.HandlerSearchByName"
+            commandId="com.buildml.eclipse.commands.searchByName">
+         <enabledWhen>
+            <test
+                  args="search-by-name"
+                  property="com.buildml.eclipse.hasFeature">
+            </test>
          </enabledWhen>
       </handler>
    </extension>
