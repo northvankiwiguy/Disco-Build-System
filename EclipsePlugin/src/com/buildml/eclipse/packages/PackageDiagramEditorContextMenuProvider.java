@@ -13,11 +13,14 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.gef.EditPartViewer;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
+import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditorContextMenuProvider;
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.actions.ActionFactory;
 
@@ -29,6 +32,16 @@ import org.eclipse.ui.actions.ActionFactory;
 public class PackageDiagramEditorContextMenuProvider extends
 		DiagramEditorContextMenuProvider {
 
+	/** the ZoomManager for this PackageDiagram */
+	private ZoomManager zoomManager;
+	
+	/** Action for zooming in */
+	private ZoomInAction zoomInAction;
+	
+	/** Action for zooming out */
+	private ZoomOutAction zoomOutAction;
+
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -42,6 +55,11 @@ public class PackageDiagramEditorContextMenuProvider extends
 	public PackageDiagramEditorContextMenuProvider(EditPartViewer viewer,
 			ActionRegistry registry, IDiagramTypeProvider diagramTypeProvider) {
 		super(viewer, registry, diagramTypeProvider);
+		
+		ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) viewer.getRootEditPart();
+		zoomManager = rootEditPart.getZoomManager();
+		zoomInAction = new ZoomInAction(zoomManager);
+		zoomOutAction = new ZoomOutAction(zoomManager);
 	}
 
 	/*=====================================================================================*
@@ -56,8 +74,11 @@ public class PackageDiagramEditorContextMenuProvider extends
 	 */
 	@Override
 	public void buildContextMenu(IMenuManager manager) {
+		
 		GEFActionConstants.addStandardActionGroups(manager);
 		addActionToMenuIfAvailable(manager, ActionFactory.DELETE.getId(), GEFActionConstants.GROUP_EDIT);
+		addActionToMenu(manager, zoomInAction.getId(), GEFActionConstants.GROUP_VIEW);
+		addActionToMenu(manager, zoomOutAction.getId(), GEFActionConstants.GROUP_VIEW);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
