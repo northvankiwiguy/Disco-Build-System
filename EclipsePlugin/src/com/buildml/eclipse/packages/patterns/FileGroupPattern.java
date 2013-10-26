@@ -573,9 +573,16 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					}
 					
 					/* record an undo/redo operation that will actually change the slot value */
-					ActionChangeOperation op = new ActionChangeOperation("Connect File Group", actionId);
+					BmlMultiOperation multiOp = new BmlMultiOperation("Connect File Group");
+					ActionChangeOperation op = new ActionChangeOperation("", actionId);
 					op.recordSlotChange(slotId, currentValue, Integer.valueOf(fileGroupId));
-					op.recordOnly();
+					multiOp.add(op);
+					
+					/* if necessary, bump pictograms to the right */
+					bumpPictogramsRight(multiOp, fileGroupId, actionId, slotId, true);
+					
+					/* record these operations for future undo/redo operations */
+					multiOp.recordOnly();
 				} 
 				
 				/*
@@ -893,5 +900,48 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		return null;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * If necessary, bump the pictograms to the right. That is, if the fileGroup was just
+	 * connected to an action's input, and that fileGroup is to the right (higher x-coord) 
+	 * of the action, then bump the action (and all other downstream members) to the right, 
+	 * so their x-coordinates will be higher than the fileGroup. If connected to the 
+	 * action's output, but it's left of the action, bump the file group (and downstream
+	 * members) to the right.
+	 * 
+	 * @param multiOp		The multi-undo/redo operation to append "move" actions to. 
+	 * @param fileGroupId	The ID of the file group that just got connected.
+	 * @param actionId		The ID of the action it was connected to.
+	 * @param slotId		The slot (within the action) it was connected to.
+	 * @param moveNow		True if this method should invoke the moves (false simply
+	 *                      adds the details to operation).
+	 */
+	private void bumpPictogramsRight(BmlMultiOperation multiOp, int fileGroupId,
+			int actionId, int slotId, boolean moveNow) {
+
+		/* determine whether the slot was INPUT or OUTPUT */
+		SlotDetails details = actionTypeMgr.getSlotByID(slotId);
+		if (details == null) {
+			return;	/* shouldn't happen */
+		}
+		
+		/* 
+		 * Where do we start bumping from? The file group, or the action? It really
+		 * depends on what type of slot it is.
+		 */
+		int memberType, memberId;
+		if (details.slotPos == ISlotTypes.SLOT_POS_INPUT) {
+			memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
+			memberId = fileGroupId;
+		} else {
+			memberType = IPackageMemberMgr.TYPE_ACTION;
+			memberId = actionId;
+		}
+		
+		/* start the bumping (recursively) */
+		layoutAlgorithm.bumpPictogramsRight(multiOp, memberType, memberId, moveNow);
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 }
