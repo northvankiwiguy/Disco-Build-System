@@ -327,13 +327,15 @@ public class LayoutAlgorithm {
 		}
 		
 		/* 
-		 * Add this member to the end of the specified column. Take care to add the
-		 * column if it doesn't yet exist.
+		 * If it's not already somewhere in the current column, add this member to the end of 
+		 * this column. Take care to add the column if it doesn't yet exist.
 		 */
-		if (colNum >= layoutGrid.size()) {
-			layoutGrid.add(colNum, new ArrayList<MemberDesc>());
+		if ((loc == null) || (loc.col < colNum)) {
+			if (colNum >= layoutGrid.size()) {
+				layoutGrid.add(colNum, new ArrayList<MemberDesc>());
+			}
+			layoutGrid.get(colNum).add(member);
 		}
-		layoutGrid.get(colNum).add(member);
 		
 		/* 
 		 * Now, fetch all of this member's left neighbours, adding them to colNum + 1.
@@ -432,21 +434,38 @@ public class LayoutAlgorithm {
 		 * is used as an offset for positioning file groups.
 		 */
 		int actionWidth = getSizeOfPictogram(IPackageMemberMgr.TYPE_ACTION).getWidth();
+		int actionHeight = getSizeOfPictogram(IPackageMemberMgr.TYPE_ACTION).getHeight();
 		int fileGroupWidth = getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getWidth();
+		int fileGroupHeight = getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getHeight();
 		int colWidth = (int)((actionWidth > fileGroupWidth ? actionWidth : fileGroupWidth) * 1.2);
+		int rowHeight = (actionHeight > fileGroupHeight) ? actionHeight : fileGroupHeight;
 		int fileGroupOffset = (actionWidth - fileGroupWidth) / 2;
 
+		/*
+		 * Now, we proceed to assign x-coordinates for each members, based on its column. For later
+		 * on, we also remember which of the columns is the "tallest".
+		 */
 		int numCols = layoutGrid.size();
-		
-		/* for each column... */
+		if (numCols == 0) {
+			return;
+		}
+		int tallestColumn = -1;
+		int tallestColumnSize = -1; 
 		for (int i = 0; i != numCols; i++) {
 			
 			/* determine the x coordinate of the column so that members are nicely lined up. */
 			int colX = colWidth * (numCols - i - 1);
 			ArrayList<MemberDesc> colMembers = layoutGrid.get(i);
+			int numRows = colMembers.size();
+			
+			/* is this the column (or one of the columns) that has the most members in it? */
+			if (numRows > tallestColumnSize) {
+				tallestColumn = i;
+				tallestColumnSize = numRows;
+			}
 			
 			/* set all members in the column to the same x coordinate */
-			for (int j = 0; j < colMembers.size(); j++) {
+			for (int j = 0; j < numRows; j++) {
 				MemberDesc member = colMembers.get(j);
 				member.x = colX;
 				
@@ -456,6 +475,26 @@ public class LayoutAlgorithm {
 				}
 			}
 		}
+				
+		/*
+		 * Now assign y coordinates. This is done by evenly spacing the members across
+		 * each column. For example, if there are two members in a row, they're positioned
+		 * at 1/3rd and 2/3rds of the way.
+		 * TODO: we need a force-based algorithm for positioning members within a column.
+		 */
+		int diagramHeight = tallestColumnSize * rowHeight;
+
+		for (int i = 0; i != numCols; i++) {	
+			ArrayList<MemberDesc> colMembers = layoutGrid.get(i);
+			int numRows = colMembers.size();
+			
+			/* evenly space out the members of the column */
+			for (int j = 0; j < numRows; j++) {
+				MemberDesc member = colMembers.get(j);
+				member.y = (int) (((j + 1) / (double)(numRows + 1)) * diagramHeight);
+			}
+		}
+		
 	}
 
 	/*-------------------------------------------------------------------------------------*/
