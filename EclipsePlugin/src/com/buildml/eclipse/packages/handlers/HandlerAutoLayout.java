@@ -16,6 +16,11 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
+import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
+import com.buildml.eclipse.utils.BmlMultiOperation;
+import com.buildml.eclipse.utils.EclipsePartUtils;
+
 /**
  * An Eclipse UI Handler for managing the "Auto Layout" UI command.
  * 
@@ -32,7 +37,18 @@ public class HandlerAutoLayout extends AbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("Auto Layout");
+		
+		/* determine which editor we're currently looking at */
+		PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
+		if (pde == null) {
+			return null;
+		}
+		
+		/* invoke the layout algorithm for this editor's package */
+		LayoutAlgorithm layoutAlgorithm = pde.getLayoutAlgorithm();
+		BmlMultiOperation multiOp = new BmlMultiOperation("Auto Layout");
+		layoutAlgorithm.autoLayoutPackage(multiOp, pde.getPackageId());
+		multiOp.recordAndInvoke();
 		return null;
 	}
 
