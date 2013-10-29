@@ -155,7 +155,7 @@ public interface IPackageMemberMgr {
 	 * 
 	 * @param pkgId				The package to query the members from.
 	 * @param pkgScopeId		The scope to search within (SCOPE_NONE for all scopes).
-	 * @param memberTypeFilter	The type of member to search for (MEMBER_TYPE_ANY to return all members).
+	 * @param memberTypeFilter	The type of member to search for (TYPE_ANY to return all members).
 	 * @return An (possibly empty) array of MemberDesc, describing the relevant package members.
 	 */
 	public abstract MemberDesc[] getMembersInPackage(int pkgId, int pkgScopeId, int memberTypeFilter);
