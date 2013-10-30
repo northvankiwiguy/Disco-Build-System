@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMemberMgr;
 
@@ -46,6 +47,9 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	
 	/** The ID of the fileGroup being changed */
 	private int fileGroupId;
+	
+	/** The type of this file group (e.g. SOURCE_GROUP, GENERATED_GROUP, etc) */
+	private int fileGroupType;
 	
 	/** The fields of this operation that have changed - see above bitmap */
 	private int changedFields = 0;
@@ -82,7 +86,10 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	public FileGroupChangeOperation(String label, int fileGroupId) {
 		super(label);
 		
+		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		
 		this.fileGroupId = fileGroupId;
+		this.fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
 	}
 
 	/*=====================================================================================*
@@ -233,6 +240,11 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	private void setFileGroupMembers(int fileGroupId, ArrayList<Integer> members) {
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		
+		if ((fileGroupType != IFileGroupMgr.SOURCE_GROUP) && 
+				(fileGroupType != IFileGroupMgr.MERGE_GROUP)) {
+			throw new FatalError("Unhandled file group type: " + fileGroupType);
+		}
+				
 		/* clear out any existing members */
 		int groupSize = fileGroupMgr.getGroupSize(fileGroupId);
 		for (int i = groupSize - 1; i >= 0; i--) {
@@ -241,8 +253,14 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 		
 		/* add the new members */
 		groupSize = members.size();
-		for (int i = 0; i != groupSize; i++) {
-			fileGroupMgr.addPathId(fileGroupId, members.get(i));
+		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
+			for (int i = 0; i != groupSize; i++) {
+				fileGroupMgr.addPathId(fileGroupId, members.get(i));
+			}
+		} else {
+			for (int i = 0; i != groupSize; i++) {
+				fileGroupMgr.addSubGroup(fileGroupId, members.get(i));
+			}			
 		}
 	}
 

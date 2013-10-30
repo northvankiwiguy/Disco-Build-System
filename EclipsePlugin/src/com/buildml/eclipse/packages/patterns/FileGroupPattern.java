@@ -23,6 +23,7 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
+import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
@@ -166,6 +167,24 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			OFF_X + FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP,
 			OFF_X + FILE_GROUP_OVERLAP + FILE_GROUP_WIDTH, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT,
 			OFF_X + FILE_GROUP_OVERLAP, FILE_GROUP_OVERLAP + FILE_GROUP_HEIGHT 
+	};
+	
+	/**
+	 * Coordinates for the three additional lines that are shown inside a merge group box.
+	 */
+	int coordsMergeLines[][] = new int[][] {
+			{
+				OFF_X + 5, FILE_GROUP_CORNER_SIZE,
+				OFF_X + FILE_GROUP_WIDTH - 5, FILE_GROUP_CORNER_SIZE + 10,
+			},
+			{
+				OFF_X + 5, FILE_GROUP_CORNER_SIZE + 13,
+				OFF_X + FILE_GROUP_WIDTH - 5, FILE_GROUP_CORNER_SIZE + 13,
+			},
+			{
+				OFF_X + 5, FILE_GROUP_CORNER_SIZE + 26,
+				OFF_X + FILE_GROUP_WIDTH - 5, FILE_GROUP_CORNER_SIZE + 16,
+			},
 	};
 	
 	/** The (static) maximum size of a file group pictogram, in pixels */
@@ -499,7 +518,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			return true;
 		}
 		Object targetBo = GraphitiUtils.getBusinessObject(targetContainer);
-		if (targetBo instanceof UIAction) {
+		if ((targetBo instanceof UIAction) || (targetBo instanceof UIFileGroup)) {
 			return true;
 		}
 		
@@ -550,48 +569,18 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		else {
 			Object targetBo = GraphitiUtils.getBusinessObject(context.getTargetContainer());
 			if (targetBo instanceof UIAction) {
-				
-				/*
-				 * We're connecting a file group to an action's slot. First, pop up a dialog
-				 * to ask the user which slot, then proceed to set it.
-				 */
+				/* create a connection arrow between the file group and the action */
 				int actionId = ((UIAction)targetBo).getId();
-				SlotSelectionDialog dialog = new SlotSelectionDialog(buildStore, actionId, true, true);
-				int status = dialog.open();
-				if (status == SlotSelectionDialog.OK) {
-					int slotId = dialog.getSlotId();
-					
-					Object currentValue = actionMgr.getSlotValue(actionId, slotId);
-					
-					/* make the change - checking for cycles in the diagram */
-					int error = actionMgr.setSlotValue(actionId, slotId, fileGroupId);
-					if (error == ErrorCode.LOOP_DETECTED) {
-						AlertDialog.displayErrorDialog("Can't Connect File Group",
-								"Adding this connection would cause a cycle in the package diagram.");
-						((PackageDiagramEditor)getDiagramEditor()).refreshView(true);
-						return;
-					}
-					
-					/* record an undo/redo operation that will actually change the slot value */
-					BmlMultiOperation multiOp = new BmlMultiOperation("Connect File Group");
-					ActionChangeOperation op = new ActionChangeOperation("", actionId);
-					op.recordSlotChange(slotId, currentValue, Integer.valueOf(fileGroupId));
-					multiOp.add(op);
-					
-					/* if necessary, bump pictograms to the right */
-					bumpPictogramsRight(multiOp, fileGroupId, actionId, slotId, true);
-					
-					/* record these operations for future undo/redo operations */
-					multiOp.recordOnly();
-				} 
+				moveOntoAction(fileGroupId, actionId);
+				((PackageDiagramEditor)getDiagramEditor()).refreshView(true);
+			}
+			
+			else if (targetBo instanceof UIFileGroup) {
 				
-				/*
-				 * Cancel was pressed, so nothing changes on the diagram. However, the UIFileGroup needs
-				 * to be redrawn back in its original location.
-				 */
-				else {
-					((PackageDiagramEditor)getDiagramEditor()).refreshView(true);
-				}
+				/* create merge file groups */
+				int targetFileGroupId = ((UIFileGroup)targetBo).getId();
+				moveOntoFileGroup(fileGroupId, targetFileGroupId);
+				((PackageDiagramEditor)getDiagramEditor()).refreshView(true);						
 			}
 		}
 		
@@ -758,6 +747,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		int fileGroupId = addedFileGroup.getId();
+		int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
 		
 		/*
 		 * How many boxes will be shown? This helps us distinguish between file groups
@@ -771,9 +761,15 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		
 		/* 
 		 * We can show a limited number of file names in the pictogram. If more than our
-		 * maximum, display the last name as "...".
+		 * maximum, display the last name as "...". For merge file groups, we don't show file
+		 * names underneath the pictogram.
 		 */
-		int fileNamesToShow = (groupSize <= MAX_LABELS_TO_SHOW) ? groupSize : MAX_LABELS_TO_SHOW;
+		int fileNamesToShow;
+		if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+			fileNamesToShow = 0;
+		} else {
+			fileNamesToShow = (groupSize <= MAX_LABELS_TO_SHOW) ? groupSize : MAX_LABELS_TO_SHOW;
+		}
 		
 		/* create a container that holds the pictogram */
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -816,34 +812,49 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		boxCorner.setLineWidth(2);
 		
 		/*
-		 * Display the file group's content (or at least part of it) under the file box.
-		 * We can only show a limited number of file names. If there are too many to
-		 * show, the last label must be "...".
+		 * For source/generated groups, display the file group's content (or at least part
+		 * of it) under the file box. We can only show a limited number of file names. If
+		 * there are too many to show, the last label must be "...".
 		 */
-		for (int i = 0; i != fileNamesToShow; i++) {
-	
-			String value;
-			if ((i == (MAX_LABELS_TO_SHOW - 1)) && (groupSize > MAX_LABELS_TO_SHOW)) {
-				value = "...";
-			} else {
-				/* fetch this particular file's base name */
-				int pathId = fileGroupMgr.getPathId(fileGroupId, i);
-				if (pathId < 0) {
-					value = "";
+		if (fileGroupType != IFileGroupMgr.MERGE_GROUP) {
+			for (int i = 0; i != fileNamesToShow; i++) {
+
+				String value;
+				if ((i == (MAX_LABELS_TO_SHOW - 1)) && (groupSize > MAX_LABELS_TO_SHOW)) {
+					value = "...";
 				} else {
-					value = fileMgr.getBaseName(pathId);
+					/* fetch this particular file's base name */
+					int pathId = fileGroupMgr.getPathId(fileGroupId, i);
+					if (pathId < 0) {
+						value = "";
+					} else {
+						value = fileMgr.getBaseName(pathId);
+					}
 				}
+
+				/* draw the label underneath the main "page" polygon */
+				Text fileNames = gaService.createText(getDiagram(), invisibleRectangle, 
+						value, LABEL_FONT, LABEL_FONT_SIZE);
+				fileNames.setFilled(false);
+				fileNames.setForeground(manageColor(TEXT_FOREGROUND));
+				fileNames.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+				gaService.setLocationAndSize(fileNames, 
+						0, FILE_GROUP_HEIGHT + ((1 + i) * (LABEL_FONT_SIZE + LABEL_FONT_GAP)), 
+						FILE_GROUP_WIDTH * 2, (LABEL_FONT_SIZE + LABEL_FONT_GAP));
 			}
-			
-			/* draw the label underneath the main "page" polygon */
-			Text fileNames = gaService.createText(getDiagram(), invisibleRectangle, 
-					value, LABEL_FONT, LABEL_FONT_SIZE);
-			fileNames.setFilled(false);
-			fileNames.setForeground(manageColor(TEXT_FOREGROUND));
-			fileNames.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			gaService.setLocationAndSize(fileNames, 
-					0, FILE_GROUP_HEIGHT + ((1 + i) * (LABEL_FONT_SIZE + LABEL_FONT_GAP)), 
-					FILE_GROUP_WIDTH * 2, (LABEL_FONT_SIZE + LABEL_FONT_GAP));
+		}
+
+		/*
+		 * For merge groups, we draw three extra lines inside the file group box as
+		 * an indication to the user that it's a merge group.
+		 */
+		else {
+			for (int i = 0; i < coordsMergeLines.length; i++) {				
+				Polyline mergeLine = gaService.createPolyline(invisibleRectangle, coordsMergeLines[i]);
+				mergeLine.setForeground(manageColor(LINE_COLOUR));
+				mergeLine.setBackground(manageColor(FILL_COLOUR));
+				mergeLine.setLineWidth(1);
+			}
 		}
 		
 		/* 
@@ -944,4 +955,136 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for moveShape() that handles the case where a file group is moved on
+	 * top of an action, in which case a connection arrow must be added.
+	 * 
+	 * @param fileGroupId ID of the file group that was moved.
+	 * @param actionId    ID of the action that the file group was moved onto.
+	 */
+	private void moveOntoAction(int fileGroupId, int actionId) {
+		/*
+		 * We're connecting a file group to an action's slot. First, pop up a dialog
+		 * to ask the user which slot, then proceed to set it.
+		 */
+		SlotSelectionDialog dialog = new SlotSelectionDialog(buildStore, actionId, true, true);
+		int status = dialog.open();
+		if (status == SlotSelectionDialog.OK) {
+			int slotId = dialog.getSlotId();
+			
+			Object currentValue = actionMgr.getSlotValue(actionId, slotId);
+			
+			/* make the change - checking for cycles in the diagram */
+			int error = actionMgr.setSlotValue(actionId, slotId, fileGroupId);
+			if (error == ErrorCode.LOOP_DETECTED) {
+				AlertDialog.displayErrorDialog("Can't Connect File Group",
+						"Adding this connection would cause a cycle in the package diagram.");
+				return;
+			}
+			
+			/* record an undo/redo operation that will actually change the slot value */
+			BmlMultiOperation multiOp = new BmlMultiOperation("Connect File Group");
+			ActionChangeOperation op = new ActionChangeOperation("", actionId);
+			op.recordSlotChange(slotId, currentValue, Integer.valueOf(fileGroupId));
+			multiOp.add(op);
+			
+			/* if necessary, bump pictograms to the right */
+			bumpPictogramsRight(multiOp, fileGroupId, actionId, slotId, true);
+			
+			/* record these operations for future undo/redo operations */
+			multiOp.recordOnly();
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for moveShape() that handles the case where a file group is dragged
+	 * on top of another file group. Either of the file groups can be SOURCE, GENERATED
+	 * or MERGE groups. The following cases are handled:
+	 *   1) SOURCE/GENERATED/MERGE dropped on SOURCE/GENERATED -> creates a new MERGE group that
+	 *      they both feed into.
+	 *   2) SOURCE/GENERATED dropped on MERGE GROUP -> adds source group into MERGE GROUP.
+	 *   3) MERGE dropped onto MERGE - illegal for now (need to determine semantics, which
+	 *      will probably involve a pop-up box to ask the user what to do).
+	 * 
+	 * @param sourceFileGroupId		ID of the file group that was dragged.
+	 * @param targetFileGroupId ID of the file group it was dragged onto.
+	 */
+	private void moveOntoFileGroup(int sourceFileGroupId, int targetFileGroupId) {
+		
+		/* determine type of each file group (SOURCE, GENERATED, MERGE) */
+		int sourceGroupType = fileGroupMgr.getGroupType(sourceFileGroupId);
+		int targetGroupType = fileGroupMgr.getGroupType(targetFileGroupId);
+		if ((sourceGroupType == ErrorCode.NOT_FOUND) || (targetGroupType == ErrorCode.NOT_FOUND)) {
+			return; /* error - just ignore the move */
+		}
+		
+		/*
+		 * Handle case where we dragged onto an existing MERGE file group.
+		 */
+		if (targetGroupType == IFileGroupMgr.MERGE_GROUP) {
+			AlertDialog.displayErrorDialog("Error Creating Merge Group", 
+					"Dragging file groups onto merge groups is currently not supported");
+			return;
+		}
+		 
+		/*
+		 * Handle case where we dragged a SOURCE/GENERATED group onto an existing SOURCE
+		 * or GENERATED group and need to create a new MERGE group.
+		 */
+		else {
+	
+			/*
+			 * Create a new merge group. This will allocate an empty group, providing
+			 * us with the group ID.
+			 */
+			int pkgId = editor.getPackageId();
+			int mergeFileGroupId = fileGroupMgr.newMergeGroup(pkgId);
+			if (mergeFileGroupId == ErrorCode.NOT_FOUND) {
+				AlertDialog.displayErrorDialog("Error Creating Merge Group",
+						"Unable to create a new merge group in the database.");
+				return;
+			}
+						
+			/* 
+			 * Position the new merge group halfway between the source and
+			 * target file groups.
+			 */
+			MemberLocation sourceLocation = pkgMemberMgr.getMemberLocation(
+					IPackageMemberMgr.TYPE_FILE_GROUP, sourceFileGroupId);
+			MemberLocation targetLocation = pkgMemberMgr.getMemberLocation(
+					IPackageMemberMgr.TYPE_FILE_GROUP, targetFileGroupId);
+			if ((sourceLocation == null) || (targetLocation == null)) {
+				AlertDialog.displayErrorDialog("Error Positioning Merge Group",
+						"Unable to determine the current position of source/target file groups");
+				return;
+			}
+			if (pkgMemberMgr.setMemberLocation(
+					IPackageMemberMgr.TYPE_FILE_GROUP, mergeFileGroupId,
+					sourceLocation.x,
+					(sourceLocation.y + targetLocation.y) / 2) != ErrorCode.OK) {
+				AlertDialog.displayErrorDialog("Error Positioning Merge Group",
+						"Unable to set position for new merge group");
+				return;				
+			}
+		
+			// TODO: bump the merge file group to the right.
+			
+			/*
+			 * Finally, generate an undo/redo operation to add the members to the group.
+			 * If this operation is "undoned" then the group will still exist in the
+			 * database, but will have no members and therefore won't be shown.
+			 */
+			FileGroupChangeOperation op = new FileGroupChangeOperation("Create Merge Group", mergeFileGroupId);
+			ArrayList<Integer> newMembers = new ArrayList<Integer>();
+			newMembers.add(sourceFileGroupId);
+			newMembers.add(targetFileGroupId);
+			op.recordMembershipChange(new ArrayList<Integer>(), newMembers);
+			op.recordAndInvoke();
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/	
 }
