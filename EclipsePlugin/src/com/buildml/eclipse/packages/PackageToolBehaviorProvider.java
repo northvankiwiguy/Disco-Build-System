@@ -121,9 +121,15 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	UIFileGroup fileGroup = (UIFileGroup)bo;
         	int fileGroupId = fileGroup.getId();
         	String files[] = fileGroupMgr.getExpandedGroupFiles(fileGroupId);
+        	int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
+        	String typeName = (fileGroupType == IFileGroupMgr.SOURCE_GROUP) ? "Source" :
+        						((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ?
+        								"Generated" : "Merge");
         	
         	StringBuffer sb = new StringBuffer();
-        	sb.append("\n Source File Group: \n");
+        	sb.append("\n ");
+        	sb.append(typeName);
+        	sb.append(" File Group: \n");
         	for (int i = 0; i < files.length; i++) {
 				sb.append(' ');
 				sb.append(files[i]);
