@@ -3,10 +3,13 @@ package com.buildml.eclipse.packages.properties.filegroup;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -53,6 +56,15 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	
 	/** The initial content of the file group, before any editing took place */
 	private ArrayList<Integer> initialMembers;
+	
+	/**
+	 * Set to true if we're programmatically changing the selection and should therefore
+	 * include the listener events.
+	 */
+	private boolean programmaticallySelecting = false;
+	
+	/** the JFace provider for fetching children of elements in the tree viewer */
+	private FileGroupContentProvider contentProvider;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -107,8 +119,9 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		 */
 		filesList = new TreeViewer(panel, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		filesList.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		filesList.setContentProvider(new FileGroupContentProvider(buildStore, fileGroupId, fileGroupType));
-		filesList.setLabelProvider(new FileGroupLabelProvider(buildStore, fileGroupId, fileGroupType));
+		contentProvider = new FileGroupContentProvider(buildStore, fileGroupType);
+		filesList.setContentProvider(contentProvider);
+		filesList.setLabelProvider(new FileGroupLabelProvider(buildStore, fileGroupType));
 		
 		/*
 		 * The second column - buttons that we can press to modify the file group content
@@ -173,6 +186,9 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		filesList.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
+				if (programmaticallySelecting) {
+					return;
+				}
 				int selectedFilesCount = handleSelection();
 				deleteButton.setEnabled(selectedFilesCount >= 1);
 				moveUpButton.setEnabled(selectedFilesCount >= 1);
@@ -265,6 +281,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	
 		Integer membersArray[] = currentMembers.toArray(new Integer[currentMembers.size()]);
 		filesList.setInput(membersArray);
+		filesList.expandAll();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -306,7 +323,12 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		Iterator<Object> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object element = iter.next();
-			if ((fileGroupType == IFileGroupMgr.SOURCE_GROUP) && (element instanceof Integer)) {
+			
+			/* 
+			 * For both SOURCE and MERGE groups, the top level treeviewer elements are
+			 * Integer (pathId or subGroupId). This is what we remove. All else is ignored.
+			 */
+			if (element instanceof Integer) {
 				currentMembers.remove(element);
 			}
 		}
@@ -329,8 +351,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 				
 		/* if nothing's selected, there's nothing to do */
 		ITreeSelection selection = (ITreeSelection) filesList.getSelection();
-		int selectedCount = selection.size();		
-		if (selectedCount == 0) {
+		if (selection.size() == 0) {
 			return;
 		}
 		
@@ -340,14 +361,20 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		 * our array should be [2, 4]. To do this, we need to convert the ITreeSelection
 		 * that Eclipse gives us into a sorted array of indicies.
 		 */
-		Integer selectedIndicies[] = new Integer[selectedCount];
+		ArrayList<Integer> selectedTopLevelIndicies = new ArrayList<Integer>();
 		Iterator<Object> iter = selection.iterator();
 		int i = 0;
 		while (iter.hasNext()) {
 			Object element = iter.next();
-			selectedIndicies[i] = currentMembers.indexOf(element);
-			i++;
+			if (element instanceof Integer) {
+				selectedTopLevelIndicies.add(currentMembers.indexOf(element));
+				i++;
+			}
 		}
+		
+		/* convert from ArrayList<Integer> to sorted Integer[] */
+		Integer selectedIndicies[] = new Integer[i];
+		selectedTopLevelIndicies.toArray(selectedIndicies);
 		Arrays.sort(selectedIndicies);
 		
 		/* 
@@ -357,7 +384,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		 */
 		int currentMemberSize = currentMembers.size();
 		if (((direction == -1) && (selectedIndicies[0] == 0)) ||
-			((direction == 1) && (selectedIndicies[selectedCount - 1] == (currentMemberSize - 1)))) {
+			((direction == 1) && (selectedIndicies[selectedIndicies.length - 1] == (currentMemberSize - 1)))) {
 			return;
 		}
 
@@ -368,11 +395,11 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		 */
 		int firstIndex, lastIndex;
 		if (direction == 1) {
-			firstIndex = selectedCount - 1;
+			firstIndex = selectedIndicies.length - 1;
 			lastIndex = -1;
 		} else {
 			firstIndex = 0;
-			lastIndex = selectedCount;
+			lastIndex = selectedIndicies.length;
 		}
 		
 		/*
@@ -409,13 +436,46 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	 */
 	private int handleSelection() {
 		
+		ITreeSelection selection = (ITreeSelection)filesList.getSelection();
+
 		/* for source groups, any number of items can be selected */
 		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
-			ITreeSelection selection = (ITreeSelection)filesList.getSelection();
 			return selection.size();
 		}
 		
 		/* for merge file groups, selecting a single item will select all of them in that group */
+		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+			
+			/* for each selected element, select its entire subtree */
+			TreePath paths[] = selection.getPaths();
+			List<Object> elementsToSelect = new ArrayList<Object>();			
+			for (int i = 0; i < paths.length; i++) {
+				
+				/* determine the parent, select it, then select all it children */
+				Object parentOfSubTree = paths[i].getFirstSegment();
+				elementsToSelect.add(parentOfSubTree);
+				Object children[] = contentProvider.getChildren(parentOfSubTree);
+				if (children != null) {
+					for (int j = 0; j < children.length; j++) {
+						elementsToSelect.add(children[j]);	
+					}
+				}
+			}
+
+			/* 
+			 * Proceed to modify the current selection, taking care to ignore selection events
+			 * (since this method is called from within an event listener).
+			 */
+			StructuredSelection newSelection = new StructuredSelection(elementsToSelect);
+			programmaticallySelecting = true;
+			filesList.setSelection(newSelection, true);
+			programmaticallySelecting = false;
+			
+			/* yes, there's a selection */
+			return elementsToSelect.size();
+		}
+		
+		/* other situations not yet handled */
 		return 0;
 	}
 	

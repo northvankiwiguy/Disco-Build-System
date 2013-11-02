@@ -33,9 +33,6 @@ public class FileGroupLabelProvider extends LabelProvider {
 	/** The IFileMgr we retrieve label information from */
 	private IFileMgr fileMgr;
 	
-	/** The file group we're viewing */
-	private int fileGroupId;
-	
 	/** The type of this file group (e.g. SOURCE_GROUP, MERGE_GROUP, etc). */
 	private int fileGroupType;
 	
@@ -47,12 +44,10 @@ public class FileGroupLabelProvider extends LabelProvider {
 	 * Create a new {@link FileGroupLabelProvider} object.
 	 * 
 	 * @param buildStore The IBuildStore to retrieve content information from.
-	 * @param fileGroupId The file group we're viewing.
 	 * @param fileGroupType The type of this file group (e.g. SOURCE_GROUP, MERGE_GROUP, etc).
 	 */
-	public FileGroupLabelProvider(IBuildStore buildStore, int fileGroupId, int fileGroupType) {
+	public FileGroupLabelProvider(IBuildStore buildStore, int fileGroupType) {
 		this.fileMgr = buildStore.getFileMgr();
-		this.fileGroupId = fileGroupId;
 		this.fileGroupType = fileGroupType;
 	}
 	
@@ -74,6 +69,18 @@ public class FileGroupLabelProvider extends LabelProvider {
 			Integer pathId = (Integer)element;
 			return fileMgr.getPathName(pathId, true);
 		}
+		
+		/* for file groups, we have Integer (top level), and String (second level) */
+		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+			if (element instanceof Integer) {
+				return "Sub Group ";
+			}
+			
+			else if (element instanceof String) {
+				return (String)element;
+			}
+		}
+		
 		return "";
 	}
 	

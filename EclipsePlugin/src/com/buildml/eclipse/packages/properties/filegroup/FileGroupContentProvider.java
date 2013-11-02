@@ -15,6 +15,7 @@ package com.buildml.eclipse.packages.properties.filegroup;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
+import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 
@@ -31,11 +32,8 @@ public class FileGroupContentProvider extends ArrayContentProvider implements
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 	
-	/** The IBuildStore we retrieve content information from */
-	private IBuildStore buildStore;
-	
-	/** The file group we're viewing */
-	private int fileGroupId;
+	/** The IFileGroupMgr we retrieve content information from */
+	private IFileGroupMgr fileGroupMgr;
 	
 	/** The type of this file group (e.g. SOURCE_GROUP, MERGE_GROUP, etc). */
 	private int fileGroupType;
@@ -48,13 +46,11 @@ public class FileGroupContentProvider extends ArrayContentProvider implements
 	 * Create a new FileGroupContentProvider.
 	 * 
 	 * @param buildStore The IBuildStore to retrieve content information from.
-	 * @param fileGroupId The file group we're viewing.
 	 * @param fileGroupType The type of this file group (e.g. SOURCE_GROUP, MERGE_GROUP, etc).
 	 */
-	public FileGroupContentProvider(IBuildStore buildStore, int fileGroupId, int fileGroupType) {
-		this.buildStore = buildStore;
-		this.fileGroupId = fileGroupId;
+	public FileGroupContentProvider(IBuildStore buildStore, int fileGroupType) {
 		this.fileGroupType = fileGroupType;
+		this.fileGroupMgr = buildStore.getFileGroupMgr();
 	}
 	
 	/*=====================================================================================*
@@ -71,6 +67,20 @@ public class FileGroupContentProvider extends ArrayContentProvider implements
 		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
 			return null;
 		}
+		
+		/* for merge groups, the top-level sub-group ID have String paths as their children */
+		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+			
+			/* the parent is the ID of the sub file group */
+			if (parentElement instanceof Integer) {
+				int parentId = (Integer)parentElement;
+				return fileGroupMgr.getExpandedGroupFiles(parentId);
+			}
+			
+			/* else, if the parent is a String, it's at the second level, with no kids */
+			return null;
+		}
+		
 		return null;
 	}
 	
@@ -96,7 +106,17 @@ public class FileGroupContentProvider extends ArrayContentProvider implements
 		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
 			return false;
 		}
-		return false;
+		
+		/* 
+		 * For merge groups, the first level (subgroup parent - Integer) has children, but
+		 * the actual paths (Strings) don't have children.
+		 */
+		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+			return (element instanceof Integer);
+		}
+		
+		/* other cases are currently not handled */
+		throw new FatalError("Unhandled file group type: " + fileGroupType);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
