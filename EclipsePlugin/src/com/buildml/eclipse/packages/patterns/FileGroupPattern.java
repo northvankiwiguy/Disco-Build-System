@@ -1005,9 +1005,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * or MERGE groups. The following cases are handled:
 	 *   1) SOURCE/GENERATED/MERGE dropped on SOURCE/GENERATED -> creates a new MERGE group that
 	 *      they both feed into.
-	 *   2) SOURCE/GENERATED dropped on MERGE GROUP -> adds source group into MERGE GROUP.
-	 *   3) MERGE dropped onto MERGE - illegal for now (need to determine semantics, which
-	 *      will probably involve a pop-up box to ask the user what to do).
+	 *   2) SOURCE/GENERATED/MERGE dropped on MERGE GROUP -> adds source group into MERGE GROUP.
 	 * 
 	 * @param sourceFileGroupId		ID of the file group that was dragged.
 	 * @param targetFileGroupId ID of the file group it was dragged onto.
@@ -1022,17 +1020,25 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		}
 		
 		/*
-		 * Handle case where we dragged onto an existing MERGE file group.
+		 * Handle case where we drag onto an existing MERGE file group. The
+		 * source is simply added into the destination.
 		 */
 		if (targetGroupType == IFileGroupMgr.MERGE_GROUP) {
-			AlertDialog.displayErrorDialog("Error Creating Merge Group", 
-					"Dragging file groups onto merge groups is currently not supported");
+			
+			int error = fileGroupMgr.addSubGroup(targetFileGroupId, sourceFileGroupId);
+			if (error < 0) {
+				AlertDialog.displayErrorDialog("Error Adding to Merge Group",
+						"For some reason, the file group could not be added to the merge group");
+				return;
+			}
+			
+			// TODO: make sure that cycles are avoided/reported.
 			return;
 		}
 		 
 		/*
-		 * Handle case where we dragged a SOURCE/GENERATED group onto an existing SOURCE
-		 * or GENERATED group and need to create a new MERGE group.
+		 * Handle case where we dragged a SOURCE/GENERATED/MERGE group onto an existing SOURCE
+		 * or GENERATED group. This results in the creation of a new MERGE group.
 		 */
 		else {
 	
