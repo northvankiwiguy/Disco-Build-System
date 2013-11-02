@@ -246,6 +246,7 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 		}
 				
 		/* clear out any existing members */
+		buildStore.setFastAccessMode(true);
 		int groupSize = fileGroupMgr.getGroupSize(fileGroupId);
 		for (int i = groupSize - 1; i >= 0; i--) {
 			fileGroupMgr.removeEntry(fileGroupId, i);
@@ -262,6 +263,7 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 				fileGroupMgr.addSubGroup(fileGroupId, members.get(i));
 			}			
 		}
+		buildStore.setFastAccessMode(false);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

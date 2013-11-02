@@ -1,11 +1,14 @@
-package com.buildml.eclipse.packages.properties;
+package com.buildml.eclipse.packages.properties.filegroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -13,7 +16,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 
 import com.buildml.eclipse.bobj.UIFileGroup;
@@ -22,6 +24,7 @@ import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.dialogs.VFSTreeSelectionDialog;
+import com.buildml.model.IFileGroupMgr;
 
 /**
  * An Eclipse "property" page that allows viewing/editing of file group's content.
@@ -39,8 +42,11 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	/** The ID of the underlying file group */
 	private int fileGroupId;
 	
-	/** The List control that contains the list of files */
-	private List filesList;
+	/** The type of this file group (source, generated, etc) */
+	private int fileGroupType;
+	
+	/** The TreeViewer control that contains the list of files */
+	private TreeViewer filesList;
 	
 	/** The current content of the file group */
 	private ArrayList<Integer> currentMembers;
@@ -75,6 +81,8 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 			return null;
 		}
 		fileGroupId = fileGroup.getId();
+		fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
+		
 		if (!fetchMembers(fileGroupId)) {
 			return null;
 		}
@@ -97,8 +105,10 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		/*
 		 * The first column - the list of files in the file group.
 		 */
-		filesList = new List(panel, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		filesList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		filesList = new TreeViewer(panel, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		filesList.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		filesList.setContentProvider(new FileGroupContentProvider(buildStore, fileGroupId, fileGroupType));
+		filesList.setLabelProvider(new FileGroupLabelProvider(buildStore, fileGroupId, fileGroupType));
 		
 		/*
 		 * The second column - buttons that we can press to modify the file group content
@@ -111,15 +121,17 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		buttonPanelLayout.spacing = 10;
 		buttonPanel.setLayout(buttonPanelLayout);
 		
-		/* add button - adds a new file to the file group */
-		final Button newButton = new Button(buttonPanel, SWT.NONE);
-		newButton.setText("Add File");
-		newButton.addListener(SWT.Selection, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				performAddOperation();
-			}
-		});
+		/* add button - adds a new file to the source file group */
+		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
+			final Button newButton = new Button(buttonPanel, SWT.NONE);
+			newButton.setText("Add File");
+			newButton.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					performAddOperation();
+				}
+			});
+		}
 		
 		/* delete button - deletes the selected files */
 		final Button deleteButton = new Button(buttonPanel, SWT.NONE);
@@ -158,24 +170,17 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		deleteButton.setEnabled(false);
 		moveUpButton.setEnabled(false);
 		moveDownButton.setEnabled(false);
-		
-		filesList.addSelectionListener(new SelectionListener() {
-			
+		filesList.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int selectedFilesCount = filesList.getSelectionCount();
+			public void selectionChanged(SelectionChangedEvent event) {
+				int selectedFilesCount = handleSelection();
 				deleteButton.setEnabled(selectedFilesCount >= 1);
 				moveUpButton.setEnabled(selectedFilesCount >= 1);
 				moveDownButton.setEnabled(selectedFilesCount >= 1);
 			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				/* nothing */
-			}
 		});
 
-		/* populate the List control with all the file members */
+		/* populate the TreeViewer control with all the file members */
 		populateList(filesList);
 
 		return panel;
@@ -189,7 +194,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void performDefaults() {
-		currentMembers = (ArrayList)initialMembers.clone();
+		currentMembers = (ArrayList<Integer>)initialMembers.clone();
 		populateList(filesList);
 	}
 	
@@ -233,7 +238,12 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		initialMembers = new ArrayList<Integer>(groupSize);
 		currentMembers = new ArrayList<Integer>(groupSize);
 		for (int i = 0; i != groupSize; i++) {
-			int memberId = fileGroupMgr.getPathId(groupId, i);
+			int memberId;
+			if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
+				memberId = fileGroupMgr.getPathId(groupId, i);
+			} else {
+				memberId = fileGroupMgr.getSubGroup(groupId, i);				
+			}
 			if (memberId < 0) {
 				return false;
 			}
@@ -251,20 +261,16 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	 * 
 	 * @param filesList The List control.
 	 */
-	private void populateList(List filesList) {
-		filesList.removeAll();
-		for (int i = 0; i < currentMembers.size(); i++) {
-			String pathName = fileMgr.getPathName(currentMembers.get(i), true);
-			if (pathName != null) {
-				filesList.add(pathName);
-			}
-		}
+	private void populateList(TreeViewer filesList) {
+	
+		Integer membersArray[] = currentMembers.toArray(new Integer[currentMembers.size()]);
+		filesList.setInput(membersArray);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Add a new file to the file group (the new item will be added to the bottom).
+	 * Add a new file (or files) to the file group (the new item will be added to the bottom).
 	 */
 	private void performAddOperation() {
 		VFSTreeSelectionDialog dialog = 
@@ -296,20 +302,16 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	private void performDeleteOperation() {
 		
 		/* fetch the indicies of the selected items */
-		int selectedIndicies[] = filesList.getSelectionIndices();
-		Arrays.sort(selectedIndicies);
-		
-		/* 
-		 * move backwards through the list, deleting them (deleting them in the forward
-		 * direction will mess up our index numbers).
-		 */
-		int i = selectedIndicies.length - 1;
-		while (i >= 0) {
-			int deleteIndex = selectedIndicies[i]; 
-			filesList.remove(deleteIndex);
-			currentMembers.remove(deleteIndex);
-			i--;
+		ITreeSelection selection = (ITreeSelection) filesList.getSelection();
+		Iterator<Object> iter = selection.iterator();
+		while (iter.hasNext()) {
+			Object element = iter.next();
+			if ((fileGroupType == IFileGroupMgr.SOURCE_GROUP) && (element instanceof Integer)) {
+				currentMembers.remove(element);
+			}
 		}
+		
+		populateList(filesList);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -324,61 +326,97 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		if ((direction != 1) && (direction != -1)) {
 			return;
 		}
-		
-		/* fetch the indicies of the selected items */
-		int selectedIndicies[] = filesList.getSelectionIndices();
-		Arrays.sort(selectedIndicies);
-		int count = selectedIndicies.length;
-		int listSize = filesList.getItemCount();
-		
+				
 		/* if nothing's selected, there's nothing to do */
-		if (count == 0) {
+		ITreeSelection selection = (ITreeSelection) filesList.getSelection();
+		int selectedCount = selection.size();		
+		if (selectedCount == 0) {
 			return;
 		}
 		
 		/* 
-		 * if our first item is at 0, and we're moving up, or our last item is at listSize -1, 
-		 * and we're moving down, there's nothing to do.
+		 * Fetch the indicies (into the "currentMembers" member) of the selected items.
+		 * For example, if the user selects the 2nd and 4th items in the list,
+		 * our array should be [2, 4]. To do this, we need to convert the ITreeSelection
+		 * that Eclipse gives us into a sorted array of indicies.
 		 */
+		Integer selectedIndicies[] = new Integer[selectedCount];
+		Iterator<Object> iter = selection.iterator();
+		int i = 0;
+		while (iter.hasNext()) {
+			Object element = iter.next();
+			selectedIndicies[i] = currentMembers.indexOf(element);
+			i++;
+		}
+		Arrays.sort(selectedIndicies);
+		
+		/* 
+		 * if our first item is at 0, and we're moving up, or our last item is at listSize -1, 
+		 * and we're moving down, there's nothing to do. We can't move beyond the bounds of
+		 * the list.
+		 */
+		int currentMemberSize = currentMembers.size();
 		if (((direction == -1) && (selectedIndicies[0] == 0)) ||
-			((direction == 1) && (selectedIndicies[count - 1] == listSize - 1))) {
+			((direction == 1) && (selectedIndicies[selectedCount - 1] == (currentMemberSize - 1)))) {
 			return;
 		}
 
 		/*
 		 * The direction in which we're moving the files will dictate the order in which
-		 * we must traverse the list of files.
+		 * we must traverse the list of files (if we go the wrong direction, list items
+		 * will "leapfrog" their neighbours, even if their neighbours are also moving.
 		 */
 		int firstIndex, lastIndex;
 		if (direction == 1) {
-			firstIndex = count - 1;
+			firstIndex = selectedCount - 1;
 			lastIndex = -1;
 		} else {
 			firstIndex = 0;
-			lastIndex = count;
+			lastIndex = selectedCount;
 		}
 		
 		/*
-		 * Traverse the list of files that we're moving. Starting at position 'firstIndex',
-		 * and decrementing by 'direction' until we reach 'lastIndex'.
+		 * Now we actually modify the content of "currentMembers". Starting at position
+		 * 'firstIndex', and decrementing by 'direction' until we reach 'lastIndex'.
 		 */
 		int pos = firstIndex;
 		while (pos != lastIndex) {
 			int index = selectedIndicies[pos];
-			String label = filesList.getItem(index);
 			int id = currentMembers.get(index);
 			
 			/* shuffle the item along */
-			filesList.remove(index);
 			currentMembers.remove(index);
-			filesList.add(label, index + direction);
 			currentMembers.add(index + direction, id);
-			filesList.select(index + direction);
 			
 			/* move to next selected file */
 			pos -= direction;
 		}
 		
+		/* redraw the tree with the modified content */
+		populateList(filesList);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Handle selection behaviour, which depends on the type of file group selected. For
+	 * source groups, any number of items can be selected. For merge groups, if the user clicks
+	 * on a single path name, we instead auto-select the entire sub-group that the path
+	 * belongs to.
+	 * 
+	 * @return The number of items selected. Note that a merge file group will show an entire
+	 * subgroup as being selected, but will return "1".
+	 */
+	private int handleSelection() {
+		
+		/* for source groups, any number of items can be selected */
+		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
+			ITreeSelection selection = (ITreeSelection)filesList.getSelection();
+			return selection.size();
+		}
+		
+		/* for merge file groups, selecting a single item will select all of them in that group */
+		return 0;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

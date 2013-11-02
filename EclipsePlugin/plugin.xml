@@ -1336,7 +1336,7 @@
          </enabledWhen>
       </page>
       <page
-            class="com.buildml.eclipse.packages.properties.FileGroupContentPropertyPage"
+            class="com.buildml.eclipse.packages.properties.filegroup.FileGroupContentPropertyPage"
             id="com.buildml.eclipse.properties.filegroupcontent"
             name="File Group Content">
          <enabledWhen>
