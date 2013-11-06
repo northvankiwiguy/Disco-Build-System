@@ -140,6 +140,17 @@ public class LayoutAlgorithm {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
+	 * @return The number of pixels in the X direction to pad between pictograms, to make
+	 * them look nicely spread out.
+	 */
+	public int getXPadding() {
+		return X_PADDING;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+
+	/**
 	 * Given a package member (e.g. file group or action), ensure that all of its right-side
 	 * neighbours are moved (if necessary) to higher x-coordinates. The avoid the appearance
 	 * of backward-facing arrows.

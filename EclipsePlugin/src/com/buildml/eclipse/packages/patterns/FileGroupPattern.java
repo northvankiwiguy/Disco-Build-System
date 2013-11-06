@@ -1068,16 +1068,19 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 						"Unable to determine the current position of source/target file groups");
 				return;
 			}
+			
+			int newX = sourceLocation.x > targetLocation.x ? sourceLocation.x : targetLocation.x;
+			newX += layoutAlgorithm.getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getWidth();
+			newX += layoutAlgorithm.getXPadding();
+			
 			if (pkgMemberMgr.setMemberLocation(
 					IPackageMemberMgr.TYPE_FILE_GROUP, mergeFileGroupId,
-					sourceLocation.x,
+					newX,
 					(sourceLocation.y + targetLocation.y) / 2) != ErrorCode.OK) {
 				AlertDialog.displayErrorDialog("Error Positioning Merge Group",
 						"Unable to set position for new merge group");
 				return;				
 			}
-		
-			// TODO: bump the merge file group to the right.
 			
 			/*
 			 * Finally, generate an undo/redo operation to add the members to the group.
