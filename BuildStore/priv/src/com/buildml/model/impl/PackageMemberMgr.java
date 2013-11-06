@@ -86,7 +86,9 @@ import com.buildml.utils.errors.ErrorCode;
 		findLocationPrepStmt = null,
 		updateLocationPrepStmt = null,
 		findActionNeighbourPrepStmt = null,
-		findFileGroupNeighbourPrepStmt = null;
+		findFileGroupNeighbourPrepStmt = null,
+		findMergeFileGroupMembersPrepStmt = null,
+		findMergeFileGroupsContainingFileGroup = null;
 	
 	/** The event listeners who are registered to learn about package membership changes */
 	List<IPackageMemberMgrListener> listeners = new ArrayList<IPackageMemberMgrListener>();
@@ -152,6 +154,17 @@ import com.buildml.utils.errors.ErrorCode;
 						"and (slotTypes.slotPos = ? or slotTypes.slotPos = ?) " +
 						"and packageMembers.memberType = " + IPackageMemberMgr.TYPE_ACTION + " " +
 						"and packageMembers.memberId = slotValues.ownerId");
+		findMergeFileGroupMembersPrepStmt = db.prepareStatement(
+				"select distinct pathId, x, y from fileGroupPaths, packageMembers where groupId = ? " +
+						"and packageMembers.memberType = " + IPackageMemberMgr.TYPE_FILE_GROUP + " " +
+						"and packageMembers.memberId = fileGroupPaths.pathId");
+		findMergeFileGroupsContainingFileGroup = db.prepareStatement(
+				"select distinct groupId, x, y from fileGroups, fileGroupPaths, packageMembers " +
+						"where packageMembers.memberType = " + IPackageMemberMgr.TYPE_FILE_GROUP + " " +
+						"and packageMembers.memberId = fileGroupPaths.groupId " +
+						"and fileGroups.id = fileGroupPaths.groupId " +
+						"and fileGroups.type = " + IFileGroupMgr.MERGE_GROUP + " " +
+						"and fileGroupPaths.pathId = ?");
 	}
 
 	/*=====================================================================================*
@@ -538,29 +551,31 @@ import com.buildml.utils.errors.ErrorCode;
 			 * Find the neighbours of a file group. 
 			 */
 		case IPackageMemberMgr.TYPE_FILE_GROUP:
-			
+						
 			/* file group ID must be valid */
-			if (fileGroupMgr.getGroupSize(memberId) == ErrorCode.NOT_FOUND) {
+			int groupType = fileGroupMgr.getGroupType(memberId);
+			if (groupType == ErrorCode.NOT_FOUND) {
 				return null;
 			}
-			
-			/*
-			 * Search for slots in this package's actions that refer to our file group.
-			 * If necessary, also look at the direction (input versus output) of the slot.
-			 */
+
 			try {
+
+				/*
+				 * Search for slots in this package's actions that refer to our file group.
+				 * If necessary, also look at the direction (input versus output) of the slot.
+				 */
 				findFileGroupNeighbourPrepStmt.setInt(1, memberId);
 				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
 					findFileGroupNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
 					findFileGroupNeighbourPrepStmt.setInt(3, ISlotTypes.SLOT_POS_OUTPUT);
 				} else {
 					int slotType = (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
-									ISlotTypes.SLOT_POS_OUTPUT : ISlotTypes.SLOT_POS_INPUT;
+							ISlotTypes.SLOT_POS_OUTPUT : ISlotTypes.SLOT_POS_INPUT;
 					findFileGroupNeighbourPrepStmt.setInt(2, slotType);
 					findFileGroupNeighbourPrepStmt.setInt(3, slotType);
 				}
 				ResultSet rs = db.executePrepSelectResultSet(findFileGroupNeighbourPrepStmt);
-				
+
 				while (rs.next()) {
 					MemberDesc member = new MemberDesc();
 					member.memberType = IPackageMemberMgr.TYPE_ACTION;
@@ -570,12 +585,56 @@ import com.buildml.utils.errors.ErrorCode;
 					neighbours.add(member);
 				}
 				rs.close();
+
+				/*
+				 * If this is a merge group, and we're looking for "left" or "any" neigbours,
+				 * get all the members of this group (they will all be file groups, since merge
+				 * groups can only contain file groups).
+				 */
+				if (groupType == IFileGroupMgr.MERGE_GROUP) {
+					if ((direction == IPackageMemberMgr.NEIGHBOUR_ANY) ||
+							(direction == IPackageMemberMgr.NEIGHBOUR_LEFT)) {
+
+						findMergeFileGroupMembersPrepStmt.setInt(1, memberId);
+						rs = db.executePrepSelectResultSet(findMergeFileGroupMembersPrepStmt);
+						while (rs.next()) {
+							MemberDesc member = new MemberDesc();
+							member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
+							member.memberId = rs.getInt(1);
+							member.x = rs.getInt(2);
+							member.y = rs.getInt(3);
+							neighbours.add(member);
+						}
+						rs.close();
+					}
+				}
+
+				/*
+				 * If this is any type of file group, then look for all occurrences of our file
+				 * group ID in all other merge groups. Only do this for RIGHT and ANY
+				 * neighbours.
+				 */
+				if ((direction == IPackageMemberMgr.NEIGHBOUR_ANY) ||
+							(direction == IPackageMemberMgr.NEIGHBOUR_RIGHT)) {
+						
+					findMergeFileGroupsContainingFileGroup.setInt(1, memberId);
+					rs = db.executePrepSelectResultSet(findMergeFileGroupsContainingFileGroup);
+					while (rs.next()) {
+						MemberDesc member = new MemberDesc();
+						member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
+						member.memberId = rs.getInt(1);
+						member.x = rs.getInt(2);
+						member.y = rs.getInt(3);
+						neighbours.add(member);
+					}
+					rs.close();					
+				}
 				
 			} catch (SQLException e) {
 				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 			}
 			break;
-			
+						
 			/*
 			 * All other member types are invalid.
 			 */

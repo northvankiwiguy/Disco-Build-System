@@ -27,6 +27,7 @@ import com.buildml.model.IFileGroupMgrListener;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
@@ -68,6 +69,9 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * to us when the FileGroupMgr is first instantiated.
 	 */
 	private BuildStoreDB db = null;
+	
+	/** The PackageMemberMgr object associated with this FileGroupMgr */
+	private IPackageMemberMgr pkgMemberMgr = null;	
 	
 	/**
 	 * Various prepared statement for database access.
@@ -525,11 +529,12 @@ public class FileGroupMgr implements IFileGroupMgr {
 			return ErrorCode.OUT_OF_RANGE;
 		}
 		
-		/* if the subGroupId is itself a merge group, we need to check for cycles */
-		if (getGroupType(subGroupId) == MERGE_GROUP) {
-			if (groupContainsGroup(subGroupId, groupId)) {
-				return ErrorCode.BAD_PATH;
-			}
+		/*
+		 * Check for possibility of cycles.
+		 */
+		if ((groupId == subGroupId) ||
+				checkForCycles(IPackageMemberMgr.TYPE_FILE_GROUP, groupId, subGroupId)) {
+			return ErrorCode.LOOP_DETECTED;
 		}
 		
 		addEntryHelper(groupId, subGroupId, null, index, initialSize);
@@ -969,6 +974,49 @@ public class FileGroupMgr implements IFileGroupMgr {
 		for (int i = 0; i < listenerCopy.length; i++) {
 			listenerCopy[i].fileGroupChangeNotification(fileGroupId, how);			
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * If we're modifying the membership of a merge file group,we could potentially be creating
+	 * a cycle in the dependency graph. Before allowing this addition, check whether it
+	 * would create a cycle. This is a recursive algorithm that searches "to the right" in search
+	 * of the file group to be added. For example, if we're inserting fileGroup1 into fileGroup2
+	 * (i.e. its being inserted to the left), search downstream (right) of fileGroup2 to see if
+	 * we bump into fileGroup1.
+	 * 
+	 * @param memberType  What are we currently looking at? (IPackageMemberMgr.TYPE_ACTION, etc).
+	 * @param memberId	  The ID of the member we're currently looking at (initially the merge
+	 * 					  file group).
+	 * @param fileGroupId The ID of the file group that's being inserted into the merge file group.
+	 * @return True if a cycle would be created, else false.
+	 */
+	private boolean checkForCycles(int memberType, int memberId, int fileGroupId) {
+
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
+
+		/* get neighbours of this member */
+		MemberDesc[] neighbours = pkgMemberMgr.getNeighboursOf(
+				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		for (int i = 0; i < neighbours.length; i++) {
+			MemberDesc neighbour = neighbours[i];
+			
+			/* if we've hit the file group we're searching for - end the search */
+			if ((neighbour.memberType == IPackageMemberMgr.TYPE_FILE_GROUP) &&
+				(neighbour.memberId == fileGroupId)) {
+				return true;
+			}
+			
+			/* not found, recursively search our neighbours */
+			if (checkForCycles(neighbour.memberType, neighbour.memberId, fileGroupId)) {
+				return true;
+			}
+			
+			/* now loop to the next neighbour */
+		}
+		
+		return false;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

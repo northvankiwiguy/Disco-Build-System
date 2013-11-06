@@ -608,10 +608,10 @@ public class TestFileGroupMgr {
 		assertEquals("@root/path1", results[2]);
 		
 		/* try to add the main group into the subMergeGroup - should fail */
-		assertEquals(ErrorCode.BAD_PATH, fileGroupMgr.addSubGroup(subMergeGroup, mergeGroup));	
+		assertEquals(ErrorCode.LOOP_DETECTED, fileGroupMgr.addSubGroup(subMergeGroup, mergeGroup));	
 
 		/* try to add the main group into itself - should fail */
-		assertEquals(ErrorCode.BAD_PATH, fileGroupMgr.addSubGroup(mergeGroup, mergeGroup));	
+		assertEquals(ErrorCode.LOOP_DETECTED, fileGroupMgr.addSubGroup(mergeGroup, mergeGroup));	
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

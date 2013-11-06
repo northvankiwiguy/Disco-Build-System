@@ -325,7 +325,7 @@ public class TestPackageMemberMgr {
 	 * @throws Exception
 	 */
 	@Test
-	public void testGetNeighboursOf() throws Exception {
+	public void testGetNeighboursOf1() throws Exception {
 
 		/*
 		 * We create the following package diagram:
@@ -493,7 +493,109 @@ public class TestPackageMemberMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the getNeighboursOf() method.
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetNeighboursOf2() throws Exception {
+
+		/*
+		 * We create the following package diagram:
+		 * 
+		 *   fg1 --- a1
+		 *   fg1 --- a2
+		 *   fg1 ---- mfg1
+		 *   fg2 ---- mfg1
+		 *   fg3 ---- mfg1
+		 *   fg2 ---- mfg1
+		 */
+		int pkgId = pkgMgr.addPackage("TestPkg");
+		int fg1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg2 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg3 = fileGroupMgr.newSourceGroup(pkgId);
+		int mfg1 = fileGroupMgr.newMergeGroup(pkgId);
+		int rootActionId = actionMgr.getRootAction("root");
+		int dirId = fileMgr.getPath("/");
+		int a1 = actionMgr.addShellCommandAction(rootActionId, dirId, "action1");
+		int a2 = actionMgr.addShellCommandAction(rootActionId, dirId, "action2");
+		int actionTypeId = actionMgr.getActionType(a1);
+		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
+
+		/* create all the connections - fg1 is added into mfg1 twice */
+		actionMgr.setSlotValue(a1, inputSlot.slotId, fg1);
+		actionMgr.setSlotValue(a2, inputSlot.slotId, fg1);
+		fileGroupMgr.addSubGroup(mfg1, fg1);
+		fileGroupMgr.addSubGroup(mfg1, fg2);
+		fileGroupMgr.addSubGroup(mfg1, fg3);
+		fileGroupMgr.addSubGroup(mfg1, fg2);
+		
+		/* set some x, y locations, for a1, a2, fg1, fg2, fg3 and mfg1 */
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, a1, 1, 2));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, a2, 3, 4));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fg1, 10, 11));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fg2, 12, 13));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, fg3, 14, 15));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_FILE_GROUP, mfg1, 16, 17));
+		
+		MemberDesc neighbours[];
+		
+		/* the right neighbours of fg1 are a1, a2 and mfg1 */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fg1, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		assertEquals(3, neighbours.length);
+		int matchCount = expectMember(neighbours, IPackageMemberMgr.TYPE_ACTION, a1, 1, 2);
+		matchCount += expectMember(neighbours, IPackageMemberMgr.TYPE_ACTION, a2, 3, 4);
+		matchCount += expectMember(neighbours, IPackageMemberMgr.TYPE_FILE_GROUP, mfg1, 16, 17);
+		assertEquals(3, matchCount);
+
+		/* the right neighbour of fg2 is mfg1 */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fg2, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(neighbours, IPackageMemberMgr.TYPE_FILE_GROUP, mfg1);
+		assertEquals(16, neighbours[0].x);
+		assertEquals(17, neighbours[0].y);
+		
+		/* the right neighbour of fg3 is mfg1 */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fg3, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectOne(neighbours, IPackageMemberMgr.TYPE_FILE_GROUP, mfg1);
+		assertEquals(16, neighbours[0].x);
+		assertEquals(17, neighbours[0].y);
+		
+		/* the left neighbours of mfg1 are fg1, fg2 and fg3 - fg2 only appears once */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, mfg1, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		assertEquals(3, neighbours.length);
+		matchCount = expectMember(neighbours, IPackageMemberMgr.TYPE_FILE_GROUP, fg1, 10, 11);
+		matchCount += expectMember(neighbours, IPackageMemberMgr.TYPE_FILE_GROUP, fg2, 12, 13);
+		matchCount += expectMember(neighbours, IPackageMemberMgr.TYPE_FILE_GROUP, fg3, 14, 15);
+		assertEquals(3, matchCount);
+		
+		/* there are three "any" neighbours for mfg1 */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, mfg1, IPackageMemberMgr.NEIGHBOUR_ANY);
+		assertEquals(3, neighbours.length);
+		
+		/* there are no left neighbours of fg1, fg2, or fg3 */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fg1, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(neighbours);
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fg2, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(neighbours);
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, fg3, IPackageMemberMgr.NEIGHBOUR_LEFT);
+		expectEmpty(neighbours);
+		
+		/* there are no right neighbours of mfg1 */
+		neighbours = pkgMemberMgr.getNeighboursOf(
+				IPackageMemberMgr.TYPE_FILE_GROUP, mfg1, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+		expectEmpty(neighbours);
+	}
 	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Expect the provided results array to be empty.
@@ -539,6 +641,31 @@ public class TestPackageMemberMgr {
 				   ((results[0].memberId == id2) && (results[1].memberId == id1)));
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Search for a specific member within a neighbours array, return 1 if it's in the array,
+	 * or 0 if it's not.
+	 * 
+	 * @param neighbours An array of neighbours
+	 * @param memberType The type of the member to search for.
+	 * @param memberId   The ID of the member to search for.
+	 * @param x          The expected x coordinate.
+	 * @param y          The expected y coordinate.
+	 * @return 0 if the member was not found, or 1 if it was found.
+	 */
+	private int expectMember(MemberDesc neighbours[], int memberType, int memberId, int x, int y) {
+		
+		for (int i = 0; i < neighbours.length; i++) {
+			MemberDesc n = neighbours[i];
+			if ((n.memberType == memberType) && (n.memberId == memberId) &&
+				  (n.x == x) && (n.y == y)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -1125,7 +1252,7 @@ public class TestPackageMemberMgr {
 	 * Test that cycles can't be created
 	 */
 	@Test
-	public void testCycleAvoidance() {
+	public void testCycleAvoidance1() {
 
 		/*
 		 * We first create the following package diagram:
@@ -1177,6 +1304,46 @@ public class TestPackageMemberMgr {
 		assertEquals(fg2, actionMgr.getSlotValue(a1, output3Slot.slotId));
 		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a3, output6Slot.slotId, fg1));
 		assertEquals(fg2, actionMgr.getSlotValue(a1, output3Slot.slotId));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test that cycles can't be created
+	 */
+	@Test
+	public void testCycleAvoidance2() {
+
+		/*
+		 * We first create the following package diagram:
+		 * 
+		 *   fg1 --- mfg1 --- a1 --- fg2
+		 */
+		int pkgId = pkgMgr.addPackage("TestPkg");
+		int rootActionId = actionMgr.getRootAction("root");
+		int dirId = fileMgr.getPath("/");
+		int mfg1 = fileGroupMgr.newMergeGroup(pkgId);
+		int fg1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg2 = fileGroupMgr.newSourceGroup(pkgId);
+		int a1 = actionMgr.addShellCommandAction(rootActionId, dirId, "action1");
+		int actionTypeId = actionMgr.getActionType(a1);
+		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
+		SlotDetails output3Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output3");
+		SlotDetails output6Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output6");
+		
+		/* create the connections */
+		assertEquals(0, fileGroupMgr.addSubGroup(mfg1, fg1));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a1, inputSlot.slotId, mfg1));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(a1, output3Slot.slotId, fg2));
+		
+		/* adding fg2 into mfg1 will cause a cycle */
+		assertEquals(ErrorCode.LOOP_DETECTED, fileGroupMgr.addSubGroup(mfg1, fg2));
+		
+		/* adding fg1 as an output of a1 will cause a cycle */
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a1, output6Slot.slotId, fg1));
+		
+		/* adding mfg1 as an output of a1 will cause a cycle */
+		assertEquals(ErrorCode.LOOP_DETECTED, actionMgr.setSlotValue(a1, output3Slot.slotId, mfg1));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
