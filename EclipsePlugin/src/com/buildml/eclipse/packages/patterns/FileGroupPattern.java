@@ -1026,13 +1026,14 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		if (targetGroupType == IFileGroupMgr.MERGE_GROUP) {
 			
 			int error = fileGroupMgr.addSubGroup(targetFileGroupId, sourceFileGroupId);
-			if (error < 0) {
+			if (error == ErrorCode.LOOP_DETECTED) {
+				AlertDialog.displayErrorDialog("Can't Connect File Group",
+						"Adding this connection would cause a cycle in the package diagram.");
+			}
+			else if (error < 0) {
 				AlertDialog.displayErrorDialog("Error Adding to Merge Group",
 						"For some reason, the file group could not be added to the merge group");
-				return;
-			}
-			
-			// TODO: make sure that cycles are avoided/reported.
+			}			
 			return;
 		}
 		 
