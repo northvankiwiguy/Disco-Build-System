@@ -695,8 +695,16 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		if (groupSize < 0) {
 			return result;
 		}
+		int groupType = fileGroupMgr.getGroupType(fileGroupId);
+		
 		for (int i = 0; i != groupSize; i++) {
-			int pathId = fileGroupMgr.getPathId(fileGroupId, i);
+			int pathId;
+			
+			if (groupType == IFileGroupMgr.MERGE_GROUP) {
+				pathId = fileGroupMgr.getSubGroup(fileGroupId, i);
+			} else {
+				pathId = fileGroupMgr.getPathId(fileGroupId, i);
+			}
 			if (pathId < 0) {
 				return result;
 			}
@@ -1025,6 +1033,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 */
 		if (targetGroupType == IFileGroupMgr.MERGE_GROUP) {
 			
+			ArrayList<Integer> currentMembers = getFileGroupAsArrayList(targetFileGroupId);
 			int error = fileGroupMgr.addSubGroup(targetFileGroupId, sourceFileGroupId);
 			if (error == ErrorCode.LOOP_DETECTED) {
 				AlertDialog.displayErrorDialog("Can't Connect File Group",
@@ -1033,7 +1042,23 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			else if (error < 0) {
 				AlertDialog.displayErrorDialog("Error Adding to Merge Group",
 						"For some reason, the file group could not be added to the merge group");
-			}			
+			}
+
+			/*
+			 * Now record the membership change in an operation, so we can undo/redo it later. This
+			 * may also involve bumping pictograms to the right.
+			 */
+			BmlMultiOperation multiOp = new BmlMultiOperation("Add to Merge Group");
+			FileGroupChangeOperation op = new FileGroupChangeOperation("", targetFileGroupId);
+			ArrayList<Integer> newMembers = getFileGroupAsArrayList(targetFileGroupId);
+			op.recordMembershipChange(currentMembers, newMembers);
+			
+			/* bump to the right (now), and record changes in undo/redo stack */
+			layoutAlgorithm.bumpPictogramsRight(multiOp, IPackageMemberMgr.TYPE_FILE_GROUP, sourceFileGroupId, true);
+			
+			/* record, but don't execute now, since we've already added the members and bumped the pictograms */
+			multiOp.recordOnly();
+			
 			return;
 		}
 		 
