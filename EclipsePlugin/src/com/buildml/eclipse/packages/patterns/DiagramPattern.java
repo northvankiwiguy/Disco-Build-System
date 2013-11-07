@@ -31,12 +31,14 @@ import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.bobj.UIInteger;
+import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.ISlotTypes;
@@ -68,6 +70,9 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	
 	/** The IActionTypeMgr in this BuildStore */
 	private IActionTypeMgr actionTypeMgr;
+	
+	/** The IFileGroupMgr in this BuildStore */
+	private IFileGroupMgr fileGroupMgr;
 	
 	/** The pkgMgr ID of the package we're displaying */
 	private int pkgId;
@@ -157,6 +162,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		actionMgr = buildStore.getActionMgr();
 		actionTypeMgr = buildStore.getActionTypeMgr();
+		fileGroupMgr = buildStore.getFileGroupMgr();
 		pkgId = editor.getPackageId();
 		
 		final ContainerShape container = (ContainerShape)context.getPictogramElement();
@@ -217,13 +223,21 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 				}
 				
 				/*
-				 * Now draw connections between file groups and actions.
+				 * Now draw connections between various file groups, and actions.
 				 */
 				for (MemberDesc member : members) {
 					
 					/* for package members that are actions... */
 					if (member.memberType == IPackageMemberMgr.TYPE_ACTION) {
 						addFileActionConnections(member);
+					}
+					
+					/* for merge file group, draw the input arrows */
+					else if (member.memberType == IPackageMemberMgr.TYPE_FILE_GROUP) {
+						int fileGroupType = fileGroupMgr.getGroupType(member.memberId);
+						if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+							addMergeFileGroupConnections(member);
+						}
 					}
 				}
 			}
@@ -282,20 +296,8 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					 * know the fileGroupId and actionId, but need to search for the pictogram.
 					 * Search for the UIFileGroup and UIAction end points, and retrieve their anchors
 					 */
-					Anchor fileGroupAnchor = null, actionAnchor = null;
-					EList<Shape> shapes = getDiagram().getChildren();
-					for (Shape shape : shapes) {
-						Object bo = GraphitiUtils.getBusinessObject(shape);
-						if (bo instanceof UIFileGroup) {
-							if (((UIFileGroup)bo).getId() == fileGroupId) {
-								fileGroupAnchor = shape.getAnchors().get(connectionDirection);
-							}
-						} else if (bo instanceof UIAction) {
-							if (((UIAction)bo).getId() == actionId) {
-								actionAnchor = shape.getAnchors().get(connectionDirection);
-							}
-						}
-					}
+					Anchor fileGroupAnchor = getAnchorFor(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, connectionDirection);
+					Anchor actionAnchor = getAnchorFor(IPackageMemberMgr.TYPE_ACTION, actionId, connectionDirection);
 
 					/* We found both anchors, so now draw the connection between them */
 					if ((fileGroupAnchor != null) && (actionAnchor != null)) {
@@ -306,6 +308,76 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 				}
 			}
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * For each member of the merge file group, draw an arrow from the right side of the 
+	 * sub file group into the left side of the merge.
+	 * @param member Details of the merge file group.
+	 */
+	protected void addMergeFileGroupConnections(MemberDesc member) {
+		
+		/* the merge group's anchor point */
+		Anchor targetAnchor = getAnchorFor(IPackageMemberMgr.TYPE_FILE_GROUP, member.memberId, 
+				UIMergeFileGroupConnection.INPUT_TO_MERGE_GROUP);
+		if (targetAnchor == null) {
+			return;
+		}
+		
+		/* for each of the input sub groups... */
+		int groupSize = fileGroupMgr.getGroupSize(member.memberId);
+		for (int i = 0; i != groupSize; i++) {
+			int subGroupId = fileGroupMgr.getSubGroup(member.memberId, i);
+
+			/* find the sub group's anchor */
+			Anchor sourceAnchor = getAnchorFor(IPackageMemberMgr.TYPE_FILE_GROUP, subGroupId, 
+												UIMergeFileGroupConnection.OUTPUT_FROM_SUB_GROUP);
+
+			/* create a new business object (to be displayed) */
+			UIMergeFileGroupConnection newConnection = new UIMergeFileGroupConnection(subGroupId, member.memberId);
+			getDiagram().eResource().getContents().add(newConnection);
+		
+			/* We found the sub group's anchor, so now draw the connection */
+			if (sourceAnchor != null) {
+				AddConnectionContext addContext = new AddConnectionContext(sourceAnchor, targetAnchor);
+				addContext.setNewObject(newConnection);
+				getFeatureProvider().addIfPossible(addContext);
+			}
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * For a particular package member, return the relevant Graphiti anchor.
+	 * 
+	 * @param memberType	The type of the member (TYPE_ACTION, TYPE_FILE_GROUP, etc).
+	 * @param memberId		The ID of the member (fileGroupId, or actionId, etc).
+	 * @param connectionId	The ID of the anchor (0, 1, etc.).
+	 * @return The Graphiti anchor associated with this package member, or null if the member can't
+	 * be found.
+	 */
+	private Anchor getAnchorFor(int memberType, Integer memberId, int connectionId) {
+
+		/* visit each shape in the current diagram, looking for the package member */
+		EList<Shape> shapes = getDiagram().getChildren();
+		for (Shape shape : shapes) {
+			Object bo = GraphitiUtils.getBusinessObject(shape);
+			if ((memberType == IPackageMemberMgr.TYPE_FILE_GROUP) && (bo instanceof UIFileGroup)) {
+				if (((UIFileGroup)bo).getId() == memberId) {
+					return shape.getAnchors().get(connectionId);
+				}
+			} 
+			
+			else if ((memberType == IPackageMemberMgr.TYPE_ACTION) && (bo instanceof UIAction)) {
+				if (((UIAction)bo).getId() == memberId) {
+					return shape.getAnchors().get(connectionId);
+				}
+			}
+		}
+		return null;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

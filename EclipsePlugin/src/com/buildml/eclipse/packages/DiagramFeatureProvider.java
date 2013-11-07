@@ -20,7 +20,9 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 
 import com.buildml.eclipse.bobj.UIFileActionConnection;
+import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 import com.buildml.eclipse.packages.features.AddFileActionConnectionFeature;
+import com.buildml.eclipse.packages.features.AddMergeFileGroupConnectionFeature;
 import com.buildml.eclipse.packages.features.PackageDiagramDeleteFeature;
 import com.buildml.eclipse.packages.patterns.ActionPattern;
 import com.buildml.eclipse.packages.patterns.DiagramPattern;
@@ -63,8 +65,13 @@ public class DiagramFeatureProvider extends DefaultFeatureProviderWithPatterns {
 	 */
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
-	    if (context.getNewObject() instanceof UIFileActionConnection) {
+		
+		Object newObject = context.getNewObject();
+	    if (newObject instanceof UIFileActionConnection) {
 	        return new AddFileActionConnectionFeature(this);
+	    }
+	    else if (newObject instanceof UIMergeFileGroupConnection) {
+	        return new AddMergeFileGroupConnectionFeature(this);    	
 	    }
 	    return super.getAddFeature(context);
 	}
