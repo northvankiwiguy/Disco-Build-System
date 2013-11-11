@@ -153,6 +153,26 @@ public interface IFileGroupMgr {
 	int getPathId(int groupId, int index);
 	
 	/**
+	 * Return the IDs of all members within the file group.
+     *
+	 * @param groupId   The file group being queried.
+	 * @return			An array of all the sub group IDs, in their position order, or
+	 *                  null if the groupId is invalid or doesn't relate to a source group.
+	 */
+	Integer[] getPathIds(int groupId);
+	
+	/**
+	 * Set all the members of a specified file group. All existing members of the group
+	 * are first removed.
+	 * 
+	 * @param groupId   The file group whose content is being set.
+	 * @param members   The new members of the group.
+	 * @return			ErrorCode.OK on success, ErrorCode.NOT_FOUND if groupId is invalid
+	 *                  or isn't for a source file group.
+	 */
+	int setPathIds(int groupId, Integer[] members);
+		
+	/**
 	 * Append a new path string into the file group. The path is expressed as being relative
 	 * to the root of a package (such as \@pkg_gen/output.o). The path will be persisted to
 	 * the database. This method is intended for use when hard-coding the output of an action,
@@ -260,6 +280,26 @@ public interface IFileGroupMgr {
 	 * 					is invalid, or ErrorCode.OUT_OF_RANGE if index is not valid.
 	 */
 	int getSubGroup(int groupId, int index);
+	
+	/**
+	 * Return the IDs of all sub groups within the merge group.
+     *
+	 * @param groupId   The merge file group being queried.
+	 * @return			An array of all the sub group IDs, in their position order, or
+	 *                  null if the groupId is invalid or doesn't relate to a merge file group.
+	 */
+	Integer[] getSubGroups(int groupId);
+	
+	/**
+	 * Set all the sub groups within the specified merge file group. All existing members
+	 * of the group are first removed.
+	 * 
+	 * @param groupId   The file group whose content is being set.
+	 * @param members   The new members of the group.
+	 * @return			ErrorCode.OK on success, ErrorCode.NOT_FOUND if groupId is invalid
+	 *                  or not a merge file group.
+	 */
+	int setSubGroups(int groupId, Integer[] members);
 	
 	/**
 	 * Remove an entry from within a file group. This command can be used for all types

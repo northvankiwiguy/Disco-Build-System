@@ -217,6 +217,18 @@ public class TestFileGroupMgr {
 		assertEquals(file2, fileGroupMgr.getPathId(groupId, 3));
 		assertEquals(file4, fileGroupMgr.getPathId(groupId, 4));
 		assertEquals(file3, fileGroupMgr.getPathId(groupId, 5));
+		
+		/* fetch all file group members at once */
+		Integer members[] = fileGroupMgr.getPathIds(groupId);
+		assertArrayEquals(new Integer[] { file5,  file1, file6, file2, file4, file3}, members);
+		
+		/* set all file group members at once, and validate new content */
+		assertEquals(ErrorCode.OK, fileGroupMgr.setPathIds(groupId, new Integer[] { file6, file4, file5, file1 }));
+		assertEquals(4, fileGroupMgr.getGroupSize(groupId));
+		assertEquals(file6, fileGroupMgr.getPathId(groupId, 0));
+		assertEquals(file4, fileGroupMgr.getPathId(groupId, 1));
+		assertEquals(file5, fileGroupMgr.getPathId(groupId, 2));
+		assertEquals(file1, fileGroupMgr.getPathId(groupId, 3));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -259,6 +271,14 @@ public class TestFileGroupMgr {
 		/* test getting from non-source file groups - error */
 		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.getPathId(generatedGroupId, 0));
 		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.getPathId(mergeGroupId, 0));
+
+		/* try to fetch all members of the group, from a bad file group ID, or a non-merge group */
+		assertNull(fileGroupMgr.getPathIds(10000));
+		assertNull(fileGroupMgr.getPathIds(mergeGroupId));
+		
+		/* try to set all members of the group, from a bad file group ID, or a non-merge group */
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setPathIds(10000, new Integer[] {1, 2, 3, 4}));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setPathIds(mergeGroupId, new Integer[] {1, 2, 3, 4}));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -561,6 +581,10 @@ public class TestFileGroupMgr {
 		assertEquals("@root/path3",            results[8]);
 		assertEquals("@root/path4",            results[9]);
 		
+		/* fetch the members of the group, all at once */
+		Integer members[] = fileGroupMgr.getSubGroups(mergeGroup);
+		assertArrayEquals(new Integer[] {sourceGroup1, sourceGroup2, generatedGroup}, members);
+		
 		/* remove one of the entries, and re-check the content */
 		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(mergeGroup, 1));
 		results = fileGroupMgr.getExpandedGroupFiles(mergeGroup);
@@ -571,6 +595,15 @@ public class TestFileGroupMgr {
 		assertEquals("@root/path2",            results[4]);
 		assertEquals("@root/path3",            results[5]);
 		assertEquals("@root/path4",            results[6]);
+		
+		/* set the members of the group, all at once */
+		assertEquals(ErrorCode.OK, fileGroupMgr.setSubGroups(mergeGroup, 
+				new Integer[] { generatedGroup, sourceGroup2, sourceGroup2, sourceGroup1 }));
+		assertEquals(4, fileGroupMgr.getGroupSize(mergeGroup));
+		assertEquals(generatedGroup, fileGroupMgr.getSubGroup(mergeGroup, 0));
+		assertEquals(sourceGroup2, fileGroupMgr.getSubGroup(mergeGroup, 1));
+		assertEquals(sourceGroup2, fileGroupMgr.getSubGroup(mergeGroup, 2));
+		assertEquals(sourceGroup1, fileGroupMgr.getSubGroup(mergeGroup, 3));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -633,6 +666,14 @@ public class TestFileGroupMgr {
 		/* try to add to an invalid group ID, and to add an invalid subgroup */
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.addSubGroup(1000, generatedGroup));
 		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addSubGroup(mergeGroup, 2000));
+		
+		/* try to fetch all members of the group, from a bad file group ID, or a non-merge group */
+		assertNull(fileGroupMgr.getSubGroups(10000));
+		assertNull(fileGroupMgr.getSubGroups(sourceGroup));
+		
+		/* try to set all members of the group, from a bad file group ID, or a non-merge group */
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setSubGroups(10000, new Integer[] {1, 2, 3, 4}));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setSubGroups(sourceGroup, new Integer[] {1, 2, 3, 4}));
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
