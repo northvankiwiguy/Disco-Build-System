@@ -12,6 +12,9 @@
 
 package com.buildml.eclipse.packages.features;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
@@ -20,8 +23,13 @@ import org.eclipse.graphiti.pattern.IPattern;
 
 import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
+import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
+import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.DiagramFeatureProvider;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 
 /**
  * A customized "DeleteFeature" that calls upon the appropriate Pattern to do the work
@@ -38,6 +46,9 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	/** The feature provider that owns the patterns we use */
 	private DiagramFeatureProvider featureProvider;
 	
+	/** The IBuildStore we operate on */
+	private IBuildStore buildStore;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -48,6 +59,10 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	 */
 	public PackageDiagramDeleteFeature(DiagramFeatureProvider diagramFeatureProvider) {
 		this.featureProvider = diagramFeatureProvider;
+		
+		PackageDiagramEditor pde = 
+				(PackageDiagramEditor)featureProvider.getDiagramTypeProvider().getDiagramEditor();
+		buildStore = pde.getBuildStore();
 	}
 
 	/*=====================================================================================*
@@ -91,7 +106,10 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		else {
 			Object bo = GraphitiUtils.getBusinessObject(deleteContext.getPictogramElement());
 			if (bo instanceof UIFileActionConnection) {
-				deleteConnection(deleteContext);
+				deleteFileActionConnection(deleteContext);
+			}
+			else if (bo instanceof UIMergeFileGroupConnection) {
+				deleteMergeFileGroupConnection(deleteContext);
 			}
 		}
 	}
@@ -164,6 +182,8 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		Object bo = GraphitiUtils.getBusinessObject(context.getPictogramElement());
 		if (bo instanceof UIFileActionConnection) {
 			return true;
+		} else if (bo instanceof UIMergeFileGroupConnection) {
+			return true;
 		}
 		return false;
 	}
@@ -202,10 +222,10 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A special-purpose method for deleting a connection arrow.
+	 * A special-purpose method for deleting a fileGroup-action connection arrow.
 	 * @param context The Graphiti context of the delete operation.
 	 */
-	private void deleteConnection(IDeleteContext context) {
+	private void deleteFileActionConnection(IDeleteContext context) {
 		Object bo = GraphitiUtils.getBusinessObject(context.getPictogramElement());
 		if (!(bo instanceof UIFileActionConnection)) {
 			return;
@@ -219,4 +239,36 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * A special-purpose method for deleting a merge file group connection arrow.
+	 * @param context The Graphiti context of the delete operation.
+	 */
+	private void deleteMergeFileGroupConnection(IDeleteContext context) {
+		
+		/* locate the connection information */
+		Object bo = GraphitiUtils.getBusinessObject(context.getPictogramElement());
+		if (!(bo instanceof UIMergeFileGroupConnection)) {
+			return;
+		}
+		UIMergeFileGroupConnection connection = (UIMergeFileGroupConnection)bo;
+		int mergeFileGroupId = connection.getTargetFileGroupId();
+		int subFileGroupId = connection.getSourceFileGroupId();
+		
+		/* get the current members of the merge file group */
+		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		Integer members[] = fileGroupMgr.getSubGroups(mergeFileGroupId);
+		ArrayList<Integer> currentMembers = new ArrayList<Integer>(Arrays.asList(members));
+		
+		/* our new membership will be the same as the current membership, with subFileGroupId removed */
+		ArrayList<Integer> newMembers = new ArrayList<Integer>(currentMembers);
+		newMembers.remove(Integer.valueOf(subFileGroupId));
+		
+		/* set up an undo/redo operation for this change */
+		FileGroupChangeOperation op = new FileGroupChangeOperation("Delete Connection", mergeFileGroupId);
+		op.recordMembershipChange(currentMembers, newMembers);
+		op.recordAndInvoke();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/	
 }
