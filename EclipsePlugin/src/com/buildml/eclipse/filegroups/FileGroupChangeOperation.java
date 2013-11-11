@@ -245,25 +245,11 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 			throw new FatalError("Unhandled file group type: " + fileGroupType);
 		}
 				
-		/* clear out any existing members */
-		buildStore.setFastAccessMode(true);
-		int groupSize = fileGroupMgr.getGroupSize(fileGroupId);
-		for (int i = groupSize - 1; i >= 0; i--) {
-			fileGroupMgr.removeEntry(fileGroupId, i);
-		}
-		
-		/* add the new members */
-		groupSize = members.size();
 		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
-			for (int i = 0; i != groupSize; i++) {
-				fileGroupMgr.addPathId(fileGroupId, members.get(i));
-			}
+			fileGroupMgr.setPathIds(fileGroupId, members.toArray(new Integer[0]));
 		} else {
-			for (int i = 0; i != groupSize; i++) {
-				fileGroupMgr.addSubGroup(fileGroupId, members.get(i));
-			}			
+			fileGroupMgr.setSubGroups(fileGroupId, members.toArray(new Integer[0]));			
 		}
-		buildStore.setFastAccessMode(false);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -245,26 +245,24 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		if (groupSize < 0) {
 			return false;
 		}
+	
+		Integer members[];
+		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
+			members = fileGroupMgr.getPathIds(groupId);
+		} else {
+			members = fileGroupMgr.getSubGroups(groupId);				
+		}
 		
 		/* 
 		 * We store the members in two separate arrays - one to record the initial
 		 * set of members, and one to store the "to-be" set of members that the user
 		 * is permitted to modify.
 		 */
-		initialMembers = new ArrayList<Integer>(groupSize);
-		currentMembers = new ArrayList<Integer>(groupSize);
-		for (int i = 0; i != groupSize; i++) {
-			int memberId;
-			if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
-				memberId = fileGroupMgr.getPathId(groupId, i);
-			} else {
-				memberId = fileGroupMgr.getSubGroup(groupId, i);				
-			}
-			if (memberId < 0) {
-				return false;
-			}
-			initialMembers.add(memberId);
-			currentMembers.add(memberId);
+		initialMembers = new ArrayList<Integer>(members.length);
+		currentMembers = new ArrayList<Integer>(members.length);
+		for (int i = 0; i < members.length; i++) {
+			initialMembers.add(members[i]);
+			currentMembers.add(members[i]);
 		}
 		
 		return true;
