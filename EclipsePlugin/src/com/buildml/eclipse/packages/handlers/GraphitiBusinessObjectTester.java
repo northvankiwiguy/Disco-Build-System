@@ -32,6 +32,10 @@ public class GraphitiBusinessObjectTester extends PropertyTester {
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		
+		if (property == null) {
+			return false;
+		}
+		
 		if (property.equals("isGraphitiBusinessObjectType")) {
 			
 			/* 
@@ -59,8 +63,11 @@ public class GraphitiBusinessObjectTester extends PropertyTester {
 				 */
 				PictogramElement pe = ((GraphitiShapeEditPart)object).getPictogramElement();
 				PictogramLink pl = pe.getLink();
+				if (pl == null) {
+					return false;
+				}
 				EList<EObject> businessObjects = pl.getBusinessObjects();
-				if (businessObjects.size() != 1) {
+				if ((businessObjects == null) || (businessObjects.size() != 1)) {
 					return false;
 				}
 				

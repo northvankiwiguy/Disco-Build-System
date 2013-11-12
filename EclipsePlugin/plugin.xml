@@ -852,6 +852,10 @@
                commandId="com.buildml.eclipse.commands.package.autolayout"
                style="push">
          </command>
+         <command
+               commandId="org.eclipse.ui.file.properties"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension
