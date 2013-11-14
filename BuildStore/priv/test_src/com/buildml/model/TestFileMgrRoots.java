@@ -94,6 +94,9 @@ public class TestFileMgrRoots {
 		assertEquals(path6, fileMgr.getPath("@pkgA_src/cat/dog/test.h"));
 		assertEquals(path6, fileMgr.getPath("@pkgA_gen/test.h"));
 		
+		/* adding a path at an invalid root is an error */
+		assertEquals(ErrorCode.BAD_PATH, fileMgr.addFile("@badroot/a/b/c.java"));
+		
 		// TODO: should we be able to ../../ above a root?
 	}
 	

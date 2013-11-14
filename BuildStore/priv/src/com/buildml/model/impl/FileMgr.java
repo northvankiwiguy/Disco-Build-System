@@ -548,6 +548,9 @@ public class FileMgr implements IFileMgr {
 		
 		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		int parentId = pkgRootMgr.getRootPath(rootName);
+		if (parentId == ErrorCode.NOT_FOUND) {
+			return ErrorCode.BAD_PATH;
+		}
 		
 		/* for each path name component, make sure it's added, then move to the next */
 		int len = components.length - 1;
