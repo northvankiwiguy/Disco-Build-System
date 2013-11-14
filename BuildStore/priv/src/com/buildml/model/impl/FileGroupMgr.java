@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
@@ -28,9 +29,12 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.regex.BmlRegex;
+import com.buildml.utils.regex.RegexChain;
 
 /**
  * An implementation of {@link IFileGroupMgr}.
@@ -79,6 +83,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 	private PreparedStatement 
 		insertNewGroupPrepStmt = null, 
 		findGroupTypePrepStmt = null,
+		findGroupPredPrepStmt = null,
 		removeGroupPrepStmt = null,
 		shiftUpPathsPrepStmt = null,
 		insertPathAtPrepStmt = null,
@@ -116,9 +121,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		/* initialize prepared database statements */
 		insertNewGroupPrepStmt = db.prepareStatement(
-				"insert into fileGroups values (null, ?)");
+				"insert into fileGroups values (null, ?, ?)");
 		findGroupTypePrepStmt = db.prepareStatement(
 				"select type from fileGroups where id = ?");
+		findGroupPredPrepStmt = db.prepareStatement(
+				"select predId from fileGroups where id = ?");
 		removeGroupPrepStmt = db.prepareStatement(
 				"delete from fileGroups where id = ?");
 		shiftUpPathsPrepStmt = db.prepareStatement(
@@ -158,7 +165,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int newSourceGroup(int pkgId) {
-		return newGroup(pkgId, IFileGroupMgr.SOURCE_GROUP);
+		return newGroup(pkgId, IFileGroupMgr.SOURCE_GROUP, -1);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -168,7 +175,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int newGeneratedGroup(int pkgId) {
-		return newGroup(pkgId, IFileGroupMgr.GENERATED_GROUP);
+		return newGroup(pkgId, IFileGroupMgr.GENERATED_GROUP, -1);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -178,7 +185,35 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public int newMergeGroup(int pkgId) {
-		return newGroup(pkgId, IFileGroupMgr.MERGE_GROUP);
+		return newGroup(pkgId, IFileGroupMgr.MERGE_GROUP, -1);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#newFilterGroup(int, int)
+	 */
+	@Override
+	public int newFilterGroup(int pkgId, int predGroupId) {
+
+		/* check that pkgId refers to a valid package */
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		if (!pkgMgr.isValid(pkgId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* validate the predGroupId exists and is already in the pkgId package */
+		if (getGroupType(predGroupId) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.BAD_VALUE;
+		}
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
+		PackageDesc desc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, predGroupId);
+		if ((desc == null) || (desc.pkgId != pkgId)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* defer the rest of the work - it's common across group types */
+		return newGroup(pkgId, IFileGroupMgr.FILTER_GROUP, predGroupId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -187,13 +222,13 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * @see com.buildml.model.IFileGroupMgr#newGroup(int, int)
 	 */
 	@Override
-	public int newGroup(int pkgId, int type) {
+	public int newGroup(int pkgId, int type, int predId) {
 		
 		int lastRowId;
 		
 		/* validate inputs */
 		if ((type < IFileGroupMgr.SOURCE_GROUP) ||
-			(type > IFileGroupMgr.MERGE_GROUP)) {
+			(type > IFileGroupMgr.FILTER_GROUP)) {
 			return ErrorCode.BAD_VALUE;
 		}
 		IPackageMgr pkgMgr = buildStore.getPackageMgr();
@@ -204,6 +239,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 		/* insert the new group into the database, returning the new group ID */
 		try {
 			insertNewGroupPrepStmt.setInt(1, type);
+			insertNewGroupPrepStmt.setInt(2, predId);
 			db.executePrepUpdate(insertNewGroupPrepStmt);
 			
 			lastRowId = db.getLastRowID();
@@ -247,6 +283,39 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return ErrorCode.NOT_FOUND;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getPredId(int)
+	 */
+	@Override
+	public int getPredId(int groupId) {
+
+		/* validate that groupId is valid group */
+		int groupType = getGroupType(groupId);
+		if (groupType == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* only applicable for filter file groups */
+		if (groupType != FILTER_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		Integer results[] = null;
+		try {
+			findGroupPredPrepStmt.setInt(1, groupId);
+			results = db.executePrepSelectIntegerColumn(findGroupPredPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		if (results.length != 0) {
+			return results[0];
+		}
+		return ErrorCode.NOT_FOUND;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -414,12 +483,13 @@ public class FileGroupMgr implements IFileGroupMgr {
 		}
 		
 		/* only applicable for generated file groups */
-		if (getGroupType(groupId) != GENERATED_GROUP) {
+		int groupType = getGroupType(groupId);
+		if ((groupType != GENERATED_GROUP) && (groupType != FILTER_GROUP)) {
 			return ErrorCode.INVALID_OP;
 		}
 		
 		/* validate that the path string is valid */
-		if (!isValidPathString(path)) {
+		if ((groupType == GENERATED_GROUP) && (!isValidPathString(path))) {
 			return ErrorCode.BAD_VALUE;
 		}
 		
@@ -440,17 +510,14 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 */
 	@Override
 	public String getPathString(int groupId, int index) {
+
+		/* only applicable for generated and filter groups */
+		int groupType = getGroupType(groupId);
+		if ((groupType != GENERATED_GROUP) && (groupType != FILTER_GROUP)) {
+			return null;
+		}
 		
 		int size = getGroupSize(groupId);
-		if (size == ErrorCode.NOT_FOUND) {
-			return null;
-		}
-
-		/* only applicable for generated file groups */
-		if (getGroupType(groupId) != GENERATED_GROUP) {
-			return null;
-		}
-		
 		if ((index < 0) || (index >= size)) {
 			return null;
 		}
@@ -932,7 +999,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * 
 	 * @param groupId		The ID of the top-level group.
 	 * @param outputPaths	An input/output list that we'll append output paths to.
-	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if a sub group is invalid. 
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if a sub group is invalid,
+	 *         or ErrorCode.BAD_VALUE if it's a filter group with bad regular expressions.
 	 */
 	private int getExpandedGroupFilesHelper(int groupId, ArrayList<String> outputPaths) {
 		
@@ -977,6 +1045,46 @@ public class FileGroupMgr implements IFileGroupMgr {
 					return rc;
 				}
 				index++;
+			}
+		}
+		
+		/* filter groups require us to filter out the files of our upstream file group */
+		else if (type == FILTER_GROUP) {
+			int predGroupId = getPredId(groupId);
+			if (predGroupId < 0) {
+				return predGroupId;
+			}
+			
+			/* fetch the input files from the predecessor group - we'll filter from these */
+			String inputPaths[] = getExpandedGroupFiles(predGroupId);
+			
+			/* our own file group contains the regex strings to filter with */
+			ResultSet rs = null;
+			ArrayList<String> regexs = new ArrayList<String>();
+			try {
+				findGroupMembersPrepStmt.setInt(1, groupId);
+				rs = db.executePrepSelectResultSet(findGroupMembersPrepStmt);
+				while (rs.next()) {
+					regexs.add(rs.getString(2));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new FatalBuildStoreError("Error in SQL: " + e);
+			}
+			String regexArray[] = regexs.toArray(new String[regexs.size()]);
+			
+			/* convert the regex strings into a RegexChain (precompiled regexes) */
+			RegexChain chain;
+			try {
+				chain = BmlRegex.compileRegexChain(regexArray);
+			} catch (PatternSyntaxException ex) {
+				return ErrorCode.BAD_VALUE;
+			}
+				
+			/* finally, filter the inputPaths using our regexes */
+			String filteredPaths[] = BmlRegex.filterRegexChain(inputPaths, chain);
+			for (int i = 0; i < filteredPaths.length; i++) {
+				outputPaths.add(filteredPaths[i]);
 			}
 		}
 		

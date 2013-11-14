@@ -177,6 +177,11 @@ public class UpgradeDB {
 			if (dbVersion < 404) {
 				/* note: create of the "Main" package is done within BuildStore */
 			}
+			
+			/* update to 405 */
+			if (dbVersion < 405) {
+				stat.executeUpdate("alter table fileGroups add column predId integer");
+			}
 
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);

@@ -111,12 +111,12 @@ public class TestFileGroupMgr {
 	public void testNewFileGroupErrors() {
 
 		/* test with invalid group type */
-		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newGroup(pkg1Id, -1));
-		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newGroup(pkg1Id, 5));
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newGroup(pkg1Id, -1, -1));
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newGroup(pkg1Id, 5, -1));
 		
 		/* test with invalid package ID */
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newGroup(-1, IFileGroupMgr.SOURCE_GROUP));
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newGroup(1000, IFileGroupMgr.SOURCE_GROUP));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newGroup(-1, IFileGroupMgr.SOURCE_GROUP, -1));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newGroup(1000, IFileGroupMgr.SOURCE_GROUP, -1));
 
 		/* test get of file group type with bad group Id */
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getGroupType(1000));
@@ -242,6 +242,9 @@ public class TestFileGroupMgr {
 		/* create a new source file group */
 		int groupId = fileGroupMgr.newSourceGroup(pkg1Id);
 		assertTrue(groupId >= 0);
+		
+		/* try to add a negative path ID */
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.addPathId(groupId, -1));
 		
 		/* test addition of files at invalid locations */
 		assertEquals(ErrorCode.OUT_OF_RANGE, fileGroupMgr.addPathId(groupId, file1, -2));
@@ -675,7 +678,119 @@ public class TestFileGroupMgr {
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setSubGroups(10000, new Integer[] {1, 2, 3, 4}));
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setSubGroups(sourceGroup, new Integer[] {1, 2, 3, 4}));
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a filter group that filters files from a source group.
+	 */
+	@Test
+	public void testNewFilterGroup() {
+				
+		/* First, create the source group */
+		int pkgId = pkgMgr.addPackage("MyPkg");
+		assertTrue(pkgId > 0);
+		int srcGroupId = fileGroupMgr.newSourceGroup(pkgId);
+		assertTrue(srcGroupId > 0);
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/b/cat.java"));
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/b/dog.java"));
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/b/cat.h"));
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/b/cat.c"));
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/z/cat.java"));
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/z/dog.java"));
+		assertEquals(6, fileGroupMgr.getGroupSize(srcGroupId));
 		
+		/* Create a new filter group, attaching it to srcGroupId */
+		int filterGroupId = fileGroupMgr.newFilterGroup(pkgId, srcGroupId);
+		assertTrue(filterGroupId > 0);
+		assertEquals(IFileGroupMgr.FILTER_GROUP, fileGroupMgr.getGroupType(filterGroupId));
+		assertEquals(srcGroupId, fileGroupMgr.getPredId(filterGroupId));
+		
+		/* for now, there are no members, and there are no results when running the filter */
+		assertEquals(0, fileGroupMgr.getGroupSize(filterGroupId));
+		String[] results = fileGroupMgr.getExpandedGroupFiles(filterGroupId);
+		assertEquals(0, results.length);
+		
+		/* add a pattern than includes *.java files */
+		int filter1 = fileGroupMgr.addPathString(filterGroupId, "ia:@workspace/**/*.java");
+		assertTrue(filter1 >= 0);
+		results = fileGroupMgr.getExpandedGroupFiles(filterGroupId);
+		assertArrayEquals(new String[] { "@workspace/a/b/cat.java",  "@workspace/a/b/dog.java", 
+				"@workspace/a/z/cat.java", "@workspace/a/z/dog.java"}, results);
+		
+		/* add a new include rule for "*.c" */
+		int filter2 = fileGroupMgr.addPathString(filterGroupId, "ia:@workspace/**/*.c");
+		assertTrue(filter2 >= 0);
+		results = fileGroupMgr.getExpandedGroupFiles(filterGroupId);
+		assertArrayEquals(new String[] { "@workspace/a/b/cat.java",  "@workspace/a/b/dog.java", 
+				"@workspace/a/b/cat.c", "@workspace/a/z/cat.java", "@workspace/a/z/dog.java"}, results);
+		
+		/* add an exclude rule for @workspace/a/z */
+		int filter3 = fileGroupMgr.addPathString(filterGroupId, "ea:@workspace/a/z/");
+		assertTrue(filter3 >= 0);
+		results = fileGroupMgr.getExpandedGroupFiles(filterGroupId);
+		assertArrayEquals(new String[] { "@workspace/a/b/cat.java",  "@workspace/a/b/dog.java", 
+										"@workspace/a/b/cat.c"}, results);
+		
+		/* add include rule for *.h */
+		int filter4 = fileGroupMgr.addPathString(filterGroupId, "ia:**/*.h");
+		assertTrue(filter4 >= 0);
+		results = fileGroupMgr.getExpandedGroupFiles(filterGroupId);
+		assertArrayEquals(new String[] { "@workspace/a/b/cat.java",  "@workspace/a/b/dog.java", 
+										"@workspace/a/b/cat.h", "@workspace/a/b/cat.c"}, results);
+		
+		/* remove the @work/a/z exclude */
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(filterGroupId, filter3));
+		assertEquals(3, fileGroupMgr.getGroupSize(filterGroupId));
+		results = fileGroupMgr.getExpandedGroupFiles(filterGroupId);
+		assertArrayEquals(new String[] { "@workspace/a/b/cat.java",  "@workspace/a/b/dog.java", 
+				"@workspace/a/b/cat.h", "@workspace/a/b/cat.c", "@workspace/a/z/cat.java", 
+				"@workspace/a/z/dog.java"}, results);
+		
+		/* swap the *.c and *.java rules, and use getPathString() to confirm positions */
+		assertEquals("ia:@workspace/**/*.java", fileGroupMgr.getPathString(filterGroupId, filter1));
+		assertEquals("ia:@workspace/**/*.c", fileGroupMgr.getPathString(filterGroupId, filter2));
+		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(filterGroupId, filter2, filter1));
+		assertEquals("ia:@workspace/**/*.java", fileGroupMgr.getPathString(filterGroupId, filter2));
+		assertEquals("ia:@workspace/**/*.c", fileGroupMgr.getPathString(filterGroupId, filter1));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a filter group that filters files from a source group.
+	 */
+	@Test
+	public void testNewFilterGroupErrors() {
+		
+		int pkgId = pkgMgr.addPackage("MyPkg");
+		int srcGroupId = fileGroupMgr.newSourceGroup(pkgId);
+		
+		/* Try creating a new filterGroup that's based in an invalid package */
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newFilterGroup(1000, srcGroupId));
+
+		/* Try creating a new filterGroup that's based on an invalid group Id */
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newFilterGroup(pkgId, 1000));
+		
+		/* Try creating a new filterGroup on a group that's in a different package */
+		int otherPkgId = pkgMgr.addPackage("MyOtherPkg");
+		assertTrue(otherPkgId > 0);
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newFilterGroup(otherPkgId, srcGroupId));
+		
+		/* try getting the predecessor of an invalid file group */
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getPredId(1000));
+		
+		/* try getting the predecessor of a non-filter group */
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.getPredId(srcGroupId));
+		
+		/* test with bad regexs - should return the empty list. */
+		int filterGroupId = fileGroupMgr.newFilterGroup(pkgId, srcGroupId);
+		fileGroupMgr.addPathId(srcGroupId, fileMgr.addFile("@workspace/a/b/cat.java"));
+		int filter1 = fileGroupMgr.addPathString(filterGroupId, "badtag:**");
+		assertTrue(filter1 >= 0);
+		assertNull(fileGroupMgr.getExpandedGroupFiles(filterGroupId));
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

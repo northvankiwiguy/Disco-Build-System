@@ -33,6 +33,9 @@ public interface IFileGroupMgr {
 	/** indicates that a file group is a "Merge" file group */ 
 	public static final int MERGE_GROUP = 2;
 	
+	/** indicates that a file group is a "Filter" file group */ 
+	public static final int FILTER_GROUP = 3;	
+	
 	/**
 	 * Create a new "Source File Group" into which source files can be added.
 	 * A source file group is an ordered list of path IDs from the FileMgr,
@@ -80,15 +83,31 @@ public interface IFileGroupMgr {
 	int newMergeGroup(int pkgId);
 	
 	/**
+	 * Create a new "Filter File Group" which filters the content of an existing
+	 * file group, providing a subset of the original list of files. Filtering is
+	 * done based on a chain of regular expressions. Those files from the existing
+	 * file group that match the regular expressions will be output from the filter
+	 * file group.
+	 * 
+	 * @param pkgId			The package in which this filter appears.
+	 * @param predGroupId	The ID of the predecessor file group we are filtering.
+	 * @return The unique ID number of this new group, ErrorCode.NOT_FOUND
+	 * if the package ID is invalid, or ErrorCode.BAD_VALUE if the predGroupId
+	 * is not a valid file group that is already in the same package (pkgId).
+	 */
+	int newFilterGroup(int pkgId, int predGroupId);
+	
+	/**
 	 * Create a file group of the specified type. This is simply a generalized
 	 * version of newSourceGroup(), newGeneratedGroup() or newMergeGroup().
 	 * 
 	 * @param pkgId	The ID of the package that this group will belong to.
-	 * @param type  The group's type (SOURCE_GROUP, GENERATED_GROUP, MERGE_GROUP).
+	 * @param type  The group's type (SOURCE_GROUP, GENERATED_GROUP, MERGE_GROUP, FILTER_GROUP).
+	 * @param predId For FILTER_GROUP, which other group are we filtering?
 	 * @return The unique ID number of this new group, ErrorCode.NOT_FOUND
 	 * if the package ID is invalid, or ErrorCode.BAD_VALUE if the type is invalid.
 	 */
-	int newGroup(int pkgId, int type);
+	int newGroup(int pkgId, int type, int predId);
 	
 	/**
 	 * Return the type of the specified file group.
@@ -98,6 +117,15 @@ public interface IFileGroupMgr {
 	 * ErrorCode.NOT_FOUND if groupId is invalid.
 	 */
 	int getGroupType(int groupId);
+	
+	/**
+	 * For filter groups, there must always be some other file group that this
+	 * group depends on. Return the ID of this predecessor group.
+	 * @param groupId	ID of the filter group.
+	 * @return The ID of the filter group's predecessor group, or ErrorCode.NOT_FOUND
+	 * if groupId is invalid, or ErrorCode.INVALID_OP if this is not a filter group.
+	 */
+	int getPredId(int groupId);
 	
 	/**
 	 * Delete an existing file group. After deletion, no more operations
@@ -178,12 +206,14 @@ public interface IFileGroupMgr {
 	 * the database. This method is intended for use when hard-coding the output of an action,
 	 * rather than requiring the action to auto-generate the names of its output files.
 	 * 
+	 * For filter groups, this method is used for adding a regular expression.
+	 * 
 	 * @param groupId 		The ID of the group to append to.
 	 * @param path    		The package-relative path to the generated file (e.g. \@pkg_gen/output.o)
 	 * @return				The index of the newly added entry, or
 	 * 						ErrorCode.NOT_FOUND if the groupId is invalid,
 	 * 						ErrorCode.BAD_VALUE if the path string is malformed, or
-	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
+	 * 						ErrorCode.INVALID_OP if groupId isn't a generated or filter file group.
 	 */
 	int addPathString(int groupId, String path);
 
@@ -192,6 +222,8 @@ public interface IFileGroupMgr {
 	 * rather than appending to the end of the group. All existing entries at higher index positions
 	 * will be shifted up one position.
 	 * 
+	 * For filter groups, this method is used for adding a regular expression.
+     *
 	 * @param groupId 		The ID of the group to append to.
 	 * @param path    		The package-relative path to the generated file (e.g. \@pkg_gen/output.o)
 	 * @param index         The index within the group, at which the new entry will be added.
@@ -199,7 +231,7 @@ public interface IFileGroupMgr {
 	 * 						ErrorCode.NOT_FOUND if the groupId is invalid,
 	 * 						ErrorCode.OUT_OF_RANGE if the index is invalid for this group,
 	 * 						ErrorCode.BAD_VALUE if the path string is malformed, or
-	 * 						ErrorCode.INVALID_OP if groupId isn't a generated file group.
+	 * 						ErrorCode.INVALID_OP if groupId isn't a generated or filter file group.
 	 */
 	int addPathString(int groupId, String path, int index);
 	
