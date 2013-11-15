@@ -93,7 +93,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 * Various colour constants used in displaying this element.
 	 */
 	private static final IColorConstant TEXT_FOREGROUND = IColorConstant.BLACK;
-	private static final IColorConstant LINE_COLOUR = new ColorConstant(10, 10, 10);
+	private static final IColorConstant LINE_COLOUR = new ColorConstant(180, 180, 155);
 	private static final IColorConstant FILL_COLOUR = new ColorConstant(220, 220, 190);
 
 	/*

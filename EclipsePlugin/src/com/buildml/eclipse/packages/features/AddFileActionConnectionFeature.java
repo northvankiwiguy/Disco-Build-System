@@ -24,7 +24,6 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.util.IColorConstant;
 
 import com.buildml.eclipse.bobj.UIFileActionConnection;
@@ -91,13 +90,13 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 		/* draw the line */
 		IGaService gaService = Graphiti.getGaService();
 		Polyline polyline = gaService.createPolyline(connection);
-		polyline.setLineWidth(2);
+		polyline.setLineWidth(1);
 		polyline.setForeground(manageColor(CONNECTION_COLOUR));
 		
 		/* draw the arrow */
 	    ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
 	    Polyline arrow = gaService.createPolyline(cd, new int[] { -10, 5, 0, 0, -10, -5 });
-		arrow.setLineWidth(2);
+		arrow.setLineWidth(1);
 		arrow.setForeground(manageColor(CONNECTION_COLOUR));
 	    
 		/* 

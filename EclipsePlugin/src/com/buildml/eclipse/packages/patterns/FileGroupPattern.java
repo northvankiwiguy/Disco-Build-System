@@ -119,7 +119,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * Various colour constants used in displaying this element.
 	 */
 	private static final IColorConstant TEXT_FOREGROUND = IColorConstant.BLACK;
-	private static final IColorConstant LINE_COLOUR = new ColorConstant(98, 131, 167);
+	private static final IColorConstant LINE_COLOUR = new ColorConstant(141, 166, 190);
 	private static final IColorConstant FILL_COLOUR = new ColorConstant(187, 218, 247);
 	private static final IColorConstant FILL_CORNER_COLOUR = new ColorConstant(160, 190, 220);
 
