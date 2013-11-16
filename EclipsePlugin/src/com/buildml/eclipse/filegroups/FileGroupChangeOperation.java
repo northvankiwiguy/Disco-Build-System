@@ -12,7 +12,7 @@
 
 package com.buildml.eclipse.filegroups;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
@@ -67,10 +67,10 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	private int newX, newY;
 	
 	/** if CHANGED_MEMBERSHIP, what are the old members? */
-	private ArrayList<Integer> oldMembers;
+	private List<Integer> oldMembers;
 
 	/** if CHANGED_MEMBERSHIP, what are the new members? */
-	private ArrayList<Integer> newMembers;
+	private List<Integer> newMembers;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -138,7 +138,7 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	 * @param oldMembers The old members of this file group.
 	 * @param newMembers The new members of this file group.
 	 */
-	public void recordMembershipChange(ArrayList<Integer> oldMembers, ArrayList<Integer> newMembers) {
+	public void recordMembershipChange(List<Integer> oldMembers, List<Integer> newMembers) {
 		if (!oldMembers.equals(newMembers)){
 			changedFields |= CHANGED_MEMBERSHIP;
 			this.oldMembers = oldMembers;
@@ -237,7 +237,7 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	 * @param fileGroupId 	The ID of the file group to set membership of.
 	 * @param members		The ArrayList of members to populate the file group with.
 	 */
-	private void setFileGroupMembers(int fileGroupId, ArrayList<Integer> members) {
+	private void setFileGroupMembers(int fileGroupId, List<Integer> members) {
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		
 		if ((fileGroupType != IFileGroupMgr.SOURCE_GROUP) && 
