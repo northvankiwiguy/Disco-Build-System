@@ -15,10 +15,17 @@ package com.buildml.eclipse.utils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
+import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
+import org.eclipse.graphiti.pattern.IPattern;
 import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
+
+import com.buildml.eclipse.packages.DiagramFeatureProvider;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.packages.patterns.FileGroupPattern;
 
 /**
  * Various static methods, for interacting with Graphiti.
@@ -78,6 +85,41 @@ public class GraphitiUtils {
 			}			
 		}
 		return null;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return the DiagramFeatureProvider for the currently active PackageDiagramEditor.
+	 * @return The DiagramFeatureProvider, or null if none is active.
+	 */
+	public static DiagramFeatureProvider getActiveGraphitiFeatureProvider() {
+		PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
+		if (pde == null) {
+			return null;
+		}
+		IDiagramTypeProvider dtp = pde.getDiagramTypeProvider();
+		if (dtp == null) {
+			return null;
+		}
+		return (DiagramFeatureProvider) dtp.getFeatureProvider();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * For the currently active package diagram, return the Pattern object that implements
+	 * the Graphiti pattern for the specified pictogram.
+	 * 
+	 * @param pictogramElement The pictogram that is managed by the pattern we're searching for.
+	 * @return The pattern object, or null if it couldn't be found.
+	 */
+	public static IPattern getPattern(PictogramElement pictogramElement) {
+		DiagramFeatureProvider dfp = getActiveGraphitiFeatureProvider();
+		if (dfp == null) {
+			return null;
+		}
+		return dfp.getPatternForPictogramElement(pictogramElement);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

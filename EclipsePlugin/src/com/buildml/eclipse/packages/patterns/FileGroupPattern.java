@@ -13,6 +13,8 @@
 package com.buildml.eclipse.packages.patterns;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
@@ -628,6 +630,82 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		opMain.recordAndInvoke();
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Create a new merge file group, based off one or more existing file groups. This method
+	 * assumes that creation operation was invoked via a GUI operation, and therefore the
+	 * change is added to the undo/redo stack.
+	 * 
+	 * @param pkgId 		The package that the file group will be placed in.
+	 * @param subGroupIds	The list of sub file group IDs to add into the merge list.
+	 */
+	public void createMergeFileGroup(int pkgId, List<Integer> subGroupIds) {
+		
+		/* must have at least one member */
+		if (subGroupIds.size() < 1) {
+			return;
+		}
+		
+		/*
+		 * Create a new merge group. This will allocate an empty group, providing
+		 * us with the group ID.
+		 */
+		int mergeFileGroupId = fileGroupMgr.newMergeGroup(pkgId);
+		if (mergeFileGroupId == ErrorCode.NOT_FOUND) {
+			AlertDialog.displayErrorDialog("Error Creating Merge Group",
+					"Unable to create a new merge group in the database.");
+			return;
+		}
+					
+		/* 
+		 * Position the new merge group at the y-axis mid point of all the
+		 * existing sub groups, but to the right of the right-most sub group.
+		 * First, find the "average" (y-axis) and "maximum" (x-axis) of all sub
+		 * file groups.
+		 */
+		int totalY = 0, maxX = 0;
+		for (Iterator<Integer> iterator = subGroupIds.iterator(); iterator.hasNext();) {
+			int subGroupId = (Integer) iterator.next();
+			
+			MemberLocation subGroupLocation = pkgMemberMgr.getMemberLocation(
+				IPackageMemberMgr.TYPE_FILE_GROUP, subGroupId);
+			if (subGroupLocation == null) {
+				AlertDialog.displayErrorDialog("Error Positioning Merge Group",
+					"Unable to determine the current position of a source file group");
+				return;
+			}
+			totalY += subGroupLocation.y;
+			if (subGroupLocation.x > maxX) {
+				maxX = subGroupLocation.x;
+			}
+		}
+		int averageY = totalY / subGroupIds.size();
+		
+		/*
+		 * Now position the new merge group to the right of the right-most sub group.
+		 */
+		maxX += layoutAlgorithm.getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getWidth();
+		maxX += layoutAlgorithm.getXPadding();
+		
+		if (pkgMemberMgr.setMemberLocation(
+				IPackageMemberMgr.TYPE_FILE_GROUP, mergeFileGroupId,
+				maxX, averageY) != ErrorCode.OK) {
+			AlertDialog.displayErrorDialog("Error Positioning Merge Group",
+					"Unable to set position for new merge group");
+			return;				
+		}
+		
+		/*
+		 * Finally, generate an undo/redo operation to add the members to the group.
+		 * If this operation is "undoned" then the group will still exist in the
+		 * database, but will have no members and therefore won't be shown.
+		 */
+		FileGroupChangeOperation op = new FileGroupChangeOperation("Create Merge Group", mergeFileGroupId);		
+		op.recordMembershipChange(new ArrayList<Integer>(), subGroupIds);
+		op.recordAndInvoke();
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
@@ -1067,57 +1145,10 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * or GENERATED group. This results in the creation of a new MERGE group.
 		 */
 		else {
-	
-			/*
-			 * Create a new merge group. This will allocate an empty group, providing
-			 * us with the group ID.
-			 */
-			int pkgId = editor.getPackageId();
-			int mergeFileGroupId = fileGroupMgr.newMergeGroup(pkgId);
-			if (mergeFileGroupId == ErrorCode.NOT_FOUND) {
-				AlertDialog.displayErrorDialog("Error Creating Merge Group",
-						"Unable to create a new merge group in the database.");
-				return;
-			}
-						
-			/* 
-			 * Position the new merge group halfway between the source and
-			 * target file groups.
-			 */
-			MemberLocation sourceLocation = pkgMemberMgr.getMemberLocation(
-					IPackageMemberMgr.TYPE_FILE_GROUP, sourceFileGroupId);
-			MemberLocation targetLocation = pkgMemberMgr.getMemberLocation(
-					IPackageMemberMgr.TYPE_FILE_GROUP, targetFileGroupId);
-			if ((sourceLocation == null) || (targetLocation == null)) {
-				AlertDialog.displayErrorDialog("Error Positioning Merge Group",
-						"Unable to determine the current position of source/target file groups");
-				return;
-			}
-			
-			int newX = sourceLocation.x > targetLocation.x ? sourceLocation.x : targetLocation.x;
-			newX += layoutAlgorithm.getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getWidth();
-			newX += layoutAlgorithm.getXPadding();
-			
-			if (pkgMemberMgr.setMemberLocation(
-					IPackageMemberMgr.TYPE_FILE_GROUP, mergeFileGroupId,
-					newX,
-					(sourceLocation.y + targetLocation.y) / 2) != ErrorCode.OK) {
-				AlertDialog.displayErrorDialog("Error Positioning Merge Group",
-						"Unable to set position for new merge group");
-				return;				
-			}
-			
-			/*
-			 * Finally, generate an undo/redo operation to add the members to the group.
-			 * If this operation is "undoned" then the group will still exist in the
-			 * database, but will have no members and therefore won't be shown.
-			 */
-			FileGroupChangeOperation op = new FileGroupChangeOperation("Create Merge Group", mergeFileGroupId);
-			ArrayList<Integer> newMembers = new ArrayList<Integer>();
-			newMembers.add(sourceFileGroupId);
-			newMembers.add(targetFileGroupId);
-			op.recordMembershipChange(new ArrayList<Integer>(), newMembers);
-			op.recordAndInvoke();
+			List<Integer> subGroupIds = new ArrayList<Integer>();
+			subGroupIds.add(sourceFileGroupId);
+			subGroupIds.add(targetFileGroupId);
+			createMergeFileGroup(editor.getPackageId(), subGroupIds);
 		}
 	}
 	

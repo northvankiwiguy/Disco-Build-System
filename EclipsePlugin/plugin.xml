@@ -190,6 +190,16 @@
             name="New Action">
       </command>
       <command
+            defaultHandler="com.buildml.eclipse.packages.handlers.HandlerNewMergeGroup"
+            id="com.buildml.eclipse.commands.package.newmergegroup"
+            name="New Merge Group">
+      </command>
+      <command
+            defaultHandler="com.buildml.eclipse.packages.handlers.HandlerNewFilter"
+            id="com.buildml.eclipse.commands.package.newfilter"
+            name="New Filter">
+      </command>
+      <command
             defaultHandler="com.buildml.eclipse.packages.handlers.HandlerAutoLayout"
             id="com.buildml.eclipse.commands.package.autolayout"
             name="Auto Layout">
@@ -844,10 +854,24 @@
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?after=org.eclipse.gef.group.edit">
-         <command
-               commandId="com.buildml.eclipse.commands.package.newaction"
-               style="push">
-         </command>
+         <menu
+               label="New">
+            <command
+                  commandId="com.buildml.eclipse.commands.package.newaction"
+                  label="Action"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.package.newmergegroup"
+                  label="Merge Group"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.package.newfilter"
+                  label="Filter"
+                  style="push">
+            </command>
+         </menu>
          <command
                commandId="com.buildml.eclipse.commands.package.autolayout"
                style="push">
