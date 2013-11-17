@@ -14,6 +14,7 @@ package com.buildml.eclipse.packages.handlers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -46,31 +47,26 @@ public class HandlerNewMergeGroup extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
-		if (buildStore == null) {
-			return null;
-		}
 		PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
-		if (pde == null) {
+		List<Object> selectedObjects = GraphitiUtils.getSelection();
+		if ((buildStore == null) || (pde == null) || (selectedObjects == null)) {
 			return null;
 		}
 
 		/*
-		 * Get the selection - we know there's at least one UIFileGroup selected,
-		 * and that all selected elements are UIFileGroups. We can skip a bunch
-		 * of error checking because we know what to expect (isEnabled() already
+		 * Convert the selected UIFileGroups into a list of fileGroup IDs - we know there's 
+		 * at least one UIFileGroup selected, and that all selected elements are UIFileGroups.
+		 * We can skip a bunch of error checking because we know what to expect (isEnabled() already
 		 * validated for us).
 		 */
-		IStructuredSelection selection = EclipsePartUtils.getSelection();
-		Iterator<Object> iter = selection.iterator();
-		ArrayList<Integer> subGroupIds = new ArrayList<Integer>(selection.size());
-		while (iter.hasNext()) {
-			IContainerShapeEditPart element = (IContainerShapeEditPart) iter.next();
-			UIFileGroup fileGroup = (UIFileGroup) GraphitiUtils.getBusinessObject(
-					((IContainerShapeEditPart)element).getPictogramElement());
+		List<Integer> subGroupIds = new ArrayList<Integer>(selectedObjects.size());
+		for (Iterator<Object> iterator = selectedObjects.iterator(); iterator.hasNext();) {
+			UIFileGroup fileGroup = (UIFileGroup)iterator.next();
 			subGroupIds.add(fileGroup.getId());
 		}
-		
+
 		/* we defer the actual work of creating the merge file group to the FileGroupPattern */
+		IStructuredSelection selection = EclipsePartUtils.getSelection();
 		IContainerShapeEditPart shapePart = (IContainerShapeEditPart) selection.getFirstElement();
 		FileGroupPattern fgp = (FileGroupPattern)GraphitiUtils.getPattern(shapePart.getPictogramElement());
 		fgp.createMergeFileGroup(pde.getPackageId(), subGroupIds);
@@ -86,27 +82,21 @@ public class HandlerNewMergeGroup extends AbstractHandler {
 	 */
 	@Override
 	public boolean isEnabled() {
-		IStructuredSelection selection = EclipsePartUtils.getSelection();
-		Iterator<Object> iter = selection.iterator();
-		
+		List<Object> selectedObjects = GraphitiUtils.getSelection();
+		if (selectedObjects == null) {
+			return false;
+		}
+
+		/* count the number of UIFileGroups - exit completely if other object types are selected */
 		int fileGroupsSelected = 0;
-		while (iter.hasNext()) {
-			Object element = iter.next();
+		for (Iterator<Object> iterator = selectedObjects.iterator(); iterator.hasNext();) {
+			Object object = (Object) iterator.next();
 			
-			/* Note the selected object is "internal" to Graphiti! (we must access an internal class) */
-			if (!(element instanceof IContainerShapeEditPart)) {
-				return false;
-			}			
-						
-			/* if this selected item is not a UIFileGroup, we not enabled */
-			Object bo = GraphitiUtils.getBusinessObject(
-					((IContainerShapeEditPart)element).getPictogramElement());
-			if (!(bo instanceof UIFileGroup)) {
+			if (object instanceof UIFileGroup) {
+				fileGroupsSelected++;
+			} else {
 				return false;
 			}
-
-			/* count the number of UIFileGroup objects we see */
-			fileGroupsSelected++;
 		}
 	
 		/* there must be at least one */
