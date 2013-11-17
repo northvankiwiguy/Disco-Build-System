@@ -53,7 +53,7 @@ public class ActionShellCommandPage extends BmlPropertyPage {
 	protected Control createContents(Composite parent) {
 
 		/* determine the numeric ID of the action */
-		UIAction action = (UIAction) GraphitiUtils.getSelectedBusinessObjects(getElement(), UIAction.class);
+		UIAction action = (UIAction) GraphitiUtils.getBusinessObjectFromElement(getElement(), UIAction.class);
 		if (action == null) {
 			return null;
 		}

@@ -88,7 +88,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	protected Control createContents(Composite parent) {
 		
 		/* determine the numeric ID of the file group */
-		UIFileGroup fileGroup = (UIFileGroup) GraphitiUtils.getSelectedBusinessObjects(getElement(), UIFileGroup.class);
+		UIFileGroup fileGroup = (UIFileGroup) GraphitiUtils.getBusinessObjectFromElement(getElement(), UIFileGroup.class);
 		if (fileGroup == null) {
 			return null;
 		}

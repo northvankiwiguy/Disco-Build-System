@@ -41,13 +41,14 @@ public class GraphitiUtils {
 	 *=====================================================================================*/
 
 	/**
-	 * Return the business object underlying the currently-selected Graphiti icon.
+	 * Return the business object underlying the specified Graphiti element. This is
+	 * primarily useful in PropertyPages where the element is obtained from getElement().
 	 * 
 	 * @param element The element that's currently selected.
 	 * @param boClass The underlying class that we're expecting.
 	 * @return The business object that underlies the selected pictogram.
 	 */
-	public static Object getSelectedBusinessObjects(IAdaptable element, Class<?> boClass) {
+	public static Object getBusinessObjectFromElement(IAdaptable element, Class<?> boClass) {
 		
 		/* the element must be a Graphiti shape */
 		GraphitiShapeEditPart container = (GraphitiShapeEditPart)element;
