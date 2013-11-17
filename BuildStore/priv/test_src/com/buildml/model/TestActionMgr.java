@@ -866,6 +866,11 @@ public class TestActionMgr {
 		assertEquals(null, actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));		
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, Integer.valueOf(10)));
 		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));	
+		
+		/* Test getSlotByName */
+		assertEquals(inputSlotDetails.slotId, actionMgr.getSlotByName(myActionId, "Input"));
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getSlotByName(myActionId, "BadSlot"));
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getSlotByName(10000, "Input"));		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -293,6 +293,17 @@ public interface IActionMgr {
 	public abstract boolean isActionTrashed(int actionId);
 	
 	/**
+	 * For this specific action, return the ID of the named slot. This is simply a short-cut
+	 * approach, instead of getting the slotID from the IActionTypeMgr.
+	 * 
+	 * @param actionId	The action that contains the slot.
+	 * @param slotName	The name of the slot.
+	 * @return The slot's ID, or ErrorCode.NOT_FOUND if the action is invalid, or the slot
+	 * name is not valid for this action.
+	 */
+	public abstract int getSlotByName(int actionId, String slotName);
+	
+	/**
 	 * For the specified action, set the specified slot to the given value.
 	 * 
 	 * @param actionId The action that the slot is attached to.
@@ -355,5 +366,4 @@ public interface IActionMgr {
 	 * @param listener The object to be removed from the list of listeners.
 	 */
 	public void removeListener(IActionMgrListener listener);
-	
 }

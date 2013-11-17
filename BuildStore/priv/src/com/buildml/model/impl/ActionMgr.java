@@ -21,6 +21,7 @@ import java.util.List;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
@@ -837,6 +838,27 @@ public class ActionMgr implements IActionMgr {
 		
 		/* if "trashed" field is 1, then the action is trashed */
 		return results[0] == 1;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getSlotByName(int, java.lang.String)
+	 */
+	@Override
+	public int getSlotByName(int actionId, String slotName) {
+
+		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
+		int actionTypeId = getActionType(actionId);
+		if (actionTypeId == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		SlotDetails details = actionTypeMgr.getSlotByName(actionTypeId, slotName);
+		if (details == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		return details.slotId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
