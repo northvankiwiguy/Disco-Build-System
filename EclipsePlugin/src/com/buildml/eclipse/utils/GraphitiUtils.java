@@ -12,20 +12,23 @@
 
 package com.buildml.eclipse.utils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
-import org.eclipse.graphiti.pattern.DefaultFeatureProviderWithPatterns;
 import org.eclipse.graphiti.pattern.IPattern;
+import org.eclipse.graphiti.ui.platform.GraphitiConnectionEditPart;
 import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
 import com.buildml.eclipse.packages.DiagramFeatureProvider;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
-import com.buildml.eclipse.packages.patterns.FileGroupPattern;
 
 /**
  * Various static methods, for interacting with Graphiti.
@@ -85,6 +88,55 @@ public class GraphitiUtils {
 			}			
 		}
 		return null;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return a list of the objects currently selected on the Graphiti Diagram. The returned
+	 * list will only contain business objects (e.g. UIFileGroup, etc). This method is
+	 * useful for converting the Graphiti EditPart objects into objects that we actually
+	 * care about.
+	 * 
+	 * @return A list of business objects currently selected, or null if there's an
+	 * error fetching the selection.
+	 */
+	public static List<Object> getSelection() {
+		
+		IStructuredSelection selectedParts = EclipsePartUtils.getSelection();
+		if (selectedParts == null) {
+			return null;
+		}
+		
+		/* traverse the list of selected "edit parts" and convert to business objects */
+		List<Object> result = new ArrayList<Object>();
+		Iterator<Object> iter = selectedParts.iterator();
+		while (iter.hasNext()) {
+			Object element = iter.next();
+			PictogramElement pe = null;
+			
+			/* handle shapes (actions, file groups, etc) */
+			if (element instanceof GraphitiShapeEditPart) {
+				GraphitiShapeEditPart shapeEditPart = (GraphitiShapeEditPart)element;
+				pe = shapeEditPart.getPictogramElement();
+			}
+			
+			/* handle connection arrows */
+			else if (element instanceof GraphitiConnectionEditPart) {
+				GraphitiConnectionEditPart connectionEditPart = (GraphitiConnectionEditPart)element;
+				pe = connectionEditPart.getPictogramElement();
+			}
+			
+			/* convert Pictogram Element into business object, and add to result list */
+			if (pe != null) {
+				Object bo = getBusinessObject(pe);
+				if (bo != null) {
+					result.add(bo);
+				}
+			}
+		
+		}
+		return result;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
