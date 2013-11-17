@@ -13,6 +13,8 @@
 package com.buildml.eclipse.packages.patterns;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -747,6 +749,33 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 						}
 					}
 				}
+			}
+		}
+		
+		/*
+		 * Else if this UIFileGroup is somehow embedded in a neighbouring file group.
+		 */
+		else if (memberType == IPackageMemberMgr.TYPE_FILE_GROUP) {
+			int fgType = fileGroupMgr.getGroupType(memberId);
+			
+			/* for merge groups, remove any/all references we have to the deleted group */
+			if (fgType == IFileGroupMgr.MERGE_GROUP) {
+				Integer members[] = fileGroupMgr.getSubGroups(memberId);
+				for (int i = 0; i < members.length; i++) {
+					if (members[i] == fileGroupId) {
+						List<Integer> oldMembers = Arrays.asList(members);
+						List<Integer> newMembers = new ArrayList<Integer>(Arrays.asList(members));
+						while (newMembers.remove(Integer.valueOf(fileGroupId))) { /* remove delete group multiple times? */};
+						FileGroupChangeOperation op = new FileGroupChangeOperation("", memberId);
+						op.recordMembershipChange(oldMembers, newMembers);
+						opMain.add(op);
+						break;
+					}
+				}
+			}
+			
+			else if (fgType == IFileGroupMgr.FILTER_GROUP) {
+				// TODO: implement this.
 			}
 		}
 		
