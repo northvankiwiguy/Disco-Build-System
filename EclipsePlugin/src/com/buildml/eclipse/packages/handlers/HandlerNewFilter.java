@@ -72,7 +72,16 @@ public class HandlerNewFilter extends AbstractHandler {
 			return false;
 		}
 		
-		// TODO: check whether this connection already has a filter.
+		/* for UIFileActionConnection object, we can only add a filter when going into an action */
+		if (bo instanceof UIFileActionConnection) {
+			UIFileActionConnection connection = (UIFileActionConnection)bo;
+			if (connection.getDirection() == UIFileActionConnection.OUTPUT_FROM_ACTION) {
+				return false;
+			}
+		}
+		
+		/* finally check whether this connection already has a filter - we can only have one */
+		// TODO: implement this.
 
 		return true;
 	}
