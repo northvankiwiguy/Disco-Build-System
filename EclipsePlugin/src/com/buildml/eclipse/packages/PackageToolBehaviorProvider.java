@@ -14,6 +14,8 @@ package com.buildml.eclipse.packages;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.context.IDoubleClickContext;
@@ -25,11 +27,15 @@ import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 
 import com.buildml.eclipse.bobj.UIAction;
+import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIFileGroup;
+import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 import com.buildml.eclipse.packages.features.PackageDiagramDoubleClickFeature;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.print.PrintUtils;
 
 /**
@@ -51,11 +57,17 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	/** The IActionMgr associated with this BuildStore */
 	private IActionMgr actionMgr;
 
+	/** The IActionTypeMgr associated with this BuildStore */
+	private IActionTypeMgr actionTypeMgr;
+
 	/** The IFileGroupMgr associated with this BuildStore */
 	private IFileGroupMgr fileGroupMgr;
 
 	/** The maximum number of characters wide that a tooltip should be */
 	private final int toolTipWrapWidth = 120;
+	
+	/** The maximum number of file group members we should show in the tool-tip */
+	private final int toolTipMaxFileGroupLines = 20;
 	
 	/** The custom graphiti feature for handling double-clicks */
  	private ICustomFeature doubleClickFeature = null;
@@ -75,6 +87,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         PackageDiagramEditor pde = (PackageDiagramEditor)dtp.getDiagramEditor();
         buildStore = pde.getBuildStore();
     	actionMgr = buildStore.getActionMgr();
+    	actionTypeMgr = buildStore.getActionTypeMgr();
     	fileGroupMgr = buildStore.getFileGroupMgr();
     }
     
@@ -120,21 +133,76 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         else if (bo instanceof UIFileGroup) {
         	UIFileGroup fileGroup = (UIFileGroup)bo;
         	int fileGroupId = fileGroup.getId();
-        	String files[] = fileGroupMgr.getExpandedGroupFiles(fileGroupId);
-        	int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
-        	String typeName = (fileGroupType == IFileGroupMgr.SOURCE_GROUP) ? "Source" :
-        						((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ?
-        								"Generated" : "Merge");
         	
         	StringBuffer sb = new StringBuffer();
-        	sb.append("\n ");
-        	sb.append(typeName);
-        	sb.append(" File Group: \n");
-        	for (int i = 0; i < files.length; i++) {
-				sb.append(' ');
-				sb.append(files[i]);
-				sb.append(" \n");
+        	displayFileGroupMembers(fileGroupId, sb);
+        	return sb.toString();
+        }
+        
+        /*
+         * For UIFileActionConnection, we can be going into, or going out of an action.
+         */
+        else if (bo instanceof UIFileActionConnection) {
+        	UIFileActionConnection connection = (UIFileActionConnection)bo;
+        	
+    	    SlotDetails details = actionTypeMgr.getSlotByID(connection.getSlotId());
+    	    if (details == null) {
+    	    	return null;
+    	    }
+    	    
+    	    /* for output connections, just show the slot we come out of */
+        	if (connection.getDirection() == UIFileActionConnection.OUTPUT_FROM_ACTION) {
+        		return "\n Output from slot \"" + details.slotName + "\" \n";
+        	}
+        	
+        	/* for input connections, show the slot and the (optional) filter group content */
+        	else {
+        		return "\n Input to slot \"" + details.slotName + "\" \n";
+        		// TODO: show output of filter file set.
+        	}
+        }
+        
+        /*
+         * for UIMergeFileGroupConnection, show the sub group's 1-based position inside the
+         * merge group. If there's a filter on the connection, also show the output of
+         * the filter group. 
+         */
+        else if (bo instanceof UIMergeFileGroupConnection) {
+        	UIMergeFileGroupConnection connection = (UIMergeFileGroupConnection)bo;
+        	int subGroupId = connection.getSourceFileGroupId();
+        	int mergeGroupId = connection.getTargetFileGroupId();
+        	
+        	/* find the index (or indicies) that the sub group appears in the merge group */
+        	Integer subGroups[] = fileGroupMgr.getSubGroups(mergeGroupId);
+        	if (subGroups == null) {
+        		return null;
+        	}
+        	List<Integer> indexList = new ArrayList<Integer>();
+        	for (int i = 0; i < subGroups.length; i++) {
+				if (subGroups[i] == subGroupId) {
+					indexList.add(i + 1);
+				}
 			}
+			
+        	StringBuffer sb = new StringBuffer();
+        	sb.append("\n File group merged into position");
+        	if (indexList.size() > 1) {
+        		sb.append('s');
+        	}
+        	int size = indexList.size();
+        	for (int i = 0; i < size; i++) {
+        		if (i == 0) {
+        			sb.append(' ');
+        		}
+        		else if (i == (size - 1)) {
+        			sb.append(" and ");
+        		}
+        		else {
+        			sb.append(", ");
+        		}
+    			sb.append(indexList.get(i));
+			}
+        	sb.append(" \n");
         	return sb.toString();
         }
         
@@ -193,6 +261,42 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         return super.getDoubleClickFeature(context);    	
     }
     
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Helper function for appending the list of a file group's members onto a StringBuffer.
+	 * 
+	 * @param fileGroupId	ID of the file group to display the content of.
+	 * @param stringBuffer	The StringBuffer to append the member names to.
+	 */
+	private void displayFileGroupMembers(int fileGroupId, StringBuffer stringBuffer) {
+		String files[] = fileGroupMgr.getExpandedGroupFiles(fileGroupId);
+		
+		int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
+		String typeName = (fileGroupType == IFileGroupMgr.SOURCE_GROUP) ? "Source" :
+							((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ?
+									"Generated" : "Merge");
+		
+		stringBuffer.append("\n ");
+		stringBuffer.append(typeName);
+		stringBuffer.append(" File Group: \n");
+		
+		int halfMaxLines = toolTipMaxFileGroupLines / 2;
+		
+		for (int i = 0; i < files.length; i++) {
+			if ((i < halfMaxLines) || (i >= (files.length - halfMaxLines))) {
+				stringBuffer.append(' ');
+				stringBuffer.append(files[i]);
+				stringBuffer.append(" \n");
+			}
+			
+			else if (i == halfMaxLines) {
+				stringBuffer.append("    ...\n");
+			}
+		}
+	}
+	
     /*-------------------------------------------------------------------------------------*/
-    
 }

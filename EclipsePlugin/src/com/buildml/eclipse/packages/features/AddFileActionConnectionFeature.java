@@ -16,8 +16,8 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
-import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -30,7 +30,6 @@ import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.ISlotTypes.SlotDetails;
 
 /**
  *
@@ -44,6 +43,9 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 
 	/** The colour of connection lines */
 	private static final IColorConstant CONNECTION_COLOUR = IColorConstant.BLACK;
+	
+	/** The colour of the filter icon */
+	private static final IColorConstant FILTER_COLOUR = IColorConstant.LIGHT_BLUE;
 	
 	/** our IActionTypeMgr */
 	private IActionTypeMgr actionTypeMgr;
@@ -98,21 +100,11 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 	    Polyline arrow = gaService.createPolyline(cd, new int[] { -10, 5, 0, 0, -10, -5 });
 		arrow.setLineWidth(1);
 		arrow.setForeground(manageColor(CONNECTION_COLOUR));
-	    
-		/* 
-		 * Put the slot's name on the arrow. We position it near to the action's side of the arrow.
-		 */
-	    SlotDetails details = actionTypeMgr.getSlotByID(bo.getSlotId());
-	    if (details != null) {
-	    	double position = 
-	    			(bo.getDirection() == UIFileActionConnection.INPUT_TO_ACTION) ? 0.75 : 0.25;
-	    	ConnectionDecorator textDecorator = 
-	    			peCreateService.createConnectionDecorator(connection, true, position, true);
-	    	Text text = gaService.createDefaultText(getDiagram(), textDecorator);
-	    	text.setForeground(manageColor(IColorConstant.BLACK));
-	    	gaService.setLocation(text, -10, 5);
-	    	text.setValue(details.slotName);
-	    }
+		
+		/* draw an optional filter symbol */
+		//cd = peCreateService.createConnectionDecorator(connection, false, 0.5, true);
+	    //Polygon filter = gaService.createPolygon(cd, new int[] { -10, 10, 10, 10, 2, 2, 0, -10, -2, 2 });
+		//filter.setBackground(manageColor(FILTER_COLOUR));
 	    
 		/* link the connection pictogram to the business object */
 		link(connection, bo);
