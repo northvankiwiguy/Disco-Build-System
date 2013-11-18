@@ -1156,7 +1156,7 @@ public class ActionMgr implements IActionMgr {
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 
 		/* get neighbours of this member */
-		MemberDesc[] neighbours = pkgMemberMgr.getNeighboursOf(memberType, memberId, direction);
+		MemberDesc[] neighbours = pkgMemberMgr.getNeighboursOf(memberType, memberId, direction, false);
 		for (int i = 0; i < neighbours.length; i++) {
 			MemberDesc neighbour = neighbours[i];
 			

@@ -1184,7 +1184,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 
 		/* get neighbours of this member */
 		MemberDesc[] neighbours = pkgMemberMgr.getNeighboursOf(
-				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
 		for (int i = 0; i < neighbours.length; i++) {
 			MemberDesc neighbour = neighbours[i];
 			

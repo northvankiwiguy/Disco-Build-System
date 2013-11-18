@@ -618,7 +618,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		
 		/* first, delete all slots that refer to this file group */
 		MemberDesc neighbours[] = pkgMemberMgr.getNeighboursOf(
-				IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, IPackageMemberMgr.NEIGHBOUR_ANY);
+				IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, IPackageMemberMgr.NEIGHBOUR_ANY, false);
 		for (int i = 0; i < neighbours.length; i++) {
 			removeReferenceFromNeighbour(opMain, fileGroupId, neighbours[i].memberType, neighbours[i].memberId);
 		}

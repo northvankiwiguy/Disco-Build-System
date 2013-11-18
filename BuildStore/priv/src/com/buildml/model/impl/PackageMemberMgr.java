@@ -487,7 +487,8 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @see com.buildml.model.IPackageMemberMgr#getNeighboursOf(int, int, int)
 	 */
 	@Override
-	public MemberDesc[] getNeighboursOf(int memberType, int memberId, int direction) {
+	public MemberDesc[] getNeighboursOf(
+			int memberType, int memberId, int direction, boolean showFilters) {
 		
 		/* valid the memberType */
 		if ((memberType != IPackageMemberMgr.TYPE_FILE_GROUP) &&

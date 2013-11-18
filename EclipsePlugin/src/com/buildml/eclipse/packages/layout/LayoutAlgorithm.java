@@ -90,7 +90,7 @@ public class LayoutAlgorithm {
 				
 		/* determine the list of neighbours on the right side of this file group */
 		MemberDesc[] rightNeighbours = pkgMemberMgr.getNeighboursOf(
-				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
 		for (int i = 0; i < rightNeighbours.length; i++) {
 			if (rightNeighbours[i].x < rightX) {
 				rightX = rightNeighbours[i].x;
@@ -105,7 +105,7 @@ public class LayoutAlgorithm {
 		 * width of each left neighbour.
 		 */
 		MemberDesc[] leftNeighbours = pkgMemberMgr.getNeighboursOf(
-				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_LEFT);
+				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_LEFT, false);
 		for (int i = 0; i < leftNeighbours.length; i++) {
 			if (leftNeighbours[i].x > leftX) {
 				leftX = leftNeighbours[i].x;
@@ -207,7 +207,7 @@ public class LayoutAlgorithm {
 		for (int i = 0; i < allMembers.length; i++) {
 			MemberDesc member = allMembers[i];
 			MemberDesc rightNeighbours[] = pkgMemberMgr.getNeighboursOf(
-					member.memberType, member.memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+					member.memberType, member.memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
 			if (rightNeighbours.length == 0) {
 				addWithNeighboursToAutoLayoutGrid(layoutGrid, member, 0);
 			}
@@ -249,7 +249,7 @@ public class LayoutAlgorithm {
 				
 		/* determine this member's right-side neigbours */
 		MemberDesc neighbours[] = pkgMemberMgr.getNeighboursOf(
-				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT);
+				memberType, memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
 		
 		/* 
 		 * For each neighbour, see if it's x-coordinate is left of us, and therefore needs
@@ -354,7 +354,7 @@ public class LayoutAlgorithm {
 		 * neighbours in a left-ward direction.
 		 */
 		MemberDesc leftNeighbours[] = pkgMemberMgr.getNeighboursOf(
-				member.memberType, member.memberId, IPackageMemberMgr.NEIGHBOUR_LEFT);
+				member.memberType, member.memberId, IPackageMemberMgr.NEIGHBOUR_LEFT, false);
 		if (leftNeighbours == null) {
 			return;
 		}

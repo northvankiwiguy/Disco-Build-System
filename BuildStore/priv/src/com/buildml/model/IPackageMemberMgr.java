@@ -188,10 +188,12 @@ public interface IPackageMemberMgr {
 	 * @param memberType	The type of this member (e.g. TYPE_FILE).
 	 * @param memberId		The ID of this member.
 	 * @param direction		NEIGHBOUR_LEFT, NEIGHBOUR_RIGHT or NEIGHBOUR_EITHER.
+	 * @param showFilters	If true, return filter file groups, otherwise skip over them 
 	 * @return A (possibly empty) array of MemberDesc, describing this member's connected
 	 * neighbours. Returns null if any of the input parameters are invalid.
 	 */
-	public abstract MemberDesc[] getNeighboursOf(int memberType, int memberId, int direction);
+	public abstract MemberDesc[] getNeighboursOf(
+			int memberType, int memberId, int direction, boolean showFilters);
 	
 	/**
 	 * Return the set of files that are within the specified package (any scope).
