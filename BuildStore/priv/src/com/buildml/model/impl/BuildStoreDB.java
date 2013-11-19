@@ -164,6 +164,20 @@ import com.buildml.model.IPackageMemberMgr;
 			executeUpdate("pragma cache_size=" + cache_size);
 		}
 	}
+		
+	/*=====================================================================================*
+	 * STATIC METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * Utility method for converting an SQL exception into a FatalBuildStoreError. Lots of
+	 * parts of the code could trigger an SQL exception, and all exception reporting happens here.
+	 * 
+	 * @param sqlException The SQL exception that was thrown.
+	 */
+	public static void throwSqlException(SQLException sqlException) {
+		throw new FatalBuildStoreError("Unable to execute SQL statement", sqlException);
+	}
 	
 	/*=====================================================================================*
 	 * PACKAGE METHODS

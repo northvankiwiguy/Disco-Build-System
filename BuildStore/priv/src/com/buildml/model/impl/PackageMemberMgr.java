@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
@@ -88,7 +90,8 @@ import com.buildml.utils.errors.ErrorCode;
 		findActionNeighbourPrepStmt = null,
 		findFileGroupNeighbourPrepStmt = null,
 		findMergeFileGroupMembersPrepStmt = null,
-		findMergeFileGroupsContainingFileGroup = null;
+		findMergeFileGroupsContainingFileGroup = null,
+		findFiltersContainingFileGroup = null;
 	
 	/** The event listeners who are registered to learn about package membership changes */
 	List<IPackageMemberMgrListener> listeners = new ArrayList<IPackageMemberMgrListener>();
@@ -143,7 +146,7 @@ import com.buildml.utils.errors.ErrorCode;
 						"slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " " + 
 						"and slotValues.ownerId = ? " +
 						"and slotValues.slotId = slotTypes.slotId " +
-						"and (slotTypes.slotPos = ? or slotTypes.slotPos = ?) " +
+						"and slotTypes.slotPos = ? " +
 						"and packageMembers.memberType = " + IPackageMemberMgr.TYPE_FILE_GROUP + " " +
 						"and packageMembers.memberId = value");
 		findFileGroupNeighbourPrepStmt = db.prepareStatement(
@@ -165,6 +168,8 @@ import com.buildml.utils.errors.ErrorCode;
 						"and fileGroups.id = fileGroupPaths.groupId " +
 						"and fileGroups.type = " + IFileGroupMgr.MERGE_GROUP + " " +
 						"and fileGroupPaths.pathId = ?");
+		findFiltersContainingFileGroup = db.prepareStatement(
+				"select id from fileGroups where predId = ?");
 	}
 
 	/*=====================================================================================*
@@ -394,11 +399,8 @@ import com.buildml.utils.errors.ErrorCode;
 			/* copy results into a MemberDesc[] */
 			members = new ArrayList<IPackageMemberMgr.MemberDesc>();
 			do {
-				MemberDesc newMember = new MemberDesc();
-				newMember.memberType = rs.getInt(1);
-				newMember.memberId = rs.getInt(2);
-				newMember.x = rs.getInt(3);
-				newMember.y = rs.getInt(4);
+				MemberDesc newMember = new MemberDesc(
+						rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
 				
 				/* don't show trashed actions */
 				if ((newMember.memberType != IPackageMemberMgr.TYPE_ACTION) ||
@@ -490,160 +492,79 @@ import com.buildml.utils.errors.ErrorCode;
 	public MemberDesc[] getNeighboursOf(
 			int memberType, int memberId, int direction, boolean showFilters) {
 		
-		/* valid the memberType */
-		if ((memberType != IPackageMemberMgr.TYPE_FILE_GROUP) &&
-				(memberType != IPackageMemberMgr.TYPE_ACTION)) {
-			return null;
-		}
-		
 		/* validate direction */
-		if ((direction < IPackageMemberMgr.NEIGHBOUR_ANY) || 
-				(direction > IPackageMemberMgr.NEIGHBOUR_RIGHT)) {
+		boolean lookLeft = false;
+		boolean lookRight = false;
+		if (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) {
+			lookLeft = true;
+		} else if (direction == IPackageMemberMgr.NEIGHBOUR_RIGHT) {
+			lookRight = true;
+		} else if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
+			lookLeft = lookRight = true;
+		} else {
 			return null;
 		}
 		
-		ArrayList<MemberDesc> neighbours = new ArrayList<MemberDesc>();
-		
-		switch (memberType) {
-			/*
-			 * Find the neighbours of an action...
-			 */
-		case IPackageMemberMgr.TYPE_ACTION:
-			try {
-				
-				/* the action ID must be valid */
-				if (!actionMgr.isActionValid(memberId)) {
-					return null;
-				}
-				
-				/* 
-				 * Depending on whether direction is relevant (NEIGHBOUR_ANY versus LEFT or RIGHT),
-				 * we need to select an appropriate query.
-				 */
-				findActionNeighbourPrepStmt.setInt(1, memberId);
-				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
-					findActionNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
-					findActionNeighbourPrepStmt.setInt(3, ISlotTypes.SLOT_POS_OUTPUT);
-				} else {
-					int slotType = (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
-										ISlotTypes.SLOT_POS_INPUT : ISlotTypes.SLOT_POS_OUTPUT;
-					findActionNeighbourPrepStmt.setInt(2, slotType);
-					findActionNeighbourPrepStmt.setInt(3, slotType);
-				}
-				ResultSet rs = db.executePrepSelectResultSet(findActionNeighbourPrepStmt);
-				
-				/* collect all the results into a single ArrayList */
-				while (rs.next()) {
-					MemberDesc member = new MemberDesc();
-					member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
-					member.memberId = Integer.valueOf(rs.getString(1));
-					member.x = rs.getInt(2);
-					member.y = rs.getInt(3);
-					neighbours.add(member);
-				}
-				rs.close();
-				
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-			}
-			break;
-		
-			/*
-			 * Find the neighbours of a file group. 
-			 */
-		case IPackageMemberMgr.TYPE_FILE_GROUP:
-						
-			/* file group ID must be valid */
+		/* start with an empty list - we'll add to this as we go along */
+		List<MemberDesc> neighbours = new ArrayList<MemberDesc>();
+
+		/* is this member a file group? */
+		if (memberType == IPackageMemberMgr.TYPE_FILE_GROUP) {
 			int groupType = fileGroupMgr.getGroupType(memberId);
 			if (groupType == ErrorCode.NOT_FOUND) {
 				return null;
 			}
-
-			try {
-
-				/*
-				 * Search for slots in this package's actions that refer to our file group.
-				 * If necessary, also look at the direction (input versus output) of the slot.
-				 */
-				findFileGroupNeighbourPrepStmt.setInt(1, memberId);
-				if (direction == IPackageMemberMgr.NEIGHBOUR_ANY) {
-					findFileGroupNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
-					findFileGroupNeighbourPrepStmt.setInt(3, ISlotTypes.SLOT_POS_OUTPUT);
-				} else {
-					int slotType = (direction == IPackageMemberMgr.NEIGHBOUR_LEFT) ?
-							ISlotTypes.SLOT_POS_OUTPUT : ISlotTypes.SLOT_POS_INPUT;
-					findFileGroupNeighbourPrepStmt.setInt(2, slotType);
-					findFileGroupNeighbourPrepStmt.setInt(3, slotType);
-				}
-				ResultSet rs = db.executePrepSelectResultSet(findFileGroupNeighbourPrepStmt);
-
-				while (rs.next()) {
-					MemberDesc member = new MemberDesc();
-					member.memberType = IPackageMemberMgr.TYPE_ACTION;
-					member.memberId = Integer.valueOf(rs.getString(1));
-					member.x = rs.getInt(2);
-					member.y = rs.getInt(3);
-					neighbours.add(member);
-				}
-				rs.close();
-
-				/*
-				 * If this is a merge group, and we're looking for "left" or "any" neigbours,
-				 * get all the members of this group (they will all be file groups, since merge
-				 * groups can only contain file groups).
-				 */
-				if (groupType == IFileGroupMgr.MERGE_GROUP) {
-					if ((direction == IPackageMemberMgr.NEIGHBOUR_ANY) ||
-							(direction == IPackageMemberMgr.NEIGHBOUR_LEFT)) {
-
-						findMergeFileGroupMembersPrepStmt.setInt(1, memberId);
-						rs = db.executePrepSelectResultSet(findMergeFileGroupMembersPrepStmt);
-						while (rs.next()) {
-							MemberDesc member = new MemberDesc();
-							member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
-							member.memberId = rs.getInt(1);
-							member.x = rs.getInt(2);
-							member.y = rs.getInt(3);
-							neighbours.add(member);
-						}
-						rs.close();
-					}
-				}
-
-				/*
-				 * If this is any type of file group, then look for all occurrences of our file
-				 * group ID in all other merge groups. Only do this for RIGHT and ANY
-				 * neighbours.
-				 */
-				if ((direction == IPackageMemberMgr.NEIGHBOUR_ANY) ||
-							(direction == IPackageMemberMgr.NEIGHBOUR_RIGHT)) {
-						
-					findMergeFileGroupsContainingFileGroup.setInt(1, memberId);
-					rs = db.executePrepSelectResultSet(findMergeFileGroupsContainingFileGroup);
-					while (rs.next()) {
-						MemberDesc member = new MemberDesc();
-						member.memberType = IPackageMemberMgr.TYPE_FILE_GROUP;
-						member.memberId = rs.getInt(1);
-						member.x = rs.getInt(2);
-						member.y = rs.getInt(3);
-						neighbours.add(member);
-					}
-					rs.close();					
-				}
-				
-			} catch (SQLException e) {
-				throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+			if (lookLeft) {
+				getNeighboursOfFileGroupLeft(neighbours, memberId, groupType, showFilters);
 			}
-			break;
-						
-			/*
-			 * All other member types are invalid.
-			 */
-		default:
-			return null;
+			if (lookRight) {
+				getNeighboursOfFileGroupRight(neighbours, memberId, groupType, showFilters);
+			}
 		}
 		
-		return neighbours.toArray(new MemberDesc[neighbours.size()]);
+		/* is this member an action? */
+		else if (memberType == IPackageMemberMgr.TYPE_ACTION) {
+			if (!actionMgr.isActionValid(memberId)) {
+				return null;
+			}
+			if (lookLeft) {
+				getNeighboursOfActionLeft(neighbours, memberId, showFilters);
+			}
+			if (lookRight) {
+				getNeighboursOfActionRight(neighbours, memberId);
+			}		
+		}
+		
+		/* we don't yet support other types of package member */ 
+		else {
+			return null;
+		}
+
+		/* 
+		 * Convert the accumulated list of neighbours into an array, but first remove
+		 * duplicates. This is an O(n*n) algorithm, but with a small number of
+		 * neighbours it should be quick.
+		 */
+		List<MemberDesc> resultsNoDups = new ArrayList<MemberDesc>();
+		for (Iterator<MemberDesc> iterator = neighbours.iterator(); iterator.hasNext();) {
+			MemberDesc newMember = (MemberDesc) iterator.next();
+			
+			/* search to see if this neighbour is already in our "resultsNoDups" list */
+			boolean alreadyEntered = false;
+			for (Iterator<MemberDesc> iterator2 = resultsNoDups.iterator(); iterator2.hasNext();) {
+				MemberDesc existingMember = (MemberDesc) iterator2.next();
+				if ((newMember.memberType == existingMember.memberType) &&
+						(newMember.memberId == existingMember.memberId)) {
+					alreadyEntered = true;
+					break;
+				}
+			}
+			if (!alreadyEntered) {
+				resultsNoDups.add(newMember);
+			}
+		}
+		
+		return resultsNoDups.toArray(new MemberDesc[resultsNoDups.size()]);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -891,5 +812,251 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper function for GetNeighboursOf() to compute the left-side neighbours of an action.
+	 * 
+	 * @param neighbours	The List<MemberDesc> to add newly-found neighbours into.
+	 * @param actionId		The ID of the action whose neighbours we are looking for.
+	 * @param showFilters	True if we should return neighbouring filter file groups, or
+	 *                      false if filter groups should be skipped over.
+	 */
+	private void getNeighboursOfActionLeft(List<MemberDesc> neighbours, int actionId, boolean showFilters)
+	{
+		try {
+			/* 
+			 * Query the database for all file groups that are mentioned in our INPUT slots.
+			 */
+			findActionNeighbourPrepStmt.setInt(1, actionId);
+			findActionNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
+			ResultSet rs = db.executePrepSelectResultSet(findActionNeighbourPrepStmt);
+			while (rs.next()) {
+				MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP,
+						Integer.valueOf(rs.getString(1)), rs.getInt(2), rs.getInt(3));
+				
+				/* skip over filters, if necessary */
+				if (!showFilters && 
+				    (fileGroupMgr.getGroupType(member.memberId) == IFileGroupMgr.FILTER_GROUP)) {
+					member = getPredecessorOfFilter(member.memberId);
+				} 
+				
+				/* else add non-filter groups to our neighbour list */
+				if (member != null) {
+					neighbours.add(member);					
+				}
+			}
+			rs.close();
+
+
+		} catch (SQLException e) {
+			BuildStoreDB.throwSqlException(e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper function for GetNeighboursOf() to compute the right-side neighbours of an action.
+	 * 
+	 * @param neighbours	The List<MemberDesc> to add newly-found neighbours into.
+	 * @param actionId		The ID of the action whose neighbours we are looking for.
+	 */
+	private void getNeighboursOfActionRight(List<MemberDesc> neighbours, int actionId)
+	{
+		try {
+			/* 
+			 * Query the database for all file groups mentioned in our OUTPUT slots.
+			 */
+			findActionNeighbourPrepStmt.setInt(1, actionId);
+			findActionNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_OUTPUT);
+			ResultSet rs = db.executePrepSelectResultSet(findActionNeighbourPrepStmt);
+			while (rs.next()) {
+				MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP,
+						Integer.valueOf(rs.getString(1)), rs.getInt(2), rs.getInt(3));
+				neighbours.add(member);
+			}
+			rs.close();
+
+		} catch (SQLException e) {
+			BuildStoreDB.throwSqlException(e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper function for GetNeighboursOf() to compute the left-side neighbours of a file group.
+	 * 
+	 * @param neighbours	The List<MemberDesc> to add newly-found neighbours into.
+	 * @param fileGroupId	The ID of the file group whose neighbours we are looking for.
+	 * @param fileGroupType The type of this file group (e.g. MERGE_GROUP, etc).
+	 * @param showFilters	True if we should return neighbouring filter file groups, or
+	 *                      false if filter groups should be skipped over.
+	 */
+	private void getNeighboursOfFileGroupLeft(List<MemberDesc> neighbours, int fileGroupId, 
+			int fileGroupType, boolean showFilters)
+	{
+		try {
+
+			/*
+			 * To find left neighbours that are actions... search for output slots in this 
+			 * package's actions that refer to our file group.
+=			 */
+			findFileGroupNeighbourPrepStmt.setInt(1, fileGroupId);
+			findFileGroupNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_OUTPUT);
+			ResultSet rs = db.executePrepSelectResultSet(findFileGroupNeighbourPrepStmt);
+			while (rs.next()) {
+				MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_ACTION,
+						Integer.valueOf(rs.getString(1)), rs.getInt(2), rs.getInt(3));
+				neighbours.add(member);
+			}
+			rs.close();
+
+			/*
+			 * If this is a merge group, get all the members of this group (they will all
+			 * be file groups, since merge groups can only contain file groups).
+			 */
+			if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+
+				findMergeFileGroupMembersPrepStmt.setInt(1, fileGroupId);
+				rs = db.executePrepSelectResultSet(findMergeFileGroupMembersPrepStmt);
+				while (rs.next()) {
+					MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP,
+							rs.getInt(1), rs.getInt(2), rs.getInt(3));
+					
+					/* skip over filters, if necessary */
+					if (!showFilters && 
+					    (fileGroupMgr.getGroupType(member.memberId) == IFileGroupMgr.FILTER_GROUP)) {
+						member = getPredecessorOfFilter(member.memberId);
+					}
+					if (member != null) {
+						neighbours.add(member);
+					}
+				}
+				rs.close();
+			}
+
+			/*
+			 * If this file group is itself a filter file group, the left neighbour is always the
+			 * predecessor.
+			 */
+			if (fileGroupType == IFileGroupMgr.FILTER_GROUP) {
+				MemberDesc member = getPredecessorOfFilter(fileGroupId);
+				if (member != null) {
+					neighbours.add(member);
+				}
+			}
+
+		} catch (SQLException e) {
+			BuildStoreDB.throwSqlException(e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper function for GetNeighboursOf() to compute the right-side neighbours of a file group.
+	 * 
+	 * @param neighbours	The List<MemberDesc> to add newly-found neighbours into.
+	 * @param fileGroupId	The ID of the file group whose neighbours we are looking for.
+	 * @param fileGroupType The type of this file group (e.g. MERGE_GROUP, etc).
+	 * @param showFilters	True if we should return neighbouring filter file groups, or
+	 *                      false if filter groups should be skipped over.
+	 */
+	private void getNeighboursOfFileGroupRight(List<MemberDesc> neighbours, int fileGroupId, 
+												int fileGroupType, boolean showFilters)
+	{
+		try {
+			/*
+			 * To find right neighbours that are actions... search for input slots in this 
+			 * package's actions that refer to our file group.
+=			 */
+			findFileGroupNeighbourPrepStmt.setInt(1, fileGroupId);
+			findFileGroupNeighbourPrepStmt.setInt(2, ISlotTypes.SLOT_POS_INPUT);
+			ResultSet rs = db.executePrepSelectResultSet(findFileGroupNeighbourPrepStmt);
+			while (rs.next()) {
+				MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_ACTION,
+						Integer.valueOf(rs.getString(1)), rs.getInt(2), rs.getInt(3));
+				neighbours.add(member);
+			}
+			rs.close();
+
+			/*
+			 * To find a right neighbour that's a merge group... look for
+			 * all occurrences of our file group ID in all merge groups.
+			 */
+			findMergeFileGroupsContainingFileGroup.setInt(1, fileGroupId);
+			rs = db.executePrepSelectResultSet(findMergeFileGroupsContainingFileGroup);
+			while (rs.next()) {
+				MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP,
+						rs.getInt(1), rs.getInt(2), rs.getInt(3));
+				neighbours.add(member);
+			}
+			rs.close();					
+
+			/*
+			 * When our right neighbour is a filter group... if we're a non-filter group, 
+			 * search for any filter file groups that this file group is a predecessor of. 
+			 * However, if showFilters is false, then we must instead return the right
+			 * neighbour of the filter, rather than the filter itself.
+			 */
+			if (fileGroupType != IFileGroupMgr.FILTER_GROUP) {
+			
+				/* get a list of all the filters */
+				List<MemberDesc> filters = new ArrayList<MemberDesc>();
+				findFiltersContainingFileGroup.setInt(1, fileGroupId);
+				rs = db.executePrepSelectResultSet(findFiltersContainingFileGroup);
+				while (rs.next()) {
+					MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP,
+							rs.getInt(1), -1, -1);	/* filter groups are never positioned */
+					filters.add(member);
+				}
+				rs.close();	
+
+				/* if showFilters is true, we do want to see the filters returned */ 
+				if (showFilters) {
+					neighbours.addAll(filters);						
+				}
+
+				/* if we don't want to showFilters, return the right neighbours of each filter */
+				else {
+					for (Iterator<MemberDesc> iterator = filters.iterator(); iterator.hasNext();) {
+						MemberDesc memberDesc = (MemberDesc) iterator.next();
+						MemberDesc[] filterNeighbours = getNeighboursOf(
+								IPackageMemberMgr.TYPE_FILE_GROUP, memberDesc.memberId, 
+								IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
+						neighbours.addAll(Arrays.asList(filterNeighbours));
+					}
+				}
+			}
+
+		} catch (SQLException e) {
+			BuildStoreDB.throwSqlException(e);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for returning the left-neighbour of a filter file group.
+	 * @param fileGroupId ID of the filter file group.
+	 * @return The corresponding MemberDesc of the predecessor, or null on error.
+	 */
+	private MemberDesc getPredecessorOfFilter(int fileGroupId) {
+
+		int predId = fileGroupMgr.getPredId(fileGroupId);
+		if (predId >= 0) {
+			MemberLocation location = getMemberLocation(
+					IPackageMemberMgr.TYPE_FILE_GROUP, predId);
+			if (location != null) {
+				MemberDesc member = new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP,
+						predId, location.x, location.y);
+				return member;
+			}
+		}
+		return null;
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 }

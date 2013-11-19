@@ -68,6 +68,13 @@ public interface IPackageMemberMgr {
 		public int memberId;
 		public int x;
 		public int y;
+		
+		public MemberDesc(int memberType, int memberId, int x, int y) {
+			this.memberType = memberType;
+			this.memberId = memberId;
+			this.x = x;
+			this.y = y;
+		}
 	}
 	
 	/**
