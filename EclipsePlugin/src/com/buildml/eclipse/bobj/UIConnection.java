@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Arapiki Solutions Inc.
+ * Copyright (c) 2013 Arapiki Solutions Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,61 +12,64 @@
 
 package com.buildml.eclipse.bobj;
 
+import org.eclipse.emf.ecore.impl.EObjectImpl;
+
+import com.buildml.utils.errors.ErrorCode;
+
 /**
- * A "business object" representing a connection between a UIFileGroup and a merge UIFileGroup.
+ * A "business object" representing a connection between two objects on a package diagram.
+ * The Graphiti framework recognizes this object and something that can be rendered on
+ * a package diagram. This class is intended to be subclassed to represent different types
+ * of connection.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class UIMergeFileGroupConnection extends UIConnection {
+public abstract class UIConnection extends EObjectImpl {
 
 	/*=====================================================================================*
 	 * TYPES/FIELDS
 	 *=====================================================================================*/
 
-	/** The connection is outward from the sub file group */
-	public static final int OUTPUT_FROM_SUB_GROUP = 0;
-	
-	/** The connection is into the merge file group's input */
-	public static final int INPUT_TO_MERGE_GROUP = 1;
-
-	/** The ID of the file group at one end of the connection */
-	private int sourceFileGroupId;
-
-	/** The ID of the merge file group at one end of the connection */
-	private int targetFileGroupId;
+	/** The filter group's ID, or ErrorCode.NOT_FOUND if none attached */
+	protected int filterGroupId = ErrorCode.NOT_FOUND;
 	
 	/*=====================================================================================*
-	 * CONSTRUCTORS
+	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new {@link UIMergeFileGroupConnection}, representing a connection between a UIFileGroup
-	 * and a merge file group
-	 * @param sourceFileGroupId	 ID of the sub file group. 
-	 * @param targetFileGroupId  ID of the merge file group that the sub file group is joined into.
-	 * 
+	 * @return whether this connection has a filter group attached.
 	 */
-	public UIMergeFileGroupConnection(int sourceFileGroupId, int targetFileGroupId) {
-		this.sourceFileGroupId = sourceFileGroupId;
-		this.targetFileGroupId = targetFileGroupId;
+	public boolean hasFilter() {
+		return (filterGroupId != ErrorCode.NOT_FOUND);
 	}
 
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * @return the sourceFileGroupId
+	 * Remove the attached filter group.
 	 */
-	public int getSourceFileGroupId() {
-		return sourceFileGroupId;
+	public void removeFilter() {
+		filterGroupId = ErrorCode.NOT_FOUND;
 	}
 
 	/*-------------------------------------------------------------------------------------*/	
 
 	/**
-	 * @return the targetFileGroupId
+	 * @return the ID of attached filter group, or ErrorCode.NOT_FOUND if not attached.
 	 */
-	public int getTargetFileGroupId() {
-		return targetFileGroupId;
+	public int getFilterGroupId() {
+		return filterGroupId;
+	}
+
+	/*-------------------------------------------------------------------------------------*/	
+
+	/**
+	 * Set the attached filter group ID.
+	 * @param filterGroupId ID of the filter group to attach to this connection.
+	 */
+	public void setFilterGroupId(int filterGroupId) {
+		this.filterGroupId = filterGroupId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/	

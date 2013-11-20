@@ -24,11 +24,11 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
+import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
 
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
-import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 
 /**
@@ -45,10 +45,10 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 	private static final IColorConstant CONNECTION_COLOUR = IColorConstant.BLACK;
 	
 	/** The colour of the filter icon */
-	private static final IColorConstant FILTER_COLOUR = IColorConstant.LIGHT_BLUE;
+	public static final IColorConstant FILTER_COLOUR = new ColorConstant(144, 144, 144);
 	
-	/** our IActionTypeMgr */
-	private IActionTypeMgr actionTypeMgr;
+	/** The drawing coordinates of a filter icon */
+	public static final int[] FILTER_COORDS = new int[] { -7, 5, 7, 5, 2, 0, 0, -8, -2, 0 };
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -63,7 +63,6 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 		
 		PackageDiagramEditor diagramEditor = (PackageDiagramEditor)getDiagramEditor();
 		IBuildStore buildStore = diagramEditor.getBuildStore();
-		actionTypeMgr = buildStore.getActionTypeMgr();
 	}
 
 	/*=====================================================================================*
@@ -102,10 +101,13 @@ public class AddFileActionConnectionFeature extends AbstractAddFeature {
 		arrow.setForeground(manageColor(CONNECTION_COLOUR));
 		
 		/* draw an optional filter symbol */
-		//cd = peCreateService.createConnectionDecorator(connection, false, 0.5, true);
-	    //Polygon filter = gaService.createPolygon(cd, new int[] { -10, 10, 10, 10, 2, 2, 0, -10, -2, 2 });
-		//filter.setBackground(manageColor(FILTER_COLOUR));
-	    
+		if (bo.hasFilter()) {
+			cd = peCreateService.createConnectionDecorator(connection, false, 0.5, true);
+			Polygon filter = gaService.createPolygon(cd, FILTER_COORDS);
+			filter.setBackground(manageColor(FILTER_COLOUR));
+			filter.setForeground(manageColor(FILTER_COLOUR));
+		}
+		
 		/* link the connection pictogram to the business object */
 		link(connection, bo);
 

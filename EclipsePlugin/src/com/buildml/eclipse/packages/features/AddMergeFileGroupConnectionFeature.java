@@ -16,15 +16,18 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.Connection;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.IColorConstant;
 
+import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 
 /**
@@ -78,6 +81,14 @@ public class AddMergeFileGroupConnectionFeature extends AbstractAddFeature {
 		polyline.setLineWidth(1);
 		polyline.setLineStyle(LineStyle.DOT);
 		polyline.setForeground(manageColor(CONNECTION_COLOUR));
+		
+		/* draw an optional filter symbol */
+		if (bo.hasFilter()) {
+			ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 0.5, true);
+			Polygon filter = gaService.createPolygon(cd, AddFileActionConnectionFeature.FILTER_COORDS);
+			filter.setBackground(manageColor(AddFileActionConnectionFeature.FILTER_COLOUR));
+			filter.setForeground(manageColor(AddFileActionConnectionFeature.FILTER_COLOUR));
+		}
 
 		/* link the connection pictogram to the business object */
 		link(connection, bo);

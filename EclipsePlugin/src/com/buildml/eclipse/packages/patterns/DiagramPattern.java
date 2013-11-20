@@ -198,28 +198,32 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					}
 					
 					/* create a business object to represent this member */
-					UIInteger memberBo;
+					UIInteger memberBo = null;
 					switch (member.memberType) {
 					case IPackageMemberMgr.TYPE_ACTION:
 						memberBo = new UIAction(member.memberId);
 						break;
 					case IPackageMemberMgr.TYPE_FILE_GROUP:
-						memberBo = new UIFileGroup(member.memberId);
+						int fileGroupType = fileGroupMgr.getGroupType(member.memberId);
+						if (fileGroupType != IFileGroupMgr.FILTER_GROUP) {
+							memberBo = new UIFileGroup(member.memberId);
+						}
 						break;
 					default:
 						throw new FatalError("Unrecognized package member type: " + member.memberType);
 					}
 					
 					/*
-					 * TODO: Fix this layout algorithm. For now it simply lays out
-					 * actions in rows and columns.
+					 * Add the business object (UIFileGroup, UIAction, etc) to the diagram.
 					 */
-					container.eResource().getContents().add(memberBo);
-					AddContext context2 = new AddContext();
-					context2.setNewObject(memberBo);
-					context2.setLocation(member.x, member.y);
-					context2.setTargetContainer(container);
-					getFeatureProvider().addIfPossible(context2);
+					if (memberBo != null) {
+						container.eResource().getContents().add(memberBo);
+						AddContext context2 = new AddContext();
+						context2.setNewObject(memberBo);
+						context2.setLocation(member.x, member.y);
+						context2.setTargetContainer(container);
+						getFeatureProvider().addIfPossible(context2);
+					}
 				}
 				
 				/*
@@ -251,7 +255,10 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	
 	/**
 	 * For each of an action's slots that have a file group connected to them, draw a connection
-	 * line.
+	 * line, and possibly a filter. At this point we're not actually drawing them, but we're
+	 * adding their business objects (UIAction, UIFileActionConnection, etc) to the diagram
+	 * to be drawn later by Graphiti.
+	 * 
 	 * @param member The UIAction's details.
 	 */
 	private void addFileActionConnections(MemberDesc member) {
@@ -286,9 +293,26 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 							UIFileActionConnection.INPUT_TO_ACTION :
 							UIFileActionConnection.OUTPUT_FROM_ACTION;
 
+					/* 
+					 * if this is INPUT_TO_ACTION, and fileGroupId is a filter, register the
+					 * filter in the connection object, and instead draw the line to the
+					 * filter's input. 
+					 */
+					int filterGroupId = -1;
+					if (connectionDirection == UIFileActionConnection.INPUT_TO_ACTION) {
+						int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
+						if (fileGroupType == IFileGroupMgr.FILTER_GROUP) {
+							filterGroupId = fileGroupId;
+							fileGroupId = fileGroupMgr.getPredId(fileGroupId);
+						}
+					}
+					
 					/* create the new business object */
 					UIFileActionConnection newConnection = new UIFileActionConnection(
 							fileGroupId, actionId, slotId, connectionDirection);
+					if (filterGroupId != -1) {
+						newConnection.setFilterGroupId(filterGroupId);
+					}
 					getDiagram().eResource().getContents().add(newConnection);
 
 					/*

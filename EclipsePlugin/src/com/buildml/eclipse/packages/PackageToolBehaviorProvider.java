@@ -157,8 +157,11 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	
         	/* for input connections, show the slot and the (optional) filter group content */
         	else {
-        		return "\n Input to slot \"" + details.slotName + "\" \n";
-        		// TODO: show output of filter file set.
+        		String str = "\n Input to slot \"" + details.slotName + "\" \n";
+        		if (connection.hasFilter()) {
+	        		// TODO: show output of filter file set.
+        		}
+        		return str;
         	}
         }
         
@@ -276,8 +279,8 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 		
 		int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
 		String typeName = (fileGroupType == IFileGroupMgr.SOURCE_GROUP) ? "Source" :
-							((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ?
-									"Generated" : "Merge");
+							((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ? "Generated" : 
+								((fileGroupType == IFileGroupMgr.MERGE_GROUP) ? "Merge" : "Filter"));
 		
 		stringBuffer.append("\n ");
 		stringBuffer.append(typeName);

@@ -12,14 +12,12 @@
 
 package com.buildml.eclipse.bobj;
 
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 /**
  * A "business object" representing a connection between a UIFileGroup and a UIAction.
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class UIFileActionConnection extends EObjectImpl {
+public class UIFileActionConnection extends UIConnection {
 
 	/*=====================================================================================*
 	 * TYPES/FIELDS
