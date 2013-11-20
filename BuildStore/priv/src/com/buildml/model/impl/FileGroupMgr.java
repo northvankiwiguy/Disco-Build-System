@@ -89,7 +89,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 		insertPathAtPrepStmt = null,
 		findGroupSizePrepStmt = null,
 		findPathsAtPrepStmt = null,
-		findMembersPrepStmt = null,
+		findIntegerMembersPrepStmt = null,
+		findStringMembersPrepStmt = null,
 		findGroupMembersPrepStmt = null,
 		removePathPrepStmt = null,
 		removePathsPrepStmt = null,
@@ -136,8 +137,10 @@ public class FileGroupMgr implements IFileGroupMgr {
 				"select count(*) from fileGroupPaths where groupId = ?");
 		findPathsAtPrepStmt = db.prepareStatement(
 				"select pathId, pathString from fileGroupPaths where groupId = ? and pos = ?");
-		findMembersPrepStmt = db.prepareStatement(
+		findIntegerMembersPrepStmt = db.prepareStatement(
 				"select pathId from fileGroupPaths where groupId = ? order by pos");
+		findStringMembersPrepStmt = db.prepareStatement(
+				"select pathString from fileGroupPaths where groupId = ? order by pos");
 		findGroupMembersPrepStmt = db.prepareStatement(
 				"select pathId, pathString from fileGroupPaths where groupId = ? order by pos");
 		removePathPrepStmt = db.prepareStatement(
@@ -437,7 +440,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 		}
 		
 		/* defer work to our helper */
-		return getMembersHelper(groupId);
+		return getIntegerMembersHelper(groupId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -450,8 +453,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		/* only applicable for source file groups */
 		int groupType = getGroupType(groupId);
-		if (groupType != SOURCE_GROUP) {
+		if (groupType == ErrorCode.NOT_FOUND) {
 			return ErrorCode.NOT_FOUND;
+		}
+		if (groupType != SOURCE_GROUP) {
+			return ErrorCode.INVALID_OP;
 		}
 
 		setMembersHelper(groupId, members);
@@ -529,6 +535,50 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return (String)output[1];
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getPathStrings(int)
+	 */
+	@Override
+	public String[] getPathStrings(int groupId) {
+		
+		/* only applicable for generated and filter groups */
+		int groupType = getGroupType(groupId);
+		if ((groupType != GENERATED_GROUP) && (groupType != FILTER_GROUP)) {
+			return null;
+		}
+		
+		/* Defer the work to our helper */
+		return getStringMembersHelper(groupId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#setPathStrings(int, java.lang.String[])
+	 */
+	@Override
+	public int setPathStrings(int groupId, String[] members) {
+		
+		/* only applicable for generated and filter groups */
+		int groupType = getGroupType(groupId);
+		if (groupType == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if ((groupType != GENERATED_GROUP) && (groupType != FILTER_GROUP)) {
+			return ErrorCode.INVALID_OP;
+		}
+
+		if (members == null) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* defer to our helper function */
+		setMembersHelper(groupId, members);
+		return ErrorCode.OK;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -694,7 +744,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 		}
 		
 		/* delegate most of the work to a helper */
-		return getMembersHelper(groupId);
+		return getIntegerMembersHelper(groupId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -707,8 +757,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		/* only applicable for merge file groups */
 		int groupType = getGroupType(groupId);
-		if (groupType != MERGE_GROUP) {
+		if (groupType == ErrorCode.NOT_FOUND) {
 			return ErrorCode.NOT_FOUND;
+		}
+		if (groupType != MERGE_GROUP) {
+			return ErrorCode.INVALID_OP;
 		}
 
 		setMembersHelper(groupId, members);
@@ -1214,11 +1267,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 * @param groupId The ID of the group to query.
 	 * @return A (possibly empty) array of group members.
 	 */
-	private Integer[] getMembersHelper(int groupId) {
+	private Integer[] getIntegerMembersHelper(int groupId) {
 
 		try {
-			findMembersPrepStmt.setInt(1, groupId);
-			return db.executePrepSelectIntegerColumn(findMembersPrepStmt);
+			findIntegerMembersPrepStmt.setInt(1, groupId);
+			return db.executePrepSelectIntegerColumn(findIntegerMembersPrepStmt);
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
@@ -1228,13 +1281,32 @@ public class FileGroupMgr implements IFileGroupMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
+	 * Helper function (supporting getPathStrings()) to return the Strings within a file group.
+     *
+	 * @param groupId The ID of the group to query.
+	 * @return A (possibly empty) array of group members.
+	 */
+	private String[] getStringMembersHelper(int groupId) {
+
+		try {
+			findStringMembersPrepStmt.setInt(1, groupId);
+			return db.executePrepSelectStringColumn(findStringMembersPrepStmt);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
 	 * Helper function (supporting setPathIds() and setSubGroups()) to set the members of
 	 * a group. All existing members will first be removed.
 	 * 
 	 * @param groupId	The ID of the group (source or merge group that uses numeric member IDs).
 	 * @param members	The members to set.
 	 */
-	private void setMembersHelper(int groupId, Integer[] members) {
+	private void setMembersHelper(int groupId, Object[] members) {
 
 		/* lots of individual changes here - do them without committing */
 		db.setFastAccessMode(true);
@@ -1252,8 +1324,13 @@ public class FileGroupMgr implements IFileGroupMgr {
 		for (int i = 0; i < members.length; i++) {
 			try {
 				insertPathAtPrepStmt.setInt(1, groupId);
-				insertPathAtPrepStmt.setInt(2, members[i]);
-				insertPathAtPrepStmt.setString(3, null);
+				if (members[i] instanceof Integer) {
+					insertPathAtPrepStmt.setInt(2, (Integer)members[i]);
+					insertPathAtPrepStmt.setString(3, null);
+				} else {
+					insertPathAtPrepStmt.setInt(2, 0);
+					insertPathAtPrepStmt.setString(3, (String)members[i]);					
+				}
 				insertPathAtPrepStmt.setInt(4, i);
 				db.executePrepUpdate(insertPathAtPrepStmt);
 			} catch (SQLException e) {

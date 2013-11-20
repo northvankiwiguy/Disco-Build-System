@@ -247,6 +247,29 @@ public interface IFileGroupMgr {
 	String getPathString(int groupId, int index);
 	
 	/**
+	 * Return all the elements within the file group, as Strings.
+     *
+	 * @param groupId   The file group being queried.
+	 * @return			An array of all members, in their position order, or
+	 *                  null if the groupId is invalid or doesn't relate to a filter or 
+	 *                  generated group.
+	 */
+	String[] getPathStrings(int groupId);
+	
+	/**
+	 * Set all the members of a specified file group. All existing members of the group
+	 * are first removed.
+	 * 
+	 * @param groupId   The file group whose content is being set.
+	 * @param members   The new members of the group.
+	 * @return			ErrorCode.OK on success, 
+	 * 					ErrorCode.NOT_FOUND if groupId is invalid,
+	 *                  ErrorCode.BAD_VALUE if the members list is invalid, or
+	 *                  ErrorCode.INVALID_OP if groupId isn't a generated or filter file group.
+	 */
+	int setPathStrings(int groupId, String[] members);
+	
+	/**
 	 * Add a transient path string to the specified file group. This path is not persisted
 	 * to the database, so will only exist while the current BuildStore is open. This method
 	 * is intended for use when a generated file group is populated by the action that 

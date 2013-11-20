@@ -281,7 +281,7 @@ public class TestFileGroupMgr {
 		
 		/* try to set all members of the group, from a bad file group ID, or a non-merge group */
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setPathIds(10000, new Integer[] {1, 2, 3, 4}));
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setPathIds(mergeGroupId, new Integer[] {1, 2, 3, 4}));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.setPathIds(mergeGroupId, new Integer[] {1, 2, 3, 4}));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -676,7 +676,7 @@ public class TestFileGroupMgr {
 		
 		/* try to set all members of the group, from a bad file group ID, or a non-merge group */
 		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setSubGroups(10000, new Integer[] {1, 2, 3, 4}));
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setSubGroups(sourceGroup, new Integer[] {1, 2, 3, 4}));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.setSubGroups(sourceGroup, new Integer[] {1, 2, 3, 4}));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -753,6 +753,21 @@ public class TestFileGroupMgr {
 		assertEquals(ErrorCode.OK, fileGroupMgr.moveEntry(filterGroupId, filter2, filter1));
 		assertEquals("ia:@workspace/**/*.java", fileGroupMgr.getPathString(filterGroupId, filter2));
 		assertEquals("ia:@workspace/**/*.c", fileGroupMgr.getPathString(filterGroupId, filter1));
+		
+		/* Test getting all the group members at once */
+		String members[] = fileGroupMgr.getPathStrings(filterGroupId);
+		assertEquals(3, members.length);
+		assertEquals("ia:@workspace/**/*.c", members[0]);
+		assertEquals("ia:@workspace/**/*.java", members[1]);
+		assertEquals("ia:**/*.h", members[2]);
+		
+		/* Test setting all the group members at once */
+		assertEquals(ErrorCode.OK, fileGroupMgr.setPathStrings(filterGroupId, 
+				new String[] { "aaa", "bbb", "ccc", "ddd"} ));
+		assertEquals("aaa", fileGroupMgr.getPathString(filterGroupId, 0));
+		assertEquals("bbb", fileGroupMgr.getPathString(filterGroupId, 1));
+		assertEquals("ccc", fileGroupMgr.getPathString(filterGroupId, 2));
+		assertEquals("ddd", fileGroupMgr.getPathString(filterGroupId, 3));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -789,6 +804,23 @@ public class TestFileGroupMgr {
 		int filter1 = fileGroupMgr.addPathString(filterGroupId, "badtag:**");
 		assertTrue(filter1 >= 0);
 		assertNull(fileGroupMgr.getExpandedGroupFiles(filterGroupId));
+		
+		/* Test getting all String members of a merge group, or a source group - error */
+		int mergeGroupId = fileGroupMgr.newMergeGroup(pkgId);
+		int sourceGroupId = fileGroupMgr.newSourceGroup(pkgId);
+		assertNull(fileGroupMgr.getPathStrings(mergeGroupId));
+		assertNull(fileGroupMgr.getPathStrings(sourceGroupId));
+
+		/* Test setting all String members of a merge group, or a source group - error */
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.setPathStrings(mergeGroupId, new String[] {"aaa", "bbb"}));
+		assertEquals(ErrorCode.INVALID_OP, fileGroupMgr.setPathStrings(sourceGroupId, new String[] {"aaa", "bbb"}));
+
+		/* Test getting and settings all String members of an illegal group ID */
+		assertNull(fileGroupMgr.getPathStrings(1234));
+		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.setPathStrings(1234, new String[] {"aaa", "bbb"}));
+		
+		/* Test setting all String members with a null list */
+		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.setPathStrings(filterGroupId, null));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
