@@ -152,16 +152,21 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
     	    
     	    /* for output connections, just show the slot we come out of */
         	if (connection.getDirection() == UIFileActionConnection.OUTPUT_FROM_ACTION) {
-        		return "\n Output from slot \"" + details.slotName + "\" \n";
+        		return "\n Output from action slot \"" + details.slotName + "\" \n";
         	}
         	
         	/* for input connections, show the slot and the (optional) filter group content */
         	else {
-        		String str = "\n Input to slot \"" + details.slotName + "\" \n";
+        		int filterGroupId = connection.getFilterGroupId();
+            	StringBuffer sb = new StringBuffer();
+            	sb.append("\n Input to action slot \"");
+            	sb.append(details.slotName);
+            	sb.append("\" \n");
         		if (connection.hasFilter()) {
-	        		// TODO: show output of filter file set.
+        			displayFilterPatterns(filterGroupId, sb);
+        			displayFileGroupMembers(filterGroupId, sb);
         		}
-        		return str;
+        		return sb.toString();
         	}
         }
         
@@ -278,13 +283,16 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 		String files[] = fileGroupMgr.getExpandedGroupFiles(fileGroupId);
 		
 		int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
-		String typeName = (fileGroupType == IFileGroupMgr.SOURCE_GROUP) ? "Source" :
-							((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ? "Generated" : 
-								((fileGroupType == IFileGroupMgr.MERGE_GROUP) ? "Merge" : "Filter"));
 		
 		stringBuffer.append("\n ");
-		stringBuffer.append(typeName);
-		stringBuffer.append(" File Group: \n");
+		if (fileGroupType == IFileGroupMgr.FILTER_GROUP) {
+			stringBuffer.append("Files passing through filter: \n");
+		} else {
+			String typeName = (fileGroupType == IFileGroupMgr.SOURCE_GROUP) ? "Source" :
+				((fileGroupType == IFileGroupMgr.GENERATED_GROUP) ? "Generated" : "Merge");
+			stringBuffer.append(typeName);
+			stringBuffer.append(" File Group: \n");
+		}
 		
 		int halfMaxLines = toolTipMaxFileGroupLines / 2;
 		
@@ -299,6 +307,38 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 				stringBuffer.append("    ...\n");
 			}
 		}
+	}
+	
+    /*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Helper function for displaying the patterns in a filter file group.
+	 * @param filterGroupId		ID of the filter group to display the patterns from.
+	 * @param sb				The StringBuffer to append output to.
+	 */
+	private void displayFilterPatterns(int filterGroupId, StringBuffer sb) {
+		String filterStrings[] = fileGroupMgr.getPathStrings(filterGroupId);
+		sb.append("\n Filter Patterns:\n");
+		for (int i = 0; i < filterStrings.length; i++) {
+			sb.append(" ");
+			String pattern = filterStrings[i];
+			String[] parts = pattern.split(":");
+			if (parts.length != 2) {
+				sb.append("Invalid:");
+				sb.append(pattern);
+			} else if (parts[0].equals("ia")) {
+				sb.append("Include: ");
+				sb.append(parts[1]);
+			} else if (parts[0].equals("ea")) {
+				sb.append("Exclude: ");
+				sb.append(parts[1]);				
+			} else {
+				sb.append("Invalid Prefix:");
+				sb.append(parts[0]);
+			}
+			sb.append(" \n");
+		}
+
 	}
 	
     /*-------------------------------------------------------------------------------------*/
