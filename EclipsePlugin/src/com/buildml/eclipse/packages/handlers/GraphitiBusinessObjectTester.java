@@ -1,14 +1,9 @@
 package com.buildml.eclipse.packages.handlers;
 
-import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.PictogramLink;
-import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import java.util.List;
 
-import com.buildml.eclipse.utils.EclipsePartUtils;
+import org.eclipse.core.expressions.PropertyTester;
+import com.buildml.eclipse.utils.GraphitiUtils;
 
 /**
  * Eclipse plugin.xml property tester - used in &lt;enableWhen&gt; clauses to determine
@@ -44,30 +39,8 @@ public class GraphitiBusinessObjectTester extends PropertyTester {
 			 */
 			if ((args.length == 1) && (args[0] instanceof String)) {
 				
-				/* get the currently selected object (there may only be one selected) */
-				IStructuredSelection selection = EclipsePartUtils.getSelection();
-				if ((selection == null) || (selection.size() != 1)) {
-					return false;
-				}
-				
-				/* we expect this object to be some type of Graphiti object */
-				Object object = selection.getFirstElement();
-				if (!(object instanceof GraphitiShapeEditPart)) {
-					return false;
-				}
-				
-				/* 
-				 * Now figure out the business object that's selected. We must first
-				 * identify the Graphiti pictogram element and follow the "link" to
-				 * the business object.
-				 */
-				PictogramElement pe = ((GraphitiShapeEditPart)object).getPictogramElement();
-				PictogramLink pl = pe.getLink();
-				if (pl == null) {
-					return false;
-				}
-				EList<EObject> businessObjects = pl.getBusinessObjects();
-				if ((businessObjects == null) || (businessObjects.size() != 1)) {
+				List<Object> selection = GraphitiUtils.getSelection();
+				if (selection.size() != 1) {
 					return false;
 				}
 				
@@ -75,7 +48,7 @@ public class GraphitiBusinessObjectTester extends PropertyTester {
 				 * Finally, compare the actual class with the expected class - first stripping
 				 * off the word "class" that the getClass() method returns.
 				 */
-				String className = businessObjects.get(0).getClass().toString();
+				String className = selection.get(0).getClass().toString();
 				String classNameWords[] = className.split(" ");
 				return args[0].equals(classNameWords[1]);
 			}
