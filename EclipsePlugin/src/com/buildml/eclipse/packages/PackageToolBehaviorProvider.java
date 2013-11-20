@@ -179,6 +179,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	UIMergeFileGroupConnection connection = (UIMergeFileGroupConnection)bo;
         	int subGroupId = connection.getSourceFileGroupId();
         	int mergeGroupId = connection.getTargetFileGroupId();
+        	int myIndex = connection.getIndex() + 1;
         	
         	/* find the index (or indicies) that the sub group appears in the merge group */
         	Integer subGroups[] = fileGroupMgr.getSubGroups(mergeGroupId);
@@ -208,7 +209,11 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         		else {
         			sb.append(", ");
         		}
-    			sb.append(indexList.get(i));
+        		int index = indexList.get(i); 
+    			sb.append(index);
+    			if ((size > 1) && (index == myIndex)) {
+    				sb.append(" (this link)");
+    			}
 			}
         	sb.append(" \n");
         	return sb.toString();

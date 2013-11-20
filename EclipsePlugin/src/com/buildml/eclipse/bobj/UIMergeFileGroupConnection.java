@@ -35,6 +35,9 @@ public class UIMergeFileGroupConnection extends UIConnection {
 	/** The ID of the merge file group at one end of the connection */
 	private int targetFileGroupId;
 	
+	/** The 0-based index, within the merge group, of this connection */
+	private int index;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -44,11 +47,13 @@ public class UIMergeFileGroupConnection extends UIConnection {
 	 * and a merge file group
 	 * @param sourceFileGroupId	 ID of the sub file group. 
 	 * @param targetFileGroupId  ID of the merge file group that the sub file group is joined into.
+	 * @param index              0-based index within the merge group, for this connection.
 	 * 
 	 */
-	public UIMergeFileGroupConnection(int sourceFileGroupId, int targetFileGroupId) {
+	public UIMergeFileGroupConnection(int sourceFileGroupId, int targetFileGroupId, int index) {
 		this.sourceFileGroupId = sourceFileGroupId;
 		this.targetFileGroupId = targetFileGroupId;
+		this.index = index;
 	}
 
 	/*-------------------------------------------------------------------------------------*/	
@@ -67,6 +72,15 @@ public class UIMergeFileGroupConnection extends UIConnection {
 	 */
 	public int getTargetFileGroupId() {
 		return targetFileGroupId;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * @return the index
+	 */
+	public int getIndex() {
+		return index;
 	}
 
 	/*-------------------------------------------------------------------------------------*/	

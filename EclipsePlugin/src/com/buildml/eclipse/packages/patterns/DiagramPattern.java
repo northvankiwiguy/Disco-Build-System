@@ -360,7 +360,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 												UIMergeFileGroupConnection.OUTPUT_FROM_SUB_GROUP);
 
 			/* create a new business object (to be displayed) */
-			UIMergeFileGroupConnection newConnection = new UIMergeFileGroupConnection(subGroupId, member.memberId);
+			UIMergeFileGroupConnection newConnection = new UIMergeFileGroupConnection(subGroupId, member.memberId, i);
 			getDiagram().eResource().getContents().add(newConnection);
 		
 			/* We found the sub group's anchor, so now draw the connection */
