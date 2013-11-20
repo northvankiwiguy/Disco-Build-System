@@ -67,10 +67,10 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	private int newX, newY;
 	
 	/** if CHANGED_MEMBERSHIP, what are the old members? */
-	private List<Integer> oldMembers;
+	private List<?> oldMembers;
 
 	/** if CHANGED_MEMBERSHIP, what are the new members? */
-	private List<Integer> newMembers;
+	private List<?> newMembers;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -138,7 +138,7 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	 * @param oldMembers The old members of this file group.
 	 * @param newMembers The new members of this file group.
 	 */
-	public void recordMembershipChange(List<Integer> oldMembers, List<Integer> newMembers) {
+	public void recordMembershipChange(List<?> oldMembers, List<?> newMembers) {
 		if (!oldMembers.equals(newMembers)){
 			changedFields |= CHANGED_MEMBERSHIP;
 			this.oldMembers = oldMembers;
@@ -237,18 +237,17 @@ public class FileGroupChangeOperation extends BmlAbstractOperation {
 	 * @param fileGroupId 	The ID of the file group to set membership of.
 	 * @param members		The ArrayList of members to populate the file group with.
 	 */
-	private void setFileGroupMembers(int fileGroupId, List<Integer> members) {
+	private void setFileGroupMembers(int fileGroupId, List<?> members) {
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
-		
-		if ((fileGroupType != IFileGroupMgr.SOURCE_GROUP) && 
-				(fileGroupType != IFileGroupMgr.MERGE_GROUP)) {
-			throw new FatalError("Unhandled file group type: " + fileGroupType);
-		}
 				
 		if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
 			fileGroupMgr.setPathIds(fileGroupId, members.toArray(new Integer[0]));
+		} else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+			fileGroupMgr.setSubGroups(fileGroupId, members.toArray(new Integer[0]));
+		} else if (fileGroupType == IFileGroupMgr.FILTER_GROUP) {
+			fileGroupMgr.setPathStrings(fileGroupId, members.toArray(new String[0]));			
 		} else {
-			fileGroupMgr.setSubGroups(fileGroupId, members.toArray(new Integer[0]));			
+			throw new FatalError("Unhandled file group type: " + fileGroupType);
 		}
 	}
 
