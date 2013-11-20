@@ -27,6 +27,7 @@ import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.DiagramFeatureProvider;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
@@ -222,7 +223,12 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * A special-purpose method for deleting a fileGroup-action connection arrow.
+	 * A special-purpose method for deleting a fileGroup-action connection arrow. There are
+	 * two possible scenarios. If the connection has a filter, the delete operation will remove
+	 * the filter only. If it doesn't have a filter, the whole connection will be removed.
+	 * Therefore, the user might need to press "delete" twice to completely remove the
+	 * connection.
+	 * 
 	 * @param context The Graphiti context of the delete operation.
 	 */
 	private void deleteFileActionConnection(IDeleteContext context) {
@@ -231,11 +237,36 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 			return;
 		}
 		UIFileActionConnection connection = (UIFileActionConnection)bo;
+	
+		/* If there's filter, delete it */
+		if (connection.hasFilter()) {
+			
+			BmlMultiOperation multiOp = new BmlMultiOperation("Delete Filter");
+			
+			/* set the action's slot to refer to the filter's predecessor */
+			ActionChangeOperation actionOp = new ActionChangeOperation("", connection.getActionId());
+			actionOp.recordSlotChange(connection.getSlotId(), connection.getFilterGroupId(), 
+									connection.getFileGroupId());
+			multiOp.add(actionOp);
+			
+			/* set the filter group's content to empty, so it'll be garbage collected upon shutdown */
+			FileGroupChangeOperation fileGroupOp = new FileGroupChangeOperation("", connection.getFilterGroupId());
+			IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+			String currentMembers[] = fileGroupMgr.getPathStrings(connection.getFilterGroupId());
+			if (currentMembers != null) {
+				fileGroupOp.recordMembershipChange(Arrays.asList(currentMembers), new ArrayList<String>());
+				multiOp.add(fileGroupOp);
+			}
+			multiOp.recordAndInvoke();
+		}
 		
-		/* create an undo/redo operation to set the slot value back to null */
-		ActionChangeOperation op = new ActionChangeOperation("Delete Connection", connection.getActionId());
-		op.recordSlotChange(connection.getSlotId(), connection.getFileGroupId(), null);
-		op.recordAndInvoke();
+		/* no filter, so delete the connection */
+		else {
+			/* create an undo/redo operation to set the slot value back to null */
+			ActionChangeOperation op = new ActionChangeOperation("Delete Connection", connection.getActionId());
+			op.recordSlotChange(connection.getSlotId(), connection.getFileGroupId(), null);
+			op.recordAndInvoke();
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
