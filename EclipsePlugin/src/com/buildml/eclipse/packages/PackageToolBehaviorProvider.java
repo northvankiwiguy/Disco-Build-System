@@ -181,41 +181,17 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	int mergeGroupId = connection.getTargetFileGroupId();
         	int myIndex = connection.getIndex() + 1;
         	
-        	/* find the index (or indicies) that the sub group appears in the merge group */
-        	Integer subGroups[] = fileGroupMgr.getSubGroups(mergeGroupId);
-        	if (subGroups == null) {
-        		return null;
-        	}
-        	List<Integer> indexList = new ArrayList<Integer>();
-        	for (int i = 0; i < subGroups.length; i++) {
-				if (subGroups[i] == subGroupId) {
-					indexList.add(i + 1);
-				}
-			}
-			
         	StringBuffer sb = new StringBuffer();
-        	sb.append("\n File group merged into position");
-        	if (indexList.size() > 1) {
-        		sb.append('s');
-        	}
-        	int size = indexList.size();
-        	for (int i = 0; i < size; i++) {
-        		if (i == 0) {
-        			sb.append(' ');
-        		}
-        		else if (i == (size - 1)) {
-        			sb.append(" and ");
-        		}
-        		else {
-        			sb.append(", ");
-        		}
-        		int index = indexList.get(i); 
-    			sb.append(index);
-    			if ((size > 1) && (index == myIndex)) {
-    				sb.append(" (this link)");
-    			}
-			}
-        	sb.append(" \n");
+
+        	/* display this subgroup's various positions in the merge group */
+        	displayMergeGroupIndicies(subGroupId, mergeGroupId, myIndex, sb);
+        	
+        	/* if there's a filter attached, so the patterns and resulting output */
+    		if (connection.hasFilter()) {
+    			int filterGroupId = connection.getFilterGroupId();
+    			displayFilterPatterns(filterGroupId, sb);
+    			displayFileGroupMembers(filterGroupId, sb);
+    		}
         	return sb.toString();
         }
         
@@ -346,5 +322,72 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
 	}
 	
+    /*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for displaying a connection's index positions within a merge file group.
+	 * Any particular sub group may appear in multiple places in the merge group, so we
+	 * provide a meaningful list of all index positions.
+	 * 
+	 * @param subGroupId	The ID of the sub group at one end of the connection.
+	 * @param mergeGroupId	The ID of the merge group at the other end.
+	 * @param myIndex		The merge group's index for this connection.
+	 * @param sb			The StringBuffer to append content onto.
+	 */
+	private void displayMergeGroupIndicies(
+			int subGroupId, int mergeGroupId, int myIndex, StringBuffer sb) {
+		
+		/* 
+		 * Find the index (or indicies) where the sub group appears in the merge group, skipping
+		 * over filters if they exist.
+		 */
+		Integer subGroups[] = fileGroupMgr.getSubGroups(mergeGroupId);
+		if (subGroups == null) {
+			return;
+		}
+		List<Integer> indexList = new ArrayList<Integer>();
+		for (int i = 0; i < subGroups.length; i++) {
+			int thisSubGroupId = subGroups[i];
+			
+			/* skip over filters - important with multiple connections from the same sub group */
+			int thisSubGroupType = fileGroupMgr.getGroupType(thisSubGroupId);
+			if (thisSubGroupType == IFileGroupMgr.FILTER_GROUP) {
+				thisSubGroupId = fileGroupMgr.getPredId(thisSubGroupId);
+			}
+			
+			/* if our subgroup is in this index position, record */
+			if (thisSubGroupId == subGroupId) {
+				indexList.add(i + 1);
+			}
+		}
+		
+		/*
+		 * Now pretty-print the message, providing a list of all indicies. Our connection's
+		 * position is highlighted with "(this link)".
+		 */
+		sb.append("\n File group merged into position");
+		if (indexList.size() > 1) {
+			sb.append('s');
+		}
+		int size = indexList.size();
+		for (int i = 0; i < size; i++) {
+			if (i == 0) {
+				sb.append(' ');
+			}
+			else if (i == (size - 1)) {
+				sb.append(" and ");
+			}
+			else {
+				sb.append(", ");
+			}
+			int index = indexList.get(i); 
+			sb.append(index);
+			if ((size > 1) && (index == myIndex)) {
+				sb.append(" (this link)");
+			}
+		}
+		sb.append(" \n");
+	}
+
     /*-------------------------------------------------------------------------------------*/
 }

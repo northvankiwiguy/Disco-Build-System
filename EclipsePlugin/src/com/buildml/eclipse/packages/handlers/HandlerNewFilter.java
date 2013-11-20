@@ -13,6 +13,7 @@
 package com.buildml.eclipse.packages.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -57,6 +58,7 @@ public class HandlerNewFilter extends AbstractHandler {
 		if ((buildStore == null) || (pde == null)) {
 			return null;
 		}
+		int pkgId = pde.getPackageId();
 		
 		List<Object> selectedObjects = GraphitiUtils.getSelection();
 		Object bo = (UIConnection)selectedObjects.get(0);
@@ -74,34 +76,45 @@ public class HandlerNewFilter extends AbstractHandler {
 			int slotId = connection.getSlotId();
 			int fileGroupId = connection.getFileGroupId();
 			
-			/* create the new filter group, populate it with the "ia:**" pattern */
-			int filterGroupId = fileGroupMgr.newFilterGroup(pde.getPackageId(), fileGroupId);
+			int filterGroupId = createNewFilter(fileGroupMgr, multiOp, fileGroupId, pkgId);
 			if (filterGroupId < 0) {
-				AlertDialog.displayErrorDialog("Can't create filter", "Unable to create new filter on this connection");
+				AlertDialog.displayErrorDialog("Can't create filter", 
+						"Unable to create new filter on this connection");
 				return null;
 			}
-			
-			/* add the ** pattern to the filter group. This must be recorded in the undo/redo stack */
-			FileGroupChangeOperation filterOp = new FileGroupChangeOperation("", filterGroupId);
-			List<String> newMembers = new ArrayList<String>();
-			newMembers.add("ia:**");
-			filterOp.recordMembershipChange(new ArrayList<String>(), newMembers);
-			multiOp.add(filterOp);
 			
 			/* modify the action's slot so it now refers to our new filter group */
 			ActionChangeOperation actionOp = new ActionChangeOperation("", actionId);
 			int oldSlotId = (Integer)actionMgr.getSlotValue(actionId, slotId);
 			actionOp.recordSlotChange(slotId, oldSlotId, filterGroupId);
 			multiOp.add(actionOp);
-			
-			/* invoke the change... */
-			multiOp.recordAndInvoke();
 		}
  
 		else if (bo instanceof UIMergeFileGroupConnection) {
 			UIMergeFileGroupConnection connection = (UIMergeFileGroupConnection)bo;
-			// TODO: implement this.
+			int sourceFileGroupId = connection.getSourceFileGroupId();
+			int targetFileGroupId = connection.getTargetFileGroupId();
+			int index = connection.getIndex();
+			
+			/* create and populate the new filter */
+			int filterGroupId = createNewFilter(fileGroupMgr, multiOp, sourceFileGroupId, pkgId);
+			if (filterGroupId < 0) {
+				AlertDialog.displayErrorDialog("Can't create filter", 
+						"Unable to create new filter on this connection");
+				return null;
+			}
+			
+			/* modify the members of the merge group so that "index" entry now refers to the filter */
+			FileGroupChangeOperation fileGroupOp = new FileGroupChangeOperation("", targetFileGroupId);
+			Integer currentMembers[] = fileGroupMgr.getSubGroups(targetFileGroupId);
+			Integer newMembers[] = currentMembers.clone();
+			newMembers[index] = filterGroupId;
+			fileGroupOp.recordMembershipChange(Arrays.asList(currentMembers), Arrays.asList(newMembers));
+			multiOp.add(fileGroupOp);
 		}
+		
+		/* invoke the change... */
+		multiOp.recordAndInvoke();
 		
 		return null;
 	}
@@ -139,7 +152,38 @@ public class HandlerNewFilter extends AbstractHandler {
 		/* finally check whether this connection already has a filter - we can only have one */
 		return !(connection.hasFilter());
 	}
+
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Helper method for creating a new filter group, and populating it with an initial
+	 * pattern.
+	 * 
+	 * @param fileGroupMgr	The IFileGroupMgr we create the filter in.
+	 * @param multiOp		The BmlMultiOperation to add the changes to.
+	 * @param fileGroupId	The file group to base this filter on.
+	 * @param pkgId			The package to add the filter into.
+	 * @return The new filter's ID.
+	 */
+	private int createNewFilter(IFileGroupMgr fileGroupMgr,
+			BmlMultiOperation multiOp, int fileGroupId, int pkgId) {
+			
+		/* create the new filter group, populate it with the "ia:**" pattern */
+		int filterGroupId = fileGroupMgr.newFilterGroup(pkgId, fileGroupId);
+		if (filterGroupId < 0) {
+			return filterGroupId;
+		}
+		
+		/* add the ** pattern to the filter group. This must be recorded in the undo/redo stack */
+		FileGroupChangeOperation filterOp = new FileGroupChangeOperation("", filterGroupId);
+		List<String> newMembers = new ArrayList<String>();
+		newMembers.add("ia:**");
+		filterOp.recordMembershipChange(new ArrayList<String>(), newMembers);
+		multiOp.add(filterOp);
+		return filterGroupId;
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
-	
 }

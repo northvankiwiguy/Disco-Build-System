@@ -355,12 +355,26 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		for (int i = 0; i != groupSize; i++) {
 			int subGroupId = fileGroupMgr.getSubGroup(member.memberId, i);
 
+			/* 
+			 * If the subGroupId is a filter group, record the filter in the 
+			 * connection, but actually draw the line to the filter's predecessor.
+			 */
+			int filterGroupId = -1;
+			int subGroupType = fileGroupMgr.getGroupType(subGroupId);
+			if (subGroupType == IFileGroupMgr.FILTER_GROUP) {
+				filterGroupId = subGroupId;
+				subGroupId = fileGroupMgr.getPredId(subGroupId);
+			}
+			
 			/* find the sub group's anchor */
 			Anchor sourceAnchor = getAnchorFor(IPackageMemberMgr.TYPE_FILE_GROUP, subGroupId, 
 												UIMergeFileGroupConnection.OUTPUT_FROM_SUB_GROUP);
 
 			/* create a new business object (to be displayed) */
 			UIMergeFileGroupConnection newConnection = new UIMergeFileGroupConnection(subGroupId, member.memberId, i);
+			if (filterGroupId != -1) {
+				newConnection.setFilterGroupId(filterGroupId);
+			}
 			getDiagram().eResource().getContents().add(newConnection);
 		
 			/* We found the sub group's anchor, so now draw the connection */

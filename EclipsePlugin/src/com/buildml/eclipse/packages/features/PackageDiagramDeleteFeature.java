@@ -220,7 +220,9 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		/* unused */
 	}
 
-	/*-------------------------------------------------------------------------------------*/
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
 
 	/**
 	 * A special-purpose method for deleting a fileGroup-action connection arrow. There are
@@ -250,13 +252,7 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 			multiOp.add(actionOp);
 			
 			/* set the filter group's content to empty, so it'll be garbage collected upon shutdown */
-			FileGroupChangeOperation fileGroupOp = new FileGroupChangeOperation("", connection.getFilterGroupId());
-			IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
-			String currentMembers[] = fileGroupMgr.getPathStrings(connection.getFilterGroupId());
-			if (currentMembers != null) {
-				fileGroupOp.recordMembershipChange(Arrays.asList(currentMembers), new ArrayList<String>());
-				multiOp.add(fileGroupOp);
-			}
+			emptyFilterGroup(multiOp, connection.getFilterGroupId());
 			multiOp.recordAndInvoke();
 		}
 		
@@ -272,7 +268,12 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * A special-purpose method for deleting a merge file group connection arrow.
+	 * A special-purpose method for deleting a merge file group connection arrow. There are
+	 * two possible scenarios. If the connection has a filter, the delete operation will remove
+	 * the filter only. If it doesn't have a filter, the whole connection will be removed.
+	 * Therefore, the user might need to press "delete" twice to completely remove the
+	 * connection.
+	 * 
 	 * @param context The Graphiti context of the delete operation.
 	 */
 	private void deleteMergeFileGroupConnection(IDeleteContext context) {
@@ -282,23 +283,65 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		if (!(bo instanceof UIMergeFileGroupConnection)) {
 			return;
 		}
+		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		
 		UIMergeFileGroupConnection connection = (UIMergeFileGroupConnection)bo;
 		int mergeFileGroupId = connection.getTargetFileGroupId();
 		int subFileGroupId = connection.getSourceFileGroupId();
+		int index = connection.getIndex();
 		
-		/* get the current members of the merge file group */
+		/*
+		 * If there's a filter, remove that only.
+		 */
+		if (connection.hasFilter()) {
+			BmlMultiOperation multiOp = new BmlMultiOperation("Delete Filter");
+			
+			/* replace the merge group's "index" entry with the filter group's predecessor */
+			FileGroupChangeOperation mergeGroupOp = new FileGroupChangeOperation("", mergeFileGroupId);
+			Integer members[] = fileGroupMgr.getSubGroups(mergeFileGroupId);
+			ArrayList<Integer> currentMembers = new ArrayList<Integer>(Arrays.asList(members));
+			ArrayList<Integer> newMembers = new ArrayList<Integer>(currentMembers);
+			newMembers.set(index, subFileGroupId);
+			mergeGroupOp.recordMembershipChange(currentMembers, newMembers);
+			mergeGroupOp.recordAndInvoke();
+			
+			multiOp.add(mergeGroupOp);
+			
+			/* set the filter group's content to empty, so it'll be garbage collected upon shutdown */
+			emptyFilterGroup(multiOp, connection.getFilterGroupId());
+			multiOp.recordAndInvoke();			
+		}
+		
+		/*
+		 * If there's no filter, remove the whole connection.
+		 */
+		else {
+			/* our new membership will be the same as the current membership, with subFileGroupId removed */
+			FileGroupChangeOperation op = new FileGroupChangeOperation("Delete Connection", mergeFileGroupId);
+			Integer members[] = fileGroupMgr.getSubGroups(mergeFileGroupId);
+			ArrayList<Integer> currentMembers = new ArrayList<Integer>(Arrays.asList(members));
+			ArrayList<Integer> newMembers = new ArrayList<Integer>(currentMembers);
+			newMembers.remove(index);		
+			op.recordMembershipChange(currentMembers, newMembers);
+			op.recordAndInvoke();
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/		
+
+	/**
+	 * Helper method for creating the undo/redo commands for emptying a filter file group.
+	 * @param multiOp	The BmlMultiOperation to append the commands to.
+	 * @param groupId	The filter group's ID.
+	 */
+	private void emptyFilterGroup(BmlMultiOperation multiOp, int groupId) {
+		FileGroupChangeOperation fileGroupOp = new FileGroupChangeOperation("", groupId);
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
-		Integer members[] = fileGroupMgr.getSubGroups(mergeFileGroupId);
-		ArrayList<Integer> currentMembers = new ArrayList<Integer>(Arrays.asList(members));
-		
-		/* our new membership will be the same as the current membership, with subFileGroupId removed */
-		ArrayList<Integer> newMembers = new ArrayList<Integer>(currentMembers);
-		newMembers.remove(Integer.valueOf(subFileGroupId));
-		
-		/* set up an undo/redo operation for this change */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("Delete Connection", mergeFileGroupId);
-		op.recordMembershipChange(currentMembers, newMembers);
-		op.recordAndInvoke();
+		String currentMembers[] = fileGroupMgr.getPathStrings(groupId);
+		if (currentMembers != null) {
+			fileGroupOp.recordMembershipChange(Arrays.asList(currentMembers), new ArrayList<String>());
+			multiOp.add(fileGroupOp);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	
