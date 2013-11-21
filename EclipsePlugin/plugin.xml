@@ -1374,5 +1374,22 @@
             </test>
          </enabledWhen>
       </page>
+      <page
+            class="com.buildml.eclipse.packages.properties.ConnectionPropertyPage"
+            id="com.buildml.eclipse.properties.connection"
+            name="Connection">
+         <enabledWhen>
+            <or>
+               <test
+                     args="com.buildml.eclipse.bobj.UIFileActionConnection"
+                     property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+               </test>
+               <test
+                     args="com.buildml.eclipse.bobj.UIMergeFileGroupConnection"
+                     property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+               </test>
+            </or>
+         </enabledWhen>
+      </page>
    </extension>
 </plugin>
