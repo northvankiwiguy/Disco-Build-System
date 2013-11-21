@@ -50,12 +50,23 @@ public class GraphitiUtils {
 	 */
 	public static Object getBusinessObjectFromElement(IAdaptable element, Class<?> boClass) {
 		
-		/* the element must be a Graphiti shape */
-		GraphitiShapeEditPart container = (GraphitiShapeEditPart)element;
-		
-		/* fetch the pictogram element, and its link to the underlying business object */
-		PictogramElement pe = container.getPictogramElement();
+		/* the element must be a Graphiti shape or connection */
+		PictogramElement pe = null;
+		if (element instanceof GraphitiShapeEditPart) {
+			GraphitiShapeEditPart container = (GraphitiShapeEditPart)element;
+			pe = container.getPictogramElement();
+
+		} else if (element instanceof GraphitiConnectionEditPart) {
+			GraphitiConnectionEditPart container = (GraphitiConnectionEditPart)element;
+			pe = container.getPictogramElement();
+		}
+		if (pe == null) {
+			return null;
+		}
 		PictogramLink pl = pe.getLink();
+		if (pl == null) {
+			return null;
+		}
 		EList<EObject> list = pl.getBusinessObjects();
 		
 		/* we assume that there's only one business object (because that's how we set it up) */
