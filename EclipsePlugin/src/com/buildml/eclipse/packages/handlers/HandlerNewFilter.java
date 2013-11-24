@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.handlers.IHandlerService;
 
 import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIConnection;
@@ -26,10 +27,12 @@ import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.packages.properties.ConnectionPropertyPage;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
@@ -61,7 +64,7 @@ public class HandlerNewFilter extends AbstractHandler {
 		int pkgId = pde.getPackageId();
 		
 		List<Object> selectedObjects = GraphitiUtils.getSelection();
-		Object bo = (UIConnection)selectedObjects.get(0);
+		UIConnection bo = (UIConnection)selectedObjects.get(0);
 		
 		/* all our steps to create a filter must be recorded in the undo/redo stack */
 		BmlMultiOperation multiOp = new BmlMultiOperation("Add Filter");
@@ -70,13 +73,14 @@ public class HandlerNewFilter extends AbstractHandler {
 		 * Handle addition of new filter between a file group and an INPUT slot for
 		 * an action (we can't have filters after action OUTPUTs).
 		 */
+		int filterGroupId = -1;
 		if (bo instanceof UIFileActionConnection) {
 			UIFileActionConnection connection = (UIFileActionConnection)bo;
 			int actionId = connection.getActionId();
 			int slotId = connection.getSlotId();
 			int fileGroupId = connection.getFileGroupId();
 			
-			int filterGroupId = createNewFilter(fileGroupMgr, multiOp, fileGroupId, pkgId);
+			filterGroupId = fileGroupMgr.newFilterGroup(pkgId, fileGroupId);
 			if (filterGroupId < 0) {
 				AlertDialog.displayErrorDialog("Can't create filter", 
 						"Unable to create new filter on this connection");
@@ -97,7 +101,10 @@ public class HandlerNewFilter extends AbstractHandler {
 			int index = connection.getIndex();
 			
 			/* create and populate the new filter */
-			int filterGroupId = createNewFilter(fileGroupMgr, multiOp, sourceFileGroupId, pkgId);
+			filterGroupId = fileGroupMgr.newFilterGroup(pkgId, sourceFileGroupId);
+			if (filterGroupId < 0) {
+				return filterGroupId;
+			}
 			if (filterGroupId < 0) {
 				AlertDialog.displayErrorDialog("Can't create filter", 
 						"Unable to create new filter on this connection");
@@ -113,9 +120,34 @@ public class HandlerNewFilter extends AbstractHandler {
 			multiOp.add(fileGroupOp);
 		}
 		
-		/* invoke the change... */
-		multiOp.recordAndInvoke();
+		/*
+		 * Now that we've created an empty filter, pop up the properties page to allow the user
+		 * to edit the filter patterns. We do this by storing our multiOp in the UIConnection object, which
+		 * is then used by the properties dialog (see ConnectionPropertyPage).
+		 */
+		bo.setFilterGroupId(filterGroupId);
+		bo.setUndoRedoOperation(multiOp);
 		
+    	/* Open the standard "properties" dialog for UIConnection */
+    	String commandId = "org.eclipse.ui.file.properties";
+    	IHandlerService handlerService = (IHandlerService) 
+    			EclipsePartUtils.getService(IHandlerService.class);
+    	try {
+			handlerService.executeCommand(commandId, null);
+		} catch (Exception e) {
+			throw new FatalError("Unable to open Properties Dialog.");
+		}
+    	
+    	/* 
+    	 * At this point, the operation has been invoked (by ConnectionPropertyPage.performOK), so detach
+    	 * it from the UIConnection. Note that if "cancel" was pressed, we also need to remove the
+    	 * filter.
+    	 */
+    	if (bo.getUndoRedoOperation() == null) {
+    		bo.removeFilter();
+    	}
+    	bo.setUndoRedoOperation(null);
+    	
 		return null;
 	}
 
@@ -151,38 +183,6 @@ public class HandlerNewFilter extends AbstractHandler {
 		
 		/* finally check whether this connection already has a filter - we can only have one */
 		return !(connection.hasFilter());
-	}
-
-	/*=====================================================================================*
-	 * PRIVATE METHODS
-	 *=====================================================================================*/
-
-	/**
-	 * Helper method for creating a new filter group, and populating it with an initial
-	 * pattern.
-	 * 
-	 * @param fileGroupMgr	The IFileGroupMgr we create the filter in.
-	 * @param multiOp		The BmlMultiOperation to add the changes to.
-	 * @param fileGroupId	The file group to base this filter on.
-	 * @param pkgId			The package to add the filter into.
-	 * @return The new filter's ID.
-	 */
-	private int createNewFilter(IFileGroupMgr fileGroupMgr,
-			BmlMultiOperation multiOp, int fileGroupId, int pkgId) {
-			
-		/* create the new filter group, populate it with the "ia:**" pattern */
-		int filterGroupId = fileGroupMgr.newFilterGroup(pkgId, fileGroupId);
-		if (filterGroupId < 0) {
-			return filterGroupId;
-		}
-		
-		/* add the ** pattern to the filter group. This must be recorded in the undo/redo stack */
-		FileGroupChangeOperation filterOp = new FileGroupChangeOperation("", filterGroupId);
-		List<String> newMembers = new ArrayList<String>();
-		newMembers.add("ia:**");
-		filterOp.recordMembershipChange(new ArrayList<String>(), newMembers);
-		multiOp.add(filterOp);
-		return filterGroupId;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

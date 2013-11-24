@@ -14,6 +14,7 @@ package com.buildml.eclipse.bobj;
 
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
+import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -32,6 +33,9 @@ public abstract class UIConnection extends EObjectImpl {
 
 	/** The filter group's ID, or ErrorCode.NOT_FOUND if none attached */
 	protected int filterGroupId = ErrorCode.NOT_FOUND;
+	
+	/** The undo/redo operation that was used when first adding the filter to this connection */
+	protected BmlMultiOperation operation = null;
 	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
@@ -73,4 +77,25 @@ public abstract class UIConnection extends EObjectImpl {
 	}
 
 	/*-------------------------------------------------------------------------------------*/	
+
+	/**
+	 * Set the undo/redo operation that was used to create this new connection. This
+	 * operation can be passed onto property pages (such as ConnectionPropertyPage) to
+	 * add further changes to this multi operation.
+	 * @param operation The multi operation associated with creating this connection.
+	 */
+	public void setUndoRedoOperation(BmlMultiOperation operation) {
+		this.operation = operation;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * @return The multi operation associated with creating this connection.
+	 */
+	public BmlMultiOperation getUndoRedoOperation() {
+		return this.operation;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }

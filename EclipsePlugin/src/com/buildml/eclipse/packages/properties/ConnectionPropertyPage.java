@@ -33,7 +33,7 @@ import com.buildml.eclipse.bobj.UIConnection;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
 import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
-import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
@@ -90,6 +90,9 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 	/** The initial list of patterns when we opened the properties box (for restoring) */
 	private ArrayList<String> initialFilterFilePaths;
 
+	/** The UIConnection object that our filter is applied to */
+	private UIConnection connection;
+
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -124,13 +127,47 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 	@Override
 	public boolean performOk() {
 		
-		/* create an undo/redo operation that will invoke the underlying database changes */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("Modify Filter", filterFileGroupId);
-		op.recordMembershipChange(initialFilterFilePaths, filterFilePaths);
-		op.recordAndInvoke();
+		/* 
+		 * when OK is pressed (assuming there's a filter), we need to create an undo/redo
+		 * operation to initiate the changes. This code is complicated by the fact that
+		 * the connection object might have an existing undo/redo operation attached to it.
+		 * If so, extend this operation. If not, create a new operation.
+		 */
+		if (connection.hasFilter()) {
+
+			/* create an undo/redo operation that will invoke the underlying database changes */
+			FileGroupChangeOperation op = new FileGroupChangeOperation("Modify Filter", filterFileGroupId);
+			op.recordMembershipChange(initialFilterFilePaths, filterFilePaths);
+
+			/* If this properties dialog was invoked as part of the "add filter" operation? */
+			BmlMultiOperation creationMultiOp = connection.getUndoRedoOperation();
+			if (creationMultiOp != null) {
+				creationMultiOp.add(op);
+				creationMultiOp.recordAndInvoke();
+			} 
+			
+			/* no, this is a standalone "properties" command, invoked via the "Properties" menu option */
+			else {
+				op.recordAndInvoke();
+			}
+		}
 		return super.performOk();
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * The cancel button was pressed. Reset the undo/redo multiOp to indicate to the
+	 * "add filter" command (HandlerNewFilter) that the user pressed cancel.
+	 */
+	@Override
+	public boolean performCancel() {
+		if (connection.hasFilter()) {
+			connection.setUndoRedoOperation(null);
+		}
+		return super.performCancel();
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -140,14 +177,16 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 	@Override
 	protected void performDefaults() {
 		
-		/* restore back to the original list */
-		filterFilePaths.clear();
-		filterFilePaths.addAll(initialFilterFilePaths);
-		
-		/* refresh the view */
-		refreshMiddleList();
-		setMiddlePanelButtons();
-		refreshRightList();
+		if (connection.hasFilter()) {
+			/* restore back to the original list */
+			filterFilePaths.clear();
+			filterFilePaths.addAll(initialFilterFilePaths);
+
+			/* refresh the view */
+			refreshMiddleList();
+			setMiddlePanelButtons();
+			refreshRightList();
+		}
 		super.performDefaults();
 	}
 	
@@ -161,8 +200,7 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 	@Override
 	protected Control createContents(Composite parent) {
 		
-		UIConnection connection = 
-				(UIConnection)GraphitiUtils.getBusinessObjectFromElement(getElement(), UIConnection.class);
+		connection = (UIConnection)GraphitiUtils.getBusinessObjectFromElement(getElement(), UIConnection.class);
 		if (connection == null) {
 			return null;
 		}
@@ -230,6 +268,14 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 		/* make a copy, if we need to restore later */
 		initialFilterFilePaths = new ArrayList<String>();
 		initialFilterFilePaths.addAll(Arrays.asList(initialPatterns));
+		
+		/* 
+		 * In the case where the filter was just created, there will be 0 patterns.
+		 * We must now add a default pattern.
+		 */
+		if (initialPatterns.length == 0) {
+			filterFilePaths.add("ia:**");
+		}
 	}
 
 	/*-------------------------------------------------------------------------------------*/
