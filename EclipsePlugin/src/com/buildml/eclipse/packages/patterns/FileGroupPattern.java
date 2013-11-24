@@ -1159,6 +1159,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			FileGroupChangeOperation op = new FileGroupChangeOperation("", targetFileGroupId);
 			ArrayList<Integer> newMembers = getFileGroupAsArrayList(targetFileGroupId);
 			op.recordMembershipChange(currentMembers, newMembers);
+			multiOp.add(op);
 			
 			/* bump to the right (now), and record changes in undo/redo stack */
 			layoutAlgorithm.bumpPictogramsRight(multiOp, IPackageMemberMgr.TYPE_FILE_GROUP, sourceFileGroupId, true);
