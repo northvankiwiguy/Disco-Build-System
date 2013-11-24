@@ -694,7 +694,39 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 	 * 					 selected item.
 	 */
 	protected void handleAddEditButton(boolean createNew) {
-		AlertDialog.displayErrorDialog("Not Implemented", "This feature is not yet implemented.");
+
+		/* create a new Dialog for editing the filter pattern */
+		ConnectionPatternDialog dialog = new ConnectionPatternDialog(createNew);
+
+		/* If "edit" is pressed, fetch the currently selected pattern */
+		int index = -1;
+		if (!createNew){
+			index = middleListBox.getSelectionIndex();
+			if (index == -1) {
+				return;
+			}
+			String pattern = filterFilePaths.get(index);
+			dialog.setPattern(pattern);
+		}
+		
+		/* open the dialog and wait for either OK or Cancel to be pressed */
+		int status = dialog.open();
+		if (status == ConnectionPatternDialog.OK){
+
+			/* 
+			 * OK was pressed, either add the new pattern to the end of the group, or replace
+			 * the currently selected pattern.
+			 */
+			String newPattern = dialog.getPattern();
+			if (createNew) {
+				filterFilePaths.add(newPattern);
+			} else {
+				filterFilePaths.set(index, newPattern);
+			}
+			refreshMiddleList();
+			setMiddlePanelButtons();
+			refreshRightList();
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
