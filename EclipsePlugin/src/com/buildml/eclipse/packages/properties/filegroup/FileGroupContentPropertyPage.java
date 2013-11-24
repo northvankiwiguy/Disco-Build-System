@@ -77,6 +77,21 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		/* nothing */
 	}
  
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * The OK button was pressed. Proceed to change the file group in the underlying database 
+	 */
+	@Override
+	public boolean performOk() {
+		
+		/* create an undo/redo operation that will invoke the underlying database changes */
+		FileGroupChangeOperation op = new FileGroupChangeOperation("Modify File Group", fileGroupId);
+		op.recordMembershipChange(initialMembers, currentMembers);
+		op.recordAndInvoke();
+		return super.performOk();
+	}
+
 	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/
@@ -191,8 +206,7 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 				}
 				int selectedFilesCount = handleSelection();
 				deleteButton.setEnabled(selectedFilesCount >= 1);
-				moveUpButton.setEnabled(selectedFilesCount >= 1);
-				moveDownButton.setEnabled(selectedFilesCount >= 1);
+				enableMoveButtons(moveUpButton, moveDownButton);
 			}
 		});
 
@@ -217,16 +231,35 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * The OK button was pressed. Proceed to change the file group in the underlying database 
+	 * Compute the state of the "Move Up" and "Move Down" buttons. If the selection has the
+	 * last member selected, we can't move down. If it has the first member selected, we can't
+	 * move up. If no members are selected, neither is an option.
+	 * 
+	 * @param moveUpButton			The "Move Up" button control.
+	 * @param moveDownButton		The "Move Down" button control.
 	 */
-	@Override
-	public boolean performOk() {
+	protected void enableMoveButtons(Button moveUpButton, Button moveDownButton) {
 		
-		/* create an undo/redo operation that will invoke the underlying database changes */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("Modify File Group", fileGroupId);
-		op.recordMembershipChange(initialMembers, currentMembers);
-		op.recordAndInvoke();
-		return super.performOk();
+		/* we must have at least one member selected */
+		ITreeSelection selection = (ITreeSelection) filesList.getSelection();
+		int selectedFilesCount = selection.size();
+		boolean moveUpEnabled = selectedFilesCount >= 1;
+		boolean moveDownEnabled = selectedFilesCount >= 1;
+		
+		/* check whether the first/last members are highlighted */
+		Iterator<TreeMember> iter = selection.iterator();
+		while (iter.hasNext()) {
+			TreeMember member = iter.next();
+			if (member.seq == 0) {
+				moveUpEnabled = false;
+			} else if (member.seq == currentMembers.size() - 1) {
+				moveDownEnabled = false;
+			}
+		}
+		
+		/* enable/disable the button state, as appropriate */
+		moveUpButton.setEnabled(moveUpEnabled);
+		moveDownButton.setEnabled(moveDownEnabled);
 	}
 
 	/*=====================================================================================*
@@ -277,7 +310,12 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	 */
 	private void populateList(TreeViewer filesList) {
 	
-		Integer membersArray[] = currentMembers.toArray(new Integer[currentMembers.size()]);
+		TreeMember membersArray[] = new TreeMember[currentMembers.size()];
+		int i = 0;
+		for (int id : currentMembers) {
+			membersArray[i] = new TreeMember(0, i, id, null);
+			i++;
+		}
 		filesList.setInput(membersArray);
 		filesList.expandAll();
 	}
@@ -322,12 +360,12 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		while (iter.hasNext()) {
 			Object element = iter.next();
 			
-			/* 
-			 * For both SOURCE and MERGE groups, the top level treeviewer elements are
-			 * Integer (pathId or subGroupId). This is what we remove. All else is ignored.
-			 */
-			if (element instanceof Integer) {
-				currentMembers.remove(element);
+			/* we can only remove top-level items (for source file groups and merge file groups). */
+			if (element instanceof TreeMember) {
+				TreeMember member = (TreeMember)element; 
+				if (member.level == 0) {
+					currentMembers.remove(member.seq);
+				}
 			}
 		}
 		
@@ -360,13 +398,18 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		 * that Eclipse gives us into a sorted array of indicies.
 		 */
 		ArrayList<Integer> selectedTopLevelIndicies = new ArrayList<Integer>();
+		ArrayList<TreeMember> selectedMembers = new ArrayList<TreeMember>();
 		Iterator<Object> iter = selection.iterator();
 		int i = 0;
 		while (iter.hasNext()) {
 			Object element = iter.next();
-			if (element instanceof Integer) {
-				selectedTopLevelIndicies.add(currentMembers.indexOf(element));
-				i++;
+			if (element instanceof TreeMember) {
+				TreeMember member = (TreeMember)element;
+				if (member.level == 0) {
+					selectedTopLevelIndicies.add(member.seq);
+					i++;
+				}
+				selectedMembers.add(member);
 			}
 		}
 		
@@ -419,6 +462,16 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 		
 		/* redraw the tree with the modified content */
 		populateList(filesList);
+		
+		/* 
+		 * Reset the selection so that the same elements are selected in the new tree. Naturaly
+		 * their sequence numbers have now changed.
+		 */
+		for (TreeMember member: selectedMembers) {
+			member.seq += direction;
+		}
+		StructuredSelection newSelection = new StructuredSelection(selectedMembers);
+		filesList.setSelection(newSelection, true);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -446,16 +499,16 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 			
 			/* for each selected element, select its entire subtree */
 			TreePath paths[] = selection.getPaths();
-			List<Object> elementsToSelect = new ArrayList<Object>();			
+			List<TreeMember> elementsToSelect = new ArrayList<TreeMember>();			
 			for (int i = 0; i < paths.length; i++) {
 				
 				/* determine the parent, select it, then select all it children */
-				Object parentOfSubTree = paths[i].getFirstSegment();
+				TreeMember parentOfSubTree = (TreeMember) paths[i].getFirstSegment();
 				elementsToSelect.add(parentOfSubTree);
 				Object children[] = contentProvider.getChildren(parentOfSubTree);
 				if (children != null) {
 					for (int j = 0; j < children.length; j++) {
-						elementsToSelect.add(children[j]);	
+						elementsToSelect.add((TreeMember)children[j]);	
 					}
 				}
 			}

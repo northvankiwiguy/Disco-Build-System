@@ -65,22 +65,20 @@ public class FileGroupLabelProvider extends LabelProvider {
 		 * for source groups, the objects are path IDs. Return the full path name with
 		 * path roots (e.g. @root/etc/passwd)
 		 */
-		if ((fileGroupType == IFileGroupMgr.SOURCE_GROUP) && (element instanceof Integer)) {
-			Integer pathId = (Integer)element;
-			return fileMgr.getPathName(pathId, true);
-		}
-		
-		/* for file groups, we have Integer (top level), and String (second level) */
-		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
-			if (element instanceof Integer) {
-				return "Sub Group ";
-			}
+		if (element instanceof TreeMember) {
+			TreeMember member = (TreeMember)element;
+			if (fileGroupType == IFileGroupMgr.SOURCE_GROUP) {
+				return fileMgr.getPathName(member.id, true);
 			
-			else if (element instanceof String) {
-				return (String)element;
+			} else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
+				if (member.level == 0) {
+					return "Sub Group";
+				} else {
+					return member.text;
+				}
 			}
 		}
-		
+				
 		return "";
 	}
 	

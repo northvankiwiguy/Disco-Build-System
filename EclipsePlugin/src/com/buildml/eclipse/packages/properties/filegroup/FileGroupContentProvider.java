@@ -72,9 +72,16 @@ public class FileGroupContentProvider extends ArrayContentProvider implements
 		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
 			
 			/* the parent is the ID of the sub file group */
-			if (parentElement instanceof Integer) {
-				int parentId = (Integer)parentElement;
-				return fileGroupMgr.getExpandedGroupFiles(parentId);
+			if (parentElement instanceof TreeMember) {
+				TreeMember parent = (TreeMember)parentElement;
+				
+				/* fetch all the children of this subgroup, and convert to FileGroupContentMember[] */
+				String files[] = fileGroupMgr.getExpandedGroupFiles(parent.id);
+				TreeMember children[] = new TreeMember[files.length];
+				for (int i = 0; i < files.length; i++) {
+					children[i] = new TreeMember(1, parent.seq, parent.id, files[i]);
+				}
+				return children;
 			}
 			
 			/* else, if the parent is a String, it's at the second level, with no kids */
@@ -112,7 +119,10 @@ public class FileGroupContentProvider extends ArrayContentProvider implements
 		 * the actual paths (Strings) don't have children.
 		 */
 		else if (fileGroupType == IFileGroupMgr.MERGE_GROUP) {
-			return (element instanceof Integer);
+			if (element instanceof TreeMember) {
+				return ((TreeMember)element).level == 0;
+			}
+			return false;
 		}
 		
 		/* other cases are currently not handled */
