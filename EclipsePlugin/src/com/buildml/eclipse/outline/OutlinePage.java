@@ -143,7 +143,7 @@ public class OutlinePage extends ContentOutlinePage {
 		 * will display the BuildML editor's package structure.
 		 */
 		treeViewer = getTreeViewer();
-		treeViewer.setContentProvider(new OutlineContentProvider(pkgMgr));
+		treeViewer.setContentProvider(new OutlineContentProvider(pkgMgr, true));
 		treeViewer.setLabelProvider(new OutlineLabelProvider(pkgMgr));
 		treeViewer.addSelectionChangedListener(this);
 		treeViewer.setInput(new UIPackageFolder[] { new UIPackageFolder(pkgMgr.getRootFolder()) });

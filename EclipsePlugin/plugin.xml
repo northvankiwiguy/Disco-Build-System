@@ -204,6 +204,11 @@
             id="com.buildml.eclipse.commands.package.autolayout"
             name="Auto Layout">
       </command>
+      <command
+            defaultHandler="com.buildml.eclipse.packages.handlers.HandlerMoveToPackage"
+            id="com.buildml.eclipse.commands.package.movetopackage"
+            name="Move to Package...">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -551,6 +556,11 @@
                </with>
             </visibleWhen>
          </menu>
+         <command
+               commandId="com.buildml.eclipse.commands.package.movetopackage"
+               label="Move to Package..."
+               style="push">
+         </command>
          <separator
                name="com.buildml.eclipse.commands.separator1"
                visible="true">
@@ -878,6 +888,11 @@
          </command>
          <command
                commandId="org.eclipse.ui.file.properties"
+               style="push">
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.package.movetopackage"
+               label="Move to Package..."
                style="push">
          </command>
       </menuContribution>

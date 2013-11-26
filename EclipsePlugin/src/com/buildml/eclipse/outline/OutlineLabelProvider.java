@@ -27,7 +27,7 @@ import com.buildml.model.IPackageMgr;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-/* package */ class OutlineLabelProvider extends LabelProvider {
+public class OutlineLabelProvider extends LabelProvider {
 	
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -52,7 +52,7 @@ import com.buildml.model.IPackageMgr;
 	 * 
 	 * @param pkgMgr The IPackageMgr from which to obtain label information.
 	 */
-	/* package */ OutlineLabelProvider(IPackageMgr pkgMgr) {
+	public OutlineLabelProvider(IPackageMgr pkgMgr) {
 		this.pkgMgr = pkgMgr;
 		
 		/* pre-obtain images for packages and package folders */

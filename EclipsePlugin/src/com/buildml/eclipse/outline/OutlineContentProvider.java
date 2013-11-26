@@ -12,6 +12,9 @@
 
 package com.buildml.eclipse.outline;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
@@ -26,7 +29,7 @@ import com.buildml.model.IPackageMgr;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-/* package */ class OutlineContentProvider extends ArrayContentProvider
+public class OutlineContentProvider extends ArrayContentProvider
 		implements ITreeContentProvider {
 	
 	/*=====================================================================================*
@@ -35,6 +38,9 @@ import com.buildml.model.IPackageMgr;
 
 	/** The IPackageMgr that we're providing content from */
 	private IPackageMgr pkgMgr = null;
+	
+	/** True if we should display the &lt;import&gt; package, else false */
+	private boolean showImportPkg;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -45,9 +51,11 @@ import com.buildml.model.IPackageMgr;
 	 * each OutlinePage object.
 	 * 
 	 * @param pkgMgr The IPackageMgr that this object will provide content from.
+	 * @param showImportPkg True if we should display the &lt;import&gt; package, else false
 	 */
-	/* package */ OutlineContentProvider(IPackageMgr pkgMgr) {
+	public OutlineContentProvider(IPackageMgr pkgMgr, boolean showImportPkg) {
 		this.pkgMgr = pkgMgr;
+		this.showImportPkg = showImportPkg;
 	}
 	
 	/*=====================================================================================*
@@ -68,16 +76,22 @@ import com.buildml.model.IPackageMgr;
 			Integer children[] = pkgMgr.getFolderChildren(pkgId);
 			int childrenLength = children.length;
 			
+			/* we might need to skip over this one, depending on value of showImportPkg */
+			int importPkgId = pkgMgr.getImportPackage();
+			
 			/* convert the children to UIPackage or UIPackageFolder objects */
-			UIInteger uiChildren[] = new UIInteger[childrenLength];
+			List<UIInteger> uiChildren = new ArrayList<UIInteger>();
 			for (int i = 0; i != childrenLength; i++) {
-				if (pkgMgr.isFolder(children[i])) {
-					uiChildren[i] = new UIPackageFolder(children[i]);
-				} else {
-					uiChildren[i] = new UIPackage(children[i]);					
+				int thisPkgId = children[i];
+				if (showImportPkg || (thisPkgId != importPkgId)) {
+					if (pkgMgr.isFolder(thisPkgId)) {
+						uiChildren.add(new UIPackageFolder(thisPkgId));
+					} else {
+						uiChildren.add(new UIPackage(thisPkgId));					
+					}
 				}
 			}
-			return uiChildren;
+			return uiChildren.toArray();
 		}
 		
 		/* non-folders don't have children */
