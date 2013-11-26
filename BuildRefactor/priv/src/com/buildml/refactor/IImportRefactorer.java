@@ -94,8 +94,10 @@ public interface IImportRefactorer {
 	 * 
 	 * @param destPkgId		ID of the package to move the members into.
 	 * @param members		A List of members to be moved into the destination package.
+	 * @throws CanNotRefactorException Refactoring failed for some reason.
 	 */
-	public void moveMembersToPackage(int destPkgId, List<MemberDesc> members);
+	public void moveMembersToPackage(int destPkgId, List<MemberDesc> members)
+			throws CanNotRefactorException;
 
 	/**
 	 * Undo the previous refactoring operation. Operations are held on a stack,

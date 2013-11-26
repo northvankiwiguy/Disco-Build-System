@@ -149,7 +149,7 @@ public class HandlerMergeActions extends AbstractHandler {
 			
 		} catch (CanNotRefactorException e) {
 
-			Integer actionInError[] = e.getActionIds();
+			Integer actionInError[] = e.getCauseIDs();
 			switch (e.getCauseCode()) {
 			
 			case ACTION_NOT_ATOMIC:

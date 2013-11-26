@@ -23,7 +23,9 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.types.ActionSet;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.CanNotRefactorException.Cause;
@@ -51,6 +53,9 @@ public class ImportRefactorer implements IImportRefactorer {
 	/** The ActionMgr used by these refactorings. */
 	private IActionMgr actionMgr;
 	
+	/** The PackageMgr used by these refactorings. */
+	private IPackageMgr pkgMgr;
+	
 	/** The stack of history operations that have been executed, and can now be undone. */
 	private Stack<ImportHistoryItem> undoStack;
 
@@ -71,6 +76,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		this.buildStore = buildStore;
 		this.fileMgr = buildStore.getFileMgr();
 		this.actionMgr = buildStore.getActionMgr();
+		this.pkgMgr = buildStore.getPackageMgr();
 		
 		undoStack = new Stack<ImportHistoryItem>();
 		redoStack = new Stack<ImportHistoryItem>();
@@ -327,13 +333,27 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#moveMembersToPackage()
 	 */
 	@Override
-	public void moveMembersToPackage(int destPkgId, List<MemberDesc> members) {
+	public void moveMembersToPackage(int destPkgId, List<MemberDesc> members) 
+			throws CanNotRefactorException {
+
+		/** Validate the destination package ID */
+		if (!pkgMgr.isValid(destPkgId)) {
+			throw new CanNotRefactorException(Cause.INVALID_PACKAGE, destPkgId);
+		}
+
+		/* validate inputs - this will throw an exception if there's an error */
+		MoveRefactorerUtils.validateMembersList(buildStore, members);
+
 		
 		// TODO: validate that all members are already in the same package.
 		// They could be any of FILE, FILE_GROUP, ACTION, SUB_PACKAGE.
 		// Initially, focus on moving things from import.
 		// Note: this method does not focus on layout, but the UI layer should call
 		// this method, then call layout as a multiOp.
+		
+		System.out.println("Moving the following members into package " + destPkgId);
+
+		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

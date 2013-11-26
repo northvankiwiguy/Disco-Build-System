@@ -187,7 +187,7 @@ public class TestImportRefactorDeleteFile {
 
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.INVALID_PATH, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { badPathId } , ex.getPathIds());
+			assertArrayEquals(new Integer[] { badPathId } , ex.getCauseIDs());
 		}
 	}
 	
@@ -241,7 +241,7 @@ public class TestImportRefactorDeleteFile {
 			fail("Failed when attempting to delete a file the second time.");
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.INVALID_PATH, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { fileUnused } , ex.getPathIds());
+			assertArrayEquals(new Integer[] { fileUnused } , ex.getCauseIDs());
 		}
 		assertTrue(fileMgr.isPathTrashed(fileUnused));
 	}
@@ -262,7 +262,7 @@ public class TestImportRefactorDeleteFile {
 			
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.PATH_IN_USE, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { actionA4 } , ex.getActionIds());
+			assertArrayEquals(new Integer[] { actionA4 } , ex.getCauseIDs());
 		}
 	}
 	
@@ -281,7 +281,7 @@ public class TestImportRefactorDeleteFile {
 			
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.PATH_IN_USE, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { actionA3 } , ex.getActionIds());
+			assertArrayEquals(new Integer[] { actionA3 } , ex.getCauseIDs());
 		}
 	}
 
@@ -300,7 +300,7 @@ public class TestImportRefactorDeleteFile {
 			
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.PATH_IS_GENERATED, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { actionA6 } , ex.getActionIds());
+			assertArrayEquals(new Integer[] { actionA6 } , ex.getCauseIDs());
 		}
 	}
 	
@@ -373,7 +373,7 @@ public class TestImportRefactorDeleteFile {
 			fail("Failed when deleting an file/action that's in use.");
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.ACTION_IN_USE, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { fileWorkIOut }, ex.getPathIds());
+			assertArrayEquals(new Integer[] { fileWorkIOut }, ex.getCauseIDs());
 		}
 	}
 	
@@ -391,7 +391,7 @@ public class TestImportRefactorDeleteFile {
 			
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.DIRECTORY_NOT_EMPTY, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { dirWork } , ex.getPathIds());
+			assertArrayEquals(new Integer[] { dirWork } , ex.getCauseIDs());
 		}
 	}
 	
@@ -409,7 +409,7 @@ public class TestImportRefactorDeleteFile {
 
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.ACTION_NOT_ATOMIC, ex.getCauseCode());
-			assertArrayEquals(new Integer[] { actionA } , ex.getActionIds());
+			assertArrayEquals(new Integer[] { actionA } , ex.getCauseIDs());
 		}
 	}
 

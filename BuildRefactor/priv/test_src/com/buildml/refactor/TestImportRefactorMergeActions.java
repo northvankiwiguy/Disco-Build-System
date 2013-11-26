@@ -26,7 +26,6 @@ import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.types.ActionSet;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
-import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Test cases to verify the IImportRefactorer implementation. These tests focus
@@ -272,7 +271,7 @@ public class TestImportRefactorMergeActions {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.ACTION_IN_USE, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { fileWorkBarO }, e.getPathIds()));
+					new Integer[] { fileWorkBarO }, e.getCauseIDs()));
 		}
 		
 	}
@@ -344,7 +343,7 @@ public class TestImportRefactorMergeActions {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { rootAction }, e.getActionIds()));
+					new Integer[] { rootAction }, e.getCauseIDs()));
 		}
 
 		/* deleting an invalid actionID is illegal */
@@ -355,7 +354,7 @@ public class TestImportRefactorMergeActions {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { 1234 }, e.getActionIds()));
+					new Integer[] { 1234 }, e.getCauseIDs()));
 		}
 	}
 	
@@ -427,7 +426,7 @@ public class TestImportRefactorMergeActions {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.ACTION_NOT_ATOMIC, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { actionA1 }, e.getActionIds()));
+					new Integer[] { actionA1 }, e.getCauseIDs()));
 		}
 
 		/* test merging of invalid action ID */
@@ -439,7 +438,7 @@ public class TestImportRefactorMergeActions {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { 1234 }, e.getActionIds()));
+					new Integer[] { 1234 }, e.getCauseIDs()));
 		}
 		
 		/* test merging of trashed action - actionA4c */
@@ -456,7 +455,7 @@ public class TestImportRefactorMergeActions {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.ACTION_IS_TRASHED, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { actionA4c }, e.getActionIds()));
+					new Integer[] { actionA4c }, e.getCauseIDs()));
 		}
 	}
 
