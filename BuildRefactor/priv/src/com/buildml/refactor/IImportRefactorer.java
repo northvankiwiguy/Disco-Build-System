@@ -12,6 +12,9 @@
 
 package com.buildml.refactor;
 
+import java.util.List;
+
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.types.ActionSet;
 
 /**
@@ -83,6 +86,17 @@ public interface IImportRefactorer {
 	 */
 	public void mergeActions(ActionSet actionIds) throws CanNotRefactorException;
 	
+	/**
+	 * Move any number of package members from one package to another. Depending on which
+	 * members are being moved, this may result in a whole chain of members being moved.
+	 * If moving from the &lt;import&gt package, new file groups and filters might need
+	 * to be created.
+	 * 
+	 * @param destPkgId		ID of the package to move the members into.
+	 * @param members		A List of members to be moved into the destination package.
+	 */
+	public void moveMembersToPackage(int destPkgId, List<MemberDesc> members);
+
 	/**
 	 * Undo the previous refactoring operation. Operations are held on a stack,
 	 * so calling this method multiple times will undo multiple refactorings.
