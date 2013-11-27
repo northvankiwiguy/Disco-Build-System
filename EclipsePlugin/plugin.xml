@@ -1244,7 +1244,7 @@
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            description="BuildML Actions Editor"
+            description="BuildML Editor"
             id="com.buildml.eclipse.contexts.editor"
             name="BuildML Editor"
             parentId="org.eclipse.ui.contexts.window">
