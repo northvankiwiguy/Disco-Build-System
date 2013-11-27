@@ -470,6 +470,14 @@ public class TestPackageMgr {
 		assertEquals(pkgA, notifyPkgValue);
 		assertEquals(IPackageMgrListener.CHANGED_NAME, notifyHowValue);
 
+		/* change a package's parent */
+		int folderA = pkgMgr.addFolder("Folder");
+		notifyPkgValue = 0;
+		notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, pkgMgr.setParent(pkgA, folderA));
+		assertEquals(pkgA, notifyPkgValue);
+		assertEquals(IPackageMgrListener.REPARENT_PACKAGE, notifyHowValue);
+		
 		/* remove the pkgListener, and change the package again - will trigger */
 		pkgMgr.removeListener(pkgListener);
 		notifyPkgValue = 0;

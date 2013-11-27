@@ -309,7 +309,6 @@ public class OutlineUndoOperation extends AbstractOperation {
 			throw new FatalBuildStoreError("Unhandled operation: " + operation);
 		}
 		
-		outlinePage.refresh();
 		return Status.OK_STATUS;
 	}
 
@@ -365,7 +364,6 @@ public class OutlineUndoOperation extends AbstractOperation {
 			throw new FatalBuildStoreError("Unhandled operation: " + operation);
 		}
 		
-		outlinePage.refresh();
 		return Status.OK_STATUS;
 	}
 	

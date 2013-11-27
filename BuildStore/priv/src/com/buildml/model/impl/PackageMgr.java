@@ -462,6 +462,15 @@ import com.buildml.utils.errors.ErrorCode;
 			return ErrorCode.BAD_VALUE;
 		}
 		
+		/* if there's no change in parent, there's no need to update */
+		int existingParent = getParent(folderOrPackageId);
+		if (existingParent == ErrorCode.NOT_FOUND) {
+			return ErrorCode.BAD_VALUE;
+		}
+		if (existingParent == parentId) {
+			return ErrorCode.OK;
+		}
+		
 		/* the parent must be a folder */
 		if (!isFolder(parentId)) {
 			return ErrorCode.NOT_A_DIRECTORY;
@@ -504,6 +513,9 @@ import com.buildml.utils.errors.ErrorCode;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
+		
+		/* notify interested listeners */
+		notifyListeners(folderOrPackageId, IPackageMgrListener.REPARENT_PACKAGE);
 		
 		return ErrorCode.OK;
 	}

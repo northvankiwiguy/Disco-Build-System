@@ -45,6 +45,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -54,7 +55,7 @@ import com.buildml.utils.errors.ErrorCode;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class OutlinePage extends ContentOutlinePage {
+public class OutlinePage extends ContentOutlinePage implements IPackageMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -125,6 +126,9 @@ public class OutlinePage extends ContentOutlinePage {
 		buildStore = mainEditor.getBuildStore();
 		pkgMgr = buildStore.getPackageMgr();
 		pkgRootMgr = buildStore.getPackageRootMgr();
+		
+		/* add ourselves as a listener for package changes */
+		pkgMgr.addListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -565,6 +569,17 @@ public class OutlinePage extends ContentOutlinePage {
 	 */
 	protected int getTreeStyle() {
 		return super.getTreeStyle() | SWT.SINGLE;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/*
+	 * When the underlying IPackageMgr is changed in some way, we must refresh our outline
+	 * view so it reflects the latest changes.
+	 */
+	@Override
+	public void packageChangeNotification(int pkgId, int how) {
+		refresh();
 	}
 	
 	/*=====================================================================================*

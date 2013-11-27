@@ -31,7 +31,10 @@ public interface IPackageMgrListener {
 	
 	/** value of "how" if a package is deleted */
 	public static final int REMOVED_PACKAGE = 4;
-	
+
+	/** value of "how" if a package's parent is changed */
+	public static final int REPARENT_PACKAGE = 5;
+
 	/**
 	 * Called to notify the listener that the specified package has changed.
 	 * 
