@@ -20,13 +20,10 @@ import org.eclipse.swt.dnd.TransferData;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
-import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
 import com.buildml.eclipse.utils.dnd.BuildMLTransferType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
-import com.buildml.model.IPackageMemberMgr.PackageDesc;
-import com.buildml.model.undo.ActionUndoOp;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -57,9 +54,6 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	/** The PackageMgr associated with the BuildStore */
 	private IPackageMgr pkgMgr;
 
-	/** The PackageMemberMgr associated with the BuildStore */
-	private IPackageMemberMgr pkgMemberMgr;
-
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -78,7 +72,6 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		this.mainEditor = outlinePage.getMainEditor();
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = this.buildStore.getPackageMgr();
-		this.pkgMemberMgr = this.buildStore.getPackageMemberMgr();
 	
 		/* register ourselves with the drag/drop framework - we can receive drops */
 		treeViewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY, 
@@ -140,23 +133,11 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 				/* Require that the drop is from the same BuildStore as the target */
 				if (buildStore.toString().equals(myTypes[index].owner)){
 					
-					/* 
-					 * If dropping a UIAction, we change the package that the action
-					 * resides in. 
-					 */
-					if (myTypes[index].type == BuildMLTransferType.TYPE_ACTION) {
-
-						/* perform the drop - on failure, skip to next element */
-						if (performDropUIAction(myTypes[index], target)) {
-							editorDirty = true;
-						}
-					}
-					
 					/*
 					 * If dropping a UIPackage or UIPackageFolder, we restructure
 					 * that package's hierarchy within the outline view.
 					 */
-					else if ((myTypes[index].type == BuildMLTransferType.TYPE_PACKAGE) ||
+					if ((myTypes[index].type == BuildMLTransferType.TYPE_PACKAGE) ||
 							(myTypes[index].type == BuildMLTransferType.TYPE_PACKAGE_FOLDER)) {
 						
 						/* perform the drop - on failure, skip to next element */
@@ -179,48 +160,6 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		}
 		
 		/* transfer probably succeeded (although individual drops may have failed) */
-		return true;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Perform a drop of a UIAction into a UIPackage. This has the effect of changing the
-	 * package that the action is contained within.
-	 * 
-	 * @param droppedObj BuildStore actionId of the action being dropped.
-	 * @param targetObj BuildStore packageId of the package being dropped into.
-	 * @return True on success, or false if the drop failed for any reason.
-	 */
-	private boolean performDropUIAction(BuildMLTransferType droppedObj, UIInteger targetObj) {
-
-		int targetPackageId = targetObj.getId();
-		int droppedActionId = droppedObj.id;
-		
-		/* 
-		 * We can only drop UIAction into real packages (not folders), and not into the 
-		 * <import> package.
-		 */
-		if (!pkgMgr.isValid(targetPackageId) || pkgMgr.isFolder(targetPackageId) ||
-				(targetPackageId == pkgMgr.getImportPackage())) {
-			return false;
-		}
-		
-		/* determine the action's current package */
-		PackageDesc currentPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_ACTION, droppedActionId);
-		if (currentPackage == null) {
-			return false;
-		}
-				
-		/* 
-		 * Record the undo/redo information. This will also move the action into the destination
-		 * package. We have no refreshing or updating to do, since the ActionMgr will notify any
-		 * listeners of the change and they can refresh themselves if needed.
-		 */
-		ActionUndoOp operation = new ActionUndoOp(buildStore, droppedActionId);
-		operation.recordPackageChange(currentPackage.pkgId, targetPackageId);
-		new UndoOpAdapter("Change Package", operation).invoke();
-		
 		return true;
 	}
 
