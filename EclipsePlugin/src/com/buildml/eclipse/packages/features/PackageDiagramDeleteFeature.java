@@ -21,16 +21,17 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.pattern.IPattern;
 
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.DiagramFeatureProvider;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.FileGroupUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 
 /**
  * A customized "DeleteFeature" that calls upon the appropriate Pattern to do the work
@@ -243,25 +244,27 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		/* If there's filter, delete it */
 		if (connection.hasFilter()) {
 			
-			BmlMultiOperation multiOp = new BmlMultiOperation("Delete Filter");
+			MultiUndoOp multiOp = new MultiUndoOp();
 			
 			/* set the action's slot to refer to the filter's predecessor */
-			ActionChangeOperation actionOp = new ActionChangeOperation("", connection.getActionId());
+			ActionUndoOp actionOp = new ActionUndoOp(buildStore, connection.getActionId());
 			actionOp.recordSlotChange(connection.getSlotId(), connection.getFilterGroupId(), 
 									connection.getFileGroupId());
 			multiOp.add(actionOp);
 			
 			/* set the filter group's content to empty, so it'll be garbage collected upon shutdown */
 			emptyFilterGroup(multiOp, connection.getFilterGroupId());
-			multiOp.recordAndInvoke();
+			
+			/* record and invoke the undo/redo operation */
+			new UndoOpAdapter("Delete Filter", multiOp).invoke();
 		}
 		
 		/* no filter, so delete the connection */
 		else {
 			/* create an undo/redo operation to set the slot value back to null */
-			ActionChangeOperation op = new ActionChangeOperation("Delete Connection", connection.getActionId());
+			ActionUndoOp op = new ActionUndoOp(buildStore, connection.getActionId());
 			op.recordSlotChange(connection.getSlotId(), connection.getFileGroupId(), null);
-			op.recordAndInvoke();
+			new UndoOpAdapter("Delete Connection", op).invoke();
 		}
 	}
 
@@ -294,22 +297,22 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		 * If there's a filter, remove that only.
 		 */
 		if (connection.hasFilter()) {
-			BmlMultiOperation multiOp = new BmlMultiOperation("Delete Filter");
+			MultiUndoOp multiOp = new MultiUndoOp();
 			
 			/* replace the merge group's "index" entry with the filter group's predecessor */
-			FileGroupChangeOperation mergeGroupOp = new FileGroupChangeOperation("", mergeFileGroupId);
+			FileGroupUndoOp mergeGroupOp = new FileGroupUndoOp(buildStore, mergeFileGroupId);
 			Integer members[] = fileGroupMgr.getSubGroups(mergeFileGroupId);
 			ArrayList<Integer> currentMembers = new ArrayList<Integer>(Arrays.asList(members));
 			ArrayList<Integer> newMembers = new ArrayList<Integer>(currentMembers);
 			newMembers.set(index, subFileGroupId);
-			mergeGroupOp.recordMembershipChange(currentMembers, newMembers);
-			mergeGroupOp.recordAndInvoke();
-			
+			mergeGroupOp.recordMembershipChange(currentMembers, newMembers);			
 			multiOp.add(mergeGroupOp);
 			
 			/* set the filter group's content to empty, so it'll be garbage collected upon shutdown */
 			emptyFilterGroup(multiOp, connection.getFilterGroupId());
-			multiOp.recordAndInvoke();			
+			
+			/* record and invoke the operation */
+			new UndoOpAdapter("Delete Filter", multiOp).invoke();
 		}
 		
 		/*
@@ -317,13 +320,15 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 		 */
 		else {
 			/* our new membership will be the same as the current membership, with subFileGroupId removed */
-			FileGroupChangeOperation op = new FileGroupChangeOperation("Delete Connection", mergeFileGroupId);
+			FileGroupUndoOp op = new FileGroupUndoOp(buildStore, mergeFileGroupId);
 			Integer members[] = fileGroupMgr.getSubGroups(mergeFileGroupId);
 			ArrayList<Integer> currentMembers = new ArrayList<Integer>(Arrays.asList(members));
 			ArrayList<Integer> newMembers = new ArrayList<Integer>(currentMembers);
 			newMembers.remove(index);		
 			op.recordMembershipChange(currentMembers, newMembers);
-			op.recordAndInvoke();
+			
+			/* record and invoke the operation */
+			new UndoOpAdapter("Delete Connection", op).invoke();
 		}
 	}
 	
@@ -331,11 +336,12 @@ public class PackageDiagramDeleteFeature implements IDeleteFeature {
 
 	/**
 	 * Helper method for creating the undo/redo commands for emptying a filter file group.
+	 * 
 	 * @param multiOp	The BmlMultiOperation to append the commands to.
 	 * @param groupId	The filter group's ID.
 	 */
-	private void emptyFilterGroup(BmlMultiOperation multiOp, int groupId) {
-		FileGroupChangeOperation fileGroupOp = new FileGroupChangeOperation("", groupId);
+	private void emptyFilterGroup(MultiUndoOp multiOp, int groupId) {
+		FileGroupUndoOp fileGroupOp = new FileGroupUndoOp(buildStore, groupId);
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		String currentMembers[] = fileGroupMgr.getPathStrings(groupId);
 		if (currentMembers != null) {

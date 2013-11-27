@@ -14,7 +14,6 @@ package com.buildml.eclipse.packages.patterns;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,20 +45,17 @@ import org.eclipse.graphiti.util.IColorConstant;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.widgets.Display;
 
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.actions.dialogs.SlotSelectionDialog;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileGroup;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.packages.layout.LeftRightBounds;
 import com.buildml.eclipse.packages.layout.PictogramSize;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.BmlAbstractOperation;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
@@ -71,6 +67,9 @@ import com.buildml.model.ISlotTypes;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.FileGroupUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -347,9 +346,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					@Override
 					public void run() {
 						multiAddFileGroup = null;
-						FileGroupChangeOperation op = new FileGroupChangeOperation("Create New File Group", fileGroupId);
+						FileGroupUndoOp op = new FileGroupUndoOp(buildStore, fileGroupId);
 						op.recordMembershipChange(initialMembers, currentMembers);
-						op.recordAndInvoke();
+						new UndoOpAdapter("Create New File Group", op).invoke();
 					}
 				});
 					
@@ -393,9 +392,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 						@Override
 						public void run() {
 							multiAddFileGroup = null;
-							FileGroupChangeOperation op = new FileGroupChangeOperation("Modify File Group", fileGroupId);
+							FileGroupUndoOp op = new FileGroupUndoOp(buildStore, fileGroupId);
 							op.recordMembershipChange(initialMembers, currentMembers);
-							op.recordAndInvoke();
+							new UndoOpAdapter("Modify File Group", op).invoke();
 						}
 					});
 				}
@@ -565,9 +564,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			}
 		
 			/* create an undo/redo operation that will invoke the underlying database changes */
-			FileGroupChangeOperation op = new FileGroupChangeOperation("Move File Group", fileGroupId);
+			FileGroupUndoOp op = new FileGroupUndoOp(buildStore, fileGroupId);
 			op.recordLocationChange(oldXY.x, oldXY.y, x, y);
-			op.recordAndInvoke();
+			new UndoOpAdapter("Move File Group", op).invoke();
 		}
 		
 		else {
@@ -614,22 +613,22 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		int fileGroupId = fileGroup.getId();
 		
 		/* add the "delete" operation to our redo/undo stack */
-		BmlMultiOperation opMain = new BmlMultiOperation("Delete File Group");
+		MultiUndoOp multiOp = new MultiUndoOp();
 		
 		/* first, delete all slots that refer to this file group */
 		MemberDesc neighbours[] = pkgMemberMgr.getNeighboursOf(
 				IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId, IPackageMemberMgr.NEIGHBOUR_ANY, false);
 		for (int i = 0; i < neighbours.length; i++) {
-			removeReferenceFromNeighbour(opMain, fileGroupId, neighbours[i].memberType, neighbours[i].memberId);
+			removeReferenceFromNeighbour(multiOp, fileGroupId, neighbours[i].memberType, neighbours[i].memberId);
 		}
 		
 		/* now delete the file group itself */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("", fileGroupId);
+		FileGroupUndoOp op = new FileGroupUndoOp(buildStore, fileGroupId);
 		op.recordMembershipChange(getFileGroupAsArrayList(fileGroupId), new ArrayList<Integer>());
-		opMain.add(op);
+		multiOp.add(op);
 		
 		/* invoke all changes in one step... */
-		opMain.recordAndInvoke();
+		new UndoOpAdapter("Delete File Group", multiOp).invoke();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -703,9 +702,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 		 * If this operation is "undoned" then the group will still exist in the
 		 * database, but will have no members and therefore won't be shown.
 		 */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("Create Merge Group", mergeFileGroupId);		
+		FileGroupUndoOp op = new FileGroupUndoOp(buildStore, mergeFileGroupId);		
 		op.recordMembershipChange(new ArrayList<Integer>(), subGroupIds);
-		op.recordAndInvoke();
+		new UndoOpAdapter("Create Merge Group", op).invoke();
 	}
 	
 	/*=====================================================================================*
@@ -716,12 +715,12 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * Given that a UIFileGroup is being deleted, we need to go through and first remove the
 	 * connection to any neighbours who reference this file group.
 	 * 
-	 * @param opMain		The undo/redo multi-operation to add our "delete connections" to.
+	 * @param multiOp		The undo/redo multi-operation to add our "delete connections" to.
 	 * @param fileGroupId	The ID of the file group that has been removed.
 	 * @param memberType	The type of neighbour (IPackageMemberMgr.TYPE_ACTION, etc).
 	 * @param memberId		The ID of the neighbour (e.g. actionId).
 	 */
-	private void removeReferenceFromNeighbour(BmlMultiOperation opMain,
+	private void removeReferenceFromNeighbour(MultiUndoOp multiOp,
 			int fileGroupId, int memberType, int memberId) {
 
 		/*
@@ -743,9 +742,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 					Object slotValue = actionMgr.getSlotValue(memberId, slotId);
 					if (slotValue instanceof Integer) {
 						if (slotValue.equals(Integer.valueOf(fileGroupId))) {
-							ActionChangeOperation op = new ActionChangeOperation("Delete Connection", memberId);
+							ActionUndoOp op = new ActionUndoOp(buildStore, memberId);
 							op.recordSlotRemove(slotId, fileGroupId);
-							opMain.add(op);
+							multiOp.add(op);
 						}
 					}
 				}
@@ -766,9 +765,9 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 						List<Integer> oldMembers = Arrays.asList(members);
 						List<Integer> newMembers = new ArrayList<Integer>(Arrays.asList(members));
 						while (newMembers.remove(Integer.valueOf(fileGroupId))) { /* remove delete group multiple times? */};
-						FileGroupChangeOperation op = new FileGroupChangeOperation("", memberId);
+						FileGroupUndoOp op = new FileGroupUndoOp(buildStore, memberId);
 						op.recordMembershipChange(oldMembers, newMembers);
-						opMain.add(op);
+						multiOp.add(op);
 						break;
 					}
 				}
@@ -1043,7 +1042,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * @param moveNow		True if this method should invoke the moves (false simply
 	 *                      adds the details to operation).
 	 */
-	private void bumpPictogramsRight(BmlMultiOperation multiOp, int fileGroupId,
+	private void bumpPictogramsRight(MultiUndoOp multiOp, int fileGroupId,
 			int actionId, int slotId, boolean moveNow) {
 
 		/* determine whether the slot was INPUT or OUTPUT */
@@ -1099,8 +1098,8 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			}
 			
 			/* record an undo/redo operation that will actually change the slot value */
-			BmlMultiOperation multiOp = new BmlMultiOperation("Connect File Group");
-			ActionChangeOperation op = new ActionChangeOperation("", actionId);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
 			op.recordSlotChange(slotId, currentValue, Integer.valueOf(fileGroupId));
 			multiOp.add(op);
 			
@@ -1108,7 +1107,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			bumpPictogramsRight(multiOp, fileGroupId, actionId, slotId, true);
 			
 			/* record these operations for future undo/redo operations */
-			multiOp.recordOnly();
+			new UndoOpAdapter("Connect File Group", multiOp).record();
 		}
 	}
 	
@@ -1155,8 +1154,8 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			 * Now record the membership change in an operation, so we can undo/redo it later. This
 			 * may also involve bumping pictograms to the right.
 			 */
-			BmlMultiOperation multiOp = new BmlMultiOperation("Add to Merge Group");
-			FileGroupChangeOperation op = new FileGroupChangeOperation("", targetFileGroupId);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			FileGroupUndoOp op = new FileGroupUndoOp(buildStore, targetFileGroupId);
 			ArrayList<Integer> newMembers = getFileGroupAsArrayList(targetFileGroupId);
 			op.recordMembershipChange(currentMembers, newMembers);
 			multiOp.add(op);
@@ -1165,7 +1164,7 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 			layoutAlgorithm.bumpPictogramsRight(multiOp, IPackageMemberMgr.TYPE_FILE_GROUP, sourceFileGroupId, true);
 			
 			/* record, but don't execute now, since we've already added the members and bumped the pictograms */
-			multiOp.recordOnly();
+			new UndoOpAdapter("Add to Merge Group", multiOp).record();
 			
 			return;
 		}

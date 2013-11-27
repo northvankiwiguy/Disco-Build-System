@@ -6,11 +6,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
+import com.buildml.model.undo.ActionUndoOp;
 
 /**
  * An Eclipse "property" page that allows viewing/editing of a shell action's command
@@ -104,9 +105,9 @@ public class ActionShellCommandPage extends BmlPropertyPage {
 	public boolean performOk() {
 		
 		/* create an undo/redo operation that will invoke the underlying database changes */
-		ActionChangeOperation op = new ActionChangeOperation("change action", actionId);
+		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
 		op.recordCommandChange(getShellCommandValue(), textField.getText());
-		op.recordAndInvoke();
+		new UndoOpAdapter("Change Action", op).invoke();
 		return super.performOk();
 	}
 	

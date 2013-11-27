@@ -12,7 +12,6 @@
 
 package com.buildml.eclipse.packages.patterns;
 
-import java.util.ArrayList;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -39,27 +38,24 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
 
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIAction;
-import com.buildml.eclipse.bobj.UIFileActionConnection;
-import com.buildml.eclipse.bobj.UIFileGroup;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.packages.layout.LeftRightBounds;
 import com.buildml.eclipse.packages.layout.PictogramSize;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.ISlotTypes;
-import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -228,9 +224,6 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 
 		Diagram targetDiagram = (Diagram) context.getTargetContainer();
 		
-		int actionTypeId = actionMgr.getActionType(actionId);
-		String actionTypeName = actionTypeMgr.getName(actionTypeId);
-
 		/*
 		 * How many ellipses will be shown? This illustrate whether it's
 		 * a regular action, or a multi-action.
@@ -452,9 +445,9 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		}
 		
 		/* create an undo/redo operation that will invoke the underlying database changes */
-		ActionChangeOperation op = new ActionChangeOperation("move action", actionId);
+		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
 		op.recordLocationChange(oldXY.x, oldXY.y, x, y);
-		op.recordAndInvoke();
+		new UndoOpAdapter("Move Action", op).invoke();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -495,7 +488,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		}
 		
 		/* add the "delete" operation to our redo/undo stack */
-		BmlMultiOperation opMain = new BmlMultiOperation("Delete Action");
+		MultiUndoOp multiOp = new MultiUndoOp();
 		
 		/* 
 		 * first, delete all of this action's slots that refer to file groups.
@@ -510,20 +503,20 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 				int slotId = slots[i].slotId;
 				Object slotValue = actionMgr.getSlotValue(actionId, slotId);
 				if (slotValue instanceof Integer) {
-					ActionChangeOperation op = new ActionChangeOperation("Delete Connection", actionId);
+					ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
 					op.recordSlotRemove(slotId, slotValue);
-					opMain.add(op);
+					multiOp.add(op);
 				}
 			}
 		}
 		
 		/* now delete the action itself */
-		ActionChangeOperation op = new ActionChangeOperation("Delete Action", actionId);
+		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
 		op.recordMoveToTrash();
-		opMain.add(op);
+		multiOp.add(op);
 		
 		/* invoke all changes in one step... */
-		opMain.recordAndInvoke();
+		new UndoOpAdapter("Delete Action", multiOp).invoke();
 	}
 
 	/*-------------------------------------------------------------------------------------*/

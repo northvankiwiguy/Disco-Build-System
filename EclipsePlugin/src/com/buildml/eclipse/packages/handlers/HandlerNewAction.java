@@ -17,19 +17,20 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -80,8 +81,8 @@ public class HandlerNewAction extends AbstractHandler {
 		pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, pkgId);
 		
 		/* add the creation of the new action to the undo/redo stack */
-		BmlMultiOperation multiOp = new BmlMultiOperation("New Action");
-		ActionChangeOperation newActionOp = new ActionChangeOperation("", actionId);
+		MultiUndoOp multiOp = new MultiUndoOp();
+		ActionUndoOp newActionOp = new ActionUndoOp(buildStore, actionId);
 		newActionOp.recordNewAction();
 		multiOp.add(newActionOp);
 		
@@ -102,7 +103,7 @@ public class HandlerNewAction extends AbstractHandler {
 			/* successfully added */
 			else {
 				/* record this slot change in our undo/redo stack */ 
-				ActionChangeOperation newSlotOp = new ActionChangeOperation("", actionId);
+				ActionUndoOp newSlotOp = new ActionUndoOp(buildStore, actionId);
 				newSlotOp.recordSlotChange(slotId, null, fileGroupId);
 				multiOp.add(newSlotOp);
 				
@@ -123,7 +124,8 @@ public class HandlerNewAction extends AbstractHandler {
 			}
 		}
 
-		multiOp.recordOnly();
+		/* record this undo/redo operation, but don't invoke it - the work is already done */
+		new UndoOpAdapter("New Action", multiOp).record();
 		return null;
 	}
 

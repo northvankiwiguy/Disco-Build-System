@@ -10,25 +10,19 @@
  *        implementation and/or initial documentation
  *******************************************************************************/ 
 
-package com.buildml.eclipse.actions;
+package com.buildml.model.undo;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
-import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.utils.BmlAbstractOperation;
-import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 
 /**
- * An undo/redo operation for any change that is made to an Action. This object records
- * the change in the undo/redo stack, allowing changes to actionMgr to be made and unmade.
+ * An undo/redo operation for any change that is made to an Action. This object records the
+ * details of the changes necessary to the IBuildStore so they can be undone or redone later.
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class ActionChangeOperation extends BmlAbstractOperation {
+public class ActionUndoOp implements IUndoOp {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -45,7 +39,10 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	private final static int REMOVED_SLOT     = 16;
 	private final static int MOVED_TO_TRASH   = 32;
 	private final static int NEW_ACTION       = 64;
-		
+
+	/** The IBuildStore we're operating on */
+	private IBuildStore buildStore;
+
 	/** The ID of the action being changed */
 	private int actionId;
 	
@@ -84,15 +81,14 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	 *=====================================================================================*/
 
 	/**
-	 * Create a new ActionChangeOperation object, representing a single entry on the
+	 * Create a new {@link ActionUndoOp} object, representing a single entry on the
 	 * undo/redo stack.
 	 * 
-	 * @param label The text label to appear in the "Edit" menu, next to "Undo" or "Redo".
-	 * @param actionId The actionMgr ID of the action being changed.
+     * @param buildStore The IBuildStore we're operating on.
+   	 * @param actionId   The actionMgr ID of the action being changed.
 	 */
-	public ActionChangeOperation(String label, int actionId) {
-		super(label);
-		
+	public ActionUndoOp(IBuildStore buildStore, int actionId) {	
+		this.buildStore = buildStore;
 		this.actionId = actionId;
 	}
 
@@ -204,41 +200,12 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
-	
-	/**
-	 * Records the operation in the undo/redo stack, but only if there's an actual change
-	 * in the action.
-	 */
-	@Override
-	public void recordAndInvoke() {
-		if (changedFields != 0) {
-			super.recordAndInvoke();
-		}
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-	
-	/**
-	 * Records the operation in the undo/redo stack, but only if there's an actual change
-	 * in the action. Do not execute the operation, since it's assumed to have already been
-	 * performed.
-	 */
-	@Override
-	public void recordOnly() {
-		if (changedFields != 0) {
-			super.recordOnly();
-		}
-	}
-	
-	/*=====================================================================================*
-	 * PROTECTED METHODS
-	 *=====================================================================================*/
 
 	/* (non-Javadoc)
 	 * @see com.buildml.eclipse.utils.BmlAbstractOperation#undo()
 	 */
 	@Override
-	protected IStatus undo() throws ExecutionException {
+	public boolean undo() {
 		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		
@@ -272,14 +239,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 			actionMgr.moveActionToTrash(actionId);
 		}
 
-		/* if there's a change, mark the editor as dirty */
-		if (changedFields != 0) {
-			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
-			if (editor != null) {
-				editor.markDirty();
-			}
-		}
-		return Status.OK_STATUS;
+		return (changedFields != 0);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -288,7 +248,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 	 * @see com.buildml.eclipse.utils.BmlAbstractOperation#redo()
 	 */
 	@Override
-	protected IStatus redo() throws ExecutionException {
+	public boolean redo() {
 		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
 
@@ -327,14 +287,7 @@ public class ActionChangeOperation extends BmlAbstractOperation {
 			actionMgr.reviveActionFromTrash(actionId);
 		}
 		
-		/* if there's a change, mark the editor as dirty */
-		if (changedFields != 0) {
-			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
-			if (editor != null) {
-				editor.markDirty();
-			}
-		}
-		return Status.OK_STATUS;
+		return (changedFields != 0);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

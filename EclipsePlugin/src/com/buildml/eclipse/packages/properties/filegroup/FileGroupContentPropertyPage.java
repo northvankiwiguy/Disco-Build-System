@@ -23,11 +23,12 @@ import org.eclipse.swt.widgets.Listener;
 
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.bobj.UIInteger;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.dialogs.VFSTreeSelectionDialog;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.undo.FileGroupUndoOp;
 
 /**
  * An Eclipse "property" page that allows viewing/editing of file group's content.
@@ -86,9 +87,9 @@ public class FileGroupContentPropertyPage extends BmlPropertyPage {
 	public boolean performOk() {
 		
 		/* create an undo/redo operation that will invoke the underlying database changes */
-		FileGroupChangeOperation op = new FileGroupChangeOperation("Modify File Group", fileGroupId);
+		FileGroupUndoOp op = new FileGroupUndoOp(buildStore, fileGroupId);
 		op.recordMembershipChange(initialMembers, currentMembers);
-		op.recordAndInvoke();
+		new UndoOpAdapter("Modify File Group", op).invoke();
 		return super.performOk();
 	}
 

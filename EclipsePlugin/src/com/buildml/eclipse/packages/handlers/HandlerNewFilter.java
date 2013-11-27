@@ -21,21 +21,21 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIConnection;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.properties.ConnectionPropertyPage;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.FileGroupUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 
 /**
  * An Eclipse UI Handler for managing the "New Filter" UI command.
@@ -67,7 +67,7 @@ public class HandlerNewFilter extends AbstractHandler {
 		UIConnection bo = (UIConnection)selectedObjects.get(0);
 		
 		/* all our steps to create a filter must be recorded in the undo/redo stack */
-		BmlMultiOperation multiOp = new BmlMultiOperation("Add Filter");
+		MultiUndoOp multiOp = new MultiUndoOp();
 		
 		/*
 		 * Handle addition of new filter between a file group and an INPUT slot for
@@ -88,7 +88,7 @@ public class HandlerNewFilter extends AbstractHandler {
 			}
 			
 			/* modify the action's slot so it now refers to our new filter group */
-			ActionChangeOperation actionOp = new ActionChangeOperation("", actionId);
+			ActionUndoOp actionOp = new ActionUndoOp(buildStore, actionId);
 			int oldSlotId = (Integer)actionMgr.getSlotValue(actionId, slotId);
 			actionOp.recordSlotChange(slotId, oldSlotId, filterGroupId);
 			multiOp.add(actionOp);
@@ -112,7 +112,7 @@ public class HandlerNewFilter extends AbstractHandler {
 			}
 			
 			/* modify the members of the merge group so that "index" entry now refers to the filter */
-			FileGroupChangeOperation fileGroupOp = new FileGroupChangeOperation("", targetFileGroupId);
+			FileGroupUndoOp fileGroupOp = new FileGroupUndoOp(buildStore, targetFileGroupId);
 			Integer currentMembers[] = fileGroupMgr.getSubGroups(targetFileGroupId);
 			Integer newMembers[] = currentMembers.clone();
 			newMembers[index] = filterGroupId;

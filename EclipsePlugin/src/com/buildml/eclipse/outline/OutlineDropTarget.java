@@ -18,14 +18,15 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import com.buildml.eclipse.MainEditor;
-import com.buildml.eclipse.actions.ActionChangeOperation;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
 import com.buildml.eclipse.utils.dnd.BuildMLTransferType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
+import com.buildml.model.undo.ActionUndoOp;
 import com.buildml.model.IPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
@@ -185,7 +186,7 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 
 	/**
 	 * Perform a drop of a UIAction into a UIPackage. This has the effect of changing the
-	 * package that the actiobn is contained within.
+	 * package that the action is contained within.
 	 * 
 	 * @param droppedObj BuildStore actionId of the action being dropped.
 	 * @param targetObj BuildStore packageId of the package being dropped into.
@@ -216,9 +217,9 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		 * package. We have no refreshing or updating to do, since the ActionMgr will notify any
 		 * listeners of the change and they can refresh themselves if needed.
 		 */
-		ActionChangeOperation operation = new ActionChangeOperation("change package", droppedActionId);
+		ActionUndoOp operation = new ActionUndoOp(buildStore, droppedActionId);
 		operation.recordPackageChange(currentPackage.pkgId, targetPackageId);
-		operation.recordAndInvoke();
+		new UndoOpAdapter("Change Package", operation).invoke();
 		
 		return true;
 	}

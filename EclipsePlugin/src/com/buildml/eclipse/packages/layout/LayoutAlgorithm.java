@@ -14,16 +14,16 @@ package com.buildml.eclipse.packages.layout;
 
 import java.util.ArrayList;
 
-import com.buildml.eclipse.actions.ActionChangeOperation;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
 import com.buildml.eclipse.packages.patterns.ActionPattern;
 import com.buildml.eclipse.packages.patterns.FileGroupPattern;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.FileGroupUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 
 /**
  * A support object for managing the layout of members on a BuildML package diagram.
@@ -161,7 +161,7 @@ public class LayoutAlgorithm {
 	 * @param moveNow		True if we should do the move operations now, or false to let the
 	 * 						undo/redo operation handle it later.
 	 */
-	public void bumpPictogramsRight(BmlMultiOperation multiOp,
+	public void bumpPictogramsRight(MultiUndoOp multiOp,
 			int memberType, int memberId, boolean moveNow) {
 
 		/* 
@@ -192,7 +192,7 @@ public class LayoutAlgorithm {
 	 * @param multiOp	The multi-undo/redo operation to append "move" operations to.
 	 * @param pkgId		The ID of the package to auto-layout.
 	 */
-	public void autoLayoutPackage(BmlMultiOperation multiOp, int pkgId) {
+	public void autoLayoutPackage(MultiUndoOp multiOp, int pkgId) {
 		
 		/* initialize the data structure we'll use for sorting package members */
 		ArrayList<ArrayList<MemberDesc>> layoutGrid = new ArrayList<ArrayList<MemberDesc>>();
@@ -241,7 +241,7 @@ public class LayoutAlgorithm {
 	 * @param x				The current member's x-coordinate.
 	 * @param y				y-coordinate (not used for now)
 	 */
-	private void bumpPictogramsRightHelper(BmlMultiOperation multiOp,
+	private void bumpPictogramsRightHelper(MultiUndoOp multiOp,
 			int memberType, int memberId, boolean moveNow, int x, int y) {
 
 		/* allow for the width of the pictogram, and some extra padding */
@@ -292,16 +292,16 @@ public class LayoutAlgorithm {
 	 * @param newX			The member's new X coordinate.
 	 * @param newY			The member's old Y coordinate.
 	 */
-	private void addMemberMoveToHistory(BmlMultiOperation multiOp, int memberType, int memberId, 
+	private void addMemberMoveToHistory(MultiUndoOp multiOp, int memberType, int memberId, 
 										int oldX,int oldY, int newX, int newY) {
 		
 		if (memberType == IPackageMemberMgr.TYPE_ACTION) {
-			ActionChangeOperation op = new ActionChangeOperation("", memberId);
+			ActionUndoOp op = new ActionUndoOp(buildStore, memberId);
 			op.recordLocationChange(oldX, oldY, newX, newY);
 			multiOp.add(op);
 			
 		} else if (memberType == IPackageMemberMgr.TYPE_FILE_GROUP) {
-			FileGroupChangeOperation op = new FileGroupChangeOperation("", memberId);
+			FileGroupUndoOp op = new FileGroupUndoOp(buildStore, memberId);
 			op.recordLocationChange(oldX, oldY, newX, newY);
 			multiOp.add(op);
 			
@@ -518,7 +518,7 @@ public class LayoutAlgorithm {
 	 * @param multiOp 		The multi-undo/redo operation to add all the move operations to.	
 	 * @param layoutGrid 	The layout grid that contains all the members.
 	 */
-	private void recordAutoLayoutOperations(BmlMultiOperation multiOp, 
+	private void recordAutoLayoutOperations(MultiUndoOp multiOp, 
 											ArrayList<ArrayList<MemberDesc>> layoutGrid) {
 		
 		/* for each column in the layout grid... */

@@ -32,13 +32,14 @@ import org.eclipse.swt.widgets.List;
 import com.buildml.eclipse.bobj.UIConnection;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
-import com.buildml.eclipse.filegroups.FileGroupChangeOperation;
-import com.buildml.eclipse.utils.BmlMultiOperation;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.undo.FileGroupUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.utils.regex.BmlRegex;
 import com.buildml.utils.regex.RegexChain;
 
@@ -136,19 +137,19 @@ public class ConnectionPropertyPage extends BmlPropertyPage {
 		if (connection.hasFilter()) {
 
 			/* create an undo/redo operation that will invoke the underlying database changes */
-			FileGroupChangeOperation op = new FileGroupChangeOperation("Modify Filter", filterFileGroupId);
+			FileGroupUndoOp op = new FileGroupUndoOp(buildStore, filterFileGroupId);
 			op.recordMembershipChange(initialFilterFilePaths, filterFilePaths);
 
 			/* If this properties dialog was invoked as part of the "add filter" operation? */
-			BmlMultiOperation creationMultiOp = connection.getUndoRedoOperation();
+			MultiUndoOp creationMultiOp = connection.getUndoRedoOperation();
 			if (creationMultiOp != null) {
 				creationMultiOp.add(op);
-				creationMultiOp.recordAndInvoke();
+				new UndoOpAdapter("Add Filter", creationMultiOp).invoke();
 			} 
 			
 			/* no, this is a standalone "properties" command, invoked via the "Properties" menu option */
 			else {
-				op.recordAndInvoke();
+				new UndoOpAdapter("Modify Filter", op).invoke();
 			}
 		}
 		return super.performOk();
