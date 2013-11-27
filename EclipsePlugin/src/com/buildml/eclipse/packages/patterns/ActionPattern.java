@@ -353,7 +353,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 	 */
 	@Override
 	public boolean update(IUpdateContext context) {
-		editor.refresh();
+		editor.getDiagramBehavior().refresh();
 		return super.update(context);
 	}
 

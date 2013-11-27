@@ -575,7 +575,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 				/* create a connection arrow between the file group and the action */
 				int actionId = ((UIAction)targetBo).getId();
 				moveOntoAction(fileGroupId, actionId);
-				((PackageDiagramEditor)getDiagramEditor()).refreshView(true);
 			}
 			
 			else if (targetBo instanceof UIFileGroup) {
@@ -583,7 +582,6 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 				/* create merge file groups */
 				int targetFileGroupId = ((UIFileGroup)targetBo).getId();
 				moveOntoFileGroup(fileGroupId, targetFileGroupId);
-				((PackageDiagramEditor)getDiagramEditor()).refreshView(true);						
 			}
 		}
 		

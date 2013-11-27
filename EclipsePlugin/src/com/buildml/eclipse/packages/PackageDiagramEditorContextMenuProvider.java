@@ -21,6 +21,7 @@ import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditorContextMenuProvider;
+import org.eclipse.graphiti.ui.platform.IConfigurationProvider;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.ui.actions.ActionFactory;
 
@@ -50,11 +51,11 @@ public class PackageDiagramEditorContextMenuProvider extends
 	 * Create a new {@link PackageDiagramEditorContextMenuProvider} object.
 	 * @param viewer
 	 * @param registry
-	 * @param diagramTypeProvider
+	 * @param configurationProvider
 	 */
 	public PackageDiagramEditorContextMenuProvider(EditPartViewer viewer,
-			ActionRegistry registry, IDiagramTypeProvider diagramTypeProvider) {
-		super(viewer, registry, diagramTypeProvider);
+			ActionRegistry registry, IConfigurationProvider configurationProvider) {
+		super(viewer, registry, configurationProvider);		
 		
 		ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) viewer.getRootEditPart();
 		zoomManager = rootEditPart.getZoomManager();

@@ -13,11 +13,8 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.gef.ContextMenuProvider;
-import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
-import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.graphiti.ui.editor.DiagramEditorContextMenuProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.dnd.Clipboard;
@@ -75,16 +72,16 @@ public class PackageDiagramEditor extends DiagramEditor
 	
 	/** The ID of the package we're displaying */
 	private int packageId;
-
-	/** The delegate object that Graphiti queries to see if our underlying model has changed */
-	private PackageEditorUpdateBehavior updateBehavior;
 	
 	/** The layout algorithm for determining the location of members on the package */
 	private LayoutAlgorithm layoutAlgorithm;
+	
+	/** The object (associated with this editor) that manages our behaviour */
+	private PackageDiagramBehaviour behaviour = null;
+	
+	/** The delegate object that Graphiti queries to see if our underlying model has changed */
+	private PackageEditorUpdateBehavior updateBehavior;
 
-	/** Provider for our context menu */
-	private PackageDiagramEditorContextMenuProvider contextMenuProvider = null;
-		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -456,30 +453,32 @@ public class PackageDiagramEditor extends DiagramEditor
 		fileGroupMgr.removeListener(this);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.ui.editor.DiagramEditor#getDiagramBehavior()
+	 */
+	@Override
+	public DiagramBehavior getDiagramBehavior() {
+		return behaviour;
+	}
+	
 	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/
 
-	/**
-	 * Override the default persistency behaviour of this editor. This allows us to
-	 * generate the view by demand-loading from the database, rather than loading a
-	 * resource (file) from disk.
+	/* (non-Javadoc)
+	 * @see org.eclipse.graphiti.ui.editor.DiagramEditor#createDiagramBehavior()
 	 */
 	@Override
-	protected DefaultPersistencyBehavior createPersistencyBehavior() {
-		return new EditorPersistencyBehavior(this);
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Override the default update behaviour for this editor. This allows us to update
-	 * the diagram (pictogram) when the underlying model changes.
-	 */
-	@Override
-	protected DefaultUpdateBehavior createUpdateBehavior() {
-		updateBehavior = new PackageEditorUpdateBehavior(this);
-		return updateBehavior;
+	protected DiagramBehavior createDiagramBehavior() {
+		
+		/* figure out our editor behaviours */
+		if (behaviour == null) {
+			behaviour = new PackageDiagramBehaviour(this);
+			updateBehavior = (PackageEditorUpdateBehavior) behaviour.createUpdateBehavior();
+		}
+		return behaviour;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -494,21 +493,6 @@ public class PackageDiagramEditor extends DiagramEditor
 								
 		URI pkgURI = URI.createURI("buildml:" + packageId);
 		return new DiagramEditorInput(pkgURI, "com.buildml.eclipse.diagram.package.provider");
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.graphiti.ui.editor.DiagramEditor#createContextMenuProvider()
-	 */
-	@Override
-	protected ContextMenuProvider createContextMenuProvider() {
-		
-		if (contextMenuProvider == null) {
-			contextMenuProvider = new PackageDiagramEditorContextMenuProvider(
-				getGraphicalViewer(), getActionRegistry(), getDiagramTypeProvider());
-		}
-		return contextMenuProvider;
 	}
 
 	/*=====================================================================================*

@@ -102,7 +102,9 @@ public class UndoOpAdapter extends AbstractOperation {
 		
 		/* bring the appropriate sub-editor to the top */
 		if (!subEditor.isDisposed()) {
-			mainEditor.setActiveEditor(subEditor);
+			if (mainEditor.getActiveSubEditor() != subEditor) {
+				mainEditor.setActiveEditor(subEditor);
+			}
 		}
 
 		/* 
@@ -131,7 +133,9 @@ public class UndoOpAdapter extends AbstractOperation {
 
 		/* bring the appropriate sub-editor to the top */
 		if (!subEditor.isDisposed()) {
-			mainEditor.setActiveEditor(subEditor);
+			if (mainEditor.getActiveSubEditor() != subEditor) {
+				mainEditor.setActiveEditor(subEditor);
+			}
 		}
 		
 		/* 

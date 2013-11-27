@@ -13,6 +13,7 @@
 package com.buildml.eclipse.packages;
 
 import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 
 /**
@@ -41,10 +42,10 @@ public class PackageEditorUpdateBehavior extends DefaultUpdateBehavior {
 	 * Create a new PackageEditorUpdateBehavior instance, which controls the update/refresh
 	 * behaviour for PackageDiagramEditor.
 	 * 
-	 * @param diagramEditor The DiagramEditor that we provide the update behaviour for.
+	 * @param diagramBehaviour The behaviour class for this diagram.
 	 */
-	public PackageEditorUpdateBehavior(DiagramEditor diagramEditor) {
-		super(diagramEditor);
+	public PackageEditorUpdateBehavior(DiagramBehavior diagramBehaviour) {
+		super(diagramBehaviour);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -75,5 +76,17 @@ public class PackageEditorUpdateBehavior extends DefaultUpdateBehavior {
 		return result;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/*
+	 * This method is called whenever the diagram changes, and the underlying model changes.
+	 * The default behaviour is to ask the user what to do to resolve the conflict, but we
+	 * just return true to always refresh from the model (which will reset the Diagram).
+	 */
+	@Override
+	protected boolean handleDirtyConflict() {
+		return true;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

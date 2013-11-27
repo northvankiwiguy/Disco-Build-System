@@ -157,7 +157,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 	public boolean update(final IUpdateContext context) {
 				
 		/* determine our editor and BuildStore */
-		editor = (PackageDiagramEditor)getDiagramEditor();
+		editor = (PackageDiagramEditor)(getDiagramBehavior().getDiagramContainer());
 		buildStore = editor.getBuildStore();
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		actionMgr = buildStore.getActionMgr();
@@ -166,7 +166,7 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 		pkgId = editor.getPackageId();
 		
 		final ContainerShape container = (ContainerShape)context.getPictogramElement();
-        TransactionalEditingDomain editingDomain = getDiagramEditor().getEditingDomain();
+        TransactionalEditingDomain editingDomain = editor.getEditingDomain();
 
         /*
          * Add each of the Diagram elements. This must be done as part of a transaction.

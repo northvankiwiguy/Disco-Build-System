@@ -196,7 +196,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         }
         
         /* else, return the default tooltip */
-    	return super.getToolTip(ga);
+    	return (String) super.getToolTip(ga);
     }
 
     /*-------------------------------------------------------------------------------------*/

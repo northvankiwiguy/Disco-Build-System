@@ -21,10 +21,9 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 
 import com.buildml.eclipse.utils.ConversionUtils;
-import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
@@ -55,13 +54,12 @@ import com.buildml.utils.errors.ErrorCode;
 	/**
 	 * Create a new {@link EditorPersistencyBehavior} object.
 	 * 
-	 * @param diagramEditor The associated {@link DiagramEditor} that delegates responsibility
-	 * to this object.
+	 * @param diagramBehaviour The behaviour class for this diagram.
 	 */
-	public EditorPersistencyBehavior(DiagramEditor diagramEditor) {
-		super(diagramEditor);
+	public EditorPersistencyBehavior(DiagramBehavior diagramBehaviour) {
+		super(diagramBehaviour);
 
-		this.diagramEditor = (PackageDiagramEditor)diagramEditor;
+		this.diagramEditor = (PackageDiagramEditor)(diagramBehaviour.getDiagramContainer());
 	}
 
 	/*=====================================================================================*
@@ -90,7 +88,7 @@ import com.buildml.utils.errors.ErrorCode;
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		final Diagram diagram = peCreateService.createDiagram("com.buildml.eclipse.diagram.package", 
 															  "Package: " + pkgName, true);
-		final Resource resource = diagramEditor.getResourceSet().createResource(uri);
+		final Resource resource = diagramEditor.getDiagramBehavior().getResourceSet().createResource(uri);
 		
 		/*
 		 * Add the new "Diagram" object. This is the only thing we "load" since all other information
