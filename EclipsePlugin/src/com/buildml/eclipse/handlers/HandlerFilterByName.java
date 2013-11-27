@@ -3,22 +3,21 @@ package com.buildml.eclipse.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 
 import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.actions.ActionsEditor;
 import com.buildml.eclipse.files.FilesEditor;
-import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.NameFilterDialog;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IReportMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
+import com.buildml.model.undo.IUndoOp;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**
@@ -36,27 +35,28 @@ public class HandlerFilterByName extends AbstractHandler {
 	 * An undo/redo operation for recording changes in an editor's visibility state
 	 * when "filter by name" is used to modify the visible tree items.
 	 */
-	private class FilterOperation extends BmlAbstractOperation {
+	private class FilterOperation implements IUndoOp {
 
 		/** The existing visibility set, recording the state before the operation takes place. */
 		private IntegerTreeSet existingSet;
 
 		/** The new visibility set to put in place */
 		private IntegerTreeSet newSet;
+		
+		/** The SubEditor we're filtering the content of */
+		private ISubEditor subEditor;
 
 		/*--------------------------------------------------------------------------------*/
 
 		/**
 		 * Create a new FilterOperation object.
 		 * 
+		 * @param subEditor   The SubEditor we're filter the content of.
 		 * @param existingSet The visibility set, before the operation takes place.
-		 * @param newSet The visibility set to start using.
+		 * @param newSet      The visibility set to start using.
 		 */
-		public FilterOperation(IntegerTreeSet existingSet, IntegerTreeSet newSet) {
-			
-			/* set up the operation "label" that appears in the undo/redo menu */
-			super("Filter Items");
-			
+		public FilterOperation(ISubEditor subEditor, IntegerTreeSet existingSet, IntegerTreeSet newSet) {
+						
 			/* 
 			 * We need to make a copy of the visibility sets, since they'll be changing
 			 * and we need it to be constant.
@@ -64,6 +64,7 @@ public class HandlerFilterByName extends AbstractHandler {
 			try {
 				this.existingSet = (IntegerTreeSet) existingSet.clone();
 				this.newSet = (IntegerTreeSet) newSet.clone();
+				this.subEditor = subEditor;
 			} catch (CloneNotSupportedException e) {
 				/* can't happen */
 			}
@@ -75,7 +76,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Do, or redo an operation.
 		 */
 		@Override
-		public IStatus redo() throws ExecutionException {
+		public boolean redo() {
 			return useVisibilitySet(newSet);
 		}
 
@@ -85,7 +86,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Undo an operation.
 		 */
 		@Override
-		public IStatus undo() throws ExecutionException {
+		public boolean undo() {
 			return useVisibilitySet(existingSet);
 		}
 		
@@ -96,7 +97,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * @param setToUse The visibility set to use for this editor.
 		 * @return The status of the action.
 		 */
-		private IStatus useVisibilitySet(IntegerTreeSet setToUse) {
+		private boolean useVisibilitySet(IntegerTreeSet setToUse) {
 			
 			/* copy the set, since this will be used for making future changes */
 			IntegerTreeSet nextSet = null;
@@ -111,7 +112,7 @@ public class HandlerFilterByName extends AbstractHandler {
 				subEditor.setVisibilityFilterSet(nextSet);
 				subEditor.refreshView(true);
 			}
-			return Status.OK_STATUS;
+			return false;
 		}
 		
 		/*--------------------------------------------------------------------------------*/
@@ -127,9 +128,9 @@ public class HandlerFilterByName extends AbstractHandler {
 		
 		ISubEditor subEditor = EclipsePartUtils.getActiveSubEditor();
 		if (subEditor instanceof FilesEditor) {
-			return executeFilesEditor(event);
+			return executeFilesEditor((FilesEditor)subEditor, event);
 		} else if (subEditor instanceof ActionsEditor) {
-			return executeActionsEditor(event);
+			return executeActionsEditor((ActionsEditor)subEditor, event);
 		}
 		
 		/* for other editors, do nothing */
@@ -140,19 +141,14 @@ public class HandlerFilterByName extends AbstractHandler {
 
 	/**
 	 * Variant of execute() that's invoked if the current sub-editor is a FilesEditor.
-	 * @param event The UI command event.
+	 * 
+	 * @param subEditor   The FileEditor we're operating on. 
+	 * @param event       The UI command event.
 	 * @return Always null.
 	 * @throws ExecutionException Something bad happened.
 	 */
-	public Object executeFilesEditor(ExecutionEvent event) throws ExecutionException {
+	public Object executeFilesEditor(FilesEditor subEditor, ExecutionEvent event) throws ExecutionException {
 			
-		/*
-		 * Figure out which editor/sub-editor this event applies to.
-		 */
-		FilesEditor editor = EclipsePartUtils.getActiveFilesEditor();
-		if (editor == null) {
-			return null;
-		}
 		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
@@ -181,7 +177,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Depending on the selected mode, either merge or filter these files from the
 		 * current tab's file set. 
 		 */
-		FileSet currentFileSet = (FileSet) editor.getVisibilityFilterSet();
+		FileSet currentFileSet = (FileSet) subEditor.getVisibilityFilterSet();
 		switch (resultCode) {
 		
 		case NameFilterDialog.SELECT_ONLY_MATCHING_ITEMS:
@@ -217,8 +213,8 @@ public class HandlerFilterByName extends AbstractHandler {
 		
 		/* create a new undo/redo operation, for recording this change */
 		newVisibilitySet.populateWithParents();
-		FilterOperation operation = new FilterOperation(currentFileSet, newVisibilitySet);
-		operation.recordAndInvoke();
+		FilterOperation operation = new FilterOperation(subEditor, currentFileSet, newVisibilitySet);
+		new UndoOpAdapter("Filter Items", operation).invoke();
 		return null;
 	}
 
@@ -226,19 +222,14 @@ public class HandlerFilterByName extends AbstractHandler {
 
 	/**
 	 * Variant of execute() that's invoked if the current sub-editor is an ActionsEditor.
-	 * @param event The UI command event.
+	 * 
+	 * @param subEditor     The SubEditor we're filtering. 
+	 * @param event         The UI command event.
 	 * @return Always null.
 	 * @throws ExecutionException Something bad happened.
 	 */
-	public Object executeActionsEditor(ExecutionEvent event) throws ExecutionException {
+	public Object executeActionsEditor(ActionsEditor subEditor, ExecutionEvent event) throws ExecutionException {
 			
-		/*
-		 * Figure out which editor/sub-editor this event applies to.
-		 */
-		ActionsEditor editor = EclipsePartUtils.getActiveActionsEditor();
-		if (editor == null) {
-			return null;
-		}
 		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		IActionMgr actionsMgr = buildStore.getActionMgr();
 		IReportMgr reportMgr = buildStore.getReportMgr();
@@ -267,7 +258,7 @@ public class HandlerFilterByName extends AbstractHandler {
 		 * Depending on the selected mode, either merge or filter these actions from the
 		 * current tab's action set. 
 		 */
-		ActionSet currentActionSet = (ActionSet)editor.getVisibilityFilterSet();
+		ActionSet currentActionSet = (ActionSet)subEditor.getVisibilityFilterSet();
 		switch (resultCode) {
 		
 		case NameFilterDialog.SELECT_ONLY_MATCHING_ITEMS:
@@ -303,10 +294,10 @@ public class HandlerFilterByName extends AbstractHandler {
 		
 		/* create a new undo/redo operation, for recording this change */
 		newVisibilitySet.populateWithParents();
-		FilterOperation operation = new FilterOperation(currentActionSet, newVisibilitySet);
+		FilterOperation operation = new FilterOperation(subEditor, currentActionSet, newVisibilitySet);
 		
 		/* execute! */
-		operation.recordAndInvoke();
+		new UndoOpAdapter("Filter Items", operation).invoke();
 		return null;
 	}
 

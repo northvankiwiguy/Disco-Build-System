@@ -13,9 +13,10 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.ISubEditor;
-import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.errors.FatalError;
+import com.buildml.model.undo.IUndoOp;
 import com.buildml.utils.types.IntegerTreeSet;
 
 /**
@@ -35,7 +36,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 	 *
 	 * @author Peter Smith <psmith@arapiki.com>
 	 */
-	private class HideRevealOperation extends BmlAbstractOperation {
+	private class HideRevealOperation implements IUndoOp {
 
 		/** The existing visibility set, recording the state before the operation takes place. */
 		private IntegerTreeSet existingSet;
@@ -45,21 +46,22 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		
 		/** True if the items should be revealed, else false. */
 		private boolean revealState;
+		
+		/** The sub editor we're operating on */
+		private ISubEditor subEditor;
 
 		/*--------------------------------------------------------------------------------*/
 
 		/**
 		 * Create a new HideRevealOperation object.
 		 * 
+		 * @param subEditor   The sub editor we're operating on.
 		 * @param existingSet The visibility set, before the operation takes place.
 		 * @param changesToMake The items that need to be modified (revealed/hidden).
 		 * @param revealState True if the items should be revealed, else false.
 		 */
-		public HideRevealOperation(IntegerTreeSet existingSet, 
+		public HideRevealOperation(ISubEditor subEditor, IntegerTreeSet existingSet, 
 								   List<Object> changesToMake, boolean revealState) {
-			
-			/* set up the operation "label" that appears in the undo/redo menu */
-			super(revealState ? "Reveal Items" : "Hide Items");
 			
 			/* 
 			 * We need to make a copy of the visibility set, since it'll be changing
@@ -74,6 +76,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 			/* save these for later undos/redos */
 			this.changesToMake = changesToMake;
 			this.revealState = revealState;
+			this.subEditor = subEditor;
 		}
 
 		/*--------------------------------------------------------------------------------*/
@@ -82,7 +85,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		 * Do, or redo an operation.
 		 */
 		@Override
-		public IStatus redo() throws ExecutionException {
+		public boolean redo() {
 
 			/* mark all the selected items with their new state */
 			if (!subEditor.isDisposed()) {
@@ -90,7 +93,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 					subEditor.setItemVisibilityState(item, revealState);
 				}
 			}
-			return Status.OK_STATUS;
+			return false;
 		}
 
 		/*--------------------------------------------------------------------------------*/
@@ -99,7 +102,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		 * Undo an operation.
 		 */
 		@Override
-		public IStatus undo() throws ExecutionException {
+		public boolean undo() {
 			
 			/* Make a copy of the set, so that our copy stays intact */
 			IntegerTreeSet revertedSet = null;
@@ -117,7 +120,7 @@ public class HandlerHideRevealPath extends AbstractHandler {
 				subEditor.setVisibilityFilterSet(revertedSet);
 				subEditor.refreshView(true);
 			}
-			return Status.OK_STATUS;
+			return false;
 		}
 
 	}
@@ -160,8 +163,8 @@ public class HandlerHideRevealPath extends AbstractHandler {
 		
 		/* create a new undo/redo operation, for recording this change */
 		HideRevealOperation operation = 
-				new HideRevealOperation(existingVisibleItems, listOfChanges, revealState); 
-		operation.recordAndInvoke();
+				new HideRevealOperation(subEditor, existingVisibleItems, listOfChanges, revealState); 
+		new UndoOpAdapter(revealState ? "Reveal Items" : "Hide Items", operation).invoke();
 		
 		return null;
 	}
