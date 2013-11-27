@@ -24,6 +24,7 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
@@ -124,6 +125,10 @@ public class TestImportRefactorMoveToPackage {
 		f7 = fileMgr.addFile("/a/b/file7");
 		f8 = fileMgr.addFile("/a/b/file8");
 		a1 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a1");
+		actionMgr.addFileAccess(a1, f4, OperationType.OP_READ);
+		actionMgr.addFileAccess(a1, f5, OperationType.OP_READ);
+		actionMgr.addFileAccess(a2, f6, OperationType.OP_READ);
+		actionMgr.addFileAccess(a2, f7, OperationType.OP_READ);
 		a2 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a2");
 		fg1 = fileGroupMgr.newSourceGroup(srcPkgId);
 		fg2 = fileGroupMgr.newSourceGroup(srcPkgId);
@@ -188,6 +193,35 @@ public class TestImportRefactorMoveToPackage {
 			resultList.add(newMember);
 		}
 		return resultList;
+	}
+	
+
+	/**
+	 * Helper method for comparing a file group's content against it's expected
+	 * membership. The ordering of the members is ignored, and duplicates will
+	 * not be accounted for correctly.
+	 * 
+	 * @param fileGroupId	The ID of the file group.
+	 * @param expected		An array of expected ID values.
+	 */
+	private void validateFileGroupContains(int fileGroupId, Integer[] expected) {
+
+		Integer actual[] = fileGroupMgr.getPathIds(fileGroupId);
+		assertNotNull(actual);
+		assertEquals(expected.length, actual.length);
+		
+		/* now look for the presence of all the members */
+		for (int i = 0; i < expected.length; i++) {
+			boolean found = false;
+			for (int j = 0; j < actual.length; j++) {
+				if (actual[j] == expected[i]) {
+					found = true;
+				}
+			}
+			if (!found) {
+				fail("Unable to find expected file group member: " + expected[i]);
+			}
+		}
 	}
 	
 	/*=====================================================================================*
@@ -281,4 +315,25 @@ public class TestImportRefactorMoveToPackage {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test that any "loose" files that aren't attached to any actions are placed into a single
+	 * file group in the destination package.
+	 */
+	@Test
+	public void testLooseFiles() {
+		try {
+			refactor.moveMembersToPackage(destPkgId, buildList('f', f3, 'f', f1, 'f', f2));
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		MemberDesc members[] = getResult();
+		assertEquals(1, members.length);
+		MemberDesc fileGroup = members[0];
+		assertEquals(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup.memberType);
+		validateFileGroupContains(fileGroup.memberId, new Integer[] {f1, f2, f3});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

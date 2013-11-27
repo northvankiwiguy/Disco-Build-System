@@ -20,6 +20,7 @@ import com.buildml.main.ICliCommand;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.ActionSet;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.IImportRefactorer;
 import com.buildml.refactor.imports.ImportRefactorer;
@@ -108,7 +109,9 @@ public class CliCommandMergeActions implements ICliCommand {
 
 		IImportRefactorer refactor = new ImportRefactorer(buildStore);
 		try {
-			refactor.mergeActions(set);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.mergeActions(multiOp, set);
+			multiOp.redo();
 			
 		/* 
 		 * Handle the array of possible error cases.

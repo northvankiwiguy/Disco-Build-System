@@ -13,6 +13,9 @@
 package com.buildml.model.undo;
 
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.IFileMgr;
+import com.buildml.model.impl.FileMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 
@@ -32,14 +35,17 @@ public class ActionUndoOp implements IUndoOp {
 	 * Bitmap of all the parts of the action that have changed, and will need to be changed
 	 * back on an undo/redo operation.
 	 */
-	private final static int CHANGED_PACKAGE  = 1;
-	private final static int CHANGED_COMMAND  = 2;
-	private final static int CHANGED_LOCATION = 4;
-	private final static int CHANGED_SLOT     = 8;
-	private final static int REMOVED_SLOT     = 16;
-	private final static int MOVED_TO_TRASH   = 32;
-	private final static int NEW_ACTION       = 64;
-
+	private final static int CHANGED_PACKAGE      = 1;
+	private final static int CHANGED_COMMAND      = 2;
+	private final static int CHANGED_LOCATION     = 4;
+	private final static int CHANGED_SLOT         = 8;
+	private final static int REMOVED_SLOT         = 16;
+	private final static int MOVED_TO_TRASH       = 32;
+	private final static int NEW_ACTION           = 64;
+	private final static int CHANGED_PARENT       = 128;
+	private final static int ADD_PATH_ACCESS      = 256;
+	private final static int REMOVE_PATH_ACCESS   = 512;
+	
 	/** The IBuildStore we're operating on */
 	private IBuildStore buildStore;
 
@@ -75,6 +81,21 @@ public class ActionUndoOp implements IUndoOp {
 
 	/** if CHANGED_SLOT, what is the new value in the slot */
 	private Object newSlotValue;
+	
+	/** if CHANGED_PARENT, the old parent ID */
+	private int oldParentId;
+	
+	/** if CHANGED_PARENT, the new parent ID */
+	private int newParentId;
+	
+	/** if ADD_PATH_ACCESS | REMOVE_PATH_ACCESS what is the sequence number? */
+	private int accessSeqno;
+	
+	/** If ADD_PATH_ACCESS | REMOVE_PATH_ACCESS what is the ID of the path being accessed? */
+	private int accessPathId;
+	
+	/** If ADD_PATH_ACCESS | REMOVE_PATH_ACCESS what is the type of access? */
+	private OperationType accessOpType;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -201,6 +222,53 @@ public class ActionUndoOp implements IUndoOp {
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Records a change to an action's parent.
+	 * @param oldParentId	The action's current parent ID.
+	 * @param newParentId	The action's new parent ID.
+	 */
+	public void recordParentChange(int oldParentId, int newParentId) {
+		if (oldParentId != newParentId) {
+			changedFields |= CHANGED_PARENT;
+			this.oldParentId = oldParentId;
+			this.newParentId = newParentId;
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Record the removal of a file access for this action.
+	 * 
+	 * @param seqno		The sequence number of this access (to retain ordering).
+	 * @param pathId	The path being accessed.
+	 * @param opType	The type of access (OP_READ, OP_WRITE, etc).
+	 */
+	public void recordRemovePathAccess(int seqno, int pathId, OperationType opType) {
+		changedFields |= REMOVE_PATH_ACCESS;
+		this.accessSeqno = seqno;
+		this.accessPathId = pathId;
+		this.accessOpType = opType;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Record the addition of a file access for this action.
+	 * 
+	 * @param seqno		The sequence number of this access (to retain ordering).
+	 * @param pathId	The path being accessed.
+	 * @param opType	The type of access (OP_READ, OP_WRITE, etc).
+	 */
+	public void recordAddPathAccess(int seqno, int pathId, OperationType opType) {
+		changedFields |= ADD_PATH_ACCESS;
+		this.accessSeqno = seqno;
+		this.accessPathId = pathId;
+		this.accessOpType = opType;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/* (non-Javadoc)
 	 * @see com.buildml.eclipse.utils.BmlAbstractOperation#undo()
 	 */
@@ -238,7 +306,22 @@ public class ActionUndoOp implements IUndoOp {
 		if ((changedFields & NEW_ACTION) != 0) {
 			actionMgr.moveActionToTrash(actionId);
 		}
+		
+		/* if the action's parent has changed */
+		if ((changedFields & CHANGED_PARENT) != 0) {
+			actionMgr.setParent(actionId, oldParentId);
+		}
+		
+		/* if this action is now accessing a new path */
+		if ((changedFields & ADD_PATH_ACCESS) != 0) {
+			actionMgr.removeFileAccess(actionId, accessPathId);
+		}
 
+		/* if this action is no longer accessing a path */
+		if ((changedFields & REMOVE_PATH_ACCESS) != 0) {
+			actionMgr.addSequencedFileAccess(accessSeqno, actionId, accessPathId, accessOpType);
+		}
+		
 		return (changedFields != 0);
 	}
 	
@@ -285,6 +368,21 @@ public class ActionUndoOp implements IUndoOp {
 		/* if the action has been newly created */
 		if ((changedFields & NEW_ACTION) != 0) {
 			actionMgr.reviveActionFromTrash(actionId);
+		}
+		
+		/* if the action's parent has changed */
+		if ((changedFields & CHANGED_PARENT) != 0) {
+			actionMgr.setParent(actionId, newParentId);
+		}
+
+		/* if this action is now accessing a new path */
+		if ((changedFields & ADD_PATH_ACCESS) != 0) {
+			actionMgr.addSequencedFileAccess(accessSeqno, actionId, accessPathId, accessOpType);
+		}
+
+		/* if this action is no longer accessing a new path */
+		if ((changedFields & REMOVE_PATH_ACCESS) != 0) {
+			actionMgr.removeFileAccess(actionId, accessPathId);
 		}
 		
 		return (changedFields != 0);

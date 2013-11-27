@@ -19,16 +19,24 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.graphiti.ui.platform.GraphitiConnectionEditPart;
 import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
+import com.buildml.eclipse.bobj.UIFileGroup;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.refactor.CanNotRefactorException;
+import com.buildml.refactor.IImportRefactorer;
 
 /**
  * An Eclipse UI Handler for managing the "Move to Package" UI command.
@@ -49,18 +57,23 @@ public class HandlerMoveToPackage extends AbstractHandler {
 
 		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		
-		List<Object> objectList = getSelectedObjects();
+		List<MemberDesc> members = getSelectedObjects();
 
 		MoveToPackageDialog dialog = new MoveToPackageDialog(buildStore);
 		int status = dialog.open();
 		if (status == MoveToPackageDialog.OK) {
 			int pkgId = dialog.getPackageId();
-			
-			// TODO: proceed to refactor...
-			System.out.println("selected package " + pkgId);
-			for (Iterator iterator = objectList.iterator(); iterator.hasNext();) {
-				Object object = (Object) iterator.next();
-				System.out.println("Object: " + object);
+
+			/* ask the refactorer to perform the redo */
+			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
+			if (editor != null) {
+				IImportRefactorer refactorer = editor.getImportRefactorer();
+				try {
+					refactorer.moveMembersToPackage(pkgId, members);
+				} catch (CanNotRefactorException e) {
+					// TODO: provide better error messages.
+					AlertDialog.displayErrorDialog("Can't Move", "Error");
+				}
 			}
 		}
 		return null;
@@ -79,12 +92,12 @@ public class HandlerMoveToPackage extends AbstractHandler {
 		 * Get the list of business objects that are selected, return false if an unhandled
 		 * object is selected.
 		 */
-		List<Object> objectList = getSelectedObjects();
+		List<MemberDesc> objectList = getSelectedObjects();
 		return (objectList != null);
 	}
 
 	/*=====================================================================================*
-	 * PUBLIC METHODS
+	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
 	/**
@@ -92,13 +105,13 @@ public class HandlerMoveToPackage extends AbstractHandler {
 	 * selected by the user. Returns null if any non-valid objects were selected. Note that
 	 * connection arrows are silently ignored, rather than flagged as invalid.
 	 */
-	private List<Object> getSelectedObjects() {
+	private List<MemberDesc> getSelectedObjects() {
 		
 		/* get the list of all things that are selected */
 		IStructuredSelection selection = EclipsePartUtils.getSelection();
 		
 		/* we'll return a list of valid business objects */
-		List<Object> result = new ArrayList<Object>();
+		List<MemberDesc> result = new ArrayList<MemberDesc>();
 		
 		Iterator<Object> iter = selection.iterator();
 		while (iter.hasNext()) {
@@ -108,8 +121,10 @@ public class HandlerMoveToPackage extends AbstractHandler {
 			if (obj instanceof GraphitiShapeEditPart) {
 				GraphitiShapeEditPart shape = (GraphitiShapeEditPart)obj;
 				Object bo = GraphitiUtils.getBusinessObject(shape.getPictogramElement());
-				if (bo != null) {
-					result.add(bo);
+				if (bo instanceof UIAction) {
+					result.add(new MemberDesc(IPackageMemberMgr.TYPE_ACTION, ((UIAction)bo).getId(), 0, 0));
+				} else if (bo instanceof UIFileGroup) {
+					result.add(new MemberDesc(IPackageMemberMgr.TYPE_FILE_GROUP, ((UIFileGroup)bo).getId(), 0, 0));
 				}
 			}
 			
@@ -119,8 +134,15 @@ public class HandlerMoveToPackage extends AbstractHandler {
 			}
 			
 			/* Other objects, selectable from TreeViewers (rather than from Graphiti diagrams) */
-			else if ((obj instanceof UIAction) || (obj instanceof UIFile) || (obj instanceof UIDirectory)) {
-				result.add(obj);
+			else if (obj instanceof UIAction){
+				result.add(new MemberDesc(IPackageMemberMgr.TYPE_ACTION, ((UIAction)obj).getId(), 0, 0));
+			}
+			else if (obj instanceof UIFile) {
+				result.add(new MemberDesc(IPackageMemberMgr.TYPE_FILE, ((UIFile)obj).getId(), 0, 0));
+			}
+			else if (obj instanceof UIDirectory) {
+				// TODO: expand this into files?
+				result.add(new MemberDesc(IPackageMemberMgr.TYPE_FILE, ((UIFile)obj).getId(), 0, 0));
 			}
 			
 			/* else, anything else is invalid */
@@ -135,6 +157,6 @@ public class HandlerMoveToPackage extends AbstractHandler {
 		}
 		return null;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 }

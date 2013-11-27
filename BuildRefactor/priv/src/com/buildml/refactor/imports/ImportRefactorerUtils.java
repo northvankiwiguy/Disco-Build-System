@@ -18,11 +18,14 @@ import java.util.List;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.undo.ActionUndoOp;
+import com.buildml.model.undo.FileUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.CanNotRefactorException.Cause;
-import com.buildml.refactor.imports.ImportHistoryItem.ItemOpType;
 
 /**
  * A class of static utility methods to support commands in ImportRefactorer().
@@ -91,12 +94,14 @@ public class ImportRefactorerUtils {
 	 * Helper method for scheduling an action to be removed. This must also remove any
 	 * file-access links that are currently associated with the action.
 	 * 
-	 * @param actionMgr The IActionMgr we can query for information.
-	 * @param historyItem The undo/redo operation that we'll use for scheduling.
-	 * @param actions The actions to be removed.
+	 * @param buildStore The IBuildStore we can query for information.
+	 * @param multiOp    The undo/redo operation that we'll use for scheduling.
+	 * @param actions    The actions to be removed.
 	 */
-	/* package */ static void scheduleRemoveAction(IActionMgr actionMgr, 
-											ImportHistoryItem historyItem, Integer[] actions) {
+	/* package */ static void scheduleRemoveAction(IBuildStore buildStore,
+											MultiUndoOp multiOp, Integer[] actions) {
+		
+		IActionMgr actionMgr = buildStore.getActionMgr();
 		
 		/* in addition to removing actions, we also need to remove generated files */
 		List<Integer> writtenFilesToRemove = new ArrayList<Integer>();	
@@ -107,8 +112,9 @@ public class ImportRefactorerUtils {
 		 */
 		FileAccess[] fileAccesses = actionMgr.getSequencedFileAccesses(actions);
 		for (FileAccess fileAccess : fileAccesses) {
-			historyItem.addPathAccessOp(ItemOpType.REMOVE_ACTION_PATH_LINK, fileAccess.seqno, 
-					fileAccess.actionId, fileAccess.pathId, fileAccess.opType);
+			ActionUndoOp actionOp = new ActionUndoOp(buildStore, fileAccess.actionId);
+			actionOp.recordRemovePathAccess(fileAccess.seqno, fileAccess.pathId, fileAccess.opType);
+			multiOp.add(actionOp);
 			if (fileAccess.opType == OperationType.OP_WRITE){
 				writtenFilesToRemove.add(fileAccess.pathId);
 			}
@@ -116,12 +122,16 @@ public class ImportRefactorerUtils {
 			
 		/* Move the actions into the trash.*/
 		for (int actionId : actions) {
-			historyItem.addActionOp(ItemOpType.REMOVE_ACTION, actionId);
+			ActionUndoOp actionOp = new ActionUndoOp(buildStore, actionId);
+			actionOp.recordMoveToTrash();
+			multiOp.add(actionOp);
 		}
 
 		/* remove all written files - we can only do this once all action-path links are removed. */
 		for (int writtenPathId : writtenFilesToRemove) {
-			historyItem.addPathOp(ItemOpType.REMOVE_PATH, writtenPathId);			
+			FileUndoOp fileOp = new FileUndoOp(buildStore, writtenPathId);
+			fileOp.recordRemovePath();
+			multiOp.add(fileOp);
 		}
 	}
 
@@ -130,16 +140,18 @@ public class ImportRefactorerUtils {
 	/**
 	 * A helper function, shared by deletePath() and deletePathTree().
 	 * 
-	 * @param actionMgr			The IActionMgr to query/update.
-	 * @param fileMgr 			The IFileMgr to query/update.
+	 * @param buildStore		The IBuildStore to query/update.
 	 * @param pathId			The path to be deleted.
 	 * @param alsoDeleteAction  True if we should also delete actions that generate the path.
-	 * @param historyItem		Undo/redo history item to add operation steps to.
+	 * @param multiOp			Undo/redo history item to add operation steps to.
 	 * @throws CanNotRefactorException Something went wrong.
 	 */
-	/* package */ static void deletePathHelper(IActionMgr actionMgr, IFileMgr fileMgr,
-				int pathId, boolean alsoDeleteAction, ImportHistoryItem historyItem)
+	/* package */ static void deletePathHelper(IBuildStore buildStore,
+				int pathId, boolean alsoDeleteAction, MultiUndoOp multiOp)
 			throws CanNotRefactorException {
+		
+		IActionMgr actionMgr = buildStore.getActionMgr();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* the path must exist and must not be trashed - otherwise give an error */
 		PathType pathType = fileMgr.getPathType(pathId);
@@ -191,14 +203,16 @@ public class ImportRefactorerUtils {
 		 */
 
 		/* remove the actions, and any associated file accesses */
-		ImportRefactorerUtils.scheduleRemoveAction(actionMgr, historyItem, actionsUsingPath);
+		ImportRefactorerUtils.scheduleRemoveAction(buildStore, multiOp, actionsUsingPath);
 		
 		/* 
 		 * If we didn't already delete the action (and the paths it generates), we need to
 		 * explicitly delete it (this is the case where it's an unused path we're deleting).
 		 */
 		if (actionsUsingPath.length == 0) {
-			historyItem.addPathOp(ItemOpType.REMOVE_PATH, pathId);
+			FileUndoOp fileOp = new FileUndoOp(buildStore, pathId);
+			fileOp.recordRemovePath();
+			multiOp.add(fileOp);
 		}
 	}
 
@@ -208,25 +222,27 @@ public class ImportRefactorerUtils {
 	 * A helper method for deletePathTree(). Performs a bottom up traversal of a directory
 	 * hierarchy.
 	 * 
-	 * @param actionMgr			The IActionMgr to query/update.
-	 * @param fileMgr 			The IFileMgr to query/update.
+	 * @param buildStore		 The IBuildStore to query/update.
 	 * @param pathId			 The path (file or directory) to be deleted.
 	 * @param alsoDeleteActions  True if we should also delete actions that generate the path.
-	 * @param historyItem		 Undo/redo history item to add operation steps to.
+	 * @param multiOp			 Undo/redo history item to add operation steps to.
 	 * @throws CanNotRefactorException 
 	 */
-	/* package */ static void deletePathTreeHelper(IActionMgr actionMgr, IFileMgr fileMgr,
-				int pathId, boolean alsoDeleteActions, ImportHistoryItem historyItem) 
+	/* package */ static void deletePathTreeHelper(IBuildStore buildStore,
+				int pathId, boolean alsoDeleteActions, MultiUndoOp multiOp) 
 							throws CanNotRefactorException {
+		
+		IActionMgr actionMgr = buildStore.getActionMgr();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* delete children first */
 		Integer children[] = fileMgr.getChildPaths(pathId);
 		for (int childId : children) {
-			deletePathTreeHelper(actionMgr, fileMgr, childId, alsoDeleteActions, historyItem);
+			deletePathTreeHelper(buildStore, childId, alsoDeleteActions, multiOp);
 		}
 		
 		/* now delete the current path */
-		deletePathHelper(actionMgr, fileMgr, pathId, alsoDeleteActions, historyItem);
+		deletePathHelper(buildStore, pathId, alsoDeleteActions, multiOp);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

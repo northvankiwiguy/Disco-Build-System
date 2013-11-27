@@ -3,23 +3,21 @@ package com.buildml.eclipse.files.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.types.FileSet;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.IImportRefactorer;
 
@@ -33,104 +31,6 @@ import com.buildml.refactor.IImportRefactorer;
 public class HandlerDeletePath extends AbstractHandler {
 
 	/*=====================================================================================*
-	 * NESTED CLASSES
-	 *=====================================================================================*/
-
-	/**
-	 * An undo/redo operation for supporting the "delete path" and "delete directory"
-	 * operations.
-	 */
-	private class DeletePathOperation extends BmlAbstractOperation {
-		
-		/** how many deletions does this single operation encompass? */
-		private int changesPerformed;
-		
-		/*---------------------------------------------------------------------------*/
-
-		/**
-		 * Create a new AssignRootNameOperation instance. This becomes an operation
-		 * on the undo/redo stack.
-		 * @param changesPerformed The number of deletion operations performed.
-		 */
-		public DeletePathOperation(int changesPerformed) {
-			super("Delete File" + (changesPerformed > 1 ? "s" : ""));
-			this.changesPerformed = changesPerformed;
-		}
-
-		/*---------------------------------------------------------------------------*/
-
-		/* 
-		 * Deliberately do nothing when the operation is first added to history.
-		 * We already did the operation (via the refactorer).
-		 */
-		@Override
-		public IStatus execute() throws ExecutionException {
-			/* nothing */
-			return Status.OK_STATUS;
-		}
-		
-		/*---------------------------------------------------------------------------*/
-
-		
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.core.commands.operations.IUndoableOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IAdaptable)
-		 */
-		@Override
-		public IStatus redo() throws ExecutionException {
-
-			/* ask the refactorer to perform the redo */
-			IImportRefactorer refactorer = mainEditor.getImportRefactorer();
-			try {
-				for (int i = 0; i != changesPerformed; i++) {
-					refactorer.redoRefactoring();
-				}
-			} catch (CanNotRefactorException e) {
-				return Status.CANCEL_STATUS;
-			}
-
-			/* if the sub-editor is still open, refresh the content */
-			if (!subEditor.isDisposed()) {
-				subEditor.refreshView(true);
-			}
-
-			/* mark the editor as dirty */
-			EclipsePartUtils.markEditorDirty();
-			return Status.OK_STATUS;
-		}
-
-		/*---------------------------------------------------------------------------*/
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.core.commands.operations.IUndoableOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IAdaptable)
-		 */
-		@Override
-		public IStatus undo() throws ExecutionException {			
-
-			/* ask the refactorer to perform the undo */
-			IImportRefactorer refactorer = mainEditor.getImportRefactorer();
-			try {
-				for (int i = 0; i != changesPerformed; i++) {
-					refactorer.undoRefactoring();
-				}
-			} catch (CanNotRefactorException e) {
-				return Status.CANCEL_STATUS;
-			}
-
-			/* if the sub-editor is still open, refresh the content */
-			if (!subEditor.isDisposed()) {
-				subEditor.refreshView(true);
-			}
-			System.out.println("Undoing");
-			EclipsePartUtils.markEditorDirty();
-			return Status.OK_STATUS;
-		}		
-	}
-	
-	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
@@ -141,7 +41,6 @@ public class HandlerDeletePath extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
-		ISubEditor subEditor = mainEditor.getActiveSubEditor();
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		IActionMgr actionMgr = buildStore.getActionMgr();
@@ -152,7 +51,9 @@ public class HandlerDeletePath extends AbstractHandler {
 		FileSet selectedPaths = EclipsePartUtils.getFileSetFromSelection(buildStore, selection);
 
 		/* Note how many changes (deletions) actually happened */
-		int changesPerformed = 0;	
+		int changesPerformed = 0;
+		MultiUndoOp multiOp = new MultiUndoOp();
+		
 		/*
 		 * For each file/directory that was selected, treat it as an individual "delete"
 		 * operation. 
@@ -179,9 +80,9 @@ public class HandlerDeletePath extends AbstractHandler {
 				needsRetry = false;
 				try {
 					if (deleteSubTree) {
-						refactorer.deletePathTree(pathId, deleteActionToo);
+						refactorer.deletePathTree(multiOp, pathId, deleteActionToo);
 					} else {
-						refactorer.deletePath(pathId, deleteActionToo);
+						refactorer.deletePath(multiOp, pathId, deleteActionToo);
 					}
 					
 					/* success! The file/directory was deleted */
@@ -296,13 +197,7 @@ public class HandlerDeletePath extends AbstractHandler {
 		 * to the undo/redo history.
 		 */
 		if (changesPerformed > 0) {
-			// TODO: limit this scope of this refresh
-			subEditor.refreshView(true);
-			mainEditor.markDirty();
-		
-			/* create an undo/redo operation, but don't execute it. */
-			DeletePathOperation operation = new DeletePathOperation(changesPerformed);
-			operation.recordAndInvoke();
+			new UndoOpAdapter("Delete File" + ((changesPerformed > 1) ? "s" : ""), multiOp).invoke();
 		}
 		return null;
 	}

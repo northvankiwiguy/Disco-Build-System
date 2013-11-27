@@ -18,6 +18,7 @@ import org.apache.commons.cli.Options;
 import com.buildml.main.CliUtils;
 import com.buildml.main.ICliCommand;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.IImportRefactorer;
 import com.buildml.refactor.imports.ImportRefactorer;
@@ -110,7 +111,9 @@ public class CliCommandMakeAtomic implements ICliCommand {
 		
 		IImportRefactorer refactor = new ImportRefactorer(buildStore);
 		try {
-			refactor.makeActionAtomic(actionId);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.makeActionAtomic(multiOp, actionId);
+			multiOp.redo();
 			
 		/* 
 		 * Handle the array of possible error cases.

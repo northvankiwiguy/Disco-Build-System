@@ -24,6 +24,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.types.ActionSet;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
 
@@ -197,7 +198,9 @@ public class TestImportRefactorMergeActions {
 		
 		/* actionA4c is already atomic - no work required */
 		try {
-			importRefactorer.makeActionAtomic(actionA4c);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			importRefactorer.makeActionAtomic(multiOp, actionA4c);
+			multiOp.redo();
 		} catch (CanNotRefactorException e) {
 			fail("Action is already atomic, but got an error.");
 		}
@@ -208,8 +211,10 @@ public class TestImportRefactorMergeActions {
 		
 		/* actionA4 has three children */
 		assertEquals(3, actionMgr.getChildren(actionA4).length);
+		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
-			importRefactorer.makeActionAtomic(actionA4);
+			importRefactorer.makeActionAtomic(multiOp, actionA4);
+			multiOp.redo();
 		} catch (CanNotRefactorException e) {
 			fail("Failed to make action4 atomic.");
 		}
@@ -232,18 +237,15 @@ public class TestImportRefactorMergeActions {
 		
 		/* Try to make a trashed file atomic - should fail */
 		try {
-			importRefactorer.makeActionAtomic(actionA4a);
+			MultiUndoOp tmpMultiOp = new MultiUndoOp();
+			importRefactorer.makeActionAtomic(tmpMultiOp, actionA4a);
 			fail("Was able to make a trashed file atomic.");
 		} catch (CanNotRefactorException e1) {
 			assertEquals(Cause.ACTION_IS_TRASHED, e1.getCauseCode());
 		}		
 		
-		/* under the operation, and check that things are back to normal */
-		try {
-			importRefactorer.undoRefactoring();
-		} catch (CanNotRefactorException e) {
-			fail("Failed to undo make atomic operation.");
-		}
+		/* undo the operation, and check that things are back to normal */
+		multiOp.undo();
 		assertEquals(3, actionMgr.getChildren(actionA4).length);
 		assertFalse(actionMgr.isActionTrashed(actionA4a));
 		assertFalse(actionMgr.isActionTrashed(actionA4b));
@@ -265,7 +267,8 @@ public class TestImportRefactorMergeActions {
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionA2a, actionA2b },
 													 actionMgr.getChildren(actionA2)));
 		try {
-			importRefactorer.deleteAction(actionA2b);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			importRefactorer.deleteAction(multiOp, actionA2b);
 			fail("Failed to detect in-use action");
 			
 		} catch (CanNotRefactorException e) {
@@ -291,8 +294,10 @@ public class TestImportRefactorMergeActions {
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { actionA4a, actionA4b, actionA4c },
 				actionMgr.getChildren(actionA4)));
+		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
-			importRefactorer.deleteAction(actionA4c);
+			importRefactorer.deleteAction(multiOp, actionA4c);
+			multiOp.redo();
 			/* success */
 		} catch (CanNotRefactorException e) {
 			fail("Failed to delete actionA4c");
@@ -304,23 +309,14 @@ public class TestImportRefactorMergeActions {
 				 actionMgr.getChildren(actionA4)));
 		
 		/* undo the operation */
-		try {
-			importRefactorer.undoRefactoring();
-		} catch (CanNotRefactorException e) {
-			fail("Failed to undo deleteAction");
-		}
+		multiOp.undo();
 		assertFalse(actionMgr.isActionTrashed(actionA4c));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { actionA4a, actionA4b, actionA4c },
 				actionMgr.getChildren(actionA4)));
 		
 		/* redo the operation */
-		try {
-			importRefactorer.redoRefactoring();
-			/* success */
-		} catch (CanNotRefactorException e) {
-			fail("Failed to redo delete of actionA4c");
-		}
+		multiOp.redo();
 		assertTrue(actionMgr.isActionTrashed(actionA4c));
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionA4a, actionA4b },
 				 actionMgr.getChildren(actionA4)));
@@ -337,7 +333,8 @@ public class TestImportRefactorMergeActions {
 		/* deleting the root action is illegal */
 		int rootAction = actionMgr.getRootAction("root");
 		try {
-			importRefactorer.deleteAction(rootAction);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			importRefactorer.deleteAction(multiOp, rootAction);
 			fail("Incorrectly deleted root action");
 			
 		} catch (CanNotRefactorException e) {
@@ -348,7 +345,8 @@ public class TestImportRefactorMergeActions {
 
 		/* deleting an invalid actionID is illegal */
 		try {
-			importRefactorer.deleteAction(1234);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			importRefactorer.deleteAction(multiOp, 1234);
 			fail("Incorrectly deleted root action");
 			
 		} catch (CanNotRefactorException e) {
@@ -373,8 +371,10 @@ public class TestImportRefactorMergeActions {
 		assertFalse(actionMgr.isActionTrashed(actionA));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { actionA }, actionMgr.getChildren(rootAction)));
+		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
-			importRefactorer.deleteAction(actionA);
+			importRefactorer.deleteAction(multiOp, actionA);
+			multiOp.redo();
 			/* success */
 		} catch (CanNotRefactorException e) {
 			fail("Failed to delete actionA");
@@ -387,22 +387,13 @@ public class TestImportRefactorMergeActions {
 				actionMgr.getChildren(rootAction)));
 		
 		/* undo the operation */
-		try {
-			importRefactorer.undoRefactoring();
-		} catch (CanNotRefactorException e) {
-			fail("Failed to undo deleteAction");
-		}
+		multiOp.undo();
 		assertFalse(actionMgr.isActionTrashed(actionA));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { actionA }, actionMgr.getChildren(rootAction)));
 		
 		/* redo the operation */
-		try {
-			importRefactorer.redoRefactoring();
-			/* success */
-		} catch (CanNotRefactorException e) {
-			fail("Failed to redo delete of actionA");
-		}
+		multiOp.redo();
 		assertTrue(actionMgr.isActionTrashed(actionA));
 		assertTrue(CommonTestUtils.sortedArraysEqual(
 				new Integer[] { actionA1, actionA2, actionA3, actionA4 },
@@ -419,8 +410,9 @@ public class TestImportRefactorMergeActions {
 		
 		/* test merging of non-atomic action (actionA1) - should fail */
 		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
 			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA1a, actionA1 }); 
-			importRefactorer.mergeActions(set);
+			importRefactorer.mergeActions(multiOp, set);
 			fail("Incorrectly merged an atomic action.");
 			
 		} catch (CanNotRefactorException e) {
@@ -431,8 +423,9 @@ public class TestImportRefactorMergeActions {
 
 		/* test merging of invalid action ID */
 		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
 			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA1a, 1234 });
-			importRefactorer.mergeActions(set);
+			importRefactorer.mergeActions(multiOp, set);
 			fail("Incorrectly merged an atomic action.");
 			
 		} catch (CanNotRefactorException e) {
@@ -443,13 +436,16 @@ public class TestImportRefactorMergeActions {
 		
 		/* test merging of trashed action - actionA4c */
 		try {
-			importRefactorer.deleteAction(actionA4c);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			importRefactorer.deleteAction(multiOp, actionA4c);
+			multiOp.redo();
 		} catch (CanNotRefactorException e1) {
 			fail("Failed to remove actionA4c");
 		}
 		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
 			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA4b, actionA4c });
-			importRefactorer.mergeActions(set);
+			importRefactorer.mergeActions(multiOp, set);
 			fail("Incorrectly merged a trashed action.");
 			
 		} catch (CanNotRefactorException e) {
@@ -469,16 +465,19 @@ public class TestImportRefactorMergeActions {
 		
 		/* test merging of a single atomic action (actionA4b) - will succeed */
 		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
 			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA4b });
-			importRefactorer.mergeActions(set);
+			importRefactorer.mergeActions(multiOp, set);
 		} catch (CanNotRefactorException e1) {
 			fail("Failed to merge single action actionA4b");
 		}
 		
 		/* test merging of two actions - will succeed */
+		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
 			ActionSet set = new ActionSet(actionMgr, new Integer[] { actionA1b, actionA1a });
-			importRefactorer.mergeActions(set);
+			importRefactorer.mergeActions(multiOp, set);
+			multiOp.redo();
 			
 			assertFalse(actionMgr.isActionTrashed(actionA1a));
 			assertTrue(actionMgr.isActionTrashed(actionA1b));
@@ -494,44 +493,32 @@ public class TestImportRefactorMergeActions {
 			fail("Failed to merge two actions.");
 		}
 		
-		/* test undo */
-		try {
-			importRefactorer.undoRefactoring();
-
-			assertFalse(actionMgr.isActionTrashed(actionA1a));
-			assertFalse(actionMgr.isActionTrashed(actionA1b));
-			assertEquals("cc1 -o /tmp/aaa.s foo.c", actionMgr.getCommand(actionA1a));
-			assertEquals("as -o foo.o /tmp/aaa.s", actionMgr.getCommand(actionA1b));			
-			assertArrayEquals(new Integer[] { fileWorkFooC },
-				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
-			assertArrayEquals(new Integer[] { fileTmpAaaS },
-				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE));
-			assertArrayEquals(new Integer[] { fileTmpAaaS },
-				actionMgr.getFilesAccessed(actionA1b, OperationType.OP_READ));
-			assertArrayEquals(new Integer[] { fileWorkFooO },
-				actionMgr.getFilesAccessed(actionA1b, OperationType.OP_WRITE));
+		/* undo, and check for sanity */
+		multiOp.undo();
+		assertFalse(actionMgr.isActionTrashed(actionA1a));
+		assertFalse(actionMgr.isActionTrashed(actionA1b));
+		assertEquals("cc1 -o /tmp/aaa.s foo.c", actionMgr.getCommand(actionA1a));
+		assertEquals("as -o foo.o /tmp/aaa.s", actionMgr.getCommand(actionA1b));			
+		assertArrayEquals(new Integer[] { fileWorkFooC },
+			actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
+		assertArrayEquals(new Integer[] { fileTmpAaaS },
+			actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE));
+		assertArrayEquals(new Integer[] { fileTmpAaaS },
+			actionMgr.getFilesAccessed(actionA1b, OperationType.OP_READ));
+		assertArrayEquals(new Integer[] { fileWorkFooO },
+			actionMgr.getFilesAccessed(actionA1b, OperationType.OP_WRITE));
 		
-		} catch (CanNotRefactorException e) {
-			fail("Failed to undo merge action.");
-		}
-		
-		/* test redo */
-		try {
-			importRefactorer.redoRefactoring();
-
-			assertFalse(actionMgr.isActionTrashed(actionA1a));
-			assertTrue(actionMgr.isActionTrashed(actionA1b));
-			assertEquals("cc1 -o /tmp/aaa.s foo.c\nas -o foo.o /tmp/aaa.s", 
-						 actionMgr.getCommand(actionA1a));
-			assertArrayEquals(new Integer[] { fileWorkFooC },
-				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
-			assertTrue(CommonTestUtils.sortedArraysEqual(
-					new Integer[] { fileWorkFooO, fileTmpAaaS },
-					actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE)));
-
-		} catch (CanNotRefactorException e) {
-			fail("Failed to redo merge action.");
-		}
+		/* redo, and check for sanity */
+		multiOp.redo();
+		assertFalse(actionMgr.isActionTrashed(actionA1a));
+		assertTrue(actionMgr.isActionTrashed(actionA1b));
+		assertEquals("cc1 -o /tmp/aaa.s foo.c\nas -o foo.o /tmp/aaa.s", 
+					 actionMgr.getCommand(actionA1a));
+		assertArrayEquals(new Integer[] { fileWorkFooC },
+			actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] { fileWorkFooO, fileTmpAaaS },
+				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_WRITE)));
 	}
 
 	/*-------------------------------------------------------------------------------------*/

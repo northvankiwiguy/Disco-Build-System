@@ -3,20 +3,18 @@ package com.buildml.eclipse.actions.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.BmlAbstractOperation;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.eclipse.utils.EclipsePartUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.ActionSet;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.IImportRefactorer;
 
@@ -30,92 +28,6 @@ import com.buildml.refactor.IImportRefactorer;
 public class HandlerMergeActions extends AbstractHandler {
 
 	/*=====================================================================================*
-	 * NESTED CLASSES
-	 *=====================================================================================*/
-
-	/**
-	 * An undo/redo operation for supporting the "merge action" operation.
-	 */
-	private class MergeActionOperation extends BmlAbstractOperation {
-				
-		/*---------------------------------------------------------------------------*/
-
-		/**
-		 * Create a new MergeActionOperation instance. This becomes an operation
-		 * on the undo/redo stack.
-		 */
-		public MergeActionOperation() {
-			super("Merge Actions");
-		}
-
-		/*---------------------------------------------------------------------------*/
-
-		/* 
-		 * Deliberately do nothing when the operation is first added to history.
-		 * We already did the operation (via the refactorer).
-		 */
-		@Override
-		public IStatus execute() throws ExecutionException {
-			/* nothing */
-			return Status.OK_STATUS;
-		}
-		
-		/*---------------------------------------------------------------------------*/
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.core.commands.operations.IUndoableOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IAdaptable)
-		 */
-		@Override
-		public IStatus redo() throws ExecutionException {
-
-			/* ask the refactorer to perform the redo */
-			IImportRefactorer refactorer = mainEditor.getImportRefactorer();
-			try {
-				refactorer.redoRefactoring();
-			} catch (CanNotRefactorException e) {
-				return Status.CANCEL_STATUS;
-			}
-
-			/* if the sub-editor is still open, refresh the content */
-			if (!subEditor.isDisposed()) {
-				subEditor.refreshView(true);
-			}
-
-			/* mark the editor as dirty */
-			EclipsePartUtils.markEditorDirty();
-			return Status.OK_STATUS;
-		}
-
-		/*---------------------------------------------------------------------------*/
-
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.core.commands.operations.IUndoableOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IAdaptable)
-		 */
-		@Override
-		public IStatus undo() throws ExecutionException {			
-
-			/* ask the refactorer to perform the undo */
-			IImportRefactorer refactorer = mainEditor.getImportRefactorer();
-			try {
-				refactorer.undoRefactoring();
-			} catch (CanNotRefactorException e) {
-				return Status.CANCEL_STATUS;
-			}
-
-			/* if the sub-editor is still open, refresh the content */
-			if (!subEditor.isDisposed()) {
-				subEditor.refreshView(true);
-			}
-			EclipsePartUtils.markEditorDirty();
-			return Status.OK_STATUS;
-		}		
-	}
-	
-	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
@@ -126,7 +38,6 @@ public class HandlerMergeActions extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
-		ISubEditor subEditor = mainEditor.getActiveSubEditor();
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		IImportRefactorer refactorer = mainEditor.getImportRefactorer();
@@ -137,15 +48,9 @@ public class HandlerMergeActions extends AbstractHandler {
 		
 		/* attempt to perform the "merge action" operation */
 		try {
-			refactorer.mergeActions(selectedActions);
-
-			// TODO: limit this scope of this refresh
-			subEditor.refreshView(true);
-			mainEditor.markDirty();
-		
-			/* create an undo/redo operation, but don't execute it. */
-			MergeActionOperation operation = new MergeActionOperation();
-			operation.recordAndInvoke();
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactorer.mergeActions(multiOp, selectedActions);
+			new UndoOpAdapter("Merge Actions", multiOp).invoke();
 			
 		} catch (CanNotRefactorException e) {
 

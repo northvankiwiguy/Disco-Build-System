@@ -21,6 +21,7 @@ import com.buildml.main.ICliCommand;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.IImportRefactorer;
 import com.buildml.refactor.imports.ImportRefactorer;
@@ -139,11 +140,13 @@ public class CliCommandRmFile implements ICliCommand {
 		if (pathId != ErrorCode.BAD_PATH) {
 			IImportRefactorer refactor = new ImportRefactorer(buildStore);
 			try {
+				MultiUndoOp multiOp = new MultiUndoOp();
 				if (optionRecursive) {
-					refactor.deletePathTree(pathId, optionForceRmAction);
+					refactor.deletePathTree(multiOp, pathId, optionForceRmAction);
 				} else {
-					refactor.deletePath(pathId, optionForceRmAction);
+					refactor.deletePath(multiOp, pathId, optionForceRmAction);
 				}
+				multiOp.redo();
 				
 			/* 
 			 * Handle the array of possible error cases.
