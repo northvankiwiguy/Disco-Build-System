@@ -54,6 +54,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
+import com.buildml.model.IActionMgrListener;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgrListener;
@@ -67,7 +68,7 @@ import com.buildml.utils.types.IntegerTreeSet;
  * @author "Peter Smith <psmith@arapiki.com>"
  */
 public class ActionsEditor extends ImportSubEditor 
-			implements IPackageMemberMgrListener {
+			implements IPackageMemberMgrListener, IActionMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -129,6 +130,7 @@ public class ActionsEditor extends ImportSubEditor
 		super(buildStore, tabTitle);
 		
 		actionMgr = buildStore.getActionMgr();
+		actionMgr.addListener(this);
 		
 		/* listen to changes in package content (for all packages) */
 		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
@@ -566,20 +568,20 @@ public class ActionsEditor extends ImportSubEditor
 	public void packageMemberChangeNotification(int pkgId, int how, int memberType, int memberId) {
 
 		if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
+			scheduleRefresh();
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
-			/*
-			 * Schedule the editor content (TreeViewer) to be refreshed with the new
-			 * content. Note that we deliberately schedule this to happen later,
-			 * since our current thread is quite possibly doing a number of updates
-			 * that will result in multiple notifications. We don't want to refresh
-			 * for each individual update.
-			 */
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					refreshView(true);
-				}
-			});
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgrListener#actionChangeNotification(int, int, int)
+	 */
+	@Override
+	public void actionChangeNotification(int actionId, int how, int changeId) {
+
+		if (how == IActionMgrListener.TRASHED_ACTION) {
+			scheduleRefresh();
 		}
 	}
 	
@@ -598,5 +600,25 @@ public class ActionsEditor extends ImportSubEditor
 		}
 	}
 
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Schedule the editor content (TreeViewer) to be refreshed with the new
+	 * content. Note that we deliberately schedule this to happen later,
+	 * since our current thread is quite possibly doing a number of updates
+	 * that will result in multiple notifications. We don't want to refresh
+	 * for each individual update.
+	 */
+	private void scheduleRefresh() {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refreshView(true);
+			}
+		});
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
