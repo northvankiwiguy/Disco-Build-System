@@ -17,10 +17,11 @@ import org.eclipse.swt.widgets.Item;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.bobj.UIInteger;
-import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.undo.PackageUndoOp;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -44,9 +45,6 @@ public class OutlineContentCellModifier implements ICellModifier {
 	
 	/** The BuildStore's package manager */
 	private IPackageMgr pkgMgr;
-	
-	/** The Outline view page that initiated this cell modify operation */
-	private OutlinePage outlinePage;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -55,12 +53,10 @@ public class OutlineContentCellModifier implements ICellModifier {
 	/**
 	 * Create a new OutlineContentCellModifier which will be called into action whenever
 	 * the user wishes to rename a package or folder.
-
-	 * @param outlinePage The Outline view page that initiated this cell modify operation.
+	 * 
 	 * @param mainEditor The main BuildML editor that we're outlining.
 	 */
-	public OutlineContentCellModifier(OutlinePage outlinePage, MainEditor mainEditor) {
-		this.outlinePage = outlinePage;
+	public OutlineContentCellModifier(MainEditor mainEditor) {
 		this.mainEditor = mainEditor;
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = buildStore.getPackageMgr();
@@ -150,11 +146,10 @@ public class OutlineContentCellModifier implements ICellModifier {
 				 * the undo/redo history.
 				 */
 				else {
-					OutlineUndoOperation op = new OutlineUndoOperation(outlinePage, "Rename", 
-														OpType.OP_RENAME, id, oldName, newName);
-					op.record(mainEditor);
+					PackageUndoOp op = new PackageUndoOp(buildStore, id);
+					op.recordRename(oldName, newName);
+					new UndoOpAdapter("Rename", op).invoke();
 					mainEditor.markDirty();
-					outlinePage.refresh();				
 				}
 			}
 		}

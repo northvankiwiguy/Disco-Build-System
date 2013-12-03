@@ -19,12 +19,12 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.bobj.UIInteger;
-import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.dnd.BuildMLTransfer;
 import com.buildml.eclipse.utils.dnd.BuildMLTransferType;
 import com.buildml.model.IBuildStore;
-import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.undo.PackageUndoOp;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -44,9 +44,6 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	
 	/** The BuildStore underlying the main editor */
 	private IBuildStore buildStore;
-	
-	/** The OutlinePage view we're supporting */
-	private OutlinePage outlinePage;
 	
 	/** The main BuildML editor we're operating on */
 	private MainEditor mainEditor;
@@ -68,7 +65,6 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 	public OutlineDropTarget(TreeViewer treeViewer, OutlinePage outlinePage) {
 		super(treeViewer);
 		this.treeViewer = treeViewer;
-		this.outlinePage = outlinePage;
 		this.mainEditor = outlinePage.getMainEditor();
 		this.buildStore = mainEditor.getBuildStore();
 		this.pkgMgr = this.buildStore.getPackageMgr();
@@ -213,10 +209,10 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 		 * Each drop of a package into a package folder is treated as an individual operation,
 		 * even if multiple were dropped at the same time.
 		 */
-		OutlineUndoOperation op = 
-				new OutlineUndoOperation(outlinePage, "Move", OpType.OP_MOVE, 
-									     nodeId, parentId, targetId);
-		op.record(mainEditor);
+		PackageUndoOp op = new PackageUndoOp(buildStore, nodeId);
+		op.recordMove(parentId, targetId);
+		new UndoOpAdapter("Move", op).invoke();
+
 		return true;
 	}
 

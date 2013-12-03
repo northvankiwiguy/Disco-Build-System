@@ -39,14 +39,15 @@ import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.bobj.UIPackage;
 import com.buildml.eclipse.bobj.UIPackageFolder;
-import com.buildml.eclipse.outline.OutlineUndoOperation.OpType;
 import com.buildml.eclipse.outline.dialogs.ChangeRootsDialog;
 import com.buildml.eclipse.utils.AlertDialog;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.undo.PackageUndoOp;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -202,7 +203,7 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 		 * OutlineContentCellModifier class does most of the hard work.
 		 */
 		treeViewer.setColumnProperties(new String[] { "NAME" });
-		treeViewer.setCellModifier(new OutlineContentCellModifier(this, mainEditor));
+		treeViewer.setCellModifier(new OutlineContentCellModifier(mainEditor));
 		treeViewer.setCellEditors(new CellEditor [] { new TextCellEditor(treeViewer.getTree()) });
 		
 		/*
@@ -289,20 +290,18 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 
 		/* now mark the new node for editing, to encourage the user to change the name */
 		UIInteger newNode;
-		OutlineUndoOperation op;
+		PackageUndoOp op = new PackageUndoOp(buildStore, id);
 		if (createFolder) {
 			newNode = new UIPackageFolder(id);
-			op = new OutlineUndoOperation(this, "Create Package Folder", 
-										  OpType.OP_NEW_PACKAGE_FOLDER, newName, parentId);
+			op.recordNewFolder(newName, parentId);
 		} else {
-			newNode = new UIPackage(id);			
-			op = new OutlineUndoOperation(this, "Create Package", 
-					  					  OpType.OP_NEW_PACKAGE, newName, parentId);
+			newNode = new UIPackage(id);
+			op.recordNewPackage(newName, parentId);
 		}
 		treeViewer.editElement(newNode, 0);
 		
 		/* record the undo/redo operation */
-		op.record(mainEditor);
+		new UndoOpAdapter(createFolder ? "Create Package Folder" : "Create Package", op).record();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -362,11 +361,13 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 		
 		/* Success - element removed. Update view accordingly. */
 		else {
-			OutlineUndoOperation op = 
-					new OutlineUndoOperation(this, "Remove Package", 
-											 OpType.OP_REMOVE, name, parentId, isFolder);
-			op.record(mainEditor);
-			treeViewer.refresh();
+			PackageUndoOp op = new PackageUndoOp(buildStore, id);
+			if (isFolder) {
+				op.recordRemoveFolder(name, parentId);
+			} else {
+				op.recordRemovePackage(name, parentId);
+			}
+			new UndoOpAdapter(isFolder ? "Remove Folder" : "Remove Package", op).record();
 			mainEditor.markDirty();
 		}
 	}
@@ -435,11 +436,9 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 		
 		/* if anything changed, create a history item so we can undo/redo */
 		if ((oldSrcRootPathId != srcRootPathId) || (oldGenRootPathId != genRootPathId)) {
-			OutlineUndoOperation op = 
-					new OutlineUndoOperation(this, "Change Package Root", OpType.OP_CHANGE_ROOT, 
-										 pkgId, oldSrcRootPathId, oldGenRootPathId,
-										 srcRootPathId, genRootPathId);
-			op.record(mainEditor);
+			PackageUndoOp op = new PackageUndoOp(buildStore, pkgId);
+			op.recordRootChange(oldSrcRootPathId, oldGenRootPathId, srcRootPathId, genRootPathId);
+			new UndoOpAdapter("Change Package Root", op).invoke();
 			mainEditor.markDirty();
 		}
 	}
