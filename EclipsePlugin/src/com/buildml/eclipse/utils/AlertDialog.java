@@ -18,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -144,6 +145,8 @@ public class AlertDialog extends BmlTitleAreaDialog {
 				
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
+		composite.setLayout(new GridLayout());
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		/* create a label for the message, and centre it */
 		if (message != null) {
@@ -155,7 +158,7 @@ public class AlertDialog extends BmlTitleAreaDialog {
 			label.setLayoutData(gridData);
 			label.setText(message);
 		}
-		return composite;
+		return parent;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -185,7 +188,7 @@ public class AlertDialog extends BmlTitleAreaDialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(EclipsePartUtils.getScreenWidth() / 4, EclipsePartUtils.getScreenHeight() / 5);
+		return new Point(EclipsePartUtils.getScreenWidth() / 4, EclipsePartUtils.getScreenHeight() / 4);
 	}
 	
 	/*=====================================================================================*
