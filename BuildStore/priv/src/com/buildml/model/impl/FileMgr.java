@@ -15,14 +15,18 @@ package com.buildml.model.impl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
+import com.buildml.model.IFileGroupMgrListener;
 import com.buildml.model.IFileIncludeMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgrListener;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
@@ -73,6 +77,9 @@ public class FileMgr implements IFileMgr {
 		trashPathPrepStmt = null,
 		pathIsTrashPrepStmt = null,
 		insertPackageMemberPrepStmt = null;
+	
+	/** The event listeners who are registered to learn about path changes */
+	List<IFileMgrListener> listeners = new ArrayList<IFileMgrListener>();
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -430,7 +437,10 @@ public class FileMgr implements IFileMgr {
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}
-				
+		
+		/* notify listeners */
+		notifyListeners(pathId, IFileMgrListener.PATH_REMOVED);
+		
 		/* success, the path has been removed */
 		return ErrorCode.OK;
 	}
@@ -453,7 +463,10 @@ public class FileMgr implements IFileMgr {
 			throw new FatalBuildStoreError("Error in SQL: " + e);
 		}
 		
-		return 0;
+		/* notify listeners */
+		notifyListeners(pathId, IFileMgrListener.NEW_PATH);
+		
+		return ErrorCode.OK;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -516,9 +529,48 @@ public class FileMgr implements IFileMgr {
 		return buildStore;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#addListener(com.buildml.model.IFileMgrListener)
+	 */
+	@Override
+	public void addListener(IFileMgrListener listener) {
+		listeners.add(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#removeListener(com.buildml.model.IFileMgrListener)
+	 */
+	@Override
+	public void removeListener(IFileMgrListener listener) {
+		listeners.remove(listener);		
+	}
+	
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
+	
+	/**
+	 * Notify any registered listeners about our change in state.
+	 * @param pathId   		The path that has changed.
+	 * @param how     		The way in which the path changed (see {@link IFileMgrListener}).
+	 */
+	private void notifyListeners(int pathId, int how) {
+		
+		/* 
+		 * Make a copy of the listeners list, otherwise a registered listener can't remove
+		 * itself from the list within the pathChangeNotification() method.
+		 */
+		IFileMgrListener listenerCopy[] = listeners.toArray(new IFileMgrListener[listeners.size()]);
+		for (int i = 0; i < listenerCopy.length; i++) {
+			listenerCopy[i].pathChangeNotification(pathId, how);			
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Helper method for addDirectory, addFile and addSymlink. Adds a new path, of the
@@ -569,6 +621,10 @@ public class FileMgr implements IFileMgr {
 			}
 			
 		}
+		
+		/* notify all listeners */
+		notifyListeners(parentId, IFileMgrListener.NEW_PATH);
+		
 		return parentId;
 	}
 

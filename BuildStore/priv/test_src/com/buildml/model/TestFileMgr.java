@@ -642,4 +642,55 @@ public class TestFileMgr {
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
+
+	private static int notifyId;
+	private static int notifyHow;
+	
+	/**
+	 * Test the various ways in which IFileMgr can send notifications.
+	 */
+	@Test
+	public void testNotifications() {
+		
+		/* set up a listener for changes to the IFileMgr */
+		IFileMgrListener listener = new IFileMgrListener() {
+			@Override
+			public void pathChangeNotification(int pathId, int how) {
+				TestFileMgr.notifyId = pathId;
+				TestFileMgr.notifyHow = how;
+			}
+		};
+		fileMgr.addListener(listener);
+		
+		/* Test adding a new file */
+		notifyId = notifyHow = 0;
+		int fileId1 = fileMgr.addFile("/a/b/file.path");
+		assertTrue(fileId1 >= 0);
+		assertEquals(IFileMgrListener.NEW_PATH, notifyHow);
+		assertEquals(fileId1, notifyId);
+		
+		/* Test adding a new directory */
+		notifyId = notifyHow = 0;
+		int dirId1 = fileMgr.addDirectory("/a/b/file.dir");
+		assertTrue(dirId1 >= 0);
+		assertEquals(IFileMgrListener.NEW_PATH, notifyHow);
+		assertEquals(dirId1, notifyId);
+		
+		/* Test trashing a file */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileMgr.movePathToTrash(fileId1));
+		assertEquals(IFileMgrListener.PATH_REMOVED, notifyHow);
+		assertEquals(fileId1, notifyId);
+		
+		/* Test reviving a file */
+		notifyId = notifyHow = 0;
+		assertEquals(ErrorCode.OK, fileMgr.revivePathFromTrash(fileId1));
+		assertEquals(IFileMgrListener.NEW_PATH, notifyHow);
+		assertEquals(fileId1, notifyId);
+		
+		fileMgr.removeListener(listener);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
 }

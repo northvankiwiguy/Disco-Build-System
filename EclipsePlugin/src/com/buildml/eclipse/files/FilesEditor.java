@@ -54,6 +54,7 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IFileMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
@@ -66,7 +67,7 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FilesEditor extends ImportSubEditor implements IPackageMgrListener {
+public class FilesEditor extends ImportSubEditor implements IPackageMgrListener, IFileMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -131,6 +132,7 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 		pkgRootMgr = buildStore.getPackageRootMgr();
 		pkgMgr.addListener(this);
 		pkgRootMgr.addListener(this);
+		fileMgr.addListener(this);
 
 		/* initially, all paths are visible */
 		visiblePaths = buildStore.getReportMgr().reportAllFiles();
@@ -575,9 +577,19 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 		/* if this FilesEditor is displaying roots, and the roots have changed, refresh the tree */
 		if (how == IPackageMgrListener.CHANGED_ROOTS) {
 			if ((getOptions() & EditorOptions.OPT_SHOW_ROOTS) != 0) {
-				refreshView(true);
+				scheduleRefresh();
 			}
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgrListener#pathChangeNotification(int, int)
+	 */
+	@Override
+	public void pathChangeNotification(int pathId, int how) {
+		scheduleRefresh();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -592,6 +604,7 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 		/* we no longer want to hear about package changes */
 		pkgMgr.removeListener(this);
 		pkgRootMgr.removeListener(this);
+		fileMgr.removeListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -619,5 +632,23 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener 
 		}
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Schedule the editor content (TreeViewer) to be refreshed with the new
+	 * content. Note that we deliberately schedule this to happen later,
+	 * since our current thread is quite possibly doing a number of updates
+	 * that will result in multiple notifications. We don't want to refresh
+	 * for each individual update.
+	 */
+	private void scheduleRefresh() {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refreshView(true);
+			}
+		});
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

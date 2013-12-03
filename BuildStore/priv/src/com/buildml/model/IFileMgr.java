@@ -228,5 +228,20 @@ public interface IFileMgr {
 	 * @return A reference to this FileMgr's BuildStore object.
 	 */
 	public abstract IBuildStore getBuildStore();
+	
+	/**
+	 * Add the specified listener to the list of objects that are notified when
+	 * a path changes in some way.
+	 * 
+	 * @param listener The object to be added as a listener.
+	 */
+	public void addListener(IFileMgrListener listener);
 
+	/**
+	 * Remove the specified listener from the list of objects to be notified when
+	 * a path changes in some way.
+	 * 
+	 * @param listener The object to be removed from the list of listeners.
+	 */
+	public void removeListener(IFileMgrListener listener);
 }
