@@ -114,7 +114,7 @@ public class UndoOpAdapter extends AbstractOperation {
 		if (operation.redo()) {
 			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
 			if (editor != null) {
-				editor.markDirty();
+				editor.markDirty(1);
 			}
 		}
 		return Status.OK_STATUS;
@@ -145,7 +145,7 @@ public class UndoOpAdapter extends AbstractOperation {
 		if (operation.undo()) {
 			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
 			if (editor != null) {
-				editor.markDirty();
+				editor.markDirty(-1);
 			}
 		}
 		return Status.OK_STATUS;
@@ -204,6 +204,7 @@ public class UndoOpAdapter extends AbstractOperation {
 				history.execute(this, null, null);
 			} else {
 				history.add(this);
+				mainEditor.markDirty(1);
 			}
 		} catch (ExecutionException e) {
 			throw new FatalBuildStoreError("Exception occurred during execution of operation", e);

@@ -269,19 +269,6 @@ public class EclipsePartUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Mark the current MainEditor as having been modified. This means that it's now a
-	 * candidate for saving.
-	 */
-	public static void markEditorDirty() {
-		MainEditor editor = getActiveMainEditor();
-		if (editor != null) {
-			editor.markDirty();
-		}
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * Returns true or false, to specify whether the currently active sub editor supports
 	 * the specified feature.
 	 * @param feature A textual name for an editor feature.

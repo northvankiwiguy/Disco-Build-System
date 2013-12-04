@@ -286,7 +286,6 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 		UIPackageFolder parentNode = new UIPackageFolder(parentId);
 		treeViewer.setExpandedState(parentNode, true);
 		treeViewer.refresh();
-		mainEditor.markDirty();
 
 		/* now mark the new node for editing, to encourage the user to change the name */
 		UIInteger newNode;
@@ -368,7 +367,6 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 				op.recordRemovePackage(name, parentId);
 			}
 			new UndoOpAdapter(isFolder ? "Remove Folder" : "Remove Package", op).record();
-			mainEditor.markDirty();
 		}
 	}
 
@@ -439,7 +437,6 @@ public class OutlinePage extends ContentOutlinePage implements IPackageMgrListen
 			PackageUndoOp op = new PackageUndoOp(buildStore, pkgId);
 			op.recordRootChange(oldSrcRootPathId, oldGenRootPathId, srcRootPathId, genRootPathId);
 			new UndoOpAdapter("Change Package Root", op).invoke();
-			mainEditor.markDirty();
 		}
 	}
 	

@@ -373,6 +373,9 @@ public class MainEditor extends MultiPageEditorPart
 			/* save was successful - notify other parts of Eclipse */
 			editorIsDirty = false;
 			firePropertyChange(PROP_DIRTY);
+			
+			/* undo/redo change is now reset */
+			modelChangeCounter = 0;
 
 		} catch (IOException e) {
 			AlertDialog.displayErrorDialog("Error Saving Database",
@@ -426,6 +429,9 @@ public class MainEditor extends MultiPageEditorPart
 				firePropertyChange(PROP_DIRTY);
 				firePropertyChange(PROP_INPUT);
 				
+				/* undo/redo change is now reset */
+				modelChangeCounter = 0;
+				
 			} catch (IOException e) {
 				AlertDialog.displayErrorDialog("Error Saving Database",
 						"The database could not be saved to disk. Reason: " + e.getMessage());
@@ -458,36 +464,23 @@ public class MainEditor extends MultiPageEditorPart
 
 	/**
 	 * The content of the editor has changed, so mark the editor as dirty (the "save" menu
-	 * option will now be available).
+	 * option will now be available). The caller must provide an increment to indicate whether
+	 * the recent change is moving forward (+1) or backward/undo (-1). The "*" on the title
+	 * of the editor tab will indicate whether the content is different from what was last
+	 * saved.
+	 * 
+	 * @param incr +1 or -1, to indicate whether the stream of changes is moving forward or backward.
 	 */
-	public void markDirty() {
+	public void markDirty(int incr) {
+		
+		modelChangeCounter += incr;
 		
 		/* tell Eclipse that we're changing our dirty state (it should put a * in our title). */
-		if (!editorIsDirty) {
-			editorIsDirty = true;
+		boolean oldState = editorIsDirty;
+		editorIsDirty = (modelChangeCounter != 0);
+		if (oldState != editorIsDirty) {
 			firePropertyChange(PROP_DIRTY);
 		}
-		
-		/* 
-		 * Increment our "change counter". This is used by sub-editors to know whether they
-		 * need to refresh themselves. That is, if a sub-editor makes a change to the
-		 * underlying model, other sub-editors will need to refresh themselves. However,
-		 * if there were no model changes since the last refresh, there's no need to refresh.
-		 */
-		modelChangeCounter++;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Return the number of times the underlying BuildStore model has changed. This is
-	 * can be used by sub-editors to determine if their content needs to be refreshed
-	 * on a page-change operation.
-	 * 
-	 * @return The number of times the underlying BuildStore has changed.
-	 */
-	public long getModelChangeCount() {
-		return modelChangeCounter;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

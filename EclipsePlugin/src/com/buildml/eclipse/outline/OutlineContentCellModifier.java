@@ -149,7 +149,6 @@ public class OutlineContentCellModifier implements ICellModifier {
 					PackageUndoOp op = new PackageUndoOp(buildStore, id);
 					op.recordRename(oldName, newName);
 					new UndoOpAdapter("Rename", op).invoke();
-					mainEditor.markDirty();
 				}
 			}
 		}

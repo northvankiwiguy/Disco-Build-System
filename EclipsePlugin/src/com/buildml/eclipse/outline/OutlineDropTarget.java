@@ -137,22 +137,11 @@ public class OutlineDropTarget extends ViewerDropAdapter {
 							(myTypes[index].type == BuildMLTransferType.TYPE_PACKAGE_FOLDER)) {
 						
 						/* perform the drop - on failure, skip to next element */
-						if (performDropUIPackage(myTypes[index], target)) {
-							outlineRefreshNeeded = true;
-							editorDirty = true;
-						}
+						performDropUIPackage(myTypes[index], target);
 					}
 				
 				}
 			}
-		}
-
-		/* one or more drop operations impacted the outline tree view, so refresh the tree */
-		if (outlineRefreshNeeded) {
-			treeViewer.refresh();
-		}
-		if (editorDirty) {
-			mainEditor.markDirty();
 		}
 		
 		/* transfer probably succeeded (although individual drops may have failed) */

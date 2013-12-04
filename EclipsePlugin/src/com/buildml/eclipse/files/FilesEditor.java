@@ -335,9 +335,6 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 		service.refreshElements("com.buildml.eclipse.commands.showPackages", null);
 		service.refreshElements("com.buildml.eclipse.commands.showHiddenPaths", null);
 		service.refreshElements("com.buildml.eclipse.commands.showPathRoots", null);
-		
-		/* if model has changed recently - update it */
-		refreshViewIfOutDated();
 	}
 
 	/*-------------------------------------------------------------------------------------*/

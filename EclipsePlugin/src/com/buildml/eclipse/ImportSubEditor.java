@@ -463,25 +463,6 @@ public abstract class ImportSubEditor extends EditorPart implements IElementComp
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Check whether this sub-editor's view is up to date with respect to the underlying
-	 * model. If not, refresh it. This is typically performed on a page-change to ensure
-	 * that model changes in one sub-editor are reflected in other sub-editors.
-	 */
-	protected void refreshViewIfOutDated() {
-
-		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
-		if (mainEditor != null) {
-			long modelChangeCount = mainEditor.getModelChangeCount();
-			if (lastRefreshedAtChange < modelChangeCount) {
-				refreshView(true);
-				lastRefreshedAtChange = modelChangeCount;
-			}
-		}
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
 	 * This method is used by TreeViewers to compare elements in the tree for "sameness".
 	 * This is useful when refreshing a TreeViewer, to ensure that expanded elements stay
 	 * expanded after a refresh.
