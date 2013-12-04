@@ -182,21 +182,6 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 				int row = 0, column = 0;
 				for (MemberDesc member : members) {
 					
-					/*
-					 * Determine the location for this pictogram. If the database
-					 * has a valid location, use it. If not, perform a very simple
-					 * placement algorithm.
-					 */
-					if (member.x == -1) {
-						member.x = column * 150;
-						member.y = row * 50;
-						column++;
-						if (column == 5) {
-							column = 0;
-							row++;
-						}
-					}
-					
 					/* create a business object to represent this member */
 					UIInteger memberBo = null;
 					switch (member.memberType) {
@@ -209,6 +194,9 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 							memberBo = new UIFileGroup(member.memberId);
 						}
 						break;
+					case IPackageMemberMgr.TYPE_FILE:
+						/* ignore */
+						break;
 					default:
 						throw new FatalError("Unrecognized package member type: " + member.memberType);
 					}
@@ -217,6 +205,22 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 					 * Add the business object (UIFileGroup, UIAction, etc) to the diagram.
 					 */
 					if (memberBo != null) {
+						
+						/*
+						 * Determine the location for this pictogram. If the database
+						 * has a valid location, use it. If not, perform a very simple
+						 * placement algorithm.
+						 */
+						if (member.x == -1) {
+							member.x = column * 150;
+							member.y = row * 50;
+							column++;
+							if (column == 5) {
+								column = 0;
+								row++;
+							}
+						}
+						
 						container.eResource().getContents().add(memberBo);
 						AddContext context2 = new AddContext();
 						context2.setNewObject(memberBo);

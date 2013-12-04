@@ -29,10 +29,13 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IPackageMemberMgr.*;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.model.IPackageMgr;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * Test cases to verify the IImportRefactorer implementation. These tests focus
@@ -116,14 +119,14 @@ public class TestImportRefactorMoveToPackage {
 		 */
 		int parentActionId = actionMgr.getRootAction("root");
 		int actionDirId = fileMgr.getPath("/");
-		f1 = fileMgr.addFile("/a/b/file1");
-		f2 = fileMgr.addFile("/a/b/file2");
-		f3 = fileMgr.addFile("/a/b/file3");
-		f4 = fileMgr.addFile("/a/b/file4");
-		f5 = fileMgr.addFile("/a/b/file5");
-		f6 = fileMgr.addFile("/a/b/file6");
-		f7 = fileMgr.addFile("/a/b/file7");
-		f8 = fileMgr.addFile("/a/b/file8");
+		f1 = fileMgr.addFile("@workspace/a/b/file1");
+		f2 = fileMgr.addFile("@workspace/a/b/file2");
+		f3 = fileMgr.addFile("@workspace/a/b/file3");
+		f4 = fileMgr.addFile("@workspace/a/b/file4");
+		f5 = fileMgr.addFile("@workspace/a/c/file5");
+		f6 = fileMgr.addFile("@workspace/a/c/file6");
+		f7 = fileMgr.addFile("@workspace/a/c/file7");
+		f8 = fileMgr.addFile("@workspace/a/c/file8");
 		a1 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a1");
 		actionMgr.addFileAccess(a1, f4, OperationType.OP_READ);
 		actionMgr.addFileAccess(a1, f5, OperationType.OP_READ);
@@ -150,11 +153,20 @@ public class TestImportRefactorMoveToPackage {
 	 *=====================================================================================*/
 	
 	/**
-	 * @return The members that were actually refactored into our destination package.
+	 * @return The members that were actually refactored into our destination package. We
+	 * 		   extract all TYPE_FILE members because they're not interesting.
 	 */
 	private MemberDesc[] getResult() {
-		return pkgMemberMgr.getMembersInPackage(destPkgId, 
+		MemberDesc result[] = pkgMemberMgr.getMembersInPackage(destPkgId, 
 				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_ANY);
+		
+		List<MemberDesc> filtered = new ArrayList<IPackageMemberMgr.MemberDesc>();
+		for (int i = 0; i < result.length; i++) {
+			if (result[i].memberType != IPackageMemberMgr.TYPE_FILE) {
+				filtered.add(result[i]);
+			}
+		}
+		return filtered.toArray(new MemberDesc[filtered.size()]);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -195,6 +207,7 @@ public class TestImportRefactorMoveToPackage {
 		return resultList;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Helper method for comparing a file group's content against it's expected
@@ -224,6 +237,20 @@ public class TestImportRefactorMoveToPackage {
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Validate that a packge member belongs to a specific package.
+	 * 
+	 * @param pkgId			The package that we expect the member to be in.
+	 * @param memberType	The type of member (TYPE_FILE, TYPE_FILE_GROUP, etc).
+	 * @param memberId		The ID of the member.
+	 */
+	private void validatePackage(int pkgId, int memberType, int memberId) {
+		PackageDesc desc = pkgMemberMgr.getPackageOfMember(memberType, memberId);
+		assertEquals(pkgId, desc.pkgId);
+	}
+	
 	/*=====================================================================================*
 	 * TEST METHODS
 	 *=====================================================================================*/
@@ -237,7 +264,9 @@ public class TestImportRefactorMoveToPackage {
 		
 		/* test with empty list */
 		try {
-			refactor.moveMembersToPackage(destPkgId, new ArrayList<MemberDesc>());
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, new ArrayList<MemberDesc>());
+			multiOp.redo();
 			assertEquals(0, getResult().length);
 		} catch (CanNotRefactorException e) {
 			fail();
@@ -245,7 +274,9 @@ public class TestImportRefactorMoveToPackage {
 		
 		/* test with null list */
 		try {
-			refactor.moveMembersToPackage(destPkgId, null);
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, null);
+			multiOp.redo();
 			fail();
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_MEMBER, e.getCauseCode());
@@ -254,7 +285,9 @@ public class TestImportRefactorMoveToPackage {
 		
 		/* test with invalid package ID */
 		try {
-			refactor.moveMembersToPackage(1389, buildList('f', f1));
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, 1389, buildList('f', f1));
+			multiOp.redo();
 			fail();
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_PACKAGE, e.getCauseCode());
@@ -265,8 +298,10 @@ public class TestImportRefactorMoveToPackage {
 		try {
 			List<MemberDesc> members = new ArrayList<MemberDesc>();
 			members.add(new MemberDesc(IPackageMemberMgr.TYPE_FILE, f1, 0, 0));
-			members.add(new MemberDesc(1357, f1, 0, 0));			
-			refactor.moveMembersToPackage(destPkgId, members);
+			members.add(new MemberDesc(1357, f1, 0, 0));
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, members);
+			multiOp.redo();
 			fail();
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_MEMBER, e.getCauseCode());
@@ -275,8 +310,10 @@ public class TestImportRefactorMoveToPackage {
 		
 		/* test with two invalid file IDs (mixed in with other valid members) */
 		try {
-			refactor.moveMembersToPackage(destPkgId, 
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, 
 					buildList('a', a1, 'f', f2, 'f', 1000, 'f', f3, 'f', 2000, 'a', a2));
+			multiOp.redo();
 			fail();
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_PATH, e.getCauseCode());
@@ -288,8 +325,10 @@ public class TestImportRefactorMoveToPackage {
 		
 		/* test with two invalid actions (and other valid members) */
 		try {
-			refactor.moveMembersToPackage(destPkgId, 
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, 
 					buildList('a', a1, 'f', f2, 'a', 1234, 'f', f3, 'a', 5678, 'a', a2));
+			multiOp.redo();
 			fail();
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_ACTION, e.getCauseCode());
@@ -301,8 +340,10 @@ public class TestImportRefactorMoveToPackage {
 		
 		/* test with two invalid file groups (and other valid members) */
 		try {
-			refactor.moveMembersToPackage(destPkgId, 
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, 
 					buildList('a', a1, 'g', 1359, 'g', fg2, 'g', fg1, 'g', 1357, 'g', 1358));
+			multiOp.redo();
 			fail();
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.INVALID_FILE_GROUP, e.getCauseCode());
@@ -322,16 +363,54 @@ public class TestImportRefactorMoveToPackage {
 	 */
 	@Test
 	public void testLooseFiles() {
+		
+		/* move three loose files into a package */
 		try {
-			refactor.moveMembersToPackage(destPkgId, buildList('f', f3, 'f', f1, 'f', f2));
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f3, 'f', f1, 'f', f2));
+			multiOp.redo();
 		} catch (CanNotRefactorException e) {
 			fail();
 		}
+		
+		/* 
+		 * Validate that the package now has a single file group containing those three files.
+		 * Also, each of the files must have been moved into the new package.
+		 */
 		MemberDesc members[] = getResult();
 		assertEquals(1, members.length);
 		MemberDesc fileGroup = members[0];
 		assertEquals(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup.memberType);
 		validateFileGroupContains(fileGroup.memberId, new Integer[] {f1, f2, f3});
+		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE, f1);
+		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE, f2);
+		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE, f3);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test that any "loose" files which out out of range of the package's root will cause
+	 * an exception.
+	 */
+	@Test
+	public void testLooseFilesOutOfRange() {
+		
+		/* set the source root of the package to @workspace/a/b */
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		assertEquals(ErrorCode.OK, pkgRootMgr.setPackageRoot(
+				destPkgId, IPackageRootMgr.SOURCE_ROOT, fileMgr.getPath("@workspace/a/b")));
+		
+		/* move three loose files into a package - f6 and f7 are in @workspace/a/c */
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f3, 'f', f6, 'f', f7));
+			multiOp.redo();
+			fail();
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.PATH_OUT_OF_RANGE, e.getCauseCode());
+			assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {f6,  f7}, e.getCauseIDs()));
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

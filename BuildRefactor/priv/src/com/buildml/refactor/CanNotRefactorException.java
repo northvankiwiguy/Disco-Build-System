@@ -100,6 +100,12 @@ public class CanNotRefactorException extends Exception {
 		 * returns the ID(s) of the action, or actions, that are in the directory.
 		 */
 		DIRECTORY_CONTAINS_ACTIONS,
+		
+		/**
+		 * The path, or paths are not within the bounds (roots) of the destination package.
+		 * getCauseIDs() return the ID(s) of the paths that are out of range.
+		 */
+		PATH_OUT_OF_RANGE
 	}
 	
 	/** The cause of the exception */

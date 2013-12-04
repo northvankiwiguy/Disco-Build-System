@@ -206,10 +206,12 @@ public class LayoutAlgorithm {
 				pkgId, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_ANY);
 		for (int i = 0; i < allMembers.length; i++) {
 			MemberDesc member = allMembers[i];
-			MemberDesc rightNeighbours[] = pkgMemberMgr.getNeighboursOf(
+			if (member.memberType != IPackageMemberMgr.TYPE_FILE) {
+				MemberDesc rightNeighbours[] = pkgMemberMgr.getNeighboursOf(
 					member.memberType, member.memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
-			if (rightNeighbours.length == 0) {
-				addWithNeighboursToAutoLayoutGrid(layoutGrid, member, 0);
+				if (rightNeighbours.length == 0) {
+					addWithNeighboursToAutoLayoutGrid(layoutGrid, member, 0);
+				}
 			}
 		}
 	

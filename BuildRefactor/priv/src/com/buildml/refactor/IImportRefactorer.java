@@ -98,12 +98,12 @@ public interface IImportRefactorer {
 	 * members are being moved, this may result in a whole chain of members being moved.
 	 * If moving from the &lt;import&gt package, new file groups and filters might need
 	 * to be created.
-	 * 
+	 * @param multiOp   	The IUndoOp multi operation to add changes to.
 	 * @param destPkgId		ID of the package to move the members into.
 	 * @param members		A List of members to be moved into the destination package.
 	 * @throws CanNotRefactorException Refactoring failed for some reason.
 	 */
-	public void moveMembersToPackage(int destPkgId, List<MemberDesc> members)
+	public void moveMembersToPackage(MultiUndoOp multiOp, int destPkgId, List<MemberDesc> members)
 			throws CanNotRefactorException;
 
 }

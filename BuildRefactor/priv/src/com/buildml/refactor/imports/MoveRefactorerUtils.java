@@ -13,7 +13,6 @@
 package com.buildml.refactor.imports;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.buildml.model.IActionMgr;
@@ -24,9 +23,15 @@ import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
+import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.undo.FileGroupUndoOp;
+import com.buildml.model.undo.FileUndoOp;
+import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.errors.FatalError;
 
 /**
  * A class of static utility methods to support commands in ImportRefactorer(). These
@@ -118,15 +123,21 @@ public class MoveRefactorerUtils {
 	 * 
 	 * All loose files are removed from the member list upon return.
 	 * 
+	 * @param multiOp 		The MultiUndoOp to add change operations to.
 	 * @param buildStore	The IBuildStore that holds the database.
 	 * @param destPkgId		The ID of the package to move files into.
 	 * @param members		The list of members to be moved.
+	 * @throws CanNotRefactorException If something goes wrong.
 	 */
 	public static void convertLooseFilesToFileGroup(
-			IBuildStore buildStore, int destPkgId, List<MemberDesc> members) {
+			MultiUndoOp multiOp, IBuildStore buildStore, int destPkgId, List<MemberDesc> members)
+					throws CanNotRefactorException {
 		
 		IActionMgr actionMgr = buildStore.getActionMgr();
+		IFileMgr fileMgr = buildStore.getFileMgr();
 		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
+		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
 		
 		/* we'll collect up all the loose paths */
 		List<MemberDesc> looseMembers = new ArrayList<MemberDesc>();
@@ -152,17 +163,67 @@ public class MoveRefactorerUtils {
 		}
 		
 		/*
-		 * If there are any loose files, create a file group.
+		 * If there are any loose files, create a file group and populate it with the
+		 * files.
 		 */
 		if (looseMembers.size() > 0) {
 			int fileGroupId = fileGroupMgr.newSourceGroup(destPkgId);
+			if (fileGroupId < 0) {
+				throw new FatalError("Unable to create new file group");
+			}
+			FileGroupUndoOp op = new FileGroupUndoOp(buildStore, fileGroupId);
+			List<Integer> newMembers = new ArrayList<Integer>(looseMembers.size());
 			for (MemberDesc member : looseMembers) {
-				fileGroupMgr.addPathId(fileGroupId, member.memberId);
+				newMembers.add(member.memberId);
+			}
+			op.recordMembershipChange(new ArrayList<Integer>(), newMembers);
+			multiOp.add(op);
+		
+			/* 
+			 * Move all the files into the destination package, using FileUndoOps. Before
+			 * a file can be moved, we must ensure that it's within the source root of the package.
+			 */
+			int pkgRootId = pkgRootMgr.getPackageRoot(destPkgId, IPackageRootMgr.SOURCE_ROOT);
+			if (pkgRootId == ErrorCode.NOT_FOUND) {
+				throw new FatalError("Unrecognized package ID");
+			}
+			List<Integer> filesOutOfRange = new ArrayList<Integer>();
+			
+			/* 
+			 * For each loose file, validate if it's within the package roots, and if so, 
+			 * schedule an UndoOp to make the necessary change. If not, throw an exception.
+			 */
+			for (MemberDesc member : looseMembers) {
+				int pathId = member.memberId;
+				PackageDesc oldDesc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId);
+				if (oldDesc == null) {
+					throw new FatalError("Can't find pathId");
+				}
+			
+				/* check that this path is within the source root */
+				if (fileMgr.isAncestorOf(pkgRootId, pathId)) {
+					FileUndoOp pkgChangeOp = new FileUndoOp(buildStore, pathId);
+					pkgChangeOp.recordChangePackage(oldDesc.pkgId, oldDesc.pkgScopeId, 
+							destPkgId, IPackageMemberMgr.SCOPE_PRIVATE);
+					multiOp.add(pkgChangeOp);
+				}
+				
+				/* 
+				 * Else, record this pathID as being out of range. We'll report an exception
+				 * once we've collected the complete list of invalid paths.
+				 */
+				else {
+					filesOutOfRange.add(pathId);
+				}
+			}
+			
+			/*
+			 * If any files were out of range, throw an exception.
+			 */
+			if (filesOutOfRange.size() > 0) {
+				throw new CanNotRefactorException(Cause.PATH_OUT_OF_RANGE, filesOutOfRange.toArray(new Integer[0]));
 			}
 		}
-		
-		// TODO: move the files into the new package.
-		// TODO: undo/redo.
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

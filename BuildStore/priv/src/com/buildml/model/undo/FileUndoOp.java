@@ -15,6 +15,7 @@ package com.buildml.model.undo;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -34,6 +35,7 @@ public class FileUndoOp implements IUndoOp {
 	 * back on an undo/redo operation.
 	 */
 	private final static int REMOVE_PATH    	= 1;
+	private final static int CHANGE_PACKAGE		= 2;
 	
 	/** The IBuildStore we're operating on */
 	private IBuildStore buildStore;
@@ -43,6 +45,18 @@ public class FileUndoOp implements IUndoOp {
 	
 	/** The ID of the path being changed */
 	private int pathId;
+	
+	/** For CHANGE_PACKAGE, what is the current package ID */
+	private int oldPkgId;
+	
+	/** For CHANGE_PACKAGE, what is the new package ID */
+	private int newPkgId;
+
+	/** For CHANGE_PACKAGE, what is the current scope ID */
+	private int oldScopeId;
+	
+	/** For CHANGE_PACKAGE, what is the new scope ID */
+	private int newScopeId;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -70,6 +84,27 @@ public class FileUndoOp implements IUndoOp {
 	public void recordRemovePath() {
 		changedFields |= REMOVE_PATH;
 	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Record the fact that a path has moved into a different package.
+	 * 
+	 * @param oldPkgId		ID of the path's current package.
+	 * @param oldScopeId	ID of the path's current scope.
+	 * @param newPkgId		ID of the path's new package.
+	 * @param newScopeId	ID of the path's new scope.
+	 */
+	public void recordChangePackage(int oldPkgId, int oldScopeId, int newPkgId, int newScopeId) {
+		if ((oldPkgId == newPkgId) && (oldScopeId == newScopeId)) {
+			return;
+		}
+		changedFields |= CHANGE_PACKAGE;
+		this.oldPkgId = oldPkgId;
+		this.newPkgId = newPkgId;
+		this.oldScopeId = oldScopeId;
+		this.newScopeId = newScopeId;
+	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
@@ -79,13 +114,19 @@ public class FileUndoOp implements IUndoOp {
 	@Override
 	public boolean undo() {
 		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		
-		/* if the action's package needs to change... */
+		/* undo removal of a path */
 		if ((changedFields & REMOVE_PATH) != 0) {
 			if (fileMgr.revivePathFromTrash(pathId) != ErrorCode.OK) {
 				throw new FatalBuildStoreError(
 						"Unable to revive file from trash: " + fileMgr.getPathName(pathId));
 			}
+		}
+
+		/* undo the change of package/scope */
+		if ((changedFields & CHANGE_PACKAGE) != 0) {
+			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId, oldPkgId, oldScopeId);
 		}
 		
 		return (changedFields != 0);
@@ -99,15 +140,21 @@ public class FileUndoOp implements IUndoOp {
 	@Override
 	public boolean redo() {
 		IFileMgr fileMgr = buildStore.getFileMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 
-		/* if the file group's package needs to change... */
+		/* do/redo removal of a path */
 		if ((changedFields & REMOVE_PATH) != 0) {
 			if (fileMgr.movePathToTrash(pathId) != ErrorCode.OK) {
 				throw new FatalBuildStoreError(
 						"Unable to move file to trash: " + fileMgr.getPathName(pathId));
 			}
 		}
-		
+
+		/* do/redo the change of package/scope */
+		if ((changedFields & CHANGE_PACKAGE) != 0) {
+			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId, newPkgId, newScopeId);
+		}
+
 		/* if there's a change, mark the editor as dirty */
 		return (changedFields != 0);
 	}
