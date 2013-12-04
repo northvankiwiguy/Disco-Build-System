@@ -14,7 +14,9 @@ package com.buildml.eclipse.utils;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -31,7 +33,7 @@ import org.eclipse.swt.widgets.Label;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class AlertDialog extends BmlTitleAreaDialog {
+public class AlertDialog extends TitleAreaDialog {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -67,6 +69,12 @@ public class AlertDialog extends BmlTitleAreaDialog {
 		this.message = message;
 		this.severity = severity;
 		this.allowCancel = allowCancel;
+		
+		/* set the title image to say "BuildML" */
+		Image iconImage = EclipsePartUtils.getImage("images/buildml_logo_dialog.gif");
+		if (iconImage != null) {
+			setTitleImage(iconImage);
+		}
 	}
 	
 	/*=====================================================================================*
@@ -179,16 +187,6 @@ public class AlertDialog extends BmlTitleAreaDialog {
 		} else {
 			return super.createButton(parent, id, label, defaultButton);
 		}
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#getInitialSize()
-	 */
-	@Override
-	protected Point getInitialSize() {
-		return new Point(EclipsePartUtils.getScreenWidth() / 4, EclipsePartUtils.getScreenHeight() / 4);
 	}
 	
 	/*=====================================================================================*
