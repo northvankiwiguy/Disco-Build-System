@@ -117,6 +117,9 @@ public class ActionsEditor extends ImportSubEditor
 	 */
 	UIAction previousSelection = null;
 
+	/** True if we currently have a TreeViewer refresh scheduled to occur, else false */
+	private boolean currentlyRefreshing = false;
+
 	/*=====================================================================================*
 	 * CONSTRUCTOR
 	 *=====================================================================================*/
@@ -610,10 +613,16 @@ public class ActionsEditor extends ImportSubEditor
 	 * for each individual update.
 	 */
 	private void scheduleRefresh() {
+		if (currentlyRefreshing) {
+			return;
+		}
+		currentlyRefreshing = true;
+		
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				refreshView(true);
+				currentlyRefreshing = false;
 			}
 		});
 	}

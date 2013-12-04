@@ -36,7 +36,6 @@ import org.eclipse.ui.part.EditorPart;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.preferences.PreferenceConstants;
 import com.buildml.eclipse.utils.AlertDialog;
-import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.os.SystemUtils;
@@ -90,12 +89,6 @@ public abstract class ImportSubEditor extends EditorPart implements IElementComp
 	 * They should only see the message once per Eclipse invocation, so this field is static.
 	 */
 	private static boolean warnedAboutPathOverride = false;
-	
-	/**
-	 * Records the time at which this sub-editor's view was last updated. If this is 
-	 * less than the MainEditor.getModelChangeCount() then the view is out of date.
-	 */
-	private long lastRefreshedAtChange = 0;
 	
 	/**
 	 * Record whether or not we've been disposed. Nobody should be allowed to make this
