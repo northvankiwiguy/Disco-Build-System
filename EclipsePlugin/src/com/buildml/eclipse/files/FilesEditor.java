@@ -55,6 +55,8 @@ import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgrListener;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
@@ -67,7 +69,8 @@ import com.buildml.utils.types.IntegerTreeSet;
  * 
  * @author "Peter Smith <psmith@arapiki.com>"
  */
-public class FilesEditor extends ImportSubEditor implements IPackageMgrListener, IFileMgrListener {
+public class FilesEditor extends ImportSubEditor 
+		implements IPackageMgrListener, IFileMgrListener, IPackageMemberMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -93,6 +96,9 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 
 	/** The PackageRootMgr object that contains the package root information */
 	private IPackageRootMgr pkgRootMgr = null;
+	
+	/** The PackageMemberMgr that tracks file membership */
+	private IPackageMemberMgr pkgMemberMgr = null;
 
 	/** The ArrayContentProvider object providing this editor's content */
 	private FilesEditorContentProvider contentProvider;
@@ -114,6 +120,9 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 
 	/** The TreeViewer's parent control. */
 	private Composite filesEditorComposite;
+	
+	/** True if we currently have a TreeViewer refresh scheduled to occur, else false */
+	private boolean currentlyRefreshing = false;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -130,9 +139,11 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 		fileMgr = buildStore.getFileMgr();
 		pkgMgr = buildStore.getPackageMgr();
 		pkgRootMgr = buildStore.getPackageRootMgr();
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		pkgMgr.addListener(this);
 		pkgRootMgr.addListener(this);
 		fileMgr.addListener(this);
+		pkgMemberMgr.addListener(this);
 
 		/* initially, all paths are visible */
 		visiblePaths = buildStore.getReportMgr().reportAllFiles();
@@ -582,6 +593,21 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMemberMgrListener#packageMemberChangeNotification(int, int, int, int)
+	 */
+	@Override
+	public void packageMemberChangeNotification(int pkgId, int how, int memberType, int memberId) {
+		
+		if (how == IPackageMemberMgrListener.CHANGED_MEMBERSHIP) {
+			if (isOptionSet(EditorOptions.OPT_SHOW_PACKAGES)) {
+				scheduleRefresh();
+			}
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileMgrListener#pathChangeNotification(int, int)
 	 */
 	@Override
@@ -602,6 +628,7 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 		pkgMgr.removeListener(this);
 		pkgRootMgr.removeListener(this);
 		fileMgr.removeListener(this);
+		pkgMemberMgr.removeListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -639,10 +666,16 @@ public class FilesEditor extends ImportSubEditor implements IPackageMgrListener,
 	 * for each individual update.
 	 */
 	private void scheduleRefresh() {
+		if (currentlyRefreshing) {
+			return;
+		}
+		currentlyRefreshing = true;
+		
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				refreshView(true);
+				currentlyRefreshing = false;
 			}
 		});
 	}
