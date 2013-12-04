@@ -577,7 +577,8 @@ public class ActionsEditor extends ImportSubEditor
 	@Override
 	public void actionChangeNotification(int actionId, int how, int changeId) {
 
-		if (how == IActionMgrListener.TRASHED_ACTION) {
+		if ((how == IActionMgrListener.TRASHED_ACTION) ||
+				(how == IActionMgrListener.CHANGED_COMMAND)) {
 			scheduleRefresh();
 		}
 	}
