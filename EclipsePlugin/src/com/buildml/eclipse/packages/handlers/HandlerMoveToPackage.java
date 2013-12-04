@@ -30,6 +30,8 @@ import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.outline.OutlinePage;
+import com.buildml.eclipse.packages.PackageDiagramEditor;
+import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
@@ -94,6 +96,17 @@ public class HandlerMoveToPackage extends AbstractHandler {
 					
 					/* open the package diagram so the user can see the results */
 					editor.openPackageDiagram(pkgId);
+
+					/* 
+					 * re-layout the package members - this must be done as a separate multiOp
+					 * since the planning algorithm depends on all the members being in
+					 * the package.
+					 */
+					multiOp = new MultiUndoOp();
+					PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
+					LayoutAlgorithm layoutAlgorithm = pde.getLayoutAlgorithm();
+					layoutAlgorithm.autoLayoutPackage(multiOp, pkgId);
+					new UndoOpAdapter("Auto Layout Package", multiOp).invoke();
 					
 				} catch (CanNotRefactorException e) {
 					displayErrorMessage(pkgId, e.getCauseCode(), e.getCauseIDs());
@@ -214,6 +227,11 @@ public class HandlerMoveToPackage extends AbstractHandler {
 			} else {
 				displayPaths(sb, new Integer[] { pkgRootId });
 			}
+			break;
+			
+		case FILE_IS_MODIFIED:
+			sb.append("The following files are written-to by multiple actions:\n\n");
+			displayPaths(sb, causeIDs);
 			break;
 	
 		default:
