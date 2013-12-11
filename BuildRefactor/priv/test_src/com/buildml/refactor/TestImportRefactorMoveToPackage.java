@@ -60,14 +60,14 @@ public class TestImportRefactorMoveToPackage {
 	/** The empty package we're moving members into */
 	private int destPkgId;
 	
-	/** The source package that we create file groups in (they can't be in import) */
+	/** The source package that we create file groups in (file groups can't be in import) */
 	private int srcPkgId;
 	
 	/** IDs of all the files that we're creating in our test harness */
-	private int f1, f2, f3, f4, f5, f6, f7, f8;
+	private int f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16;
 	
 	/** IDs of all the actions that we're creating in our test harness */
-	private int a1, a2, a3;
+	private int a1, a2, a3, a4, a5;
 	
 	/** IDs of all the file groups that we're creating in our test harness */
 	private int fg1, fg2;
@@ -107,11 +107,15 @@ public class TestImportRefactorMoveToPackage {
 		 * f1
 		 * f2
 		 * f3
-		 * f4 - a1
-		 * f5 - a1
-		 * f6 - a2
-		 * f7 - a2
-		 * f8 - a2
+		 * f4 - a1 - f9  - a3 - f14
+		 *           f9  - a4 - f15
+		 *           f9  - a5 - f16
+		 * f5 - a1 - f10 - a3
+		 *           f10 - a4 - f15
+		 *           f10 - a5 - f16
+		 * f6 - a2 - f11 - a3
+		 * f7 - a2 - f12 - a3
+		 * f8 - a2 - f13 - a3
 		 * 
 		 * fg1
 		 * fg2
@@ -127,14 +131,45 @@ public class TestImportRefactorMoveToPackage {
 		f6 = fileMgr.addFile("@workspace/a/c/file6");
 		f7 = fileMgr.addFile("@workspace/a/c/file7");
 		f8 = fileMgr.addFile("@workspace/a/c/file8");
+		f9 = fileMgr.addFile("@workspace/a/c/file9");
+		f10 = fileMgr.addFile("@workspace/a/c/file10");
+		f11 = fileMgr.addFile("@workspace/a/c/file11");
+		f12 = fileMgr.addFile("@workspace/a/c/file12");
+		f13 = fileMgr.addFile("@workspace/a/c/file13");
+		f14 = fileMgr.addFile("@workspace/a/c/file14");
+		f15 = fileMgr.addFile("@workspace/a/c/file15");
+		f16 = fileMgr.addFile("@workspace/a/c/file16");
 		a1 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a1");
-		actionMgr.addFileAccess(a1, f4, OperationType.OP_READ);
-		actionMgr.addFileAccess(a1, f5, OperationType.OP_READ);
-		actionMgr.addFileAccess(a2, f6, OperationType.OP_READ);
-		actionMgr.addFileAccess(a2, f7, OperationType.OP_READ);
 		a2 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a2");
+		a3 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a3");
+		a4 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a4");
+		a5 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a5");
 		fg1 = fileGroupMgr.newSourceGroup(srcPkgId);
 		fg2 = fileGroupMgr.newSourceGroup(srcPkgId);
+		
+		/* add file access relationships - as shown in the diagram */
+		actionMgr.addFileAccess(a1, f4, OperationType.OP_READ);
+		actionMgr.addFileAccess(a1, f5, OperationType.OP_READ);
+		actionMgr.addFileAccess(a1, f9, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a1, f10, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a2, f6, OperationType.OP_READ);
+		actionMgr.addFileAccess(a2, f7, OperationType.OP_READ);
+		actionMgr.addFileAccess(a2, f8, OperationType.OP_READ);
+		actionMgr.addFileAccess(a2, f11, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a2, f12, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a2, f13, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a3, f9, OperationType.OP_READ);
+		actionMgr.addFileAccess(a3, f10, OperationType.OP_READ);
+		actionMgr.addFileAccess(a3, f11, OperationType.OP_READ);
+		actionMgr.addFileAccess(a3, f12, OperationType.OP_READ);
+		actionMgr.addFileAccess(a3, f13, OperationType.OP_READ);
+		actionMgr.addFileAccess(a3, f14, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a4, f9, OperationType.OP_READ);
+		actionMgr.addFileAccess(a4, f10, OperationType.OP_READ);
+		actionMgr.addFileAccess(a4, f15, OperationType.OP_WRITE);
+		actionMgr.addFileAccess(a5, f9, OperationType.OP_READ);
+		actionMgr.addFileAccess(a5, f10, OperationType.OP_READ);
+		actionMgr.addFileAccess(a5, f16, OperationType.OP_WRITE);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -153,13 +188,17 @@ public class TestImportRefactorMoveToPackage {
 	 *=====================================================================================*/
 	
 	/**
+	 * Fetch the members in the destination package, to check what was moved.
+	 * 
+	 * @param type The type of result we're looking for (TYPE_ANY, TYPE_ACTION, etc).
 	 * @return The members that were actually refactored into our destination package. We
 	 * 		   extract all TYPE_FILE members because they're not interesting.
 	 */
-	private MemberDesc[] getResult() {
+	private MemberDesc[] getResult(int type) {
 		MemberDesc result[] = pkgMemberMgr.getMembersInPackage(destPkgId, 
-				IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_ANY);
+				IPackageMemberMgr.SCOPE_NONE, type);
 		
+		/* remove any files that we may have collected (files aren't shown in a diagram) */
 		List<MemberDesc> filtered = new ArrayList<IPackageMemberMgr.MemberDesc>();
 		for (int i = 0; i < result.length; i++) {
 			if (result[i].memberType != IPackageMemberMgr.TYPE_FILE) {
@@ -217,7 +256,7 @@ public class TestImportRefactorMoveToPackage {
 	 * @param fileGroupId	The ID of the file group.
 	 * @param expected		An array of expected ID values.
 	 */
-	private void validateFileGroupContains(int fileGroupId, Integer[] expected) {
+	private void validateFileGroupContents(int fileGroupId, Integer[] expected) {
 
 		Integer actual[] = fileGroupMgr.getPathIds(fileGroupId);
 		assertNotNull(actual);
@@ -240,7 +279,7 @@ public class TestImportRefactorMoveToPackage {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Validate that a packge member belongs to a specific package.
+	 * Validate that a package member belongs to a specific package.
 	 * 
 	 * @param pkgId			The package that we expect the member to be in.
 	 * @param memberType	The type of member (TYPE_FILE, TYPE_FILE_GROUP, etc).
@@ -249,6 +288,49 @@ public class TestImportRefactorMoveToPackage {
 	private void validatePackage(int pkgId, int memberType, int memberId) {
 		PackageDesc desc = pkgMemberMgr.getPackageOfMember(memberType, memberId);
 		assertEquals(pkgId, desc.pkgId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Validate that an action, and its input and output file groups are correct. This method
+	 * is called by all of our test* methods.
+	 * 
+	 * @param destPkgId 	The ID of the package we're moving things to.
+	 * @param actionId		The action we're validating
+	 * @param inputFiles	The array of files we're expecting to see at the input.
+	 * @param outputFiles	The array of files we're expecting to see on the output.
+	 */
+	private void validateInputsOutputs(int destPkgId, int actionId, Integer[] inputFiles, Integer[] outputFiles) {
+		
+		validatePackage(destPkgId, IPackageMemberMgr.TYPE_ACTION, actionId);
+
+		Integer inputSlotValue = (Integer) actionMgr.getSlotValue(
+				actionId, actionMgr.getSlotByName(actionId, "Input"));
+		Integer outputSlotValue = (Integer) actionMgr.getSlotValue(
+				actionId, actionMgr.getSlotByName(actionId, "Output0"));
+		assertNotNull(inputSlotValue);
+		assertNotNull(outputSlotValue);
+		
+		/* confirm that each of the input/output file groups are in destPkgId */
+		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE_GROUP, inputSlotValue);
+		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE_GROUP, outputSlotValue);
+		
+		/* 
+		 * Confirm the membership of the input file group. Given that it could be any type
+		 * of group, we must expand the content of the group in order to validate it.
+		 */
+		String actualInputs[] = fileGroupMgr.getExpandedGroupFiles(inputSlotValue);
+		List<String> expectedInputs = new ArrayList<String>();
+		for (int i = 0; i < inputFiles.length; i++) {
+			expectedInputs.add(fileMgr.getPathName(inputFiles[i], true));
+		}
+		String expectedInputArray[] = expectedInputs.toArray(new String[0]);
+		assertTrue(CommonTestUtils.sortedArraysEqual(expectedInputArray, actualInputs));
+
+		/* confirm the membership of the output file group */
+		Integer actualOutputs[] = fileGroupMgr.getPathIds(outputSlotValue);
+		assertTrue(CommonTestUtils.sortedArraysEqual(outputFiles, actualOutputs));
 	}
 	
 	/*=====================================================================================*
@@ -267,7 +349,7 @@ public class TestImportRefactorMoveToPackage {
 			MultiUndoOp multiOp = new MultiUndoOp();
 			refactor.moveMembersToPackage(multiOp, destPkgId, new ArrayList<MemberDesc>());
 			multiOp.redo();
-			assertEquals(0, getResult().length);
+			assertEquals(0, getResult(IPackageMemberMgr.TYPE_ANY).length);
 		} catch (CanNotRefactorException e) {
 			fail();
 		}
@@ -377,11 +459,11 @@ public class TestImportRefactorMoveToPackage {
 		 * Validate that the package now has a single file group containing those three files.
 		 * Also, each of the files must have been moved into the new package.
 		 */
-		MemberDesc members[] = getResult();
+		MemberDesc members[] = getResult(IPackageMemberMgr.TYPE_ANY);
 		assertEquals(1, members.length);
 		MemberDesc fileGroup = members[0];
 		assertEquals(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroup.memberType);
-		validateFileGroupContains(fileGroup.memberId, new Integer[] {f1, f2, f3});
+		validateFileGroupContents(fileGroup.memberId, new Integer[] {f1, f2, f3});
 		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE, f1);
 		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE, f2);
 		validatePackage(destPkgId, IPackageMemberMgr.TYPE_FILE, f3);
@@ -410,6 +492,297 @@ public class TestImportRefactorMoveToPackage {
 		} catch (CanNotRefactorException e) {
 			assertEquals(Cause.PATH_OUT_OF_RANGE, e.getCauseCode());
 			assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] {f6,  f7}, e.getCauseIDs()));
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test moving of action a1.
+	 */
+	@Test
+	public void testMoveActionA1() {
+
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('a', a1));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/* 
+		 * Package should now contain:
+		 * 	- Input file group: {f4, f5}
+		 *  - Action a1
+		 *  - Output file group: {f9, f10}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(1, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(2, fileGroups.length);
+		
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test moving a2
+	 */
+	@Test
+	public void testMoveActionA2() {
+
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('a', a2));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/* 
+		 * Package should now contain:
+		 * 	- Input file group: {f6, f7, f8}
+		 *  - Action a2
+		 *  - Output file group: {f11, f12, f13}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(1, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(2, fileGroups.length);
+		
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a2, new Integer[] {f6, f7, f8}, new Integer[] {f11, f12, f13});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test moving f10
+	 */
+	@Test
+	public void testMoveFileF10() {
+
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f10));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+
+		/* 
+		 * Package should now contain:
+		 * 	- Input file group: {f4, f5}
+		 *  - Action a1
+		 *  - Output file group: {f9, f10}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(1, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(2, fileGroups.length);
+
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test moving f12
+	 */
+	@Test
+	public void testMoveFileF12() {
+
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f12));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/* 
+		 * Package should now contain:
+		 * 	- Input file group: {f6, f7, f8}
+		 *  - Action a2
+		 *  - Output file group: {f11, f12, f13}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(1, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(2, fileGroups.length);
+		
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a2, new Integer[] {f6, f7, f8}, new Integer[] {f11, f12, f13});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test moving f10 and f12
+	 */
+	@Test
+	public void testMoveFileF1012() {
+
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f12, 'f', f10));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/* 
+		 * Package should now contain:
+		 *  - Input file group: {f4, f5}
+		 *  - Action a1
+		 *  - Output file group: {f9, f10}
+		 * AND
+		 * 	- Input file group: {f6, f7, f8}
+		 *  - Action a2
+		 *  - Output file group: {f11, f12, f13}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(2, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(4, fileGroups.length);
+		
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+		validateInputsOutputs(destPkgId, a2, new Integer[] {f6, f7, f8}, new Integer[] {f11, f12, f13});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 *  Test chain where multiple actions converge into a single action.
+	 */
+	@Test
+	public void testMoveFileF14() {
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f14));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/* 
+		 * Package should now contain:
+		 *  - Input file group: {f4, f5}
+		 *  - Action a1
+		 *  - Output file group: {f9, f10}
+		 * AND
+		 * 	- Input file group: {f6, f7, f8}
+		 *  - Action a2
+		 *  - Output file group: {f11, f12, f13}
+		 * AND
+		 * 	- Input file group: {f9, f10, f11, f12, f13}
+		 *  - Action a3
+		 *  - Output file group: {f14}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(3, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(6, fileGroups.length);
+		
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+		validateInputsOutputs(destPkgId, a2, new Integer[] {f6, f7, f8}, new Integer[] {f11, f12, f13});		
+		validateInputsOutputs(destPkgId, a3, new Integer[] {f9, f10, f11, f12, f13}, new Integer[] {f14});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 *  Test chain where a single action splits out into multiple actions..
+	 */
+	@Test
+	public void testMoveFileF14F15() {
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f15, 'f', f16));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/* 
+		 * Package should now contain:
+		 *  - Input file group: {f4, f5}
+		 *  - Action a1
+		 *  - Output file group: {f9, f10}
+		 * AND
+		 * 	- Input file group: {f9, f10}
+		 *  - Action a4
+		 *  - Output file group: {f15}
+		 * AND
+		 * 	- Input file group: {f9, f10}
+		 *  - Action a5
+		 *  - Output file group: {f16}
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(3, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(4, fileGroups.length);
+		
+		/* confirm that action A1 has an input and output slot connected, and that the file groups are correct */
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+		validateInputsOutputs(destPkgId, a4, new Integer[] {f9, f10}, new Integer[] {f15});		
+		validateInputsOutputs(destPkgId, a5, new Integer[] {f9, f10}, new Integer[] {f16});
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test moving an action that writes into /home (which is out of range of the package).
+	 */
+	@Test
+	public void testMoveWriteToOutOfRange() {
+		
+		/* create a new file /tmp/foo, that action a1 writes to */
+		int fTmp = fileMgr.addFile("/home/foo");
+		assertTrue(fTmp > 0);
+		actionMgr.addFileAccess(a1, fTmp, OperationType.OP_WRITE);
+		
+		/* try the move - it will fail */
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('a', a1));
+			multiOp.redo();
+			fail();
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.PATH_OUT_OF_RANGE, e.getCauseCode());
+			Integer ids[] = e.getCauseIDs();
+			assertEquals(1, ids.length);
+			assertEquals(Integer.valueOf(fTmp), ids[0]);
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test moving a non-atomic action (
+	 */
+	@Test
+	public void testMoveNonAtomic() {
+		
+		/* create a child action for a1 */
+		int actionDirId = fileMgr.getPath("/");
+		int a1Child = actionMgr.addShellCommandAction(a1, actionDirId, "a1Child");
+		
+		/* move a chain, which has a1 in it */
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f15, 'f', f16));
+			multiOp.redo();
+			fail();
+		} catch (CanNotRefactorException e) {
+			assertEquals(Cause.ACTION_NOT_ATOMIC, e.getCauseCode());
+			assertEquals(a1, (int)(e.getCauseIDs()[0]));
 		}
 	}
 	

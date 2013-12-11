@@ -105,7 +105,13 @@ public class CanNotRefactorException extends Exception {
 		 * The path, or paths are not within the bounds (roots) of the destination package.
 		 * getCauseIDs() return the ID(s) of the paths that are out of range.
 		 */
-		PATH_OUT_OF_RANGE
+		PATH_OUT_OF_RANGE,
+		
+		/**
+		 * There are multiple actions that generate a specific file, which is not allowed.
+		 * getCauseIDs() return the ID of the file(s) that are modified.
+		 */
+		FILE_IS_MODIFIED
 	}
 	
 	/** The cause of the exception */
