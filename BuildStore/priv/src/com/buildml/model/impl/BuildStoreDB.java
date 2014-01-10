@@ -685,6 +685,16 @@ import com.buildml.model.IPackageMemberMgr;
 		if (saveRequired) {
 			setFastAccessMode(false);
 			FileUtils.copyFile(new File(tempDatabaseFileName), new File(databaseFileName));
+			
+			/*
+			 * We must now empty the trash on the file that was saved, so that it no longer
+			 * includes all objects (actions, file groups, etc) that were deleted. However,
+			 * we must NOT empty the trash on the temporary database, since the user can
+			 * still do "undo" the delete.
+			 */
+			BuildStoreDB emptyTrashDB = new BuildStoreDB(databaseFileName, false);
+			emptyTrashDB.emptyTrash();
+			emptyTrashDB.close();
 		}
 	}
 	
