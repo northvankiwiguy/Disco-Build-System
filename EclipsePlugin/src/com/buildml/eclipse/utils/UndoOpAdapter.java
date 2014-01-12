@@ -111,7 +111,11 @@ public class UndoOpAdapter extends AbstractOperation {
 		 * Perform the operation. If there's a change to the database, mark the editor as 
 		 * dirty so that it reflects in the editor tab's title with a "*"
 		 */
-		if (operation.redo()) {
+		IBuildStore buildStore = mainEditor.getBuildStore();
+		boolean prevState = buildStore.setFastAccessMode(true);
+		boolean opState = operation.redo();
+		buildStore.setFastAccessMode(prevState);
+		if (opState) {
 			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
 			if (editor != null) {
 				editor.markDirty(1);
@@ -142,7 +146,11 @@ public class UndoOpAdapter extends AbstractOperation {
 		 * Un-perform the operation. If there's a change to the database, mark the editor as 
 		 * dirty so that it reflects in the editor tab's title with a "*"
 		 */
-		if (operation.undo()) {
+		IBuildStore buildStore = mainEditor.getBuildStore();
+		boolean prevState = buildStore.setFastAccessMode(true);
+		boolean opState = operation.undo();
+		buildStore.setFastAccessMode(prevState);
+		if (opState) {
 			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
 			if (editor != null) {
 				editor.markDirty(-1);

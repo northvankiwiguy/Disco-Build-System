@@ -197,7 +197,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 	public void parse() throws IOException {
 		
 		/* we'll do a lot of writing to the database, speed up access in favour of safety. */
-		buildStore.setFastAccessMode(true);
+		boolean prevState = buildStore.setFastAccessMode(true);
 		
 		String fileName = null;
 		boolean eof = false;
@@ -264,7 +264,7 @@ import com.buildml.utils.string.ShellCommandUtils;
 				
 		} while (!eof);
 		
-		buildStore.setFastAccessMode(false);
+		buildStore.setFastAccessMode(prevState);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

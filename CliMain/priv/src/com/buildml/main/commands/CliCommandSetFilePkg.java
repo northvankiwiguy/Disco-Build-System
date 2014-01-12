@@ -121,7 +121,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 
 		/* now visit each file in the FileSet and set it's package/scope */
 		boolean errorOccurred = false;
-		buildStore.setFastAccessMode(true);
+		boolean prevState = buildStore.setFastAccessMode(true);
 		for (int file : filesToSet) {
 			int rc = pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, file, pkgId, scopeId);
 			if (rc == ErrorCode.OUT_OF_RANGE) {
@@ -130,7 +130,7 @@ public class CliCommandSetFilePkg implements ICliCommand {
 				errorOccurred = true;
 			}
 		}
-		buildStore.setFastAccessMode(false);
+		buildStore.setFastAccessMode(prevState);
 
 		if (errorOccurred) {
 			CliUtils.reportErrorAndExit("One or more errors occurred while changing packages.");

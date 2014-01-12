@@ -1309,7 +1309,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 	private void setMembersHelper(int groupId, Object[] members) {
 
 		/* lots of individual changes here - do them without committing */
-		db.setFastAccessMode(true);
+		boolean prevState = db.setFastAccessMode(true);
 		
 		/* start by removing all existing members of this group */
 		try {
@@ -1339,7 +1339,7 @@ public class FileGroupMgr implements IFileGroupMgr {
 		}
 
 		/* commit */
-		db.setFastAccessMode(false);
+		db.setFastAccessMode(prevState);
 
 		/* notify about the change */
 		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);

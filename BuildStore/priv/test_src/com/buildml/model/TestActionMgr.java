@@ -684,7 +684,7 @@ public class TestActionMgr {
 	@Test
 	public void testScalability() {
 
-		bs.setFastAccessMode(true);
+		boolean prevState = bs.setFastAccessMode(true);
 
 		/* create a large number of randomly-generated file names */
 		Random r = new Random();
@@ -716,7 +716,7 @@ public class TestActionMgr {
 			/* now read the files that were added */
 			actionMgr.getFilesAccessed(actionId, OperationType.OP_UNSPECIFIED);
 		}
-		bs.setFastAccessMode(false);
+		bs.setFastAccessMode(prevState);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

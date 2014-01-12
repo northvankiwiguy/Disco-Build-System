@@ -252,14 +252,14 @@ public class TestFileIncludeMgr {
 	@Test
 	public void testScalability() {
 		
-		bs.setFastAccessMode(true);
+		boolean prevState = bs.setFastAccessMode(true);
 
 		/* create a large number of randomly-generated file relationships */
 		Random r = new Random();
 		for (int i = 0; i != 50000; i++) {
 			fileIncludeMgr.addFileIncludes(r.nextInt(100), r.nextInt(100));
 		}
-		bs.setFastAccessMode(false);
+		bs.setFastAccessMode(prevState);
 		
 		/*
 		 * Now, fetch them in various ways.

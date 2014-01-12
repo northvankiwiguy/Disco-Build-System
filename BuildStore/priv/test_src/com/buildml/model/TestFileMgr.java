@@ -588,7 +588,7 @@ public class TestFileMgr {
 	@Test
 	public void testAddManyFiles() {
 		
-		bs.setFastAccessMode(true);
+		boolean prevState = bs.setFastAccessMode(true);
 
 		/* create a large number of randomly-generated file names */
 		Random r = new Random();
@@ -613,7 +613,7 @@ public class TestFileMgr {
 			/* add the file name to the FileSpace */
 			fileMgr.addFile(sb.toString());
 		}
-		bs.setFastAccessMode(false);
+		bs.setFastAccessMode(prevState);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

@@ -349,8 +349,8 @@ public class BuildStore implements IBuildStore {
 	 * @see com.buildml.model.IBuildStore#setFastAccessMode(boolean)
 	 */
 	@Override
-	public void setFastAccessMode(boolean fast) {
-		db.setFastAccessMode(fast);
+	public boolean setFastAccessMode(boolean fast) {
+		return db.setFastAccessMode(fast);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

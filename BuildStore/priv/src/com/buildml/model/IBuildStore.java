@@ -128,8 +128,9 @@ public interface IBuildStore {
 	 * written to disk.
 	 * 
 	 * @param fast Set to true to enable fast access, or false for safe access.
+	 * @return The previous state of fast access mode (before this call was made).
 	 */
-	public abstract void setFastAccessMode(boolean fast);
+	public abstract boolean setFastAccessMode(boolean fast);
 
 	/**
 	 * Close the BuildStore, and release any resources associated with it.

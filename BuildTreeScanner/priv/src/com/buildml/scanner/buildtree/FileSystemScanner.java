@@ -73,7 +73,7 @@ public class FileSystemScanner {
 		final IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* make the database really fast (turn off auto-commit ). */
-		buildStore.setFastAccessMode(true);
+		boolean prevState = buildStore.setFastAccessMode(true);
 		
 		/* now traverse the file system */
 		SystemUtils.traverseFileSystem(fileSystemPath, 
@@ -96,7 +96,7 @@ public class FileSystemScanner {
 				});
 		
 		/* now commit everything */
-		buildStore.setFastAccessMode(false);
+		buildStore.setFastAccessMode(prevState);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

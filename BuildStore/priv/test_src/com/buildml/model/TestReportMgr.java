@@ -159,7 +159,7 @@ public class TestReportMgr {
 		int numActions = 100;
 		int filesPerAction = 2000;
 		
-		bs.setFastAccessMode(true);
+		boolean prevState = bs.setFastAccessMode(true);
 		Random r = new Random();
 		
 		/* add a bunch of files */
@@ -175,7 +175,7 @@ public class TestReportMgr {
 				actionMgr.addFileAccess(actionId, r.nextInt(numFiles), OperationType.OP_READ);
 			}
 		}
-		bs.setFastAccessMode(false);
+		bs.setFastAccessMode(prevState);
 
 		/* now, run a report - we don't care about the results, just the response time */
 		reports.reportMostCommonlyAccessedFiles();
@@ -242,7 +242,7 @@ public class TestReportMgr {
 		int numFiles = 20000;
 		int numIncludes = 200000;
 		
-		bs.setFastAccessMode(true);
+		boolean prevState = bs.setFastAccessMode(true);
 		Random r = new Random();
 		
 		int file1 = fileMgr.addFile("/file1");
@@ -254,7 +254,7 @@ public class TestReportMgr {
 			fileIncludeMgr.addFileIncludes(r.nextInt(numFiles), file2);
 		}
 		
-		bs.setFastAccessMode(false);
+		bs.setFastAccessMode(prevState);
 
 		/* now, run a report - we don't care about the results, just the response time */
 		reports.reportMostCommonIncludersOfFile(file1);

@@ -102,11 +102,11 @@ public class ElectricAnnoScanner {
 		 * Read the *.xml file and process the content. This could take a long
 		 * time, so put the database in fast mode.
 		 */
-		buildStore.setFastAccessMode(true);
+		boolean prevState = buildStore.setFastAccessMode(true);
 		try {
 			parser.parse(new InputSource(in));
 		} finally {
-			buildStore.setFastAccessMode(false);
+			buildStore.setFastAccessMode(prevState);
 		}
 	}
 	

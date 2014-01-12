@@ -69,6 +69,12 @@ import com.buildml.model.IPackageMemberMgr;
 	 */
 	private boolean saveRequired;
 	
+	/**
+	 * True if the database is in "fast mode" (i.e. auto-commit is disabled). By default,
+	 * this is turned off (auto-commit is one). 
+	 */
+	private boolean fastAccessMode = false;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -375,10 +381,16 @@ import com.buildml.model.IPackageMemberMgr;
 	 * changes are written to the disk. Only use fast access for "large write" operations.
 	 * 
 	 * @param fast Set to true to enable fast access, or false for safe access.
+	 * @return The previous "fast access" state (before this call was made).
 	 */
 	/* package private */	
-	void setFastAccessMode(boolean fast){
+	boolean setFastAccessMode(boolean fast){
 				
+		/* if there's no state change, do nothing */
+		if (fast == fastAccessMode) {
+			return fast;
+		}
+		
 		/* make sure the database connection is still open */
 		checkDatabase();
 
@@ -387,6 +399,11 @@ import com.buildml.model.IPackageMemberMgr;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to setFastAccessMode", e);
 		}
+		
+		fastAccessMode = fast;
+		
+		/* the state has now flipped - return the previous state */
+		return !fast;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
