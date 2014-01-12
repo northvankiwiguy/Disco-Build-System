@@ -41,6 +41,7 @@ import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.undo.IUndoOp;
 import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException;
 import com.buildml.refactor.CanNotRefactorException.Cause;
@@ -54,6 +55,71 @@ import com.buildml.utils.errors.ErrorCode;
  */
 public class HandlerMoveToPackage extends AbstractHandler {
 
+	/*=====================================================================================*
+	 * NESTED CLASSES
+	 *=====================================================================================*/
+	
+	/**
+	 * A private IUndoOp for laying out a package. We encapsulate this as an IUndoOp so
+	 * that the layout operation can be placed into a MultiUndoOp and performed in the same
+	 * operation as the import. Layout requires the import to be complete before it can
+	 * compute the layout information, so this operation must be sequenced appropriately.
+	 *
+	 * @author Peter Smith <psmith@arapiki.com>
+	 */
+	private class LayoutOp implements IUndoOp {
+
+		/** 
+		 * This is null the first time "redo" is called, or points to a valid MultiUndoOp
+		 * if the layout strategy has already been computed. That is, the layout algorithm
+		 * is only executed the first time redo() is called.
+		 */
+		private MultiUndoOp layoutOp = null;
+		
+		/** ID of the package we're laying out */
+		private int pkgId;
+		
+		/** The layoutAlgorithm to use for laying out the package */
+		private LayoutAlgorithm layoutAlgorithm;
+		
+		/**
+		 * Create a new LayoutOp object.
+		 * @param pkgId	ID of the package to lay out.
+		 * @param layoutAlgorithm The layout algorithm to use.
+		 */
+		public LayoutOp(LayoutAlgorithm layoutAlgorithm, int pkgId) {
+			this.pkgId = pkgId;
+			this.layoutAlgorithm = layoutAlgorithm;
+		}
+		
+		/**
+		 * Undo the layout operation.
+		 */
+		@Override
+		public boolean undo() {
+			return layoutOp.undo();
+		}
+
+		/**
+		 * Perform the operation for the first time, or redo an operation that has previously
+		 * been undone. If this is the first time, we must execute the layout algorithm. If
+		 * this is a "redo", we just replay the operation we already have.
+		 */
+		@Override
+		public boolean redo() {
+			
+			/* Schedule the individual layout steps - first time only */			
+			if (layoutOp == null) {
+				layoutOp = new MultiUndoOp();
+				layoutAlgorithm.autoLayoutPackage(layoutOp, pkgId);
+			} 
+			
+			/* now actually perform the steps */
+			return layoutOp.redo();
+		}
+		
+	}
+	
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
@@ -91,22 +157,20 @@ public class HandlerMoveToPackage extends AbstractHandler {
 					/* plan the move to the new package (multiOp will be populated) */
 					refactorer.moveMembersToPackage(multiOp, pkgId, members);
 					
-					/* invoke the changes, and record in undo/redo history */
-					new UndoOpAdapter("Move to Package", multiOp).invoke();
-					
-					/* open the package diagram so the user can see the results */
-					editor.openPackageDiagram(pkgId);
-
 					/* 
-					 * re-layout the package members - this must be done as a separate multiOp
-					 * since the planning algorithm depends on all the members being in
-					 * the package.
+					 * Open the package diagram so the user can see the results. Note
+					 * that we do this before the layout operation, since the layout algorithm
+					 * is obtained from the currently opened editor.
 					 */
-					multiOp = new MultiUndoOp();
+					editor.openPackageDiagram(pkgId);
+					
+					/* schedule the layout operation to happen */
 					PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
 					LayoutAlgorithm layoutAlgorithm = pde.getLayoutAlgorithm();
-					layoutAlgorithm.autoLayoutPackage(multiOp, pkgId);
-					new UndoOpAdapter("Auto Layout Package", multiOp).invoke();
+					multiOp.add(new LayoutOp(layoutAlgorithm, pkgId));
+					
+					/* invoke the changes, and record in undo/redo history */
+					new UndoOpAdapter("Move to Package", multiOp).invoke();
 					
 				} catch (CanNotRefactorException e) {
 					displayErrorMessage(pkgId, e.getCauseCode(), e.getCauseIDs());
