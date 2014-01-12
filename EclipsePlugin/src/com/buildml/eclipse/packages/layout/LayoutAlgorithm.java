@@ -18,6 +18,7 @@ import com.buildml.eclipse.packages.patterns.ActionPattern;
 import com.buildml.eclipse.packages.patterns.FileGroupPattern;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.MemberDesc;
 import com.buildml.model.IPackageMemberMgr.MemberLocation;
@@ -57,6 +58,9 @@ public class LayoutAlgorithm {
 	/** The IPackageMemberMgr that contains our package membership information */
 	private IPackageMemberMgr pkgMemberMgr;
 	
+	/** The IFileGroupMgr that contains our fileGroup membership information */
+	private IFileGroupMgr fileGroupMgr;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -68,6 +72,7 @@ public class LayoutAlgorithm {
 	public LayoutAlgorithm(IBuildStore buildStore) {
 		this.buildStore = buildStore;
 		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
+		this.fileGroupMgr = buildStore.getFileGroupMgr();
 	}
 	
 	/*=====================================================================================*
@@ -207,6 +212,16 @@ public class LayoutAlgorithm {
 		for (int i = 0; i < allMembers.length; i++) {
 			MemberDesc member = allMembers[i];
 			if (member.memberType != IPackageMemberMgr.TYPE_FILE) {
+				
+				/* skip over empty file groups - they aren't to be displayed */
+				if (member.memberType == IPackageMemberMgr.TYPE_FILE_GROUP) {
+					int fileGroupSize = fileGroupMgr.getGroupSize(member.memberId);
+					if (fileGroupSize < 1) {
+						continue;
+					}
+				}
+				
+				/* this member is to be displayed - add it to the grid */
 				MemberDesc rightNeighbours[] = pkgMemberMgr.getNeighboursOf(
 					member.memberType, member.memberId, IPackageMemberMgr.NEIGHBOUR_RIGHT, false);
 				if (rightNeighbours.length == 0) {
