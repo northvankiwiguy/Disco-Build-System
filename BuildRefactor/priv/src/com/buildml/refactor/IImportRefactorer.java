@@ -48,9 +48,10 @@ public interface IImportRefactorer {
 	 * @param pathId           The path (file/directory) to be deleted.
 	 * @param alsoDeleteAction If true, also proceed to delete the action(s) that generate
 	 *                         this file.
+     * @param removeFromAction If this path is read by an action, remove the path-access from the action.
 	 * @throws CanNotRefactorException If the refactoring can not proceed for some reason.
 	 */
-	public void deletePath(MultiUndoOp multiOp, int pathId, boolean alsoDeleteAction)
+	public void deletePath(MultiUndoOp multiOp, int pathId, boolean alsoDeleteAction, boolean removeFromAction)
 			throws CanNotRefactorException;
 	
 	/**
@@ -58,9 +59,10 @@ public interface IImportRefactorer {
 	 * @param dirId			      ID of the directory (path) to remove.
 	 * @param alsoDeleteActions   True if we should also delete actions that generate the
 	 *                            files in this directory.
+	 * @param removeFromAction    If this path is read by an action, remove the path-access from the action.
 	 * @throws CanNotRefactorException
 	 */
-	public void deletePathTree(MultiUndoOp multiOp, int dirId, boolean alsoDeleteActions)
+	public void deletePathTree(MultiUndoOp multiOp, int dirId, boolean alsoDeleteActions, boolean removeFromAction)
 			throws CanNotRefactorException;
 	
 	/**

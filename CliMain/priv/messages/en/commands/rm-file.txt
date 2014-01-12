@@ -5,18 +5,19 @@ files:
 * If the path refers to a directory, it must be empty (no files within it).
   If not empty, use the -r option to recursively delete files.
     
-* If the file is being used as input to one or more actions, there is no way
-  to delete the file. You must first delete the actions that use the file,
-  which typically requires that you delete files further in the compilation
-  chain. For example, to delete "foo.c", you will first need to delete
-  "foo.o" and the action that generates "foo.o". At this point, "foo.c" is no
-  longer referenced by any actions and can be deleted. 
+* If the file is being used as input to one or more actions, you may only
+  remove the file if the -f option is provided. This will remove any file
+  access information from those actions, as if those actions never read
+  the file in the first place. This is useful for removing unimportant
+  file access information, such as the inclusion of system header files.
+  
+    bmladmin rm-file -f /usr/include/stdio.h    
 
 * If the file to be deleted is a generated file (it is the output of an
   action), you must also delete the action. To perform this additional
   deletion, specify the -f option. For example:
     
-    bmladmin -f /home/psmith/mysrc/foo.o
+    bmladmin rm-file -f /home/psmith/mysrc/foo.o
      
   will delete both foo.o and the action that generates foo.o.
     

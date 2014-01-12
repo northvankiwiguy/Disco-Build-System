@@ -16,6 +16,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -154,17 +155,21 @@ public class AlertDialog extends TitleAreaDialog {
 		/* create and format the top-level composite of this dialog */
 		Composite composite = (Composite) super.createDialogArea(parent);
 		composite.setLayout(new GridLayout());
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		composite.setLayoutData(gd);
+		
+		ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL | SWT.H_SCROLL);
+		sc.setLayout(new GridLayout());
+		sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		/* create a label for the message, and centre it */
 		if (message != null) {
-			Label label = new Label(composite, SWT.WRAP);
-			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-			gridData.horizontalAlignment = SWT.CENTER;
-			gridData.verticalAlignment = SWT.CENTER;
-			gridData.widthHint = dialogWidth;
-			label.setLayoutData(gridData);
+			Label label = new Label(sc, SWT.WRAP);
+			label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			label.setText(message);
+			
+			sc.setContent(label);
+			label.setSize(label.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		}
 		return parent;
 	}

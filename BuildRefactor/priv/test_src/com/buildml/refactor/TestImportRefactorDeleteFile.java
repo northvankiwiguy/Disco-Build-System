@@ -184,7 +184,7 @@ public class TestImportRefactorDeleteFile {
 		int badPathId = 10000;
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, badPathId, false);
+			importRefactorer.deletePath(multiOp, badPathId, false, false);
 			fail("Failed when trying to delete non-existent file.");
 
 		} catch (CanNotRefactorException ex) {
@@ -208,7 +208,7 @@ public class TestImportRefactorDeleteFile {
 		assertFalse(fileMgr.isPathTrashed(fileUnused));
 		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
-			importRefactorer.deletePath(multiOp, fileUnused, false);
+			importRefactorer.deletePath(multiOp, fileUnused, false, false);
 			multiOp.redo();
 		} catch (CanNotRefactorException ex) {
 			fail("Failed to delete: " + fileUnused);
@@ -234,7 +234,7 @@ public class TestImportRefactorDeleteFile {
 		assertFalse(fileMgr.isPathTrashed(fileUnused));
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileUnused, false);
+			importRefactorer.deletePath(multiOp, fileUnused, false, false);
 			multiOp.redo();
 		} catch (CanNotRefactorException ex) {
 			fail("Failed to delete: " + fileUnused);
@@ -244,7 +244,7 @@ public class TestImportRefactorDeleteFile {
 		/* delete the file a second time - should fail */
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileUnused, false);
+			importRefactorer.deletePath(multiOp, fileUnused, false, false);
 			fail("Failed when attempting to delete a file the second time.");
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.INVALID_PATH, ex.getCauseCode());
@@ -265,13 +265,53 @@ public class TestImportRefactorDeleteFile {
 		
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileWorkEIn, false);
+			importRefactorer.deletePath(multiOp, fileWorkEIn, false, false);
 			fail("Failed when trying to delete in-use file.");
 			
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.PATH_IN_USE, ex.getCauseCode());
 			assertArrayEquals(new Integer[] { actionA4 } , ex.getCauseIDs());
 		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Attempt to delete a file (fileE.in) that's read by an action. Use the "removeFromAction"
+	 * flag so that it'll be removed from the action that reads it. Also, undo and redo the
+	 * operation.
+	 */
+	@Test
+	public void testForceDeleteSourceFileInUse() {
+
+		/* ensure that actionA4 reads fileE.in */
+		Integer filesRead[] = actionMgr.getFilesAccessed(actionA4, OperationType.OP_READ);
+		assertEquals(1, filesRead.length);
+		assertEquals(fileWorkEIn, filesRead[0].intValue());
+		
+		/* attempt the deletion */
+		MultiUndoOp multiOp = new MultiUndoOp();
+		try {
+			importRefactorer.deletePath(multiOp, fileWorkEIn, false, true);
+		} catch (CanNotRefactorException ex) {
+			fail("Failed to remove file-access from action.");
+		}
+		multiOp.redo();
+		
+		/* Test that actionA4 no longer reads fileE.in. */
+		filesRead = actionMgr.getFilesAccessed(actionA4, OperationType.OP_READ);
+		assertEquals(0, filesRead.length);
+		
+		/* undo the delete and re-test actionA4 */
+		multiOp.undo();
+		filesRead = actionMgr.getFilesAccessed(actionA4, OperationType.OP_READ);
+		assertEquals(1, filesRead.length);
+		assertEquals(fileWorkEIn, filesRead[0].intValue());
+		
+		/* redo the delete and re-test actionA4 */
+		multiOp.redo();
+		filesRead = actionMgr.getFilesAccessed(actionA4, OperationType.OP_READ);
+		assertEquals(0, filesRead.length);		
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -285,7 +325,7 @@ public class TestImportRefactorDeleteFile {
 		
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileWorkBOut, false);
+			importRefactorer.deletePath(multiOp, fileWorkBOut, false, false);
 			fail("Failed when trying to delete in-use file.");
 			
 		} catch (CanNotRefactorException ex) {
@@ -305,7 +345,7 @@ public class TestImportRefactorDeleteFile {
 		
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileWorkKOut, false);
+			importRefactorer.deletePath(multiOp, fileWorkKOut, false, false);
 			fail("Failed when trying to delete in-use file.");
 			
 		} catch (CanNotRefactorException ex) {
@@ -325,7 +365,7 @@ public class TestImportRefactorDeleteFile {
 		
 		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
-			importRefactorer.deletePath(multiOp, fileWorkGOut, true);			
+			importRefactorer.deletePath(multiOp, fileWorkGOut, true, false);			
 			multiOp.redo();
 			
 		} catch (CanNotRefactorException ex) {
@@ -374,7 +414,7 @@ public class TestImportRefactorDeleteFile {
 		
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileWorkJOut, true);			
+			importRefactorer.deletePath(multiOp, fileWorkJOut, true, false);			
 			fail("Failed when deleting an file/action that's in use.");
 		} catch (CanNotRefactorException ex) {
 			assertEquals(Cause.ACTION_IN_USE, ex.getCauseCode());
@@ -392,7 +432,7 @@ public class TestImportRefactorDeleteFile {
 		
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, dirWork, false);
+			importRefactorer.deletePath(multiOp, dirWork, false, false);
 			fail("Failed when trying to delete non-empty directory.");
 			
 		} catch (CanNotRefactorException ex) {
@@ -411,7 +451,7 @@ public class TestImportRefactorDeleteFile {
 
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePath(multiOp, fileWorkLog, true);
+			importRefactorer.deletePath(multiOp, fileWorkLog, true, false);
 			fail("Failed when deleting file used by non-atomic action.");
 
 		} catch (CanNotRefactorException ex) {
@@ -431,7 +471,7 @@ public class TestImportRefactorDeleteFile {
 		/* we can't delete the whole /home/work directory - it's in use */
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePathTree(multiOp, dirWork, true);
+			importRefactorer.deletePathTree(multiOp, dirWork, true, false);
 			fail("Incorrectly deleted in-use files");
 			
 		} catch (CanNotRefactorException e) {
@@ -441,7 +481,7 @@ public class TestImportRefactorDeleteFile {
 		/* delete fileWorkLog - will have NOT_ATOMIC error */
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePathTree(multiOp, fileWorkLog, true);
+			importRefactorer.deletePathTree(multiOp, fileWorkLog, true, false);
 			fail("Incorrectly deleted in-use files");			
 			
 		} catch (CanNotRefactorException e) {
@@ -453,7 +493,7 @@ public class TestImportRefactorDeleteFile {
 		assertFalse(actionMgr.isActionTrashed(actionA6));
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePathTree(multiOp, fileWorkKOut, false);
+			importRefactorer.deletePathTree(multiOp, fileWorkKOut, false, false);
 			fail("Incorrectly deleted in-use files");
 			
 		} catch (CanNotRefactorException e) {
@@ -461,7 +501,7 @@ public class TestImportRefactorDeleteFile {
 		}
 		try {
 			MultiUndoOp multiOp = new MultiUndoOp();
-			importRefactorer.deletePathTree(multiOp, fileWorkKOut, true);
+			importRefactorer.deletePathTree(multiOp, fileWorkKOut, true, false);
 			multiOp.redo();
 			assertTrue(fileMgr.isPathTrashed(fileWorkKOut));
 			assertTrue(actionMgr.isActionTrashed(actionA6));
@@ -482,7 +522,7 @@ public class TestImportRefactorDeleteFile {
 		assertEquals(dirUnused, fileMgr.getPath("/home/work/unused"));
 		MultiUndoOp multiOp = new MultiUndoOp();
 		try {
-			importRefactorer.deletePathTree(multiOp, dirUnused, false);
+			importRefactorer.deletePathTree(multiOp, dirUnused, false, false);
 			multiOp.redo();
 			
 		} catch (CanNotRefactorException e) {

@@ -34,7 +34,9 @@ import com.buildml.refactor.CanNotRefactorException.Cause;
  */
 public class ImportRefactorerUtils {
 
-	/*-------------------------------------------------------------------------------------*/
+	/*=====================================================================================*
+	 * PACKAGE-STATIC METHODS
+	 *=====================================================================================*/
 
 	/**
 	 * Collect together a list of all an action's child action IDs. For complex actions, this
@@ -91,6 +93,37 @@ public class ImportRefactorerUtils {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * Helper method for removing file accesses from an action. This is used when we're
+	 * deleting paths, without deleting the actions that read those paths. Instead, we
+	 * simply remove the file access that the action(s) have for the path.
+	 * 
+	 * @param buildStore The IBuildStore we can query for information.
+	 * @param multiOp    The undo/redo operation that we'll use for scheduling.
+	 * @param pathId     The path whose accesses must be removed from the reading actions.
+	 * @param actions    The actions that the file access should be removed from.
+	 */
+	/* package */ static void scheduleRemoveFilesAccessFromAction(
+			IBuildStore buildStore, MultiUndoOp multiOp, int pathId, Integer[] actions) {
+		
+		IActionMgr actionMgr = buildStore.getActionMgr();
+		
+		/*
+		 * Locate all file access (for these actions) that "read" pathId. Add their
+		 * removal to our multiOp.
+		 */
+		FileAccess[] fileAccesses = actionMgr.getSequencedFileAccesses(actions);
+		for (FileAccess fileAccess : fileAccesses) {	
+			if ((fileAccess.pathId == pathId) && (fileAccess.opType == OperationType.OP_READ)) {
+				ActionUndoOp actionOp = new ActionUndoOp(buildStore, fileAccess.actionId);
+				actionOp.recordRemovePathAccess(fileAccess.seqno, pathId, OperationType.OP_READ);
+				multiOp.add(actionOp);
+			}
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * Helper method for scheduling an action to be removed. This must also remove any
 	 * file-access links that are currently associated with the action.
 	 * 
@@ -143,11 +176,12 @@ public class ImportRefactorerUtils {
 	 * @param buildStore		The IBuildStore to query/update.
 	 * @param pathId			The path to be deleted.
 	 * @param alsoDeleteAction  True if we should also delete actions that generate the path.
+	 * @param removeFromAction  If this path is read by an action, remove the path-access from the action.
 	 * @param multiOp			Undo/redo history item to add operation steps to.
 	 * @throws CanNotRefactorException Something went wrong.
 	 */
 	/* package */ static void deletePathHelper(IBuildStore buildStore,
-				int pathId, boolean alsoDeleteAction, MultiUndoOp multiOp)
+				int pathId, boolean alsoDeleteAction, boolean removeFromAction, MultiUndoOp multiOp)
 			throws CanNotRefactorException {
 		
 		IActionMgr actionMgr = buildStore.getActionMgr();
@@ -160,9 +194,12 @@ public class ImportRefactorerUtils {
 			throw new CanNotRefactorException(Cause.INVALID_PATH, pathId);
 		}		
 		
-		/* the path must not currently be used as input to an action - otherwise give an error */
+		/* 
+		 * If "removeFromAction" is false, then the path must not be used as input to an
+		 * action - otherwise give an error.
+		 */
 		Integer actionsReadingPath[] = actionMgr.getActionsThatAccess(pathId, OperationType.OP_READ);
-		if (actionsReadingPath.length != 0) {
+		if ((actionsReadingPath.length != 0) && !removeFromAction) {
 			throw new CanNotRefactorException(Cause.PATH_IN_USE, actionsReadingPath);
 		}
 
@@ -177,14 +214,15 @@ public class ImportRefactorerUtils {
 		 * actions too. However, only delete them if "alsoDeleteActions" is set.
 		 */
 		Integer actionsUsingPath[] = actionMgr.getActionsThatAccess(pathId, OperationType.OP_UNSPECIFIED);
-		if ((actionsUsingPath.length != 0) && !alsoDeleteAction) {
-			throw new CanNotRefactorException(Cause.PATH_IS_GENERATED, actionsUsingPath);
+		Integer actionsWritingPath[] = subtractArrays(actionsUsingPath, actionsReadingPath); /* remove OP_READ actions */
+		if ((actionsWritingPath.length != 0) && !alsoDeleteAction) {
+			throw new CanNotRefactorException(Cause.PATH_IS_GENERATED, actionsWritingPath);
 		}
 		
 		/*
-		 * Make sure that all the actions that generate the path are atomic.
+		 * Make sure that all the actions that write to the path are atomic.
 		 */
-		for (int actionId: actionsUsingPath) {
+		for (int actionId: actionsWritingPath) {
 			if (actionMgr.getChildren(actionId).length != 0) {
 				throw new CanNotRefactorException(Cause.ACTION_NOT_ATOMIC, actionId);
 			}
@@ -195,21 +233,27 @@ public class ImportRefactorerUtils {
 		 * paths are used as input into other actions. If so, the output paths are considered "in use".
 		 * Calling this method will throw a CanNotRefactorException if anything goes wrong.
 		 */
-		ImportRefactorerUtils.validateActionsNotInUse(actionMgr, actionsUsingPath);
+		validateActionsNotInUse(actionMgr, actionsWritingPath);
 		
 		/*
 		 * All is good, now go ahead and start deleting things. We can now build up a history item
 		 * of the changes to be made to the BuildStore.
 		 */
 
+		/* 
+		 * If this path is read by any actions, remove that file accesses from the actions.
+		 * This implies that removeFromActions is true (we've already check this above).
+		 */
+		scheduleRemoveFilesAccessFromAction(buildStore, multiOp, pathId, actionsReadingPath);
+		
 		/* remove the actions, and any associated file accesses */
-		ImportRefactorerUtils.scheduleRemoveAction(buildStore, multiOp, actionsUsingPath);
+		scheduleRemoveAction(buildStore, multiOp, actionsWritingPath);
 		
 		/* 
-		 * If we didn't already delete the action (and the paths it generates), we need to
-		 * explicitly delete it (this is the case where it's an unused path we're deleting).
+		 * If we didn't already delete this path's generating action (and therefore all the paths it generates), 
+		 * we'll still need to explicitly delete the path (this is the case where it's an unused path we're deleting).
 		 */
-		if (actionsUsingPath.length == 0) {
+		if (actionsWritingPath.length == 0) {
 			FileUndoOp fileOp = new FileUndoOp(buildStore, pathId);
 			fileOp.recordRemovePath();
 			multiOp.add(fileOp);
@@ -225,26 +269,56 @@ public class ImportRefactorerUtils {
 	 * @param buildStore		 The IBuildStore to query/update.
 	 * @param pathId			 The path (file or directory) to be deleted.
 	 * @param alsoDeleteActions  True if we should also delete actions that generate the path.
+	 * @param removeFromAction  If this path is read by an action, remove the path-access from the action.
 	 * @param multiOp			 Undo/redo history item to add operation steps to.
 	 * @throws CanNotRefactorException 
 	 */
 	/* package */ static void deletePathTreeHelper(IBuildStore buildStore,
-				int pathId, boolean alsoDeleteActions, MultiUndoOp multiOp) 
+				int pathId, boolean alsoDeleteActions, boolean removeFromAction, MultiUndoOp multiOp) 
 							throws CanNotRefactorException {
 		
-		IActionMgr actionMgr = buildStore.getActionMgr();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* delete children first */
 		Integer children[] = fileMgr.getChildPaths(pathId);
 		for (int childId : children) {
-			deletePathTreeHelper(buildStore, childId, alsoDeleteActions, multiOp);
+			deletePathTreeHelper(buildStore, childId, alsoDeleteActions, removeFromAction, multiOp);
 		}
 		
 		/* now delete the current path */
-		deletePathHelper(buildStore, pathId, alsoDeleteActions, multiOp);
+		deletePathHelper(buildStore, pathId, alsoDeleteActions, removeFromAction, multiOp);
+	}
+	
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Subtract (remove) the members of the second array from the first array. A totally
+	 * new array is returned (neither of the input arrays are modified).
+	 * 
+	 * @param firstArray	The array of Integer that the secondArray will be removed from.
+	 * @param secondArray	The array of Integer to subtract from firstArray.
+	 * @return The result of subtracting the members of secondArray from firstArray.
+	 */
+	private static Integer[] subtractArrays(Integer[] firstArray, Integer[] secondArray) {
+		List<Integer> resultArray = new ArrayList<Integer>();
+		
+		for (int firstMember : firstArray) {
+			boolean found = false;
+			for (int secondMember : secondArray) {
+				if (firstMember == secondMember) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				resultArray.add(firstMember);
+			}
+		}
+		
+		return resultArray.toArray(new Integer[resultArray.size()]);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
-	
 }

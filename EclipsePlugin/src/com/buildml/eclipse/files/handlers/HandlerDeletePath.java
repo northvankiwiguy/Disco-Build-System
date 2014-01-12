@@ -68,21 +68,20 @@ public class HandlerDeletePath extends AbstractHandler {
 			 */
 			PathType pathType = fileMgr.getPathType(pathId);
 			if (pathType == PathType.TYPE_INVALID) {
-				// TODO: test this case.
-				System.out.println("Skipping " + pathName + " since it no longer exists.");
 				continue;
 			}
 			
 			boolean needsRetry;
 			boolean deleteSubTree = false;
 			boolean deleteActionToo = false;
+			boolean deleteFromActions = false;
 			do {
 				needsRetry = false;
 				try {
 					if (deleteSubTree) {
-						refactorer.deletePathTree(multiOp, pathId, deleteActionToo);
+						refactorer.deletePathTree(multiOp, pathId, deleteActionToo, deleteFromActions);
 					} else {
-						refactorer.deletePath(multiOp, pathId, deleteActionToo);
+						refactorer.deletePath(multiOp, pathId, deleteActionToo, deleteFromActions);
 					}
 					
 					/* success! The file/directory was deleted */
@@ -134,11 +133,15 @@ public class HandlerDeletePath extends AbstractHandler {
 					 * The path is used (read) by an action. It can't be deleted at all.
 					 */
 					case PATH_IN_USE:
-						AlertDialog.displayErrorDialog("Can't delete",
-								"The file " + pathName + " can't be deleted as it's still " +
-								"in use by the following " +
+						status = AlertDialog.displayOKCancelDialog( 
+								"The file " + pathName + " is still in use. Do you wish to delete it anyway?\n\n" +
+								"It is used by the following " +
 								(multipleActions ? "actions" : "action") + ":\n\n" +
 								ConversionUtils.getActionsAsText(actionMgr, badIds));
+						if (status == IDialogConstants.OK_ID) {
+							needsRetry = true;
+							deleteFromActions = true;
+						}
 						break;
 
 					/*

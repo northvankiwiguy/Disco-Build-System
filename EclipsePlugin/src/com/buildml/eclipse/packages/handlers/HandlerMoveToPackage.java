@@ -227,6 +227,14 @@ public class HandlerMoveToPackage extends AbstractHandler {
 			} else {
 				displayPaths(sb, new Integer[] { pkgRootId });
 			}
+			sb.append("\nTo resolve this issue, consider the following solutions:\n");
+			sb.append("- For system headers and libraries, delete the files so they won't\n" +
+					  "  be explicitly imported onto the package diagram.\n");
+			sb.append("- For temporary files which are shared between two actions,\n" +
+					  "  merge the actions together.\n");
+			sb.append("- First, move the files into a different package (with more\n" +
+					  "  appropriate roots), from where they can be referenced.\n");
+			sb.append("- Modify this package's roots so they encompass these files.\n");
 			break;
 			
 		case FILE_IS_MODIFIED:

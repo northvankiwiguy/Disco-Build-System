@@ -81,7 +81,7 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#deleteFile(int)
 	 */
 	@Override
-	public void deletePath(MultiUndoOp multiOp, int pathId, boolean alsoDeleteAction) 
+	public void deletePath(MultiUndoOp multiOp, int pathId, boolean alsoDeleteAction, boolean removeFromAction) 
 			throws CanNotRefactorException {
 
 		/* the path must not be a non-empty directory - otherwise give an error */
@@ -93,7 +93,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		}
 
 		/* the helper does most of the work */
-		ImportRefactorerUtils.deletePathHelper(buildStore, pathId, alsoDeleteAction, multiOp);
+		ImportRefactorerUtils.deletePathHelper(buildStore, pathId, alsoDeleteAction, removeFromAction, multiOp);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -102,11 +102,11 @@ public class ImportRefactorer implements IImportRefactorer {
 	 * @see com.buildml.refactor.IImportRefactorer#deleteFileTree(int)
 	 */
 	@Override
-	public void deletePathTree(MultiUndoOp multiOp, int dirId, boolean alsoDeleteActions)
+	public void deletePathTree(MultiUndoOp multiOp, int dirId, boolean alsoDeleteActions, boolean removeFromAction)
 			throws CanNotRefactorException {
 
 		/* the helper does most of the work */
-		ImportRefactorerUtils.deletePathTreeHelper(buildStore, dirId, alsoDeleteActions, multiOp);
+		ImportRefactorerUtils.deletePathTreeHelper(buildStore, dirId, alsoDeleteActions, removeFromAction, multiOp);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -38,8 +38,8 @@ public class CliCommandRmFile implements ICliCommand {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 	
-	/** Set if we should force removal of associated actions. */
-	private boolean optionForceRmAction = false;
+	/** Set if we should force removal of the file, and its generating actions. */
+	private boolean optionForceRm = false;
 	
 	/** Set if we want to delete directory content recursively */
 	private boolean optionRecursive = false;
@@ -77,8 +77,8 @@ public class CliCommandRmFile implements ICliCommand {
 		Options opts = new Options();
 
 		/* add the --force-rm-actions option */
-		Option deleteActionsOpt = new Option("f", "force-rm-action", false, 
-				"Also delete the action generating this file.");
+		Option deleteActionsOpt = new Option("f", "force-rm-file", false, 
+				"Force removal of this path, even if it's in use.");
 		opts.addOption(deleteActionsOpt);
 
 		/* add the --recursive option */
@@ -116,7 +116,7 @@ public class CliCommandRmFile implements ICliCommand {
 	 */
 	@Override
 	public void processOptions(IBuildStore buildStore, CommandLine cmdLine) {
-		optionForceRmAction = cmdLine.hasOption("force-rm-action");
+		optionForceRm = cmdLine.hasOption("force-rm-file");
 		optionRecursive = cmdLine.hasOption("recursive");
 	}
 
@@ -142,9 +142,9 @@ public class CliCommandRmFile implements ICliCommand {
 			try {
 				MultiUndoOp multiOp = new MultiUndoOp();
 				if (optionRecursive) {
-					refactor.deletePathTree(multiOp, pathId, optionForceRmAction);
+					refactor.deletePathTree(multiOp, pathId, optionForceRm, optionForceRm);
 				} else {
-					refactor.deletePath(multiOp, pathId, optionForceRmAction);
+					refactor.deletePath(multiOp, pathId, optionForceRm, optionForceRm);
 				}
 				multiOp.redo();
 				
