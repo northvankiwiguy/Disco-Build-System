@@ -21,8 +21,10 @@ import java.util.Iterator;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IReportMgr;
@@ -55,17 +57,18 @@ import com.buildml.utils.errors.ErrorCode;
 	private BuildStoreDB db = null;
 	
 	/**
-	 * The FileMgr object we're reporting on. This is provided to us when the
-	 * Reports object is first instantiated.
+	 * The BuildStore managers we interact with.
 	 */
 	private IFileMgr fileMgr = null;
-	
-	/**
-	 * The ActionMgr object we're reporting on. This is provided to us when the
-	 * Reports object is first instantiated.
-	 */
 	private IActionMgr actionMgr = null;
+	private IActionTypeMgr actionTypeMgr = null;
 	
+	/** The slotID for the "Directory" slot */
+	private int dirSlotId;
+
+	/** The slotID for the "Command" slot */
+	private int cmdSlotId;
+
 	/**
 	 * Various prepared statement for database access.
 	 */
@@ -74,7 +77,6 @@ import com.buildml.utils.errors.ErrorCode;
 		selectFileIncludesCountPrepStmt = null,
 		selectFilesNotUsedPrepStmt = null,
 		selectFilesWithMatchingNamePrepStmt = null,
-		selectActionsWithMatchingNamePrepStmt = null,
 		selectDerivedFilesPrepStmt = null,
 		selectInputFilesPrepStmt = null,
 		selectActionsAccessingFilesPrepStmt = null,
@@ -99,6 +101,7 @@ import com.buildml.utils.errors.ErrorCode;
 		this.db = buildStore.getBuildStoreDB();
 		this.fileMgr = buildStore.getFileMgr();
 		this.actionMgr = buildStore.getActionMgr();
+		this.actionTypeMgr = buildStore.getActionTypeMgr();
 		
 		selectFileAccessCountPrepStmt = db.prepareStatement(
 				"select fileId, count(*) as usage from actionFiles, files " +
@@ -116,9 +119,6 @@ import com.buildml.utils.errors.ErrorCode;
 		selectFilesWithMatchingNamePrepStmt = db.prepareStatement(
 				"select files.id from files where (name like ?) and (files.trashed = 0) and " +
 		        "(pathType = " + PathType.TYPE_FILE.ordinal() + ")");
-
-		selectActionsWithMatchingNamePrepStmt = db.prepareStatement(
-				"select actionId from buildActions where command like ?");
 
 		selectDerivedFilesPrepStmt = db.prepareStatement(
 				"select distinct fileId from actionFiles where actionId in " +
@@ -153,6 +153,14 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		selectAllFilesPrepStmt = db.prepareStatement("select id from files where trashed = 0");
 		selectAllActionsPrepStmt = db.prepareStatement("select actionId from buildActions");
+		
+		/* fetch the slot ID for "Directory" and "Command" */
+		SlotDetails slotDetails = 
+				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Directory");
+		dirSlotId = slotDetails.slotId;
+		slotDetails = 
+				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command");
+		cmdSlotId = slotDetails.slotId;
 	}
 
 	/*=====================================================================================*
@@ -273,15 +281,7 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public ActionSet reportActionsThatMatchName(String pattern) {
 		
-		Integer results[];
-		try {
-			selectActionsWithMatchingNamePrepStmt.setString(1, "%" + pattern + "%");
-			results = db.executePrepSelectIntegerColumn(selectActionsWithMatchingNamePrepStmt);
-			
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
+		Integer results[] = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "%" + pattern + "%");
 		return new ActionSet(actionMgr, results);
 	}
 
@@ -366,9 +366,11 @@ import com.buildml.utils.errors.ErrorCode;
 	public ActionSet reportActionsInDirectory(FileSet directories) {
 		ActionSet results = new ActionSet(actionMgr);
 		for (int pathId : directories) {
-			Integer actions[] = actionMgr.getActionsInDirectory(pathId);
-			for (int i = 0; i < actions.length; i++) {
-				results.add(actions[i]);
+			Integer actions[] = actionMgr.getActionsWhereSlotEquals(dirSlotId, pathId);
+			if (actions != null) {
+				for (int i = 0; i < actions.length; i++) {
+					results.add(actions[i]);
+				}
 			}
 		}
 		return results;

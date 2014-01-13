@@ -18,9 +18,11 @@ import java.util.List;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.undo.ActionUndoOp;
 import com.buildml.model.undo.FileUndoOp;
 import com.buildml.model.undo.MultiUndoOp;
@@ -185,6 +187,7 @@ public class ImportRefactorerUtils {
 			throws CanNotRefactorException {
 		
 		IActionMgr actionMgr = buildStore.getActionMgr();
+		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
 		IFileMgr fileMgr = buildStore.getFileMgr();
 		
 		/* the path must exist and must not be trashed - otherwise give an error */
@@ -204,7 +207,9 @@ public class ImportRefactorerUtils {
 		}
 
 		/* the path must not be the "current directory" for any actions */
-		Integer actionsExecutingInDir[] = actionMgr.getActionsInDirectory(pathId);
+		int shellCmdTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
+		SlotDetails details = actionTypeMgr.getSlotByName(shellCmdTypeId, "Directory");
+		Integer actionsExecutingInDir[] = actionMgr.getActionsWhereSlotEquals(details.slotId, pathId);
 		if (actionsExecutingInDir.length != 0) {
 			throw new CanNotRefactorException(Cause.DIRECTORY_CONTAINS_ACTIONS, actionsExecutingInDir);
 		}

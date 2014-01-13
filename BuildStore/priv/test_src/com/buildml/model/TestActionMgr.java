@@ -681,7 +681,7 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#getActionsInDirectory(int)}.
+	 * Test method for finding actions that reside in a directory.
 	 */
 	@Test
 	public void testGetActionsInDirectory() {
@@ -700,17 +700,22 @@ public class TestActionMgr {
 		int action23 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
 		int action24 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
 		int action13 = actionMgr.addShellCommandAction(rootAction, dir1, "true");
+		
+		/* what "slot" is "Directory"? */
+		int dirSlotId = actionMgr.getSlotByName(action11, "Directory");
 	
 		/* fetch the list of actions that execute in the first directory */
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getActionsInDirectory(dir1),
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				actionMgr.getActionsWhereSlotEquals(dirSlotId, dir1),
 				new Integer[] {action11, action12, action13}));
 		
 		/* repeat for the second directory */
-		assertTrue(CommonTestUtils.sortedArraysEqual(actionMgr.getActionsInDirectory(dir2),
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				actionMgr.getActionsWhereSlotEquals(dirSlotId, dir2),
 				new Integer[] {action21, action22, action23, action24}));
 		
 		/* and the third should be empty */
-		assertEquals(0, actionMgr.getActionsInDirectory(dir3).length);
+		assertEquals(0, actionMgr.getActionsWhereSlotEquals(dirSlotId, dir3).length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -777,10 +782,13 @@ public class TestActionMgr {
 		int childAction = actionMgr.addShellCommandAction(parentAction, rootDir, "child");		
 		actionMgr.addFileAccess(childAction, fileId, OperationType.OP_READ);
 		
+		/* what "slot" is "Directory"? */
+		int dirSlotId = actionMgr.getSlotByName(parentAction, "Directory");
+		
 		/* check that the parent has the child and that the child is in the directory */
 		Integer children[] = actionMgr.getChildren(parentAction);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction }, children));
-		Integer actions[] = actionMgr.getActionsInDirectory(rootDir);
+		Integer actions[] = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction, parentAction }, actions));
 		
 		/* Attempt to delete the parent action - should fail because of child action. */
@@ -797,14 +805,14 @@ public class TestActionMgr {
 		assertEquals(0, actionMgr.getChildren(parentAction).length);
 		
 		/* query the list of actions in the specified directory */
-		actions = actionMgr.getActionsInDirectory(rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { parentAction }, actions));
 		
 		/* now move the parent action into the trash */
 		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(parentAction));
 
 		/* query the list of actions in the specified directory - should be one fewer. */
-		actions = actionMgr.getActionsInDirectory(rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
 		assertEquals(0, actions.length);
 		
 		/* try to revive the child - can't be done because the parent is trashed */
@@ -812,14 +820,14 @@ public class TestActionMgr {
 		
 		/* revive the parent - this is allowed */
 		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(parentAction));
-		actions = actionMgr.getActionsInDirectory(rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { parentAction }, actions));
 
 		/* finally, revive the child - this is now possible. */
 		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(childAction));
 		children = actionMgr.getChildren(parentAction);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction }, children));
-		actions = actionMgr.getActionsInDirectory(rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction, parentAction }, actions));
 	}
 	
@@ -882,7 +890,6 @@ public class TestActionMgr {
 		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
 		
 		/* Assign a command string to "Command" parameter slot - returned as String */
-		assertNull(actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, "My command"));
 		assertEquals("My command", actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
 		

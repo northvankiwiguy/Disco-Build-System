@@ -281,9 +281,8 @@ import com.buildml.model.IPackageMemberMgr;
 			
 			/* Create the "buildActions" table. */
 			stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
-							   "parentActionId integer, trashed integer, actionDirId integer, " +
-							   "command text, actionType integer)");
-			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, null, 0)");
+							   "parentActionId integer, trashed integer, actionType integer)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0)");
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */

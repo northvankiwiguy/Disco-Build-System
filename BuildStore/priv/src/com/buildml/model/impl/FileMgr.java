@@ -21,6 +21,7 @@ import java.util.List;
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileAttributeMgr;
 import com.buildml.model.IFileGroupMgrListener;
@@ -31,6 +32,7 @@ import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.types.PathNameCache;
 import com.buildml.model.types.PathNameCache.PathNameCacheValue;
 import com.buildml.utils.errors.ErrorCode;
@@ -65,6 +67,17 @@ public class FileMgr implements IFileMgr {
 	 * helps to speed up file access.
 	 */
 	PathNameCache fileNameCache;
+	
+	/**
+	 * Other BuildStore managers we need to communicate with
+	 */
+	private IActionMgr actionMgr;
+	private IActionTypeMgr actionTypeMgr;
+	private IFileAttributeMgr fileAttrMgr;
+	private IFileIncludeMgr fileIncludeMgr;
+	
+	/** The slotID for the "Directory" slot */
+	private int dirSlotId;
 	
 	/**
 	 * Various prepared statement for database access.
@@ -381,22 +394,15 @@ public class FileMgr implements IFileMgr {
 	 */
 	@Override
 	public int movePathToTrash(int pathId)
-	{
-		/* 
-		 * We need to refer to all these helper objects, to see if they
-		 * use the path we're trying to delete.
-		 */
-		IActionMgr actionMgr = buildStore.getActionMgr();
-		IFileAttributeMgr fileAttrMgr = buildStore.getFileAttributeMgr();
-		IFileIncludeMgr fileIncludeMgr = buildStore.getFileIncludeMgr();
-		
+	{	
 		/* check that this path doesn't have children */
 		if (getChildPaths(pathId).length != 0) {
 			return ErrorCode.CANT_REMOVE;
 		}
 
-		/* check that it's not used as the directory for any actions */
-		if (actionMgr.getActionsInDirectory(pathId).length != 0) {
+		/* check that it's not used as the directory for any shell actions */
+		Integer dirResult[] = actionMgr.getActionsWhereSlotEquals(dirSlotId, pathId);
+		if ((dirResult == null) || (dirResult.length != 0)) {
 			return ErrorCode.CANT_REMOVE;
 		}
 		
@@ -547,6 +553,29 @@ public class FileMgr implements IFileMgr {
 	@Override
 	public void removeListener(IFileMgrListener listener) {
 		listeners.remove(listener);		
+	}
+	
+	/*=====================================================================================*
+	 * PACKAGE METHODS
+	 *=====================================================================================*/	
+
+	/**
+	 * Extra initialization that can only happen all other managers are initialized.
+	 */
+	/* package */ void initPass2() {
+		/* 
+		 * We need to refer to all these helper objects, to see if they
+		 * use the path we're trying to delete.
+		 */
+		actionMgr = buildStore.getActionMgr();
+		actionTypeMgr = buildStore.getActionTypeMgr();
+		fileAttrMgr = buildStore.getFileAttributeMgr();
+		fileIncludeMgr = buildStore.getFileIncludeMgr();
+		
+		/* fetch the slot ID for "Directory" */
+		SlotDetails slotDetails = 
+				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Directory");
+		dirSlotId = slotDetails.slotId;
 	}
 	
 	/*=====================================================================================*

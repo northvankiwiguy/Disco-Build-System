@@ -30,7 +30,6 @@ import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
-import com.buildml.utils.string.ShellCommandUtils;
 
 /**
  * A manager class (that supports the BuildStore class) responsible for managing all 
@@ -71,13 +70,9 @@ public class ActionMgr implements IActionMgr {
 	/** Various prepared statement for database access. */
 	private PreparedStatement 
 		insertActionPrepStmt = null,
-		insertShellActionPrepStmt = null,
 		insertPackageMemberPrepStmt = null,
-		findCommandPrepStmt = null,
-		updateCommandPrepStmt = null,
 		findParentPrepStmt = null,
 		updateParentPrepStmt = null,
-		findDirectoryPrepStmt = null,
 		findChildrenPrepStmt = null,
 		insertActionFilesPrepStmt = null,
 		removeActionFilesPrepStmt = null,
@@ -85,7 +80,6 @@ public class ActionMgr implements IActionMgr {
 		updateActionFilesPrepStmt = null,
 		findOperationInActionFilesPrepStmt = null,
 		findFilesInActionFilesPrepStmt = null,
-		findActionsInDirectoryPrepStmt = null,
 		findFilesByOperationInActionFilesPrepStmt = null,
 		findActionsByFileInActionFilesPrepStmt = null,
 		findActionsByFileAndOperationInActionFilesPrepStmt = null,
@@ -94,7 +88,13 @@ public class ActionMgr implements IActionMgr {
 		findActionTypePrepStmt = null;
 	
 	/** The event listeners who are registered to learn about action changes */
-	List<IActionMgrListener> listeners = new ArrayList<IActionMgrListener>();
+	private List<IActionMgrListener> listeners = new ArrayList<IActionMgrListener>();
+	
+	/** The slotID for "Command", within the "Shell Command" action type */
+	private int cmdSlotId;
+	
+	/** The slotID for "Directory", within the "Shell Command" action type */
+	private int dirSlotId;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -113,16 +113,10 @@ public class ActionMgr implements IActionMgr {
 		this.slotMgr = buildStore.getSlotMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, 0, 0, 0, null, ?)");
-		insertShellActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, ?, ?)");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, 0, 0, ?)");
 		insertPackageMemberPrepStmt = db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
-		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
-		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
 		findParentPrepStmt = db.prepareStatement("select parentActionId from buildActions where actionId = ?");
 		updateParentPrepStmt = db.prepareStatement("update buildActions set parentActionId = ? where actionId = ?");
-		findDirectoryPrepStmt = db.prepareStatement("select actionDirId from buildActions where actionId = ?");
-		findActionsInDirectoryPrepStmt =
-			db.prepareStatement("select actionId from buildActions where (actionDirId = ?) and (trashed = 0)");
 		findChildrenPrepStmt = db.prepareStatement("select actionId from buildActions where parentActionId = ?" +
 				" and (parentActionId != actionId) and (trashed = 0) order by actionId");
 		insertActionFilesPrepStmt = db.prepareStatement("insert into actionFiles values (?, ?, ?, ?)");
@@ -199,34 +193,31 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public int addShellCommandAction(int parentActionId, int actionDirId, String command) {
 		
-		this.pkgMgr = buildStore.getPackageMgr();
-
-		int lastRowId;
-		try {
-			insertShellActionPrepStmt.setInt(1, parentActionId);
-			insertShellActionPrepStmt.setInt(2, actionDirId);
-			insertShellActionPrepStmt.setString(3, command);
-			insertShellActionPrepStmt.setInt(4, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
-			db.executePrepUpdate(insertShellActionPrepStmt);
-		
-			lastRowId = db.getLastRowID();
-			if (lastRowId >= MAX_ACTIONS) {
-				throw new FatalBuildStoreError("Exceeded maximum action number: " + MAX_ACTIONS);
-			}
-
-			/* insert the default package membership values */
-			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_ACTION);
-			insertPackageMemberPrepStmt.setInt(2, lastRowId);
-			insertPackageMemberPrepStmt.setInt(3, pkgMgr.getImportPackage());
-			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
-			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
-				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
-			}
-
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		/* create a new action of type "Shell Command" */
+		int newActionId = addAction(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		if (newActionId < 0) {
+			return newActionId;
 		}
-		return lastRowId;
+
+		/* set the action's parent */
+		int rc = setParent(newActionId, parentActionId);
+		if (rc != ErrorCode.OK) {
+			return rc;
+		}
+		
+		/* set the action's command string */
+		rc = setSlotValue(newActionId, cmdSlotId, command);
+		if (rc != ErrorCode.OK) {
+			return rc;
+		}
+
+		/* set the action's working directory */
+		rc = setSlotValue(newActionId, dirSlotId, actionDirId);
+		if (rc != ErrorCode.OK) {
+			return rc;
+		}
+
+		return newActionId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -486,52 +477,11 @@ public class ActionMgr implements IActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionMgr#getActionsInDirectory(int)
-	 */
-	@Override
-	public Integer[] getActionsInDirectory(int pathId) {
-		
-		Integer intResults[] = null;
-		try {
-			findActionsInDirectoryPrepStmt.setInt(1, pathId);
-			intResults = db.executePrepSelectIntegerColumn(findActionsInDirectoryPrepStmt);
-			
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		return intResults;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getCommand(int)
 	 */
 	@Override
 	public String getCommand(int actionId) {
-		String [] stringResults = null;
-		try {
-			findCommandPrepStmt.setInt(1, actionId);
-			stringResults = db.executePrepSelectStringColumn(findCommandPrepStmt);
-			
-		} catch (SQLException e) {
-			new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		
-		/* if there were no results, return null */
-		if (stringResults.length == 0) {
-			return null;
-		}
-		
-		/* if there was one result, return it */
-		else if (stringResults.length == 1) {
-			return stringResults[0];
-		}
-		
-		/* else, multiple results is a bad thing */
-		else {
-			throw new FatalBuildStoreError("Multiple results find in buildActions table for actionId = " + actionId);
-		}
+		return (String) getSlotValue(actionId, cmdSlotId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -542,7 +492,7 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public int setCommand(int actionId, String command) {
 
-		String currentCommand = getCommand(actionId);
+		String currentCommand = (String) getSlotValue(actionId, cmdSlotId);
 		if (currentCommand == null) {
 			return ErrorCode.BAD_VALUE;
 		}
@@ -552,15 +502,7 @@ public class ActionMgr implements IActionMgr {
 			return ErrorCode.OK;
 		}
 		
-		/* update the database */
-		try {
-			updateCommandPrepStmt.setString(1, command);
-			updateCommandPrepStmt.setInt(2, actionId);
-			db.executePrepUpdate(updateCommandPrepStmt);
-			
-		} catch (SQLException e) {
-			new FatalBuildStoreError("Error in SQL: " + e);
-		}
+		setSlotValue(actionId, cmdSlotId, command);
 		
 		/* notify listeners about the change */
 		notifyListeners(actionId, IActionMgrListener.CHANGED_COMMAND, 0);
@@ -670,29 +612,13 @@ public class ActionMgr implements IActionMgr {
 	 */
 	@Override
 	public int getDirectory(int actionId) {
-		Integer [] intResults = null;
-		try {
-			findDirectoryPrepStmt.setInt(1, actionId);
-			intResults = db.executePrepSelectIntegerColumn(findDirectoryPrepStmt);
-			
-		} catch (SQLException e) {
-			new FatalBuildStoreError("Error in SQL: " + e);
-		}
 		
-		/* if there were no results, return a not found error */
-		if (intResults.length == 0) {
+		Object result = getSlotValue(actionId, dirSlotId);
+		if (result == null) {
 			return ErrorCode.NOT_FOUND;
 		}
 		
-		/* if there was one result, return it */
-		else if (intResults.length == 1) {
-			return intResults[0];
-		}
-		
-		/* else, multiple results is a bad thing */
-		else {
-			throw new FatalBuildStoreError("Multiple results find in buildActions table for actionId = " + actionId);
-		}
+		return (Integer)result;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -995,6 +921,29 @@ public class ActionMgr implements IActionMgr {
 	public void removeListener(IActionMgrListener listener) {
 		listeners.remove(listener);
 	};
+	
+	/*=====================================================================================*
+	 * PACKAGE METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * Extra initialization that can only happen all other managers are initialized.
+	 */
+	/* package */ void initPass2() {
+		/* 
+		 * We need to refer to all these helper objects, to see if they
+		 * use the path we're trying to delete.
+		 */
+		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
+
+		/* fetch the slot ID for "Directory" and "Command" */
+		SlotDetails slotDetails = 
+				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Directory");
+		dirSlotId = slotDetails.slotId;
+		slotDetails = 
+				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command");
+		cmdSlotId = slotDetails.slotId;
+	}
 	
 	/*=====================================================================================*
 	 * PRIVATE METHODS

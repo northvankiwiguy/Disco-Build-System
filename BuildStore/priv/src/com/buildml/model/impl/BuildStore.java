@@ -161,6 +161,13 @@ public class BuildStore implements IBuildStore {
 		pkgRootMgr = new PackageRootMgr(this);
 		
 		/*
+		 * Since these managers were initialized in a specific order, some of the earlier
+		 * managers might need extra initialization that depends on the later managers.
+		 */
+		((FileMgr)fileMgr).initPass2();
+		((ActionMgr)actionMgr).initPass2();
+		
+		/*
 		 * When the database is first created, it won't have the "workspace" root set.
 		 * By default, we set it to the parent directory of the build.bml file.
 		 */

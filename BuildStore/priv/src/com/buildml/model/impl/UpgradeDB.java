@@ -183,15 +183,30 @@ public class UpgradeDB {
 				stat.executeUpdate("alter table fileGroups add column predId integer");
 			}
 			
-			/* update to 406 - drop the pkgId column from the buildActions table */
+			/* update to 406:
+			 *  - create slot records for "Command" and "Directory"
+			 *  - drop the pkgId column from the buildActions table
+			 */
 
 			if (dbVersion < 406) {
+				
+				/* move command/dir info from buildActions to slotValues */ 
+				int cmdSlotId = 2; /* this is constant - as of 405 */
+				int dirSlotId = 3; /* this is constant - as of 405 */
+				
+				stat.executeUpdate("insert into slotValues select " + 
+									SlotMgr.SLOT_OWNER_ACTION + ", actionId, " + cmdSlotId + ", command " +
+									"from buildActions");
+				stat.executeUpdate("insert into slotValues select " + 
+									SlotMgr.SLOT_OWNER_ACTION + ", actionId, " + dirSlotId + ", actionDirId " +
+									"from buildActions");
+				
+				/* move unneeded fields from buildActions */
 				stat.executeUpdate("alter table buildActions rename to buildActionstmp");
 				stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
-						   				"parentActionId integer, trashed integer, actionDirId integer, " +
-						   				"command text, actionType integer)");
+						   				"parentActionId integer, trashed integer, actionType integer)");
 				stat.executeUpdate("insert into buildActions select actionId, parentActionId, trashed, " +
-						   				"actionDirId, command, actionType from buildActionstmp");
+						   				"actionType from buildActionstmp");
 				stat.executeUpdate("drop table buildActionstmp");
 			}
 

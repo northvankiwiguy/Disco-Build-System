@@ -168,14 +168,6 @@ public interface IActionMgr {
 	 * @return The action's type, or ErrorCode.NOT_FOUND if actionId is invalid.
 	 */
 	public int getActionType(int actionId);
-	
-	/**
-	 * Return the list of all actions that execute within the file system directory 
-	 * specified by pathId.
-	 * @param pathId The directory in which the actions must be executed.
-	 * @return The list of actions.
-	 */
-	public abstract Integer[] getActionsInDirectory(int pathId);
 
 	/**
 	 * Fetch a build action's command line string.
