@@ -270,12 +270,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		 * shell commands.
 		 */
 		String actionCommand = actionMgr.getCommand(actionId);
-		String actionCommandSplit[] = actionCommand.split(" ", 2);
-		String actionCommandBase = actionCommandSplit[0];
-		int slashIndex = actionCommandBase.lastIndexOf('/');
-		if (slashIndex != -1){
-			actionCommandBase = actionCommandBase.substring(slashIndex + 1);
-		}
+		String actionCommandBase = getShellCommandSummary(actionCommand);
 		
 		/* draw the action type's name inside the oval(s) */
 		Text actionTypeNameText = gaService.createPlainText(invisibleRectangle, 
@@ -519,5 +514,51 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		new UndoOpAdapter("Delete Action", multiOp).invoke();
 	}
 
+	/*=====================================================================================*
+	 * PRIVATE METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * Given a full shell command string, generate a summary of that command that is suitable
+	 * for display with an action's oval. This summary provides the command name (without
+	 * arguments or absolute paths), and possibly combines multiple commands into a single
+	 * summary. For example, "/usr/bin/gcc -c test.c" will be summarized as "gcc". Also,
+	 * "gcc -c test.c\n/usr/bin/ld -o test test.o" is summarized as "gcc,ld".
+	 * 
+	 * @param actionCommand The original (full) action shell command.
+	 * @return The summarized String.
+	 */
+	private String getShellCommandSummary(String actionCommand) {
+	
+		/* we'll accumulate the command summary in this StringBuilder */
+		StringBuilder sb = new StringBuilder();
+		
+		/* break the action's full (possibly multi-line) command into multiple lines */
+		String lines[] = actionCommand.split("\n", 0);
+		
+		/* for each command line in the action's shell command... */
+		for (int i = 0; i < lines.length; i++) {
+
+			/* extract the first part of the command line, up until the first space */
+			String lineSplit[] = lines[i].split(" ", 2);
+			if (lineSplit.length > 0) {
+				String base = lineSplit[0];
+				
+				/* Fetch the last part of the command. For example, /usr/bin/gcc -> gcc */
+				int slashIndex = base.lastIndexOf('/');
+				if (slashIndex != -1){
+					base = base.substring(slashIndex + 1);
+				}
+				
+				/* append the base of this command to the output */
+				if (i != 0) {
+					sb.append(',');
+				}
+				sb.append(base);
+			}
+		}	
+		return sb.toString();
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }
