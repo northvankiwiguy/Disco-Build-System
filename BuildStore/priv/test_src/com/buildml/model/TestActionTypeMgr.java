@@ -138,10 +138,13 @@ public class TestActionTypeMgr {
 
 		/* test the parameter slots */
 		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_PARAMETER);
-		assertEquals(1, results.length);
+		assertEquals(2, results.length);
 		assertEquals("Command", results[0].slotName);
 		assertEquals(ISlotTypes.SLOT_POS_PARAMETER, results[0].slotPos);
 		assertEquals(ISlotTypes.SLOT_TYPE_TEXT, results[0].slotType);
+		assertEquals("Directory", results[1].slotName);
+		assertEquals(ISlotTypes.SLOT_POS_PARAMETER, results[1].slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_DIRECTORY, results[1].slotType);
 
 		/* test the local slots - there aren't any */
 		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_LOCAL);
@@ -149,14 +152,14 @@ public class TestActionTypeMgr {
 
 		/* test the output slots */
 		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_OUTPUT);
-		assertEquals(10, results.length);
-		assertEquals("Output5", results[5].slotName);
-		assertEquals(ISlotTypes.SLOT_POS_OUTPUT, results[5].slotPos);
-		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, results[5].slotType);
+		assertEquals(1, results.length);
+		assertEquals("Output", results[0].slotName);
+		assertEquals(ISlotTypes.SLOT_POS_OUTPUT, results[0].slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, results[0].slotType);
 
 		/* test fetching all slot types at once */
 		results = actionTypeMgr.getSlots(shellActionId, ISlotTypes.SLOT_POS_ANY);
-		assertEquals(12, results.length);
+		assertEquals(4, results.length);
 		
 		/* fetch by name - "Input" */
 		SlotDetails result = actionTypeMgr.getSlotByName(shellActionId, "Input");
@@ -164,9 +167,9 @@ public class TestActionTypeMgr {
 		assertEquals(ISlotTypes.SLOT_POS_INPUT, result.slotPos);
 		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, result.slotType);
 		
-		/* fetch by name - "Output3" */
-		result = actionTypeMgr.getSlotByName(shellActionId, "Output3");
-		assertEquals("Output3", result.slotName);
+		/* fetch by name - "Output" */
+		result = actionTypeMgr.getSlotByName(shellActionId, "Output");
+		assertEquals("Output", result.slotName);
 		assertEquals(ISlotTypes.SLOT_POS_OUTPUT, result.slotPos);
 		assertEquals(ISlotTypes.SLOT_TYPE_FILEGROUP, result.slotType);
 		
@@ -175,6 +178,12 @@ public class TestActionTypeMgr {
 		assertEquals("Command", result.slotName);
 		assertEquals(ISlotTypes.SLOT_POS_PARAMETER, result.slotPos);
 		assertEquals(ISlotTypes.SLOT_TYPE_TEXT, result.slotType);
+		
+		/* fetch by name - "Directory" */
+		result = actionTypeMgr.getSlotByName(shellActionId, "Directory");
+		assertEquals("Directory", result.slotName);
+		assertEquals(ISlotTypes.SLOT_POS_PARAMETER, result.slotPos);
+		assertEquals(ISlotTypes.SLOT_TYPE_DIRECTORY, result.slotType);
 		
 		/* fetch an invalid name */
 		result = actionTypeMgr.getSlotByName(shellActionId, "BADNAME");

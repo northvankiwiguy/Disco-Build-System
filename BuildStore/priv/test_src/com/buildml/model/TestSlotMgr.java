@@ -96,12 +96,16 @@ public class TestSlotMgr {
 		details = actionTypeMgr.getSlotByID(2);
 		validateDetails(details, 2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
-		
-		for (int id = 0; id < 10; id++) {
-			details = actionTypeMgr.getSlotByID(3 + id);
-			validateDetails(details, 3 + id, "Output" + id, ISlotTypes.SLOT_TYPE_FILEGROUP, 
-					ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
-		}
+
+		/* slot 3 is "Directory" */
+		details = actionTypeMgr.getSlotByID(3);
+		validateDetails(details, 3, "Directory", ISlotTypes.SLOT_TYPE_DIRECTORY, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
+
+		/* slot 4 is "Output" */
+		details = actionTypeMgr.getSlotByID(4);
+		validateDetails(details, 4, "Output", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 	}
 	
@@ -125,17 +129,21 @@ public class TestSlotMgr {
 		
 		/* get the parameter slots */
 		details = actionTypeMgr.getSlots(shellCmdId, ISlotTypes.SLOT_POS_PARAMETER);
-		assertEquals(1, details.length);
+		assertEquals(2, details.length);
 		validateDetails(details[0], 2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
+		validateDetails(details[1], 3, "Directory", ISlotTypes.SLOT_TYPE_DIRECTORY, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		
 		/* get the output slots - don't bother checking the details */
 		details = actionTypeMgr.getSlots(shellCmdId, ISlotTypes.SLOT_POS_OUTPUT);
-		assertEquals(10, details.length);
+		assertEquals(1, details.length);
+		validateDetails(details[0], 4, "Output", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* get all the slots - don't bother checking the details */
 		details = actionTypeMgr.getSlots(shellCmdId, ISlotTypes.SLOT_POS_ANY);
-		assertEquals(12, details.length);
+		assertEquals(4, details.length);
 		
 		/* get slots for an invalid action type - invalid */
 		details = actionTypeMgr.getSlots(1000, ISlotTypes.SLOT_POS_ANY);
@@ -166,9 +174,14 @@ public class TestSlotMgr {
 		validateDetails(details, 2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 
-		/* check just one of the output slots */
-		details = actionTypeMgr.getSlotByName(shellCmdId, "Output3");
-		validateDetails(details, 6, "Output3", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		/* slot 3 is "Directory" */
+		details = actionTypeMgr.getSlotByName(shellCmdId, "Directory");
+		validateDetails(details, 3, "Directory", ISlotTypes.SLOT_TYPE_DIRECTORY, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
+		
+		/* slot 4 is "Output" */
+		details = actionTypeMgr.getSlotByName(shellCmdId, "Output");
+		validateDetails(details, 4, "Output", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 	}
 
@@ -491,6 +504,14 @@ public class TestSlotMgr {
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		int bool2SlotId = actionTypeMgr.newSlot(typeId, "Bool2", ISlotTypes.SLOT_TYPE_BOOLEAN,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "true", null);
+		int file1SlotId = actionTypeMgr.newSlot(typeId, "File1", ISlotTypes.SLOT_TYPE_FILE,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int file2SlotId = actionTypeMgr.newSlot(typeId, "File2", ISlotTypes.SLOT_TYPE_FILE,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(25), null);
+		int dir1SlotId = actionTypeMgr.newSlot(typeId, "Directory1", ISlotTypes.SLOT_TYPE_DIRECTORY,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int dir2SlotId = actionTypeMgr.newSlot(typeId, "Directory2", ISlotTypes.SLOT_TYPE_DIRECTORY,
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(43), null);
 		
 		/*
 		 * Test the default values of each slot.
@@ -504,6 +525,10 @@ public class TestSlotMgr {
 		assertEquals("DefaultValue", actionMgr.getSlotValue(actionId, text2SlotId));
 		assertNull(actionMgr.getSlotValue(actionId, bool1SlotId));
 		assertEquals(Boolean.TRUE, actionMgr.getSlotValue(actionId, bool2SlotId));
+		assertNull(actionMgr.getSlotValue(actionId, file1SlotId));
+		assertEquals(Integer.valueOf(25), actionMgr.getSlotValue(actionId, file2SlotId));
+		assertNull(actionMgr.getSlotValue(actionId, dir1SlotId));
+		assertEquals(Integer.valueOf(43), actionMgr.getSlotValue(actionId, dir2SlotId));
 		
 		/*
 		 * Set a range of valid values for each slot type.
@@ -557,6 +582,22 @@ public class TestSlotMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, bool1SlotId, "no"));
 		assertEquals(Boolean.FALSE, actionMgr.getSlotValue(actionId, bool1SlotId));
 		
+		/* SLOT_TYPE_FILE can have value null or Integer */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, file1SlotId, null));
+		assertNull(actionMgr.getSlotValue(actionId, file1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, file1SlotId, Integer.valueOf(5)));
+		assertEquals(Integer.valueOf(5), actionMgr.getSlotValue(actionId, file1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, file1SlotId, Integer.valueOf(10)));
+		assertEquals(Integer.valueOf(10), actionMgr.getSlotValue(actionId, file1SlotId));
+
+		/* SLOT_TYPE_DIRECTORY can have value null or Integer */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, dir1SlotId, null));
+		assertNull(actionMgr.getSlotValue(actionId, dir1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, dir1SlotId, Integer.valueOf(51)));
+		assertEquals(Integer.valueOf(51), actionMgr.getSlotValue(actionId, dir1SlotId));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, dir1SlotId, Integer.valueOf(101)));
+		assertEquals(Integer.valueOf(101), actionMgr.getSlotValue(actionId, dir1SlotId));
+
 		/*
 		 * Test a range of invalid values.
 		 */
@@ -578,6 +619,16 @@ public class TestSlotMgr {
 		/* SLOT_TYPE_BOOLEAN */
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, bool1SlotId, "maybe"));
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, bool1SlotId, 'b'));
+		
+		/* SLOT_TYPE_FILE */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, file1SlotId, "123ab"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, file1SlotId, "Fred"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, file1SlotId, false));
+
+		/* SLOT_TYPE_DIRECTORY */
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, dir1SlotId, "123ab"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, dir1SlotId, "Fred"));
+		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setSlotValue(actionId, dir1SlotId, false));
 
 		/*
 		 * Set some invalid default values for each type of slot.
@@ -606,6 +657,18 @@ public class TestSlotMgr {
 				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, "maybe", null));
 		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool102", 
 				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'c', null));
+		
+		/* SLOT_TYPE_FILE */
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "File101", 
+				ISlotTypes.SLOT_TYPE_FILE, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "123", null));
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "File102", 
+				ISlotTypes.SLOT_TYPE_FILE, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, true, null));
+		
+		/* SLOT_TYPE_DIRECTORY */
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Dir101", 
+				ISlotTypes.SLOT_TYPE_DIRECTORY, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "hello", null));
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Dir102", 
+				ISlotTypes.SLOT_TYPE_DIRECTORY, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "123", null));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

@@ -125,9 +125,9 @@ public class MovePackageRefactorer {
 		if (inputSlotDetails == null) {
 			throw new FatalError("Can't find slot \"Input\"");
 		}
-		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellTypeId, "Output0");
+		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellTypeId, "Output");
 		if (outputSlotDetails == null) {
-			throw new FatalError("Can't find slot \"Output0\"");
+			throw new FatalError("Can't find slot \"Output\"");
 		}
 		inputSlotId = inputSlotDetails.slotId;
 		outputSlotId = outputSlotDetails.slotId;

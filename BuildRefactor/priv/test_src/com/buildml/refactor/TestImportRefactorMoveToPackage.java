@@ -308,7 +308,7 @@ public class TestImportRefactorMoveToPackage {
 		Integer inputSlotValue = (Integer) actionMgr.getSlotValue(
 				actionId, actionMgr.getSlotByName(actionId, "Input"));
 		Integer outputSlotValue = (Integer) actionMgr.getSlotValue(
-				actionId, actionMgr.getSlotByName(actionId, "Output0"));
+				actionId, actionMgr.getSlotByName(actionId, "Output"));
 		assertNotNull(inputSlotValue);
 		assertNotNull(outputSlotValue);
 		

@@ -58,6 +58,12 @@ public interface ISlotTypes {
 	
 	/** The slot holds a value from a specific enumeration */
 	public static final int SLOT_TYPE_ENUMERATION   = 6;
+	
+	/** The slot holds the pathID of a directory */
+	public static final int SLOT_TYPE_DIRECTORY     = 7;
+
+	/** The slot holds the pathID of a file */
+	public static final int SLOT_TYPE_FILE          = 8;
 
 	/*=====================================================================================*
 	 * SLOT CARD - Defines the cardinality of the slot. That is, how many values

@@ -38,11 +38,10 @@ class SlotMgr {
 	
 	/*
 	 * Note: the following slot IDs are pre-defined:
-	 *   1 - SLOT_OWNER_ACTION / "Shell Command" / "Input" / Input pos / FileGroup type.
-	 *   2 - SLOT_OWNER_ACTION / "Shell Command" / "Command" / Param pos / String type.
-	 *   3 - SLOT_OWNER_ACTION / "Shell Command" / "Output0" / Output pos / FileGroup type.
-	 *   ...
-	 *  12 - SLOT_OWNER_ACTION / "Shell Command" / "Output9" / Output pos / FileGroup type.
+	 *   1 - SLOT_OWNER_ACTION / "Shell Command" / "Input"     / Input pos  / FileGroup type.
+	 *   2 - SLOT_OWNER_ACTION / "Shell Command" / "Command"   / Param pos  / String type.
+	 *   3 - SLOT_OWNER_ACTION / "Shell Command" / "Directory" / Param pos  / Directory type.
+	 *   4 - SLOT_OWNER_ACTION / "Shell Command" / "Output"    / Output pos / FileGroup type.
 	 */
 
 	/*=====================================================================================*
@@ -124,12 +123,13 @@ class SlotMgr {
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
 		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command", 
 				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_PARAMETER,
-				ISlotTypes.SLOT_CARD_REQUIRED, null, null);		
-		for (int id = 0; id < 10; id++) {
-			newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Output" + id, 
-					ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT,
-					ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
-		}
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Directory", 
+				ISlotTypes.SLOT_TYPE_DIRECTORY, ISlotTypes.SLOT_POS_PARAMETER,
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Output", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT,
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
 	}
 	
 	/*=====================================================================================*
@@ -168,7 +168,7 @@ class SlotMgr {
 		}
 		
 		/* validate slotType and slotPos */
-		if ((slotType < ISlotTypes.SLOT_TYPE_FILEGROUP) || (slotType > ISlotTypes.SLOT_TYPE_ENUMERATION)) {
+		if ((slotType < ISlotTypes.SLOT_TYPE_FILEGROUP) || (slotType > ISlotTypes.SLOT_TYPE_FILE)) {
 			return ErrorCode.INVALID_OP;
 		}
 		if ((slotPos < ISlotTypes.SLOT_POS_INPUT) || (slotPos > ISlotTypes.SLOT_POS_LOCAL)) {
@@ -424,8 +424,6 @@ class SlotMgr {
 		/* 
 		 * Assume that ownerType and ownerId was validated by our caller, but we need
 		 * to check that slotId is relevant for ownerType/ownerId. If not, return NOT_FOUND.
-		 * Note: for now, actionType can only be "Shell Command", so we only need to validate
-		 * that slotId is a valid default slot ID.
 		 */
 		SlotDetails details = getSlotByID(slotId);
 		if (details == null) {
@@ -636,8 +634,6 @@ class SlotMgr {
 		 * For each slot type, convert from the normalize String value into an appropriate return type.
 		 */
 		switch (slotType) {
-		case ISlotTypes.SLOT_TYPE_FILEGROUP:
-			return Integer.valueOf(stringValue);
 			
 		case ISlotTypes.SLOT_TYPE_BOOLEAN:
 			if (stringValue.equals("true")) {
@@ -646,7 +642,10 @@ class SlotMgr {
 				return Boolean.FALSE;
 			}
 			
+		case ISlotTypes.SLOT_TYPE_FILEGROUP:
 		case ISlotTypes.SLOT_TYPE_INTEGER:
+		case ISlotTypes.SLOT_TYPE_DIRECTORY:
+		case ISlotTypes.SLOT_TYPE_FILE:
 			return Integer.valueOf(stringValue);
 		
 		case ISlotTypes.SLOT_TYPE_TEXT:
@@ -678,6 +677,8 @@ class SlotMgr {
 		
 		/* SLOT_TYPE_FILEGROUP must have value Integer */
 		case ISlotTypes.SLOT_TYPE_FILEGROUP:
+		case ISlotTypes.SLOT_TYPE_DIRECTORY:			
+		case ISlotTypes.SLOT_TYPE_FILE:
 			
 			/* integers must be positive */
 			if (value instanceof Integer) {
@@ -686,7 +687,7 @@ class SlotMgr {
 						
 			/* other object types are illegal */
 			else {
-				throw new NumberFormatException("Illegal value type for SLOT_TYPE_FILEGROUP: " + value.getClass());
+				throw new NumberFormatException("Illegal value type for SLOT_TYPE_FILEGROUP/FILE/DIRECTORY: " + value.getClass());
 			}
 			
 		/* For SLOT_TYPE_INTEGER, the input must be a String or Integer. */

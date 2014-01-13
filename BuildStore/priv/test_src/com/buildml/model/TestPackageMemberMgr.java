@@ -352,6 +352,16 @@ public class TestPackageMemberMgr {
 		int a4 = actionMgr.addShellCommandAction(rootActionId, dirId, "action4");
 		int a5 = actionMgr.addShellCommandAction(rootActionId, dirId, "action5");
 		int actionTypeId = actionMgr.getActionType(a1);
+		
+		/* 
+		 * Create multiple output slots. Our standard shell action doesn't have multiple outputs, but it's
+		 * possible for custom-designed action types.
+		 */
+		actionTypeMgr.newSlot(actionTypeId, "Output0", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		actionTypeMgr.newSlot(actionTypeId, "Output1", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		
 		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
 		SlotDetails output0Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output0");
 		SlotDetails output1Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output1");
@@ -1434,6 +1444,16 @@ public class TestPackageMemberMgr {
 		int a3 = actionMgr.addShellCommandAction(rootActionId, dirId, "action3");
 		
 		int actionTypeId = actionMgr.getActionType(a1);
+		
+		/*
+		 * Create multiple output slots (our standard shell action doesn't have this, but it's possible
+		 * to create a custom type with multiple outputs).
+		 */
+		actionTypeMgr.newSlot(actionTypeId, "Output3", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		actionTypeMgr.newSlot(actionTypeId, "Output6", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		
 		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
 		SlotDetails output3Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output3");
 		SlotDetails output6Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output6");
@@ -1490,6 +1510,16 @@ public class TestPackageMemberMgr {
 		int fg2 = fileGroupMgr.newSourceGroup(pkgId);
 		int a1 = actionMgr.addShellCommandAction(rootActionId, dirId, "action1");
 		int actionTypeId = actionMgr.getActionType(a1);
+		
+		/*
+		 * Create multiple output slots (our standard shell action doesn't have this, but it's possible
+		 * to create a custom type with multiple outputs).
+		 */
+		actionTypeMgr.newSlot(actionTypeId, "Output3", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		actionTypeMgr.newSlot(actionTypeId, "Output6", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		
 		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
 		SlotDetails output3Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output3");
 		SlotDetails output6Slot = actionTypeMgr.getSlotByName(actionTypeId, "Output6");

@@ -808,7 +808,7 @@ public class TestActionMgr {
 		
 		/* fetch the slot details for Input, Output0 and Command */
 		SlotDetails inputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Input");
-		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Output0");
+		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Output");
 		SlotDetails commandSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Command");
 		assertNotNull(inputSlotDetails);
 		assertNotNull(outputSlotDetails);
@@ -835,7 +835,7 @@ public class TestActionMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, inputSlotDetails.slotId, 12));
 		assertEquals(Integer.valueOf(12), actionMgr.getSlotValue(myActionId, inputSlotDetails.slotId));
 
-		/* Assign a FileGroup to "Output5" slot */
+		/* Assign a FileGroup to "Output" slot */
 		assertNull(actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, 123));
 		assertEquals(Integer.valueOf(123), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
@@ -848,7 +848,7 @@ public class TestActionMgr {
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, commandSlotDetails.slotId, "My command"));
 		assertEquals("My command", actionMgr.getSlotValue(myActionId, commandSlotDetails.slotId));
 		
-		/* Assign a number to "Output5" - should be returned as Integer */
+		/* Assign a number to "Output" - should be returned as Integer */
 		assertEquals(Integer.valueOf(123), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(myActionId, outputSlotDetails.slotId, 456));
 		assertEquals(Integer.valueOf(456), actionMgr.getSlotValue(myActionId, outputSlotDetails.slotId));
