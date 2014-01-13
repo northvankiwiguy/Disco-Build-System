@@ -566,22 +566,6 @@ public class ActionMgr implements IActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionMgr#getDirectory(int)
-	 */
-	@Override
-	public int getDirectory(int actionId) {
-		
-		Object result = getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
-		if (result == null) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		return (Integer)result;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getChildren(int)
 	 */
 	@Override

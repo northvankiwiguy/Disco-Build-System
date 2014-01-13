@@ -134,7 +134,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 			 * First, output the command's current working directory, taking care to
 			 * wrap the path if it's too long.
 			 */
-			int cmdDirId = actionMgr.getDirectory(actionId);
+			int cmdDirId = (Integer) actionMgr.getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
 			String dirString = fileMgr.getPathName(cmdDirId);
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 			PrintStream printStream = new PrintStream(outStream);

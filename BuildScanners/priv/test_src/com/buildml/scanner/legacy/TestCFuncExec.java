@@ -209,9 +209,9 @@ public class TestCFuncExec {
 		 */
 		int currentDirId = 
 			fileMgr.getPath(PathUtils.normalizeAbsolutePath(new File(".").getAbsolutePath()));
-		int parentDirId = actionMgr.getDirectory(parentActionId);
+		int parentDirId = (Integer) actionMgr.getSlotValue(parentActionId, IActionMgr.DIRECTORY_SLOT_ID);
 		assertEquals(currentDirId, parentDirId);
-		int childDirId = actionMgr.getDirectory(childActionId);
+		int childDirId = (Integer) actionMgr.getSlotValue(childActionId, IActionMgr.DIRECTORY_SLOT_ID);
 		assertEquals(currentDirId, childDirId);
 		
 		/*

@@ -280,7 +280,7 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#getDirectory(int)}
+	 * Test method for fetching an action's "Directory" slot.
 	 * @throws Exception Something bad happened
 	 */
 	@Test
@@ -294,14 +294,14 @@ public class TestActionMgr {
 		int action5 = actionMgr.addShellCommandAction(action3, 30, "gcc -o bark.o bark.c");
 		
 		/* check that the directories are stored correctly */
-		assertEquals(0, actionMgr.getDirectory(action1));
-		assertEquals(10, actionMgr.getDirectory(action2));
-		assertEquals(20, actionMgr.getDirectory(action3));
-		assertEquals(25, actionMgr.getDirectory(action4));
-		assertEquals(30, actionMgr.getDirectory(action5));
+		assertEquals(0, actionMgr.getSlotValue(action1, IActionMgr.DIRECTORY_SLOT_ID));
+		assertEquals(10, actionMgr.getSlotValue(action2, IActionMgr.DIRECTORY_SLOT_ID));
+		assertEquals(20, actionMgr.getSlotValue(action3, IActionMgr.DIRECTORY_SLOT_ID));
+		assertEquals(25, actionMgr.getSlotValue(action4, IActionMgr.DIRECTORY_SLOT_ID));
+		assertEquals(30, actionMgr.getSlotValue(action5, IActionMgr.DIRECTORY_SLOT_ID));
 		
 		/* invalid action IDs should return an error */
-		assertEquals(ErrorCode.NOT_FOUND, actionMgr.getDirectory(1000));
+		assertNull(actionMgr.getSlotValue(1000, IActionMgr.DIRECTORY_SLOT_ID));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

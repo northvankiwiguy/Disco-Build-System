@@ -639,7 +639,7 @@ public class CliUtils {
 		}
 		
 		/* fetch the name of the directory the action was executed in */
-		int actionDirId = actionMgr.getDirectory(actionId);
+		int actionDirId = (Integer) actionMgr.getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
 		String actionDirName = fileMgr.getPathName(actionDirId);
 		
 		/* display the correct number of "-" characters */

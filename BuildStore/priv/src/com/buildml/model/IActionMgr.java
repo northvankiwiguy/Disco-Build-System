@@ -202,14 +202,6 @@ public interface IActionMgr {
 	public abstract int setParent(int actionId, int newParentId);
 
 	/**
-	 * Return the path ID of the directory in which this action was executed.
-	 * 
-	 * @param actionId The ID of the action.
-	 * @return The path ID of the directory in which this action was executed.
-	 */
-	public abstract int getDirectory(int actionId);
-
-	/**
 	 * Given the ID of an action, return an array of the action's children (possibly empty).
 	 * 
 	 * @param actionId The parent action of the children to be returned.

@@ -14,6 +14,7 @@ import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.dialogs.VFSTreeSelectionDialog;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageRootMgr;
@@ -115,7 +116,7 @@ public class ActionPropertyPage extends BmlPropertyPage {
 		/*
 		 * Display the action's directory, providing the option to change the directory.
 		 */
-		originalPathId = actionMgr.getDirectory(actionId);
+		originalPathId = (Integer) actionMgr.getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
 		String pathString = fileMgr.getPathName(originalPathId);
 		new Label(panel, SWT.NONE).setText("Action Directory : ");
 		final Label actionDirectoryLabelValue = new Label(panel, SWT.NONE);

@@ -133,7 +133,7 @@ public class TestCFuncDir {
 		/* test that the child action ("true") executed in tmpDir */
 		Integer childActions[] = actionMgr.getChildren(action);
 		assertEquals(1, childActions.length);
-		int dirId = actionMgr.getDirectory(childActions[0]);
+		int dirId = (Integer) actionMgr.getSlotValue(childActions[0], IActionMgr.DIRECTORY_SLOT_ID);
 		assertEquals(tmpDir.toString(), fileMgr.getPathName(dirId));
 		
 		/*
@@ -150,7 +150,7 @@ public class TestCFuncDir {
 		/* test that the child action ("true") executes in /, rather than tmpdir/invalid */
 		childActions = actionMgr.getChildren(action);
 		assertEquals(1, childActions.length);
-		dirId = actionMgr.getDirectory(childActions[0]);
+		dirId = (Integer) actionMgr.getSlotValue(childActions[0], IActionMgr.DIRECTORY_SLOT_ID);
 		assertEquals("/", fileMgr.getPathName(dirId));
 	}
 
@@ -178,7 +178,7 @@ public class TestCFuncDir {
 		/* test that the child action ("true") executed in tmpDir */
 		Integer childActions[] = actionMgr.getChildren(action);
 		assertEquals(1, childActions.length);
-		int dirId = actionMgr.getDirectory(childActions[0]);
+		int dirId = (Integer) actionMgr.getSlotValue(childActions[0], IActionMgr.DIRECTORY_SLOT_ID);
 		assertEquals(tmpDir.toString(), fileMgr.getPathName(dirId));
 		
 		/*
@@ -196,7 +196,7 @@ public class TestCFuncDir {
 		/* test that the child action ("true") executes in / */
 		childActions = actionMgr.getChildren(action);
 		assertEquals(1, childActions.length);
-		dirId = actionMgr.getDirectory(childActions[0]);
+		dirId = (Integer) actionMgr.getSlotValue(childActions[0], IActionMgr.DIRECTORY_SLOT_ID);
 		assertEquals("/", fileMgr.getPathName(dirId));
 	}
 
