@@ -81,7 +81,6 @@ import com.buildml.utils.errors.ErrorCode;
 		findFilesInPackage2PrepStmt = null,
 		findFilesOutsidePackage1PrepStmt = null,
 		findFilesOutsidePackage2PrepStmt = null,		
-		updateActionPackagePrepStmt = null,
 		findActionPackagePrepStmt = null,
 		findActionsInPackagePrepStmt = null,
 		findActionsOutsidePackagePrepStmt = null,
@@ -129,8 +128,6 @@ import com.buildml.utils.errors.ErrorCode;
 		findFilesOutsidePackage2PrepStmt = db.prepareStatement(
 				"select memberId from packageMembers where memberType = " + TYPE_FILE +
 				" and not (pkgId = ? and scopeId = ?)");
-		updateActionPackagePrepStmt = db.prepareStatement("update buildActions set pkgId = ? " +
-				"where actionId = ?");
 		findActionPackagePrepStmt = db.prepareStatement("select pkgId from packageMembers where memberId = ?" +
 				" and memberType = " + TYPE_ACTION);
 		findActionsInPackagePrepStmt = db.prepareStatement(

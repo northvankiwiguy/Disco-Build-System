@@ -182,6 +182,18 @@ public class UpgradeDB {
 			if (dbVersion < 405) {
 				stat.executeUpdate("alter table fileGroups add column predId integer");
 			}
+			
+			/* update to 406 - drop the pkgId column from the buildActions table */
+
+			if (dbVersion < 406) {
+				stat.executeUpdate("alter table buildActions rename to buildActionstmp");
+				stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
+						   				"parentActionId integer, trashed integer, actionDirId integer, " +
+						   				"command text, actionType integer)");
+				stat.executeUpdate("insert into buildActions select actionId, parentActionId, trashed, " +
+						   				"actionDirId, command, actionType from buildActionstmp");
+				stat.executeUpdate("drop table buildActionstmp");
+			}
 
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);

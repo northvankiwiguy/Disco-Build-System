@@ -52,7 +52,7 @@ import com.buildml.model.IPackageMemberMgr;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 405;
+	public static final int SCHEMA_VERSION = 406;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -281,9 +281,9 @@ import com.buildml.model.IPackageMemberMgr;
 			
 			/* Create the "buildActions" table. */
 			stat.executeUpdate("create table buildActions ( actionId integer primary key, " +
-							   "parentActionId integer, trashed integer, actionDirId integer, pkgId integer, " +
+							   "parentActionId integer, trashed integer, actionDirId integer, " +
 							   "command text, actionType integer)");
-			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, 0, null, 0)");
+			stat.executeUpdate("insert into buildActions values (0, 0, 0, 0, null, 0)");
 			stat.executeUpdate("create index buildActionsIdx on buildActions (parentActionId)");
 			
 			/* Create the "actionFiles" tables. */
