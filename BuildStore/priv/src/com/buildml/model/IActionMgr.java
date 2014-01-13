@@ -195,18 +195,6 @@ public interface IActionMgr {
 	 * is invalid.
 	 */
 	public abstract int setCommand(int actionId, String command);
-	
-	/**
-	 * Fetch a summary of this action's command. The summary string is designed to give a
-	 * high-level overview of what the command does. The summary string for certain commands
-	 * may contain the command name and most important parameters, whereas for other commands
-	 * it may just be the first 'width' characters of the shell command.
-	 * 
-	 * @param actionId The ID of the action.
-	 * @param width The maximum number of characters in the summary string.
-	 * @return The summary string for this action's command.
-	 */
-	public abstract String getCommandSummary(int actionId, int width);
 
 	/**
 	 * Given the ID of a action, return the ID of the action's parent.

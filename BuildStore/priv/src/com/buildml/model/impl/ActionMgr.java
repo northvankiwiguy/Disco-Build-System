@@ -540,38 +540,6 @@ public class ActionMgr implements IActionMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionMgr#getCommandSummary(int, int)
-	 */
-	@Override
-	public String getCommandSummary(int actionId, int width) {
-		
-		/* 
-		 * For now, we treat all commands as being the same, and simply return the
-		 * first 'width' characters from the action's command string.
-		 */
-		String command = ShellCommandUtils.joinCommandLine(getCommand(actionId));
-		
-		/* for strings that are longer than 'width', truncate them and suffix them with "..." */
-		boolean dotsNeeded = false;
-		int stringLen = command.length();
-		if (stringLen > width - 3) {
-			stringLen = width - 3;
-			dotsNeeded = true;
-		}
-		
-		/* form the summary string, possibly with ... */
-		StringBuffer sb = new StringBuffer(command.substring(0, stringLen));
-		if (dotsNeeded){
-			sb.append("...");
-		}
-		
-		/* return the summary string */
-		return sb.toString();
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
 
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getParent(int)

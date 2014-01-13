@@ -124,5 +124,26 @@ public class TestShellCommandUtils {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
-
+	
+	/**
+	 * Test method for getCommandSummary().
+	 */
+	@Test
+	public void testGetCommandSummary() {
+	
+		/* create a single action, with a long command string */
+		String shellCmd = "gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
+				"-o myfile.o -c myfile.c";
+		
+		/* fetch the summary at various widths */
+		assertEquals("gcc -Ipath1/...", ShellCommandUtils.getCommandSummary(shellCmd, 15));
+		assertEquals("gcc -Ipath1/include -Ipath2...", ShellCommandUtils.getCommandSummary(shellCmd, 30));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/inc...", ShellCommandUtils.getCommandSummary(shellCmd, 50));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
+				"-o myfile.o -c myfile....", ShellCommandUtils.getCommandSummary(shellCmd, 89));
+		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
+				"-o myfile.o -c myfile.c", ShellCommandUtils.getCommandSummary(shellCmd, 100));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

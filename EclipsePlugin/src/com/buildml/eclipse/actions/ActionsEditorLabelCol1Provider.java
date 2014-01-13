@@ -27,6 +27,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.utils.print.PrintUtils;
+import com.buildml.utils.string.ShellCommandUtils;
 
 /**
  * Label provider for the first column of the TreeViewer which is the main viewer for the
@@ -104,7 +105,10 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 		if (element instanceof UIAction) {
 			UIAction uiAction = (UIAction)element;
 			int actionId = uiAction.getId();
-			return " " + actionMgr.getCommandSummary(actionId, 200);
+			String command = actionMgr.getCommand(actionId);
+			if (command != null) {
+				return " " + ShellCommandUtils.getCommandSummary(command, 200);
+			}
 		}
 		return " <invalid>";
 	}

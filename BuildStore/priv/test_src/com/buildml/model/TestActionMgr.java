@@ -124,29 +124,6 @@ public class TestActionMgr {
 		/* an invalid action ID should return an error */
 		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setCommand(100, "command"));
 	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#getCommandSummary(int, int)}
-	 */
-	@Test
-	public void testGetCommandSummary() {
-	
-		/* create a single action, with a long command string */
-		int myaction = actionMgr.addShellCommandAction(actionMgr.getRootAction(""), 0,
-				"gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
-				"-o myfile.o -c myfile.c");
-		
-		/* fetch the summary at various widths */
-		assertEquals("gcc -Ipath1/...", actionMgr.getCommandSummary(myaction, 15));
-		assertEquals("gcc -Ipath1/include -Ipath2...", actionMgr.getCommandSummary(myaction, 30));
-		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/inc...", actionMgr.getCommandSummary(myaction, 50));
-		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
-				"-o myfile.o -c myfile....", actionMgr.getCommandSummary(myaction, 89));
-		assertEquals("gcc -Ipath1/include -Ipath2/include -Ipath3/include -DFOO -DBAR " +
-				"-o myfile.o -c myfile.c", actionMgr.getCommandSummary(myaction, 100));
-	}
 
 	/*-------------------------------------------------------------------------------------*/
 

@@ -174,5 +174,42 @@ public class ShellCommandUtils {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Summarize a shell command (possibly multi-line) by truncating it (if needed) to the
+	 * specified width and putting "..." to indicate that it continues.
+	 * 
+	 * @param shellCommand The original shell command string (possibly multi-line).
+	 * @param width 	   The number of characters to truncate it to.
+	 * @return 			   The summary string.
+	 *  
+	 */
+	public static String getCommandSummary(String shellCommand, int width) {
+		
+		/* 
+		 * For now, we treat all commands as being the same, and simply return the
+		 * first 'width' characters from the action's command string.
+		 */
+		String command = ShellCommandUtils.joinCommandLine(shellCommand);
+		
+		/* for strings that are longer than 'width', truncate them and suffix them with "..." */
+		boolean dotsNeeded = false;
+		int stringLen = command.length();
+		if (stringLen > width - 3) {
+			stringLen = width - 3;
+			dotsNeeded = true;
+		}
+		
+		/* form the summary string, possibly with ... */
+		StringBuffer sb = new StringBuffer(command.substring(0, stringLen));
+		if (dotsNeeded){
+			sb.append("...");
+		}
+		
+		/* return the summary string */
+		return sb.toString();
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 }

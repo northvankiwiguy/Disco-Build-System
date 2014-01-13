@@ -30,6 +30,7 @@ import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.print.PrintUtils;
+import com.buildml.utils.string.ShellCommandUtils;
 
 /**
  * A collection of utility methods that can be used by any CLI Command code. This
@@ -629,14 +630,12 @@ public class CliUtils {
 		 * Fetch the action's command string (if there is one). It can either be
 		 * in short format (on a single line), or a full string (possibly multiple lines)
 		 */
-		String command;
-		if (outputFormat == DisplayWidth.ONE_LINE) {
-			command = actionMgr.getCommandSummary(actionId, getColumnWidth() - indentLevel - 3);
-		} else {
-			command = actionMgr.getCommand(actionId);
-		}
+		String command = actionMgr.getCommand(actionId);
 		if (command == null) {
 			command = "<unknown command>";
+		}
+		else if (outputFormat == DisplayWidth.ONE_LINE) {
+			command = ShellCommandUtils.getCommandSummary(command, getColumnWidth() - indentLevel - 3);
 		}
 		
 		/* fetch the name of the directory the action was executed in */
