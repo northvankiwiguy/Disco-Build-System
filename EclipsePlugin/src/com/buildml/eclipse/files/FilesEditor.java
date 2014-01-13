@@ -451,7 +451,8 @@ public class FilesEditor extends ImportSubEditor
 		 * Unless our caller explicitly requested a redraw.
 		 */
 		if (!forceRedraw && ((changedOptions & (EditorOptions.OPT_COALESCE_DIRS | 
-												EditorOptions.OPT_SHOW_ROOTS)) == 0)) {
+												EditorOptions.OPT_SHOW_ROOTS) |
+												EditorOptions.OPT_SHOW_PACKAGES) == 0)) {
 			return;
 		}
 		
