@@ -69,11 +69,10 @@ public interface IActionMgr {
 	 * Add a new action, of the specified type, returning the new action ID number.
 	 * 
 	 * @param actionTypeId The ID of the action's type.
-	 * @param actionDirId  The ID of the path (a directory) in which this action
-	 *                     should be executed.
-	 * @return The new action's ID, or ErrorCode.NOT_FOUND if actionTypeId is invalid.
+	 * @return The new action's ID, or ErrorCode.NOT_FOUND if actionTypeId is invalid
+	 * or is the ID for an action type folder.
 	 */
-	public abstract int addAction(int actionTypeId, int actionDirId);
+	public abstract int addAction(int actionTypeId);
 	
 	/**
 	 * Add a new build action of the "Shell Command" type, returning the new 
@@ -331,6 +330,27 @@ public interface IActionMgr {
 	 * @param slotId	The slot that's connected to the action.
 	 */
 	public abstract void clearSlotValue(int actionId, int slotId);
+	
+	/**
+	 * Return an array of action IDs for all actions where the specified slot
+	 * matches an expected pattern (using % as the wildcard character). This
+	 * uses the underlying database "like" operator.
+	 * 
+	 * @param slotId	ID of the slot to query (only actions that have this slot are considered).
+	 * @param match		The match string (using % as the wildcard).
+	 * @return			An array of action IDs that match, or null if invalid inputs are provided.
+	 */
+	public Integer[] getActionsWhereSlotIsLike(int slotId, String match);
+	
+	/**
+	 * Return an array of action IDs for all actions where the specified slot
+	 * exactly matches the expected value.
+	 * 
+	 * @param slotId	ID of the slot to query (only actions that have this slot are considered).
+	 * @param match		The exact match object (with a type that's relevant to the slot type).
+	 * @return			An array of action IDs that match, or null if invalid inputs are provided.
+	 */	
+	public Integer[] getActionsWhereSlotEquals(int slotId, Object match);
 	
 	/**
 	 * Return the BuildStore object that owns this IActionMgr object.

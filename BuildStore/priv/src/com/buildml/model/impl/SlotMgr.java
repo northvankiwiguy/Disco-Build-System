@@ -22,7 +22,9 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.errors.FatalError;
 
 /**
  * A class for managing slots. This is a "hidden" BuildStore manager. A reference
@@ -78,7 +80,9 @@ class SlotMgr {
 				updateValuePrepStmt = null,
 				findValuePrepStmt = null,
 				deleteValuePrepStmt = null,
-				countSlotUsage = null;
+				countSlotUsage = null,
+				selectActionsWithMatchingSlotPrepStmt = null,
+				selectActionsWithEqualSlotPrepStmt = null;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -116,6 +120,13 @@ class SlotMgr {
 		deleteValuePrepStmt = db.prepareStatement("delete from slotValues where ownerType = ? and ownerId = ? " +
 													"and slotId = ?");
 		countSlotUsage = db.prepareStatement("select count(*) from slotValues where slotId = ?");
+		selectActionsWithMatchingSlotPrepStmt = db.prepareStatement(
+				"select actionId from buildActions, slotValues where (ownerType = " + SlotMgr.SLOT_OWNER_ACTION + 
+					") and (actionId = ownerId) and (slotId = ?) and (trashed == 0) and (value like ?)");
+		selectActionsWithEqualSlotPrepStmt = db.prepareStatement(
+				"select actionId from buildActions, slotValues where (ownerType = " + SlotMgr.SLOT_OWNER_ACTION + 
+				") and (actionId = ownerId) and (slotId = ?) and (trashed == 0) and (value = ?)");
+				
 		
 		/* define the default slots */
 		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Input", 
@@ -569,6 +580,98 @@ class SlotMgr {
 		}		
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return an array of owners IDs for all owners of a specified type where the slot
+	 * matches an expected pattern (using % as the wildcard character). This
+	 * uses the underlying database "like" operator.
+	 * 
+	 * @param ownerType The type of owner for the slot (SLOT_OWNER_ACTION, SLOT_OWNER_PACKAGE).
+	 * @param slotId	ID of the slot to query (only ownerIDs that have this slot are considered).
+	 * @param match		The match string (using % as the wildcard).
+	 * @return			An array of owner IDs that match, or null if invalid inputs are provided.
+	 */
+	public Integer[] getOwnersWhereSlotIsLike(int ownerType, int slotId, String match) {
+		
+		/* validate inputs */
+		if (match == null) {
+			return null;
+		}
+		SlotDetails details = getSlotByID(slotId);
+		if (details == null) {
+			return null;
+		}
+		
+		/* search the database for actions with matching slots */
+		Integer results[];
+		try {
+			if (ownerType == SlotMgr.SLOT_OWNER_ACTION) {
+				selectActionsWithMatchingSlotPrepStmt.setInt(1, slotId);
+				selectActionsWithMatchingSlotPrepStmt.setString(2, match);
+				results = db.executePrepSelectIntegerColumn(selectActionsWithMatchingSlotPrepStmt);
+			}
+			
+			else {
+				return null;
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Return an array of IDs for all owners (actions, packages) where the specified slot
+	 * exactly matches the expected value.
+	 * 
+	 * @param ownerType The type of owner for the slot (SLOT_OWNER_ACTION, SLOT_OWNER_PACKAGE).
+	 * @param slotId	ID of the slot to query (only ownerIDs that have this slot are considered).
+	 * @param match		The match object (of a type that is relevant for this slot).
+	 * @return			An array of owner IDs that match, or null if invalid inputs are provided.
+	 */
+
+	public Integer[] getOwnersWhereSlotEquals(int ownerType, int slotId, Object match) {
+		
+		/* validate inputs */
+		if (match == null) {
+			return null;
+		}
+		SlotDetails details = getSlotByID(slotId);
+		if (details == null) {
+			return null;
+		}
+		
+		/* convert the input value into its String format */
+		String matchString = null;
+		try {
+			 matchString = convertObjectToString(details.slotType, match);
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+			 
+		/* search for "equal" slots in the database */
+		Integer results[] = null;
+		try {
+			if (ownerType == SlotMgr.SLOT_OWNER_ACTION) {
+				selectActionsWithEqualSlotPrepStmt.setInt(1, slotId);
+				selectActionsWithEqualSlotPrepStmt.setString(2, matchString);
+				results = db.executePrepSelectIntegerColumn(selectActionsWithEqualSlotPrepStmt);
+			}
+			else {
+				return null;
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return results;		
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

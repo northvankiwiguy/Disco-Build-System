@@ -71,6 +71,7 @@ public class ActionMgr implements IActionMgr {
 	/** Various prepared statement for database access. */
 	private PreparedStatement 
 		insertActionPrepStmt = null,
+		insertShellActionPrepStmt = null,
 		insertPackageMemberPrepStmt = null,
 		findCommandPrepStmt = null,
 		updateCommandPrepStmt = null,
@@ -112,7 +113,8 @@ public class ActionMgr implements IActionMgr {
 		this.slotMgr = buildStore.getSlotMgr();
 
 		/* create prepared database statements */
-		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, ?, ?)");
+		insertActionPrepStmt = db.prepareStatement("insert into buildActions values (null, 0, 0, 0, null, ?)");
+		insertShellActionPrepStmt = db.prepareStatement("insert into buildActions values (null, ?, 0, ?, ?, ?)");
 		insertPackageMemberPrepStmt = db.prepareStatement("insert into packageMembers values (?, ?, ?, ?, -1, -1)");
 		findCommandPrepStmt = db.prepareStatement("select command from buildActions where actionId = ?");
 		updateCommandPrepStmt = db.prepareStatement("update buildActions set command = ? where actionId = ?");
@@ -156,9 +158,37 @@ public class ActionMgr implements IActionMgr {
 	 * @see com.buildml.model.IActionMgr#addAction(int, int)
 	 */
 	@Override
-	public int addAction(int actionTypeId, int actionDirId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int addAction(int actionTypeId) {
+		
+		this.pkgMgr = buildStore.getPackageMgr();
+		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
+		if (!actionTypeMgr.isValid(actionTypeId) || actionTypeMgr.isFolder(actionTypeId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		int lastRowId;
+		try {
+			insertActionPrepStmt.setInt(1, actionTypeId);
+			db.executePrepUpdate(insertActionPrepStmt);
+		
+			lastRowId = db.getLastRowID();
+			if (lastRowId >= MAX_ACTIONS) {
+				throw new FatalBuildStoreError("Exceeded maximum action number: " + MAX_ACTIONS);
+			}
+
+			/* insert the default package membership values */
+			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_ACTION);
+			insertPackageMemberPrepStmt.setInt(2, lastRowId);
+			insertPackageMemberPrepStmt.setInt(3, pkgMgr.getImportPackage());
+			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
+			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
+				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
+			}
+
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		return lastRowId;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -173,11 +203,11 @@ public class ActionMgr implements IActionMgr {
 
 		int lastRowId;
 		try {
-			insertActionPrepStmt.setInt(1, parentActionId);
-			insertActionPrepStmt.setInt(2, actionDirId);
-			insertActionPrepStmt.setString(3, command);
-			insertActionPrepStmt.setInt(4, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
-			db.executePrepUpdate(insertActionPrepStmt);
+			insertShellActionPrepStmt.setInt(1, parentActionId);
+			insertShellActionPrepStmt.setInt(2, actionDirId);
+			insertShellActionPrepStmt.setString(3, command);
+			insertShellActionPrepStmt.setInt(4, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+			db.executePrepUpdate(insertShellActionPrepStmt);
 		
 			lastRowId = db.getLastRowID();
 			if (lastRowId >= MAX_ACTIONS) {
@@ -914,6 +944,26 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public void clearSlotValue(int actionId, int slotId) {
 		slotMgr.clearSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getActionsWhereSlotIsLike(int, java.lang.String)
+	 */
+	@Override
+	public Integer[] getActionsWhereSlotIsLike(int slotId, String match) {
+		return slotMgr.getOwnersWhereSlotIsLike(SlotMgr.SLOT_OWNER_ACTION, slotId, match);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IActionMgr#getActionsWhereSlotEquals(int, java.lang.String)
+	 */
+	@Override
+	public Integer[] getActionsWhereSlotEquals(int slotId, Object match) {
+		return slotMgr.getOwnersWhereSlotEquals(SlotMgr.SLOT_OWNER_ACTION, slotId, match);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
