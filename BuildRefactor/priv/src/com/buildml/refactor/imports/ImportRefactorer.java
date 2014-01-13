@@ -286,7 +286,7 @@ public class ImportRefactorer implements IImportRefactorer {
 			newShellCommand.append(actionCommand);
 		}
 		ActionUndoOp actionOp = new ActionUndoOp(buildStore, firstActionId);
-		actionOp.recordCommandChange(firstActionCommand, newShellCommand.toString());
+		actionOp.recordSlotChange(IActionMgr.COMMAND_SLOT_ID, firstActionCommand, newShellCommand.toString());
 		multiOp.add(actionOp);
 		
 		/*

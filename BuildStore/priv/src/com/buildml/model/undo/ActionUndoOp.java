@@ -34,15 +34,14 @@ public class ActionUndoOp implements IUndoOp {
 	 * back on an undo/redo operation.
 	 */
 	private final static int CHANGED_PACKAGE      = 1;
-	private final static int CHANGED_COMMAND      = 2;
-	private final static int CHANGED_LOCATION     = 4;
-	private final static int CHANGED_SLOT         = 8;
-	private final static int REMOVED_SLOT         = 16;
-	private final static int MOVED_TO_TRASH       = 32;
-	private final static int NEW_ACTION           = 64;
-	private final static int CHANGED_PARENT       = 128;
-	private final static int ADD_PATH_ACCESS      = 256;
-	private final static int REMOVE_PATH_ACCESS   = 512;
+	private final static int CHANGED_LOCATION     = 2;
+	private final static int CHANGED_SLOT         = 4;
+	private final static int REMOVED_SLOT         = 8;
+	private final static int MOVED_TO_TRASH       = 16;
+	private final static int NEW_ACTION           = 32;
+	private final static int CHANGED_PARENT       = 64;
+	private final static int ADD_PATH_ACCESS      = 128;
+	private final static int REMOVE_PATH_ACCESS   = 256;
 	
 	/** The IBuildStore we're operating on */
 	private IBuildStore buildStore;
@@ -127,23 +126,6 @@ public class ActionUndoOp implements IUndoOp {
 			changedFields |= CHANGED_PACKAGE;
 			oldPackage = prevPackageId;
 			newPackage = nextPackageId;
-		}
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Records the fact that the action's shell command has changed. If there is no change,
-	 * this method does nothing.
-	 * 
-	 * @param oldCommandString The previous command string for this action.
-	 * @param newCommandString The new command string for this action.
-	 */
-	public void recordCommandChange(String oldCommandString, String newCommandString) {
-		if (!oldCommandString.equals(newCommandString)){
-			changedFields |= CHANGED_COMMAND;
-			oldCommand = oldCommandString;
-			newCommand = newCommandString;
 		}
 	}
 	
@@ -280,11 +262,6 @@ public class ActionUndoOp implements IUndoOp {
 			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, oldPackage);
 		}
 
-		/* if the action's command needs to change... */
-		if ((changedFields & CHANGED_COMMAND) != 0) {
-			actionMgr.setSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID, oldCommand);			
-		}
-
 		/* if the action's location needs to change... */
 		if ((changedFields & CHANGED_LOCATION) != 0){
 			pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, oldX, oldY);
@@ -336,11 +313,6 @@ public class ActionUndoOp implements IUndoOp {
 		/* if the action's package needs to change... */
 		if ((changedFields & CHANGED_PACKAGE) != 0) {
 			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_ACTION, actionId, newPackage);
-		}
-		
-		/* if the action's command needs to change... */
-		if ((changedFields & CHANGED_COMMAND) != 0) {
-			actionMgr.setSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID, newCommand);
 		}
 
 		/* if the action's location needs to change... */

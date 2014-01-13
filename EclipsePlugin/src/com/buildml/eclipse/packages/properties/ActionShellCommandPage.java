@@ -107,7 +107,7 @@ public class ActionShellCommandPage extends BmlPropertyPage {
 		
 		/* create an undo/redo operation that will invoke the underlying database changes */
 		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
-		op.recordCommandChange(getShellCommandValue(), textField.getText());
+		op.recordSlotChange(IActionMgr.COMMAND_SLOT_ID, getShellCommandValue(), textField.getText());
 		new UndoOpAdapter("Change Action", op).invoke();
 		return super.performOk();
 	}
