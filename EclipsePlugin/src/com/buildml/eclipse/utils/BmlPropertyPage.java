@@ -14,6 +14,7 @@ import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.IPackageRootMgr;
 
 /**
  * An abstract superclass of all Property pages. This class factors out the common functionality
@@ -48,6 +49,9 @@ public abstract class BmlPropertyPage extends PropertyPage implements IWorkbench
 	/** The IFileGroup manager that contains file group information */
 	protected IFileGroupMgr fileGroupMgr;
 	
+	/** The IPackageRootMgr manager that contains package root information */
+	protected IPackageRootMgr pkgRootMgr;
+	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -64,6 +68,7 @@ public abstract class BmlPropertyPage extends PropertyPage implements IWorkbench
 		pkgMemberMgr = buildStore.getPackageMemberMgr();	
 		fileGroupMgr = buildStore.getFileGroupMgr();
 		fileMgr = buildStore.getFileMgr();
+		pkgRootMgr = buildStore.getPackageRootMgr();
 	}
 	
 	/*=====================================================================================*
