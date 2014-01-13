@@ -6,7 +6,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -53,7 +52,7 @@ public class HandlerMakeAtomic extends AbstractHandler {
 		MultiUndoOp multiOp = new MultiUndoOp();
 		boolean changesMade = false;
 		for (int actionId : selectedActions) {
-			String actionCmd = actionMgr.getCommand(actionId);
+			String actionCmd = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 			Integer children[] = actionMgr.getChildren(actionId);
 			
 			if (children.length != 0) {

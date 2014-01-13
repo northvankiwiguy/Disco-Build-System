@@ -105,7 +105,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 		if (element instanceof UIAction) {
 			UIAction uiAction = (UIAction)element;
 			int actionId = uiAction.getId();
-			String command = actionMgr.getCommand(actionId);
+			String command = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 			if (command != null) {
 				return " " + ShellCommandUtils.getCommandSummary(command, 200);
 			}
@@ -144,7 +144,7 @@ public class ActionsEditorLabelCol1Provider extends ColumnLabelProvider implemen
 			fullText.append("\n");
 			
 			/* Compute the action's command string, taking care to wrap it where necessary. */
-			String cmdText = actionMgr.getCommand(actionId);
+			String cmdText = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 			outStream.reset();
 			PrintUtils.indentAndWrap(printStream, cmdText, 0, toolTipWrapWidth);
 			fullText.append("Shell command:\n");

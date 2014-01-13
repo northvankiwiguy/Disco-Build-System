@@ -128,7 +128,7 @@ class SlotMgr {
 				") and (actionId = ownerId) and (slotId = ?) and (trashed == 0) and (value = ?)");
 				
 		
-		/* define the default slots */
+		/* define the default slots - these must match with the definitions in IActionMgr */
 		newSlot(SLOT_OWNER_ACTION, ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Input", 
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT,
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);

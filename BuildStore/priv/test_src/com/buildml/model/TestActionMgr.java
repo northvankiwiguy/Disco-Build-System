@@ -41,7 +41,7 @@ public class TestActionMgr {
 	IActionTypeMgr actionTypeMgr;
 	
 	/** The root action ID */
-	int rootActionId;
+	private int rootActionId;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -115,31 +115,27 @@ public class TestActionMgr {
 		assertEquals(rootId, actionMgr.getParent(actionId3));
 		
 		/* give each a "Command" slot value */
-		int cmdSlotId = actionMgr.getSlotByName(actionId1, "Command");
-		assertTrue(cmdSlotId >= 0);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, cmdSlotId, "gcc -c test.c"));
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, cmdSlotId, "gcc -c add.c"));
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, cmdSlotId, "gcc -c sub.c"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, IActionMgr.COMMAND_SLOT_ID, "gcc -c test.c"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, IActionMgr.COMMAND_SLOT_ID, "gcc -c add.c"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, IActionMgr.COMMAND_SLOT_ID, "gcc -c sub.c"));
 		
 		/* give each a "Directory" slot value */
 		int dirId1 = fileMgr.addDirectory("/a/b/dirA");
 		int dirId2 = fileMgr.addDirectory("/a/b/dirB");
 		int dirId3 = fileMgr.addDirectory("/a/b/dirC");
-		int dirSlotId = actionMgr.getSlotByName(actionId1, "Directory");
-		assertTrue(cmdSlotId >= 0);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, dirSlotId, dirId1));
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, dirSlotId, dirId2));
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, dirSlotId, dirId3));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, IActionMgr.DIRECTORY_SLOT_ID, dirId1));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, IActionMgr.DIRECTORY_SLOT_ID, dirId2));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, IActionMgr.DIRECTORY_SLOT_ID, dirId3));
 		
 		/* query the "Command" slots */
-		assertEquals("gcc -c test.c", actionMgr.getSlotValue(actionId1, cmdSlotId));
-		assertEquals("gcc -c add.c", actionMgr.getSlotValue(actionId2, cmdSlotId));
-		assertEquals("gcc -c sub.c", actionMgr.getSlotValue(actionId3, cmdSlotId));
+		assertEquals("gcc -c test.c", actionMgr.getSlotValue(actionId1, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("gcc -c add.c", actionMgr.getSlotValue(actionId2, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("gcc -c sub.c", actionMgr.getSlotValue(actionId3, IActionMgr.COMMAND_SLOT_ID));
 		
 		/* query the "Directory" slots */
-		assertEquals(dirId1, actionMgr.getSlotValue(actionId1, dirSlotId));
-		assertEquals(dirId2, actionMgr.getSlotValue(actionId2, dirSlotId));
-		assertEquals(dirId3, actionMgr.getSlotValue(actionId3, dirSlotId));
+		assertEquals(dirId1, actionMgr.getSlotValue(actionId1, IActionMgr.DIRECTORY_SLOT_ID));
+		assertEquals(dirId2, actionMgr.getSlotValue(actionId2, IActionMgr.DIRECTORY_SLOT_ID));
+		assertEquals(dirId3, actionMgr.getSlotValue(actionId3, IActionMgr.DIRECTORY_SLOT_ID));
 		
 		/* test with invalid type IDs */
 		assertEquals(ErrorCode.NOT_FOUND, actionMgr.addAction(-1));
@@ -149,25 +145,25 @@ public class TestActionMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#getCommand(int)}
+	 * Test method for getting a shell action's "Command" slot.
 	 */
 	@Test
 	public void testGetCommand() {
 		int action1 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o test.o test.c");
 		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o main.o main.c");
 		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "gcc -o tree.o tree.c");
-		assertEquals("gcc -o tree.o tree.c", actionMgr.getCommand(action3));
-		assertEquals("gcc -o main.o main.c", actionMgr.getCommand(action2));
-		assertEquals("gcc -o test.o test.c", actionMgr.getCommand(action1));
+		assertEquals("gcc -o tree.o tree.c", actionMgr.getSlotValue(action3, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("gcc -o main.o main.c", actionMgr.getSlotValue(action2, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("gcc -o test.o test.c", actionMgr.getSlotValue(action1, IActionMgr.COMMAND_SLOT_ID));
 		
 		/* an invalid action ID should return null */
-		assertNull(actionMgr.getCommand(100));
+		assertNull(actionMgr.getSlotValue(100, IActionMgr.COMMAND_SLOT_ID));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test method for {@link com.buildml.model.impl.ActionMgr#setCommand(int,String)}
+	 * Test method for setting an action's "Command" slot.
 	 */
 	@Test
 	public void testSetCommand() {
@@ -175,15 +171,15 @@ public class TestActionMgr {
 		int action2 = actionMgr.addShellCommandAction(rootActionId, 0, "B");
 		int action3 = actionMgr.addShellCommandAction(rootActionId, 0, "C");
 		
-		assertEquals(ErrorCode.OK, actionMgr.setCommand(action2, "Bprime"));
-		assertEquals(ErrorCode.OK, actionMgr.setCommand(action3, "Cprime"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action2, IActionMgr.COMMAND_SLOT_ID, "Bprime"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action3, IActionMgr.COMMAND_SLOT_ID, "Cprime"));
 		
-		assertEquals("Bprime", actionMgr.getCommand(action2));
-		assertEquals("Cprime", actionMgr.getCommand(action3));
-		assertEquals("A", actionMgr.getCommand(action1));
+		assertEquals("Bprime", actionMgr.getSlotValue(action2, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("Cprime", actionMgr.getSlotValue(action3, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("A", actionMgr.getSlotValue(action1, IActionMgr.COMMAND_SLOT_ID));
 		
 		/* an invalid action ID should return an error */
-		assertEquals(ErrorCode.BAD_VALUE, actionMgr.setCommand(100, "command"));
+		assertEquals(ErrorCode.NOT_FOUND, actionMgr.setSlotValue(100, IActionMgr.COMMAND_SLOT_ID, "command"));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -700,22 +696,19 @@ public class TestActionMgr {
 		int action23 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
 		int action24 = actionMgr.addShellCommandAction(rootAction, dir2, "true");
 		int action13 = actionMgr.addShellCommandAction(rootAction, dir1, "true");
-		
-		/* what "slot" is "Directory"? */
-		int dirSlotId = actionMgr.getSlotByName(action11, "Directory");
 	
 		/* fetch the list of actions that execute in the first directory */
 		assertTrue(CommonTestUtils.sortedArraysEqual(
-				actionMgr.getActionsWhereSlotEquals(dirSlotId, dir1),
+				actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dir1),
 				new Integer[] {action11, action12, action13}));
 		
 		/* repeat for the second directory */
 		assertTrue(CommonTestUtils.sortedArraysEqual(
-				actionMgr.getActionsWhereSlotEquals(dirSlotId, dir2),
+				actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dir2),
 				new Integer[] {action21, action22, action23, action24}));
 		
 		/* and the third should be empty */
-		assertEquals(0, actionMgr.getActionsWhereSlotEquals(dirSlotId, dir3).length);
+		assertEquals(0, actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dir3).length);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -782,13 +775,10 @@ public class TestActionMgr {
 		int childAction = actionMgr.addShellCommandAction(parentAction, rootDir, "child");		
 		actionMgr.addFileAccess(childAction, fileId, OperationType.OP_READ);
 		
-		/* what "slot" is "Directory"? */
-		int dirSlotId = actionMgr.getSlotByName(parentAction, "Directory");
-		
 		/* check that the parent has the child and that the child is in the directory */
 		Integer children[] = actionMgr.getChildren(parentAction);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction }, children));
-		Integer actions[] = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
+		Integer actions[] = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction, parentAction }, actions));
 		
 		/* Attempt to delete the parent action - should fail because of child action. */
@@ -805,14 +795,14 @@ public class TestActionMgr {
 		assertEquals(0, actionMgr.getChildren(parentAction).length);
 		
 		/* query the list of actions in the specified directory */
-		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { parentAction }, actions));
 		
 		/* now move the parent action into the trash */
 		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(parentAction));
 
 		/* query the list of actions in the specified directory - should be one fewer. */
-		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, rootDir);
 		assertEquals(0, actions.length);
 		
 		/* try to revive the child - can't be done because the parent is trashed */
@@ -820,14 +810,14 @@ public class TestActionMgr {
 		
 		/* revive the parent - this is allowed */
 		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(parentAction));
-		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { parentAction }, actions));
 
 		/* finally, revive the child - this is now possible. */
 		assertEquals(ErrorCode.OK, actionMgr.reviveActionFromTrash(childAction));
 		children = actionMgr.getChildren(parentAction);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction }, children));
-		actions = actionMgr.getActionsWhereSlotEquals(dirSlotId, rootDir);
+		actions = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, rootDir);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { childAction, parentAction }, actions));
 	}
 	
@@ -849,13 +839,11 @@ public class TestActionMgr {
 		int myActionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"),
 															fileMgr.getPath("/"), "gcc -o test.c");
 		assertTrue(myActionId >= 0);
-		int shellActionTypeId = actionMgr.getActionType(myActionId);
-		assertTrue(shellActionTypeId >= 0);
 		
 		/* fetch the slot details for Input, Output0 and Command */
-		SlotDetails inputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Input");
-		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Output");
-		SlotDetails commandSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Command");
+		SlotDetails inputSlotDetails = actionTypeMgr.getSlotByName(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Input");
+		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Output");
+		SlotDetails commandSlotDetails = actionTypeMgr.getSlotByName(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command");
 		assertNotNull(inputSlotDetails);
 		assertNotNull(outputSlotDetails);
 		assertNotNull(commandSlotDetails);
@@ -926,46 +914,42 @@ public class TestActionMgr {
 	@Test
 	public void testGetActionsWhereSlotIsLike() {
 		
-		/* add a bunch of actions that have interesting command strings in the "Command" slot */
-		int shellActionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		SlotDetails cmdSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Command");
-		int cmdSlotId = cmdSlotDetails.slotId;
-		
-		int actionId1 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, cmdSlotId, "gcc -c foo.c -o foo.o"));
-		int actionId2 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, cmdSlotId, "gcc -c bah.c -o bah.o"));
-		int actionId3 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, cmdSlotId, "gcc -c goo.c -o goo.o"));
-		int actionId4 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId4, cmdSlotId, "ar c lib.a foo.o bah.o goo.o"));
-		int actionId5 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId5, cmdSlotId, "ranlib lib.a"));
+		/* add a bunch of actions that have interesting command strings in the "Command" slot */		
+		int actionId1 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, IActionMgr.COMMAND_SLOT_ID, "gcc -c foo.c -o foo.o"));
+		int actionId2 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, IActionMgr.COMMAND_SLOT_ID, "gcc -c bah.c -o bah.o"));
+		int actionId3 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, IActionMgr.COMMAND_SLOT_ID, "gcc -c goo.c -o goo.o"));
+		int actionId4 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId4, IActionMgr.COMMAND_SLOT_ID, "ar c lib.a foo.o bah.o goo.o"));
+		int actionId5 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId5, IActionMgr.COMMAND_SLOT_ID, "ranlib lib.a"));
 		
 		/* search for actions, based on command string matching */
-		Integer results[] = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "gcc%");
+		Integer results[] = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "gcc%");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId2, actionId3 }, results));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "%foo%");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "%foo%");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId4 }, results));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "%-o %.o");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "%-o %.o");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId2, actionId3 }, results));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "ranlib%");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "ranlib%");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId5 }, results));
 		
 		/* trash actionId2, and repeat the above searches */
 		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(actionId2));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "gcc%");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "gcc%");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId3 }, results));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "%foo%");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "%foo%");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId4 }, results));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "%-o %.o");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "%-o %.o");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId3 }, results));
-		results = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "ranlib%");
+		results = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "ranlib%");
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId5 }, results));
 		
 		/* test with invalid input parameters */
 		assertNull(actionMgr.getActionsWhereSlotIsLike(1000, "ranlib%"));
-		assertNull(actionMgr.getActionsWhereSlotIsLike(cmdSlotId, null));
+		assertNull(actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, null));
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -983,45 +967,41 @@ public class TestActionMgr {
 		int dirId4 = fileMgr.addDirectory("/d/e/hDir");
 		
 		/* add a bunch of actions that have one of these directories in "Directory" slot */
-		int shellActionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		SlotDetails dirSlotDetails = actionTypeMgr.getSlotByName(shellActionTypeId, "Directory");
-		int dirSlotId = dirSlotDetails.slotId;
-		
-		int actionId1 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, dirSlotId, dirId1));
-		int actionId2 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, dirSlotId, dirId1));
-		int actionId3 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, dirSlotId, dirId2));
-		int actionId4 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId4, dirSlotId, dirId3));
-		int actionId5 = actionMgr.addAction(shellActionTypeId);
-		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId5, dirSlotId, dirId2));
+		int actionId1 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId1, IActionMgr.DIRECTORY_SLOT_ID, dirId1));
+		int actionId2 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId2, IActionMgr.DIRECTORY_SLOT_ID, dirId1));
+		int actionId3 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId3, IActionMgr.DIRECTORY_SLOT_ID, dirId2));
+		int actionId4 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId4, IActionMgr.DIRECTORY_SLOT_ID, dirId3));
+		int actionId5 = actionMgr.addAction(IActionTypeMgr.BUILTIN_SHELL_COMMAND_ID);
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId5, IActionMgr.DIRECTORY_SLOT_ID, dirId2));
 		
 		/* search for actions, based on exact matching of the "Directory" slot */
-		Integer results[] = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId2);
+		Integer results[] = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId2);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId3, actionId5 }, results));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId1);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId1);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1, actionId2 }, results));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId3);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId3);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId4 }, results));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId4);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId4);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { }, results));
 		
 		/* trash an action, and repeat the above searches */
 		assertEquals(ErrorCode.OK, actionMgr.moveActionToTrash(actionId2));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId2);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId2);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId3, actionId5 }, results));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId1);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId1);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId1 }, results));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId3);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId3);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { actionId4 }, results));
-		results = actionMgr.getActionsWhereSlotEquals(dirSlotId, dirId4);
+		results = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, dirId4);
 		assertTrue(CommonTestUtils.sortedArraysEqual(new Integer[] { }, results));
 		
 		/* test with invalid input parameters - should all return null */
-		assertNull(actionMgr.getActionsWhereSlotEquals(dirSlotId, null));
-		assertNull(actionMgr.getActionsWhereSlotEquals(dirSlotId, new BigDecimal(10)));
+		assertNull(actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, null));
+		assertNull(actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, new BigDecimal(10)));
 		assertNull(actionMgr.getActionsWhereSlotEquals(1000, dirId4));
 	}
 	
@@ -1058,14 +1038,14 @@ public class TestActionMgr {
 		/* change an action's command to it current value - no notification */
 		notifyActionValue = 0;
 		notifyHowValue = 0;
-		assertEquals(ErrorCode.OK, actionMgr.setCommand(action1, "command string"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action1, IActionMgr.COMMAND_SLOT_ID, "command string"));
 		assertEquals(0, notifyActionValue);
 		assertEquals(0, notifyHowValue);
 		
 		/* change the command to a new value - notification given */
-		assertEquals(ErrorCode.OK, actionMgr.setCommand(action1, "new command string"));
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(action1, IActionMgr.COMMAND_SLOT_ID, "new command string"));
 		assertEquals(action1, notifyActionValue);
-		assertEquals(IActionMgrListener.CHANGED_COMMAND, notifyHowValue);
+		assertEquals(IActionMgrListener.CHANGED_SLOT, notifyHowValue);
 		
 		/* change a slot value - check for notification */
 		notifyActionValue = notifyHowValue = notifySlotValue = 0;

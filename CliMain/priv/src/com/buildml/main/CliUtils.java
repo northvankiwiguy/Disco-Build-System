@@ -630,7 +630,7 @@ public class CliUtils {
 		 * Fetch the action's command string (if there is one). It can either be
 		 * in short format (on a single line), or a full string (possibly multiple lines)
 		 */
-		String command = actionMgr.getCommand(actionId);
+		String command = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 		if (command == null) {
 			command = "<unknown command>";
 		}

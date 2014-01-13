@@ -83,12 +83,6 @@ public class MovePackageRefactorer {
 	/** The destination package's path root ID */
 	private int pkgRootId;
 	
-	/** The slotID of the "Input" slot for a "Shell Command" action */
-	private int inputSlotId;
-	
-	/** The slotID of the "Output" slot for a "Shell Command" action */
-	private int outputSlotId;
-	
 	/** The cache of action->fileGroup mapping, used to avoid re-importing actions multiple times */
 	private Map<Integer, Integer> actionCache;
 	
@@ -114,23 +108,6 @@ public class MovePackageRefactorer {
 		fileGroupMgr = buildStore.getFileGroupMgr();
 		pkgMemberMgr = buildStore.getPackageMemberMgr();
 		pkgRootMgr = buildStore.getPackageRootMgr();
-		
-		/* 
-		 * Determine "Input" and "Output0" slot IDs - these are populated by our import
-		 * algorithm, so compute them here once.
-		 */
-		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
-		int shellTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		SlotDetails inputSlotDetails = actionTypeMgr.getSlotByName(shellTypeId, "Input");
-		if (inputSlotDetails == null) {
-			throw new FatalError("Can't find slot \"Input\"");
-		}
-		SlotDetails outputSlotDetails = actionTypeMgr.getSlotByName(shellTypeId, "Output");
-		if (outputSlotDetails == null) {
-			throw new FatalError("Can't find slot \"Output\"");
-		}
-		inputSlotId = inputSlotDetails.slotId;
-		outputSlotId = outputSlotDetails.slotId;
 	}
 
 	/*=====================================================================================*
@@ -367,7 +344,7 @@ public class MovePackageRefactorer {
 				
 			/* Connect the "output" slot from the action to this new file group */
 			ActionUndoOp slotOp = new ActionUndoOp(buildStore, actionId);
-			slotOp.recordSlotChange(outputSlotId, null, fileGroupId);
+			slotOp.recordSlotChange(IActionMgr.OUTPUT_SLOT_ID, null, fileGroupId);
 			multiOp.add(slotOp);
 		}
 		
@@ -488,7 +465,7 @@ public class MovePackageRefactorer {
 			}
 		
 			ActionUndoOp slotOp = new ActionUndoOp(buildStore, actionId);
-			slotOp.recordSlotChange(inputSlotId, null, inputFileGroupId);
+			slotOp.recordSlotChange(IActionMgr.INPUT_SLOT_ID, null, inputFileGroupId);
 			multiOp.add(slotOp);
 		}
 	}

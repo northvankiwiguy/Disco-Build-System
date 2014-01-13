@@ -14,8 +14,6 @@ package com.buildml.model.undo;
 
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgr.OperationType;
-import com.buildml.model.IFileMgr;
-import com.buildml.model.impl.FileMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 
@@ -284,7 +282,7 @@ public class ActionUndoOp implements IUndoOp {
 
 		/* if the action's command needs to change... */
 		if ((changedFields & CHANGED_COMMAND) != 0) {
-			actionMgr.setCommand(actionId, oldCommand);			
+			actionMgr.setSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID, oldCommand);			
 		}
 
 		/* if the action's location needs to change... */
@@ -342,7 +340,7 @@ public class ActionUndoOp implements IUndoOp {
 		
 		/* if the action's command needs to change... */
 		if ((changedFields & CHANGED_COMMAND) != 0) {
-			actionMgr.setCommand(actionId, newCommand);
+			actionMgr.setSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID, newCommand);
 		}
 
 		/* if the action's location needs to change... */

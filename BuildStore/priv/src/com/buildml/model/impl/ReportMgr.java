@@ -62,12 +62,6 @@ import com.buildml.utils.errors.ErrorCode;
 	private IFileMgr fileMgr = null;
 	private IActionMgr actionMgr = null;
 	private IActionTypeMgr actionTypeMgr = null;
-	
-	/** The slotID for the "Directory" slot */
-	private int dirSlotId;
-
-	/** The slotID for the "Command" slot */
-	private int cmdSlotId;
 
 	/**
 	 * Various prepared statement for database access.
@@ -153,14 +147,6 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		selectAllFilesPrepStmt = db.prepareStatement("select id from files where trashed = 0");
 		selectAllActionsPrepStmt = db.prepareStatement("select actionId from buildActions");
-		
-		/* fetch the slot ID for "Directory" and "Command" */
-		SlotDetails slotDetails = 
-				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Directory");
-		dirSlotId = slotDetails.slotId;
-		slotDetails = 
-				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command");
-		cmdSlotId = slotDetails.slotId;
 	}
 
 	/*=====================================================================================*
@@ -281,7 +267,7 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public ActionSet reportActionsThatMatchName(String pattern) {
 		
-		Integer results[] = actionMgr.getActionsWhereSlotIsLike(cmdSlotId, "%" + pattern + "%");
+		Integer results[] = actionMgr.getActionsWhereSlotIsLike(IActionMgr.COMMAND_SLOT_ID, "%" + pattern + "%");
 		return new ActionSet(actionMgr, results);
 	}
 
@@ -366,7 +352,7 @@ import com.buildml.utils.errors.ErrorCode;
 	public ActionSet reportActionsInDirectory(FileSet directories) {
 		ActionSet results = new ActionSet(actionMgr);
 		for (int pathId : directories) {
-			Integer actions[] = actionMgr.getActionsWhereSlotEquals(dirSlotId, pathId);
+			Integer actions[] = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, pathId);
 			if (actions != null) {
 				for (int i = 0; i < actions.length; i++) {
 					results.add(actions[i]);

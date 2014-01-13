@@ -107,7 +107,7 @@ public class ConversionUtils {
 	public static String getActionsAsText(IActionMgr actionMgr, Integer[] actionIds) {
 		StringBuffer sb = new StringBuffer();
 		for (int actionId : actionIds) {
-			sb.append(actionMgr.getCommand(actionId));
+			sb.append(actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID));
 			sb.append("\n\n");
 		}
 		return sb.toString();

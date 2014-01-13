@@ -207,9 +207,7 @@ public class ImportRefactorerUtils {
 		}
 
 		/* the path must not be the "current directory" for any actions */
-		int shellCmdTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		SlotDetails details = actionTypeMgr.getSlotByName(shellCmdTypeId, "Directory");
-		Integer actionsExecutingInDir[] = actionMgr.getActionsWhereSlotEquals(details.slotId, pathId);
+		Integer actionsExecutingInDir[] = actionMgr.getActionsWhereSlotEquals(IActionMgr.DIRECTORY_SLOT_ID, pathId);
 		if (actionsExecutingInDir.length != 0) {
 			throw new CanNotRefactorException(Cause.DIRECTORY_CONTAINS_ACTIONS, actionsExecutingInDir);
 		}

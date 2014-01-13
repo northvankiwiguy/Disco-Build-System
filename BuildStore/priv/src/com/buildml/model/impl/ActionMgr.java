@@ -90,12 +90,6 @@ public class ActionMgr implements IActionMgr {
 	/** The event listeners who are registered to learn about action changes */
 	private List<IActionMgrListener> listeners = new ArrayList<IActionMgrListener>();
 	
-	/** The slotID for "Command", within the "Shell Command" action type */
-	private int cmdSlotId;
-	
-	/** The slotID for "Directory", within the "Shell Command" action type */
-	private int dirSlotId;
-	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
@@ -206,13 +200,13 @@ public class ActionMgr implements IActionMgr {
 		}
 		
 		/* set the action's command string */
-		rc = setSlotValue(newActionId, cmdSlotId, command);
+		rc = setSlotValue(newActionId, IActionMgr.COMMAND_SLOT_ID, command);
 		if (rc != ErrorCode.OK) {
 			return rc;
 		}
 
 		/* set the action's working directory */
-		rc = setSlotValue(newActionId, dirSlotId, actionDirId);
+		rc = setSlotValue(newActionId, IActionMgr.DIRECTORY_SLOT_ID, actionDirId);
 		if (rc != ErrorCode.OK) {
 			return rc;
 		}
@@ -476,42 +470,6 @@ public class ActionMgr implements IActionMgr {
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionMgr#getCommand(int)
-	 */
-	@Override
-	public String getCommand(int actionId) {
-		return (String) getSlotValue(actionId, cmdSlotId);
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionMgr#setCommand(int, java.lang.String)
-	 */
-	@Override
-	public int setCommand(int actionId, String command) {
-
-		String currentCommand = (String) getSlotValue(actionId, cmdSlotId);
-		if (currentCommand == null) {
-			return ErrorCode.BAD_VALUE;
-		}
-
-		/* if there's no change in the command string, there's no work to do */
-		if (currentCommand.equals(command)) {
-			return ErrorCode.OK;
-		}
-		
-		setSlotValue(actionId, cmdSlotId, command);
-		
-		/* notify listeners about the change */
-		notifyListeners(actionId, IActionMgrListener.CHANGED_COMMAND, 0);
-		
-		return ErrorCode.OK;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
 
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionMgr#getParent(int)
@@ -613,7 +571,7 @@ public class ActionMgr implements IActionMgr {
 	@Override
 	public int getDirectory(int actionId) {
 		
-		Object result = getSlotValue(actionId, dirSlotId);
+		Object result = getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
 		if (result == null) {
 			return ErrorCode.NOT_FOUND;
 		}
@@ -930,19 +888,7 @@ public class ActionMgr implements IActionMgr {
 	 * Extra initialization that can only happen all other managers are initialized.
 	 */
 	/* package */ void initPass2() {
-		/* 
-		 * We need to refer to all these helper objects, to see if they
-		 * use the path we're trying to delete.
-		 */
-		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
-
-		/* fetch the slot ID for "Directory" and "Command" */
-		SlotDetails slotDetails = 
-				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Directory");
-		dirSlotId = slotDetails.slotId;
-		slotDetails = 
-				actionTypeMgr.getSlotByName(ActionTypeMgr.BUILTIN_SHELL_COMMAND_ID, "Command");
-		cmdSlotId = slotDetails.slotId;
+		/* empty for now */
 	}
 	
 	/*=====================================================================================*

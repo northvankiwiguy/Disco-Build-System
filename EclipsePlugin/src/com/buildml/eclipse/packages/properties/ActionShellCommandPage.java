@@ -11,6 +11,7 @@ import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.UndoOpAdapter;
+import com.buildml.model.IActionMgr;
 import com.buildml.model.undo.ActionUndoOp;
 
 /**
@@ -92,7 +93,7 @@ public class ActionShellCommandPage extends BmlPropertyPage {
 	 * @return The selected action's shell command string.
 	 */
 	private String getShellCommandValue() {
-		return actionMgr.getCommand(actionId);
+		return (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

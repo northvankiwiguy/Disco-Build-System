@@ -26,6 +26,9 @@ import com.buildml.model.ISlotTypes.SlotDetails;
  */
 public interface IActionTypeMgr {
 	
+	/** The hard-coded ID for the "Shell Command" action type */
+	public static final int BUILTIN_SHELL_COMMAND_ID = 1;
+	
 	/*=====================================================================================*
 	 * METHODS FOR CREATING/DELETING ACTION TYPES AND FOLDERS
 	 *=====================================================================================*/

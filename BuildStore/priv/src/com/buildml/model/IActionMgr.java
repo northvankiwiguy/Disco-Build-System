@@ -29,6 +29,18 @@ public interface IActionMgr {
 	 */
 	public static final int MAX_ACTIONS = 16777216;
 
+	/** Standard slot number for the "Input" slot */
+	public static final int INPUT_SLOT_ID = 1;
+
+	/** Standard slot number for the "Command" slot */
+	public static final int COMMAND_SLOT_ID = 2;
+
+	/** Standard slot number for the "Directory" slot */
+	public static final int DIRECTORY_SLOT_ID = 3;
+
+	/** Standard slot number for the "Output" slot */
+	public static final int OUTPUT_SLOT_ID = 4;
+
 	/** Data type for specifying the type of a file access that an action performs. */
 	public enum OperationType {
 		/** An unspecified operation for when we don't care which operation is performed. */
@@ -168,24 +180,6 @@ public interface IActionMgr {
 	 * @return The action's type, or ErrorCode.NOT_FOUND if actionId is invalid.
 	 */
 	public int getActionType(int actionId);
-
-	/**
-	 * Fetch a build action's command line string.
-	 * 
-	 * @param actionId The action we're querying.
-	 * @return The action's command line string.
-	 */
-	public abstract String getCommand(int actionId);
-
-	/**
-	 * Set a build action's command line string.
-	 * 
-	 * @param actionId The action we're updating.
-	 * @param command The action's new command line string.
-	 * @return ErrorCode.OK on success, or ErrorCode.BAD_VALUE if the actionID
-	 * is invalid.
-	 */
-	public abstract int setCommand(int actionId, String command);
 
 	/**
 	 * Given the ID of a action, return the ID of the action's parent.

@@ -20,14 +20,11 @@ package com.buildml.model;
  */
 public interface IActionMgrListener {
 	
-	/** the action's command string has changed in some way */
-	public static final int CHANGED_COMMAND = 1;
-	
 	/** one of the action's slots has changed */
-	public static final int CHANGED_SLOT = 2;
+	public static final int CHANGED_SLOT = 1;
 	
 	/** one of the actions has been trashed (or revived) */
-	public static final int TRASHED_ACTION = 3;
+	public static final int TRASHED_ACTION = 2;
 
 	/**
 	 * Called to notify the listener that the specified action has changed.

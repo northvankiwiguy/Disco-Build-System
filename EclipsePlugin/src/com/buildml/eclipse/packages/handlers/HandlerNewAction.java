@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
@@ -93,35 +94,26 @@ public class HandlerNewAction extends AbstractHandler {
 			
 			/* insert selected file group into action's "input" slot */
 			int fileGroupId = ((UIFileGroup)(selectedObjects.get(0))).getId();
-			int slotId = actionMgr.getSlotByName(actionId, "Input");
-			if ((slotId == ErrorCode.NOT_FOUND) || 
-				(actionMgr.setSlotValue(actionId, slotId, fileGroupId) != ErrorCode.OK)) {
-					AlertDialog.displayErrorDialog("Can't add action", 
-							"Unable to attach new action to selected file group");
-			}
-			
-			/* successfully added */
-			else {
-				/* record this slot change in our undo/redo stack */ 
-				ActionUndoOp newSlotOp = new ActionUndoOp(buildStore, actionId);
-				newSlotOp.recordSlotChange(slotId, null, fileGroupId);
-				multiOp.add(newSlotOp);
+
+			/* record this slot change in our undo/redo stack */ 
+			ActionUndoOp newSlotOp = new ActionUndoOp(buildStore, actionId);
+			newSlotOp.recordSlotChange(IActionMgr.INPUT_SLOT_ID, null, fileGroupId);
+			multiOp.add(newSlotOp);
 				
-				/* 
-				 * Finally, position the action to right of UIFileGroup. This doesn't need to be in
-				 * undo/redo history because the action didn't exist until now.
-				 */
-				MemberLocation fgLocation = pkgMemberMgr.getMemberLocation(
-													IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
-				if (fgLocation != null) {
-					int x = fgLocation.x;
-					int y = fgLocation.y;
-					LayoutAlgorithm layoutAlgorithm = pde.getLayoutAlgorithm();
-					x += layoutAlgorithm.getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getWidth();
-					x += layoutAlgorithm.getXPadding();
-					pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, x, y);
-				}	
-			}
+			/* 
+			 * Finally, position the action to right of UIFileGroup. This doesn't need to be in
+			 * undo/redo history because the action didn't exist until now.
+			 */
+			MemberLocation fgLocation = pkgMemberMgr.getMemberLocation(
+					IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
+			if (fgLocation != null) {
+				int x = fgLocation.x;
+				int y = fgLocation.y;
+				LayoutAlgorithm layoutAlgorithm = pde.getLayoutAlgorithm();
+				x += layoutAlgorithm.getSizeOfPictogram(IPackageMemberMgr.TYPE_FILE_GROUP).getWidth();
+				x += layoutAlgorithm.getXPadding();
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_ACTION, actionId, x, y);
+			}	
 		}
 
 		/* record this undo/redo operation, but don't invoke it - the work is already done */

@@ -269,7 +269,7 @@ public class ActionPattern extends AbstractPattern implements IPattern {
 		 * TODO: replace this with more generic code, but only after we support more than
 		 * shell commands.
 		 */
-		String actionCommand = actionMgr.getCommand(actionId);
+		String actionCommand = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 		String actionCommandBase = getShellCommandSummary(actionCommand);
 		
 		/* draw the action type's name inside the oval(s) */

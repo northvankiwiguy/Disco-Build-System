@@ -482,7 +482,7 @@ public class TestImportRefactorMergeActions {
 			assertFalse(actionMgr.isActionTrashed(actionA1a));
 			assertTrue(actionMgr.isActionTrashed(actionA1b));
 			assertEquals("cc1 -o /tmp/aaa.s foo.c\nas -o foo.o /tmp/aaa.s", 
-						 actionMgr.getCommand(actionA1a));
+						 actionMgr.getSlotValue(actionA1a, IActionMgr.COMMAND_SLOT_ID));
 			assertArrayEquals(new Integer[] { fileWorkFooC },
 				actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
 			assertTrue(CommonTestUtils.sortedArraysEqual(
@@ -497,8 +497,8 @@ public class TestImportRefactorMergeActions {
 		multiOp.undo();
 		assertFalse(actionMgr.isActionTrashed(actionA1a));
 		assertFalse(actionMgr.isActionTrashed(actionA1b));
-		assertEquals("cc1 -o /tmp/aaa.s foo.c", actionMgr.getCommand(actionA1a));
-		assertEquals("as -o foo.o /tmp/aaa.s", actionMgr.getCommand(actionA1b));			
+		assertEquals("cc1 -o /tmp/aaa.s foo.c", actionMgr.getSlotValue(actionA1a, IActionMgr.COMMAND_SLOT_ID));
+		assertEquals("as -o foo.o /tmp/aaa.s", actionMgr.getSlotValue(actionA1b, IActionMgr.COMMAND_SLOT_ID));			
 		assertArrayEquals(new Integer[] { fileWorkFooC },
 			actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
 		assertArrayEquals(new Integer[] { fileTmpAaaS },
@@ -513,7 +513,7 @@ public class TestImportRefactorMergeActions {
 		assertFalse(actionMgr.isActionTrashed(actionA1a));
 		assertTrue(actionMgr.isActionTrashed(actionA1b));
 		assertEquals("cc1 -o /tmp/aaa.s foo.c\nas -o foo.o /tmp/aaa.s", 
-					 actionMgr.getCommand(actionA1a));
+					 actionMgr.getSlotValue(actionA1a, IActionMgr.COMMAND_SLOT_ID));
 		assertArrayEquals(new Integer[] { fileWorkFooC },
 			actionMgr.getFilesAccessed(actionA1a, OperationType.OP_READ));
 		assertTrue(CommonTestUtils.sortedArraysEqual(

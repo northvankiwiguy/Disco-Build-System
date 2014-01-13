@@ -43,9 +43,6 @@ public class ActionTypeMgr implements IActionTypeMgr {
 
 	/** The hard-coded description for the root folder */	
 	static final String BUILTIN_ROOT_FOLDER_DESCR = "Root folder for all action types.";
-
-	/** The hard-coded ID for the "Shell Command" action type */
-	static final int BUILTIN_SHELL_COMMAND_ID = 1;
 	
 	/** The hard-coded name for the shell command action type */	
 	static final String BUILTIN_SHELL_COMMAND_NAME = "Shell Command";

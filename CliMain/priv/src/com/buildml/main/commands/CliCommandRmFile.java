@@ -219,7 +219,7 @@ public class CliCommandRmFile implements ICliCommand {
 	 */
 	private String appendActions(IActionMgr actionMgr, String msg, Integer[] actions) {
 		for (int actionId : actions) {
-			msg += "\n" + actionMgr.getCommand(actionId) + "\n";
+			msg += "\n" + actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID) + "\n";
 		}
 		return msg;
 	}

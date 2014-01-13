@@ -276,7 +276,7 @@ public class ImportRefactorer implements IImportRefactorer {
 		StringBuilder newShellCommand = new StringBuilder();
 		String firstActionCommand = null;
 		for (int i = 0; i < actionsArray.length; i++) {
-			String actionCommand = actionMgr.getCommand(actionsArray[i]);
+			String actionCommand = (String) actionMgr.getSlotValue(actionsArray[i], IActionMgr.COMMAND_SLOT_ID);
 			if (i == 0) {
 				firstActionCommand = actionCommand;
 			} else {

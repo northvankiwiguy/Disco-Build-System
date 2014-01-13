@@ -114,7 +114,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         if (bo instanceof UIAction) {
         	UIAction action = (UIAction)bo;
         	int actionId = action.getId();
-        	String actionString = actionMgr.getCommand(actionId);
+        	String actionString = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 
         	/* format the command string nicely, wrapping the command if it's long */
 			if (actionString != null) {

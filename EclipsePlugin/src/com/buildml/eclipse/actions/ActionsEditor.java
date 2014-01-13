@@ -55,9 +55,12 @@ import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.VisibilityTreeViewer;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionMgrListener;
+import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgrListener;
+import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.model.impl.ActionTypeMgr;
 import com.buildml.model.types.PackageSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.types.IntegerTreeSet;
@@ -535,7 +538,7 @@ public class ActionsEditor extends ImportSubEditor
 			String eol = System.getProperty("line.separator");
 			StringBuffer sb = new StringBuffer();
 			for (int actionId : actionSet) {
-				String cmd = actionMgr.getCommand(actionId);
+				String cmd = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 				sb.append(cmd);
 				sb.append(eol);
 			}
@@ -581,7 +584,7 @@ public class ActionsEditor extends ImportSubEditor
 	public void actionChangeNotification(int actionId, int how, int changeId) {
 
 		if ((how == IActionMgrListener.TRASHED_ACTION) ||
-				(how == IActionMgrListener.CHANGED_COMMAND)) {
+				(how == IActionMgrListener.CHANGED_SLOT)) {
 			scheduleRefresh();
 		}
 	}

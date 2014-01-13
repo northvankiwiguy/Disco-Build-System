@@ -3,12 +3,9 @@ package com.buildml.eclipse.actions.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
@@ -57,7 +54,7 @@ public class HandlerDeleteAction extends AbstractHandler {
 		 * operation. 
 		 */
 		for (int actionId : selectedActions) {
-			String actionCmd = actionMgr.getCommand(actionId);
+			String actionCmd = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
 			
 			try {
 				refactorer.deleteAction(multiOp, actionId);

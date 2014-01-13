@@ -218,7 +218,7 @@ public class TestCFuncExec {
 		 * Validate that the child command's arguments are correct. That is, the absolute
 		 * path name to the child, followed by the expected arguments. 
 		 */
-		String cmdLine = actionMgr.getCommand(childActionId);
+		String cmdLine = (String) actionMgr.getSlotValue(childActionId, IActionMgr.COMMAND_SLOT_ID);
 		assertEquals(childPath + " arg1 arg2 arg3", cmdLine);
 	}
 	
