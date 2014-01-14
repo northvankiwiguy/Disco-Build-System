@@ -1,17 +1,15 @@
 package com.buildml.eclipse.files.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
-
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.ConversionUtils;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.UndoOpAdapter;
+import com.buildml.eclipse.utils.handlers.AbstractHandlerWithProgress;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
@@ -28,18 +26,31 @@ import com.buildml.refactor.IImportRefactorer;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class HandlerDeletePath extends AbstractHandler {
-
+public class HandlerDeletePath extends AbstractHandlerWithProgress {
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 * @see com.buildml.eclipse.utils.handlers.AbstractHandlerWithProgress#getCommandName()
 	 */
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public String getCommandName() {
+		return "Deleting";
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
+	/**
+	 * Execute the delete path operation (in a non-UI thread), but within the Progress Service.
+	 * 
+	 * @param event The event information pass in from Eclipse.
+	 * @return Always null.
+	 */
+	@Override
+	public Object executeWithProgress(ExecutionEvent event)  {
+		
 		MainEditor mainEditor = EclipsePartUtils.getActiveMainEditor();
 		IBuildStore buildStore = mainEditor.getBuildStore();
 		IFileMgr fileMgr = buildStore.getFileMgr();
