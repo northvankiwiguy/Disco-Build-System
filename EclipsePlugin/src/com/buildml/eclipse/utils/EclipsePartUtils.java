@@ -76,6 +76,9 @@ import com.buildml.model.types.ActionSet;
  */
 public class EclipsePartUtils {
 
+	/** The MainEditor that currently has the focus */
+	private static MainEditor activeMainEditor = null;
+
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -175,22 +178,19 @@ public class EclipsePartUtils {
 	 * @return The currently active MainEditor instance, or null;
 	 */
 	public static MainEditor getActiveMainEditor() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window == null) {
-			return null;
-		}
-		IWorkbenchPage page = window.getActivePage();
-		if (page == null) {
-			return null;
-		}
-		IEditorPart part = page.getActiveEditor();
-		if (part == null) {
-			return null;
-		}
-		if (!(part instanceof MainEditor)) {
-			return null;
-		}
-		return (MainEditor)part;
+		return activeMainEditor;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Record the currently-focused MainEditor, so that we can query its features whenever
+	 * necessary.
+	 * 
+	 * @param mainEditor The MainEditor that currently has the focus.
+	 */
+	public static void setActiveMainEditor(MainEditor mainEditor) {
+		activeMainEditor = mainEditor;
 	}
 
 	/*-------------------------------------------------------------------------------------*/

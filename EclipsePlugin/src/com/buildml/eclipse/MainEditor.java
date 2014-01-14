@@ -171,6 +171,9 @@ public class MainEditor extends MultiPageEditorPart
 		 * of those operations.
 		 */
 		importRefactorer = new ImportRefactorer(buildStore);
+		
+		/* Ensure that our focus-gain activities are enabled */
+		setFocus();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -567,6 +570,7 @@ public class MainEditor extends MultiPageEditorPart
 		 * "redo" and "undo" menu items (and keyboard shortcuts) are registered to
 		 * use our queue of operations.
 		 */
+		EclipsePartUtils.setActiveMainEditor(this);
 		if ((undoAction != null) && (redoAction != null)) {
 			IActionBars actionBars = getEditorSite().getActionBars();
 			actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
