@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.widgets.Display;
 
 import com.buildml.eclipse.ISubEditor;
 import com.buildml.eclipse.MainEditor;
@@ -198,25 +199,37 @@ public class UndoOpAdapter extends AbstractOperation {
 	 * Common functionality, shared between recordAndInvoke() and recordOnly().
 	 * @param executeIt True if the operation should be executed immediately.
 	 */
-	private void recordAndInvokeCommon(boolean executeIt) {
+	private void recordAndInvokeCommon(final boolean executeIt) {
+
+		final UndoOpAdapter adapter = this;
 		
-		/* add the operation to the undo/redo stack */
-		mainEditor = EclipsePartUtils.getActiveMainEditor();
-		subEditor = mainEditor.getActiveSubEditor();
-		this.addContext(mainEditor.getUndoContext());
+		/*
+		 * Execute the operation using the UI thread (if not already on the UI thread).
+		 */
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
 				
-		/* make it so... */
-		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
-		try {
-			if (executeIt) {
-				history.execute(this, null, null);
-			} else {
-				history.add(this);
-				mainEditor.markDirty(1);
+				/* add the operation to the undo/redo stack */
+				mainEditor = EclipsePartUtils.getActiveMainEditor();
+				subEditor = mainEditor.getActiveSubEditor();
+				adapter.addContext(mainEditor.getUndoContext());
+
+				/* make it so... */
+				IOperationHistory history = OperationHistoryFactory.getOperationHistory();
+				try {
+					if (executeIt) {
+						history.execute(adapter, null, null);
+					} else {
+						history.add(adapter);
+						mainEditor.markDirty(1);
+					}
+				} catch (ExecutionException e) {
+					throw new FatalBuildStoreError("Exception occurred during execution of operation", e);
+				}
 			}
-		} catch (ExecutionException e) {
-			throw new FatalBuildStoreError("Exception occurred during execution of operation", e);
-		}
+		});
+
 	}
 
 	/*-------------------------------------------------------------------------------------*/
