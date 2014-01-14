@@ -19,7 +19,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -40,6 +39,9 @@ public class AlertDialog extends TitleAreaDialog {
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
 
+	/** Maximum size of a dialog box is 1/MAX_DIALOG_RATIO of the screen height/width */
+	private static final int MAX_DIALOG_RATIO = 2;
+	
 	/** The title of the dialog box */
 	private String title;
 	
@@ -140,10 +142,6 @@ public class AlertDialog extends TitleAreaDialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-
-		/* estimate how large the error dialog should be */
-		Rectangle parentBounds = Display.getCurrent().getBounds();
-		int dialogWidth = parentBounds.width / 4;
 		
 		/* set the dialog's title, or default to "Alert" */
 		setHelpAvailable(false);
@@ -192,6 +190,29 @@ public class AlertDialog extends TitleAreaDialog {
 		} else {
 			return super.createButton(parent, id, label, defaultButton);
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * When the dialog box is created (based on the size of all the child widgets - particularly
+	 * the label), make sure that it never takes up too much of the screen, otherwise it loses
+	 * the feeling of being a Dialog.
+	 */
+	@Override
+	protected Point getInitialSize() {
+		
+		Point initialSize = super.getInitialSize();
+		int screenWidth = EclipsePartUtils.getScreenWidth();
+		int screenHeight = EclipsePartUtils.getScreenHeight();
+		
+		if (initialSize.x > (screenWidth / MAX_DIALOG_RATIO)) {
+			initialSize.x = screenWidth / MAX_DIALOG_RATIO;
+		}
+		if (initialSize.y > (screenHeight / MAX_DIALOG_RATIO)) {
+			initialSize.y = screenHeight / MAX_DIALOG_RATIO;
+		}
+		return initialSize;
 	}
 	
 	/*=====================================================================================*
