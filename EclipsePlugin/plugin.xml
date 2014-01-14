@@ -246,7 +246,7 @@
                            ifEmpty="false"
                            operator="and">
                         <instanceof
-                              value="com.buildml.utils.types.IntegerTreeRecord">
+                              value="com.buildml.eclipse.bobj.UIInteger">
                         </instanceof>
                      </iterate>
                   </with>
@@ -267,12 +267,16 @@
                            ifEmpty="false"
                            operator="and">
                         <instanceof
-                              value="com.buildml.utils.types.IntegerTreeRecord">
+                              value="com.buildml.eclipse.bobj.UIInteger">
                         </instanceof>
                      </iterate>
                   </with>
                </visibleWhen>
             </command>
+            <separator
+                  name="com.buildml.eclipse.commands.separator4"
+                  visible="true">
+            </separator>
             <command
                   commandId="com.buildml.eclipse.commands.deletePath"
                   label="Delete File or Directory"
