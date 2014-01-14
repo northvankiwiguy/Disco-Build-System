@@ -13,10 +13,12 @@ import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.dialogs.VFSTreeSelectionDialog;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMemberMgr.PackageDesc;
+import com.buildml.model.undo.ActionUndoOp;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.utils.errors.ErrorCode;
 import com.buildml.utils.errors.FatalError;
@@ -45,6 +47,12 @@ public class ActionPropertyPage extends BmlPropertyPage {
 	
 	/** The package that this action resides in */
 	private PackageDesc pkg;
+	
+	/** The SWT label that displays the directory path */
+	private Label actionDirectoryLabelValue;
+	
+	/** The main panel of this properties page */
+	private Composite panel;
 
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -56,7 +64,27 @@ public class ActionPropertyPage extends BmlPropertyPage {
 	public ActionPropertyPage() {
 		/* nothing */
 	}
- 
+
+	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * The user has pressed the OK button
+	 */
+	@Override
+	public boolean performOk() {
+		
+		/* create an undo/redo operation that will invoke the underlying database changes */
+		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
+		op.recordSlotChange(IActionMgr.DIRECTORY_SLOT_ID, originalPathId, selectedPathId);
+		new UndoOpAdapter("Change Action", op).invoke();
+
+		// TODO: put this operation in the same MultiUndoOp as the performOK() for shell commands.
+		// This is possibly done via the BmlPropertyPage parent class.
+		return super.performOk();
+	}
+	
 	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/
@@ -77,7 +105,7 @@ public class ActionPropertyPage extends BmlPropertyPage {
 		setTitle("Action Properties:");
 		
 		/* create a panel in which all sub-widgets are added. */
-		final Composite panel = new Composite(parent, SWT.NONE);
+		panel = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
@@ -119,7 +147,7 @@ public class ActionPropertyPage extends BmlPropertyPage {
 		originalPathId = (Integer) actionMgr.getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
 		String pathString = fileMgr.getPathName(originalPathId);
 		new Label(panel, SWT.NONE).setText("Action Directory : ");
-		final Label actionDirectoryLabelValue = new Label(panel, SWT.NONE);
+		actionDirectoryLabelValue = new Label(panel, SWT.NONE);
 		actionDirectoryLabelValue.setText(pathString);
 		Button editDirectoryButton = new Button(panel, SWT.NONE);
 		editDirectoryButton.setText(" Edit Directory ");
@@ -132,8 +160,7 @@ public class ActionPropertyPage extends BmlPropertyPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				editDirectory();
-				actionDirectoryLabelValue.setText(fileMgr.getPathName(selectedPathId));
-				panel.layout();
+				refreshPage();
 			}
 		});
 		
@@ -209,17 +236,25 @@ public class ActionPropertyPage extends BmlPropertyPage {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
-
+	
 	/**
-	 * The user has pressed the OK button
+	 * Redraw the page with the latest values.
+	 */
+	private void refreshPage() {
+		actionDirectoryLabelValue.setText(fileMgr.getPathName(selectedPathId));
+		panel.layout();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	@Override
-	public boolean performOk() {
-		
-		// TODO: add code for changing the directory slot via an IUndoOp.
-		// TODO: put this operation in the same MultiUndoOp as the performOK() for shell commands.
-		// This is possibly done via the BmlPropertyPage parent class.
-		return super.performOk();
+	protected void performDefaults() {
+		selectedPathId = originalPathId;
+		refreshPage();
+		super.performDefaults();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

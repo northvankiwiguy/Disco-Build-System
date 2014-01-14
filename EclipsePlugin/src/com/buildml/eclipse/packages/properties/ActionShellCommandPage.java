@@ -45,6 +45,24 @@ public class ActionShellCommandPage extends BmlPropertyPage {
 	}
 
 	/*=====================================================================================*
+	 * PUBLIC METHODS
+	 *=====================================================================================*/
+
+	/**
+	 * The OK button has been pressed in the properties box. Save all the field values
+	 * into the database. This is done via the undo/redo stack.
+	 */
+	@Override
+	public boolean performOk() {
+		
+		/* create an undo/redo operation that will invoke the underlying database changes */
+		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
+		op.recordSlotChange(IActionMgr.COMMAND_SLOT_ID, getShellCommandValue(), textField.getText());
+		new UndoOpAdapter("Change Action", op).invoke();
+		return super.performOk();
+	}
+	
+	/*=====================================================================================*
 	 * PROTECTED METHODS
 	 *=====================================================================================*/
 
@@ -98,19 +116,14 @@ public class ActionShellCommandPage extends BmlPropertyPage {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/**
-	 * The OK button has been pressed in the properties box. Save all the field values
-	 * into the database. This is done via the undo/redo stack.
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	@Override
-	public boolean performOk() {
-		
-		/* create an undo/redo operation that will invoke the underlying database changes */
-		ActionUndoOp op = new ActionUndoOp(buildStore, actionId);
-		op.recordSlotChange(IActionMgr.COMMAND_SLOT_ID, getShellCommandValue(), textField.getText());
-		new UndoOpAdapter("Change Action", op).invoke();
-		return super.performOk();
+	protected void performDefaults() {
+		textField.setText(getShellCommandValue());
+		super.performDefaults();
 	}
-	
+		
 	/*-------------------------------------------------------------------------------------*/
 }

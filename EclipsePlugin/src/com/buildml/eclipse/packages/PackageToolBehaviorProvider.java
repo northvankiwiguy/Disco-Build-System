@@ -35,6 +35,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.print.PrintUtils;
 
@@ -62,6 +63,9 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
 	/** The IFileGroupMgr associated with this BuildStore */
 	private IFileGroupMgr fileGroupMgr;
+	
+	/** The IFileMgr associated with this BuildStore */
+	private IFileMgr fileMgr;
 
 	/** The maximum number of characters wide that a tooltip should be */
 	private final int toolTipWrapWidth = 120;
@@ -89,6 +93,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
     	actionMgr = buildStore.getActionMgr();
     	actionTypeMgr = buildStore.getActionTypeMgr();
     	fileGroupMgr = buildStore.getFileGroupMgr();
+    	fileMgr = buildStore.getFileMgr();
     }
     
 	/*=====================================================================================*
@@ -114,12 +119,24 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         if (bo instanceof UIAction) {
         	UIAction action = (UIAction)bo;
         	int actionId = action.getId();
+        	
+        	/* fetch the action's command string, and directory path */
         	String actionString = (String) actionMgr.getSlotValue(actionId, IActionMgr.COMMAND_SLOT_ID);
+        	Object dirSlotValue = actionMgr.getSlotValue(actionId, IActionMgr.DIRECTORY_SLOT_ID);
+        	String dirString = null;
+        	if (dirSlotValue != null) {
+        		int dirId = (Integer)dirSlotValue;
+        		dirString = fileMgr.getPathName(dirId);
+        	}
 
         	/* format the command string nicely, wrapping the command if it's long */
 			if (actionString != null) {
 				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 				PrintStream printStream = new PrintStream(outStream);
+				if (dirString != null) {
+					printStream.println("Directory:\n" + dirString);
+				}
+				printStream.println("\nShell command:");
 				PrintUtils.indentAndWrap(printStream, actionString, 0, toolTipWrapWidth);
 				String toolTip = outStream.toString();
 				printStream.close();
