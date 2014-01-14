@@ -996,26 +996,13 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	
 	/**
 	 * Determine whether the specified object is something in the Eclipse IDE that represents
-	 * a "disk file".
+	 * a "disk file" (but not a directory).
 	 * 
 	 * @param fileObject An object to be tested.
 	 * @return true if this object represents some type of disk file in the Eclipse IDE.
 	 */
 	private boolean isFileClass(Object fileObject) {
-
-		/* 
-		 * Else check if there's an adapter to IResource, and there's a path associated
-		 * with the IResource.
-		 */
-		if (fileObject instanceof IAdaptable) {
-			Object iResource = ((IAdaptable)fileObject).getAdapter(IResource.class);
-			if (iResource != null) {
-				return (((IResource)iResource).getLocation() != null);
-			}
-		}
-		
-		/* all other object types are invalid */
-		return false;
+		return getPathOf(fileObject) != null;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -1025,19 +1012,25 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * path to that file.
 	 * 
 	 * @param fileObject The object that represents a file.
-	 * @return The full OS-specific path to the file.
+	 * @return The full OS-specific path to the file, or null if this is not a file.
 	 */
 	private String getPathOf(Object fileObject) {
 		
+		/* all IFile objects are files (not directories) */
 		if (fileObject instanceof IFile) {
 			IFile file = (IFile)fileObject;
 			return file.getFullPath().toOSString();
-		} 
+		}
+		
+		/* 
+		 * Anything that adapts to IResource might be a file, but we need to double check
+		 * that it's not a directory.
+		 */
 		else if (fileObject instanceof IAdaptable) {
 			Object iResource = ((IAdaptable)fileObject).getAdapter(IResource.class);
 			if (iResource != null) {
 				IPath location = ((IResource)iResource).getLocation();
-				if (location != null) {
+				if ((location != null) && (location.toFile().isFile())) {
 					return location.toOSString();
 				}
 			}
