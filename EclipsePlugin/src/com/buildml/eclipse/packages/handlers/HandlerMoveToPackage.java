@@ -21,21 +21,23 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.graphiti.ui.platform.GraphitiConnectionEditPart;
 import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.buildml.eclipse.MainEditor;
 import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIDirectory;
 import com.buildml.eclipse.bobj.UIFile;
 import com.buildml.eclipse.bobj.UIFileGroup;
-import com.buildml.eclipse.outline.OutlinePage;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.packages.layout.LayoutAlgorithm;
 import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.UndoOpAdapter;
+import com.buildml.eclipse.utils.handlers.AbstractHandlerWithProgress;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
@@ -53,7 +55,7 @@ import com.buildml.utils.errors.ErrorCode;
  * 
  * @author Peter Smith <psmith@arapiki.com>
  */
-public class HandlerMoveToPackage extends AbstractHandler {
+public class HandlerMoveToPackage extends AbstractHandlerWithProgress {
 
 	/*=====================================================================================*
 	 * NESTED CLASSES
@@ -127,30 +129,58 @@ public class HandlerMoveToPackage extends AbstractHandler {
 	/** Our IBuildStore */
 	private IBuildStore buildStore;
 	
+	/** This editor's layout algorithm */
+	private LayoutAlgorithm layoutAlgorithm;
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.eclipse.utils.handlers.AbstractHandlerWithProgress#getCommandName()
+	 */
+	@Override
+	public String getCommandName() {
+		return "Moving to Package";
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Execute the "Move to Package" command.
 	 */
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object executeWithProgress(ExecutionEvent event) {
 
 		buildStore = EclipsePartUtils.getActiveBuildStore();
 		
-		List<MemberDesc> members = getSelectedObjects();
+		List<MemberDesc> members = 
+				getSelectedObjects((IStructuredSelection) HandlerUtil.getCurrentSelection(event));
 
-		MoveToPackageDialog dialog = new MoveToPackageDialog(buildStore);
-		int status = dialog.open();
-		if (status == MoveToPackageDialog.OK) {
-			int pkgId = dialog.getPackageId();
+		/*
+		 * Show the "which package to move to" Dialog in the UI-thread.
+		 */
+		final Integer pkgIdReturn[] = new Integer[1];
+		pkgIdReturn[0] = null;
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				final MoveToPackageDialog dialog = new MoveToPackageDialog(buildStore);
+				int status = dialog.open();
+				if (status == MoveToPackageDialog.OK) {
+					pkgIdReturn[0] = dialog.getPackageId();
+				}
+			}
+		});
+		
+		if (pkgIdReturn[0] != null) {
+			final int pkgId = pkgIdReturn[0];
 
 			/* all changes will be packaged in a multiOp */
 			MultiUndoOp multiOp = new MultiUndoOp();
 			
 			/* ask the refactorer to perform the move */
-			MainEditor editor = EclipsePartUtils.getActiveMainEditor();
+			final MainEditor editor = EclipsePartUtils.getActiveMainEditor();
 			if (editor != null) {
 				IImportRefactorer refactorer = editor.getImportRefactorer();
 				try {
@@ -162,11 +192,16 @@ public class HandlerMoveToPackage extends AbstractHandler {
 					 * that we do this before the layout operation, since the layout algorithm
 					 * is obtained from the currently opened editor.
 					 */
-					editor.openPackageDiagram(pkgId);
+					Display.getDefault().syncExec(new Runnable() {	
+						@Override
+						public void run() {
+							editor.openPackageDiagram(pkgId);
+							PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
+							layoutAlgorithm = pde.getLayoutAlgorithm();
+						}
+					});
 					
 					/* schedule the layout operation to happen */
-					PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
-					LayoutAlgorithm layoutAlgorithm = pde.getLayoutAlgorithm();
 					multiOp.add(new LayoutOp(layoutAlgorithm, pkgId));
 					
 					/* invoke the changes, and record in undo/redo history */
@@ -194,7 +229,7 @@ public class HandlerMoveToPackage extends AbstractHandler {
 		 * Get the list of business objects that are selected, return false if an unhandled
 		 * object is selected.
 		 */
-		List<MemberDesc> objectList = getSelectedObjects();
+		List<MemberDesc> objectList = getSelectedObjects(EclipsePartUtils.getSelection());
 		return (objectList != null);
 	}
 
@@ -203,14 +238,12 @@ public class HandlerMoveToPackage extends AbstractHandler {
 	 *=====================================================================================*/
 
 	/**
+	 * @param selection The current Eclipse selection
 	 * @return A list of valid business objects (UIAction, UIFileGroup, etc) that have been
 	 * selected by the user. Returns null if any non-valid objects were selected. Note that
 	 * connection arrows are silently ignored, rather than flagged as invalid.
 	 */
-	private List<MemberDesc> getSelectedObjects() {
-		
-		/* get the list of all things that are selected */
-		IStructuredSelection selection = EclipsePartUtils.getSelection();
+	private List<MemberDesc> getSelectedObjects(IStructuredSelection selection) {
 		
 		/* we'll return a list of valid business objects */
 		List<MemberDesc> result = new ArrayList<MemberDesc>();

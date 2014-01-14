@@ -92,11 +92,11 @@ public class EclipsePartUtils {
 	 */
 	public static IStructuredSelection getSelection() {
 		
-		IWorkbenchWindow windows[] = PlatformUI.getWorkbench().getWorkbenchWindows();
-		if ((windows == null) || (windows.length == 0)) {
+		IWorkbenchWindow window = activeMainEditor.getEditorSite().getWorkbenchWindow();
+		if (window == null) {
 			return null;
 		}
-		return (IStructuredSelection)(windows[0].getSelectionService().getSelection());
+		return (IStructuredSelection)(window.getSelectionService().getSelection());
 	}
 	
 	/*-------------------------------------------------------------------------------------*/	
