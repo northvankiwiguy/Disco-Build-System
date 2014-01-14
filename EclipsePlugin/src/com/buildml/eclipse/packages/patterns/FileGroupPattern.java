@@ -18,6 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -42,7 +45,6 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.swt.widgets.Display;
 
 import com.buildml.eclipse.actions.dialogs.SlotSelectionDialog;
@@ -1000,7 +1002,20 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * @return true if this object represents some type of disk file in the Eclipse IDE.
 	 */
 	private boolean isFileClass(Object fileObject) {
-		return (fileObject instanceof IFile) || (fileObject instanceof ICompilationUnit);
+
+		/* 
+		 * Else check if there's an adapter to IResource, and there's a path associated
+		 * with the IResource.
+		 */
+		if (fileObject instanceof IAdaptable) {
+			Object iResource = ((IAdaptable)fileObject).getAdapter(IResource.class);
+			if (iResource != null) {
+				return (((IResource)iResource).getLocation() != null);
+			}
+		}
+		
+		/* all other object types are invalid */
+		return false;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -1013,12 +1028,19 @@ public class FileGroupPattern extends AbstractPattern implements IPattern {
 	 * @return The full OS-specific path to the file.
 	 */
 	private String getPathOf(Object fileObject) {
+		
 		if (fileObject instanceof IFile) {
 			IFile file = (IFile)fileObject;
 			return file.getFullPath().toOSString();
-		} else if (fileObject instanceof ICompilationUnit) {
-			ICompilationUnit file = (ICompilationUnit)fileObject;
-			return file.getPath().toOSString();
+		} 
+		else if (fileObject instanceof IAdaptable) {
+			Object iResource = ((IAdaptable)fileObject).getAdapter(IResource.class);
+			if (iResource != null) {
+				IPath location = ((IResource)iResource).getLocation();
+				if (location != null) {
+					return location.toOSString();
+				}
+			}
 		}
 		return null;
 	}
