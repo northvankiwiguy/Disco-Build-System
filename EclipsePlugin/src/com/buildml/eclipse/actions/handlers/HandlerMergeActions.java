@@ -42,6 +42,12 @@ public class HandlerMergeActions extends AbstractHandler {
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		IImportRefactorer refactorer = mainEditor.getImportRefactorer();
 
+		String mode = event.getParameter("com.buildml.eclipse.commandParameters.mergeAction");
+		if (!mode.equals("selected")) {
+			System.out.println("Mode: " + mode);
+			return null;
+		}
+		
 		/* build an ActionSet of all the selected actions */
 		TreeSelection selection = (TreeSelection)HandlerUtil.getCurrentSelection(event);
 		ActionSet selectedActions = EclipsePartUtils.getActionSetFromSelection(buildStore, selection);

@@ -142,17 +142,32 @@
             defaultHandler="com.buildml.eclipse.actions.handlers.HandlerDeleteAction"
             id="com.buildml.eclipse.commands.deleteActionPromote"
             name="Delete Action">
+         <commandParameter
+               id="com.buildml.eclipse.commandParameters.deleteAction"
+               name="mode"
+               optional="false">
+         </commandParameter>
       </command>
       <command
             category="com.buildml.eclipse.commands.category"
             id="com.buildml.eclipse.commands.mergeActions"
             name="Merge Actions">
+         <commandParameter
+               id="com.buildml.eclipse.commandParameters.mergeAction"
+               name="mode"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             category="com.buildml.eclipse.commands.category"
             defaultHandler="com.buildml.eclipse.actions.handlers.HandlerMakeAtomic"
             id="com.buildml.eclipse.commands.makeActionAtomic"
             name="Make Action Atomic">
+         <commandParameter
+               id="com.buildml.eclipse.commandParameters.makeAtomic"
+               name="mode"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             defaultHandler="com.buildml.eclipse.outline.handlers.HandlerAddOutlineContent"
@@ -281,7 +296,31 @@
                         property="com.buildml.eclipse.hasFeature">
                   </test>
                </visibleWhen>
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.makeAtomic"
+                     value="selected">
+               </parameter>
             </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.makeActionAtomic"
+                  label="Make Matching Actions Atomic"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        args="actions"
+                        property="com.buildml.eclipse.hasFeature">
+                  </test>
+               </visibleWhen>
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.makeAtomic"
+                     value="pattern">
+               </parameter>
+            </command>
+            <separator
+                  name="com.buildml.eclipse.commands.separator2"
+                  visible="true">
+            </separator>
             <command
                   commandId="com.buildml.eclipse.commands.mergeActions"
                   label="Merge Actions"
@@ -293,7 +332,31 @@
                         property="com.buildml.eclipse.hasFeature">
                   </test>
                </visibleWhen>
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.mergeAction"
+                     value="selected">
+               </parameter>
             </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.mergeActions"
+                  label="Merge Actions Into Groups"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        args="actions"
+                        property="com.buildml.eclipse.hasFeature">
+                  </test>
+               </visibleWhen>
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.mergeAction"
+                     value="groups">
+               </parameter>
+            </command>
+            <separator
+                  name="com.buildml.eclipse.commands.separator3"
+                  visible="true">
+            </separator>
             <command
                   commandId="com.buildml.eclipse.commands.deleteActionPromote"
                   label="Delete Action"
@@ -305,6 +368,26 @@
                         property="com.buildml.eclipse.hasFeature">
                   </test>
                </visibleWhen>
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.deleteAction"
+                     value="selected">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.buildml.eclipse.commands.deleteActionPromote"
+                  label="Delete Matching Actions"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <test
+                        args="actions"
+                        property="com.buildml.eclipse.hasFeature">
+                  </test>
+               </visibleWhen>
+               <parameter
+                     name="com.buildml.eclipse.commandParameters.deleteAction"
+                     value="pattern">
+               </parameter>
             </command>
          </menu>
          <menu
@@ -1227,18 +1310,30 @@
             contextId="com.buildml.eclipse.contexts.actionseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="SHIFT+NUMPAD_DIVIDE">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.mergeAction"
+               value="selected">
+         </parameter>
       </key>
       <key
             commandId="com.buildml.eclipse.commands.deleteActionPromote"
             contextId="com.buildml.eclipse.contexts.actionseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="SHIFT+NUMPAD_SUBTRACT">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.deleteAction"
+               value="selected">
+         </parameter>
       </key>
       <key
             commandId="com.buildml.eclipse.commands.makeActionAtomic"
             contextId="com.buildml.eclipse.contexts.actionseditor"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="SHIFT+NUMPAD_MULTIPLY">
+         <parameter
+               id="com.buildml.eclipse.commandParameters.makeAtomic"
+               value="selected">
+         </parameter>
       </key>
    </extension>
    <extension
