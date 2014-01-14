@@ -865,6 +865,55 @@ public class TestFileGroupMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the getSourceGroupsContainingPath() method.
+	 */
+	@Test
+	public void testGetSourceGroupContainingPath() {
+	
+		/* create four source groups, one merge group and one generated group */
+		int srcGroup1 = fileGroupMgr.newSourceGroup(pkg1Id);
+		int srcGroup2 = fileGroupMgr.newSourceGroup(pkg1Id);
+		int srcGroup3 = fileGroupMgr.newSourceGroup(pkg1Id);
+		int mergeGroup1 = fileGroupMgr.newMergeGroup(pkg1Id);
+		int genGroup1 = fileGroupMgr.newGeneratedGroup(pkg1Id);
+
+		/* take three files, and add one to srcGroup1, two to srcGroup2, and all three to srcGroup3 */
+		assertEquals(0, fileGroupMgr.addPathId(srcGroup1, file1));
+		assertEquals(0, fileGroupMgr.addPathId(srcGroup2, file1));
+		assertEquals(1, fileGroupMgr.addPathId(srcGroup2, file2));
+		assertEquals(0, fileGroupMgr.addPathId(srcGroup3, file1));
+		assertEquals(1, fileGroupMgr.addPathId(srcGroup3, file2));
+		assertEquals(2, fileGroupMgr.addPathId(srcGroup3, file3));
+		
+		/* now, search for each of the files */
+		Integer results[] = fileGroupMgr.getSourceGroupsContainingPath(file1);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] {srcGroup1,  srcGroup2, srcGroup3}, results));
+		results = fileGroupMgr.getSourceGroupsContainingPath(file2);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] {srcGroup2, srcGroup3}, results));
+		results = fileGroupMgr.getSourceGroupsContainingPath(file3);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] {srcGroup3}, results));
+		
+		/* remove file2 from srcGroup3 */
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(srcGroup3, 1));
+		
+		/* re-perform searches */
+		results = fileGroupMgr.getSourceGroupsContainingPath(file1);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] {srcGroup1,  srcGroup2, srcGroup3}, results));
+		results = fileGroupMgr.getSourceGroupsContainingPath(file2);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] {srcGroup2}, results));
+		results = fileGroupMgr.getSourceGroupsContainingPath(file3);
+		assertTrue(CommonTestUtils.sortedArraysEqual(
+				new Integer[] {srcGroup3}, results));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 	
 	private static int notifyId;
 	private static int notifyHow;

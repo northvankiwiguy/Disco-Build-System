@@ -111,7 +111,13 @@ public class CanNotRefactorException extends Exception {
 		 * There are multiple actions that generate a specific file, which is not allowed.
 		 * getCauseIDs() return the ID of the file(s) that are modified.
 		 */
-		FILE_IS_MODIFIED
+		FILE_IS_MODIFIED,
+		
+		/**
+		 * The file to be deleted is still a member of a file group, and therefore can't be
+		 * removed. getCauseIDs() returns the ID of the file groups that contain the file.
+		 */
+		FILE_STILL_IN_GROUP
 	}
 	
 	/** The cause of the exception */

@@ -20,6 +20,7 @@ import com.buildml.model.IActionMgr.FileAccess;
 import com.buildml.model.IActionMgr.OperationType;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IFileMgr.PathType;
 import com.buildml.model.ISlotTypes.SlotDetails;
@@ -189,13 +190,20 @@ public class ImportRefactorerUtils {
 		IActionMgr actionMgr = buildStore.getActionMgr();
 		IActionTypeMgr actionTypeMgr = buildStore.getActionTypeMgr();
 		IFileMgr fileMgr = buildStore.getFileMgr();
+		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
 		
 		/* the path must exist and must not be trashed - otherwise give an error */
 		PathType pathType = fileMgr.getPathType(pathId);
 		if ((pathType == PathType.TYPE_INVALID) ||
 			(fileMgr.isPathTrashed(pathId))) {
 			throw new CanNotRefactorException(Cause.INVALID_PATH, pathId);
-		}		
+		}
+		
+		/* the path must not be a member of any file groups */
+		Integer containingGroups[] = fileGroupMgr.getSourceGroupsContainingPath(pathId);
+		if (containingGroups.length != 0){
+			throw new CanNotRefactorException(Cause.FILE_STILL_IN_GROUP, containingGroups);
+		}
 		
 		/* 
 		 * If "removeFromAction" is false, then the path must not be used as input to an

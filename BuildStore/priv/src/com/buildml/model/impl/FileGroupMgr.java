@@ -96,7 +96,8 @@ public class FileGroupMgr implements IFileGroupMgr {
 		removePathsPrepStmt = null,
 		shiftDownPathsPrepStmt = null,
 		insertPackageMemberPrepStmt = null,
-		removePackageMemberPrepStmt = null;
+		removePackageMemberPrepStmt = null,
+		findSourceGroupsContainingPathPrepStmt = null;
 
 	/**
 	 * A mapping from group ID to the list of transient path entries.
@@ -154,6 +155,11 @@ public class FileGroupMgr implements IFileGroupMgr {
 		removePackageMemberPrepStmt =
 				db.prepareStatement("delete from packageMembers where memberId = ? and memberType = " +
 						IPackageMemberMgr.TYPE_FILE_GROUP);
+		findSourceGroupsContainingPathPrepStmt = db.prepareStatement(
+				"select distinct groupId from fileGroups, fileGroupPaths" +
+						" where (fileGroups.id = fileGroupPaths.groupId)" +
+						" and (fileGroups.type = " + IFileGroupMgr.SOURCE_GROUP + ")" +
+						" and (pathId = ?)");
 		
 		/* initialize the mapping of group IDs to list of transient entries */
 		transientEntryMap = new HashMap<Integer, ArrayList<TransientEntry>>();
@@ -877,6 +883,24 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return outputPaths.toArray(new String[0]);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getSourceGroupsContainingPath(int)
+	 */
+	@Override
+	public Integer[] getSourceGroupsContainingPath(int pathId) {
+
+		Integer results[] = null;
+		try {
+			findSourceGroupsContainingPathPrepStmt.setInt(1, pathId);
+			results = db.executePrepSelectIntegerColumn(findSourceGroupsContainingPathPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return results;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)

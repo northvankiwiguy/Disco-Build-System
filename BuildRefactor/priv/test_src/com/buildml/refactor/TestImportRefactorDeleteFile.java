@@ -21,8 +21,12 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.IActionMgr.OperationType;
+import com.buildml.model.impl.FileGroupMgr;
 import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.refactor.CanNotRefactorException.Cause;
 import com.buildml.refactor.imports.ImportRefactorer;
@@ -543,5 +547,60 @@ public class TestImportRefactorDeleteFile {
 	
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Try to delete files that are members of filegroups (this should be disallowed).
+	 */
+	@Test
+	public void testDeleteFileFromFileGroup() {
+		
+		IFileGroupMgr fileGroupMgr = buildStore.getFileGroupMgr();
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		int pkgId = pkgMgr.addPackage("PkgA");
+		
+		/* create a file group, and add a source file and a generated file into it */
+		int fgId1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fgId2 = fileGroupMgr.newSourceGroup(pkgId);
+
+		assertEquals(0, fileGroupMgr.addPathId(fgId1, fileWorkAIn));
+		assertEquals(0, fileGroupMgr.addPathId(fgId2, fileWorkAIn));
+		assertEquals(1, fileGroupMgr.addPathId(fgId1, fileWorkBOut));
+		
+		/* try to delete the source file - should fail */
+		MultiUndoOp multiOp = new MultiUndoOp();
+		try {
+			importRefactorer.deletePath(multiOp, fileWorkAIn, false, true);
+			fail("Failed to reject deletion.");
+		} catch (CanNotRefactorException ex) {
+			assertEquals(Cause.FILE_STILL_IN_GROUP, ex.getCauseCode());
+			assertArrayEquals(new Integer[] { fgId1, fgId2 }, ex.getCauseIDs());
+		}
+		
+		/* remove the source file from the file groups */
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(fgId1, 0));
+		assertEquals(ErrorCode.OK, fileGroupMgr.removeEntry(fgId2, 0));
+		
+		/* try to delete the source file again - should succeed now it's no longer in the file groups */
+		multiOp = new MultiUndoOp();
+		try {
+			importRefactorer.deletePath(multiOp, fileWorkAIn, false, true);
+		} catch (CanNotRefactorException ex) {
+			fail("Failed to delete source file");
+		}
+		multiOp.redo();
+		
+		/* try to delete the generated file (and associated generator action) - should fail */
+		multiOp = new MultiUndoOp();
+		try {
+			importRefactorer.deletePath(multiOp, fileWorkBOut, true, true);
+			fail("Failed to reject deletion.");
+		} catch (CanNotRefactorException ex) {
+			assertEquals(Cause.FILE_STILL_IN_GROUP, ex.getCauseCode());
+			assertArrayEquals(new Integer[] { fgId1 }, ex.getCauseIDs());
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 
 }

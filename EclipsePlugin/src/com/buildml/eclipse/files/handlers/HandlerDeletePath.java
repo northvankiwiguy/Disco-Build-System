@@ -176,6 +176,15 @@ public class HandlerDeletePath extends AbstractHandler {
 								"the related files are still in use:\n\n" +
 								ConversionUtils.getPathsAsText(fileMgr, badIds));
 						break;
+					
+					/*
+					 * Can't delete the path because it's still a member of a file group.
+					 */
+					case FILE_STILL_IN_GROUP:
+						AlertDialog.displayErrorDialog("Can't delete",
+								"The path " + pathName + " can't be deleted as it is currently " +
+								"a member of one or more file groups.");
+						break;
 						
 					/*
 					 * Ignore this case - it's likely because the parent has already been deleted.
@@ -183,7 +192,7 @@ public class HandlerDeletePath extends AbstractHandler {
 					case INVALID_PATH:
 						break;
 						
-						/*
+					/*
 					 * These shouldn't happen.
 					 */
 					default:

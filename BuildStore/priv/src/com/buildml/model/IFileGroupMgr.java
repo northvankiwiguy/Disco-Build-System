@@ -403,6 +403,16 @@ public interface IFileGroupMgr {
 	String[] getExpandedGroupFiles(int groupId);
 
 	/**
+	 * Return the complete list of all source groups that contain the specified path
+	 * as a member.
+	 * 
+	 * @param pathId	The ID of the path to search for.
+	 * @return			A possibly-empty array of source file group IDs, or null if
+	 *                  pathId is invalid.
+	 */
+	Integer[] getSourceGroupsContainingPath(int pathId);
+	
+	/**
 	 * @return The BuildStore that delegates to this FileGroupMgr.
 	 */
 	IBuildStore getBuildStore();
