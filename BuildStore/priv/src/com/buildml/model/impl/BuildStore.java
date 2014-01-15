@@ -29,6 +29,7 @@ import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.IReportMgr;
+import com.buildml.model.ISubPackageMgr;
 import com.buildml.utils.errors.ErrorCode;
 
 
@@ -85,6 +86,9 @@ public class BuildStore implements IBuildStore {
 	
 	/** The PackageRootMgr object we'll delegate work to */
 	private IPackageRootMgr pkgRootMgr;
+	
+	/** The SubPackageMgr object we'll delegate work to */
+	private ISubPackageMgr subPkgMgr;
 	
 	/** The SlotMgr associated with this BuildStore */
 	private SlotMgr slotMgr;
@@ -159,6 +163,7 @@ public class BuildStore implements IBuildStore {
 		packages = new PackageMgr(this);
 		pkgMemberMgr = new PackageMemberMgr(this);
 		pkgRootMgr = new PackageRootMgr(this);
+		subPkgMgr = new SubPackageMgr(this);
 		
 		/*
 		 * Since these managers were initialized in a specific order, some of the earlier
@@ -341,6 +346,16 @@ public class BuildStore implements IBuildStore {
 		return actionTypeMgr;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IBuildStore#getSubPackageMgr()
+	 */
+	@Override
+	public ISubPackageMgr getSubPackageMgr() {
+		return subPkgMgr;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**

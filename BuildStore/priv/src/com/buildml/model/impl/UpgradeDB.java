@@ -209,7 +209,14 @@ public class UpgradeDB {
 						   				"actionType from buildActionstmp");
 				stat.executeUpdate("drop table buildActionstmp");
 			}
-
+			
+			/*
+			 * Update to 407 - add the subPackages table.
+			 */
+			if (dbVersion < 407) {
+				stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer)");
+			}
+			
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);
 		

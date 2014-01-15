@@ -120,6 +120,14 @@ public interface IBuildStore {
 	public abstract IActionTypeMgr getActionTypeMgr();	
 	
 	/**
+	 * Fetch the SubPackageMgr associated with this BuildStore. This object
+	 * encapsulates information about sub-package (instances of packages).
+	 * 
+	 * @return An SubPackageMgr manager object.
+	 */
+	public abstract ISubPackageMgr getSubPackageMgr();
+	
+	/**
 	 * Specify whether database access should be fast (true) or safe (false). Fast
 	 * access is considerably faster than safe access, but won't ensure that
 	 * changes are written to the disk. Only use fast access for long-running

@@ -52,7 +52,7 @@ import com.buildml.model.IPackageMemberMgr;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 406;
+	public static final int SCHEMA_VERSION = 407;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -334,6 +334,9 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("create unique index packageMembersIdx on packageMembers (memberType, memberId)");
 			stat.executeUpdate("insert into packageMembers values (" + IPackageMemberMgr.TYPE_FILE + 
 							   ", 0, 0, 0, 0, 0)"); /* the "/" path */
+			
+			/* Create the subPackage table */
+			stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer)");
 
 			stat.close();
 						
@@ -366,6 +369,7 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("drop table if exists fileAttrsName");
 			stat.executeUpdate("drop table if exists fileAttrs");
 			stat.executeUpdate("drop table if exists packages");
+			stat.executeUpdate("drop table if exists subPackages");
 			
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to drop database schema", e);
