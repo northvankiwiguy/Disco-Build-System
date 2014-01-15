@@ -32,14 +32,34 @@ import org.eclipse.swt.widgets.Shell;
 public class BmlTitleAreaDialog extends TitleAreaDialog {
 
 	/*=====================================================================================*
-	 * CONSTRUCTOR
+	 * TYPES/FIELDS
 	 *=====================================================================================*/
 	
+	/** Minimum width of dialog box - as fraction of screen width */
+	private double minWidthRatio;
+	
+	/** Maximum width of dialog box - as fraction of screen width */
+	private double maxWidthRatio;
+	
+	/** Minimum height of dialog box - as fraction of screen height */
+	private double minHeightRatio;
+
+	/** Maximum height of dialog box - as fraction of screen height */
+	private double maxHeightRatio;
+
+	/*=====================================================================================*
+	 * CONSTRUCTOR
+	 *=====================================================================================*/
+
 	/**
 	 * Create a new BmlTitleAreaDialog, with a BuildML look and feel.
 	 * @param parentShell The SWT shell that owns this dialog.
+	 * @param minWidth The minimum width of the dialog (fraction of screen), or 0 to not enforce.
+	 * @param maxWidth The minimum width of the dialog (fraction of screen), or 0 to not enforce.
+	 * @param minHeight The minimum height of the dialog (fraction of screen), or 0 to not enforce.
+	 * @param maxHeight The maximum height of the dialog (fraction of screen), or 0 to not enforce.
 	 */
-	public BmlTitleAreaDialog(Shell parentShell) {
+	public BmlTitleAreaDialog(Shell parentShell, double minWidth, double maxWidth, double minHeight, double maxHeight) {
 		super(parentShell);
 		
 		/* set the title image to say "BuildML" */
@@ -47,6 +67,12 @@ public class BmlTitleAreaDialog extends TitleAreaDialog {
 		if (iconImage != null) {
 			setTitleImage(iconImage);
 		}
+		
+		/* set the dialog box size bounds */
+		this.minWidthRatio = minWidth;
+		this.maxWidthRatio = maxWidth;
+		this.minHeightRatio = minHeight;
+		this.maxHeightRatio = maxHeight;
 	}	
  
 	/*=====================================================================================*
@@ -98,14 +124,37 @@ public class BmlTitleAreaDialog extends TitleAreaDialog {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#getInitialSize()
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(EclipsePartUtils.getScreenWidth() / 3, EclipsePartUtils.getScreenHeight() / 2);
+		
+		/* determine the dialog's natural width - the width the widgets want it to be */
+		Point naturalSize = super.getInitialSize();
+		int width = naturalSize.x;
+		int height = naturalSize.y;
+		
+		/* determine the screen's width/height */
+		int fullWidth = EclipsePartUtils.getScreenWidth();
+		int fullHeight = EclipsePartUtils.getScreenHeight();
+		
+		/* now contrain the width/height appropriately */
+		if ((minWidthRatio != 0.0) && (width < (minWidthRatio * fullWidth))) {
+			width = (int) (minWidthRatio * fullWidth);
+		}
+		if ((maxWidthRatio != 0.0) && (width > (maxWidthRatio * fullWidth))) {
+			width = (int) (maxWidthRatio * fullWidth);
+		}
+		if ((minHeightRatio != 0.0) && (height < (minHeightRatio * fullHeight))) {
+			height = (int) (minHeightRatio * fullHeight);
+		}
+		if ((maxHeightRatio != 0.0) && (height > (maxHeightRatio * fullHeight))) {
+			height = (int) (maxHeightRatio * fullHeight);
+		}
+		return new Point(width, height);
 	}
 	
-	/*-------------------------------------------------------------------------------------*/
+	/*-------------------------------------------------------------------------------------*/	
 }

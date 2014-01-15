@@ -77,7 +77,7 @@ public class ChangeRootsDialog extends BmlTitleAreaDialog implements IPropertyCh
 	 * @param pkgId The package whose roots will be edited.
 	 */
 	public ChangeRootsDialog(IBuildStore buildStore, int pkgId) {
-		super(new Shell());
+		super(new Shell(), 0, 0, 0, 0);
 		
 		this.buildStore = buildStore;
 		this.fileMgr = buildStore.getFileMgr();

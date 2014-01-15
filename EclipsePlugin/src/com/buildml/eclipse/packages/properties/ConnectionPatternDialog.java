@@ -87,7 +87,7 @@ public class ConnectionPatternDialog extends BmlTitleAreaDialog {
 	 * 				    existing pattern.
 	 */
 	public ConnectionPatternDialog(boolean createNew) {
-		super(new Shell());
+		super(new Shell(), 0.3, 0.5, 0.5, 0.5);
 		this.createNew = createNew;
 	}
 	

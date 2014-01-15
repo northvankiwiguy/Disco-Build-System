@@ -47,7 +47,7 @@ public class RootNameDialog extends BmlTitleAreaDialog {
 	 * Create a new RootNameDialog instance. 
 	 */
 	public RootNameDialog() {
-		super(new Shell());		
+		super(new Shell(), 0.3, 0.5, 0.5, 0.5);		
 	}
 	
 	/*=====================================================================================*

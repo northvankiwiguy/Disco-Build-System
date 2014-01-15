@@ -80,7 +80,7 @@ public class MatchPatternSelectionDialog extends BmlTitleAreaDialog {
 	 *                       user presses OK. For example, "Delete" or "Make Atomic".
 	 */
 	public MatchPatternSelectionDialog(IBuildStore buildStore, String initialPattern, String operation) {
-		super(new Shell());
+		super(new Shell(), 0.3, 0.5, 0.5, 0);
 			
 		this.actionMgr = buildStore.getActionMgr();
 		this.patternString = initialPattern;

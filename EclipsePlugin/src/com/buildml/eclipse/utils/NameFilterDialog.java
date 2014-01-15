@@ -79,7 +79,7 @@ public class NameFilterDialog extends BmlTitleAreaDialog {
 	 * @param itemType The name of the item being selected (e.g. "files" or "actions").
 	 */
 	public NameFilterDialog(String itemType) {
-		super(new Shell());
+		super(new Shell(), 0, 0, 0, 0);
 		
 		this.itemType = itemType;
 		this.upperItemType = itemType.substring(0, 1).toUpperCase() + 

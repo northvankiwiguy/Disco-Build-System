@@ -68,7 +68,7 @@ public class MoveToPackageDialog extends BmlTitleAreaDialog {
 	 * @param buildStore 	The IBuildStore that we query information from.
 	 */
 	public MoveToPackageDialog(IBuildStore buildStore) {
-		super(new Shell());
+		super(new Shell(), 0.3, 0.5, 0.5, 0.5);
 		
 		this.buildStore = buildStore;
 	}

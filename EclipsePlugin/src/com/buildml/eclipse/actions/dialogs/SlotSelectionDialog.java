@@ -92,7 +92,7 @@ public class SlotSelectionDialog extends BmlTitleAreaDialog {
 	 */
 	public SlotSelectionDialog(IBuildStore buildStore, int actionId, 
 				boolean showInputs, boolean showOutputs) {
-		super(new Shell());
+		super(new Shell(), 0.3, 0.5, 0.5, 0.5);
 			
 		this.actionMgr = buildStore.getActionMgr();
 		this.actionTypeMgr = buildStore.getActionTypeMgr();

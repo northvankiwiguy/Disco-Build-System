@@ -218,7 +218,7 @@ public class PackageFilterDialog extends BmlTitleAreaDialog {
 	 *    and private), or just allow the whole package to be selected.
 	 */
 	public PackageFilterDialog(PackageSet initialPkgs, boolean showScopes) {
-		super(new Shell());
+		super(new Shell(), 0, 0, 0, 0.5);
 		
 		this.showScopes = showScopes;
 		

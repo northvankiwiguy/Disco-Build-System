@@ -59,7 +59,7 @@ public class SubGroupSelectionDialog extends BmlTitleAreaDialog {
 	 * @param items		The list of String items to be grouped.
 	 */
 	public SubGroupSelectionDialog(String [] items) {
-		super(new Shell());
+		super(new Shell(), 0.3, 0.5, 0.5, 0.5);
 			
 		this.items = items;
 		
