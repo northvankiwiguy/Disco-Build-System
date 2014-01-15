@@ -132,5 +132,17 @@ public class PackageDiagramBehaviour extends DiagramBehavior {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Override the default update behaviour by not selecting the same pictograms after
+	 * an update is complete. This seems like it would be a nice behaviour, but has the
+	 * side-effect of scrolling the Diagram in awkward ways.
+	 */
+	@Override
+	public void selectBufferedPictogramElements() {
+		/* nothing */
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 }
