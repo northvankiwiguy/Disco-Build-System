@@ -37,6 +37,8 @@ import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
+import com.buildml.model.ISubPackageMgr;
+import com.buildml.model.ISubPackageMgrListener;
 import com.buildml.model.types.PackageSet;
 import com.buildml.utils.types.IntegerTreeSet;
 
@@ -49,7 +51,7 @@ import com.buildml.utils.types.IntegerTreeSet;
 public class PackageDiagramEditor extends DiagramEditor 
 									implements ISubEditor, IPackageMgrListener, 
 												IActionMgrListener, IPackageMemberMgrListener,
-												IFileGroupMgrListener {
+												IFileGroupMgrListener, ISubPackageMgrListener {
 
 	/*=====================================================================================*
 	 * FIELDS/TYPES
@@ -69,6 +71,9 @@ public class PackageDiagramEditor extends DiagramEditor
 
 	/** The ActionMgr we're using for action information */
 	private IActionMgr actionMgr = null;
+	
+	/** The SubPackageMgr we're using for sub-package information */
+	private ISubPackageMgr subPkgMgr = null;
 	
 	/** The ID of the package we're displaying */
 	private int packageId;
@@ -101,6 +106,7 @@ public class PackageDiagramEditor extends DiagramEditor
 		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 		this.fileGroupMgr = buildStore.getFileGroupMgr();
 		this.actionMgr = buildStore.getActionMgr();
+		this.subPkgMgr = buildStore.getSubPackageMgr();
 		this.packageId = packageId;
 		
 		/* we use a layout algorithm to help determine the location of things */
@@ -111,6 +117,7 @@ public class PackageDiagramEditor extends DiagramEditor
 		pkgMemberMgr.addListener(this);
 		actionMgr.addListener(this);
 		fileGroupMgr.addListener(this);
+		subPkgMgr.addListener(this);
 	}
 	
 	/*=====================================================================================*
@@ -432,6 +439,21 @@ public class PackageDiagramEditor extends DiagramEditor
 	@Override
 	public void fileGroupChangeNotification(int fileGroupId, int how) {
 		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
+		if ((pkg == null) || (pkg.pkgId != this.packageId)) {
+			return;
+		}
+		updateBehavior.markChanged();
+		refreshDiagramLater();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Receive notifications if a sub-package (possibly on this package) changes in some way.
+	 */
+	@Override
+	public void subPackageChangeNotification(int subPkgId, int how, int changeId) {
+		PackageDesc pkg = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkgId);
 		if ((pkg == null) || (pkg.pkgId != this.packageId)) {
 			return;
 		}

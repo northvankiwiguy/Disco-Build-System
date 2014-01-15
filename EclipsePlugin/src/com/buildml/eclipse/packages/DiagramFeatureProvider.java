@@ -27,6 +27,7 @@ import com.buildml.eclipse.packages.features.PackageDiagramDeleteFeature;
 import com.buildml.eclipse.packages.patterns.ActionPattern;
 import com.buildml.eclipse.packages.patterns.DiagramPattern;
 import com.buildml.eclipse.packages.patterns.FileGroupPattern;
+import com.buildml.eclipse.packages.patterns.SubPackagePattern;
 
 /**
  * An object that supports DiagramTypeProvider in providing configuration information
@@ -54,6 +55,7 @@ public class DiagramFeatureProvider extends DefaultFeatureProviderWithPatterns {
 		/* add a "pattern" for each type of graphical shape that can appear in the diagram */
 		addPattern(new FileGroupPattern());
 		addPattern(new ActionPattern());
+		addPattern(new SubPackagePattern());
 		addPattern(new DiagramPattern());
 	}
 

@@ -30,13 +30,16 @@ import com.buildml.eclipse.bobj.UIAction;
 import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
+import com.buildml.eclipse.bobj.UISubPackage;
 import com.buildml.eclipse.packages.features.PackageDiagramDoubleClickFeature;
 import com.buildml.model.IActionMgr;
 import com.buildml.model.IActionTypeMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.model.ISubPackageMgr;
 import com.buildml.utils.print.PrintUtils;
 
 /**
@@ -66,6 +69,12 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	
 	/** The IFileMgr associated with this BuildStore */
 	private IFileMgr fileMgr;
+	
+	/** The ISubPackageMgr associated with this BuildStore */
+	private ISubPackageMgr subPkgMgr;
+	
+	/** The IPackageMgr associated with this BuildStore */
+	private IPackageMgr pkgMgr;
 
 	/** The maximum number of characters wide that a tooltip should be */
 	private final int toolTipWrapWidth = 120;
@@ -94,6 +103,8 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
     	actionTypeMgr = buildStore.getActionTypeMgr();
     	fileGroupMgr = buildStore.getFileGroupMgr();
     	fileMgr = buildStore.getFileMgr();
+    	subPkgMgr = buildStore.getSubPackageMgr();
+    	pkgMgr = buildStore.getPackageMgr();
     }
     
 	/*=====================================================================================*
@@ -151,7 +162,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	UIFileGroup fileGroup = (UIFileGroup)bo;
         	int fileGroupId = fileGroup.getId();
         	
-        	StringBuffer sb = new StringBuffer();
+        	StringBuilder sb = new StringBuilder();
         	displayFileGroupMembers(fileGroupId, sb);
         	return sb.toString();
         }
@@ -175,7 +186,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	/* for input connections, show the slot and the (optional) filter group content */
         	else {
         		int filterGroupId = connection.getFilterGroupId();
-            	StringBuffer sb = new StringBuffer();
+            	StringBuilder sb = new StringBuilder();
             	sb.append("\n Input to action slot \"");
             	sb.append(details.slotName);
             	sb.append("\" \n");
@@ -198,7 +209,7 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	int mergeGroupId = connection.getTargetFileGroupId();
         	int myIndex = connection.getIndex() + 1;
         	
-        	StringBuffer sb = new StringBuffer();
+        	StringBuilder sb = new StringBuilder();
 
         	/* display this subgroup's various positions in the merge group */
         	displayMergeGroupIndicies(subGroupId, mergeGroupId, myIndex, sb);
@@ -210,6 +221,28 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
     			displayFileGroupMembers(filterGroupId, sb);
     		}
         	return sb.toString();
+        }
+        
+        /*
+         * For UISubPackage, so the full name of the package type.
+         */
+        else if (bo instanceof UISubPackage) {
+        	UISubPackage subPkg = (UISubPackage)bo;
+        	int subPkgId = subPkg.getId();
+        	
+        	/* compute the sub-package's type */
+        	int pkgTypeId = subPkgMgr.getSubPackageType(subPkgId);
+        	if (pkgTypeId < 0) {
+        		return null;
+        	}
+        	String pkgTypeName = pkgMgr.getName(pkgTypeId);
+        	if (pkgTypeName != null) {
+        		StringBuilder sb = new StringBuilder();
+        		sb.append("\n Sub-Package: ");
+        		sb.append(pkgTypeName);
+        		sb.append(" \n");
+        		return sb.toString();
+        	}
         }
         
         /* else, return the default tooltip */
@@ -272,12 +305,12 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	 *=====================================================================================*/
 
 	/**
-	 * Helper function for appending the list of a file group's members onto a StringBuffer.
+	 * Helper function for appending the list of a file group's members onto a StringBuilder.
 	 * 
 	 * @param fileGroupId	ID of the file group to display the content of.
-	 * @param stringBuffer	The StringBuffer to append the member names to.
+	 * @param stringBuffer	The StringBuilder to append the member names to.
 	 */
-	private void displayFileGroupMembers(int fileGroupId, StringBuffer stringBuffer) {
+	private void displayFileGroupMembers(int fileGroupId, StringBuilder stringBuffer) {
 		String files[] = fileGroupMgr.getExpandedGroupFiles(fileGroupId);
 		
 		int fileGroupType = fileGroupMgr.getGroupType(fileGroupId);
@@ -312,9 +345,9 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	/**
 	 * Helper function for displaying the patterns in a filter file group.
 	 * @param filterGroupId		ID of the filter group to display the patterns from.
-	 * @param sb				The StringBuffer to append output to.
+	 * @param sb				The StringBuilder to append output to.
 	 */
-	private void displayFilterPatterns(int filterGroupId, StringBuffer sb) {
+	private void displayFilterPatterns(int filterGroupId, StringBuilder sb) {
 		String filterStrings[] = fileGroupMgr.getPathStrings(filterGroupId);
 		sb.append("\n Filter Patterns:\n");
 		for (int i = 0; i < filterStrings.length; i++) {
@@ -349,10 +382,10 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	 * @param subGroupId	The ID of the sub group at one end of the connection.
 	 * @param mergeGroupId	The ID of the merge group at the other end.
 	 * @param myIndex		The merge group's index for this connection.
-	 * @param sb			The StringBuffer to append content onto.
+	 * @param sb			The StringBuilder to append content onto.
 	 */
 	private void displayMergeGroupIndicies(
-			int subGroupId, int mergeGroupId, int myIndex, StringBuffer sb) {
+			int subGroupId, int mergeGroupId, int myIndex, StringBuilder sb) {
 		
 		/* 
 		 * Find the index (or indicies) where the sub group appears in the merge group, skipping

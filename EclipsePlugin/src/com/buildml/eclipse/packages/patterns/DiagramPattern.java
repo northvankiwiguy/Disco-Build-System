@@ -32,6 +32,7 @@ import com.buildml.eclipse.bobj.UIFileActionConnection;
 import com.buildml.eclipse.bobj.UIFileGroup;
 import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.bobj.UIMergeFileGroupConnection;
+import com.buildml.eclipse.bobj.UISubPackage;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.errors.FatalError;
@@ -193,6 +194,9 @@ public class DiagramPattern extends AbstractPattern implements IPattern {
 						if (fileGroupType != IFileGroupMgr.FILTER_GROUP) {
 							memberBo = new UIFileGroup(member.memberId);
 						}
+						break;
+					case IPackageMemberMgr.TYPE_SUB_PACKAGE:
+						memberBo = new UISubPackage(member.memberId);
 						break;
 					case IPackageMemberMgr.TYPE_FILE:
 						/* ignore */
