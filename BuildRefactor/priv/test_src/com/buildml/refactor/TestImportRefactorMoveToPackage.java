@@ -787,5 +787,99 @@ public class TestImportRefactorMoveToPackage {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test moving an action that uses a subset of a previous action's output, and therefore
+	 * requires a filter. To do this, we must add a new relationship: f10 -> a6 -> f17. Note
+	 * that a6 only depends on f10 (not f9) and therefore a subset of a1's output is required.
+	 */
+	@Test
+	public void testFilterOnSingleFileGroup() {
+		
+		/* set up f17 and a6, and their relationship */
+		int parentActionId = actionMgr.getRootAction("root");
+		int actionDirId = fileMgr.getPath("/");
+		int f17 = fileMgr.addFile("@workspace/a/c/file17");
+		int a6 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a6");
+		actionMgr.addFileAccess(a6, f10, OperationType.OP_READ);
+		actionMgr.addFileAccess(a6, f17, OperationType.OP_WRITE);
+		
+		/* 
+		 * Now proceed to move f17, which should result in:
+		 * {f4, f5} -> a1 -> {f9, f10} -> filter{f10} -> a6 -> {f17}
+		 * There should be a filter between a6 and the f9/f10
+		 * file group, since we only need f10 (not f9).
+		 */
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f17));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
 
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(2, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(4, fileGroups.length);
+
+		/* confirm that actions a1 and a6 have the expected inputs and outputs */
+		validateInputsOutputs(destPkgId, a6, new Integer[] {f10}, new Integer[] {f17});
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+		
+		/* confirm that the input to a6 is a filter group with "f10" as the filter */
+		int filterGroupId = (Integer) actionMgr.getSlotValue(a6, IActionMgr.INPUT_SLOT_ID);
+		assertEquals(IFileGroupMgr.FILTER_GROUP, fileGroupMgr.getGroupType(filterGroupId));
+		assertEquals(1, fileGroupMgr.getGroupSize(filterGroupId));
+		assertEquals("ia:@workspace/a/c/file10", fileGroupMgr.getPathString(filterGroupId, 0));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test the automatic creation of filters when a merge group is used. To do this, we
+	 * create a new action (a7) that reads f10, f11, f12. This should result in.
+	 * 
+	 *    {f4,f5}    -> a1 -> {f9,f10} -> filter{f10}          ->
+	 *    {f6,f7,f8} -> a2 -> {f11,f12,f13} -> filter{f11,f12} -> merge{f10,f11,f12} -> a7 -> {f18}
+	 */
+	@Test
+	public void testFilterOnMergeFileGroup() {
+		
+		/* set up a6, and it's read relationships with f10, f11, f12 and f18 */
+		int parentActionId = actionMgr.getRootAction("root");
+		int actionDirId = fileMgr.getPath("/");
+		int f18 = fileMgr.addFile("@workspace/a/c/file18");
+		int a7 = actionMgr.addShellCommandAction(parentActionId, actionDirId, "a7");
+		actionMgr.addFileAccess(a7, f10, OperationType.OP_READ);
+		actionMgr.addFileAccess(a7, f11, OperationType.OP_READ);
+		actionMgr.addFileAccess(a7, f12, OperationType.OP_READ);
+		actionMgr.addFileAccess(a7, f18, OperationType.OP_WRITE);
+		
+		/* proceed to import */
+		try {
+			MultiUndoOp multiOp = new MultiUndoOp();
+			refactor.moveMembersToPackage(multiOp, destPkgId, buildList('f', f18));
+			multiOp.redo();
+		} catch (CanNotRefactorException e) {
+			fail();
+		}
+		
+		/*
+		 * Validate that we have the correct number of file groups and actions.
+		 */
+		MemberDesc actions[] = getResult(IPackageMemberMgr.TYPE_ACTION);
+		assertEquals(3, actions.length);
+		MemberDesc fileGroups[] = getResult(IPackageMemberMgr.TYPE_FILE_GROUP);
+		assertEquals(8, fileGroups.length);
+		
+		/*
+		 * Validate the inputs and outputs of each action.
+		 */
+		validateInputsOutputs(destPkgId, a1, new Integer[] {f4, f5}, new Integer[] {f9, f10});
+		validateInputsOutputs(destPkgId, a2, new Integer[] {f6, f7, f8}, new Integer[] {f11, f12, f13});
+		validateInputsOutputs(destPkgId, a7, new Integer[] {f10, f11, f12}, new Integer[] {f18});
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }
