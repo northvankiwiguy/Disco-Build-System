@@ -20,6 +20,8 @@ import org.junit.Test;
 import com.buildml.model.CommonTestUtils;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
+import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.MemberLocation;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.ISubPackageMgr;
@@ -119,5 +121,46 @@ public class TestSubPackageUndoOp {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test changing the x,y of sub-packages.
+	 */
+	@Test
+	public void testMoveSubPackage() {
 
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
+		
+		/* create a new sub-package with initial location (100, 200) */
+		int pkgA = pkgMgr.addPackage("PkgA");
+		int subPkgId = subPkgMgr.newSubPackage(pkgMgr.getMainPackage(), pkgA);
+		assertEquals(ErrorCode.OK, 
+				pkgMemberMgr.setMemberLocation(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkgId, 100, 200));
+		
+		/* schedule an operation to move it to (150, 250) */
+		SubPackageUndoOp op = new SubPackageUndoOp(buildStore, subPkgId);
+		op.recordLocationChange(100, 200, 150, 250);
+		op.redo();
+		
+		/* test that it moved to (150, 250) */
+		MemberLocation loc = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkgId);
+		assertNotNull(loc);
+		assertEquals(150, loc.x);
+		assertEquals(250, loc.y);
+		
+		/* now undo, and test that it's back to (100, 200) */
+		op.undo();
+		loc = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkgId);
+		assertNotNull(loc);
+		assertEquals(100, loc.x);
+		assertEquals(200, loc.y);
+		
+		/* now redo again */
+		op.redo();
+		loc = pkgMemberMgr.getMemberLocation(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkgId);
+		assertNotNull(loc);
+		assertEquals(150, loc.x);
+		assertEquals(250, loc.y);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }
