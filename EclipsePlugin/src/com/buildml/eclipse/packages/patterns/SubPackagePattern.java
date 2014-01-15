@@ -397,18 +397,19 @@ public class SubPackagePattern extends AbstractPattern implements IPattern {
 		 * Create an invisible outer rectangle. The smaller polygons and labels will be placed
 		 * inside this. The width is always twice that of the polygon, to allow for long file
 		 * names to be shown underneath the polygons. The height is carefully selected to allow
-		 * for enough labels, as well as for the possible "second page" polygon.
+		 * for the label underneath.
 		 */
 		Rectangle invisibleRectangle =
 				gaService.createInvisibleRectangle(containerShape);
-		gaService.setLocationAndSize(invisibleRectangle, x, y, SUB_PACKAGE_WIDTH, SUB_PACKAGE_HEIGHT);
+		gaService.setLocationAndSize(invisibleRectangle, x, y, 
+				SUB_PACKAGE_WIDTH * 2, SUB_PACKAGE_HEIGHT + (3 * LABEL_FONT_SIZE));
 
-		
-		/* now the front page, with the corner bent */
+		/* Now the package box - centered within the invisible rectangle */
 		Polygon box = gaService.createPolygon(invisibleRectangle, coords);
 		box.setForeground(manageColor(LINE_COLOUR));
 		box.setBackground(manageColor(FILL_COLOUR));
 		box.setLineWidth(2);
+		gaService.setLocation(box, SUB_PACKAGE_WIDTH / 2, 0);
 		
 		/* Display the type of the package in the center of the box */
 		int pkgTypeId = subPkgMgr.getSubPackageType(subPkg.getId());
@@ -423,8 +424,8 @@ public class SubPackagePattern extends AbstractPattern implements IPattern {
 			pkgType.setForeground(manageColor(TEXT_FOREGROUND));
 			pkgType.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			gaService.setLocationAndSize(pkgType, 
-				LABEL_FONT_SIZE, LABEL_FONT_SIZE, 
-				SUB_PACKAGE_WIDTH - (2 * LABEL_FONT_SIZE), SUB_PACKAGE_HEIGHT - (2 * LABEL_FONT_SIZE));
+						0, SUB_PACKAGE_HEIGHT + LABEL_FONT_SIZE,
+						SUB_PACKAGE_WIDTH * 2, LABEL_FONT_SIZE * 2);
 		}
 		
 		/* create a link between the shape and the business object, and display it. */
