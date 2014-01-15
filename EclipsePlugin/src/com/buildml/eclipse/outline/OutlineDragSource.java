@@ -12,6 +12,7 @@
 
 package com.buildml.eclipse.outline;
 
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.dnd.DND;
@@ -67,7 +68,10 @@ public class OutlineDragSource implements DragSourceListener {
 		
 		/* register ourselves as the hander for "drag" operations */
 		treeViewer.addDragSupport(DND.DROP_COPY | DND.DROP_MOVE, 
-				new Transfer[] { BuildMLTransfer.getInstance() },
+				new Transfer[] {
+					BuildMLTransfer.getInstance(),
+					LocalSelectionTransfer.getTransfer()
+				},
 				this);
 	}
 
@@ -90,6 +94,9 @@ public class OutlineDragSource implements DragSourceListener {
 			/* should we abort? */
 			event.doit = ((id != pkgMgr.getRootFolder()) && (id != pkgMgr.getImportPackage())); 
 		}
+		
+		/* this is necessary for supporting transfers to the Graphiti Diagram */
+		LocalSelectionTransfer.getTransfer().setSelection(treeViewer.getSelection());
 	}
 
 	/*-------------------------------------------------------------------------------------*/
