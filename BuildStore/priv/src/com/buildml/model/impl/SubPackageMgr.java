@@ -43,7 +43,10 @@ import com.buildml.utils.errors.ErrorCode;
 	private BuildStoreDB db = null;
 	
 	/** The IPackageMgr object that manages our package types. */
-	private IPackageMgr pkgMgr = null;	
+	private IPackageMgr pkgMgr = null;
+	
+	/** The IPackageMemberMgr object that manages our package types. */
+	private IPackageMemberMgr pkgMemberMgr = null;	
 	
 	/** The SlotMgr object that manages the slots in our packages. */
 	private SlotMgr slotMgr = null;	
@@ -73,6 +76,7 @@ import com.buildml.utils.errors.ErrorCode;
 		this.db = buildStore.getBuildStoreDB();
 		this.pkgMgr = buildStore.getPackageMgr();
 		this.slotMgr = buildStore.getSlotMgr();
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 		
 		/* initialize prepared database statements */
 		addSubPackagePrepStmt = db.prepareStatement(
@@ -129,16 +133,26 @@ import com.buildml.utils.errors.ErrorCode;
 			addSubPackagePrepStmt.setInt(1, pkgTypeId);
 			db.executePrepUpdate(addSubPackagePrepStmt);
 			
-			lastRowId = db.getLastRowID();
+			lastRowId = db.getLastRowID();			
 			
-			/* insert the default package membership values */
+			/* 
+			 * insert the default package membership values (set parent of -1 so we
+			 * can change it later on an trigger a notification).
+			 */
 			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_SUB_PACKAGE);
 			insertPackageMemberPrepStmt.setInt(2, lastRowId);
-			insertPackageMemberPrepStmt.setInt(3, parentPkgId);
+			insertPackageMemberPrepStmt.setInt(3, -1);
 			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
 			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
 				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
 			}
+
+			/* 
+			 * This additional call is required to trigger package membership change notifications.
+			 * Without this, our package diagrams won't be refreshed properly.
+			 */
+			pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_SUB_PACKAGE, lastRowId, parentPkgId);
+
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
