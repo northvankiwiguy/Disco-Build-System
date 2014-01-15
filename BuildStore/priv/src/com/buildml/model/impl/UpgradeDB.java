@@ -214,7 +214,8 @@ public class UpgradeDB {
 			 * Update to 407 - add the subPackages table.
 			 */
 			if (dbVersion < 407) {
-				stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer)");
+				stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer, " +
+									"trashed integer)");
 			}
 			
 			/* finish by setting the new version number */

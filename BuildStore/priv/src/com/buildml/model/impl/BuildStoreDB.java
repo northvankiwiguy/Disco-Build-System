@@ -336,7 +336,8 @@ import com.buildml.model.IPackageMemberMgr;
 							   ", 0, 0, 0, 0, 0)"); /* the "/" path */
 			
 			/* Create the subPackage table */
-			stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer)");
+			stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer, " +
+								"trashed integer)");
 
 			stat.close();
 						
@@ -747,13 +748,16 @@ import com.buildml.model.IPackageMemberMgr;
 		try {
 			Statement stat = dbConn.createStatement();
 			
-			/* delete entries from packageMembers where the files or actions have been trashed */
+			/* delete entries from packageMembers where the files, actions or sub-packages have been trashed */
 			stat.executeUpdate("delete from packageMembers where memberType = " + 
 									IPackageMemberMgr.TYPE_FILE + " and memberId in " + 
 									"(select id from files where trashed=1)");
 			stat.executeUpdate("delete from packageMembers where memberType = " + 
 									IPackageMemberMgr.TYPE_ACTION + " and memberId in " + 
 									"(select actionId from buildActions where trashed=1)");
+			stat.executeUpdate("delete from packageMembers where memberType = " + 
+									IPackageMemberMgr.TYPE_SUB_PACKAGE + " and memberId in " + 
+									"(select subPkgId from subPackages where trashed=1)");
 			
 			/* delete empty file groups (and their package membership) */
 			stat.executeUpdate("delete from fileGroups where id not in " +
@@ -767,7 +771,8 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("delete from fileAttrs where pathId in (select id from files where trashed=1);");
 			stat.executeUpdate("delete from files where trashed=1");
 			stat.executeUpdate("delete from buildActions where trashed=1;");
-			
+			stat.executeUpdate("delete from subPackages where trashed=1;");
+						
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to remove trashed files and actions", e);
 		}

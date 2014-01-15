@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISubPackageMgr;
@@ -35,6 +36,9 @@ import com.buildml.utils.errors.ErrorCode;
 	/*=====================================================================================*
 	 * FIELDS/TYPES
 	 *=====================================================================================*/
+	
+	/** The BuildStore object that owns all the manager objects. */
+	private IBuildStore buildStore = null;
 	
 	/**
 	 * Our database manager object, used to access the database content. This is provided 
@@ -58,9 +62,9 @@ import com.buildml.utils.errors.ErrorCode;
 		addSubPackagePrepStmt = null,
 		insertPackageMemberPrepStmt = null,
 		findSubPackageTypePrepStmt = null,
-		removeSubPackagePrepStmt = null,
-		removePackageMemberPrepStmt = null,
-		findSubPackagesOfTypePrepStmt = null;
+		trashOrReviveSubPackagePrepStmt = null,
+		findSubPackagesOfTypePrepStmt = null,
+		isValidOrTrashedPrepStmt = null;
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -73,28 +77,28 @@ import com.buildml.utils.errors.ErrorCode;
 	 * @param buildStore The BuildStore that this Packages object belongs to.
 	 */
 	public SubPackageMgr(BuildStore buildStore) {
+		this.buildStore = buildStore;
 		this.db = buildStore.getBuildStoreDB();
 		this.pkgMgr = buildStore.getPackageMgr();
 		this.slotMgr = buildStore.getSlotMgr();
-		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
 		
 		/* initialize prepared database statements */
 		addSubPackagePrepStmt = db.prepareStatement(
-				"insert into subPackages values (null, ?)");
+				"insert into subPackages values (null, ?, 0)");
 		insertPackageMemberPrepStmt = db.prepareStatement(
 				"insert into packageMembers values (?, ?, ?, ?, -1, -1)");
+		trashOrReviveSubPackagePrepStmt = db.prepareStatement(
+				"update subPackages set trashed = ? where subPkgId = ? and trashed = ?");
 		findSubPackageTypePrepStmt = db.prepareStatement(
-				"select pkgTypeId from subPackages where subPkgId = ?");
-		removeSubPackagePrepStmt = db.prepareStatement(
-				"delete from subPackages where subPkgId = ?");
-		removePackageMemberPrepStmt = db.prepareStatement(
-				"delete from packageMembers where memberId = ? and memberType = " +
-						IPackageMemberMgr.TYPE_SUB_PACKAGE);
+				"select pkgTypeId from subPackages where subPkgId = ? and trashed = 0");
 		findSubPackagesOfTypePrepStmt = db.prepareStatement(
 				"select distinct packageMembers.pkgId from packageMembers, subPackages" +
 				" where packageMembers.memberType = " + IPackageMemberMgr.TYPE_SUB_PACKAGE + 
 				" and packageMembers.memberId = subPackages.subPkgId" +
-				" and subPackages.pkgTypeId = ?");
+				" and subPackages.pkgTypeId = ?" +
+				" and subPackages.trashed = 0");
+		isValidOrTrashedPrepStmt = db.prepareStatement(
+				"select trashed from subPackages where subPkgId = ?");
 	}
 
 	/*=====================================================================================*
@@ -164,33 +168,6 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.ISubPackageMgr#removeSubPackage(int)
-	 */
-	@Override
-	public int removeSubPackage(int subPkgId) {
-
-		try {
-			/* remove entry from subPackages table */
-			removeSubPackagePrepStmt.setInt(1, subPkgId);
-			int rowsUpdated = db.executePrepUpdate(removeSubPackagePrepStmt);
-			if (rowsUpdated != 1) {
-				return ErrorCode.NOT_FOUND;
-			}
-			
-			/* remove corresponding entry from package members table */
-			removePackageMemberPrepStmt.setInt(1, subPkgId);
-			db.executePrepUpdate(removePackageMemberPrepStmt);
-			
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
-		}
-		
-		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.ISubPackageMgr#getSubPackageType(int)
 	 */
 	@Override
@@ -212,10 +189,114 @@ import com.buildml.utils.errors.ErrorCode;
 		return pkgTypeId;
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#isSubPackageValid(int)
+	 */
+	@Override
+	public boolean isSubPackageValid(int subPkgId) {
+
+		/*
+		 * A sub-package is valid if there's a single record for it. We don't actually
+		 * care if it's trashed or not - it's still valid.
+		 */
+		try {
+			isValidOrTrashedPrepStmt.setInt(1, subPkgId);
+			Integer rows[] = db.executePrepSelectIntegerColumn(isValidOrTrashedPrepStmt);
+			return (rows.length == 1);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#moveSubPackageToTrash(int)
+	 */
+	@Override
+	public int moveSubPackageToTrash(int subPkgId) {
+		return trashReviveCommon(subPkgId, 1);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#reviveSubPackageFromTrash(int)
+	 */
+	@Override
+	public int reviveSubPackageFromTrash(int subPkgId) {
+		return trashReviveCommon(subPkgId, 0);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#isSubPackageTrashed(int)
+	 */
+	@Override
+	public boolean isSubPackageTrashed(int subPkgId) {
+		
+		/*
+		 * A sub-package is trashed if the "trashed" field is set (or if for some reason
+		 * there's no record for it).
+		 */
+		try {
+			isValidOrTrashedPrepStmt.setInt(1, subPkgId);
+			Integer rows[] = db.executePrepSelectIntegerColumn(isValidOrTrashedPrepStmt);
+			return (rows.length != 1) || (rows[0] == 1);
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+	}
+	
+	/*=====================================================================================*
+	 * PACKAGE-PRIVATE METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * A second phase of initialization, needed when managers are fully initialized
+	 * in the necessary order.
+	 */
+	public void initPass2() {
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
+	}
+
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 	
+	/**
+	 * Common code, shared between moveSubPackageToTrash() and reviveSubPackageFromTrash().
+	 * 
+	 * @param subPkgId		ID of the sub-package to trash/revive.
+	 * @param toTrashState	The state to move it to (1 = trash, 0 = revive).
+	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if subPkgId has no record.
+	 */
+	private int trashReviveCommon(int subPkgId, int toTrashState) {
+
+		try {
+			trashOrReviveSubPackagePrepStmt.setInt(1, toTrashState);
+			trashOrReviveSubPackagePrepStmt.setInt(2, subPkgId);
+			trashOrReviveSubPackagePrepStmt.setInt(3, 1 - toTrashState);
+
+			int rowCount = db.executePrepUpdate(trashOrReviveSubPackagePrepStmt);
+			if (rowCount != 1) {
+				return ErrorCode.NOT_FOUND;
+			}
+
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 	/** 
 	 * Determine whether pkgA contains pkgB as a sub-package (or sub-sub-package etc).
 	 * 
@@ -271,7 +352,7 @@ import com.buildml.utils.errors.ErrorCode;
 		
 		return false;
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 }

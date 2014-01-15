@@ -31,6 +31,7 @@ import com.buildml.model.IPackageMemberMgrListener;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageRootMgr;
 import com.buildml.model.ISlotTypes;
+import com.buildml.model.ISubPackageMgr;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
@@ -68,6 +69,9 @@ import com.buildml.utils.errors.ErrorCode;
 	/** The PackageMgr object that manages the list of packages. */
 	private IPackageMgr pkgMgr = null;
 	
+	/** The SubPackageMgr object that manages the list of packages. */
+	private ISubPackageMgr subPkgMgr = null;
+
 	/** The FileGroupMgr object that manages the file groups in our package. */
 	private IFileGroupMgr fileGroupMgr = null;	
 	
@@ -112,6 +116,7 @@ import com.buildml.utils.errors.ErrorCode;
 		this.actionMgr = buildStore.getActionMgr();
 		this.pkgMgr = buildStore.getPackageMgr();
 		this.fileGroupMgr = buildStore.getFileGroupMgr();
+		this.subPkgMgr = buildStore.getSubPackageMgr();
 		
 		findMemberPackagePrepStmt = db.prepareStatement(
 				"select pkgId, scopeId from packageMembers where memberType = ? and memberId = ?");
@@ -400,8 +405,17 @@ import com.buildml.utils.errors.ErrorCode;
 						rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
 				
 				/* don't show trashed actions */
-				if ((newMember.memberType != IPackageMemberMgr.TYPE_ACTION) ||
-						!actionMgr.isActionTrashed(newMember.memberId)) {
+				boolean isTrashed = false;
+				if ((newMember.memberType == IPackageMemberMgr.TYPE_ACTION) &&
+						actionMgr.isActionTrashed(newMember.memberId)) {
+					isTrashed = true;
+				}
+				else if ((newMember.memberType == IPackageMemberMgr.TYPE_SUB_PACKAGE) &&
+						subPkgMgr.isSubPackageTrashed(newMember.memberId)) {
+					isTrashed = true;
+				}
+				
+				if (!isTrashed){
 					members.add(newMember);
 				}
 			} while (rs.next());

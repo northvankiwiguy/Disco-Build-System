@@ -123,6 +123,19 @@ public class TestSubPackageMgr {
 		assertEquals(1, members.length);
 		assertEquals(IPackageMemberMgr.TYPE_SUB_PACKAGE, members[0].memberType);
 		assertEquals(subPkg4, members[0].memberId);
+		
+		/* test that none of the sub-packages are trashed */
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg1));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg2));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg3));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg4));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg5));
+		
+		/* test validity of sub-packages */
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg2));
+		assertFalse(subPkgMgr.isSubPackageValid(-1));
+		assertFalse(subPkgMgr.isSubPackageValid(1234));
 
 		/* test with invalid parentPkgId */
 		assertEquals(ErrorCode.BAD_VALUE, subPkgMgr.newSubPackage(-1, pkgA));
@@ -179,7 +192,7 @@ public class TestSubPackageMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Test removal of sub-packages.
+	 * Test trashing of sub-packages.
 	 */
 	@Test
 	public void testRemoveSubPackages() {
@@ -199,31 +212,106 @@ public class TestSubPackageMgr {
 		PackageDesc desc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkg2);
 		assertEquals(pkgA, desc.pkgId);
 		assertEquals(pkgB, subPkgMgr.getSubPackageType(subPkg2));
+		MemberDesc members[] = pkgMemberMgr.getMembersInPackage(
+				pkgA, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_ANY);
+		assertEquals(1, members.length);
 		
 		/* remove subPkg2 */
-		assertEquals(ErrorCode.OK, subPkgMgr.removeSubPackage(subPkg2));
+		assertEquals(ErrorCode.OK, subPkgMgr.moveSubPackageToTrash(subPkg2));
 		
 		/* test that subPkg2 is no longer a member of PkgA */
-		desc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_SUB_PACKAGE, subPkg2);
-		assertNull(desc);
+		members = pkgMemberMgr.getMembersInPackage(
+				pkgA, IPackageMemberMgr.SCOPE_NONE, IPackageMemberMgr.TYPE_ANY);
+		assertEquals(0, members.length);
 		
 		/* test that subPkg2 no longer has a type */
 		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.getSubPackageType(subPkg2));
 
 		/* test that subPkg2 can't be deleted twice */
-		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.removeSubPackage(subPkg2));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.moveSubPackageToTrash(subPkg2));
 		
 		/* test that subPkg1 and subPkg3 are still valid */
 		assertEquals(pkgA, subPkgMgr.getSubPackageType(subPkg1));
 		assertEquals(pkgC, subPkgMgr.getSubPackageType(subPkg3));
 		
 		/* try to remove invalid sub-package IDs */
-		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.removeSubPackage(-10));
-		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.removeSubPackage(567));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.moveSubPackageToTrash(-10));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.moveSubPackageToTrash(567));
 	}
 
 	/*-------------------------------------------------------------------------------------*/
 	
+	/**
+	 * Test Reviving of sub-packages.
+	 */
+	@Test
+	public void testReviveSubPackages() {
+		
+		/* create some new packages (types) */
+		int pkgMain = pkgMgr.getMainPackage();
+		int pkgA = pkgMgr.addPackage("PkgA");
+		int pkgB = pkgMgr.addPackage("PkgB");
+		int pkgC = pkgMgr.addPackage("PkgC");
+
+		/* add sub-packages into packages */
+		int subPkg1 = subPkgMgr.newSubPackage(pkgMain, pkgA);
+		int subPkg2 = subPkgMgr.newSubPackage(pkgA, pkgB);
+		int subPkg3 = subPkgMgr.newSubPackage(pkgB, pkgC);
+		
+		/* validate the validity and trashed-state of all three */
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg1));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg2));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg3));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg3));
+		
+		/* trash subPkg1 and subPkg2 */
+		assertEquals(ErrorCode.OK, subPkgMgr.moveSubPackageToTrash(subPkg1));
+		assertEquals(ErrorCode.OK, subPkgMgr.moveSubPackageToTrash(subPkg2));
+		
+		/* validate the validity and trashed-state of all three */
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageTrashed(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageTrashed(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg3));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg3));
+		
+		/* revive subPkg2 */
+		assertEquals(ErrorCode.OK, subPkgMgr.reviveSubPackageFromTrash(subPkg2));
+
+		/* validate the validity and trashed-state of all three */
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageTrashed(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg2));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg3));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg3));
+		
+		/* revive subPkg1 */
+		assertEquals(ErrorCode.OK, subPkgMgr.reviveSubPackageFromTrash(subPkg1));
+
+		/* validate the validity and trashed-state of all three */
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg1));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg1));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg2));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg3));
+		assertFalse(subPkgMgr.isSubPackageTrashed(subPkg3));
+		
+		/* re-trash subPkg2 */
+		assertEquals(ErrorCode.OK, subPkgMgr.moveSubPackageToTrash(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageValid(subPkg2));
+		assertTrue(subPkgMgr.isSubPackageTrashed(subPkg2));
+		
+		/* try to revive invalid sub-packages */
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.reviveSubPackageFromTrash(-10));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.reviveSubPackageFromTrash(567));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 	/**
 	 * Test fetching of sub-packages types.
 	 */

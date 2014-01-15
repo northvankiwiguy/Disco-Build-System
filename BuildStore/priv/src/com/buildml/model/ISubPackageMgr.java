@@ -43,14 +43,6 @@ public interface ISubPackageMgr {
 	public int newSubPackage(int parentPkgId, int pkgTypeId);
 	
 	/**
-	 * Remove a sub-package from the system (and from the parent package it's a member of).
-	 * 
-	 * @param subPkgId  ID of the sub-package to remove from the system.
-	 * @return ErrorCode.OK on success, or ErrorCode.NOT_FOUND if subPkgId is invalid.
-	 */
-	public int removeSubPackage(int subPkgId);
-	
-	/**
 	 * Return the type of the sub-package. That is, which package (via IPackageMgr) is
 	 * this sub-package an instance of.
 	 * 
@@ -58,5 +50,45 @@ public interface ISubPackageMgr {
 	 * @return The package type ID, or ErrorCode.NOT_FOUND if subPkgId is invalid.
 	 */
 	public int getSubPackageType(int subPkgId);
+	
+	/**
+	 * Indicates whether the specified sub-package ID refers to a valid sub-package
+	 * (Note that trashed sub-packages will also be considered valid).
+	 * 
+	 * @param subPkgId	ID of the sub-package to query for. 
+	 * @return True if the sub-package is valid, else false.
+	 */
+	public boolean isSubPackageValid(int subPkgId);
+	
+	/**
+	 * Remove a specific sub-package from the build store. This operation can be only
+	 * be performed on sub-packages that are unused. Trashing a sub-package only marks
+	 * it as "deleted", but doesn't remove it from the database, so it can still be revived.
+	 * 
+	 * @param subPkgId The ID of the sub-package to be move to the trash.
+	 * 
+	 * @return ErrorCode.OK on successful removal, ErrorCode.NOT_FOUND if subPkgId is invalid
+	 * or ErrorCode.CANT_REMOVE if the sub-package is still used in some way.
+	 */
+	public int moveSubPackageToTrash(int subPkgId);
+	
+	/**
+	 * Revive a sub-package that had previously been deleted by the moveSubPackageToTrash() method.
+     *
+	 * @param subPkgId The ID of the sub-package to be revived.
+	 * @return ErrorCode.OK on successful revival, or ErrorCode.CANT_REVIVE if
+	 * for some reason the sub-package can't be revived.
+	 */
+	public int reviveSubPackageFromTrash(int subPkgId);
+	
+	/**
+	 * Determine whether an sub-package is currently marked as "trash" (to be deleted
+	 * when the BuildStore is next closed).
+	 * 
+	 * @param subPkgId The ID of the sub-package we are querying.
+	 * @return true if the sub-package has been marked as trash, else false.
+	 */
+	public boolean isSubPackageTrashed(int subPkgId);
+	
 }
 

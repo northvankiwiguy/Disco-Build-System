@@ -161,9 +161,9 @@ public class BuildStore implements IBuildStore {
 		reportMgr = new ReportMgr(this);
 		fileAttrMgr = new FileAttributeMgr(this, fileMgr);
 		packages = new PackageMgr(this);
+		subPkgMgr = new SubPackageMgr(this);
 		pkgMemberMgr = new PackageMemberMgr(this);
 		pkgRootMgr = new PackageRootMgr(this);
-		subPkgMgr = new SubPackageMgr(this);
 		
 		/*
 		 * Since these managers were initialized in a specific order, some of the earlier
@@ -171,6 +171,7 @@ public class BuildStore implements IBuildStore {
 		 */
 		((FileMgr)fileMgr).initPass2();
 		((ActionMgr)actionMgr).initPass2();
+		((SubPackageMgr)subPkgMgr).initPass2();
 		
 		/*
 		 * When the database is first created, it won't have the "workspace" root set.
