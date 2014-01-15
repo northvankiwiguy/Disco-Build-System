@@ -117,6 +117,22 @@ public interface IFileMgr {
 	public abstract String getPathName(int pathId, boolean showRoots);
 
 	/**
+	 * Given a path ID, return a String containing the full path name, 
+	 * including the root name. The path should be displayed relative to the root
+	 * of the specified package (which might not be the package that the path
+     * belongs to).
+	 * 
+	 * @param pathId The ID of the path to display as a String.
+	 * @param pkgId True The package that this path should be considered part of.
+     *
+	 * @return The String representation of the path, starting with the source
+	 * root of the path (e.g. {@literal @src_root/a/b/c}). If the path is not
+	 * within the package root, it will be expressed relative to the workspace
+	 * root or overall filesystem root.
+	 */
+	public abstract String getPathName(int pathId, int pkgId);
+
+	/**
 	 * Given a path ID, return a String containing the full path name.
 	 * 
 	 * @param pathId The ID of the path to display as a String.

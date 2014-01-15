@@ -39,6 +39,7 @@ public class TestFileMgr {
 	IFileIncludeMgr fileIncludeMgr;
 	IPackageMgr pkgMgr;
 	IPackageRootMgr pkgRootMgr;
+	IPackageMemberMgr pkgMemberMgr;
 	
 	/**
 	 * @throws java.lang.Exception
@@ -55,6 +56,7 @@ public class TestFileMgr {
 		fileIncludeMgr = bs.getFileIncludeMgr();
 		pkgMgr = bs.getPackageMgr();
 		pkgRootMgr = bs.getPackageRootMgr();
+		pkgMemberMgr = bs.getPackageMemberMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -355,6 +357,9 @@ public class TestFileMgr {
 		int path3 = fileMgr.addFile("/ear/foot/knee");
 		int path4 = fileMgr.addFile("/");
 
+		/*
+		 * Single argument case - don't show roots.
+		 */
 		String path1name = fileMgr.getPathName(path1);
 		String path2name = fileMgr.getPathName(path2);
 		String path3name = fileMgr.getPathName(path3);
@@ -364,6 +369,37 @@ public class TestFileMgr {
 		assertEquals("/apple/blueberry/carrot", path2name);
 		assertEquals("/ear/foot/knee", path3name);
 		assertEquals("/", path4name);
+		
+		/*
+		 * Create some packages, set the package roots, and place the files in the packages.
+		 */
+		int pkgA = pkgMgr.addPackage("pkgA");
+		int pkgB = pkgMgr.addPackage("pkgB");
+		assertEquals(ErrorCode.OK, pkgRootMgr.setWorkspaceRoot(path4));
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgA, IPackageRootMgr.SOURCE_ROOT, fileMgr.getPath("/apple")));
+		assertEquals(ErrorCode.OK, 
+				pkgRootMgr.setPackageRoot(pkgB, IPackageRootMgr.SOURCE_ROOT, fileMgr.getPath("/apple/blueberry")));
+		assertEquals(ErrorCode.OK, pkgMemberMgr.setPackageOfMember(IPackageMemberMgr.TYPE_FILE, path2, pkgB));
+		
+		/*
+		 * Dual argument case - showing roots for the path's actual package.
+		 */
+		assertEquals("@pkgB_src/carrot", fileMgr.getPathName(path2, true));
+		assertEquals("@root/ear/foot/knee", fileMgr.getPathName(path3, true));
+		assertEquals("@root", fileMgr.getPathName(path4, true));
+
+		/*
+		 * Dual argument case - showing roots for some other package.
+		 */
+		assertEquals("@pkgB_src/carrot", fileMgr.getPathName(path2, pkgB));
+		assertEquals("@pkgA_src/blueberry/carrot", fileMgr.getPathName(path2, pkgA));
+		
+		/*
+		 * Error cases.
+		 */
+		assertNull(fileMgr.getPathName(1000));
+		assertNull(fileMgr.getPathName(-1));
 	}	
 	
 	/*-------------------------------------------------------------------------------------*/

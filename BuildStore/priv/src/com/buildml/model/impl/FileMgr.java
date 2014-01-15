@@ -216,52 +216,38 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 	
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileMgr#getPathName(int, int)
+	 */
+	@Override
+	public String getPathName(int pathId, int pkgId) {
+		
+		/* delegate to the common method */
+		return getPathNameCommon(pathId, true, pkgId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileMgr#getPathName(int, boolean)
 	 */
 	@Override
 	public String getPathName(int pathId, boolean showRoots) {
 		
-		// TODO: handle case where the pathId is invalid.
-		StringBuffer sb = new StringBuffer();
+		/* determine the path's current package */
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
 		
-		/* if we're at the root, simply return /, else recurse */
-		if (pathId == 0) {
-			if (showRoots) {
-				sb.append("@root");
-			} else {
-				sb.append('/');
-			}
-		} else {
-			
-			/* determine which package this file is in */
-			IPackageMgr pkgMgr = buildStore.getPackageMgr();
-			IPackageMemberMgr pkgMemberMgr = buildStore.getPackageMemberMgr();
-			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
-			int workspaceRootPathId = pkgRootMgr.getWorkspaceRoot();
-			PackageDesc pathPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId);
-			int pkgRootPathId = 0;
-			String pkgRootName = null;
-			
-			/* error case: package not available - disable showRoots */
-			if ((workspaceRootPathId == ErrorCode.NOT_FOUND) ||
-				(pathPackage == null)) {
-				showRoots = false;
-			}
-			
-			/* else, determine path of package root */
-			else {
-				pkgRootPathId = pkgRootMgr.getPackageRoot(pathPackage.pkgId, 
-													IPackageRootMgr.SOURCE_ROOT);
-				pkgRootName = pkgRootMgr.getPackageRootName(pathPackage.pkgId,
-													IPackageRootMgr.SOURCE_ROOT);
-			}
-			
-			getPathNameHelper(sb, pathId, showRoots, 
-								workspaceRootPathId, pkgRootPathId, pkgRootName);
+		/* automatically determine the path's package - we should default to <import> */
+		PackageDesc pathPackage = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE, pathId);
+		int pkgId = pkgMgr.getImportPackage();
+		if (pathPackage != null) {
+			pkgId = pathPackage.pkgId;
 		}
-		return sb.toString();
+		
+		/* delegate to the common method */
+		return getPathNameCommon(pathId, showRoots, pkgId);
 	}
-	
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -720,6 +706,58 @@ public class FileMgr implements IFileMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
+	 * A common method used by all getPathName() variants.
+	 * 
+	 * @param pathId	ID of the path to display.
+	 * @param showRoots	True if we should show roots, else False.
+	 * @param pkgId		ID of the package that this file belongs to (or should be considered as part of).
+	 * @return The returned path name, possibly with roots.
+	 */
+	private String getPathNameCommon(int pathId, boolean showRoots, int pkgId) {
+
+		/* is pathId a valid path? */
+		if (getPathType(pathId) == PathType.TYPE_INVALID) {
+			return null;
+		}
+		
+		/* we accumulate the path string in a string builder */
+		StringBuilder sb = new StringBuilder();
+		
+		/* if we're at the root, simply return /, else recurse */
+		if (pathId == 0) {
+			if (showRoots) {
+				sb.append("@root");
+			} else {
+				sb.append('/');
+			}
+		} else {
+			
+			/* determine which package this file is in */
+			IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+			int workspaceRootPathId = pkgRootMgr.getWorkspaceRoot();
+			int pkgRootPathId = 0;
+			String pkgRootName = null;
+			
+			/* error case: package not available - disable showRoots */
+			if (workspaceRootPathId == ErrorCode.NOT_FOUND) {
+				showRoots = false;
+			}
+			
+			/* else, determine path of package root */
+			else {
+				pkgRootPathId = pkgRootMgr.getPackageRoot(pkgId, IPackageRootMgr.SOURCE_ROOT);
+				pkgRootName = pkgRootMgr.getPackageRootName(pkgId, IPackageRootMgr.SOURCE_ROOT);
+			}
+			
+			getPathNameHelper(sb, pathId, showRoots, 
+								workspaceRootPathId, pkgRootPathId, pkgRootName);
+		}
+		return sb.toString();
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
 	 * A helper method for getPathName(). This method is called recursively as we traverse from
 	 * the path ID in question, right up to the root path. The recursive step moves up the
 	 * path hierarchy until either / is reached or one of the path's is a "root". At that point,
@@ -732,7 +770,7 @@ public class FileMgr implements IFileMgr {
 	 * @param pkgRootPathId PathID of the root for this file's package.
 	 * @param pkgRootName Name of this file's package.
 	 */
-	private void getPathNameHelper(StringBuffer sb, int pathId, boolean showRoots, 
+	private void getPathNameHelper(StringBuilder sb, int pathId, boolean showRoots, 
 									int workspaceRootPathId, int pkgRootPathId, 
 									String pkgRootName) {
 
