@@ -14,12 +14,15 @@ package com.buildml.model.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISubPackageMgr;
+import com.buildml.model.ISubPackageMgrListener;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -65,6 +68,9 @@ import com.buildml.utils.errors.ErrorCode;
 		trashOrReviveSubPackagePrepStmt = null,
 		findSubPackagesOfTypePrepStmt = null,
 		isValidOrTrashedPrepStmt = null;
+	
+	/** The event listeners who are registered to learn about sub-package changes */
+	private List<ISubPackageMgrListener> listeners = new ArrayList<ISubPackageMgrListener>();
 	
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -253,6 +259,26 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#addListener(com.buildml.model.ISubPackageMgrListener)
+	 */
+	@Override
+	public void addListener(ISubPackageMgrListener listener) {
+		listeners.add(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#removeListener(com.buildml.model.ISubPackageMgrListener)
+	 */
+	@Override
+	public void removeListener(ISubPackageMgrListener listener) {
+		listeners.remove(listener);
+	};
+	
 	/*=====================================================================================*
 	 * PACKAGE-PRIVATE METHODS
 	 *=====================================================================================*/
@@ -292,6 +318,9 @@ import com.buildml.utils.errors.ErrorCode;
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
 
+		/* notify listeners of this event */
+		notifyListeners(subPkgId, ISubPackageMgrListener.TRASHED_SUB_PACKAGE, 0);
+		
 		return ErrorCode.OK;
 	}
 
@@ -353,6 +382,28 @@ import com.buildml.utils.errors.ErrorCode;
 		return false;
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Notify any registered listeners about our change in state.
+	 * 
+	 * @param subPkgId  The sub-package that has changed.
+	 * @param how       The way in which the sub-package changed (see {@link ISubPackageMgrListener}).
+	 * @param changeId  Which thing has changed (CHANGED_SLOT)
+	 */
+	private void notifyListeners(int subPkgId, int how, int changeId) {
+		
+		/* 
+		 * Make a copy of the listeners list, otherwise a registered listener can't remove
+		 * itself from the list within the subPackageChangeNotification() method.
+		 */
+		ISubPackageMgrListener listenerCopy[] = 
+				listeners.toArray(new ISubPackageMgrListener[listeners.size()]);
+		for (int i = 0; i < listenerCopy.length; i++) {
+			listenerCopy[i].subPackageChangeNotification(subPkgId, how, changeId);			
+		}
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 }

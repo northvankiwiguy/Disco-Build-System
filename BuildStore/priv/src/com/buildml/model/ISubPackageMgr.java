@@ -90,5 +90,20 @@ public interface ISubPackageMgr {
 	 */
 	public boolean isSubPackageTrashed(int subPkgId);
 	
+	/**
+	 * Add the specified listener to the list of objects that are notified when
+	 * a sub-package changes in some way.
+	 * 
+	 * @param listener The object to be added as a listener.
+	 */
+	public void addListener(ISubPackageMgrListener listener);
+
+	/**
+	 * Remove the specified listener from the list of objects to be notified when
+	 * a sub-package changes in some way.
+	 * 
+	 * @param listener The object to be removed from the list of listeners.
+	 */
+	public void removeListener(ISubPackageMgrListener listener);
 }
 

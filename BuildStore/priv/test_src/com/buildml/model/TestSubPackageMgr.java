@@ -344,4 +344,64 @@ public class TestSubPackageMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	private static int notifyId;
+	private static int notifyHow;
+	
+	/**
+	 * Test the various ways in which ISubPackageMgr can send notifications.
+	 */
+	@Test
+	public void testNotifications() {
+		
+		/* set up a listener for changes to the ISubPackageMgr */
+		ISubPackageMgrListener listener = new ISubPackageMgrListener() {
+			@Override
+			public void subPackageChangeNotification(int subPkgId, int how, int changeId) {
+				TestSubPackageMgr.notifyId = subPkgId;
+				TestSubPackageMgr.notifyHow = how;
+			}
+		};
+		subPkgMgr.addListener(listener);
+
+		/* Create a new sub-package */
+		int pkgId = pkgMgr.addPackage("MyPkg");
+		int subPkgId = subPkgMgr.newSubPackage(pkgMgr.getMainPackage(), pkgId);
+		
+		/*
+		 * Validate that trashing the sub-package provides a notification.
+		 */
+		notifyHow = notifyId = 0;
+		assertEquals(ErrorCode.OK, subPkgMgr.moveSubPackageToTrash(subPkgId));		
+		assertEquals(subPkgId, notifyId);
+		assertEquals(ISubPackageMgrListener.TRASHED_SUB_PACKAGE, notifyHow);
+
+		/*
+		 * Validate that reviving the sub-package provides a notification.
+		 */
+		notifyHow = notifyId = 0;
+		assertEquals(ErrorCode.OK, subPkgMgr.reviveSubPackageFromTrash(subPkgId));		
+		assertEquals(subPkgId, notifyId);
+		assertEquals(ISubPackageMgrListener.TRASHED_SUB_PACKAGE, notifyHow);
+		
+		/*
+		 * Validate that reviving the sub-package a second time will not have an effect.
+		 */
+		notifyHow = notifyId = 0;
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.reviveSubPackageFromTrash(subPkgId));		
+		assertEquals(0, notifyId);
+		assertEquals(0, notifyHow);
+
+		/*
+		 * Validate that trashing an invalid package will not do anything.
+		 */
+		notifyHow = notifyId = 0;
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.reviveSubPackageFromTrash(12345));		
+		assertEquals(0, notifyId);
+		assertEquals(0, notifyHow);
+
+		subPkgMgr.removeListener(listener);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 }
