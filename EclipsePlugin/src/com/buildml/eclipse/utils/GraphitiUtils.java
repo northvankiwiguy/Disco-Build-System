@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.pattern.IPattern;
@@ -27,6 +28,7 @@ import org.eclipse.graphiti.ui.platform.GraphitiConnectionEditPart;
 import org.eclipse.graphiti.ui.platform.GraphitiShapeEditPart;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import com.buildml.eclipse.bobj.UIPackage;
 import com.buildml.eclipse.packages.DiagramFeatureProvider;
 import com.buildml.eclipse.packages.PackageDiagramEditor;
 
@@ -82,14 +84,22 @@ public class GraphitiUtils {
 	/**
 	 * Given a Graphiti pictogram, return the underlying business object. This is useful for
 	 * identifying the underlying UIAction, UIFileGroup etc. that a was selected on a Graphiti
-	 * diagram.
+	 * diagram. Selecting the Diagram itself will return the corresponding UIPackage object.
 	 * 
 	 * @param pictogram The Graphiti pictogram selected on the Graphiti diagram.
 	 * @return The underlying business object (UIAction, UIFileGroup etc), or null if the
 	 * pictogram is not a recognized type.
 	 */
 	public static Object getBusinessObject(Object pictogram) {
-		if (pictogram instanceof PictogramElement) {
+
+		if (pictogram instanceof Diagram) {
+			PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
+			if (pde != null) {
+				return new UIPackage(pde.getPackageId());
+			}
+		}
+		
+		else if (pictogram instanceof PictogramElement) {
 			PictogramElement cs = (PictogramElement)pictogram;
 			PictogramLink pl = cs.getLink();
 			if (pl != null) {

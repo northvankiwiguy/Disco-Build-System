@@ -224,6 +224,11 @@
             id="com.buildml.eclipse.commands.package.movetopackage"
             name="Move to Package...">
       </command>
+      <command
+            defaultHandler="com.buildml.eclipse.packages.handlers.HandlerOpenSubPackage"
+            id="com.buildml.eclipse.commands.openSubPackage"
+            name="Open Sub-Package">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -947,6 +952,11 @@
                style="push"
                tooltip="Set Package Source and Generate Path Roots">
          </command>
+         <command
+               commandId="org.eclipse.ui.file.properties"
+               label="Edit Properties"
+               style="push">
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -975,7 +985,20 @@
          </command>
          <command
                commandId="org.eclipse.ui.file.properties"
+               label="Edit Properties"
                style="push">
+         </command>
+         <command
+               commandId="com.buildml.eclipse.commands.openSubPackage"
+               label="Open Sub-Package"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <test
+                     args="com.buildml.eclipse.bobj.UISubPackage"
+                     property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+               </test>
+            </visibleWhen>
          </command>
          <command
                commandId="com.buildml.eclipse.commands.package.movetopackage"
@@ -1502,6 +1525,33 @@
                      args="com.buildml.eclipse.bobj.UIMergeFileGroupConnection"
                      property="com.buildml.eclipse.isGraphitiBusinessObjectType">
                </test>
+            </or>
+         </enabledWhen>
+      </page>
+      <page
+            class="com.buildml.eclipse.packages.properties.SubPackagePropertyPage"
+            id="com.buildml.eclipse.properties.subpackageproperties"
+            name="Sub-Package Slot Values">
+         <enabledWhen>
+            <test
+                  args="com.buildml.eclipse.bobj.UISubPackage"
+                  property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+            </test>
+         </enabledWhen>
+      </page>
+      <page
+            class="com.buildml.eclipse.packages.properties.PackagePropertyPage"
+            id="com.buildml.eclipse.properties.packageproperties"
+            name="Package Properties">
+         <enabledWhen>
+            <or>
+               <test
+                     args="com.buildml.eclipse.bobj.UIPackage"
+                     property="com.buildml.eclipse.isGraphitiBusinessObjectType">
+               </test>
+               <instanceof
+                     value="com.buildml.eclipse.bobj.UIPackage">
+               </instanceof>
             </or>
          </enabledWhen>
       </page>
