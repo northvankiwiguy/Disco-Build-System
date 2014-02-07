@@ -34,6 +34,7 @@ import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.dialogs.SlotDefinitionDialog;
+import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISlotTypes;
@@ -200,7 +201,7 @@ public class PackagePropertyPage extends BmlPropertyPage {
 		 */
 		pkgId = pkg.getId();
 		String pkgName = pkgMgr.getName(pkgId);
-		setTitle("Package Properties: " + pkgName);
+		setTitle("Package Slots: " + pkgName);
 		
 		/* 
 		 * Create a panel in which all sub-widgets are added. The first (of 2)
@@ -238,8 +239,7 @@ public class PackagePropertyPage extends BmlPropertyPage {
 		
 		ArrayList<SlotDetails> newList = new ArrayList<SlotDetails>();
 		for (SlotDetails slot : originalSlots) {
-			newList.add(new SlotDetails(slot.slotId, slot.slotName, slot.slotType, 
-					slot.slotPos, slot.slotCard, slot.defaultValue, slot.enumValues));
+			newList.add(new SlotDetails(slot));
 		}
 		return newList;
 	}
@@ -460,7 +460,7 @@ public class PackagePropertyPage extends BmlPropertyPage {
 		SlotDetails selectedDetails = currentSlots.get(index);
 		
 		/* create a dialog so the user can edit these defaults */
-		SlotDefinitionDialog dialog = new SlotDefinitionDialog(false, selectedDetails, currentSlots);
+		SlotDefinitionDialog dialog = new SlotDefinitionDialog(buildStore, false, selectedDetails, currentSlots);
 		int status = dialog.open();
 		
 		/* on OK, insert the new slot details back into our active set of slots */
@@ -482,13 +482,31 @@ public class PackagePropertyPage extends BmlPropertyPage {
 	 */
 	private void performNewOperation(ListBoxControls controls, int slotPos) {
 		
-		/* create suitable default slot details */
-		SlotDetails defaults = new SlotDetails(
-				-1, "Enter a new slot name", ISlotTypes.SLOT_TYPE_FILEGROUP, slotPos,
-				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		
+		/* create suitable default slot details - the default depends on slotPos */
+		SlotDetails defaults;
+		switch (slotPos) {
+		case ISlotTypes.SLOT_POS_INPUT:
+		case ISlotTypes.SLOT_POS_OUTPUT:
+			defaults = new SlotDetails(
+					-1, ISlotTypes.SLOT_OWNER_PACKAGE, pkgId, 
+					"Enter a new slot name", "", 
+					ISlotTypes.SLOT_TYPE_FILEGROUP, slotPos, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+			break;
+			
+		case ISlotTypes.SLOT_POS_PARAMETER:
+		case ISlotTypes.SLOT_POS_LOCAL:
+			defaults = new SlotDetails(
+					-1, ISlotTypes.SLOT_OWNER_PACKAGE, pkgId, 
+					"Enter a new slot name", "", 
+					ISlotTypes.SLOT_TYPE_TEXT, slotPos, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+			break;
+			
+		default:
+			throw new FatalError("Unrecognized slotPos value");
+		}
+				
 		/* create a dialog so the user can edit these defaults */
-		SlotDefinitionDialog dialog = new SlotDefinitionDialog(true, defaults, currentSlots);
+		SlotDefinitionDialog dialog = new SlotDefinitionDialog(buildStore, true, defaults, currentSlots);
 		int status = dialog.open();
 		
 		/* on OK, add the new slot details to our active set of slots */

@@ -1492,7 +1492,7 @@
       <page
             class="com.buildml.eclipse.packages.properties.ActionShellCommandPage"
             id="com.buildml.eclipse.properties.actionpshellcommand"
-            name="Shell Command">
+            name="Action Shell Command">
          <enabledWhen>
             <test
                   args="com.buildml.eclipse.bobj.UIAction"
@@ -1542,7 +1542,7 @@
       <page
             class="com.buildml.eclipse.packages.properties.PackagePropertyPage"
             id="com.buildml.eclipse.properties.packageproperties"
-            name="Package Properties">
+            name="Package Slots">
          <enabledWhen>
             <or>
                <test
