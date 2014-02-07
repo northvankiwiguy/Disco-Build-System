@@ -21,6 +21,16 @@ package com.buildml.model;
 public interface ISlotTypes {
 
 	/*=====================================================================================*
+	 * SLOT OWNERS - Defines whether this slot belongs to a "package" and or "action type"
+	 *=====================================================================================*/
+
+	/** The slot is owned by an actionType */
+	final static int SLOT_OWNER_ACTION = 1;
+
+	/** The slot is owned by a package */
+	final static int SLOT_OWNER_PACKAGE = 2;	
+	
+	/*=====================================================================================*
 	 * SLOT POSITIONS - Defines the location within an actionType or package, where a
 	 * slot can appear.
 	 *=====================================================================================*/
@@ -108,8 +118,17 @@ public interface ISlotTypes {
 		/** The slot's ID number */
 		public int slotId;
 		
+		/** The owner type of the slot (attached to action = 1, attached to package = 2) */
+		public int ownerType;
+		
+		/** The actionId or packageId of the owner of this slot */
+		public int ownerId;
+		
 		/** The name of the slot */
 		public String slotName;
+		
+		/** The textual description of this slot (can be long and multi-line) */
+		public String slotDescr;
 		
 		/** The type of slot (SLOT_TYPE_FILEGROUP, etc). */
 		public int slotType;
@@ -126,16 +145,49 @@ public interface ISlotTypes {
 		/** For slotType == SLOT_TYPE_ENUMERATION, what are the legal values */
 		public String [] enumValues;
 		
-		@SuppressWarnings("javadoc")
-		public SlotDetails(int slotId, String slotName, int slotType, int slotPos, 
-							int slotCard, Object defaultValue, String [] enumValues) {
+		/**
+		 * Create a new SlotDetails, from the constituent fields.
+		 * 
+		 * @param slotId		The new slotId.
+		 * @param ownerType		The new ownerType.
+		 * @param ownerId		The new ownerId.
+		 * @param slotName		The new slotName.
+		 * @param slotDescr		The new slotDescr.
+		 * @param slotType		The new slotType.
+		 * @param slotPos		The new slotPos.
+		 * @param slotCard		The new slotCard.
+		 * @param defaultValue	The new defaultValue.
+		 * @param enumValues	The new enumValues.
+		 */
+		public SlotDetails(int slotId, int ownerType, int ownerId, String slotName, String slotDescr,
+							int slotType, int slotPos, int slotCard, Object defaultValue, String [] enumValues) {
 			this.slotId = slotId;
+			this.ownerType = ownerType;
+			this.ownerId = ownerId;
 			this.slotName = slotName;
+			this.slotDescr = slotDescr;
 			this.slotType = slotType;
 			this.slotPos = slotPos;
 			this.slotCard = slotCard;
 			this.defaultValue = defaultValue;
 			this.enumValues = enumValues;
+		}
+		
+		/**
+		 * Copy constructor.
+		 * @param other The existing SlotDetails object to copy.
+		 */
+		public SlotDetails(SlotDetails other) {
+			this.slotId = other.slotId;
+			this.ownerType = other.ownerType;
+			this.ownerId = other.ownerId;
+			this.slotName = other.slotName;
+			this.slotDescr = other.slotDescr;
+			this.slotType = other.slotType;
+			this.slotPos = other.slotPos;
+			this.slotCard = other.slotCard;
+			this.defaultValue = other.defaultValue;
+			this.enumValues = other.enumValues.clone();
 		}
 	}
 	

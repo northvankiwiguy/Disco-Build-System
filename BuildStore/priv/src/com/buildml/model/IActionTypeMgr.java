@@ -178,6 +178,7 @@ public interface IActionTypeMgr {
 	 * 
 	 * @param typeId		The actionType to add the slot to.
 	 * @param slotName		The name of the slot (must be unique within this actionType).
+	 * @param slotDescr     A textual description of this slot (can be long and multi-line).
 	 * @param slotType		The slot's type (SLOT_TYPE_FILEGROUP, etc).
 	 * @param slotPos		The slot's position (SLOT_POS_INPUT, etc).
 	 * @param slotCard  	Either SLOT_CARD_OPTIONAL, SLOT_CARD_REQUIRED, SLOT_CARD_MULTI.
@@ -192,8 +193,8 @@ public interface IActionTypeMgr {
 	 *          ErrorCode.OUT_OF_RANGE if the slotCard doesn't make sense for the slot.
 	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
 	 */
-	public abstract int newSlot(int typeId, String slotName, int slotType, int slotPos, 
-								int slotCard, Object defaultValue, String[] enumValues);
+	public abstract int newSlot(int typeId, String slotName, String slotDescr, int slotType, 
+								int slotPos, int slotCard, Object defaultValue, String[] enumValues);
 
 	/**
 	 * Return all the slots associated with an actionType.

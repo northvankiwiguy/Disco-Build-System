@@ -174,6 +174,7 @@ public interface IPackageMgr {
 	 * 
 	 * @param typeId		The package to add the slot to.
 	 * @param slotName		The name of the slot (must be unique within this package).
+	 * @param slotDescr		A textual description of the slot (can be long and multi-line).
 	 * @param slotType		The slot's type (SLOT_TYPE_FILEGROUP, etc).
 	 * @param slotPos		The slot's position (SLOT_POS_OUTPUT, etc).
 	 * @param cardinality	Either SLOT_CARD_OPTIONAL or SLOT_CARD_REQUIRED.
@@ -187,9 +188,27 @@ public interface IPackageMgr {
 	 *                    if enumValues does not contain a valid enumeration.
 	 * 			ErrorCode.BAD_VALUE if the default value is not valid for this type.
 	 */
-	public abstract int newSlot(int typeId, String slotName, int slotType, int slotPos, 
-								int cardinality, Object defaultValue, String[] enumValues);
+	public abstract int newSlot(int typeId, String slotName, String slotDescr, 
+								int slotType, int slotPos, int cardinality, 
+								Object defaultValue, String[] enumValues);
 
+	/**
+	 * Change the details of an existing slot. Although many of the slot's details can
+	 * be changed, this is not true for the slotPos and slotType fields which must
+	 * remain unmodified.
+	 *
+	 * @param details		The modified SlotDetails record.
+	 * 
+	 * @return ErrorCode.OK on success
+	 * 		   ErrorCode.INVALID_NAME if details.slotName is not a valid slot identifier.
+	 * 		   ErrorCode.ALREADY_USED if details.slotName is already in use (within this package).
+	 * 		   ErrorCode.INVALID_OP if details.slotType or details.slotPos have changed.
+	 *         ErrorCode.OUT_OF_RANGE if details.slotCard is invalid.
+	 * 		   ErrorCode.BAD_VALUE if the default value is not valid for this slot's type.
+	 * 		   ErrorCode.NOT_FOUND if details.slotId doesn't refer to an existing slotId.
+	 */
+	public int changeSlot(SlotDetails details);
+	
 	/**
 	 * Return all the slots associated with a package.
 	 * 

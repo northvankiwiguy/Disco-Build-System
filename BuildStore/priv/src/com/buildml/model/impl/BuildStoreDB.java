@@ -52,7 +52,7 @@ import com.buildml.model.IPackageMemberMgr;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 407;
+	public static final int SCHEMA_VERSION = 408;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -321,7 +321,7 @@ import com.buildml.model.IPackageMemberMgr;
 			
 			/* Create the slotTypes table */
 			stat.executeUpdate("create table slotTypes (slotId integer primary key, ownerType integer, " +
-								"ownerId integer, slotName text, slotType integer, slotPos integer, " +
+								"ownerId integer, slotName text, slotDescr text, slotType integer, slotPos integer, " +
 								"slotCard integer, defaultValue text, enumId integer)");
 			
 			/* Create the slotValues table */

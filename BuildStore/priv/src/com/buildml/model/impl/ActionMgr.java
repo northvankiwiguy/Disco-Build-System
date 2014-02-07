@@ -741,7 +741,7 @@ public class ActionMgr implements IActionMgr {
 		}
 				
 		/* what is the current slot value? */
-		Object oldValue = slotMgr.getSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+		Object oldValue = slotMgr.getSlotValue(ISlotTypes.SLOT_OWNER_ACTION, actionId, slotId);
 		
 		/* if no change in value, do nothing */
 		if (((oldValue == null) && (value == null)) || 
@@ -770,7 +770,7 @@ public class ActionMgr implements IActionMgr {
 		}
 		
 		/* delegate all slot assignments to SlotMgr */
-		int status = slotMgr.setSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId, value);
+		int status = slotMgr.setSlotValue(ISlotTypes.SLOT_OWNER_ACTION, actionId, slotId, value);
 		
 		/* notify listeners about the change */
 		notifyListeners(actionId, IActionMgrListener.CHANGED_SLOT, slotId);
@@ -791,7 +791,7 @@ public class ActionMgr implements IActionMgr {
 		}
 
 		/* delegate all slot assignments to SlotMgr */
-		return slotMgr.getSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+		return slotMgr.getSlotValue(ISlotTypes.SLOT_OWNER_ACTION, actionId, slotId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -801,7 +801,7 @@ public class ActionMgr implements IActionMgr {
 	 */
 	@Override
 	public boolean isSlotSet(int actionId, int slotId) {
-		return slotMgr.isSlotSet(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+		return slotMgr.isSlotSet(ISlotTypes.SLOT_OWNER_ACTION, actionId, slotId);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -811,7 +811,7 @@ public class ActionMgr implements IActionMgr {
 	 */
 	@Override
 	public void clearSlotValue(int actionId, int slotId) {
-		slotMgr.clearSlotValue(SlotMgr.SLOT_OWNER_ACTION, actionId, slotId);
+		slotMgr.clearSlotValue(ISlotTypes.SLOT_OWNER_ACTION, actionId, slotId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -821,7 +821,7 @@ public class ActionMgr implements IActionMgr {
 	 */
 	@Override
 	public Integer[] getActionsWhereSlotIsLike(int slotId, String match) {
-		return slotMgr.getOwnersWhereSlotIsLike(SlotMgr.SLOT_OWNER_ACTION, slotId, match);
+		return slotMgr.getOwnersWhereSlotIsLike(ISlotTypes.SLOT_OWNER_ACTION, slotId, match);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -831,7 +831,7 @@ public class ActionMgr implements IActionMgr {
 	 */
 	@Override
 	public Integer[] getActionsWhereSlotEquals(int slotId, Object match) {
-		return slotMgr.getOwnersWhereSlotEquals(SlotMgr.SLOT_OWNER_ACTION, slotId, match);
+		return slotMgr.getOwnersWhereSlotEquals(ISlotTypes.SLOT_OWNER_ACTION, slotId, match);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

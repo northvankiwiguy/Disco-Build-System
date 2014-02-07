@@ -558,11 +558,11 @@ import com.buildml.utils.errors.ErrorCode;
 	
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionTypeMgr#newSlot(int, int, int, int, boolean, java.lang.Object, java.lang.String[])
+	/**
+	 * Implementation of newSlot() for packages.
 	 */
 	@Override
-	public int newSlot(int typeId, String slotName, int slotType, int slotPos,
+	public int newSlot(int typeId, String slotName, String slotDescr, int slotType, int slotPos,
 			int slotCard, Object defaultValue, String[] enumValues) {
 		
 		/* check for invalid typeId, since SlotMgr can't determine this */
@@ -576,10 +576,20 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* delegate the rest of the work to SlotMgr */
-		return slotMgr.newSlot(SlotMgr.SLOT_OWNER_PACKAGE, typeId, slotName, slotType, slotPos,
-								slotCard, defaultValue, enumValues);
+		return slotMgr.newSlot(ISlotTypes.SLOT_OWNER_PACKAGE, typeId, slotName, slotDescr, slotType, 
+								slotPos, slotCard, defaultValue, enumValues);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Implementation of changeSlot() for packages.
+	 */
+	@Override
+	public int changeSlot(SlotDetails details) {
+		return slotMgr.changeSlot(details);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
@@ -597,7 +607,7 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* delegate to SlotMgr */
-		return slotMgr.getSlots(SlotMgr.SLOT_OWNER_PACKAGE, pkgId, slotPos);
+		return slotMgr.getSlots(ISlotTypes.SLOT_OWNER_PACKAGE, pkgId, slotPos);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -619,7 +629,7 @@ import com.buildml.utils.errors.ErrorCode;
 	public SlotDetails getSlotByName(int pkgId, String slotName) {
 
 		/* all work can be delegated */
-		return slotMgr.getSlotByName(SlotMgr.SLOT_OWNER_PACKAGE, pkgId, slotName);
+		return slotMgr.getSlotByName(ISlotTypes.SLOT_OWNER_PACKAGE, pkgId, slotName);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

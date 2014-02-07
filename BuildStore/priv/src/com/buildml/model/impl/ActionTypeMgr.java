@@ -281,11 +281,11 @@ public class ActionTypeMgr implements IActionTypeMgr {
 
 	/*-------------------------------------------------------------------------------------*/
 
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IActionTypeMgr#newSlot(int, int, int, int, boolean, java.lang.Object, java.lang.String[])
+	/*
+	 * Implementation of newSlot() for actions.
 	 */
 	@Override
-	public int newSlot(int typeId, String slotName, int slotType, int slotPos,
+	public int newSlot(int typeId, String slotName, String slotDescr, int slotType, int slotPos,
 			int slotCard, Object defaultValue, String[] enumValues) {
 		
 		/* check for invalid typeId, since SlotMgr can't determine this */
@@ -294,7 +294,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 		}
 		
 		/* delegate the rest of the work to SlotMgr */
-		return slotMgr.newSlot(SlotMgr.SLOT_OWNER_ACTION, typeId, slotName, slotType, slotPos,
+		return slotMgr.newSlot(ISlotTypes.SLOT_OWNER_ACTION, typeId, slotName, slotDescr, slotType, slotPos,
 								slotCard, defaultValue, enumValues);
 	}
 
@@ -315,7 +315,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 		}
 		
 		/* delegate to SlotMgr */
-		return slotMgr.getSlots(SlotMgr.SLOT_OWNER_ACTION, typeId, slotPos);
+		return slotMgr.getSlots(ISlotTypes.SLOT_OWNER_ACTION, typeId, slotPos);
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -337,7 +337,7 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	public SlotDetails getSlotByName(int typeId, String slotName) {
 		
 		/* all work can be delegated */
-		return slotMgr.getSlotByName(SlotMgr.SLOT_OWNER_ACTION, typeId, slotName);
+		return slotMgr.getSlotByName(ISlotTypes.SLOT_OWNER_ACTION, typeId, slotName);
 	}
 
 	/*-------------------------------------------------------------------------------------*/

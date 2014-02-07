@@ -145,7 +145,7 @@ import com.buildml.utils.errors.ErrorCode;
 				"update packageMembers set x = ?, y = ? where memberType = ? and memberId = ?");
 		findActionNeighbourPrepStmt = db.prepareStatement(
 				"select value, x, y from slotValues, slotTypes, packageMembers where " +
-						"slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " " + 
+						"slotValues.ownerType = " + ISlotTypes.SLOT_OWNER_ACTION + " " + 
 						"and slotValues.ownerId = ? " +
 						"and slotValues.slotId = slotTypes.slotId " +
 						"and slotTypes.slotPos = ? " +
@@ -153,7 +153,7 @@ import com.buildml.utils.errors.ErrorCode;
 						"and packageMembers.memberId = value");
 		findFileGroupNeighbourPrepStmt = db.prepareStatement(
 				"select slotValues.ownerId, x, y from slotValues, slotTypes, packageMembers where " +
-						"slotValues.ownerType = " + SlotMgr.SLOT_OWNER_ACTION + " " +
+						"slotValues.ownerType = " + ISlotTypes.SLOT_OWNER_ACTION + " " +
 						"and slotValues.value = ? " +
 						"and slotValues.slotId = slotTypes.slotId " +
 						"and (slotTypes.slotPos = ? or slotTypes.slotPos = ?) " +

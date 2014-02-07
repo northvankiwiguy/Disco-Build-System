@@ -64,15 +64,19 @@ public class TestSlotMgr {
 	 * @param details		The SlotDetails to validate.
 	 * @param slotId		The expected slotId.
 	 * @param slotName		The expected slotName
+	 * @param slotDescr		The expected description (or null to not check)
 	 * @param slotType		The expected slotType	
 	 * @param slotPos		The expected slotPos
 	 * @param slotCard		The expected slotCard
 	 */
-	private void validateDetails(SlotDetails details, int slotId, String slotName, int slotType, 
-									int slotPos, int slotCard) {
+	private void validateDetails(SlotDetails details, int slotId, String slotName, String slotDescr,
+						int slotType, int slotPos, int slotCard) {
 		
 		assertEquals(slotId, details.slotId);
 		assertEquals(slotName, details.slotName);
+		if (slotDescr != null) {
+			assertEquals(slotDescr, details.slotDescr);
+		}
 		assertEquals(slotType, details.slotType);
 		assertEquals(slotPos, details.slotPos);
 		assertEquals(slotCard, details.slotCard);
@@ -89,22 +93,22 @@ public class TestSlotMgr {
 		
 		/* slot 1 is "Input" */
 		SlotDetails details = actionTypeMgr.getSlotByID(1);
-		validateDetails(details, 1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP,
+		validateDetails(details, 1, "Input", null, ISlotTypes.SLOT_TYPE_FILEGROUP,
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* slot 2 is "Command" */
 		details = actionTypeMgr.getSlotByID(2);
-		validateDetails(details, 2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
+		validateDetails(details, 2, "Command", null, ISlotTypes.SLOT_TYPE_TEXT, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 
 		/* slot 3 is "Directory" */
 		details = actionTypeMgr.getSlotByID(3);
-		validateDetails(details, 3, "Directory", ISlotTypes.SLOT_TYPE_DIRECTORY, 
+		validateDetails(details, 3, "Directory", null, ISlotTypes.SLOT_TYPE_DIRECTORY, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 
 		/* slot 4 is "Output" */
 		details = actionTypeMgr.getSlotByID(4);
-		validateDetails(details, 4, "Output", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		validateDetails(details, 4, "Output", null, ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 	}
@@ -124,21 +128,21 @@ public class TestSlotMgr {
 		SlotDetails details[];
 		details = actionTypeMgr.getSlots(shellCmdId, ISlotTypes.SLOT_POS_INPUT);
 		assertEquals(1, details.length);
-		validateDetails(details[0], 1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		validateDetails(details[0], 1, "Input", null, ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* get the parameter slots */
 		details = actionTypeMgr.getSlots(shellCmdId, ISlotTypes.SLOT_POS_PARAMETER);
 		assertEquals(2, details.length);
-		validateDetails(details[0], 2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
+		validateDetails(details[0], 2, "Command", null, ISlotTypes.SLOT_TYPE_TEXT, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
-		validateDetails(details[1], 3, "Directory", ISlotTypes.SLOT_TYPE_DIRECTORY, 
+		validateDetails(details[1], 3, "Directory", null, ISlotTypes.SLOT_TYPE_DIRECTORY, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		
 		/* get the output slots - don't bother checking the details */
 		details = actionTypeMgr.getSlots(shellCmdId, ISlotTypes.SLOT_POS_OUTPUT);
 		assertEquals(1, details.length);
-		validateDetails(details[0], 4, "Output", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		validateDetails(details[0], 4, "Output", null, ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* get all the slots - don't bother checking the details */
@@ -166,22 +170,22 @@ public class TestSlotMgr {
 		
 		/* slot 1 is "Input" */
 		details = actionTypeMgr.getSlotByName(shellCmdId, "Input");
-		validateDetails(details, 1, "Input", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		validateDetails(details, 1, "Input", null, ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* slot 2 is "Command" */
 		details = actionTypeMgr.getSlotByName(shellCmdId, "Command");
-		validateDetails(details, 2, "Command", ISlotTypes.SLOT_TYPE_TEXT, 
+		validateDetails(details, 2, "Command", null, ISlotTypes.SLOT_TYPE_TEXT, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 
 		/* slot 3 is "Directory" */
 		details = actionTypeMgr.getSlotByName(shellCmdId, "Directory");
-		validateDetails(details, 3, "Directory", ISlotTypes.SLOT_TYPE_DIRECTORY, 
+		validateDetails(details, 3, "Directory", null, ISlotTypes.SLOT_TYPE_DIRECTORY, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		
 		/* slot 4 is "Output" */
 		details = actionTypeMgr.getSlotByName(shellCmdId, "Output");
-		validateDetails(details, 4, "Output", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		validateDetails(details, 4, "Output", null, ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 	}
 
@@ -206,19 +210,19 @@ public class TestSlotMgr {
 		 * Add all the new slots upfront, then validate them afterwards once they're all
 		 * in the database.
 		 */
-		int slotId1 = actionTypeMgr.newSlot(actionTypeId, "fileGroup1", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		int slotId1 = actionTypeMgr.newSlot(actionTypeId, "fileGroup1", "slotId1", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int slotId2 = pkgMgr.newSlot(pkgAId, "fileGroup1", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		int slotId2 = pkgMgr.newSlot(pkgAId, "fileGroup1", "slotId2", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
-		int slotId3 = pkgMgr.newSlot(pkgBId, "fileGroup2", ISlotTypes.SLOT_TYPE_FILEGROUP,
+		int slotId3 = pkgMgr.newSlot(pkgBId, "fileGroup2", "slotId3", ISlotTypes.SLOT_TYPE_FILEGROUP,
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int slotId4 = pkgMgr.newSlot(pkgAId, "param1", ISlotTypes.SLOT_TYPE_BOOLEAN,
+		int slotId4 = pkgMgr.newSlot(pkgAId, "param1", "slotId4", ISlotTypes.SLOT_TYPE_BOOLEAN,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int slotId5 = actionTypeMgr.newSlot(actionTypeId, "param2", ISlotTypes.SLOT_TYPE_INTEGER,
+		int slotId5 = actionTypeMgr.newSlot(actionTypeId, "param2", "slotId5", ISlotTypes.SLOT_TYPE_INTEGER,
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
-		int slotId6 = actionTypeMgr.newSlot(actionTypeId, "param3", ISlotTypes.SLOT_TYPE_TEXT,
+		int slotId6 = actionTypeMgr.newSlot(actionTypeId, "param3", "slotId6", ISlotTypes.SLOT_TYPE_TEXT,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int slotId7 = actionTypeMgr.newSlot(actionTypeId, "multiFileGroup", ISlotTypes.SLOT_TYPE_FILEGROUP,
+		int slotId7 = actionTypeMgr.newSlot(actionTypeId, "multiFileGroup", "slotId7", ISlotTypes.SLOT_TYPE_FILEGROUP,
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_MULTI, null, null);
 		
 		/* 
@@ -227,11 +231,11 @@ public class TestSlotMgr {
 		assertTrue(slotId1 >= 0);
 		SlotDetails details = actionTypeMgr.getSlotByName(actionTypeId, "fileGroup1");
 		assertNotNull(details);
-		validateDetails(details, slotId1, "fileGroup1", 
+		validateDetails(details, slotId1, "fileGroup1", "slotId1",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED);
 		details = actionTypeMgr.getSlotByID(slotId1);
 		assertNotNull(details);
-		validateDetails(details, slotId1, "fileGroup1", 
+		validateDetails(details, slotId1, "fileGroup1", "slotId1",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED);
 		
 		/* 
@@ -241,11 +245,11 @@ public class TestSlotMgr {
 		assertTrue(slotId1 != slotId2);
 		details = pkgMgr.getSlotByName(pkgAId, "fileGroup1");
 		assertNotNull(details);
-		validateDetails(details, slotId2, "fileGroup1", 
+		validateDetails(details, slotId2, "fileGroup1", "slotId2",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		details = pkgMgr.getSlotByID(slotId2);
 		assertNotNull(details);
-		validateDetails(details, slotId2, "fileGroup1", 
+		validateDetails(details, slotId2, "fileGroup1", "slotId2",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* 
@@ -256,11 +260,11 @@ public class TestSlotMgr {
 		assertTrue(slotId1 != slotId2);
 		details = pkgMgr.getSlotByName(pkgBId, "fileGroup2");
 		assertNotNull(details);
-		validateDetails(details, slotId3, "fileGroup2",
+		validateDetails(details, slotId3, "fileGroup2", "slotId3",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED);
 		details = pkgMgr.getSlotByID(slotId3);
 		assertNotNull(details);
-		validateDetails(details, slotId3, "fileGroup2", 
+		validateDetails(details, slotId3, "fileGroup2", "slotId3",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED);
 
 		/* 
@@ -269,11 +273,11 @@ public class TestSlotMgr {
 		assertTrue(slotId4 >= 0);
 		details = pkgMgr.getSlotByName(pkgAId, "param1");
 		assertNotNull(details);
-		validateDetails(details, slotId4, "param1",
+		validateDetails(details, slotId4, "param1", "slotId4",
 				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		details = pkgMgr.getSlotByID(slotId4);
 		assertNotNull(details);
-		validateDetails(details, slotId4, "param1",
+		validateDetails(details, slotId4, "param1", "slotId4",
 				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		
 		/* 
@@ -282,11 +286,11 @@ public class TestSlotMgr {
 		assertTrue(slotId5 >= 0);
 		details = actionTypeMgr.getSlotByName(actionTypeId, "param2");
 		assertNotNull(details);
-		validateDetails(details, slotId5, "param2",
+		validateDetails(details, slotId5, "param2", "slotId5",
 				ISlotTypes.SLOT_TYPE_INTEGER, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_OPTIONAL);
 		details = actionTypeMgr.getSlotByID(slotId5);
 		assertNotNull(details);
-		validateDetails(details, slotId5, "param2",
+		validateDetails(details, slotId5, "param2", "slotId5",
 				ISlotTypes.SLOT_TYPE_INTEGER, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_OPTIONAL);
 		
 		/* 
@@ -295,11 +299,11 @@ public class TestSlotMgr {
 		assertTrue(slotId6 >= 0);
 		details = actionTypeMgr.getSlotByName(actionTypeId, "param3");
 		assertNotNull(details);
-		validateDetails(details, slotId6, "param3",
+		validateDetails(details, slotId6, "param3", "slotId6",
 				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		details = actionTypeMgr.getSlotByID(slotId6);
 		assertNotNull(details);
-		validateDetails(details, slotId6, "param3",
+		validateDetails(details, slotId6, "param3", "slotId6",
 				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED);
 		
 		/* 
@@ -308,14 +312,140 @@ public class TestSlotMgr {
 		assertTrue(slotId7 >= 0);
 		details = actionTypeMgr.getSlotByName(actionTypeId, "multiFileGroup");
 		assertNotNull(details);
-		validateDetails(details, slotId7, "multiFileGroup",
+		validateDetails(details, slotId7, "multiFileGroup", "slotId7",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_MULTI);
 		details = actionTypeMgr.getSlotByID(slotId7);
 		assertNotNull(details);
-		validateDetails(details, slotId7, "multiFileGroup",
+		validateDetails(details, slotId7, "multiFileGroup", "slotId7",
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_MULTI);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for newSlot() to validate the "description" values.
+	 */
+	@Test
+	public void testDescriptions() {
+		
+		int pkgId = pkgMgr.addPackage("myPkg");
+		
+		/* add some valid descriptions that fit on a single line */
+		int slot1Id = pkgMgr.newSlot(pkgId, "MySlot1", "This slot description is on a single line.", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int slot2Id = pkgMgr.newSlot(pkgId, "MySlot2", "This slot description is also on one line.", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertTrue(slot1Id > 0);
+		assertTrue(slot2Id > 0);
+		SlotDetails details = pkgMgr.getSlotByID(slot1Id);
+		assertEquals("This slot description is on a single line.", details.slotDescr);
+		details = pkgMgr.getSlotByID(slot2Id);
+		assertEquals("This slot description is also on one line.", details.slotDescr);
+		
+		/* add a valid descriptions that fit on multiple lines */
+		int slot3Id = pkgMgr.newSlot(pkgId, "MySlot3", 
+				"This slot description that goes\nover multiple lines\nand continues for a while.", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertTrue(slot3Id > 0);
+		details = pkgMgr.getSlotByID(slot3Id);
+		assertEquals("This slot description that goes\nover multiple lines\nand continues for a while.", 
+				details.slotDescr);
+
+		/* add both empty string and null descriptions, which are also valid */
+		int slot4Id = pkgMgr.newSlot(pkgId, "MySlot5",
+				"",
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int slot5Id = pkgMgr.newSlot(pkgId, "MySlot6",
+				null,
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertTrue(slot4Id > 0);
+		assertTrue(slot5Id > 0);
+		details = pkgMgr.getSlotByID(slot4Id);
+		assertEquals("", details.slotDescr);
+		details = pkgMgr.getSlotByID(slot5Id);
+		assertEquals(null, details.slotDescr);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for changeSlot()
+	 */
+	@Test
+	public void testChangeSlot() {
+		
+		/* create two new slots that we can manipulate */
+		int pkgId = pkgMgr.addPackage("myPkg");
+		int slot1Id = pkgMgr.newSlot(pkgId, "MySlot1", "Descr1", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int slot2Id = pkgMgr.newSlot(pkgId, "MySlot2", "Descr2", 
+				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_PARAMETER, 
+				ISlotTypes.SLOT_CARD_OPTIONAL, "Default", null);
+		assertTrue(slot1Id > 0);
+		assertTrue(slot2Id > 0);
+		
+		/* test a valid slot change */
+		SlotDetails detail = pkgMgr.getSlotByID(slot1Id);
+		detail.slotName = "MyNewSlot1";
+		detail.slotCard = ISlotTypes.SLOT_CARD_OPTIONAL;
+		detail.slotDescr = "My new Slot1 descr";
+		assertEquals(ErrorCode.OK, pkgMgr.changeSlot(detail));
+		detail = pkgMgr.getSlotByID(slot1Id);
+		validateDetails(detail, slot1Id, "MyNewSlot1", "My new Slot1 descr", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT,
+				ISlotTypes.SLOT_CARD_OPTIONAL);
+		
+		/* test a second valid slot change - change slot1 again */
+		detail = pkgMgr.getSlotByID(slot1Id);
+		detail.slotName = "MyNewSlot1Again";
+		detail.slotCard = ISlotTypes.SLOT_CARD_REQUIRED;
+		detail.slotDescr = "Another description";
+		assertEquals(ErrorCode.OK, pkgMgr.changeSlot(detail));
+		detail = pkgMgr.getSlotByID(slot1Id);
+		validateDetails(detail, slot1Id, "MyNewSlot1Again", "Another description", 
+				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT,
+				ISlotTypes.SLOT_CARD_REQUIRED);
+		
+		/* test changes to invalid names (slotName) -> INVALID_NAME */
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.slotName = "Bad name!";
+		assertEquals(ErrorCode.INVALID_NAME, pkgMgr.changeSlot(detail));
+		
+		/* test changing to a name that's already in use (slotName) -> ALREADY_USED */
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.slotName = "MyNewSlot1Again";
+		assertEquals(ErrorCode.ALREADY_USED, pkgMgr.changeSlot(detail));
+		
+		/* test changing slotType or slotPos to any new value -> INVALID_OP */
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.slotType = ISlotTypes.SLOT_TYPE_DIRECTORY;
+		assertEquals(ErrorCode.INVALID_OP, pkgMgr.changeSlot(detail));
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.slotPos = ISlotTypes.SLOT_POS_LOCAL;
+		assertEquals(ErrorCode.INVALID_OP, pkgMgr.changeSlot(detail));
+
+		/* test changing to invalid slotCard value -> OUT_OF_RANGE */
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.slotCard = ISlotTypes.SLOT_CARD_MULTI;
+		assertEquals(ErrorCode.OUT_OF_RANGE, pkgMgr.changeSlot(detail));
+		
+		/* test change to invalid default value -> BAD_VALUE */
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.defaultValue = Integer.valueOf(1);
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.changeSlot(detail));
+		
+		/* test with invalid slotId -> NOT_FOUND */
+		detail = pkgMgr.getSlotByID(slot2Id);
+		detail.slotId = 1234;
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.changeSlot(detail));
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -331,86 +461,86 @@ public class TestSlotMgr {
 		int actionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
 
 		/* test with undefined typeId (actionId) - returns ErrorCode.NOT_FOUND */
-		err = actionTypeMgr.newSlot(-2, "MySlot", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(-2, "MySlot", "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 									ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.NOT_FOUND, err);
-		err = actionTypeMgr.newSlot(1000, "MySlot", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(1000, "MySlot", "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.NOT_FOUND, err);
 		
 		/* test with a null name - returns ErrorCode.INVALID_NAME */
-		err = actionTypeMgr.newSlot(actionTypeId, null, ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(actionTypeId, null, "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_NAME, err);
 
 		/* test with a name that has invalid syntax - returns ErrorCode.INVALID_NAME */
-		err = actionTypeMgr.newSlot(actionTypeId, "Bad Name", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Bad Name", "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_NAME, err);
-		err = actionTypeMgr.newSlot(actionTypeId, "Bad*Name", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Bad*Name", "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_NAME, err);
 
 		/* add the same name twice with the same typeId - returns ErrorCode.ALREADY_USED */
-		err = actionTypeMgr.newSlot(actionTypeId, "Input", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Input", "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.ALREADY_USED, err);
 		
 		/* add a slotType that's out of range - ErrorCode.INVALID_OP */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test1", -1, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test1", "", -1, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
-		err = actionTypeMgr.newSlot(actionTypeId, "Test2", 100, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test2", "", 100, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
 
 		/* add a slotPos that's out of range (includes SLOT_POS_ANY) - ErrorCode.INVALID_OP */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test3", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test3", "", ISlotTypes.SLOT_TYPE_BOOLEAN, 
 				ISlotTypes.SLOT_POS_ANY, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
-		err = actionTypeMgr.newSlot(actionTypeId, "Test4", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test4", "", ISlotTypes.SLOT_TYPE_BOOLEAN, 
 				100, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
 
 		/* add a SLOT_TYPE_FILEGROUP as a SLOT_POS_PARAMETER or SLOT_POS_LOCAL - ErrorCode.INVALID_OP */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test5", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test5", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
-		err = actionTypeMgr.newSlot(actionTypeId, "Test6", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test6", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
 
 		/* add a SLOT_TYPE_INTEGER as a SLOT_POS_INPUT or SLOT_POS_OUTPUT - ErrorCode.INVALID_OP */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test7", ISlotTypes.SLOT_TYPE_INTEGER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test7", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
-		err = actionTypeMgr.newSlot(actionTypeId, "Test8", ISlotTypes.SLOT_TYPE_INTEGER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test8", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.INVALID_OP, err);
 		
 		/* add a slotCard that's out of range - ErrorCode.OUT_OF_RANGE */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test9", ISlotTypes.SLOT_TYPE_INTEGER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test9", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_LOCAL, -1, null, null);
 		assertEquals(ErrorCode.OUT_OF_RANGE, err);
-		err = actionTypeMgr.newSlot(actionTypeId, "Test10", ISlotTypes.SLOT_TYPE_INTEGER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test10", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_LOCAL, 10, null, null);
 		assertEquals(ErrorCode.OUT_OF_RANGE, err);
 		
 		/* add a multi-slot of type SLOT_TYPE_INTEGER - ErrorCode.OUT_OF_RANGE */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test11", ISlotTypes.SLOT_TYPE_INTEGER, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test11", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_MULTI, null, null);
 		assertEquals(ErrorCode.OUT_OF_RANGE, err);
 		
 		/* add a multi-slot of type SLOT_POS_OUTPUT - ErrorCode.OUT_OF_RANGE */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test12", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test12", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_MULTI, null, null);
 		assertEquals(ErrorCode.OUT_OF_RANGE, err);
 		
 		/* add multiple multi-slots to the same action - returns ErrorCode.OUT_OF_RANGE */
-		err = actionTypeMgr.newSlot(actionTypeId, "Test13", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test13", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_MULTI, null, null);
 		assertTrue(err > 0);
-		err = actionTypeMgr.newSlot(actionTypeId, "Test14", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+		err = actionTypeMgr.newSlot(actionTypeId, "Test14", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
 				ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_MULTI, null, null);
 		assertEquals(ErrorCode.OUT_OF_RANGE, err);
 
@@ -422,16 +552,45 @@ public class TestSlotMgr {
 		int folderId = pkgMgr.addFolder("folderA");
 		
 		/* we can't add slots to folders - ErrorCode.NOT_FOUND */
-		err = pkgMgr.newSlot(folderId, "Test15", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
+		err = pkgMgr.newSlot(folderId, "Test15", "", ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_PARAMETER, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		assertEquals(ErrorCode.NOT_FOUND, err);
 
 		/* add a SLOT_TYPE_FILEGROUP as a SLOT_POS_INPUT in a package type - ErrorCode.INVALID_OP */
-		err = pkgMgr.newSlot(pkgId, "Test16", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, 
+		err = pkgMgr.newSlot(pkgId, "Test16", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, 
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		assertEquals(ErrorCode.INVALID_OP, err);
+		assertEquals(ErrorCode.INVALID_OP, err);		
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Try to add two slots with the same name, for the same package. Now try to add the
+	 * same name for a different package.
+	 */
+	@Test
+	public void testDuplicateSlotNames() {
+		
+		int pkg1Id = pkgMgr.addPackage("pkg1");
+		int pkg2Id = pkgMgr.addPackage("pkg2");
+		
+		/* add the slot to pkg1 */
+		int slot1Id = pkgMgr.newSlot(pkg1Id, "MySlot", "My Slot", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertTrue(slot1Id >= 0);
+		
+		/* try to add it again to pkg1 - should fail */
+		int err = pkgMgr.newSlot(pkg1Id, "MySlot", "My Slot (again)", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertEquals(ErrorCode.ALREADY_USED, err);
+		
+		/* now try to add it to pkg2 - should succeed */
+		int slot2Id = pkgMgr.newSlot(pkg2Id, "MySlot", "My Slot (in a different pkg)", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertTrue(slot2Id >= 0);
+		assertNotSame(slot1Id, slot2Id);
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
@@ -488,29 +647,29 @@ public class TestSlotMgr {
 		 * will have a reasonable default value.
 		 */
 		int typeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		int fg1SlotId = actionTypeMgr.newSlot(typeId, "FileGroup1", ISlotTypes.SLOT_TYPE_FILEGROUP,
+		int fg1SlotId = actionTypeMgr.newSlot(typeId, "FileGroup1", null, ISlotTypes.SLOT_TYPE_FILEGROUP,
 							ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int fg2SlotId = actionTypeMgr.newSlot(typeId, "FileGroup2", ISlotTypes.SLOT_TYPE_FILEGROUP,
+		int fg2SlotId = actionTypeMgr.newSlot(typeId, "FileGroup2", null, ISlotTypes.SLOT_TYPE_FILEGROUP,
 							ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(5), null);
-		int int1SlotId = actionTypeMgr.newSlot(typeId, "Integer1", ISlotTypes.SLOT_TYPE_INTEGER,
+		int int1SlotId = actionTypeMgr.newSlot(typeId, "Integer1", null, ISlotTypes.SLOT_TYPE_INTEGER,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int int2SlotId = actionTypeMgr.newSlot(typeId, "Integer2", ISlotTypes.SLOT_TYPE_INTEGER,
+		int int2SlotId = actionTypeMgr.newSlot(typeId, "Integer2", null, ISlotTypes.SLOT_TYPE_INTEGER,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(50), null);
-		int text1SlotId = actionTypeMgr.newSlot(typeId, "Text1", ISlotTypes.SLOT_TYPE_TEXT,
+		int text1SlotId = actionTypeMgr.newSlot(typeId, "Text1", null, ISlotTypes.SLOT_TYPE_TEXT,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int text2SlotId = actionTypeMgr.newSlot(typeId, "Text2", ISlotTypes.SLOT_TYPE_TEXT,
+		int text2SlotId = actionTypeMgr.newSlot(typeId, "Text2", null, ISlotTypes.SLOT_TYPE_TEXT,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "DefaultValue", null);
-		int bool1SlotId = actionTypeMgr.newSlot(typeId, "Bool1", ISlotTypes.SLOT_TYPE_BOOLEAN,
+		int bool1SlotId = actionTypeMgr.newSlot(typeId, "Bool1", null, ISlotTypes.SLOT_TYPE_BOOLEAN,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int bool2SlotId = actionTypeMgr.newSlot(typeId, "Bool2", ISlotTypes.SLOT_TYPE_BOOLEAN,
+		int bool2SlotId = actionTypeMgr.newSlot(typeId, "Bool2", null, ISlotTypes.SLOT_TYPE_BOOLEAN,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "true", null);
-		int file1SlotId = actionTypeMgr.newSlot(typeId, "File1", ISlotTypes.SLOT_TYPE_FILE,
+		int file1SlotId = actionTypeMgr.newSlot(typeId, "File1", null, ISlotTypes.SLOT_TYPE_FILE,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int file2SlotId = actionTypeMgr.newSlot(typeId, "File2", ISlotTypes.SLOT_TYPE_FILE,
+		int file2SlotId = actionTypeMgr.newSlot(typeId, "File2", null, ISlotTypes.SLOT_TYPE_FILE,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(25), null);
-		int dir1SlotId = actionTypeMgr.newSlot(typeId, "Directory1", ISlotTypes.SLOT_TYPE_DIRECTORY,
+		int dir1SlotId = actionTypeMgr.newSlot(typeId, "Directory1", null, ISlotTypes.SLOT_TYPE_DIRECTORY,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int dir2SlotId = actionTypeMgr.newSlot(typeId, "Directory2", ISlotTypes.SLOT_TYPE_DIRECTORY,
+		int dir2SlotId = actionTypeMgr.newSlot(typeId, "Directory2", null, ISlotTypes.SLOT_TYPE_DIRECTORY,
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, Integer.valueOf(43), null);
 		
 		/*
@@ -635,39 +794,39 @@ public class TestSlotMgr {
 		 */
 		
 		/* SLOT_TYPE_FILEGROUP */
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "FileGroup101", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "FileGroup101", null,
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED, "135", null));
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "FileGroup102", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "FileGroup102", null,
 				ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_INPUT, ISlotTypes.SLOT_CARD_REQUIRED, true, null));
 		
 		/* SLOT_TYPE_INTEGER */
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Integer101", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Integer101", null,
 				ISlotTypes.SLOT_TYPE_INTEGER, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, "Five", null));
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Integer102", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Integer102", null,
 				ISlotTypes.SLOT_TYPE_INTEGER, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'c', null));
 		
 		/* SLOT_TYPE_TEXT */
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Text101", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Text101", null,
 				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 5, null));
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Text102", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Text102", null,
 				ISlotTypes.SLOT_TYPE_TEXT, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'a', null));
 				
 		/* SLOT_TYPE_BOOLEAN */
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool101", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool101", null,
 				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, "maybe", null));
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool102", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Bool102", null,
 				ISlotTypes.SLOT_TYPE_BOOLEAN, ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 'c', null));
 		
 		/* SLOT_TYPE_FILE */
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "File101", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "File101", null,
 				ISlotTypes.SLOT_TYPE_FILE, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "123", null));
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "File102", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "File102", null,
 				ISlotTypes.SLOT_TYPE_FILE, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, true, null));
 		
 		/* SLOT_TYPE_DIRECTORY */
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Dir101", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Dir101", null,
 				ISlotTypes.SLOT_TYPE_DIRECTORY, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "hello", null));
-		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Dir102", 
+		assertEquals(ErrorCode.BAD_VALUE, actionTypeMgr.newSlot(typeId, "Dir102", null,
 				ISlotTypes.SLOT_TYPE_DIRECTORY, ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "123", null));
 	}
 	
@@ -681,9 +840,9 @@ public class TestSlotMgr {
 		
 		/* create a couple of action slots */
 		int actionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		int slot1Id = actionTypeMgr.newSlot(actionTypeId, "Value1", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+		int slot1Id = actionTypeMgr.newSlot(actionTypeId, "Value1", "Slot 1", ISlotTypes.SLOT_TYPE_BOOLEAN, 
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, true, null);
-		int slot2Id = actionTypeMgr.newSlot(actionTypeId, "Value2", ISlotTypes.SLOT_TYPE_INTEGER, 
+		int slot2Id = actionTypeMgr.newSlot(actionTypeId, "Value2", "Slot 2", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 5, null);
 		
 		/* test the default values */
@@ -734,9 +893,9 @@ public class TestSlotMgr {
 		
 		/* add two new slots to the default shell command action type */
 		int actionTypeId = actionTypeMgr.getActionTypeByName("Shell Command");
-		int slot1Id = actionTypeMgr.newSlot(actionTypeId, "Value1", ISlotTypes.SLOT_TYPE_INTEGER, 
+		int slot1Id = actionTypeMgr.newSlot(actionTypeId, "Value1", "Slot 1", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 5, null);
-		int slot2Id = actionTypeMgr.newSlot(actionTypeId, "Value2", ISlotTypes.SLOT_TYPE_INTEGER, 
+		int slot2Id = actionTypeMgr.newSlot(actionTypeId, "Value2", "Slot 2", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_REQUIRED, 10, null);
 		
 		/* validate that the slots are defined - can be fetched by name */

@@ -22,6 +22,7 @@ import java.sql.Statement;
 
 import com.buildml.model.BuildStoreVersionException;
 import com.buildml.model.FatalBuildStoreError;
+import com.buildml.model.ISlotTypes;
 
 /**
  * Static class for upgrading a pre-existing database file to the latest schema. Whenever
@@ -195,10 +196,10 @@ public class UpgradeDB {
 				int dirSlotId = 3; /* this is constant - as of 405 */
 				
 				stat.executeUpdate("insert into slotValues select " + 
-									SlotMgr.SLOT_OWNER_ACTION + ", actionId, " + cmdSlotId + ", command " +
+									ISlotTypes.SLOT_OWNER_ACTION + ", actionId, " + cmdSlotId + ", command " +
 									"from buildActions");
 				stat.executeUpdate("insert into slotValues select " + 
-									SlotMgr.SLOT_OWNER_ACTION + ", actionId, " + dirSlotId + ", actionDirId " +
+									ISlotTypes.SLOT_OWNER_ACTION + ", actionId, " + dirSlotId + ", actionDirId " +
 									"from buildActions");
 				
 				/* move unneeded fields from buildActions */
@@ -216,6 +217,19 @@ public class UpgradeDB {
 			if (dbVersion < 407) {
 				stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer, " +
 									"trashed integer)");
+			}
+			
+			/*
+			 * Update to 408 - add the slotDescr field into the slotTypes tables.
+			 */
+			if (dbVersion < 408) {
+				stat.executeUpdate("alter table slotTypes rename to slotTypestmp");
+				stat.executeUpdate("create table slotTypes (slotId integer primary key, ownerType integer, " +
+						"ownerId integer, slotName text, slotDescr text, slotType integer, slotPos integer, " +
+						"slotCard integer, defaultValue text, enumId integer)");
+				stat.executeUpdate("insert into slotTypes select slotId, ownerType, ownerId, slotName, null, " +
+									"slotType, slotPos, slotCard, defaultValue, enumId from slotTypestmp");
+				stat.executeUpdate("drop table slotTypestmp");
 			}
 			
 			/* finish by setting the new version number */

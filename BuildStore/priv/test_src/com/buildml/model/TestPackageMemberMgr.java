@@ -357,9 +357,9 @@ public class TestPackageMemberMgr {
 		 * Create multiple output slots. Our standard shell action doesn't have multiple outputs, but it's
 		 * possible for custom-designed action types.
 		 */
-		actionTypeMgr.newSlot(actionTypeId, "Output0", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+		actionTypeMgr.newSlot(actionTypeId, "Output0", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
-		actionTypeMgr.newSlot(actionTypeId, "Output1", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+		actionTypeMgr.newSlot(actionTypeId, "Output1", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
 		
 		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
@@ -385,9 +385,9 @@ public class TestPackageMemberMgr {
 		 * Add an additional Integer slots, to make sure they're not queried as if they
 		 * were SLOT_POS_INPUT or SLOT_POS_OUTPUT.
 		 */
-		int parmSlot1Id = actionTypeMgr.newSlot(actionTypeId, "Int1", ISlotTypes.SLOT_TYPE_INTEGER, 
+		int parmSlot1Id = actionTypeMgr.newSlot(actionTypeId, "Int1", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 								ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
-		int parmSlot2Id = actionTypeMgr.newSlot(actionTypeId, "Int2", ISlotTypes.SLOT_TYPE_INTEGER, 
+		int parmSlot2Id = actionTypeMgr.newSlot(actionTypeId, "Int2", "", ISlotTypes.SLOT_TYPE_INTEGER, 
 				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		actionMgr.setSlotValue(a1, parmSlot1Id, fg1);
 		actionMgr.setSlotValue(a2, parmSlot2Id, fg2);
@@ -1449,9 +1449,9 @@ public class TestPackageMemberMgr {
 		 * Create multiple output slots (our standard shell action doesn't have this, but it's possible
 		 * to create a custom type with multiple outputs).
 		 */
-		actionTypeMgr.newSlot(actionTypeId, "Output3", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+		actionTypeMgr.newSlot(actionTypeId, "Output3", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
-		actionTypeMgr.newSlot(actionTypeId, "Output6", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+		actionTypeMgr.newSlot(actionTypeId, "Output6", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
 		
 		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
@@ -1515,9 +1515,9 @@ public class TestPackageMemberMgr {
 		 * Create multiple output slots (our standard shell action doesn't have this, but it's possible
 		 * to create a custom type with multiple outputs).
 		 */
-		actionTypeMgr.newSlot(actionTypeId, "Output3", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+		actionTypeMgr.newSlot(actionTypeId, "Output3", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
-		actionTypeMgr.newSlot(actionTypeId, "Output6", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
+		actionTypeMgr.newSlot(actionTypeId, "Output6", "", ISlotTypes.SLOT_TYPE_FILEGROUP, ISlotTypes.SLOT_POS_OUTPUT, 
 				ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
 		
 		SlotDetails inputSlot = actionTypeMgr.getSlotByName(actionTypeId, "Input");
