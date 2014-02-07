@@ -197,6 +197,23 @@ public interface IActionTypeMgr {
 								int slotPos, int slotCard, Object defaultValue, String[] enumValues);
 
 	/**
+	 * Change the details of an existing slot. Although many of the slot's details can
+	 * be changed, this is not true for the slotPos and slotType fields which must
+	 * remain unmodified.
+	 *
+	 * @param details		The modified SlotDetails record.
+	 * 
+	 * @return ErrorCode.OK on success
+	 * 		   ErrorCode.INVALID_NAME if details.slotName is not a valid slot identifier.
+	 * 		   ErrorCode.ALREADY_USED if details.slotName is already in use (within this package).
+	 * 		   ErrorCode.INVALID_OP if details.slotType or details.slotPos have changed.
+	 *         ErrorCode.OUT_OF_RANGE if details.slotCard is invalid.
+	 * 		   ErrorCode.BAD_VALUE if the default value is not valid for this slot's type.
+	 * 		   ErrorCode.NOT_FOUND if details.slotId doesn't refer to an existing slotId.
+	 */
+	public int changeSlot(SlotDetails details);
+	
+	/**
 	 * Return all the slots associated with an actionType.
 	 * 
 	 * @param typeId	The ID of the actionType containing the slots.

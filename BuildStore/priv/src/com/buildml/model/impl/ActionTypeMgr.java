@@ -299,6 +299,16 @@ public class ActionTypeMgr implements IActionTypeMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Implementation of changeSlot() for actions.
+	 */
+	@Override
+	public int changeSlot(SlotDetails details) {
+		return slotMgr.changeSlot(details);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IActionTypeMgr#getSlots(int, int)
