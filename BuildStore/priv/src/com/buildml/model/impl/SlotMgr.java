@@ -107,10 +107,10 @@ class SlotMgr {
 						"where slotId = ? and trashed = 0");
 		findTypeByPosPrepStmt = db.prepareStatement(
 				"select slotId, slotName, slotDescr, slotType, slotPos, slotCard, defaultValue from slotTypes " +
-				"where ownerType = ? and ownerId = ? and slotPos = ? and trashed = 0");
+				"where ownerType = ? and ownerId = ? and slotPos = ? and trashed = 0 order by slotId");
 		findTypeByAnyPosPrepStmt = db.prepareStatement(
 				"select slotId, slotName, slotDescr, slotType, slotPos, slotCard, defaultValue from slotTypes " +
-				"where ownerType = ? and ownerId = ? and trashed = 0");
+				"where ownerType = ? and ownerId = ? and trashed = 0 order by slotId");
 		trashTypePrepStmt = db.prepareStatement("update slotTypes set trashed = ? where slotId = ? and trashed = ?");
 		insertValuePrepStmt = db.prepareStatement("insert into slotValues values (?, ?, ?, ?)");
 		updateValuePrepStmt = db.prepareStatement("update slotValues set value = ? where ownerType = ? " +

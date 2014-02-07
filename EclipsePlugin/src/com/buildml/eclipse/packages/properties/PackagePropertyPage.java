@@ -33,12 +33,15 @@ import com.buildml.eclipse.bobj.UIPackage;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
+import com.buildml.eclipse.utils.UndoOpAdapter;
 import com.buildml.eclipse.utils.dialogs.SlotDefinitionDialog;
 import com.buildml.eclipse.utils.errors.FatalError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.model.undo.MultiUndoOp;
+import com.buildml.model.undo.SlotUndoOp;
 
 /**
  * An Eclipse "property" page that allows viewing/editing of a packages slot information.
@@ -122,8 +125,80 @@ public class PackagePropertyPage extends BmlPropertyPage {
 	@Override
 	public boolean performOk() {
 		
-		// TODO: compare originalSlots and currentSlots and generate undo/redo operations
-		// to make all the changes.
+		/*
+		 * Compare currentSlots with originalSlot to see what has changed. We maintain two
+		 * pointers (originalIndex, currentIndex) as we incrementally progress through the two lists
+		 * and look for changes.
+		 * Cases:
+		 *   1) If currentIndex.slotId == -1, then we have a newly added slot.
+		 *   2) If originalIndex.slotId != currentIndex.slotId, then originalIndex.slot must be removed.
+		 *   3) else, if currentIndex.* is different from originalIndex.*, the slot has changed.
+		 * Note that this assumes that slotIDs are returned in numeric order (guaranteed by getSlots()),
+		 * yet that newly-added slots (with slotID == -1) Are at the end of the currentSlots list.
+		 */
+		MultiUndoOp multiOp = new MultiUndoOp();
+		boolean changeMade = false;
+		
+		int originalIndex = 0;
+		int originalMax = originalSlots.size();
+		int currentIndex = 0;
+		int currentMax = currentSlots.size();
+		
+		while ((originalIndex != originalMax) || (currentIndex != currentMax)) {
+		
+			SlotDetails originalDetails = 
+					(originalIndex < originalMax) ? originalSlots.get(originalIndex) : null;
+			SlotDetails currentDetails = 
+					(currentIndex < currentMax) ? currentSlots.get(currentIndex) : null;	
+
+			/* we've hit a newly-added slot */
+			if ((currentDetails != null) && (currentDetails.slotId == -1)) {
+				int newSlotId = pkgMgr.newSlot(pkgId, currentDetails.slotName, currentDetails.slotDescr, 
+						currentDetails.slotType, currentDetails.slotPos, currentDetails.slotCard,
+						currentDetails.defaultValue, currentDetails.enumValues);
+				if (newSlotId < 0) {
+					throw new FatalError("newSlot failed, even after we validated all parameters");
+				}
+								
+				SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+				op.recordNewSlot(newSlotId);
+				multiOp.add(op);
+				changeMade = true;
+				currentIndex++;
+			}
+			
+			/* we've found a deleted slot */
+			else if ((currentDetails == null) || (currentDetails.slotId != originalDetails.slotId)) {
+				SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+				op.recordRemoveSlot(originalDetails.slotId);
+				multiOp.add(op);
+				changeMade = true;
+				originalIndex++;
+			}
+			
+			/* if any of the changeable fields have changed, we issue a "change" operation */
+			else {
+			
+				boolean changed = !originalDetails.slotName.equals(currentDetails.slotName);
+				changed = changed || (!originalDetails.slotDescr.equals(currentDetails.slotDescr));
+				changed = changed || (originalDetails.slotCard != currentDetails.slotCard);
+				changed = changed || ((originalDetails.defaultValue != null) &&
+						                (!originalDetails.defaultValue.equals(currentDetails.defaultValue)));
+				if (changed) {
+					SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+					op.recordChangeSlot(originalDetails, currentDetails);
+					multiOp.add(op);
+					changeMade = true;
+				}
+				
+				originalIndex++;
+				currentIndex++;
+			}
+		}
+		
+		if (changeMade) {
+			new UndoOpAdapter("Edit Slots", multiOp).invoke();
+		}
 		
 		return super.performOk();
 	}
@@ -184,6 +259,13 @@ public class PackagePropertyPage extends BmlPropertyPage {
 		}
 
 		/*
+		 * We're good, and we have a UIPackage, so display the package information.
+		 */
+		pkgId = pkg.getId();
+		String pkgName = pkgMgr.getName(pkgId);
+		setTitle("Package Slots: " + pkgName);
+		
+		/*
 		 * Fetch the slot information, and make a copy of it so we can restore it 
 		 * later if necessary. We'll use this information as our "database", rather
 		 * than actually modifying the buildstore. This should only happen when
@@ -195,13 +277,6 @@ public class PackagePropertyPage extends BmlPropertyPage {
 			originalSlots.add(details[i]);
 		}
 		currentSlots = duplicateSlotList(originalSlots);
-		
-		/*
-		 * We're good, and we have a UIPackage, so display the package information.
-		 */
-		pkgId = pkg.getId();
-		String pkgName = pkgMgr.getName(pkgId);
-		setTitle("Package Slots: " + pkgName);
 		
 		/* 
 		 * Create a panel in which all sub-widgets are added. The first (of 2)

@@ -219,7 +219,7 @@ public interface IActionTypeMgr {
 	 * @param typeId	The ID of the actionType containing the slots.
 	 * @param slotPos	The position (within the actionType) of the slot (SLOT_POS_INPUT, etc).
 	 * @return An array of slot details, or null if typeId or slotPos is invalid, or typeId
-	 *         relates to a folder.
+	 *         relates to a folder. Results are ordered by slotId.
 	 */
 	public abstract SlotDetails[] getSlots(int typeId, int slotPos);
 

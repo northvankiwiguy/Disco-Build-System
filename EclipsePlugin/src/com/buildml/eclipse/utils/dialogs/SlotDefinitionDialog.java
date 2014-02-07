@@ -594,7 +594,15 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 	 */
 	private boolean validateDefaultValue(String value) {
 		
-		int slotType = getSlotTypeFromName(typeCombo.getText());
+		/* determine the slot's type, either from the type combo, or the predefined details */
+		int slotType;
+		if (typeCombo != null) {
+			slotType = getSlotTypeFromName(typeCombo.getText());
+		} else {
+			slotType = details.slotType;
+		}
+		
+		/* based on the slot type, check if the default value is valid */
 		switch(slotType) {
 		case ISlotTypes.SLOT_TYPE_BOOLEAN:
 			return value.equals("true") || value.equals("false");
@@ -625,7 +633,14 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 	 */
 	private Object getDefaultValueAsObject(String stringValue) {
 		
-		int slotType = getSlotTypeFromName(typeCombo.getText());
+		/* determine the slot's type, either from the type combo, or the predefined details */
+		int slotType;
+		if (typeCombo != null) {
+			slotType = getSlotTypeFromName(typeCombo.getText());
+		} else {
+			slotType = details.slotType;
+		}
+
 		switch(slotType) {
 		case ISlotTypes.SLOT_TYPE_BOOLEAN:
 			if (stringValue.equals("true")) {

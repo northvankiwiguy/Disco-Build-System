@@ -12,6 +12,8 @@
 
 package com.buildml.model;
 
+import java.util.Arrays;
+
 /**
  * This interface contains constants used when defining or querying action
  * or sub-package slots.
@@ -187,7 +189,9 @@ public interface ISlotTypes {
 			this.slotPos = other.slotPos;
 			this.slotCard = other.slotCard;
 			this.defaultValue = other.defaultValue;
-			this.enumValues = other.enumValues.clone();
+			if (other.enumValues != null) {
+				this.enumValues = Arrays.copyOf(other.enumValues, other.enumValues.length);
+			}
 		}
 	}
 	
