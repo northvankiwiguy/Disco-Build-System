@@ -62,6 +62,13 @@ public class GraphitiUtils {
 			GraphitiConnectionEditPart container = (GraphitiConnectionEditPart)element;
 			pe = container.getPictogramElement();
 		}
+		if (pe instanceof Diagram) {
+			PackageDiagramEditor pde = EclipsePartUtils.getActivePackageDiagramEditor();
+			if (pde != null) {
+				return new UIPackage(pde.getPackageId());
+			}
+		}
+		
 		if (pe == null) {
 			return null;
 		}
