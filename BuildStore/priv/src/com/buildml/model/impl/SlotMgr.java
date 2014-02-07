@@ -22,9 +22,8 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
-import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
-import com.buildml.utils.errors.FatalError;
+import com.buildml.utils.string.BuildStoreUtils;
 
 /**
  * A class for managing slots. This is a "hidden" BuildStore manager. A reference
@@ -174,7 +173,7 @@ class SlotMgr {
 				int slotCard, Object defaultValue, String[] enumValues) {
 
 		/* validate that the slot name is well-formed */
-		if (!isValidSlotName(slotName)) {
+		if (!BuildStoreUtils.isValidSlotName(slotName)) {
 			return ErrorCode.INVALID_NAME;
 		}
 		
@@ -685,40 +684,6 @@ class SlotMgr {
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
 
-	/**
-	 * Determine whether a potential slot name is valid (at least 3 characters, starts with
-	 * a letter, contains only letters, digits, underscore or dash).
-	 * @param slotName The proposed slot name.
-	 * @return True if the name is valid, else false.
-	 */
-	private boolean isValidSlotName(String slotName) {
-		int length;
-		
-		/* check minimum length requirements */
-		if ((slotName == null) || (length = slotName.length()) < 3) {
-			return false;
-		}
-		
-		/* first character must be a letter */
-		char firstCh = slotName.charAt(0);
-		if (!Character.isLetter(firstCh)) {
-			return false;
-		}
-		
-		/* remaining characters must be letters, digits, _ or - */
-		for (int i = 1; i != length - 1; i++) {
-			char ch = slotName.charAt(i);
-			boolean validChar = Character.isLetter(ch) || Character.isDigit(ch) ||
-										(ch == '-') || (ch == '_');
-			if (!validChar) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-	
 	/**
 	 * Given a string representation of a value, as stored in the database, convert it to
 	 * the appropriate Java type.
