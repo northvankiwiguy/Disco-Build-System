@@ -322,7 +322,7 @@ import com.buildml.model.IPackageMemberMgr;
 			/* Create the slotTypes table */
 			stat.executeUpdate("create table slotTypes (slotId integer primary key, ownerType integer, " +
 								"ownerId integer, slotName text, slotDescr text, slotType integer, slotPos integer, " +
-								"slotCard integer, defaultValue text, enumId integer)");
+								"slotCard integer, defaultValue text, enumId integer, trashed integer)");
 			
 			/* Create the slotValues table */
 			stat.executeUpdate("create table slotValues (ownerType integer, ownerId integer, " +
@@ -772,6 +772,7 @@ import com.buildml.model.IPackageMemberMgr;
 			stat.executeUpdate("delete from files where trashed=1");
 			stat.executeUpdate("delete from buildActions where trashed=1;");
 			stat.executeUpdate("delete from subPackages where trashed=1;");
+			stat.executeUpdate("delete from slotTypes where trashed=1;");
 						
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to remove trashed files and actions", e);

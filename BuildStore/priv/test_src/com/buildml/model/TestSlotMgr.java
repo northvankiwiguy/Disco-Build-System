@@ -903,16 +903,27 @@ public class TestSlotMgr {
 		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
 		
 		/* remove one of those slots - validate that it's no longer available */
-		assertEquals(ErrorCode.OK, actionTypeMgr.removeSlot(slot1Id));
+		assertEquals(ErrorCode.OK, actionTypeMgr.trashSlot(slot1Id));
+		
+		/* Use getSlotByName to prove it no longer exists */
 		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
 		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
+		
+		/* Use getSlotById to prove that slot1Id no longer exists */
+		assertNull(actionTypeMgr.getSlotByID(slot1Id));
+		assertNotNull(actionTypeMgr.getSlotByID(slot2Id));
+		
+		/* Use getSlots to prove slot1Id no longer exists */
+		SlotDetails slots[] = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_LOCAL);
+		assertEquals(1, slots.length);
+		assertEquals(slot2Id, slots[0].slotId);
 		
 		/* create an action and set a value for the slot */
 		int actionId = actionMgr.addShellCommandAction(actionMgr.getRootAction("root"), 0, "command");
 		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, slot2Id, 20));
 		
 		/* try removing the slot - should fail */
-		assertEquals(ErrorCode.CANT_REMOVE, actionTypeMgr.removeSlot(slot2Id));
+		assertEquals(ErrorCode.CANT_REMOVE, actionTypeMgr.trashSlot(slot2Id));
 		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
 		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
 
@@ -920,14 +931,27 @@ public class TestSlotMgr {
 		actionMgr.clearSlotValue(actionId, slot2Id);
 		
 		/* try removing the slot - should succeed */
-		assertEquals(ErrorCode.OK, actionTypeMgr.removeSlot(slot2Id));
+		assertEquals(ErrorCode.OK, actionTypeMgr.trashSlot(slot2Id));
 
 		/* confirm that the slots are not searchable any more */
 		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
 		assertNull(actionTypeMgr.getSlotByName(actionTypeId, "Value2"));
 		
+		/* revive slot1Id and test that all accessors can now see it again */
+		assertEquals(ErrorCode.OK, actionTypeMgr.reviveSlot(slot1Id));
+		assertNotNull(actionTypeMgr.getSlotByName(actionTypeId, "Value1"));
+		assertNotNull(actionTypeMgr.getSlotByID(slot1Id));
+		slots = actionTypeMgr.getSlots(actionTypeId, ISlotTypes.SLOT_POS_LOCAL);
+		assertEquals(1, slots.length);
+		
+		/* try to revive it again - should fail */
+		assertEquals(ErrorCode.CANT_REVIVE, actionTypeMgr.reviveSlot(slot1Id));
+
 		/* try removing a non-existent slot - returns ErrorCode.NOT_FOUND */
-		assertEquals(ErrorCode.NOT_FOUND, actionTypeMgr.removeSlot(1000));
+		assertEquals(ErrorCode.NOT_FOUND, actionTypeMgr.trashSlot(1000));
+
+		/* try reviving a non-existent slot - returns ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, actionTypeMgr.reviveSlot(1000));
 	}
 		
 	/*-------------------------------------------------------------------------------------*/

@@ -220,15 +220,15 @@ public class UpgradeDB {
 			}
 			
 			/*
-			 * Update to 408 - add the slotDescr field into the slotTypes tables.
+			 * Update to 408 - add the slotDescr and trashed fields into the slotTypes tables.
 			 */
 			if (dbVersion < 408) {
 				stat.executeUpdate("alter table slotTypes rename to slotTypestmp");
 				stat.executeUpdate("create table slotTypes (slotId integer primary key, ownerType integer, " +
 						"ownerId integer, slotName text, slotDescr text, slotType integer, slotPos integer, " +
-						"slotCard integer, defaultValue text, enumId integer)");
+						"slotCard integer, defaultValue text, enumId integer, trashed integer)");
 				stat.executeUpdate("insert into slotTypes select slotId, ownerType, ownerId, slotName, null, " +
-									"slotType, slotPos, slotCard, defaultValue, enumId from slotTypestmp");
+									"slotType, slotPos, slotCard, defaultValue, enumId, 0 from slotTypestmp");
 				stat.executeUpdate("drop table slotTypestmp");
 			}
 			

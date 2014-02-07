@@ -635,17 +635,30 @@ import com.buildml.utils.errors.ErrorCode;
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IPackageMgr#removeSlot(int)
+	 * @see com.buildml.model.IPackageMgr#trashSlot(int)
 	 */
 	@Override
-	public int removeSlot(int slotId) {
+	public int trashSlot(int slotId) {
 		
 		/* all work can be delegated */
-		return slotMgr.removeSlot(slotId);
+		return slotMgr.trashSlot(slotId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#reviveSlot(int)
+	 */
+	@Override
+	public int reviveSlot(int slotId) {
+		
+		/* all work can be delegated */
+		return slotMgr.reviveSlot(slotId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
 
+	
 	/* (non-Javadoc)
 	 * @see com.buildml.model.IPackageMgr#addListener(com.buildml.model.IPackageMgrListener)
 	 */

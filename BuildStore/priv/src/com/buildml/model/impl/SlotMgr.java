@@ -69,14 +69,15 @@ class SlotMgr {
 				findTypeByIdPrepStmt = null,
 				findTypeByPosPrepStmt = null,
 				findTypeByAnyPosPrepStmt = null,
-				deleteTypePrepStmt = null,
+				trashTypePrepStmt = null,
 				insertValuePrepStmt = null,
 				updateValuePrepStmt = null,
 				findValuePrepStmt = null,
 				deleteValuePrepStmt = null,
 				countSlotUsage = null,
 				selectActionsWithMatchingSlotPrepStmt = null,
-				selectActionsWithEqualSlotPrepStmt = null;
+				selectActionsWithEqualSlotPrepStmt = null,
+				doesSlotTypeExistPrepStmt = null;
 		
 	/*=====================================================================================*
 	 * CONSTRUCTORS
@@ -92,23 +93,25 @@ class SlotMgr {
 		this.db = buildStore.getBuildStoreDB();
 	
 		/* prepare the database statements */
-		insertTypePrepStmt = db.prepareStatement("insert into slotTypes values (null, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		insertTypePrepStmt = db.prepareStatement("insert into slotTypes values (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 		updateTypePrepStmt = db.prepareStatement(
 				"update slotTypes set slotName = ?, slotDescr = ?, slotCard = ?, defaultValue = ? " +
 						"where slotId = ?");
 		findTypeByNamePrepStmt = db.prepareStatement(
 				"select slotId, slotType, slotDescr, slotPos, slotCard, defaultValue from slotTypes " +
-						"where ownerType = ? and ownerId = ? and slotName = ?");
+						"where ownerType = ? and ownerId = ? and slotName = ? and trashed = 0");
+		doesSlotTypeExistPrepStmt = db.prepareStatement(
+				"select slotId from slotTypes where slotId = ?");
 		findTypeByIdPrepStmt = db.prepareStatement(
 				"select slotName, slotDescr, slotType, slotPos, slotCard, defaultValue, ownerType, ownerId from slotTypes " +
-						"where slotId = ?");
+						"where slotId = ? and trashed = 0");
 		findTypeByPosPrepStmt = db.prepareStatement(
 				"select slotId, slotName, slotDescr, slotType, slotPos, slotCard, defaultValue from slotTypes " +
-				"where ownerType = ? and ownerId = ? and slotPos = ?");
+				"where ownerType = ? and ownerId = ? and slotPos = ? and trashed = 0");
 		findTypeByAnyPosPrepStmt = db.prepareStatement(
 				"select slotId, slotName, slotDescr, slotType, slotPos, slotCard, defaultValue from slotTypes " +
-				"where ownerType = ? and ownerId = ?");
-		deleteTypePrepStmt = db.prepareStatement("delete from slotTypes where slotId = ?");
+				"where ownerType = ? and ownerId = ? and trashed = 0");
+		trashTypePrepStmt = db.prepareStatement("update slotTypes set trashed = ? where slotId = ? and trashed = ?");
 		insertValuePrepStmt = db.prepareStatement("insert into slotValues values (?, ?, ?, ?)");
 		updateValuePrepStmt = db.prepareStatement("update slotValues set value = ? where ownerType = ? " +
 													" and ownerId = ? and slotId = ?");
@@ -384,7 +387,6 @@ class SlotMgr {
 	 */
 	SlotDetails[] getSlots(int ownerType, int ownerId, int slotPos) {
 		
-		
 		PreparedStatement stmt;
 		try {
 			/* A slotPos of SLOT_POS_ANY requires a different database query */
@@ -469,12 +471,12 @@ class SlotMgr {
 	 * Remove a slot from the owner. The slot can only be removed if there are no
 	 * actions/packages that define the slot value.
 	 * 
-	 * @param slotId	The ID of the slot to be removed.
+	 * @param slotId	The ID of the slot to be trashed.
 	 * @return ErrorCode.OK on success,
 	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or
 	 * 		   ErrorCode.CANT_REMOVE if the slot is still in use.
 	 */
-	int removeSlot(int slotId) {
+	int trashSlot(int slotId) {
 		
 		try {
 			/* ensure that there are no action or package instances using this slot */
@@ -486,9 +488,11 @@ class SlotMgr {
 				return ErrorCode.CANT_REMOVE;
 			}
 
-			/* proceed to delete the entry */
-			deleteTypePrepStmt.setInt(1, slotId);
-			int count = db.executePrepUpdate(deleteTypePrepStmt);
+			/* proceed to mark the slot as being trashed (if it's not already trashed) */
+			trashTypePrepStmt.setInt(1, 1);
+			trashTypePrepStmt.setInt(2, slotId);
+			trashTypePrepStmt.setInt(3, 0);
+			int count = db.executePrepUpdate(trashTypePrepStmt);
 			if (count != 1) {
 				return ErrorCode.NOT_FOUND;
 			}
@@ -500,6 +504,41 @@ class SlotMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Revive a slot that had previously been trashed.
+	 * 
+	 * @param slotId  The ID of the slot to be revived.
+	 * @return ErrorCode.OK on success,
+	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or isn't trashed.
+	 */
+	public int reviveSlot(int slotId) {
+
+		try {
+			/* first, check if the slot exists */
+			doesSlotTypeExistPrepStmt.setInt(1, slotId);
+			Integer result[] = db.executePrepSelectIntegerColumn(doesSlotTypeExistPrepStmt);
+			if (result.length != 1) {
+				return ErrorCode.NOT_FOUND;
+			}
+			
+			/* proceed to mark the slot as being revived (if it's not already revived) */
+			trashTypePrepStmt.setInt(1, 0);
+			trashTypePrepStmt.setInt(2, slotId);
+			trashTypePrepStmt.setInt(3, 1);
+			int count = db.executePrepUpdate(trashTypePrepStmt);
+			if (count != 1) {
+				return ErrorCode.CANT_REVIVE;
+			}
+			
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}	
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 
 	/**
 	 * For the specified action/sub-package, set a slot to the given value.

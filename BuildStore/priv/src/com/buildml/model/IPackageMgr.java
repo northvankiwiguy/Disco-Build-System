@@ -246,7 +246,17 @@ public interface IPackageMgr {
 	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or
 	 * 		   ErrorCode.CANT_REMOVE if the slot is still in use by a package instance.
 	 */
-	public abstract int removeSlot(int slotId);	
+	public abstract int trashSlot(int slotId);
+	
+	/**
+	 * Revive a slot that had previously been trashed.
+	 * 
+	 * @param slotId  The ID of the slot to be revived.
+	 * @return ErrorCode.OK on success,
+	 * 		   ErrorCode.NOT_FOUND if slotId is invalid, or
+	 * 		   ErrorCode.CANT_REVIVE if this slotId isn't actually trashed.
+	 */
+	public abstract int reviveSlot(int slotId);
 	
 	/**
 	 * Add the specified listener to the list of objects that are notified when
