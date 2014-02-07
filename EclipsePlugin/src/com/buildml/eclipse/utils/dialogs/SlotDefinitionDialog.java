@@ -12,6 +12,8 @@
 
 package com.buildml.eclipse.utils.dialogs;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -26,6 +28,7 @@ import org.eclipse.swt.widgets.Text;
 import com.buildml.eclipse.utils.BmlTitleAreaDialog;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
+import com.buildml.utils.string.BuildStoreUtils;
 
 /**
  * A dialog allowing the user to add/modify a slot's definitions.
@@ -43,6 +46,9 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 	
 	/** The slot details to display/edit */
 	private SlotDetails details;
+	
+	/** All the slots that are currently active for this package/action-type */
+	private ArrayList<SlotDetails> allSlots;
 
 	/** The Text Control for entering/editing the slot name */
 	private Text slotNameEntry;
@@ -56,12 +62,14 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 	 * 
 	 * @param createNew True if we're creating (and editing) a new slot.
 	 * @param details The existing (or default) slot details to edit.
+	 * @param allSlots All of the slots for this package/action-type.
 	 */
-	public SlotDefinitionDialog(boolean createNew, SlotDetails details) {
+	public SlotDefinitionDialog(boolean createNew, SlotDetails details, ArrayList<SlotDetails> allSlots) {
 		super(new Shell(), 0.3, 0.5, 0.5, 0.5);
 
 		this.createNew = createNew;
 		this.details = details;
+		this.allSlots = allSlots;
 	}
 
 	/*=====================================================================================*
@@ -146,9 +154,11 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				String name = slotNameEntry.getText();
-				boolean valid = isValidSlotName(name);
-				setErrorMessage(valid ? null : "Slot name is invalid (too short, or invalid characters)");						
-				getButton(OK).setEnabled(valid);
+				boolean valid = BuildStoreUtils.isValidSlotName(name);
+				boolean slotNameInUse = slotNameAlreadyUsed(name);
+				setErrorMessage((!valid) ? "Slot name is invalid (too short, or invalid characters)"
+									: (slotNameInUse ? "Name is already in use by another slot": null));
+				getButton(OK).setEnabled(valid && !slotNameInUse);
 			}
 		});
 		
@@ -199,20 +209,28 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
-
+	
 	/**
-	 * Determine whether the specified slot name is valid. This is used to determine whether
-	 * a given name is legal if it was to be added to a BuildStore.
+	 * Given a proposed slot name, check if it's already used for any other slots
+	 * in this package/action-type.
 	 * 
-	 * @param text  The slot's name
-	 * @return True if the name is legal, else false.
+	 * @param name	The proposed name.
+	 * @return True if the name is already used, else false.
 	 */
-	protected boolean isValidSlotName(String text) {
-		if (text.length() < 3) {
+	protected boolean slotNameAlreadyUsed(String name) {
+		
+		/* it's OK if the name is set back to what it was when we started editing */
+		if (name.equals(details.slotName)) {
 			return false;
 		}
-		// TODO: reuse the existing isSlotNameValid() method.
-		return true;
+		
+		/* otherwise check all of the existing slots to make sure we're not duplicating slot names */
+		for (SlotDetails slot : allSlots) {
+			if (name.equals(slot.slotName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

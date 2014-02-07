@@ -460,7 +460,7 @@ public class PackagePropertyPage extends BmlPropertyPage {
 		SlotDetails selectedDetails = currentSlots.get(index);
 		
 		/* create a dialog so the user can edit these defaults */
-		SlotDefinitionDialog dialog = new SlotDefinitionDialog(false, selectedDetails);
+		SlotDefinitionDialog dialog = new SlotDefinitionDialog(false, selectedDetails, currentSlots);
 		int status = dialog.open();
 		
 		/* on OK, insert the new slot details back into our active set of slots */
@@ -488,7 +488,7 @@ public class PackagePropertyPage extends BmlPropertyPage {
 				ISlotTypes.SLOT_CARD_REQUIRED, null, null);
 		
 		/* create a dialog so the user can edit these defaults */
-		SlotDefinitionDialog dialog = new SlotDefinitionDialog(true, defaults);
+		SlotDefinitionDialog dialog = new SlotDefinitionDialog(true, defaults, currentSlots);
 		int status = dialog.open();
 		
 		/* on OK, add the new slot details to our active set of slots */
