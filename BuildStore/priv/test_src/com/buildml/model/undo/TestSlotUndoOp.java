@@ -23,6 +23,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISlotTypes;
+import com.buildml.model.ISubPackageMgr;
 
 
 /**
@@ -38,6 +39,7 @@ public class TestSlotUndoOp {
 	/** The managers associated with this BuildStore */
 	IPackageMgr pkgMgr;
 	IActionTypeMgr actionTypeMgr;
+	ISubPackageMgr subPkgMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -78,6 +80,7 @@ public class TestSlotUndoOp {
 		/* fetch the associated manager objects */
 		pkgMgr = buildStore.getPackageMgr();
 		actionTypeMgr = buildStore.getActionTypeMgr();
+		subPkgMgr = buildStore.getSubPackageMgr();
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -198,4 +201,106 @@ public class TestSlotUndoOp {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test changing a slot's value.
+	 */
+	@Test
+	public void testChangeSlotValue() {
+		
+		/* create a package */
+		int pkgId = pkgMgr.addPackage("NewPackage");
+		assertTrue(pkgId > 0);
+		
+		/* add a text slot, an integer slot and a boolean slot */
+		int textSlotId = pkgMgr.newSlot(pkgId, "text", "text", ISlotTypes.SLOT_TYPE_TEXT, 
+						ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, "Default", null);
+		int intSlotId = pkgMgr.newSlot(pkgId, "int", "int", ISlotTypes.SLOT_TYPE_INTEGER, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, 42, null);
+		int boolSlotId = pkgMgr.newSlot(pkgId, "bool", "bool", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, false, null);
+		assertTrue(textSlotId > 0 && intSlotId > 0 && boolSlotId > 0);
+		
+		
+		/* create two sub-packages (subPkg1 and subPkg2) */
+		int subPkg1Id = subPkgMgr.newSubPackage(pkgMgr.getMainPackage(), pkgId);
+		int subPkg2Id = subPkgMgr.newSubPackage(pkgMgr.getMainPackage(), pkgId);
+		assertTrue(subPkg1Id > 0 && subPkg2Id > 0);
+		
+		/* change the value in the text slot for subPkg1 */
+		SlotUndoOp op1 = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+		op1.recordChangeSlotValue(subPkg1Id, textSlotId, false, null, true, "Value 1");
+		op1.redo();
+		
+		/* change the value in the integer slot in subPkg2 */
+		SlotUndoOp op2 = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+		op2.recordChangeSlotValue(subPkg2Id, intSlotId, false, null, true, 1);
+		op2.redo();
+		
+		/* test the status/values for all 6 slots */
+		assertTrue(subPkgMgr.isSlotSet(subPkg1Id, textSlotId));
+		assertEquals("Value 1", subPkgMgr.getSlotValue(subPkg1Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, boolSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, textSlotId));
+		assertTrue(subPkgMgr.isSlotSet(subPkg2Id, intSlotId));
+		assertEquals(1, subPkgMgr.getSlotValue(subPkg2Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, boolSlotId));
+		
+		/* change the value in the text slot for subPkg1, again */
+		SlotUndoOp op3 = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+		op3.recordChangeSlotValue(subPkg1Id, textSlotId, true, "Value 1", true, "Value 2");
+		op3.redo();
+		
+		/* clear the value in the integer slot in subPkg2 */
+		SlotUndoOp op4 = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+		op4.recordChangeSlotValue(subPkg2Id, intSlotId, true, 1, false, null);
+		op4.redo();
+		
+		/* test status/values for all 6 slots, again */
+		assertTrue(subPkgMgr.isSlotSet(subPkg1Id, textSlotId));
+		assertEquals("Value 2", subPkgMgr.getSlotValue(subPkg1Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, boolSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, boolSlotId));
+		
+		/* undo the change to the two sub-packages, and test again */
+		op3.undo();
+		op4.undo();
+		assertTrue(subPkgMgr.isSlotSet(subPkg1Id, textSlotId));
+		assertEquals("Value 1", subPkgMgr.getSlotValue(subPkg1Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, boolSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, textSlotId));
+		assertTrue(subPkgMgr.isSlotSet(subPkg2Id, intSlotId));
+		assertEquals(1, subPkgMgr.getSlotValue(subPkg2Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, boolSlotId));
+		
+		/* undo the changes to the two sub-packages, again */
+		op1.undo();
+		op2.undo();
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, boolSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, boolSlotId));
+		
+		/* redo the changes */
+		op1.redo();
+		op2.redo();
+		assertTrue(subPkgMgr.isSlotSet(subPkg1Id, textSlotId));
+		assertEquals("Value 1", subPkgMgr.getSlotValue(subPkg1Id, textSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg1Id, boolSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, textSlotId));
+		assertTrue(subPkgMgr.isSlotSet(subPkg2Id, intSlotId));
+		assertEquals(1, subPkgMgr.getSlotValue(subPkg2Id, intSlotId));
+		assertFalse(subPkgMgr.isSlotSet(subPkg2Id, boolSlotId));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
 }
