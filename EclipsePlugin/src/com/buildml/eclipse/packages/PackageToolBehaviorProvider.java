@@ -254,9 +254,25 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
 					sb.append(" - ");
 					sb.append(details.slotName);
 					sb.append(": ");
+					
+					/* null values can't be displayed */
 					if (value == null) {
-						sb.append("null");
-					} else {
+						sb.append("<undefined>");
+						
+					/* directories/files should be expanded into their path */
+					} else if ((details.slotType == ISlotTypes.SLOT_TYPE_DIRECTORY) ||
+								(details.slotType == ISlotTypes.SLOT_TYPE_FILE)) {
+						int pathId = (Integer)value;
+						String pathName = fileMgr.getPathName(pathId);
+						if (pathName == null) {
+							sb.append("<invalid>");
+						} else {
+							sb.append(pathName);
+						}
+					} 
+					
+					/* other types can be displayed directly */
+					else {
 						sb.append(value.toString());
 					}
 					sb.append(" \n");

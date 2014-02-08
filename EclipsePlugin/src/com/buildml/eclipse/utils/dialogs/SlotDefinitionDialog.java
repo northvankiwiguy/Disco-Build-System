@@ -390,7 +390,15 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 	 * @param isInputOutputSlot True if this is an input/output slot, else false.
 	 */
 	private void createDefaultValueEntryField(Composite panel, boolean isInputOutputSlot) {
-		if (!isInputOutputSlot) {
+		
+		/* 
+		 * Only parameter/local slots can have default values, and for File and Directory
+		 * slots, we don't bother showing this field at all.
+		 */
+		if (!isInputOutputSlot && 
+				(createNew || 
+						((details.slotType != ISlotTypes.SLOT_TYPE_FILE) &&
+						 (details.slotType != ISlotTypes.SLOT_TYPE_DIRECTORY)))) {
 			new Label(panel, SWT.None).setText("Default Value:");
 			defaultValueEntry = new Text(panel, SWT.None);
 			defaultValueEntry.setLayoutData(new GridData(SWT.FILL, SWT.None, true, false));

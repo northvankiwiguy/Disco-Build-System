@@ -12,10 +12,6 @@
 
 package com.buildml.eclipse.utils.fieldeditors;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.StringButtonFieldEditor;
 import org.eclipse.swt.widgets.Composite;
 import com.buildml.eclipse.bobj.UIDirectory;
@@ -77,7 +73,7 @@ public class VFSDirSelectFieldEditor extends StringButtonFieldEditor {
 	@Override
 	protected String changePressed() {
 		VFSTreeSelectionDialog dialog = 
-				new VFSTreeSelectionDialog(getShell(), buildStore, message, false);
+				new VFSTreeSelectionDialog(getShell(), buildStore, message, true, false);
 		
 		if (dialog.open() == VFSTreeSelectionDialog.OK) {
 			Object[] result = dialog.getResult();

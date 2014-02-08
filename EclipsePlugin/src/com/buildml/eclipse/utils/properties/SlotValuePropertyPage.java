@@ -33,12 +33,15 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.buildml.eclipse.bobj.UIInteger;
 import com.buildml.eclipse.bobj.UISubPackage;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
 import com.buildml.eclipse.utils.UndoOpAdapter;
+import com.buildml.eclipse.utils.dialogs.VFSTreeSelectionDialog;
 import com.buildml.model.IBuildStore;
+import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
@@ -100,7 +103,10 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 
 	/** Manager that holds sub-package details */
 	private ISubPackageMgr subPkgMgr;
-	
+
+	/** Manager that holds sub-package details */
+	private IFileMgr fileMgr;
+
 	/** The validators that check the content of each entry field */
 	private List<Validator> validators;
 	
@@ -169,6 +175,7 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 		IBuildStore buildStore = EclipsePartUtils.getActiveBuildStore();
 		pkgMgr = buildStore.getPackageMgr();
 		subPkgMgr = buildStore.getSubPackageMgr();
+		fileMgr = buildStore.getFileMgr();
 				
 		/* 
 		 * Determine which "thing" (UISubPackage or UIAction) we're looking at, then
@@ -257,12 +264,12 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 				
 			/* File-typed slots */
 			case ISlotTypes.SLOT_TYPE_FILE:
-				createFileEditor(group, details, isSlotSet, (Integer)details.defaultValue, (Integer)slotValue);
+				createFileDirEditor(group, details, isSlotSet, (Integer)details.defaultValue, (Integer)slotValue, true);
 				break;
 
 			/* Directory-typed slots */
 			case ISlotTypes.SLOT_TYPE_DIRECTORY:
-				createDirectoryEditor(group, details, isSlotSet, (Integer)details.defaultValue, (Integer)slotValue);
+				createFileDirEditor(group, details, isSlotSet, (Integer)details.defaultValue, (Integer)slotValue, false);
 				break;
 			
 			default:
@@ -522,7 +529,7 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 	/*-------------------------------------------------------------------------------------*/
 
 	/**
-	 * Create the Controls necessary for editing a File-typed slot.
+	 * Create the Controls necessary for editing a File or Directory-typed slot.
 	 * 
 	 * @param group			The parent group panel to add Control into.
 	 * @param details		The slot's details.
@@ -530,28 +537,101 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 	 * 						value would be used.
 	 * @param defaultValue 	The default value for the slot.
 	 * @param slotValue 	The slot's current value (or null if !isSlotSet).
+	 * @param isFile		True if we're modifying a file field, or false for a directory field.
 	 */
-	private void createFileEditor(Group group, SlotDetails details, 
-									boolean isSlotSet, Object defaultValue, final Object slotValue) {
-		// TODO: implement this
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Create the Controls necessary for editing an Directory-typed slot.
-	 * 
-	 * @param group			The parent group panel to add Control into.
-	 * @param details		The slot's details.
-	 * @param isSlotSet 	True if the slot currently has a value set, or false if the default
-	 * 						value would be used.
-	 * @param defaultValue 	The default value for the slot.
-	 * @param slotValue 	The slot's current value (or null if !isSlotSet).
-	 */
-	private void createDirectoryEditor(Group group, SlotDetails details, 
-										boolean isSlotSet, Object defaultValue, final Object slotValue) {
-		// TODO: implement this
+	private void createFileDirEditor(Group group, final SlotDetails details, final boolean isSlotSet, 
+									Integer defaultValue, final Integer slotValue, final boolean isFile) {
 		
+		/* 
+		 * Create the Control that displays the current file name. We use a non-editable Text box,
+		 * to make it look consistent with other slots, but without letting the user edit it directly.
+		 */
+		final Text pathLabel = new Text(group, SWT.NONE);
+		pathLabel.setEditable(false);
+		pathLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		/*
+		 * Next, show the "Browse" button and the "Use default" check-box, right next to each other.
+		 */
+		Composite pathSelector = new Composite(group, SWT.NONE);
+		pathSelector.setLayoutData(new GridData(SWT.FILL, SWT.None, true, false));
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginHeight = layout.verticalSpacing = layout.horizontalSpacing = layout.marginWidth = 0;
+		pathSelector.setLayout(layout);
+		final Button browseButton = new Button(pathSelector, SWT.PUSH);
+		browseButton.setText("Browse");
+		final Button checkButton = addDefaultCheckbox(pathSelector, isSlotSet);
+		
+		/* 
+		 * Associate actions with the "use default" check-box to appropriately 
+		 * enable/disable the "Browse" button.
+		 */
+		final SelectionListener select = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean useDefault = checkButton.getSelection();
+				setPathLabel(pathLabel, useDefault ? null : slotValue);
+				browseButton.setEnabled(!useDefault);
+			}
+		};
+		checkButton.addSelectionListener(select);
+		select.widgetSelected(null);
+		
+		/*
+		 * Define the behaviour of the "Browse" button. This will open a file-selection
+		 * dialog and update the path accordingly.
+		 */
+		browseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				VFSTreeSelectionDialog dialog = 
+						new VFSTreeSelectionDialog(getShell(), buildStore,
+								"Please select the new path for this slot", !isFile, isFile);
+				dialog.setAllowMultiple(false);
+				int status = dialog.open();
+				if (status == VFSTreeSelectionDialog.OK) {
+					Object selectedPath = dialog.getFirstResult();
+					if (selectedPath instanceof UIInteger) {
+						int pathId = ((UIInteger)selectedPath).getId();
+						setPathLabel(pathLabel, Integer.valueOf(pathId));
+					}
+				}
+			}
+		});
+		
+		/*
+		 * Register a validator for this field.
+		 */
+		registerField(new Validator() {
+			
+			/* any file value is OK - never any errors given */
+			@Override
+			String getValidationError() {
+				return null;
+			}
+			
+			/* If this field has changed, schedule the undo/redo operation */
+			@Override
+			void scheduleChange(MultiUndoOp multiOp) {
+				boolean newExists = !checkButton.getSelection();
+				int pathId = fileMgr.getPath(pathLabel.getText());
+				if (pathId >= 0) {
+					Integer newValue = newExists ? pathId : null;				
+					if ((newExists != isSlotSet) || !(slotValue.equals(newValue))) {
+						SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+						op.recordChangeSlotValue(subPkgId, details.slotId, isSlotSet, slotValue, newExists, newValue);
+						multiOp.add(op);
+					}
+				}
+			}
+			
+			/* restore default values */
+			@Override
+			void restoreDefaults() {
+				checkButton.setSelection(!isSlotSet);
+				select.widgetSelected(null);
+			}
+		});
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -606,5 +686,27 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 		validators.add(validator);
 	}
 	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Helper method for translating a pathId into a user-facing string, and then setting
+	 * the text of a control to that string value.
+	 * 
+	 * @param pathLabel	The Control that we'll setting the text for. 
+	 * @param pathId	An Integer containing the pathID (or null).
+	 */
+	private void setPathLabel(Text pathLabel, Integer pathId) {
+		if (pathId == null) {
+			pathLabel.setText("<undefined>");
+		} else {
+			String pathName = fileMgr.getPathName(pathId);
+			if (pathName == null) {
+				pathLabel.setText("<invalid>");
+			} else {
+				pathLabel.setText(pathName);
+			}
+		}
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 }

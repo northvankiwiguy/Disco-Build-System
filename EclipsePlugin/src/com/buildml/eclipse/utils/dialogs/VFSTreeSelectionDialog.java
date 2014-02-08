@@ -12,6 +12,10 @@
 
 package com.buildml.eclipse.utils.dialogs;
 
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -30,6 +34,13 @@ import com.buildml.model.IPackageRootMgr;
 public class VFSTreeSelectionDialog extends ElementTreeSelectionDialog {
 	
 	/*=====================================================================================*
+	 * FIELDS/TYPES
+	 *=====================================================================================*/
+
+	/** true, if the user is allowed to select directories (not just files) */
+	private boolean allowDirs;
+	
+	/*=====================================================================================*
 	 * CONSTRUCTORS
 	 *=====================================================================================*/
 
@@ -39,12 +50,15 @@ public class VFSTreeSelectionDialog extends ElementTreeSelectionDialog {
 	 * @param parent		The shell that owns this dialog.
 	 * @param buildStore 	The IBuildStore containing the VFS.
 	 * @param message 		A custom message to display at the top of the dialog.
-	 * @param showFiles		true if we should show files as well as directories.
+	 * @param allowDirs		true if we should allow selection of directories.
+	 * @param allowFiles	true if we should allow selection of files.
 	 */
-	public VFSTreeSelectionDialog(Shell parent, IBuildStore buildStore, String message, boolean showFiles) {
-		super(parent, new VFSLabelProvider(buildStore), new VFSTreeContentProvider(buildStore, showFiles));
+	public VFSTreeSelectionDialog(Shell parent, IBuildStore buildStore, String message, 
+									boolean allowDirs, boolean allowFiles) {
+		super(parent, new VFSLabelProvider(buildStore), new VFSTreeContentProvider(buildStore, allowFiles));
 		
 		IPackageRootMgr pkgRootMgr = buildStore.getPackageRootMgr();
+		this.allowDirs = allowDirs;
 		
 		setInput(new UIInteger[] { new UIDirectory(pkgRootMgr.getRootPath("root")) });
 		
@@ -74,7 +88,24 @@ public class VFSTreeSelectionDialog extends ElementTreeSelectionDialog {
 		Control contents = super.createContents(parent);
 
 		/* customize the dialog box, before it's opened */
-		getTreeViewer().expandToLevel(5);
+		final TreeViewer viewer = getTreeViewer();
+		viewer.expandToLevel(5);
+		
+		/* 
+		 * Unless the user is allowed to select directories, disable the OK button if
+		 * a directory is selected.
+		 */
+		if (!allowDirs) {
+			viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
+				public void selectionChanged(SelectionChangedEvent event) {
+					ITreeSelection selection = (ITreeSelection) viewer.getSelection();
+					Object element = selection.getFirstElement();
+					getButton(OK).setEnabled(!(element instanceof UIDirectory));
+				}
+			});
+		}
+		
 		return contents;
 	}
 	

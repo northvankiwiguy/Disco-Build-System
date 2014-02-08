@@ -194,7 +194,7 @@ public class ActionPropertyPage extends BmlPropertyPage {
 			/* bring up the selection dialog so the user can select a directory */
 			VFSTreeSelectionDialog dialog = 
 					new VFSTreeSelectionDialog(getShell(), buildStore, 
-							"Select the directory in which this action should execute", false);
+							"Select the directory in which this action should execute", true, false);
 
 			/* 
 			 * if OK is pressed, then fetch the selected directory, validate that it's within
