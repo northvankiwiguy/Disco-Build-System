@@ -411,7 +411,7 @@ class SlotMgr {
 				int slotType = rs.getInt(4);
 				int actualSlotPos = rs.getInt(5);
 				int slotCard = rs.getInt(6);
-				String defaultValue = rs.getString(7);
+				Object defaultValue = convertStringToObject(slotType, rs.getString(7));
 				SlotDetails details = 
 						new SlotDetails(slotId, ownerType, ownerId, slotName, slotDescr, slotType, 
 								actualSlotPos, slotCard, defaultValue, null);
@@ -453,7 +453,7 @@ class SlotMgr {
 				String slotDescr = rs.getString(3);
 				int slotPos = rs.getInt(4);
 				int slotCard = rs.getInt(5);
-				String defaultValue = rs.getString(5);
+				Object defaultValue = convertStringToObject(slotType, rs.getString(5));
 				details = new SlotDetails(slotId, ownerType, ownerId, slotName, slotDescr, slotType, 
 						slotPos, slotCard, defaultValue, null);
 			}
