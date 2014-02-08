@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -585,6 +586,21 @@ public class EclipsePartUtils {
 		return bounds.height;
 	}
 
+	/*-------------------------------------------------------------------------------------*/	
+
+	/**
+	 * Return the height (in pixels) required by the font used by the specified Control.
+	 * 
+	 * @param control The control that uses the font.
+	 * @return The height of the control's font, in pixels.
+	 */
+	public static int getFontHeight(Control control) {
+		int pointHeight = control.getFont().getFontData()[0].getHeight();
+		int dpi = Display.getDefault().getDPI().y;
+		int pixelHeight = (int) Math.round((pointHeight * dpi) / 72.0);
+		return pixelHeight;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 	
 	/**
