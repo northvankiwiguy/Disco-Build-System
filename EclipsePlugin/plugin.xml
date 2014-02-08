@@ -1529,7 +1529,7 @@
          </enabledWhen>
       </page>
       <page
-            class="com.buildml.eclipse.packages.properties.SubPackagePropertyPage"
+            class="com.buildml.eclipse.utils.properties.SlotValuePropertyPage"
             id="com.buildml.eclipse.properties.subpackageproperties"
             name="Sub-Package Slot Values">
          <enabledWhen>
