@@ -398,12 +398,13 @@ public class PackageDiagramEditor extends DiagramEditor
 		}
 		
 		/* 
-		 * If the name of *ANY* package was changed, update this diagram so that
+		 * If the name or slots from *ANY* package was changed, update this diagram so that
 		 * sub-packages will now have the correct name drawn on their pictogram. We don't
 		 * actually know if this package has any sub-packages of this type, but changing
 		 * package names is rare, so refreshing is not a problem.
 		 */
-		if (how == IPackageMgrListener.CHANGED_NAME) {
+		if ((how == IPackageMgrListener.CHANGED_NAME) ||
+			(how == IPackageMgrListener.CHANGED_SLOT)) {
 			updateBehavior.markChanged();
 			refreshDiagramLater();
 		}

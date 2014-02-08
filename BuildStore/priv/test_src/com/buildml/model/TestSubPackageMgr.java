@@ -347,6 +347,7 @@ public class TestSubPackageMgr {
 	
 	private static int notifyId;
 	private static int notifyHow;
+	private static int notifyChangeId;
 	
 	/**
 	 * Test the various ways in which ISubPackageMgr can send notifications.
@@ -463,5 +464,74 @@ public class TestSubPackageMgr {
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test that changes to slot values give notifications.
+	 */
+	@Test
+	public void testSlotNotifications() {
+		
+		/* set up a listener for changes to the ISubPackageMgr */
+		ISubPackageMgrListener listener = new ISubPackageMgrListener() {
+			@Override
+			public void subPackageChangeNotification(int subPkgId, int how, int changeId) {
+				TestSubPackageMgr.notifyId = subPkgId;
+				TestSubPackageMgr.notifyHow = how;
+				TestSubPackageMgr.notifyChangeId = changeId;
+			}
+		};
+		subPkgMgr.addListener(listener);
+		
+		/* Create a package and add a slot to that package */
+		int pkgId = pkgMgr.addPackage("MyPackage");
+		assertTrue(pkgId >= 0);
+		int textSlot = pkgMgr.newSlot(pkgId, "textSlot", "This is a text slot", ISlotTypes.SLOT_TYPE_TEXT, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		
+		/* Create a new sub-package */
+		int subPkgId = subPkgMgr.newSubPackage(pkgMgr.getMainPackage(), pkgId);
+		assertTrue(subPkgId > 0);
+		
+		/* give the slot a value for this sub-package, and check that we get notified */
+		notifyId = notifyHow = notifyChangeId = 0;
+		assertEquals(ErrorCode.OK, subPkgMgr.setSlotValue(subPkgId, textSlot, "Hello"));
+		assertEquals(notifyId, subPkgId);
+		assertEquals(notifyHow, ISubPackageMgrListener.CHANGED_SLOT);
+		assertEquals(notifyChangeId, textSlot);
+		
+		/* set a different value, and check for notification */
+		notifyId = notifyHow = notifyChangeId = 0;
+		assertEquals(ErrorCode.OK, subPkgMgr.setSlotValue(subPkgId, textSlot, "Goodbye"));
+		assertEquals(notifyId, subPkgId);
+		assertEquals(notifyHow, ISubPackageMgrListener.CHANGED_SLOT);
+		assertEquals(notifyChangeId, textSlot);
+		
+		/* set the same value again, we shouldn't get notified */
+		notifyId = notifyHow = notifyChangeId = 0;
+		assertEquals(ErrorCode.OK, subPkgMgr.setSlotValue(subPkgId, textSlot, "Goodbye"));
+		assertEquals(notifyId, 0);
+		assertEquals(notifyHow, 0);
+		assertEquals(notifyChangeId, 0);
+		
+		/* clear the slot value - we should get notified */
+		notifyId = notifyHow = notifyChangeId = 0;
+		subPkgMgr.clearSlotValue(subPkgId, textSlot);
+		assertEquals(notifyId, subPkgId);
+		assertEquals(notifyHow, ISubPackageMgrListener.CHANGED_SLOT);
+		assertEquals(notifyChangeId, textSlot);
+		
+		/* clear the slot value again - no notification */
+		notifyId = notifyHow = notifyChangeId = 0;
+		subPkgMgr.clearSlotValue(subPkgId, textSlot);
+		assertEquals(notifyId, 0);
+		assertEquals(notifyHow, 0);
+		assertEquals(notifyChangeId, 0);
+		
+		/* we're done */
+		subPkgMgr.removeListener(listener);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 
 }

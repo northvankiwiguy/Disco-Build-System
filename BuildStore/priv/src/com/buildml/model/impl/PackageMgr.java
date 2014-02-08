@@ -576,8 +576,13 @@ import com.buildml.utils.errors.ErrorCode;
 		}
 		
 		/* delegate the rest of the work to SlotMgr */
-		return slotMgr.newSlot(ISlotTypes.SLOT_OWNER_PACKAGE, typeId, slotName, slotDescr, slotType, 
+		int result = slotMgr.newSlot(ISlotTypes.SLOT_OWNER_PACKAGE, typeId, slotName, slotDescr, slotType, 
 								slotPos, slotCard, defaultValue, enumValues);
+		
+		if (result >= 0) {
+			notifyListeners(typeId, IPackageMgrListener.CHANGED_SLOT);
+		}
+		return result;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -587,7 +592,11 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public int changeSlot(SlotDetails details) {
-		return slotMgr.changeSlot(details);
+		int result = slotMgr.changeSlot(details);
+		if (result == ErrorCode.OK) {
+			notifyListeners(details.ownerId, IPackageMgrListener.CHANGED_SLOT);
+		}
+		return result;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -640,8 +649,18 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public int trashSlot(int slotId) {
 		
-		/* all work can be delegated */
-		return slotMgr.trashSlot(slotId);
+		/* get the slot's details - especially it's owning package */
+		SlotDetails details = getSlotByID(slotId);
+		if (details == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* the rest of work can be delegated */
+		int result = slotMgr.trashSlot(slotId);
+		if (result == ErrorCode.OK) {
+			notifyListeners(details.ownerId, IPackageMgrListener.CHANGED_SLOT);
+		}
+		return result;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -652,8 +671,17 @@ import com.buildml.utils.errors.ErrorCode;
 	@Override
 	public int reviveSlot(int slotId) {
 		
-		/* all work can be delegated */
-		return slotMgr.reviveSlot(slotId);
+		/* much of the work can be delegated */
+		int result = slotMgr.reviveSlot(slotId);
+		
+		/* on success, send a notification about this package */
+		if (result == ErrorCode.OK){
+			SlotDetails details = getSlotByID(slotId);
+			if (details != null) {
+				notifyListeners(details.ownerId, IPackageMgrListener.CHANGED_SLOT);
+			}
+		}
+		return result;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

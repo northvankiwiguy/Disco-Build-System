@@ -347,7 +347,10 @@ import com.buildml.utils.errors.ErrorCode;
 	 */
 	@Override
 	public void clearSlotValue(int subPkgId, int slotId) {
-		slotMgr.clearSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
+		if (isSlotSet(subPkgId, slotId)) {
+			slotMgr.clearSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
+			notifyListeners(subPkgId, ISubPackageMgrListener.CHANGED_SLOT, slotId);
+		}
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

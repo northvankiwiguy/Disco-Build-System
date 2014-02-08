@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -491,6 +492,79 @@ public class TestPackageMgr {
 		assertEquals(ErrorCode.OK, pkgMgr.remove(pkgA));
 		assertEquals(pkgA, notifyPkgValue);
 		assertEquals(IPackageMgrListener.REMOVED_PACKAGE, notifyHowValue);		
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test listener notifications for slot definition changes (adds, changes, trash, revive).
+	 */
+	@Test
+	public void testNotifySlots() {
+
+		/* set up a listener for the pkgMgr */
+		IPackageMgrListener pkgListener = new IPackageMgrListener() {
+			@Override
+			public void packageChangeNotification(int pkgId, int how) {
+				TestPackageMgr.this.notifyPkgValue = pkgId;
+				TestPackageMgr.this.notifyHowValue = how;
+			}
+		};
+		pkgMgr.addListener(pkgListener);
+		
+		/* create a new package */
+		int pkgId = pkgMgr.addPackage("MyPackage");
+
+		/* add a new slot to that package - test for notifications */
+		notifyPkgValue = notifyHowValue = 0;
+		int slotId = pkgMgr.newSlot(pkgId, "MySlot", null, ISlotTypes.SLOT_TYPE_DIRECTORY, 
+						ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		assertTrue(slotId > 0);
+		assertEquals(pkgId, notifyPkgValue);
+		assertEquals(IPackageMgrListener.CHANGED_SLOT, notifyHowValue);
+		
+		/* change the details of the slot - test for notifications */
+		notifyPkgValue = notifyHowValue = 0;
+		SlotDetails details = pkgMgr.getSlotByName(pkgId, "MySlot");
+		assertNotNull(details);
+		details.slotDescr = "New Description Goes Here";
+		assertEquals(ErrorCode.OK, pkgMgr.changeSlot(details));
+		assertEquals(pkgId, notifyPkgValue);
+		assertEquals(IPackageMgrListener.CHANGED_SLOT, notifyHowValue);
+		
+		/* change the details with bad values - returns an error, but no notification */
+		notifyPkgValue = notifyHowValue = 0;
+		details.slotType = ISlotTypes.SLOT_TYPE_BOOLEAN; /* illegal */
+		assertEquals(ErrorCode.INVALID_OP, pkgMgr.changeSlot(details));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);
+		
+		/* trash a slot - test for notifications */
+		notifyPkgValue = notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, pkgMgr.trashSlot(slotId));
+		assertEquals(pkgId, notifyPkgValue);
+		assertEquals(IPackageMgrListener.CHANGED_SLOT, notifyHowValue);
+		
+		/* trash it again - should give an error, but no notification */
+		notifyPkgValue = notifyHowValue = 0;
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.trashSlot(slotId));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);
+		
+		/* revive the slot - test for notifications */
+		notifyPkgValue = notifyHowValue = 0;
+		assertEquals(ErrorCode.OK, pkgMgr.reviveSlot(slotId));
+		assertEquals(pkgId, notifyPkgValue);
+		assertEquals(IPackageMgrListener.CHANGED_SLOT, notifyHowValue);
+		
+		/* revive it again - should give an error, but no notifications */
+		notifyPkgValue = notifyHowValue = 0;
+		assertEquals(ErrorCode.CANT_REVIVE, pkgMgr.reviveSlot(slotId));
+		assertEquals(0, notifyPkgValue);
+		assertEquals(0, notifyHowValue);
+		
+		/* we're done */
+		pkgMgr.removeListener(pkgListener);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

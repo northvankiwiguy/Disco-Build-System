@@ -34,6 +34,9 @@ public interface IPackageMgrListener {
 
 	/** value of "how" if a package's parent is changed */
 	public static final int REPARENT_PACKAGE = 5;
+	
+	/** value of "how" if slots have been added/removed within this package */
+	public static final int CHANGED_SLOT = 6;
 
 	/**
 	 * Called to notify the listener that the specified package has changed.
