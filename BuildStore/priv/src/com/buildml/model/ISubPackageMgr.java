@@ -91,6 +91,57 @@ public interface ISubPackageMgr {
 	public boolean isSubPackageTrashed(int subPkgId);
 	
 	/**
+	 * For this specific sub-package, return the ID of the named slot. This is simply a short-cut
+	 * approach, instead of getting the slotID from the IPackageMgr.
+	 * 
+	 * @param subPkgId		The sub-package that contains the slot.
+	 * @param slotName		The name of the slot.
+	 * @return The slot's ID, or ErrorCode.NOT_FOUND if the sub-package is invalid, or the slot
+	 * name is not valid for this sub-package.
+	 */
+	public abstract int getSlotByName(int subPkgId, String slotName);
+	
+	/**
+	 * For the specified sub-package, set the specified slot to the given value.
+	 * 
+	 * @param subPkgId 	The sub-package that the slot is attached to.
+	 * @param slotId   	The slot that's connected to the action.
+	 * @param value	   	The new value to be set (typically an Integer or String).
+	 * @return ErrorCode.OK on success, ErrorCode.NOT_FOUND if subPkgId is invalid, slotId
+	 *         is invalid, or slotId isn't attached to subPkgId, ErrorCode.BAD_VALUE if
+	 *         the value can't be assigned to the specified slot.
+	 */
+	public abstract int setSlotValue(int subPkgId, int slotId, Object value);
+	
+	/**
+	 * For the specified sub-package, retrieve the specified slot's value. If the value
+	 * has not been explicitly set for this sub-package, the slot default value will be returned.
+	 * 
+	 * @param subPkgId	The sub-package that the slot is attached to.
+	 * @param slotId	The slot that's connected to the sub-package.
+	 * @return The slot's value (typically Integer or String), or null if subPkgId/slotId can't
+	 * be mapped to a valid slot.
+	 */
+	public abstract Object getSlotValue(int subPkgId, int slotId);	
+	
+	/**
+	 * Determine whether the specified slot currently holds a value.
+	 * @param subPkgId	The sub-package that the slot is attached to.
+	 * @param slotId	The slot that's connected to the sub-package.
+	 * @return True if there's an explicit (non-default) value in this slot, else false.
+	 *		   Also return false if subPkgId/slotId are invalid.
+	 */
+	public abstract boolean isSlotSet(int subPkgId, int slotId);
+	
+	/**
+	 * Remove the value (if any) that has been inserted into this slot, therefore setting
+	 * this slot to its default value. If subPkgId or slotId is invalid, silently do nothing.
+	 * @param subPkgId	The sub-package that the slot is attached to.
+	 * @param slotId	The slot that's connected to the sub-package.
+	 */
+	public abstract void clearSlotValue(int subPkgId, int slotId);
+	
+	/**
 	 * Add the specified listener to the list of objects that are notified when
 	 * a sub-package changes in some way.
 	 * 

@@ -404,4 +404,64 @@ public class TestSubPackageMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test slots that are attached to sub-packages.
+	 */
+	@Test
+	public void testSlots() {
+		
+		/* create a new package and add three slots to it */
+		int pkgId = pkgMgr.addPackage("MyPackage");
+		assertTrue(pkgId >= 0);
+		int textSlot = pkgMgr.newSlot(pkgId, "textSlot", "This is a text slot", ISlotTypes.SLOT_TYPE_TEXT, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_REQUIRED, null, null);
+		int intSlot = pkgMgr.newSlot(pkgId, "intSlot", "This is an integer slot", ISlotTypes.SLOT_TYPE_INTEGER, 
+				ISlotTypes.SLOT_POS_LOCAL, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		int boolSlot = pkgMgr.newSlot(pkgId, "boolSlot", "This is a boolean slot", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		assertTrue(textSlot > 0 && intSlot > 0 && boolSlot > 0);
+		
+		/* create a new sub-package */
+		int subPkgId = subPkgMgr.newSubPackage(pkgMgr.getMainPackage(), pkgId);
+		assertTrue(subPkgId > 0);
+		
+		/* test getSlotByName */
+		assertEquals(textSlot, subPkgMgr.getSlotByName(subPkgId, "textSlot"));
+		assertEquals(intSlot, subPkgMgr.getSlotByName(subPkgId, "intSlot"));
+		assertEquals(boolSlot, subPkgMgr.getSlotByName(subPkgId, "boolSlot"));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.getSlotByName(subPkgId, "badSlot"));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.getSlotByName(1234, "textSlot"));
+		
+		/* test setSlotValue */
+		assertEquals(ErrorCode.BAD_VALUE, subPkgMgr.setSlotValue(subPkgId, boolSlot, "Invalid"));
+		assertEquals(ErrorCode.BAD_VALUE, subPkgMgr.setSlotValue(subPkgId, intSlot, true));
+		assertEquals(ErrorCode.NOT_FOUND, subPkgMgr.setSlotValue(1234, textSlot, "Invalid pkgId"));
+		assertEquals(ErrorCode.OK, subPkgMgr.setSlotValue(subPkgId, textSlot, "My Value"));
+		assertEquals(ErrorCode.OK, subPkgMgr.setSlotValue(subPkgId, intSlot, 5));
+		assertEquals(ErrorCode.OK, subPkgMgr.setSlotValue(subPkgId, boolSlot, true));
+		
+		/* test getSlotValue */
+		assertEquals("My Value", subPkgMgr.getSlotValue(subPkgId, textSlot));
+		assertEquals(Integer.valueOf(5), subPkgMgr.getSlotValue(subPkgId, intSlot));
+		assertEquals(Boolean.TRUE, subPkgMgr.getSlotValue(subPkgId, boolSlot));
+		assertNull(subPkgMgr.getSlotValue(subPkgId, 1357));
+		assertNull(subPkgMgr.getSlotValue(8987, boolSlot));
+	
+		/* test isSlotSet and clearSlotValue */
+		assertTrue(subPkgMgr.isSlotSet(subPkgId, textSlot));
+		assertTrue(subPkgMgr.isSlotSet(subPkgId, intSlot));
+		assertTrue(subPkgMgr.isSlotSet(subPkgId, boolSlot));
+		subPkgMgr.clearSlotValue(subPkgId, textSlot);
+		assertFalse(subPkgMgr.isSlotSet(subPkgId, textSlot));
+		assertTrue(subPkgMgr.isSlotSet(subPkgId, intSlot));
+		assertTrue(subPkgMgr.isSlotSet(subPkgId, boolSlot));
+		subPkgMgr.clearSlotValue(subPkgId, intSlot);
+		assertFalse(subPkgMgr.isSlotSet(subPkgId, textSlot));
+		assertFalse(subPkgMgr.isSlotSet(subPkgId, intSlot));
+		assertTrue(subPkgMgr.isSlotSet(subPkgId, boolSlot));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
 }

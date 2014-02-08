@@ -21,8 +21,10 @@ import com.buildml.model.FatalBuildStoreError;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IPackageMemberMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISubPackageMgr;
 import com.buildml.model.ISubPackageMgrListener;
+import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.utils.errors.ErrorCode;
 
 /**
@@ -257,6 +259,93 @@ import com.buildml.utils.errors.ErrorCode;
 		} catch (SQLException e) {
 			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
 		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#getSlotByName(int, java.lang.String)
+	 */
+	@Override
+	public int getSlotByName(int subPkgId, String slotName) {
+		
+		int pkgId = getSubPackageType(subPkgId);
+		if (pkgId == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		SlotDetails details = pkgMgr.getSlotByName(pkgId, slotName);
+		if (details == null) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		return details.slotId;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#setSlotValue(int, int, java.lang.Object)
+	 */
+	@Override
+	public int setSlotValue(int subPkgId, int slotId, Object value) {
+
+		/* validate subPkgId */
+		if (!isSubPackageValid(subPkgId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+				
+		/* what is the current slot value? */
+		Object oldValue = slotMgr.getSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
+		
+		/* if no change in value, do nothing */
+		if (((oldValue == null) && (value == null)) || 
+			((oldValue != null) && (oldValue.equals(value)))) {
+			return ErrorCode.OK;
+		}
+		
+		/* delegate all slot assignments to SlotMgr */
+		int status = slotMgr.setSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId, value);
+		
+		/* notify listeners about the change */
+		notifyListeners(subPkgId, ISubPackageMgrListener.CHANGED_SLOT, slotId);
+		return status;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#getSlotValue(int, int)
+	 */
+	@Override
+	public Object getSlotValue(int subPkgId, int slotId) {
+		
+		/* validate subPkgId */
+		if (!isSubPackageValid(subPkgId)) {
+			return null;
+		}
+
+		/* delegate all slot assignments to SlotMgr */
+		return slotMgr.getSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#isSlotSet(int, int)
+	 */
+	@Override
+	public boolean isSlotSet(int subPkgId, int slotId) {
+		return slotMgr.isSlotSet(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.ISubPackageMgr#clearSlotValue(int, int)
+	 */
+	@Override
+	public void clearSlotValue(int subPkgId, int slotId) {
+		slotMgr.clearSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
