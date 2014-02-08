@@ -190,7 +190,7 @@ public class SlotDefinitionDialog extends BmlTitleAreaDialog {
 		details.slotCard = getSlotCardFromName(cardCombo.getText());
 		
 		/* fetch the slotDescr field */
-		details.slotDescr = descrEntry.getText();
+		details.slotDescr = descrEntry.getText().trim();
 		
 		/* now close the dialog box */
 		super.okPressed();

@@ -38,6 +38,7 @@ import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileGroupMgr;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMgr;
+import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.ISubPackageMgr;
 import com.buildml.utils.print.PrintUtils;
@@ -235,14 +236,34 @@ public class PackageToolBehaviorProvider extends DefaultToolBehaviorProvider {
         	if (pkgTypeId < 0) {
         		return null;
         	}
+        	
+        	/* display the type name (which is itself a package name) */
+    		StringBuilder sb = new StringBuilder();
         	String pkgTypeName = pkgMgr.getName(pkgTypeId);
         	if (pkgTypeName != null) {
-        		StringBuilder sb = new StringBuilder();
         		sb.append("\n Sub-Package: ");
         		sb.append(pkgTypeName);
-        		sb.append(" \n");
-        		return sb.toString();
+        		sb.append(" \n\n");
         	}
+        	
+        	/* Display the parameter values for this sub-package */
+        	SlotDetails slots[] = pkgMgr.getSlots(pkgTypeId, ISlotTypes.SLOT_POS_PARAMETER);
+        	if (slots != null) {
+        		for (SlotDetails details : slots) {
+					Object value = subPkgMgr.getSlotValue(subPkgId, details.slotId);
+					sb.append(" - ");
+					sb.append(details.slotName);
+					sb.append(": ");
+					if (value == null) {
+						sb.append("null");
+					} else {
+						sb.append(value.toString());
+					}
+					sb.append(" \n");
+				}
+        	}
+        	
+    		return sb.toString();
         }
         
         /* else, return the default tooltip */

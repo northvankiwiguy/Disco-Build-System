@@ -333,7 +333,7 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 			@Override
 			void scheduleChange(MultiUndoOp multiOp) {
 				boolean newExists = !checkButton.getSelection();
-				String newValue = newExists ? textBox.getText() : slotValue;				
+				String newValue = newExists ? textBox.getText().trim() : slotValue;				
 				if ((newExists != isSlotSet) || !(slotValue.equals(newValue))) {
 					SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
 					op.recordChangeSlotValue(subPkgId, details.slotId, isSlotSet, slotValue, newExists, newValue);
