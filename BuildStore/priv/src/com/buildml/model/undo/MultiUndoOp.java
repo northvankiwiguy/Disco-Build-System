@@ -53,7 +53,16 @@ public class MultiUndoOp implements IUndoOp {
 	public void add(IUndoOp op) {
 		opList.add(op);
 	}
-	
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * @return The number of operations in this multi-operation.
+	 */
+	public int size() {
+		return opList.size();
+	}
+
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
