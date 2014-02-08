@@ -742,10 +742,12 @@ public class ActionMgr implements IActionMgr {
 				
 		/* what is the current slot value? */
 		Object oldValue = slotMgr.getSlotValue(ISlotTypes.SLOT_OWNER_ACTION, actionId, slotId);
-		
+		boolean isAlreadySet = isSlotSet(actionId, slotId);
+
 		/* if no change in value, do nothing */
-		if (((oldValue == null) && (value == null)) || 
-			((oldValue != null) && (oldValue.equals(value)))) {
+		if (isAlreadySet && 
+				(((oldValue == null) && (value == null)) ||
+				((oldValue != null) && (oldValue.equals(value))))) {
 			return ErrorCode.OK;
 		}
 		

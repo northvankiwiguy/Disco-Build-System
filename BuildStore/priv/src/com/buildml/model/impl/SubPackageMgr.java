@@ -296,10 +296,12 @@ import com.buildml.utils.errors.ErrorCode;
 				
 		/* what is the current slot value? */
 		Object oldValue = slotMgr.getSlotValue(ISlotTypes.SLOT_OWNER_PACKAGE, subPkgId, slotId);
-		
+		boolean isAlreadySet = isSlotSet(subPkgId, slotId);
+
 		/* if no change in value, do nothing */
-		if (((oldValue == null) && (value == null)) || 
-			((oldValue != null) && (oldValue.equals(value)))) {
+		if (isAlreadySet &&
+				(((oldValue == null) && (value == null)) ||
+				 ((oldValue != null) && (oldValue.equals(value))))) {
 			return ErrorCode.OK;
 		}
 		

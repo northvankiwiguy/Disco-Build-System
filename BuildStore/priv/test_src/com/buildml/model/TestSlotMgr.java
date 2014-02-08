@@ -758,6 +758,12 @@ public class TestSlotMgr {
 		assertEquals(Integer.valueOf(101), actionMgr.getSlotValue(actionId, dir1SlotId));
 
 		/*
+		 * Test the setting a slot to its default value will still cause it to be explicitly set.
+		 */
+		assertEquals(ErrorCode.OK, actionMgr.setSlotValue(actionId, dir2SlotId, Integer.valueOf(43)));
+		assertTrue(actionMgr.isSlotSet(actionId, dir2SlotId));
+		
+		/*
 		 * Test a range of invalid values.
 		 */
 		
