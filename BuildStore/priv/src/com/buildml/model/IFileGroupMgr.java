@@ -98,18 +98,6 @@ public interface IFileGroupMgr {
 	int newFilterGroup(int pkgId, int predGroupId);
 	
 	/**
-	 * Create a file group of the specified type. This is simply a generalized
-	 * version of newSourceGroup(), newGeneratedGroup() or newMergeGroup().
-	 * 
-	 * @param pkgId	The ID of the package that this group will belong to.
-	 * @param type  The group's type (SOURCE_GROUP, GENERATED_GROUP, MERGE_GROUP, FILTER_GROUP).
-	 * @param predId For FILTER_GROUP, which other group are we filtering?
-	 * @return The unique ID number of this new group, ErrorCode.NOT_FOUND
-	 * if the package ID is invalid, or ErrorCode.BAD_VALUE if the type is invalid.
-	 */
-	int newGroup(int pkgId, int type, int predId);
-	
-	/**
 	 * Return the type of the specified file group.
 	 * 
 	 * @param groupId The ID of the group to determine the type of.

@@ -228,49 +228,6 @@ public class FileGroupMgr implements IFileGroupMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#newGroup(int, int)
-	 */
-	@Override
-	public int newGroup(int pkgId, int type, int predId) {
-		
-		int lastRowId;
-		
-		/* validate inputs */
-		if ((type < IFileGroupMgr.SOURCE_GROUP) ||
-			(type > IFileGroupMgr.FILTER_GROUP)) {
-			return ErrorCode.BAD_VALUE;
-		}
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
-		if (!pkgMgr.isValid(pkgId)) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		/* insert the new group into the database, returning the new group ID */
-		try {
-			insertNewGroupPrepStmt.setInt(1, type);
-			insertNewGroupPrepStmt.setInt(2, predId);
-			db.executePrepUpdate(insertNewGroupPrepStmt);
-			
-			lastRowId = db.getLastRowID();
-			
-			/* insert the default package membership values */
-			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_FILE_GROUP);
-			insertPackageMemberPrepStmt.setInt(2, lastRowId);
-			insertPackageMemberPrepStmt.setInt(3, pkgId);
-			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
-			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
-				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
-			}
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		
-		return lastRowId; 
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileGroupMgr#getGroupType(int)
 	 */
 	@Override
@@ -934,6 +891,54 @@ public class FileGroupMgr implements IFileGroupMgr {
 	/*=====================================================================================*
 	 * PRIVATE METHODS
 	 *=====================================================================================*/
+
+	/**
+	 * Helper method for creating a new group. This is only invoked by public methods
+	 * such as newSourceGroup(), newMergeGroup(), etc.
+	 * 
+	 * @param pkgId   ID of the package to add the group to.
+	 * @param type    The type of the new group (SOURCE, GENERATED, etc)
+	 * @param optArg1 Some group types contain an additional argument.
+	 * @return The new group's ID. 
+	 */
+	private int newGroup(int pkgId, int type, int optArg1) {
+		
+		int lastRowId;
+		
+		/* validate inputs */
+		if ((type < IFileGroupMgr.SOURCE_GROUP) ||
+			(type > IFileGroupMgr.FILTER_GROUP)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		if (!pkgMgr.isValid(pkgId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* insert the new group into the database, returning the new group ID */
+		try {
+			insertNewGroupPrepStmt.setInt(1, type);
+			insertNewGroupPrepStmt.setInt(2, optArg1);
+			db.executePrepUpdate(insertNewGroupPrepStmt);
+			
+			lastRowId = db.getLastRowID();
+			
+			/* insert the default package membership values */
+			insertPackageMemberPrepStmt.setInt(1, IPackageMemberMgr.TYPE_FILE_GROUP);
+			insertPackageMemberPrepStmt.setInt(2, lastRowId);
+			insertPackageMemberPrepStmt.setInt(3, pkgId);
+			insertPackageMemberPrepStmt.setInt(4, IPackageMemberMgr.SCOPE_NONE);
+			if (db.executePrepUpdate(insertPackageMemberPrepStmt) != 1) {
+				throw new FatalBuildStoreError("Unable to insert new record into packageMembers table");
+			}
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		return lastRowId; 
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 
 	/**
 	 * Fetch the pathId and pathString values for a specific (groupId/index) combination.

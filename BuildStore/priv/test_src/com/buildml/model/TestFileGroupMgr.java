@@ -101,29 +101,6 @@ public class TestFileGroupMgr {
 		assertEquals(pkg2Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group2Id).pkgId);
 		assertEquals(pkg3Id, pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, group3Id).pkgId);
 	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/**
-	 * Test adding new file group, but with errored parameters.
-	 */
-	@Test
-	public void testNewFileGroupErrors() {
-
-		/* test with invalid group type */
-		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newGroup(pkg1Id, -1, -1));
-		assertEquals(ErrorCode.BAD_VALUE, fileGroupMgr.newGroup(pkg1Id, 5, -1));
-		
-		/* test with invalid package ID */
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newGroup(-1, IFileGroupMgr.SOURCE_GROUP, -1));
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.newGroup(1000, IFileGroupMgr.SOURCE_GROUP, -1));
-
-		/* test get of file group type with bad group Id */
-		assertEquals(ErrorCode.NOT_FOUND, fileGroupMgr.getGroupType(1000));
-		
-		/* test get of file group package with bad group Id. */
-		assertNull(pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, 1000));
-	}
 	
 	/*-------------------------------------------------------------------------------------*/
 	
