@@ -259,6 +259,43 @@ public interface IPackageMgr {
 	public abstract int reviveSlot(int slotId);
 	
 	/**
+	 * Declare a specific file group within this package to be exported into one or
+	 * more of the package's output slots. Although a particular file group may be
+	 * exported into multiple output slots, each output slot may only have at most one
+	 * file group exported into it.
+	 * 
+	 * @param fileGroupId The ID of the file group to export into the slot.
+	 * @param slotId The output slot ID.
+	 * @return ErrorCode.OK               on success,
+	 *         ErrorCode.BAD_VALUE        if fileGroupId is not valid,
+	 *         ErrorCode.NOT_FOUND        if slotId is not valid, or isn't an output slot for the package
+	 *                                    that fileGroupId belongs to,
+	 *         ErrorCode.ONLY_ONE_ALLOWED if slotId already has a file group mapped into it.
+	 */
+	public abstract int exportFileGroupToSlot(int fileGroupId, int slotId);
+
+	/**
+	 * Fetch the ID of the file group which is exported into the specified output slot.
+	 * 
+	 * @param slotId The output slot ID.
+	 * 
+	 * @return The exported file group ID, or
+	 *         ErrorCode.NOT_FOUND slotId is invalid, or is not an output slot,
+	 *         ErrorCode.BAD_VALUE there is no file group exported into this slot.
+	 */
+	public abstract int getExportedFileGroup(int slotId);
+	
+	/**
+	 * Remove the exported file group from the specified output slot.
+	 * 
+	 * @param slotId The output slot ID.
+	 * @return ErrorCode.OK on success,
+	 *         ErrorCode.NOT_FOUND slotId is invalid, or is not an output slot.
+	 *         ErrorCode.BAD_VALUE there is no file group currently exported into this slot.
+	 */
+	public abstract int removeExport(int slotId);
+	
+	/**
 	 * Add the specified listener to the list of objects that are notified when
 	 * a package changes in some way.
 	 * 

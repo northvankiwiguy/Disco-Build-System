@@ -39,6 +39,7 @@ public class TestSlotMgr {
 	IActionTypeMgr actionTypeMgr;
 	IActionMgr actionMgr;
 	IPackageMgr pkgMgr;
+	IFileGroupMgr fileGroupMgr;
 
 	/*-------------------------------------------------------------------------------------*/
 
@@ -54,6 +55,7 @@ public class TestSlotMgr {
 		actionTypeMgr = bs.getActionTypeMgr();
 		actionMgr = bs.getActionMgr();
 		pkgMgr = bs.getPackageMgr();
+		fileGroupMgr = bs.getFileGroupMgr();
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -961,5 +963,140 @@ public class TestSlotMgr {
 	}
 		
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test method for PackageMgr.exportFileGroupToSlot() and related methods.
+	 */
+	@Test
+	public void testExportFileGroupToSlot() {
+		
+		/* create a new package that the file groups will be exported from */
+		int pkgId = pkgMgr.addPackage("MyExportPkg");
+		assertTrue(pkgId > 0);
+		
+		/* add 4 output slots  */
+		int outputSlot1 = pkgMgr.newSlot(pkgId, "Output_1", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+						ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		int outputSlot2 = pkgMgr.newSlot(pkgId, "Output_2", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+						ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		int outputSlot3 = pkgMgr.newSlot(pkgId, "Output_3", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		int outputSlot4 = pkgMgr.newSlot(pkgId, "Output_4", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		assertTrue(outputSlot1 > 0);
+		assertTrue(outputSlot2 > 0);
+		assertTrue(outputSlot3 > 0);
+		assertTrue(outputSlot4 > 0);
+		
+		/* create three file groups in the package */
+		int fileGroup1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fileGroup2 = fileGroupMgr.newSourceGroup(pkgId);
+		int fileGroup3 = fileGroupMgr.newSourceGroup(pkgId);
+		assertTrue(fileGroup1 > 0);
+		assertTrue(fileGroup2 > 0);
+		assertTrue(fileGroup3 > 0);
+		
+		/* 
+		 * Set up the following export mapping
+		 *   - fileGroup1 -> slot1
+		 *   - fileGroup2 -> slot2
+		 *   - fileGroup2 -> slot3
+		 *   - nothing    -> slot4
+		 */
+		assertEquals(ErrorCode.OK, pkgMgr.exportFileGroupToSlot(fileGroup1, outputSlot1));
+		assertEquals(ErrorCode.OK, pkgMgr.exportFileGroupToSlot(fileGroup2, outputSlot2));
+		assertEquals(ErrorCode.OK, pkgMgr.exportFileGroupToSlot(fileGroup2, outputSlot3));
 
+		/* validate the content of slot1 */
+		assertEquals(fileGroup1, pkgMgr.getExportedFileGroup(outputSlot1));
+		
+		/* validate the content of slot2 */
+		assertEquals(fileGroup2, pkgMgr.getExportedFileGroup(outputSlot2));
+
+		/* validate the content of slot3 */
+		assertEquals(fileGroup2, pkgMgr.getExportedFileGroup(outputSlot3));
+
+		/* validate the content of slot4 */
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.getExportedFileGroup(outputSlot4));
+
+		/* remove the value from slot 3 - validate that it's now empty, and that slot1/2 have values */
+		assertEquals(ErrorCode.OK, pkgMgr.removeExport(outputSlot3));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.getExportedFileGroup(outputSlot3));
+		assertEquals(fileGroup1, pkgMgr.getExportedFileGroup(outputSlot1));
+		assertEquals(fileGroup2, pkgMgr.getExportedFileGroup(outputSlot2));
+
+		/* remove the value from slot 1 - validate that it's now empty (along with slot3), and slot 2 has a value */
+		assertEquals(ErrorCode.OK, pkgMgr.removeExport(outputSlot1));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.getExportedFileGroup(outputSlot1));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.getExportedFileGroup(outputSlot3));
+		assertEquals(fileGroup2, pkgMgr.getExportedFileGroup(outputSlot2));
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * Test method for error cases with PackageMgr.exportFileGroupToSlot() and related methods.
+	 */
+	@Test
+	public void testExportFileGroupToSlotErrors() {
+		
+		/* create a new package that the file groups will be exported from */
+		int pkgId = pkgMgr.addPackage("MyExportPkg");
+		assertTrue(pkgId > 0);
+		
+		/* add 2 output slots and 1 parameter slot */
+		int outputSlot1 = pkgMgr.newSlot(pkgId, "Output_1", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		int outputSlot2 = pkgMgr.newSlot(pkgId, "Output_2", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		int paramSlot = pkgMgr.newSlot(pkgId, "Param", "", ISlotTypes.SLOT_TYPE_BOOLEAN, 
+				ISlotTypes.SLOT_POS_PARAMETER, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		assertTrue(outputSlot1 > 0);
+		assertTrue(outputSlot2 > 0);
+		assertTrue(paramSlot > 0);
+		
+		/* create three file groups in the package */
+		int fg1 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg2 = fileGroupMgr.newSourceGroup(pkgId);
+		int fg3 = fileGroupMgr.newSourceGroup(pkgId);
+		assertTrue(fg1 > 0 && fg2 > 0 && fg3 > 0);	
+		
+		/* try to export an invalid file group ID - ErrorCode.BAD_VALUE */
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.exportFileGroupToSlot(1000, outputSlot1));
+		
+		/* try to export to an invalid slot ID - ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.exportFileGroupToSlot(fg1, 1000));
+		
+		/* try to export to a parameter slot ID - ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.exportFileGroupToSlot(fg1, paramSlot));
+
+		/* try to export into a slot that's in a different package than the file group */
+		int pkgIdOther = pkgMgr.addPackage("Other");
+		assertTrue(pkgIdOther > 0);
+		int outputSlot3 = pkgMgr.newSlot(pkgIdOther, "Output_3", "", ISlotTypes.SLOT_TYPE_FILEGROUP, 
+				ISlotTypes.SLOT_POS_OUTPUT, ISlotTypes.SLOT_CARD_OPTIONAL, null, null);
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.exportFileGroupToSlot(fg3, outputSlot3));
+
+		/* try to export two different file groups into the same slot - ErrorCode.ONLY_ONE_ALLOWED */
+		assertEquals(ErrorCode.OK, pkgMgr.exportFileGroupToSlot(fg1, outputSlot1));
+		assertEquals(ErrorCode.ONLY_ONE_ALLOWED, pkgMgr.exportFileGroupToSlot(fg2, outputSlot1));
+		
+		/* try to fetch from an invalid slot ID - ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getExportedFileGroup(1234));
+
+		/* try to fetch from a parameter slot ID - ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.getExportedFileGroup(paramSlot));
+		
+		/* try to fetch from an output slot that is empty - ErrorCode.BAD_VALUE */
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.getExportedFileGroup(outputSlot2));
+
+		/* try to remove the value from an invalid slot ID - ErrorCode.NOT_FOUND */
+		assertEquals(ErrorCode.NOT_FOUND, pkgMgr.removeExport(-1));
+
+		/* try to remove the value from an empty slot - ErrorCode.BAD_VALUE */
+		assertEquals(ErrorCode.OK, pkgMgr.removeExport(outputSlot1));
+		assertEquals(ErrorCode.BAD_VALUE, pkgMgr.removeExport(outputSlot1));
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
 }

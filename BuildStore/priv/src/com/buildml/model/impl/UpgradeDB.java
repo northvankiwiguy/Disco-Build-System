@@ -232,6 +232,13 @@ public class UpgradeDB {
 				stat.executeUpdate("drop table slotTypestmp");
 			}
 			
+			/* 
+			 * Update to 409 - Create the package exports table
+			 */
+			if (dbVersion < 409) {
+				stat.executeUpdate("create table pkgExports (fileGroupId integer, slotId integer)");
+			}
+			
 			/* finish by setting the new version number */
 			stat.executeUpdate("update schemaVersion set version=" + BuildStoreDB.SCHEMA_VERSION);
 		

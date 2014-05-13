@@ -172,6 +172,7 @@ public class BuildStore implements IBuildStore {
 		((FileMgr)fileMgr).initPass2();
 		((ActionMgr)actionMgr).initPass2();
 		((SubPackageMgr)subPkgMgr).initPass2();
+		((PackageMgr)packages).initPass2();
 		
 		/*
 		 * When the database is first created, it won't have the "workspace" root set.

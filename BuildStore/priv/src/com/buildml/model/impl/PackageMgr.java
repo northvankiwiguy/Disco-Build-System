@@ -22,6 +22,7 @@ import com.buildml.model.IActionMgr;
 import com.buildml.model.IBuildStore;
 import com.buildml.model.IFileMgr;
 import com.buildml.model.IPackageMemberMgr;
+import com.buildml.model.IPackageMemberMgr.PackageDesc;
 import com.buildml.model.IPackageMgr;
 import com.buildml.model.IPackageMgrListener;
 import com.buildml.model.IPackageRootMgr;
@@ -30,6 +31,7 @@ import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.types.FileSet;
 import com.buildml.model.types.ActionSet;
 import com.buildml.utils.errors.ErrorCode;
+import com.buildml.utils.errors.FatalError;
 
 /**
  * A manager class (that supports the BuildStore class) responsible for managing all 
@@ -67,6 +69,9 @@ import com.buildml.utils.errors.ErrorCode;
 	/** The ActionMgr object that manages the actions in our packages. */
 	private IActionMgr actionMgr = null;
 	
+	/** The PackageMemberMgr object that manages the members of this package. */
+	private IPackageMemberMgr pkgMemberMgr = null;
+	
 	/** The SlotMgr object that manages the slots in our packages. */
 	private SlotMgr slotMgr = null;	
 
@@ -83,7 +88,10 @@ import com.buildml.utils.errors.ErrorCode;
 		updatePackageNamePrepStmt = null,
 		findAllPackagesPrepStmt = null,
 		findChildPackagesPrepStmt = null,
-		removePackageByIdPrepStmt = null;
+		removePackageByIdPrepStmt = null,
+		insertExportPrepStmt = null,
+		findExportPrepStmt = null,
+		removeExportPrepStmt = null;
 	
 	/** The event listeners who are registered to learn about package changes */
 	List<IPackageMgrListener> listeners = new ArrayList<IPackageMgrListener>();
@@ -126,8 +134,23 @@ import com.buildml.utils.errors.ErrorCode;
 				"select id from packages where parent = ? and id != " + ROOT_FOLDER_ID + 
 				" order by isFolder desc, name collate nocase");
 		removePackageByIdPrepStmt = db.prepareStatement("delete from packages where id = ?");
+		insertExportPrepStmt = db.prepareStatement("insert into pkgExports values (?, ?)");
+		findExportPrepStmt = db.prepareStatement("select fileGroupId from pkgExports where slotId = ?");
+		removeExportPrepStmt = db.prepareStatement("delete from pkgExports where slotId = ?");
 	}
-
+	
+	/*=====================================================================================*
+	 * PACKAGE-PRIVATE METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * A second phase of initialization, needed when managers aren't fully initialized
+	 * in the necessary order.
+	 */
+	public void initPass2() {
+		this.pkgMemberMgr = buildStore.getPackageMemberMgr();
+	}
+	
 	/*=====================================================================================*
 	 * PUBLIC METHODS
 	 *=====================================================================================*/
@@ -682,6 +705,129 @@ import com.buildml.utils.errors.ErrorCode;
 			}
 		}
 		return result;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#exportFileGroupToSlot(int, int)
+	 */
+	@Override
+	public int exportFileGroupToSlot(int fileGroupId, int slotId) {
+		
+		/*
+		 * Test fileGroupId for validity, and fetch the packageId. On failure, return
+		 * ErrorCode.BAD_VALUE.
+		 */
+		PackageDesc desc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, fileGroupId);
+		if (desc == null) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/*
+		 *  Test slotId for validity, check that it's an output slot for the package 
+		 *  containing the file group. On failure, return ErrorCode.NOT_FOUND.
+		 */
+		SlotDetails slotDetails = slotMgr.getSlotByID(slotId);
+		if ((slotDetails == null) || 
+				(slotDetails.slotPos != ISlotTypes.SLOT_POS_OUTPUT) ||
+				(slotDetails.ownerType != ISlotTypes.SLOT_OWNER_PACKAGE) ||
+				(slotDetails.ownerId != desc.pkgId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/*
+		 * Check if the output slot already has a value in it. If so, return 
+		 * ErrorCode.ONLY_ONE_ALLOWED.
+		 */
+		if (getExportedFileGroup(slotId) != ErrorCode.BAD_VALUE) {
+			return ErrorCode.ONLY_ONE_ALLOWED;
+		}
+
+		/* update the database */
+		try {
+			insertExportPrepStmt.setInt(1, fileGroupId);
+			insertExportPrepStmt.setInt(2, slotId);
+			db.executePrepUpdate(insertExportPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#getExportedFileGroup(int)
+	 */
+	@Override
+	public int getExportedFileGroup(int slotId) {
+		
+		/* ensure that slotId is valid, and is an output slot */
+		SlotDetails slotDetails = slotMgr.getSlotByID(slotId);
+		if ((slotDetails == null) || 
+				(slotDetails.slotPos != ISlotTypes.SLOT_POS_OUTPUT) ||
+				(slotDetails.ownerType != ISlotTypes.SLOT_OWNER_PACKAGE)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* look up the file group, given the slotID */
+		Integer result[] = null;
+		try {
+			findExportPrepStmt.setInt(1, slotId);
+			result = db.executePrepSelectIntegerColumn(findExportPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* no result => the slot exists, but has no value right now */
+		if (result.length == 0) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* happy path - one result */
+		else if (result.length == 1) {
+			return result[0].intValue();
+		} 
+		
+		/* error case */
+		else {
+			/* 
+			 * Handle case where multiple results exist. This case will only make
+			 * sense when variants are supported.
+			 */
+			throw new FatalError("Can't have multiple file groups in a single slot");
+		}
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IPackageMgr#removeExport(int)
+	 */
+	@Override
+	public int removeExport(int slotId) {
+		
+		/* validate the slotId is a valid output slot */
+		SlotDetails slotDetails = slotMgr.getSlotByID(slotId);
+		if ((slotDetails == null) || 
+				(slotDetails.slotPos != ISlotTypes.SLOT_POS_OUTPUT) ||
+				(slotDetails.ownerType != ISlotTypes.SLOT_OWNER_PACKAGE)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* update the database */
+		int rowCount = 0;
+		try {
+			removeExportPrepStmt.setInt(1, slotId);
+			rowCount = db.executePrepUpdate(removeExportPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Unable to execute SQL statement", e);
+		}
+		
+		/* to be successful, we must have removed a row */
+		return (rowCount == 0) ? ErrorCode.BAD_VALUE : ErrorCode.OK;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/

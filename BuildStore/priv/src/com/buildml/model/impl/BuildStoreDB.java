@@ -52,7 +52,7 @@ import com.buildml.model.IPackageMemberMgr;
 	 * If the database we're reading has a newer schema, we can't handle it. If
 	 * it has an older schema, we need to upgrade it.
 	 */
-	public static final int SCHEMA_VERSION = 408;
+	public static final int SCHEMA_VERSION = 409;
 
 	/** Prepared Statements to make database access faster. */
 	private PreparedStatement lastRowIDPrepStmt = null;
@@ -338,6 +338,9 @@ import com.buildml.model.IPackageMemberMgr;
 			/* Create the subPackage table */
 			stat.executeUpdate("create table subPackages (subPkgId integer primary key, pkgTypeId integer, " +
 								"trashed integer)");
+			
+			/* Create the package exports table */
+			stat.executeUpdate("create table pkgExports (fileGroupId integer, slotId integer)");
 
 			stat.close();
 						
