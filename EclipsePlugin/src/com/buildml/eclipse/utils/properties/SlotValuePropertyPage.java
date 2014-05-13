@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -204,7 +205,16 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 		
 		/* prepare the top-level Composite in which everything else is placed */
 		setTitle("Sub-Package Properties:");
-		Composite panel = new Composite(parent, SWT.NONE);
+		
+		/* put everything inside a scrolled composite, in case we have a very long list of slots */
+		ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.BORDER | SWT.V_SCROLL);
+		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		scrolledComposite.setLayout(new GridLayout());
+		scrolledComposite.setAlwaysShowScrollBars(true);
+		
+		
+		/* create a sub-composite that contains all the slot details */
+		Composite panel = new Composite(scrolledComposite, SWT.NONE);
 		panel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		GridLayout layout = new GridLayout();
 		layout.marginHeight = 0;
@@ -277,7 +287,13 @@ public class SlotValuePropertyPage extends BmlPropertyPage {
 			}
 		}
 		
-		return panel;
+		/* tell the ScrolledComposite what it's managing, and how big it should be. */
+		scrolledComposite.setContent(panel);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setMinWidth(0);
+		panel.setSize(panel.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
+		return scrolledComposite;
 	}
 	
 	/*=====================================================================================*
