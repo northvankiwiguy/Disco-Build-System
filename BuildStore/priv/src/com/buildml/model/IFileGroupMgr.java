@@ -417,6 +417,49 @@ public interface IFileGroupMgr {
 	int clearTransientPathStrings(int groupId);
 	
 	/*=====================================================================================*
+	 * SUB-PACKAGE GROUP METHODS
+	 *=====================================================================================*/
+	
+	/**
+	 * Create a new "Sub-Package Group" which is essentially a reference to one of the
+	 * file groups that is exported by a sub-package into one of its output slots. Since
+	 * sub-packages can only appear within a single package, there's no requirement to
+	 * specify the package ID.
+	 * 
+	 * @param subPkgId The ID of the sub-package that this file group is exported from.
+	 * @param slotId   The ID of the output slot that the file group is exported into.
+	 * 
+	 * @return The newly allocated unique ID number of this group, or 
+	 *       ErrorCode.NOT_FOUND     If the sub-package ID is invalid.
+	 *       ErrorCode.BAD_VALUE     If slotId isn't a valid output slot for the sub-package,
+	 *       ErrorCode.LOOP_DETECTED If creating this new sub-package would create a cycle
+	 *                               in the package/sub-package hierarchy.
+	 */
+	int newSubPackageGroup(int subPkgId, int slotId);
+	
+	/**
+	 * Return this sub-package group's associated sub-package.
+	 * 
+	 * @param groupId The file group from which to obtain the associated sub-package.
+	 * 
+	 * @return The associated sub-package, or
+	 *      ErrorCode.NOT_FOUND  if groupId is invalid,
+	 * 		ErrorCode.INVALID_OP if this is not a sub-package group.
+	 */
+	int getSubPkgId(int groupId);
+	
+	/**
+	 * Return this sub-package group's associated output slot.
+	 * 
+	 * @param groupId The file group from which to obtain the associated output slot.
+	 * 
+	 * @return The associated output slot, or
+	 *      ErrorCode.NOT_FOUND  if groupId is invalid,
+	 * 		ErrorCode.INVALID_OP if this is not a sub-package group.
+	 */
+	int getSubPkgSlotId(int groupId);
+	
+	/*=====================================================================================*
 	 * OTHER METHODS
 	 *=====================================================================================*/
 

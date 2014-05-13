@@ -861,6 +861,39 @@ public class FileGroupMgr implements IFileGroupMgr {
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#newSubPackageGroup(int, int, int)
+	 */
+	@Override
+	public int newSubPackageGroup(int subPkgId, int slotId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getSubPkgId(int)
+	 */
+	@Override
+	public int getSubPkgId(int groupId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getSubPkgSlotId(int)
+	 */
+	@Override
+	public int getSubPkgSlotId(int groupId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileGroupMgr#getBuildStore()
 	 */
 	@Override
@@ -1374,5 +1407,16 @@ public class FileGroupMgr implements IFileGroupMgr {
 		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
 	}
 
+	/*-------------------------------------------------------------------------------------*/
+
+	/**
+	 * TODO: complete this as a helper 
+	 * @param groupId
+	 * @return files
+	 */
+	public String[] getExpandedGroupFilesViaSubPackage(int groupId) {
+		return null;
+	}
+	
 	/*-------------------------------------------------------------------------------------*/
 }

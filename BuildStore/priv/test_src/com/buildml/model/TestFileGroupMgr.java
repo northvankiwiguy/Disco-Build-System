@@ -966,5 +966,41 @@ public class TestFileGroupMgr {
 	}
 
 	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the creation of new sub-package groups.
+	 */
+	@Test
+	public void testNewSubPackageGroup() {
+		// TODO: create a pkg, containing two sub-packages, each with two output slots.
+		
+		// TODO: create a sub-package file group in the package, referring to subPkgA's outputSlot1
+		// TODO: create another sub-package file group in the package, referring to subPkgA's outputSlot1
+		// TODO: create a sub-package file group in the package, referring to subPkgB's outputSlot2
+
+		// TODO: validate the subPkgId and subPkgSlotId for each of the created file groups.
+		
+		// TODO: remove the file groups, and validate that getters now return NOT_FOUND.
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Test the creation of new sub-package groups, with errors.
+	 */
+	@Test
+	public void testNewSubPackageGroupErrors() {
+		
+		// TODO: create a new sub-package group with invalid subPkgId -> BAD_VALUE
+		// TODO: create a new sub-package group with slotId not output slot for subPkgId -> OUT_OF_RANGE
+		// TODO: create a new sub-package group with cycle created -> LOOP_DETECTED
+	
+		// TODO: getSubPkgId from invalid groupId -> NOT_FOUND
+		// TODO: getSubPkgId from groupId that is not a sub-package group -> INVALID_OP
+		// TODO: getSubPkgSlotId from invalid groupId -> NOT_FOUND
+		// TODO: getSubPkgSlotId from groupId that is not a sub-package group -> INVALID_OP
+	}
+
+	/*-------------------------------------------------------------------------------------*/
 
 }
