@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 
 import com.buildml.eclipse.bobj.UIPackage;
+import com.buildml.eclipse.utils.AlertDialog;
 import com.buildml.eclipse.utils.BmlPropertyPage;
 import com.buildml.eclipse.utils.EclipsePartUtils;
 import com.buildml.eclipse.utils.GraphitiUtils;
@@ -42,6 +43,7 @@ import com.buildml.model.ISlotTypes;
 import com.buildml.model.ISlotTypes.SlotDetails;
 import com.buildml.model.undo.MultiUndoOp;
 import com.buildml.model.undo.SlotUndoOp;
+import com.buildml.utils.errors.ErrorCode;
 
 /**
  * An Eclipse "property" page that allows viewing/editing of a packages slot information.
@@ -169,11 +171,25 @@ public class PackagePropertyPage extends BmlPropertyPage {
 			
 			/* we've found a deleted slot */
 			else if ((currentDetails == null) || (currentDetails.slotId != originalDetails.slotId)) {
-				SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
-				op.recordRemoveSlot(originalDetails.slotId);
-				multiOp.add(op);
-				changeMade = true;
-				originalIndex++;
+				
+				/* try to delete the slot, reporting errors that might occur */
+				int result = pkgMgr.trashSlot(originalDetails.slotId);
+				if (result == ErrorCode.CANT_REMOVE) {
+					AlertDialog.displayErrorDialog("Failed to delete slot",
+							"The slot " + originalDetails.slotName + " can't be removed, since there are " +
+							"one or more sub-packagse defined that override the default value. Please remove those " +
+							"sub-package instances before trying to delete the slot.");
+					return false;
+				}
+
+				/* all good, now schedule an undo/redo operation */
+				else {
+					SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
+					op.recordRemoveSlot(originalDetails.slotId);
+					multiOp.add(op);
+					changeMade = true;
+					originalIndex++;
+				}
 			}
 			
 			/* if any of the changeable fields have changed, we issue a "change" operation */
@@ -185,6 +201,12 @@ public class PackagePropertyPage extends BmlPropertyPage {
 				changed = changed || ((originalDetails.defaultValue != null) &&
 						                (!originalDetails.defaultValue.equals(currentDetails.defaultValue)));
 				if (changed) {
+					/* try to change the slot details - this shouldn't fail because input are validated */
+					if (pkgMgr.changeSlot(currentDetails) != ErrorCode.OK) {
+						throw new FatalError("Error returned from pkgMgr.changeSlot(), even when fields were validated");
+					}
+					
+					/* record the change for undo/redo purposes */
 					SlotUndoOp op = new SlotUndoOp(buildStore, ISlotTypes.SLOT_OWNER_PACKAGE);
 					op.recordChangeSlot(originalDetails, currentDetails);
 					multiOp.add(op);
@@ -197,7 +219,7 @@ public class PackagePropertyPage extends BmlPropertyPage {
 		}
 		
 		if (changeMade) {
-			new UndoOpAdapter("Edit Slots", multiOp).invoke();
+			new UndoOpAdapter("Edit Slots", multiOp).record();
 		}
 		
 		return super.performOk();
