@@ -170,64 +170,6 @@ public class FileGroupMgr implements IFileGroupMgr {
 	 *=====================================================================================*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#newSourceGroup(int)
-	 */
-	@Override
-	public int newSourceGroup(int pkgId) {
-		return newGroup(pkgId, IFileGroupMgr.SOURCE_GROUP, -1);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#newGeneratedGroup(int)
-	 */
-	@Override
-	public int newGeneratedGroup(int pkgId) {
-		return newGroup(pkgId, IFileGroupMgr.GENERATED_GROUP, -1);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#newMergeGroup(int)
-	 */
-	@Override
-	public int newMergeGroup(int pkgId) {
-		return newGroup(pkgId, IFileGroupMgr.MERGE_GROUP, -1);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#newFilterGroup(int, int)
-	 */
-	@Override
-	public int newFilterGroup(int pkgId, int predGroupId) {
-
-		/* check that pkgId refers to a valid package */
-		IPackageMgr pkgMgr = buildStore.getPackageMgr();
-		if (!pkgMgr.isValid(pkgId)) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		/* validate the predGroupId exists and is already in the pkgId package */
-		if (getGroupType(predGroupId) == ErrorCode.NOT_FOUND) {
-			return ErrorCode.BAD_VALUE;
-		}
-		pkgMemberMgr = buildStore.getPackageMemberMgr();
-		PackageDesc desc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, predGroupId);
-		if ((desc == null) || (desc.pkgId != pkgId)) {
-			return ErrorCode.BAD_VALUE;
-		}
-		
-		/* defer the rest of the work - it's common across group types */
-		return newGroup(pkgId, IFileGroupMgr.FILTER_GROUP, predGroupId);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
 	 * @see com.buildml.model.IFileGroupMgr#getGroupType(int)
 	 */
 	@Override
@@ -248,38 +190,114 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		return ErrorCode.NOT_FOUND;
 	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getGroupSize(int)
+	 */
+	@Override
+	public int getGroupSize(int groupId) {
+		
+		int type = getGroupType(groupId);
+		if (type == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		Integer results[] = null;
+		try {
+			findGroupSizePrepStmt.setInt(1, groupId);
+			results = db.executePrepSelectIntegerColumn(findGroupSizePrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+	
+		return results[0];
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getExpandedGroupFiles(int)
+	 */
+	@Override
+	public String[] getExpandedGroupFiles(int groupId) {
+
+		/* all group types provide us with an array of string paths */
+		ArrayList<String> outputPaths = new ArrayList<String>();
+
+		/* since merge groups can be recursive, we need a recursion helper */
+		if (getExpandedGroupFilesHelper(groupId, outputPaths) != ErrorCode.OK) {
+			return null;
+		}
+		
+		/* final results as a String[] */
+		return outputPaths.toArray(new String[0]);
+	}
 
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getPredId(int)
+	 * @see com.buildml.model.IFileGroupMgr#moveEntry(int, int, int)
 	 */
 	@Override
-	public int getPredId(int groupId) {
+	public int moveEntry(int groupId, int fromIndex, int toIndex) {
 
-		/* validate that groupId is valid group */
-		int groupType = getGroupType(groupId);
-		if (groupType == ErrorCode.NOT_FOUND) {
+		/* validate inputs */
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
 			return ErrorCode.NOT_FOUND;
 		}
-		
-		/* only applicable for filter file groups */
-		if (groupType != FILTER_GROUP) {
-			return ErrorCode.INVALID_OP;
+		if ((fromIndex < 0) || (fromIndex >= size) || (toIndex < 0) || (toIndex >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
 		}
 		
-		Integer results[] = null;
-		try {
-			findGroupPredPrepStmt.setInt(1, groupId);
-			results = db.executePrepSelectIntegerColumn(findGroupPredPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
+		/* moving to the same position is pointless */
+		if (fromIndex == toIndex) {
+			return ErrorCode.OK;
 		}
 		
-		if (results.length != 0) {
-			return results[0];
+		/* determine the ID of the path we're moving */
+		Object output[] = new Object[2];
+		if (getPathsAtHelper(groupId, fromIndex, output) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
 		}
-		return ErrorCode.NOT_FOUND;
+		int pathId = (Integer)output[0];
+		String pathString = (String)output[1];
+		
+		/* delete the old entry */
+		removeEntryHelper(groupId, fromIndex);
+		
+		/* insert the same path at the new location */
+		addEntryHelper(groupId, pathId, pathString, toIndex, size);
+		
+		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#removeEntry(int, int)
+	 */
+	@Override
+	public int removeEntry(int groupId, int index) {
+
+		/* validate inputs */
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if ((index < 0) || (index >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/* update the database */
+		removeEntryHelper(groupId, index);
+		
+		/* notify listeners about the change */
+		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
+		
+		return ErrorCode.OK;
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -313,6 +331,16 @@ public class FileGroupMgr implements IFileGroupMgr {
 		
 		
 		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#newSourceGroup(int)
+	 */
+	@Override
+	public int newSourceGroup(int pkgId) {
+		return newGroup(pkgId, IFileGroupMgr.SOURCE_GROUP, -1);
 	}
 	
 	/*-------------------------------------------------------------------------------------*/
@@ -425,6 +453,225 @@ public class FileGroupMgr implements IFileGroupMgr {
 
 		setMembersHelper(groupId, members);
 		return ErrorCode.OK;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getSourceGroupsContainingPath(int)
+	 */
+	@Override
+	public Integer[] getSourceGroupsContainingPath(int pathId) {
+
+		Integer results[] = null;
+		try {
+			findSourceGroupsContainingPathPrepStmt.setInt(1, pathId);
+			results = db.executePrepSelectIntegerColumn(findSourceGroupsContainingPathPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		return results;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#newMergeGroup(int)
+	 */
+	@Override
+	public int newMergeGroup(int pkgId) {
+		return newGroup(pkgId, IFileGroupMgr.MERGE_GROUP, -1);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#addSubGroup(int, int)
+	 */
+	@Override
+	public int addSubGroup(int groupId, int subGroupId) {
+		return addSubGroup(groupId, subGroupId, -1);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#addSubGroup(int, int, int)
+	 */
+	@Override
+	public int addSubGroup(int groupId, int subGroupId, int index) {
+		
+		/* by fetching the size, we check if the group is valid */
+		int initialSize = getGroupSize(groupId);
+		if (initialSize == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* only applicable for merge file groups */
+		if (getGroupType(groupId) != MERGE_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		/* validate that the sub group ID is valid */
+		if (getGroupSize(subGroupId) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		if (index == -1) {
+			index = initialSize;
+		} else if ((index < 0) || (index > initialSize)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		/*
+		 * Check for possibility of cycles.
+		 */
+		if ((groupId == subGroupId) ||
+				checkForCycles(IPackageMemberMgr.TYPE_FILE_GROUP, groupId, subGroupId)) {
+			return ErrorCode.LOOP_DETECTED;
+		}
+		
+		addEntryHelper(groupId, subGroupId, null, index, initialSize);
+		return index;
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getSubGroupAt(int, int)
+	 */
+	@Override
+	public int getSubGroup(int groupId, int index) {
+
+		int size = getGroupSize(groupId);
+		if (size == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+
+		/* only applicable for merge file groups */
+		if (getGroupType(groupId) != MERGE_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		if ((index < 0) || (index >= size)) {
+			return ErrorCode.OUT_OF_RANGE;
+		}
+		
+		Object output[] = new Object[2];
+		if (getPathsAtHelper(groupId, index, output) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		return (Integer)output[0];
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getSubGroups(int)
+	 */
+	@Override
+	public Integer[] getSubGroups(int groupId) {
+
+		/* only applicable for merge file groups */
+		int groupType = getGroupType(groupId);
+		if (groupType != MERGE_GROUP) {
+			return null;
+		}
+		
+		/* delegate most of the work to a helper */
+		return getIntegerMembersHelper(groupId);
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#setSubGroups(int, java.lang.Integer[])
+	 */
+	@Override
+	public int setSubGroups(int groupId, Integer[] members) {
+		
+		/* only applicable for merge file groups */
+		int groupType = getGroupType(groupId);
+		if (groupType == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		if (groupType != MERGE_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+
+		setMembersHelper(groupId, members);
+		return ErrorCode.OK;
+	}
+	
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#newGeneratedGroup(int)
+	 */
+	@Override
+	public int newGeneratedGroup(int pkgId) {
+		return newGroup(pkgId, IFileGroupMgr.GENERATED_GROUP, -1);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#newFilterGroup(int, int)
+	 */
+	@Override
+	public int newFilterGroup(int pkgId, int predGroupId) {
+
+		/* check that pkgId refers to a valid package */
+		IPackageMgr pkgMgr = buildStore.getPackageMgr();
+		if (!pkgMgr.isValid(pkgId)) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* validate the predGroupId exists and is already in the pkgId package */
+		if (getGroupType(predGroupId) == ErrorCode.NOT_FOUND) {
+			return ErrorCode.BAD_VALUE;
+		}
+		pkgMemberMgr = buildStore.getPackageMemberMgr();
+		PackageDesc desc = pkgMemberMgr.getPackageOfMember(IPackageMemberMgr.TYPE_FILE_GROUP, predGroupId);
+		if ((desc == null) || (desc.pkgId != pkgId)) {
+			return ErrorCode.BAD_VALUE;
+		}
+		
+		/* defer the rest of the work - it's common across group types */
+		return newGroup(pkgId, IFileGroupMgr.FILTER_GROUP, predGroupId);
+	}
+
+	/*-------------------------------------------------------------------------------------*/
+
+	/* (non-Javadoc)
+	 * @see com.buildml.model.IFileGroupMgr#getPredId(int)
+	 */
+	@Override
+	public int getPredId(int groupId) {
+
+		/* validate that groupId is valid group */
+		int groupType = getGroupType(groupId);
+		if (groupType == ErrorCode.NOT_FOUND) {
+			return ErrorCode.NOT_FOUND;
+		}
+		
+		/* only applicable for filter file groups */
+		if (groupType != FILTER_GROUP) {
+			return ErrorCode.INVALID_OP;
+		}
+		
+		Integer results[] = null;
+		try {
+			findGroupPredPrepStmt.setInt(1, groupId);
+			results = db.executePrepSelectIntegerColumn(findGroupPredPrepStmt);
+		} catch (SQLException e) {
+			throw new FatalBuildStoreError("Error in SQL: " + e);
+		}
+		
+		if (results.length != 0) {
+			return results[0];
+		}
+		return ErrorCode.NOT_FOUND;
 	}
 
 	/*-------------------------------------------------------------------------------------*/
@@ -611,253 +858,6 @@ public class FileGroupMgr implements IFileGroupMgr {
 		return ErrorCode.OK;
 	}
 
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#addSubGroup(int, int)
-	 */
-	@Override
-	public int addSubGroup(int groupId, int subGroupId) {
-		return addSubGroup(groupId, subGroupId, -1);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#addSubGroup(int, int, int)
-	 */
-	@Override
-	public int addSubGroup(int groupId, int subGroupId, int index) {
-		
-		/* by fetching the size, we check if the group is valid */
-		int initialSize = getGroupSize(groupId);
-		if (initialSize == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		
-		/* only applicable for merge file groups */
-		if (getGroupType(groupId) != MERGE_GROUP) {
-			return ErrorCode.INVALID_OP;
-		}
-		
-		/* validate that the sub group ID is valid */
-		if (getGroupSize(subGroupId) == ErrorCode.NOT_FOUND) {
-			return ErrorCode.BAD_VALUE;
-		}
-		
-		if (index == -1) {
-			index = initialSize;
-		} else if ((index < 0) || (index > initialSize)) {
-			return ErrorCode.OUT_OF_RANGE;
-		}
-		
-		/*
-		 * Check for possibility of cycles.
-		 */
-		if ((groupId == subGroupId) ||
-				checkForCycles(IPackageMemberMgr.TYPE_FILE_GROUP, groupId, subGroupId)) {
-			return ErrorCode.LOOP_DETECTED;
-		}
-		
-		addEntryHelper(groupId, subGroupId, null, index, initialSize);
-		return index;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getSubGroupAt(int, int)
-	 */
-	@Override
-	public int getSubGroup(int groupId, int index) {
-
-		int size = getGroupSize(groupId);
-		if (size == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-
-		/* only applicable for merge file groups */
-		if (getGroupType(groupId) != MERGE_GROUP) {
-			return ErrorCode.INVALID_OP;
-		}
-		
-		if ((index < 0) || (index >= size)) {
-			return ErrorCode.OUT_OF_RANGE;
-		}
-		
-		Object output[] = new Object[2];
-		if (getPathsAtHelper(groupId, index, output) == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		return (Integer)output[0];
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getSubGroups(int)
-	 */
-	@Override
-	public Integer[] getSubGroups(int groupId) {
-
-		/* only applicable for merge file groups */
-		int groupType = getGroupType(groupId);
-		if (groupType != MERGE_GROUP) {
-			return null;
-		}
-		
-		/* delegate most of the work to a helper */
-		return getIntegerMembersHelper(groupId);
-	}
-	
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#setSubGroups(int, java.lang.Integer[])
-	 */
-	@Override
-	public int setSubGroups(int groupId, Integer[] members) {
-		
-		/* only applicable for merge file groups */
-		int groupType = getGroupType(groupId);
-		if (groupType == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		if (groupType != MERGE_GROUP) {
-			return ErrorCode.INVALID_OP;
-		}
-
-		setMembersHelper(groupId, members);
-		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#moveEntry(int, int, int)
-	 */
-	@Override
-	public int moveEntry(int groupId, int fromIndex, int toIndex) {
-
-		/* validate inputs */
-		int size = getGroupSize(groupId);
-		if (size == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		if ((fromIndex < 0) || (fromIndex >= size) || (toIndex < 0) || (toIndex >= size)) {
-			return ErrorCode.OUT_OF_RANGE;
-		}
-		
-		/* moving to the same position is pointless */
-		if (fromIndex == toIndex) {
-			return ErrorCode.OK;
-		}
-		
-		/* determine the ID of the path we're moving */
-		Object output[] = new Object[2];
-		if (getPathsAtHelper(groupId, fromIndex, output) == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		int pathId = (Integer)output[0];
-		String pathString = (String)output[1];
-		
-		/* delete the old entry */
-		removeEntryHelper(groupId, fromIndex);
-		
-		/* insert the same path at the new location */
-		addEntryHelper(groupId, pathId, pathString, toIndex, size);
-		
-		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#removeEntry(int, int)
-	 */
-	@Override
-	public int removeEntry(int groupId, int index) {
-
-		/* validate inputs */
-		int size = getGroupSize(groupId);
-		if (size == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-		if ((index < 0) || (index >= size)) {
-			return ErrorCode.OUT_OF_RANGE;
-		}
-		
-		/* update the database */
-		removeEntryHelper(groupId, index);
-		
-		/* notify listeners about the change */
-		notifyListeners(groupId, IFileGroupMgrListener.CHANGED_MEMBERSHIP);
-		
-		return ErrorCode.OK;
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getGroupSize(int)
-	 */
-	@Override
-	public int getGroupSize(int groupId) {
-		
-		int type = getGroupType(groupId);
-		if (type == ErrorCode.NOT_FOUND) {
-			return ErrorCode.NOT_FOUND;
-		}
-
-		Integer results[] = null;
-		try {
-			findGroupSizePrepStmt.setInt(1, groupId);
-			results = db.executePrepSelectIntegerColumn(findGroupSizePrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}
-	
-		return results[0];
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getExpandedGroupFiles(int)
-	 */
-	@Override
-	public String[] getExpandedGroupFiles(int groupId) {
-
-		/* all group types provide us with an array of string paths */
-		ArrayList<String> outputPaths = new ArrayList<String>();
-
-		/* since merge groups can be recursive, we need a recursion helper */
-		if (getExpandedGroupFilesHelper(groupId, outputPaths) != ErrorCode.OK) {
-			return null;
-		}
-		
-		/* final results as a String[] */
-		return outputPaths.toArray(new String[0]);
-	}
-
-	/*-------------------------------------------------------------------------------------*/
-
-	/* (non-Javadoc)
-	 * @see com.buildml.model.IFileGroupMgr#getSourceGroupsContainingPath(int)
-	 */
-	@Override
-	public Integer[] getSourceGroupsContainingPath(int pathId) {
-
-		Integer results[] = null;
-		try {
-			findSourceGroupsContainingPathPrepStmt.setInt(1, pathId);
-			results = db.executePrepSelectIntegerColumn(findSourceGroupsContainingPathPrepStmt);
-		} catch (SQLException e) {
-			throw new FatalBuildStoreError("Error in SQL: " + e);
-		}
-		return results;
-	}
-	
 	/*-------------------------------------------------------------------------------------*/
 
 	/* (non-Javadoc)
